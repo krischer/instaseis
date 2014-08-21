@@ -1,4 +1,4 @@
-import netCDF4
+import collections
 import numpy as np
 import os
 
@@ -9,11 +9,12 @@ import sem_derivatives
 import spectral_basis
 
 
+MeshCollection = collections.namedtuple("MeshCollection", ["px", "pz"])
+
+
 class AxiSEMDB(object):
     def __init__(self, folder):
         self.folder = folder
-        self.__files = {}
-        self._meshes = {}
         self._find_and_open_files()
 
     def _find_and_open_files(self):
@@ -28,27 +29,21 @@ class AxiSEMDB(object):
             raise ValueError("ordered_output.nc4 files must exist in the "
                              "PZ/Data and PX/Data subfolders")
 
-        self.__files["px"] = netCDF4.Dataset(px_file, "r", format="NETCDF4")
-        self.__files["pz"] = netCDF4.Dataset(pz_file, "r", format="NETCDF4")
-        self._meshes["px"] = mesh.Mesh(self.__files["px"])
-        self._meshes["pz"] = mesh.Mesh(self.__files["pz"])
+        # full_parse will force the kd-tree to be built
+        px_m = mesh.Mesh(px_file, full_parse=True)
+        pz_m = mesh.Mesh(pz_file, full_parse=False)
+        self.meshes = MeshCollection(px_m, pz_m)
 
-    def __del__(self):
-        for file_object in self.__files.items():
-            try:
-                file_object.close()
-            except:
-                pass
-
-    def get_seismogram(self, source, receiver, component):
+    def get_seismograms(self, source, receiver, component):
         rotmesh_s, rotmesh_phi, rotmesh_z = rotations.rotate_frame_rd(
             source.x * 1000.0, source.y * 1000.0, source.z * 1000.0,
             receiver.longitude, receiver.colatitude)
 
-        nextpoints = self._meshes["px"].kdtree.query([rotmesh_s, rotmesh_z],
-                                                     k=6)
+        # Only the px mesh has been fully parsed!
+        nextpoints = self.meshes.px.kdtree.query([rotmesh_s, rotmesh_z], k=6)
 
-        mesh = self.__files["px"].groups["Mesh"]
+        # Find the element containing the point of interest.
+        mesh = self.meshes.px.f.groups["Mesh"]
         for idx in nextpoints[1]:
             fem_mesh = mesh.variables["fem_mesh"]
             corner_point_ids = fem_mesh[idx][:4]
@@ -76,7 +71,7 @@ class AxiSEMDB(object):
         axis = bool(mesh.variables["axis"][id_elem])
 
         if component == "N":
-            mesh = self._meshes["px"]
+            mesh = self.meshes.px
             if mesh.dump_type.strip() != "displ_only":
                 raise NotImplementedError
 

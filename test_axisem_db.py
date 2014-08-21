@@ -34,8 +34,8 @@ def test_basic_output():
         m_rt=3.990000e+23 / 1E7,
         m_rp=-8.050000e+23 / 1E7,
         m_tp=-1.230000e+24 / 1E7)
-    data = axisem_db.get_seismogram(source=source, receiver=receiver,
-                                    component="N")
+    data = axisem_db.get_seismograms(source=source, receiver=receiver,
+                                     component="N")
     n_data = np.array([
         -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0,
         -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -7.183695E-44,

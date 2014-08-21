@@ -1,3 +1,4 @@
+import netCDF4
 import numpy as np
 from scipy.spatial import cKDTree
 
@@ -5,26 +6,35 @@ import spectral_basis
 
 
 class Mesh(object):
-    def __init__(self, hdf5_obj):
-        self.f = hdf5_obj
-        self._parse()
-        self.displ_varnamelist = ('disp_s', 'disp_p', 'disp_z')
+    def __init__(self, filename, full_parse=False):
+        self.f = netCDF4.Dataset(filename, "r", format="NETCDF4")
+        self._parse(full_parse=full_parse)
 
-    def _parse(self):
+    def __del__(self):
+        try:
+            self.f.close()
+        except:
+            pass
+
+    def _parse(self, full_parse=False):
+        # Cheap sanity check. No need to parse the rest.
         self.dump_type = \
             getattr(self.f, "dump type (displ_only, displ_velo, fullfields)")
-        self.source_type = getattr(self.f, "source type")
-        self.excitation_type = getattr(self.f, "excitation type")
-
         if self.dump_type != "displ_only":
             raise NotImplementedError
 
+        if full_parse is False:
+            return
+
+        # Read some basic information to have easier access later on.
+        self.source_type = getattr(self.f, "source type")
+        self.excitation_type = getattr(self.f, "excitation type")
         self.npol = self.f.npol
         self.amplitude = getattr(self.f, "scalar source magnitude")
         self.ndumps = getattr(self.f, "number of strain dumps")
         self.dt = getattr(self.f, "strain dump sampling rate in sec")
-
         self.npoints = self.f.npoints
+
         self.chunks = \
             self.f.groups["Snapshots"].variables["disp_s"].chunking()
         self.compression_level = \
@@ -37,11 +47,10 @@ class Mesh(object):
         self.G2 = spectral_basis.def_lagrange_derivs_gll(self.npol)
         self.G1T = np.require(self.G1.transpose(),
                               requirements=["F_CONTIGUOUS"])
-        # This is a bit weird but something about C and F memory order causes
-        # this confusin...
         self.G2T = np.require(self.G2.transpose(),
                               requirements=["F_CONTIGUOUS"])
 
+        # Build a kdtree of the element midpoints.
         self.s_mp = self.f.groups["Mesh"].variables["mp_mesh_S"]
         self.z_mp = self.f.groups["Mesh"].variables["mp_mesh_Z"]
 
