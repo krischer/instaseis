@@ -1,3 +1,14 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""
+Source and Receiver classes used for the AxiSEM DB Python interface.
+
+:copyright:
+    Lion Krischer (krischer@geophysik.uni-muenchen.de), 2014
+:license:
+    GNU General Public License, Version 3
+    (http://www.gnu.org/copyleft/gpl.html)
+"""
 import numpy as np
 
 EARTH_RADIUS = 6371.0 * 1000.0

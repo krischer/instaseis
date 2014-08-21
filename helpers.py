@@ -1,3 +1,14 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""
+Library loading helper.
+
+:copyright:
+    Lion Krischer (krischer@geophysik.uni-muenchen.de), 2014
+:license:
+    GNU General Public License, Version 3
+    (http://www.gnu.org/copyleft/gpl.html)
+"""
 import ctypes as C
 import inspect
 import os
