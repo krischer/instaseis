@@ -75,34 +75,3 @@ def lagrange_interpol_2D_td(points1, points2, coefficients, x1, x2):
         C.c_double(x2),
         interpolant.ctypes.data_as(C.POINTER(C.c_double)))
     return interpolant
-
-
-def test_zelegl():
-    out = zelegl(4)
-    np.testing.assert_allclose(
-        out,
-        np.array([-1.0, -0.65465367070797720, 0.0, 0.65465367070797720, 1.00]))
-
-
-def test_zemngl2():
-    out = zemngl2(4)
-    np.testing.assert_allclose(
-        out,
-        np.array([-1.0, -0.507787629, 0.13230082, 0.70882014, 1.0]))
-
-
-def test_def_lagrange_derivs_gll():
-    G = def_lagrange_derivs_gll(4)
-    assert G.shape == (5, 5)
-    np.testing.assert_allclose(
-        G[:, 0],
-        np.array([-5.000, 6.75650248, -2.66666666, 1.4101641, -0.5]))
-
-
-def test_def_lagrange_derivs_glj():
-    G0, G1 = def_lagrange_derivs_glj(4)
-    assert G0.shape == (5,)
-    assert G1.shape == (5, 5)
-    np.testing.assert_allclose(
-        G1[:, 0],
-        np.array([-5.000, 6.75650248, -2.66666666, 1.4101641, -0.5]))

@@ -32,20 +32,3 @@ def inside_element(s, z, nodes, element_type, tolerance):
                        C.byref(in_element), C.byref(xi), C.byref(eta))
 
     return in_element.value, xi.value, eta.value
-
-
-def test_inside_element():
-    nodes = np.array([
-        [4668274.5, 4313461.5],
-        [4703863.5, 4274623.],
-        [4714964.5, 4284711.],
-        [4679291.5,  4323641.]], dtype=np.float64)
-
-    is_in, xi, eta = inside_element(
-        s=4676105.76848,
-        z=4309398.54759,
-        nodes=nodes, element_type=0, tolerance=1E-3)
-
-    assert is_in
-    assert abs(xi - -0.68507753579755248 < 1E-5)
-    assert abs(eta - -0.60000654152462352 < 1E-5)

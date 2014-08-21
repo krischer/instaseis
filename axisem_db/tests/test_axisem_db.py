@@ -17,8 +17,8 @@ from __future__ import absolute_import
 
 import numpy as np
 
-from .axisem_db import AxiSEMDB
-from .source import Source, Receiver
+from ..axisem_db import AxiSEMDB
+from ..source import Source, Receiver
 
 
 def test_basic_output():
