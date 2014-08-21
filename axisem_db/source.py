@@ -9,6 +9,8 @@ Source and Receiver classes used for the AxiSEM DB Python interface.
     GNU General Public License, Version 3
     (http://www.gnu.org/copyleft/gpl.html)
 """
+from __future__ import absolute_import
+
 import numpy as np
 
 EARTH_RADIUS = 6371.0 * 1000.0

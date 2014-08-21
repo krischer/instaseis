@@ -9,11 +9,13 @@ Mesh object also taking care of opening and closing the netCDF files.
     GNU General Public License, Version 3
     (http://www.gnu.org/copyleft/gpl.html)
 """
+from __future__ import absolute_import
+
 import netCDF4
 import numpy as np
 from scipy.spatial import cKDTree
 
-import spectral_basis
+from . import spectral_basis
 
 
 class Mesh(object):

@@ -9,15 +9,17 @@ Python interface to an AxiSEM database in a netCDF file.
     GNU General Public License, Version 3
     (http://www.gnu.org/copyleft/gpl.html)
 """
+from __future__ import absolute_import
+
 import collections
 import numpy as np
 import os
 
-import finite_elem_mapping
-import mesh
-import rotations
-import sem_derivatives
-import spectral_basis
+from . import finite_elem_mapping
+from . import mesh
+from . import rotations
+from . import sem_derivatives
+from . import spectral_basis
 
 
 MeshCollection = collections.namedtuple("MeshCollection", ["px", "pz"])

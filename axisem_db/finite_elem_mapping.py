@@ -10,10 +10,12 @@ AxiSEM's kernel module.
     GNU General Public License, Version 3
     (http://www.gnu.org/copyleft/gpl.html)
 """
+from __future__ import absolute_import
+
 import ctypes as C
 import numpy as np
 
-from helpers import load_lib
+from .helpers import load_lib
 
 
 lib = load_lib()

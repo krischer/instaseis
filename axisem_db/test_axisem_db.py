@@ -13,10 +13,12 @@ to just generate a smaller database.
     GNU General Public License, Version 3
     (http://www.gnu.org/copyleft/gpl.html)
 """
+from __future__ import absolute_import
+
 import numpy as np
 
-from axisem_db import AxiSEMDB
-from source import Source, Receiver
+from .axisem_db import AxiSEMDB
+from .source import Source, Receiver
 
 
 def test_basic_output():
