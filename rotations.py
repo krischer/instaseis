@@ -5,8 +5,39 @@ from helpers import load_lib
 
 
 lib = load_lib()
-
 lib.azim_factor_bw.restype = C.c_double
+
+
+def rotate_frame_rd(x, y, z, phi, theta):
+    phi = np.deg2rad(phi)
+    theta = np.deg2rad(theta)
+    # first rotation (longitude)
+    xp_cp = x * np.cos(phi) + y * np.sin(phi)
+    yp_cp = -x * np.sin(phi) + y * np.cos(phi)
+    zp_cp = z
+
+    # second rotation (colat)
+    xp = xp_cp * np.cos(theta) - zp_cp * np.sin(theta)
+    yp = yp_cp
+    zp = xp_cp * np.sin(theta) + zp_cp * np.cos(theta)
+
+    srd = np.sqrt(xp ** 2 + yp ** 2)
+    zrd = zp
+    phi_cp = np.arctan2(yp, xp)
+    if phi_cp < 0.0:
+        phird = 2.0 * np.pi + phi_cp
+    else:
+        phird = phi_cp
+    return srd, phird, zrd
+
+
+def test_rotate_frame_rd():
+    s, phi, z = rotate_frame_rd(
+        x=9988.6897343821470, y=0.0, z=6358992.1548998145, phi=74.494,
+        theta=47.3609999)
+    assert abs(s - 4676105.76848060) < 1E-2
+    assert abs(phi - 3.14365101866993) < 1E-5
+    assert abs(z - 4309398.5475913) < 1E-2
 
 
 def azim_factor_bw(phi, fi, isim, ikind):

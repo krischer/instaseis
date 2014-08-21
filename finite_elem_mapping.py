@@ -35,4 +35,3 @@ def test_inside_element():
     assert is_in
     assert abs(xi - -0.68507753579755248 < 1E-5)
     assert abs(eta - -0.60000654152462352 < 1E-5)
-
