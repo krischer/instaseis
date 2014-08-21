@@ -83,6 +83,7 @@ class AxiSEMDB(object):
         strain_x = None
         strain_z = None
 
+        # Minor optimization: Only read if actually requested.
         if "Z" in components:
             strain_z = self.__get_strain(self.meshes.pz, gll_point_ids, G, GT,
                                          col_points_xi, col_points_eta,
@@ -92,23 +93,34 @@ class AxiSEMDB(object):
                                          col_points_xi, col_points_eta,
                                          corner_points, eltype, axis, xi, eta)
 
+        mij = rotations.rotate_symm_tensor_voigt_xyz_src_to_xyz_earth_1d(
+            source.tensor_voigt, np.deg2rad(source.longitude),
+            np.deg2rad(source.colatitude))
+        mij = rotations.rotate_symm_tensor_voigt_xyz_earth_to_xyz_src_1d(
+            mij, np.deg2rad(receiver.longitude),
+            np.deg2rad(receiver.colatitude))
+        mij = rotations.rotate_symm_tensor_voigt_xyz_to_src_1d(
+            mij, rotmesh_phi)
+        mij /= self.meshes.px.amplitude
+
         data = {}
 
-        if "N" in components:
-            mij = rotations.rotate_symm_tensor_voigt_xyz_src_to_xyz_earth_1d(
-                source.tensor_voigt, np.deg2rad(source.longitude),
-                np.deg2rad(source.colatitude))
-            mij = rotations.rotate_symm_tensor_voigt_xyz_earth_to_xyz_src_1d(
-                mij, np.deg2rad(receiver.longitude),
-                np.deg2rad(receiver.colatitude))
-            mij = rotations.rotate_symm_tensor_voigt_xyz_to_src_1d(
-                mij, rotmesh_phi)
-            mij /= self.meshes.px.amplitude
+        if "Z" in components:
+            final = np.zeros(strain_x.shape[0], dtype="float64")
+            for i in xrange(3):
+                final += 2 * mij[i] * strain_z[:, i]
+            final += 2 * mij[4] * strain_z[:, 4]
+            data["Z"] = final
 
-            fac_1 = rotations.azim_factor_bw(
-                rotmesh_phi, np.array([0.0, 1.0, 0.0]), 2, 1)
-            fac_2 = rotations.azim_factor_bw(
-                rotmesh_phi, np.array([0.0, 1.0, 0.0]), 2, 2)
+        ax_map = {"N": np.array([0.0, 1.0, 0.0]),
+                  "E": np.array([0.0, 0.0, 1.0])}
+
+        for comp in ["E", "N"]:
+            if comp not in components:
+                continue
+
+            fac_1 = rotations.azim_factor_bw(rotmesh_phi, ax_map[comp], 2, 1)
+            fac_2 = rotations.azim_factor_bw(rotmesh_phi, ax_map[comp], 2, 2)
 
             final = np.zeros(strain_x.shape[0], dtype="float64")
             final += strain_x[:, 0] * mij[0] * 1.0 * fac_1
@@ -117,8 +129,9 @@ class AxiSEMDB(object):
             final += strain_x[:, 3] * mij[3] * 2.0 * fac_2
             final += strain_x[:, 4] * mij[4] * 2.0 * fac_1
             final += strain_x[:, 5] * mij[5] * 2.0 * fac_2
-            final *= -1.0
-            data["N"] = final
+            if comp == "N":
+                final *= -1.0
+            data[comp] = final
 
         return data
 
