@@ -6,7 +6,6 @@ import finite_elem_mapping
 import mesh
 import rotations
 import sem_derivatives
-from source import Source, Receiver
 import spectral_basis
 
 
@@ -157,19 +156,3 @@ class AxiSEMDB(object):
             final *= -1.0
 
             return final
-
-if __name__ == "__main__":
-    axisem_db = \
-        AxiSEMDB("/Users/lion/workspace/code/axisem/SOLVER/prem50s_forces")
-    receiver = Receiver(latitude=42.6390, longitude=74.4940, depth_in_m=0.0)
-    source = Source(
-        latitude=89.91, longitude=0.0, depth_in_m=12000,
-        m_rr=4.710000e+24 / 1E7,
-        m_tt=3.810000e+22 / 1E7,
-        m_pp=-4.740000e+24 / 1E7,
-        m_rt=3.990000e+23 / 1E7,
-        m_rp=-8.050000e+23 / 1E7,
-        m_tp=-1.230000e+24 / 1E7)
-    f = axisem_db.get_seismogram(source=source, receiver=receiver,
-                                 component="N")
-    print f
