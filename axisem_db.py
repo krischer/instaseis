@@ -108,8 +108,8 @@ class AxiSEMDB(object):
         if "Z" in components:
             final = np.zeros(strain_x.shape[0], dtype="float64")
             for i in xrange(3):
-                final += 2 * mij[i] * strain_z[:, i]
-            final += 2 * mij[4] * strain_z[:, 4]
+                final += mij[i] * strain_z[:, i]
+            final += 2.0 * mij[4] * strain_z[:, 4]
             data["Z"] = final
 
         ax_map = {"N": np.array([0.0, 1.0, 0.0]),
@@ -137,7 +137,6 @@ class AxiSEMDB(object):
 
     def __get_strain(self, mesh, gll_point_ids, G, GT, col_points_xi,
                      col_points_eta, corner_points, eltype, axis, xi, eta):
-        mesh = self.meshes.px
 
         # Single precision in the NetCDF files but the later interpolation
         # routines require double precision. Assignment to this array will

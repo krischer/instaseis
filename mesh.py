@@ -23,20 +23,22 @@ class Mesh(object):
         if self.dump_type != "displ_only":
             raise NotImplementedError
 
+        self.npol = self.f.npol
+        self.ndumps = getattr(self.f, "number of strain dumps")
+        self.chunks = \
+            self.f.groups["Snapshots"].variables.values()[0].chunking()
+        self.excitation_type = getattr(self.f, "excitation type")
+
+        # The rest is not needed for every mesh.
+
         if full_parse is False:
             return
 
         # Read some basic information to have easier access later on.
         self.source_type = getattr(self.f, "source type")
-        self.excitation_type = getattr(self.f, "excitation type")
-        self.npol = self.f.npol
         self.amplitude = getattr(self.f, "scalar source magnitude")
-        self.ndumps = getattr(self.f, "number of strain dumps")
         self.dt = getattr(self.f, "strain dump sampling rate in sec")
         self.npoints = self.f.npoints
-
-        self.chunks = \
-            self.f.groups["Snapshots"].variables["disp_s"].chunking()
         self.compression_level = \
             self.f.groups["Snapshots"].variables["disp_s"]\
             .filters()["complevel"]
