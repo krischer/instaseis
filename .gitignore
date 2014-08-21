@@ -1,2 +1,3 @@
-lib
+axisem_db/lib
 *.pyc
+axisem_db.egg-info
