@@ -1,26 +1,58 @@
-# Python Interface to AxiSEM's netCDF Databases
+## Python Interface to AxiSEM's netCDF Databases
 
-## Installation
 
-It requires the following Python modules.
+### Requirements
+
+It has only been tested with Python 2.7 and requires the following Python modules:
 
 * netCDF4
 * ObsPy
 * numpy
+
+The experimental GUI furthermore requires
+
+* PyQt4
+* pyqtgraph
+* matplolitb
+* basemap
+
+
+If you are new to Python, first make sure to have a Fortran compiler. On Linux just run 
+
+```bash
+$ sudo apt-get install gfortran
+```
+
+or the equivalent of your distribution. On OSX I recomment to install [Homebrew](http://brew.sh/) and then type
+
+```bash
+$ brew install gcc
+```
+
+Then download [Anaconda](https://store.continuum.io/cshop/anaconda/) for Python version 2.7 and finish the installation of the requirements with
+
+```bash
+$ pip install obspy
+$ pip install pyqtgraph
+$ conda install basemap
+```
+
+
+### Installation
 
 Install by checking out from git and installing with an editable installation.
 The Makefile currently has to executed to build the shared library until a
 proper installation routine has been written.
 
 ```bash
-$ git clone ...
+$ git clone https://github.com/krischer/axisem_db.git
 $ cd axisem_db
 $ pip install -v - e .
 $ cd axisem_db
 $ make
 ```
 
-## Testing
+### Testing
 
 Testing right now is fairly minimal and machine dependent...
 
@@ -40,7 +72,7 @@ in the modules source code directory. The command will discover and execute all
 defined tests.
 
 
-## Usage
+### Usage
 
 Use it by creating an `AxiSEMDB` object which needs to know the path to the
 output folder containing the netCDF files from an AxiSEM run. All information
@@ -74,7 +106,7 @@ In [5]: st = axisem_db.get_seismograms(source=source, receiver=receiver)
 
 In [6]: print st
 3 Trace(s) in Stream:
-...BXZ | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:29:41.746126Z | 12.5 s, 144 samples
-...BXN | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:29:41.746126Z | 12.5 s, 144 samples
-...BXE | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:29:41.746126Z | 12.5 s, 144 samples
+...BXZ | 1970-01-01T00:00:00.000000Z - ... | 12.5 s, 144 samples
+...BXN | 1970-01-01T00:00:00.000000Z - ... | 12.5 s, 144 samples
+...BXE | 1970-01-01T00:00:00.000000Z - ... | 12.5 s, 144 samples
 ```
