@@ -35,18 +35,34 @@ class AxiSEMDB(object):
     def _find_and_open_files(self):
         px = os.path.join(self.folder, "PX")
         pz = os.path.join(self.folder, "PZ")
-        if not os.path.exists(px) or not os.path.exists(pz):
+        if not os.path.exists(px) and not os.path.exists(pz):
             raise ValueError(
-                "Expecting the 'PX' and 'PZ' subfolders to be present.")
+                "Expecting the 'PX' or 'PZ' subfolders to be present.")
         px_file = os.path.join(px, "Data", "ordered_output.nc4")
         pz_file = os.path.join(pz, "Data", "ordered_output.nc4")
-        if not os.path.exists(px_file) or not os.path.exists(pz_file):
-            raise ValueError("ordered_output.nc4 files must exist in the "
-                             "PZ/Data and PX/Data subfolders")
+        x_exists, z_exists = False, False
+        if os.path.exists(px_file):
+            x_exists = True
+        if os.path.exists(pz_file):
+            z_exists = True
 
         # full_parse will force the kd-tree to be built
-        px_m = mesh.Mesh(px_file, full_parse=True)
-        pz_m = mesh.Mesh(pz_file, full_parse=False)
+        if x_exists and z_exists:
+            px_m = mesh.Mesh(px_file, full_parse=True)
+            pz_m = mesh.Mesh(pz_file, full_parse=False)
+            self.parsed_mesh = px_m
+        elif x_exists:
+            px_m = mesh.Mesh(px_file, full_parse=True)
+            pz_m = None
+            self.parsed_mesh = px_m
+        elif z_exists:
+            px_m = None
+            pz_m = mesh.Mesh(pz_file, full_parse=True)
+            self.parsed_mesh = pz_m
+        else:
+            raise ValueError("ordered_output.nc4 files must exist in the "
+                             "PZ/Data and/or PX/Data subfolders")
+
         self.meshes = MeshCollection(px_m, pz_m)
 
     def get_seismograms(self, source, receiver, components=("Z", "N", "E")):
@@ -54,11 +70,10 @@ class AxiSEMDB(object):
             source.x * 1000.0, source.y * 1000.0, source.z * 1000.0,
             receiver.longitude, receiver.colatitude)
 
-        # Only the px mesh has been fully parsed!
-        nextpoints = self.meshes.px.kdtree.query([rotmesh_s, rotmesh_z], k=6)
+        nextpoints = self.parsed_mesh.kdtree.query([rotmesh_s, rotmesh_z], k=6)
 
         # Find the element containing the point of interest.
-        mesh = self.meshes.px.f.groups["Mesh"]
+        mesh = self.parsed_mesh.f.groups["Mesh"]
         for idx in nextpoints[1]:
             fem_mesh = mesh.variables["fem_mesh"]
             corner_point_ids = fem_mesh[idx][:4]
@@ -85,15 +100,15 @@ class AxiSEMDB(object):
         axis = bool(mesh.variables["axis"][id_elem])
 
         if axis:
-            G = self.meshes.px.G2
-            GT = self.meshes.px.G1T
-            col_points_xi = self.meshes.px.glj_points
-            col_points_eta = self.meshes.px.gll_points
+            G = self.parsed_mesh.G2
+            GT = self.parsed_mesh.G1T
+            col_points_xi = self.parsed_mesh.glj_points
+            col_points_eta = self.parsed_mesh.gll_points
         else:
-            G = self.meshes.px.G2
-            GT = self.meshes.px.G2T
-            col_points_xi = self.meshes.px.gll_points
-            col_points_eta = self.meshes.px.gll_points
+            G = self.parsed_mesh.G2
+            GT = self.parsed_mesh.G2T
+            col_points_xi = self.parsed_mesh.gll_points
+            col_points_eta = self.parsed_mesh.gll_points
 
         strain_x = None
         strain_z = None
@@ -116,12 +131,12 @@ class AxiSEMDB(object):
             np.deg2rad(receiver.colatitude))
         mij = rotations.rotate_symm_tensor_voigt_xyz_to_src_1d(
             mij, rotmesh_phi)
-        mij /= self.meshes.px.amplitude
+        mij /= self.parsed_mesh.amplitude
 
         data = {}
 
         if "Z" in components:
-            final = np.zeros(strain_x.shape[0], dtype="float64")
+            final = np.zeros(strain_z.shape[0], dtype="float64")
             for i in xrange(3):
                 final += mij[i] * strain_z[:, i]
             final += 2.0 * mij[4] * strain_z[:, 4]
@@ -150,7 +165,7 @@ class AxiSEMDB(object):
 
         # Convert to an ObsPy Stream object.
         st = Stream()
-        dt = self.meshes.px.dt
+        dt = self.parsed_mesh.dt
         band_code = self._get_band_code(dt)
 
         for comp in components:
