@@ -45,7 +45,7 @@ Install it by cloning the git repository and installing with an editable install
 ```bash
 $ git clone https://github.com/krischer/axisem_db.git
 $ cd axisem_db
-$ pip install -v - e .
+$ pip install -v -e .
 $ cd axisem_db
 $ make
 ```
