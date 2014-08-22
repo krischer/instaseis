@@ -36,8 +36,8 @@ def test_basic_output():
         m_rt=3.990000e+23 / 1E7,
         m_rp=-8.050000e+23 / 1E7,
         m_tp=-1.230000e+24 / 1E7)
-    data = axisem_db.get_seismograms(source=source, receiver=receiver,
-                                     components=["Z", "N", "E"])
+    st = axisem_db.get_seismograms(source=source, receiver=receiver)
+
     n_data = np.array([
         -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0,
         -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -7.183695E-44,
@@ -132,6 +132,9 @@ def test_basic_output():
         -1.115759E-07, -6.885732E-08, -3.837220E-08, -2.082509E-08,
         6.581382E-09])
 
-    np.testing.assert_allclose(data["N"], n_data, rtol=1E-4, atol=1E-15)
-    np.testing.assert_allclose(data["E"], e_data, rtol=1E-4, atol=1E-15)
-    np.testing.assert_allclose(data["Z"], z_data, rtol=1E-4, atol=1E-15)
+    np.testing.assert_allclose(st.select(component="Z")[0].data,
+                               z_data, rtol=1E-4, atol=1E-15)
+    np.testing.assert_allclose(st.select(component="N")[0].data,
+                               n_data, rtol=1E-4, atol=1E-15)
+    np.testing.assert_allclose(st.select(component="E")[0].data,
+                               e_data, rtol=1E-4, atol=1E-15)

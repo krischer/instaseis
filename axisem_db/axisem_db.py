@@ -13,6 +13,8 @@ from __future__ import absolute_import
 
 import collections
 import numpy as np
+import obspy
+from obspy.core import Stream, Trace
 import os
 
 from . import finite_elem_mapping
@@ -146,7 +148,36 @@ class AxiSEMDB(object):
                 final *= -1.0
             data[comp] = final
 
-        return data
+        # Convert to an ObsPy Stream object.
+        st = Stream()
+        dt = self.meshes.px.dt
+        band_code = self._get_band_code(dt)
+
+        for comp in components:
+            tr = Trace(data=data[comp],
+                       header={"delta": dt,
+                               "channel": "%sX%s" % (band_code, comp)})
+            st += tr
+        return st
+
+    def _get_band_code(self, dt):
+        """
+        Figure out the channel band code. Done as in SPECFEM.
+        """
+        sr = 1.0 / dt
+        if sr <= 0.001:
+            band_code = "F"
+        elif sr <= 0.004:
+            band_code = "C"
+        elif sr <= 0.0125:
+            band_code = "H"
+        elif sr <= 0.1:
+            band_code = "B"
+        elif sr <= 1:
+            band_code = "M"
+        else:
+            band_code = "L"
+        return band_code
 
     def __get_strain(self, mesh, gll_point_ids, G, GT, col_points_xi,
                      col_points_eta, corner_points, eltype, axis, xi, eta):
