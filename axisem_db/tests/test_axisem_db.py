@@ -27,7 +27,7 @@ def test_basic_output():
     """
     axisem_db = \
         AxiSEMDB("/Users/lion/workspace/code/axisem/SOLVER/prem50s_forces")
-    receiver = Receiver(latitude=42.6390, longitude=74.4940, depth_in_m=0.0)
+    receiver = Receiver(latitude=42.6390, longitude=74.4940)
     source = Source(
         latitude=89.91, longitude=0.0, depth_in_m=12000,
         m_rr=4.710000e+24 / 1E7,
