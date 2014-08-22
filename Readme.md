@@ -17,7 +17,7 @@ The experimental GUI furthermore requires
 * basemap
 
 
-If you are new to Python, first make sure to have a Fortran compiler. On Linux just run 
+If you are new to Python, first make sure to have a Fortran compiler. On Linux just run
 
 ```bash
 $ sudo apt-get install gfortran
@@ -57,13 +57,13 @@ Testing right now is fairly minimal and machine dependent...
 To test, make sure pytest is installed
 
 ```bash
-pip install pytest
+$ pip install pytest
 ```
 
 and execute
 
 ```bash
-py.test
+$ py.test
 ```
 
 in the modules source code directory. The command will discover and execute all
@@ -89,7 +89,7 @@ In [1]: from axisem_db import AxiSEMDB, Source, Receiver
 
 In [2]: axisem_db = AxiSEMDB("./prem50s_forces")
 
-In [3]: receiver = Receiver(latitude=42.6390, longitude=74.4940, depth_in_m=0.0)
+In [3]: receiver = Receiver(latitude=42.6390, longitude=74.4940)
 
 In [4]: source = Source(
    ...:     latitude=89.91, longitude=0.0, depth_in_m=12000,
@@ -114,5 +114,5 @@ In [6]: print st
 The GUI is just an experimental feature and will likely crash for some reason. To try it, just execute the correct file
 
 ```bash
-python axisem_db/experimental_gui/axisem_db_gui.py
+$ python axisem_db/experimental_gui/axisem_db_gui.py
 ```

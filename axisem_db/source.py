@@ -68,4 +68,5 @@ class Source(SourceOrReceiver):
 
 
 class Receiver(SourceOrReceiver):
-    pass
+    def __init__(self, latitude, longitude):
+        super(Receiver, self).__init__(latitude, longitude, depth_in_m=0.0)

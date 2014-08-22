@@ -3,7 +3,6 @@
 from __future__ import absolute_import
 
 from PyQt4 import QtGui
-from PyQt4.QtCore import pyqtSlot
 import pyqtgraph as pg
 # Default to antialiased drawing.
 pg.setConfigOptions(antialias=True, foreground=(50, 50, 50), background=None)
@@ -13,9 +12,6 @@ from glob import iglob
 import imp
 import inspect
 from mpl_toolkits.basemap import Basemap
-import numpy as np
-from obspy.core.util.geodetics import locations2degrees
-from obspy.taup.taup import getTravelTimes
 from obspy.imaging.mopad_wrapper import Beach
 import os
 import sys
@@ -68,12 +64,12 @@ class Window(QtGui.QMainWindow):
             p.setTitle(label[component].capitalize() + " component")
 
         # Set some random mt at startup.
-        m_rr=4.71E17 / 1E16
-        m_tt=3.81E15 / 1E16
-        m_pp=-4.74E17 / 1E16
-        m_rt=3.99E16 / 1E16
-        m_rp=-8.05E16 / 1E16
-        m_tp=-1.23E17 / 1E16
+        m_rr = 4.71E17 / 1E16
+        m_tt = 3.81E15 / 1E16
+        m_pp = -4.74E17 / 1E16
+        m_rt = 3.99E16 / 1E16
+        m_rp = -8.05E16 / 1E16
+        m_tp = -1.23E17 / 1E16
         self.ui.m_rr.setValue(m_rr)
         self.ui.m_tt.setValue(m_tt)
         self.ui.m_pp.setValue(m_pp)
@@ -97,7 +93,6 @@ class Window(QtGui.QMainWindow):
         self.mpl_mt_ax.set_axis_off()
         self.mpl_mt_figure.patch.set_alpha(0.0)
         self.mpl_mt_figure.set_facecolor('None')
-
 
         self._draw_mt()
 
@@ -193,7 +188,6 @@ class Window(QtGui.QMainWindow):
         self.__receiver_map_obj.latitude = lat
         self.mpl_map_figure.canvas.draw()
 
-
     def _reset_all_plots(self):
         for component in ["z", "n", "e"]:
             p = getattr(self.ui, "%s_graph" % component)
@@ -215,8 +209,7 @@ class Window(QtGui.QMainWindow):
     def receiver(self):
         return Receiver(
             latitude=float(self.ui.receiver_latitude.value()),
-            longitude=float(self.ui.receiver_longitude.value()),
-            depth_in_m=0.0)
+            longitude=float(self.ui.receiver_longitude.value()))
 
     def update(self):
         try:
