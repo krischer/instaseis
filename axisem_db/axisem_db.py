@@ -193,8 +193,6 @@ class AxiSEMDB(object):
         # Load displacement from all GLL points.
         for ipol in xrange(mesh.npol + 1):
             for jpol in xrange(mesh.npol + 1):
-                start_chunk = gll_point_ids[ipol, jpol] / \
-                    mesh.chunks[1] * mesh.chunks[1]
                 start_chunk = gll_point_ids[ipol, jpol]
 
                 for i, var in enumerate(["disp_s", "disp_p", "disp_z"]):
