@@ -235,7 +235,7 @@ class Window(QtGui.QMainWindow):
     def on_select_folder_button_released(self):
         self.folder = str(QtGui.QFileDialog.getExistingDirectory(
             self, "Choose Directory",
-            os.path.expanduser("~/workspace/code/axisem/SOLVER")))
+            os.path.expanduser("~")))
         if not self.folder:
             return
         self.axisem_db = AxiSEMDB(self.folder)
