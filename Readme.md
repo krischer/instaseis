@@ -23,13 +23,13 @@ If you are new to Python, first make sure to have a Fortran compiler. On Linux j
 $ sudo apt-get install gfortran
 ```
 
-or the equivalent of your distribution. On OSX I recomment to install [Homebrew](http://brew.sh/) and then type
+or the equivalent of your distribution. On OSX I recommend to install [Homebrew](http://brew.sh/) and then type
 
 ```bash
 $ brew install gcc
 ```
 
-Then download [Anaconda](https://store.continuum.io/cshop/anaconda/) for Python version 2.7 and finish the installation of the requirements with
+Finally download [Anaconda](https://store.continuum.io/cshop/anaconda/) for Python version 2.7 and finish the installation of the requirements with
 
 ```bash
 $ pip install obspy
@@ -40,9 +40,7 @@ $ conda install basemap
 
 ### Installation
 
-Install by checking out from git and installing with an editable installation.
-The Makefile currently has to executed to build the shared library until a
-proper installation routine has been written.
+Install it by cloning the git repository and installing with an editable installation. The Makefile currently has to executed to build the shared library until a proper installation routine has been written.
 
 ```bash
 $ git clone https://github.com/krischer/axisem_db.git
@@ -109,4 +107,12 @@ In [6]: print st
 ...BXZ | 1970-01-01T00:00:00.000000Z - ... | 12.5 s, 144 samples
 ...BXN | 1970-01-01T00:00:00.000000Z - ... | 12.5 s, 144 samples
 ...BXE | 1970-01-01T00:00:00.000000Z - ... | 12.5 s, 144 samples
+```
+
+### GUI
+
+The GUI is just an experimental feature and will likely crash for some reason. To try it, just execute the correct file
+
+```bash
+python axisem_db/experimental_gui/axisem_db_gui.py
 ```
