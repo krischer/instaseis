@@ -21,6 +21,7 @@ from . import spectral_basis
 class Mesh(object):
     def __init__(self, filename, full_parse=False):
         self.f = netCDF4.Dataset(filename, "r", format="NETCDF4")
+        self.filename = filename
         self._parse(full_parse=full_parse)
 
     def __del__(self):
@@ -55,6 +56,16 @@ class Mesh(object):
         self.compression_level = \
             self.f.groups["Snapshots"].variables["disp_s"]\
             .filters()["complevel"]
+
+        self.background_model = getattr(self.f, "background model")
+        self.dominant_period = getattr(self.f, "dominant source period")
+        self.axisem_version = getattr(self.f, "SVN revision")
+        self.axisem_compiler = "%s %s" % (
+            getattr(self.f, "compiler brand"),
+            getattr(self.f, "compiler version"))
+        self.axisem_user = "%s on %s" % (
+            getattr(self.f, "user name"),
+            getattr(self.f, "host name"))
 
         self.gll_points = spectral_basis.zelegl(self.npol)
         self.glj_points = spectral_basis.zemngl2(self.npol)
