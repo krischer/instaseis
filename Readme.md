@@ -116,3 +116,5 @@ The GUI is just an experimental feature and will likely crash for some reason. T
 ```bash
 $ python axisem_db/experimental_gui/axisem_db_gui.py
 ```
+
+![Imgur](http://i.imgur.com/FVmua2X.png)
