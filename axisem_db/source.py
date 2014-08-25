@@ -141,5 +141,7 @@ class Source(SourceOrReceiver):
 
 
 class Receiver(SourceOrReceiver):
-    def __init__(self, latitude, longitude):
+    def __init__(self, latitude, longitude, name=None, network=None):
         super(Receiver, self).__init__(latitude, longitude, depth_in_m=0.0)
+        self.name = name
+        self.network = network
