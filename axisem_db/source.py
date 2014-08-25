@@ -12,6 +12,7 @@ Source and Receiver classes used for the AxiSEM DB Python interface.
 from __future__ import absolute_import
 
 import numpy as np
+from scipy import interp
 
 EARTH_RADIUS = 6371.0 * 1000.0
 
@@ -129,6 +130,14 @@ class Source(SourceOrReceiver):
     def tensor_voigt(self):
         return np.array([self.m_tt, self.m_pp, self.m_rr, self.m_rp, self.m_rt,
                          self.m_tp])
+
+    def resample_stf(self, dt, nsamp):
+        t_new = np.linspace(0, nsamp * dt, nsamp, endpoint=False)
+        t_old = np.linspace(0, self.dt * len(self.sliprate), len(self.sliprate),
+                            endpoint=False)
+
+        self.sliprate = interp(t_new, t_old, self.sliprate)
+        self.dt = dt
 
 
 class Receiver(SourceOrReceiver):
