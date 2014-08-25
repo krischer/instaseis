@@ -47,7 +47,7 @@ class SourceOrReceiver(object):
 
 class Source(SourceOrReceiver):
     def __init__(self, latitude, longitude, depth_in_m, m_rr, m_tt, m_pp, m_rt,
-                 m_rp, m_tp, time_shift=None):
+                 m_rp, m_tp, time_shift=None, sliprate=None, dt=None):
         super(Source, self).__init__(latitude, longitude, depth_in_m)
         self.m_rr = m_rr
         self.m_tt = m_tt
@@ -56,6 +56,13 @@ class Source(SourceOrReceiver):
         self.m_rp = m_rp
         self.m_tp = m_tp
         self.time_shift = time_shift
+
+        if not sliprate is None:
+            self.sliprate = np.array(sliprate)
+        else:
+            self.sliprate = None
+
+        self.dt = dt
 
     @classmethod
     def from_CMTSOLUTION_file(self, filename):
@@ -81,7 +88,7 @@ class Source(SourceOrReceiver):
 
     @classmethod
     def from_strike_dip_rake(self, latitude, longitude, depth_in_m, strike, dip,
-                             rake, M0, time_shift=None):
+                             rake, M0, time_shift=None, sliprate=None, dt=None):
 
         # formulas in Udias (17.24) are in geographic system North, East, Down, which
         # transforms to the geocentric as:
@@ -111,7 +118,7 @@ class Source(SourceOrReceiver):
                 - np.sin(2. * delta) * np.sin(2.* phi) * np.sin(lambd) / 2.) * M0
 
         return self(latitude, longitude, depth_in_m, m_rr, m_tt, m_pp, m_rt,
-                    m_rp, m_tp, time_shift)
+                    m_rp, m_tp, time_shift, sliprate, dt)
 
     @property
     def tensor(self):
