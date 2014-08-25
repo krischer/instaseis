@@ -47,7 +47,7 @@ class SourceOrReceiver(object):
 
 class Source(SourceOrReceiver):
     def __init__(self, latitude, longitude, depth_in_m, m_rr, m_tt, m_pp, m_rt,
-                 m_rp, m_tp):
+                 m_rp, m_tp, time_shift=None):
         super(Source, self).__init__(latitude, longitude, depth_in_m)
         self.m_rr = m_rr
         self.m_tt = m_tt
@@ -55,6 +55,29 @@ class Source(SourceOrReceiver):
         self.m_rt = m_rt
         self.m_rp = m_rp
         self.m_tp = m_tp
+        self.time_shift = time_shift
+
+    @classmethod
+    def from_CMTSOLUTION_file(self, filename):
+        f = open(filename, 'r')
+        f.readline()
+        f.readline()
+        time_shift = float(f.readline().split()[2])
+        f.readline()
+        latitude = float(f.readline().split()[1])
+        longitude = float(f.readline().split()[1])
+        depth = float(f.readline().split()[1])
+
+        m_rr = float(f.readline().split()[1])
+        m_tt = float(f.readline().split()[1])
+        m_pp = float(f.readline().split()[1])
+        m_rt = float(f.readline().split()[1])
+        m_rp = float(f.readline().split()[1])
+        m_tp = float(f.readline().split()[1])
+
+        f.close()
+        return self(latitude, longitude, depth * 1e3, m_rr, m_tt, m_pp, m_rt,
+                    m_rp, m_tp, time_shift)
 
     @property
     def tensor(self):
