@@ -171,6 +171,8 @@ class AxiSEMDB(object):
         for comp in components:
             tr = Trace(data=data[comp],
                        header={"delta": dt,
+                               "station": receiver.name,
+                               "network": receiver.network,
                                "channel": "%sX%s" % (band_code, comp)})
             st += tr
         return st
