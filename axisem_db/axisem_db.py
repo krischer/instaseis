@@ -238,3 +238,12 @@ class AxiSEMDB(object):
         final_strain[:, 5] *= -1.0
 
         return final_strain
+
+    def get_dt(self):
+            return self.parsed_mesh.dt
+
+    def get_ndumps(self):
+            return self.parsed_mesh.ndumps
+
+    def get_background_model(self):
+            return self.parsed_mesh.background_model
