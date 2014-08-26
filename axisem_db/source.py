@@ -131,7 +131,13 @@ class Source(SourceOrReceiver):
         return np.array([self.m_tt, self.m_pp, self.m_rr, self.m_rp, self.m_rt,
                          self.m_tp])
 
-    def resample_stf(self, dt, nsamp):
+    def set_sliprate(self, sliprate, dt, normalize=True):
+        self.sliprate = np.array(sliprate)
+        if normalize:
+            self.sliprate /= np.trapz(sliprate, dx=dt)
+        self.dt = dt
+
+    def resample_sliprate(self, dt, nsamp):
         t_new = np.linspace(0, nsamp * dt, nsamp, endpoint=False)
         t_old = np.linspace(0, self.dt * len(self.sliprate), len(self.sliprate),
                             endpoint=False)

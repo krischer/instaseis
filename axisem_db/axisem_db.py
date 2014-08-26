@@ -247,3 +247,9 @@ class AxiSEMDB(object):
 
     def get_background_model(self):
             return self.parsed_mesh.background_model
+
+    def get_sliprate(self):
+        return self.parsed_mesh.f.groups["Surface"].variables["stf_d_dump"][:]
+
+    def get_slip(self):
+        return self.parsed_mesh.f.groups["Surface"].variables["stf_dump"][:]
