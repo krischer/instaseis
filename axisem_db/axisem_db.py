@@ -66,7 +66,8 @@ class AxiSEMDB(object):
         self.meshes = MeshCollection(px_m, pz_m)
 
     def get_seismograms(self, source, receiver, components=("Z", "N", "E"),
-                        remove_source_shift=True, reconvolve_stf=False):
+                        remove_source_shift=True, reconvolve_stf=False,
+                        return_obspy_stream=True):
 
         rotmesh_s, rotmesh_phi, rotmesh_z = rotations.rotate_frame_rd(
             source.x * 1000.0, source.y * 1000.0, source.z * 1000.0,
@@ -175,6 +176,9 @@ class AxiSEMDB(object):
             if remove_source_shift and not reconvolve_stf:
                 data[comp] = data[comp][self.parsed_mesh.source_shift_samp:]
             elif reconvolve_stf:
+                if source.dt is None or source.sliprate is None:
+                    raise RuntimeError("source has no source time function")
+
                 stf_deconv_f = np.fft.rfft(self.get_sliprate(), n=self.get_ndumps() * 2)
 
                 if abs((source.dt - self.get_dt()) / self.get_dt()) > 1e-7:
@@ -182,19 +186,31 @@ class AxiSEMDB(object):
 
                 stf_conv_f = np.fft.rfft(source.sliprate, n=self.get_ndumps() * 2)
 
+                if not source.time_shift is None:
+                    stf_conv_f *= np.exp(- 1j * np.fft.rfftfreq(self.get_ndumps() * 2) 
+                                         * 2. * np.pi * source.time_shift)
+
                 # TODO: double check wether a taper is needed at the end of the
                 #       trace
                 dataf = np.fft.rfft(data[comp], n=self.get_ndumps() * 2)
 
                 data[comp] = np.fft.irfft(dataf * stf_conv_f / stf_deconv_f)[:self.get_ndumps()]
 
-            tr = Trace(data=data[comp],
-                       header={"delta": dt,
-                               "station": receiver.name,
-                               "network": receiver.network,
-                               "channel": "%sX%s" % (band_code, comp)})
-            st += tr
-        return st
+        if return_obspy_stream:
+            for comp in components:
+                tr = Trace(data=data[comp],
+                           header={"delta": dt,
+                                   "station": receiver.name,
+                                   "network": receiver.network,
+                                   "channel": "%sX%s" % (band_code, comp)})
+                st += tr
+            return st
+        else:
+            return data
+
+    #def get_seismograms_finite_source(self, sources, receiver, 
+    #                                 components=("Z", "N", "E")):
+    #    for source in sources:
 
     def _get_band_code(self, dt):
         """
