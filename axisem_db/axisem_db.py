@@ -65,7 +65,9 @@ class AxiSEMDB(object):
 
         self.meshes = MeshCollection(px_m, pz_m)
 
-    def get_seismograms(self, source, receiver, components=("Z", "N", "E")):
+    def get_seismograms(self, source, receiver, components=("Z", "N", "E"),
+                        remove_source_shift=True):
+
         rotmesh_s, rotmesh_phi, rotmesh_z = rotations.rotate_frame_rd(
             source.x * 1000.0, source.y * 1000.0, source.z * 1000.0,
             receiver.longitude, receiver.colatitude)
@@ -169,11 +171,19 @@ class AxiSEMDB(object):
         band_code = self._get_band_code(dt)
 
         for comp in components:
-            tr = Trace(data=data[comp],
-                       header={"delta": dt,
-                               "station": receiver.name,
-                               "network": receiver.network,
-                               "channel": "%sX%s" % (band_code, comp)})
+            if remove_source_shift:
+                tr = Trace(data=data[comp][self.parsed_mesh.source_shift_samp:],
+                           header={"delta": dt,
+                                   "station": receiver.name,
+                                   "network": receiver.network,
+                                   "channel": "%sX%s" % (band_code, comp)})
+
+            else:
+                tr = Trace(data=data[comp],
+                           header={"delta": dt,
+                                   "station": receiver.name,
+                                   "network": receiver.network,
+                                   "channel": "%sX%s" % (band_code, comp)})
             st += tr
         return st
 
@@ -240,16 +250,16 @@ class AxiSEMDB(object):
         return final_strain
 
     def get_dt(self):
-            return self.parsed_mesh.dt
+        return self.parsed_mesh.dt
 
     def get_ndumps(self):
-            return self.parsed_mesh.ndumps
+        return self.parsed_mesh.ndumps
 
     def get_background_model(self):
-            return self.parsed_mesh.background_model
+        return self.parsed_mesh.background_model
 
     def get_sliprate(self):
-        return self.parsed_mesh.f.groups["Surface"].variables["stf_d_dump"][:]
+        return self.parsed_mesh.stf_d
 
     def get_slip(self):
-        return self.parsed_mesh.f.groups["Surface"].variables["stf_dump"][:]
+        return self.parsed_mesh.stf

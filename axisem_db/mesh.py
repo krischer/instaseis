@@ -53,6 +53,11 @@ class Mesh(object):
         self.amplitude = getattr(self.f, "scalar source magnitude")
         self.dt = getattr(self.f, "strain dump sampling rate in sec")
         self.source_shift = getattr(self.f, "source shift factor in sec")
+        self.source_shift_samp = getattr(self.f, "source shift factor for deltat_coarse")
+
+        self.stf_d = self.f.groups["Surface"].variables["stf_d_dump"][:]
+        self.stf = self.f.groups["Surface"].variables["stf_dump"][:]
+
         self.npoints = self.f.npoints
         self.compression_level = \
             self.f.groups["Snapshots"].variables["disp_s"]\
