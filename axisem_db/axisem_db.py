@@ -166,10 +166,6 @@ class AxiSEMDB(object):
                 final *= -1.0
             data[comp] = final
 
-        # Convert to an ObsPy Stream object.
-        st = Stream()
-        dt = self.parsed_mesh.dt
-        band_code = self._get_band_code(dt)
 
         for comp in components:
             
@@ -197,6 +193,10 @@ class AxiSEMDB(object):
                 data[comp] = np.fft.irfft(dataf * stf_conv_f / stf_deconv_f)[:self.get_ndumps()]
 
         if return_obspy_stream:
+            # Convert to an ObsPy Stream object.
+            st = Stream()
+            dt = self.parsed_mesh.dt
+            band_code = self._get_band_code(dt)
             for comp in components:
                 tr = Trace(data=data[comp],
                            header={"delta": dt,
@@ -208,9 +208,30 @@ class AxiSEMDB(object):
         else:
             return data
 
-    #def get_seismograms_finite_source(self, sources, receiver, 
-    #                                 components=("Z", "N", "E")):
-    #    for source in sources:
+    def get_seismograms_finite_source(self, sources, receiver, 
+                                     components=("Z", "N", "E")):
+        data_summed = {}
+        for source in sources:
+            data = self.get_seismograms(source, receiver, components,
+                reconvolve_stf=True, return_obspy_stream=False)
+            for comp in components:
+                if comp in data_summed:
+                    data_summed[comp] += data[comp]
+                else:
+                    data_summed[comp] = data[comp]
+
+        # Convert to an ObsPy Stream object.
+        st = Stream()
+        dt = self.parsed_mesh.dt
+        band_code = self._get_band_code(dt)
+        for comp in components:
+            tr = Trace(data=data_summed[comp],
+                       header={"delta": dt,
+                               "station": receiver.name,
+                               "network": receiver.network,
+                               "channel": "%sX%s" % (band_code, comp)})
+            st += tr
+        return st
 
     def _get_band_code(self, dt):
         """
