@@ -184,7 +184,7 @@ class AxiSEMDB(object):
 
                 if not source.time_shift is None:
                     stf_conv_f *= np.exp(- 1j * np.fft.rfftfreq(self.get_ndumps() * 2) 
-                                         * 2. * np.pi * source.time_shift)
+                                         * 2. * np.pi * source.time_shift / self.get_dt())
 
                 # TODO: double check wether a taper is needed at the end of the
                 #       trace
