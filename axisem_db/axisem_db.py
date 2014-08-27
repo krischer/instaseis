@@ -66,7 +66,7 @@ class AxiSEMDB(object):
         self.meshes = MeshCollection(px_m, pz_m)
 
     def get_seismograms(self, source, receiver, components=("Z", "N", "E"),
-                        remove_source_shift=True):
+                        remove_source_shift=True, reconvolve_stf=False):
 
         rotmesh_s, rotmesh_phi, rotmesh_z = rotations.rotate_frame_rd(
             source.x * 1000.0, source.y * 1000.0, source.z * 1000.0,
@@ -171,19 +171,28 @@ class AxiSEMDB(object):
         band_code = self._get_band_code(dt)
 
         for comp in components:
-            if remove_source_shift:
-                tr = Trace(data=data[comp][self.parsed_mesh.source_shift_samp:],
-                           header={"delta": dt,
-                                   "station": receiver.name,
-                                   "network": receiver.network,
-                                   "channel": "%sX%s" % (band_code, comp)})
+            
+            if remove_source_shift and not reconvolve_stf:
+                data[comp] = data[comp][self.parsed_mesh.source_shift_samp:]
+            elif reconvolve_stf:
+                stf_deconv_f = np.fft.rfft(self.get_sliprate(), n=self.get_ndumps() * 2)
 
-            else:
-                tr = Trace(data=data[comp],
-                           header={"delta": dt,
-                                   "station": receiver.name,
-                                   "network": receiver.network,
-                                   "channel": "%sX%s" % (band_code, comp)})
+                if abs((source.dt - self.get_dt()) / self.get_dt()) > 1e-7:
+                    raise ValueError("dt of the source not compatible")
+
+                stf_conv_f = np.fft.rfft(source.sliprate, n=self.get_ndumps() * 2)
+
+                # TODO: double check wether a taper is needed at the end of the
+                #       trace
+                dataf = np.fft.rfft(data[comp], n=self.get_ndumps() * 2)
+
+                data[comp] = np.fft.irfft(dataf * stf_conv_f / stf_deconv_f)[:self.get_ndumps()]
+
+            tr = Trace(data=data[comp],
+                       header={"delta": dt,
+                               "station": receiver.name,
+                               "network": receiver.network,
+                               "channel": "%sX%s" % (band_code, comp)})
             st += tr
         return st
 
@@ -259,7 +268,7 @@ class AxiSEMDB(object):
         return self.parsed_mesh.background_model
 
     def get_sliprate(self):
-        return self.parsed_mesh.stf_d
+        return self.parsed_mesh.stf_d_norm
 
     def get_slip(self):
         return self.parsed_mesh.stf

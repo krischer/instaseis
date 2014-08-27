@@ -58,6 +58,8 @@ class Mesh(object):
         self.stf_d = self.f.groups["Surface"].variables["stf_d_dump"][:]
         self.stf = self.f.groups["Surface"].variables["stf_dump"][:]
 
+        self.stf_d_norm = self.stf_d / np.trapz(self.stf_d, dx=self.dt)
+
         self.npoints = self.f.npoints
         self.compression_level = \
             self.f.groups["Snapshots"].variables["disp_s"]\
