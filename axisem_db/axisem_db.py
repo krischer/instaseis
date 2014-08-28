@@ -28,8 +28,9 @@ MeshCollection = collections.namedtuple("MeshCollection", ["px", "pz"])
 
 
 class AxiSEMDB(object):
-    def __init__(self, folder):
+    def __init__(self, folder, buffer_size_in_mb=100):
         self.folder = folder
+        self.buffer_size_in_mb = buffer_size_in_mb
         self._find_and_open_files()
 
     def _find_and_open_files(self):
@@ -48,16 +49,20 @@ class AxiSEMDB(object):
 
         # full_parse will force the kd-tree to be built
         if x_exists and z_exists:
-            px_m = mesh.Mesh(px_file, full_parse=True)
-            pz_m = mesh.Mesh(pz_file, full_parse=False)
+            px_m = mesh.Mesh(px_file, full_parse=True,
+                buffer_size_in_mb=self.buffer_size_in_mb)
+            pz_m = mesh.Mesh(pz_file, full_parse=False,
+                buffer_size_in_mb=self.buffer_size_in_mb)
             self.parsed_mesh = px_m
         elif x_exists:
-            px_m = mesh.Mesh(px_file, full_parse=True)
+            px_m = mesh.Mesh(px_file, full_parse=True,
+                buffer_size_in_mb=self.buffer_size_in_mb)
             pz_m = None
             self.parsed_mesh = px_m
         elif z_exists:
             px_m = None
-            pz_m = mesh.Mesh(pz_file, full_parse=True)
+            pz_m = mesh.Mesh(pz_file, full_parse=True,
+                buffer_size_in_mb=self.buffer_size_in_mb)
             self.parsed_mesh = pz_m
         else:
             raise ValueError("ordered_output.nc4 files must exist in the "
@@ -118,12 +123,12 @@ class AxiSEMDB(object):
 
         # Minor optimization: Only read if actually requested.
         if "Z" in components:
-            strain_z = self.__get_strain(self.meshes.pz, gll_point_ids, G, GT,
-                                         col_points_xi, col_points_eta,
+            strain_z = self.__get_strain(self.meshes.pz, id_elem, gll_point_ids,
+                                         G, GT, col_points_xi, col_points_eta,
                                          corner_points, eltype, axis, xi, eta)
         if "N" in components or "E" in components:
-            strain_x = self.__get_strain(self.meshes.px, gll_point_ids, G, GT,
-                                         col_points_xi, col_points_eta,
+            strain_x = self.__get_strain(self.meshes.px, id_elem, gll_point_ids,
+                                         G, GT, col_points_xi, col_points_eta,
                                          corner_points, eltype, axis, xi, eta)
 
         mij = rotations.rotate_symm_tensor_voigt_xyz_src_to_xyz_earth_1d(
@@ -252,38 +257,43 @@ class AxiSEMDB(object):
             band_code = "L"
         return band_code
 
-    def __get_strain(self, mesh, gll_point_ids, G, GT, col_points_xi,
+    def __get_strain(self, mesh, id_elem, gll_point_ids, G, GT, col_points_xi,
                      col_points_eta, corner_points, eltype, axis, xi, eta):
 
-        # Single precision in the NetCDF files but the later interpolation
-        # routines require double precision. Assignment to this array will
-        # force a cast.
-        utemp = np.zeros((mesh.ndumps, mesh.npol + 1, mesh.npol + 1, 3),
-                         dtype=np.float64, order="F")
+        if not id_elem in mesh.strain_buffer:
+            # Single precision in the NetCDF files but the later interpolation
+            # routines require double precision. Assignment to this array will
+            # force a cast.
+            utemp = np.zeros((mesh.ndumps, mesh.npol + 1, mesh.npol + 1, 3),
+                             dtype=np.float64, order="F")
 
-        mesh_dict = mesh.f.groups["Snapshots"].variables
+            mesh_dict = mesh.f.groups["Snapshots"].variables
 
-        # Load displacement from all GLL points.
-        for ipol in xrange(mesh.npol + 1):
-            for jpol in xrange(mesh.npol + 1):
-                start_chunk = gll_point_ids[ipol, jpol]
+            # Load displacement from all GLL points.
+            for ipol in xrange(mesh.npol + 1):
+                for jpol in xrange(mesh.npol + 1):
+                    start_chunk = gll_point_ids[ipol, jpol]
 
-                for i, var in enumerate(["disp_s", "disp_p", "disp_z"]):
-                    if var not in mesh_dict:
-                        continue
-                    # Interesting indexing once again...but consistent with
-                    # the Fortran output.
-                    utemp[:, jpol, ipol, i] = \
-                        mesh_dict[var][:, start_chunk]
+                    for i, var in enumerate(["disp_s", "disp_p", "disp_z"]):
+                        if var not in mesh_dict:
+                            continue
+                        # Interesting indexing once again...but consistent with
+                        # the Fortran output.
+                        utemp[:, jpol, ipol, i] = \
+                            mesh_dict[var][:, start_chunk]
 
-        strain_fct_map = {
-            "monopole": sem_derivatives.strain_monopole_td,
-            "dipole": sem_derivatives.strain_dipole_td,
-            "quadpole": sem_derivatives.strain_quadpole_td}
+            strain_fct_map = {
+                "monopole": sem_derivatives.strain_monopole_td,
+                "dipole": sem_derivatives.strain_dipole_td,
+                "quadpole": sem_derivatives.strain_quadpole_td}
 
-        strain = strain_fct_map[mesh.excitation_type](
-            utemp, G, GT, col_points_xi, col_points_eta, mesh.npol,
-            mesh.ndumps, corner_points, eltype, axis)
+            strain = strain_fct_map[mesh.excitation_type](
+                utemp, G, GT, col_points_xi, col_points_eta, mesh.npol,
+                mesh.ndumps, corner_points, eltype, axis)
+
+            mesh.strain_buffer.add(id_elem, strain)
+        else:
+            strain = mesh.strain_buffer.get(id_elem)
 
         final_strain = np.empty((strain.shape[0], 6))
 

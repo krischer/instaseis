@@ -14,15 +14,57 @@ from __future__ import absolute_import
 import netCDF4
 import numpy as np
 from scipy.spatial import cKDTree
+from collections import OrderedDict
 
 from . import spectral_basis
 
+class Buffer(object):
+    def __init__(self, max_size_in_mb=100):
+        self._max_size_in_bytes = max_size_in_mb * 1024**2
+        self._total_size = 0
+        self._buffer = OrderedDict()
+        self._hits = 0
+        self._fails = 0
+
+    def __contains__(self, key):
+        contains = key in self._buffer
+        if contains:
+            self._hits += 1
+        else:
+            self._fails += 1
+
+    def get(self, key):
+        # Move it to the end, so it is removed last.
+        value = self._buffer.pop(key)
+        self._buffer[key] = value
+        return value
+
+    def add(self, key, value):
+        self._buffer[key] = value
+        # Assuming value is a numpy array
+        self._total_size += value.nbytes
+
+        # Remove existing values, until the size limit is fulfilled.
+        while self._total_size > self._max_size_in_bytes:
+            _, v = self._buffer.popitem(last=False)
+            self._total_size -= v.nbytes
+
+    def get_size_mb(self):
+        return float(self._total_size) / 1024**2
+
+    def efficiency(self):
+        if (self._hits + self._fails) == 0:
+            return 0.
+        else:
+           return float(self._hits) / float(self._hits + self._fails)
+
 
 class Mesh(object):
-    def __init__(self, filename, full_parse=False):
+    def __init__(self, filename, full_parse=False, buffer_size_in_mb=100):
         self.f = netCDF4.Dataset(filename, "r", format="NETCDF4")
         self.filename = filename
         self._parse(full_parse=full_parse)
+        self.strain_buffer = Buffer(buffer_size_in_mb)
 
     def __del__(self):
         try:
