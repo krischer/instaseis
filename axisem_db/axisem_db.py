@@ -26,6 +26,7 @@ from . import spectral_basis
 
 MeshCollection = collections.namedtuple("MeshCollection", ["px", "pz"])
 
+DEFAULT_MU = 32e9
 
 class AxiSEMDB(object):
     def __init__(self, folder, buffer_size_in_mb=100):
@@ -211,19 +212,21 @@ class AxiSEMDB(object):
                 st += tr
             return st
         else:
-            return data
+            npol = self.parsed_mesh.npol
+            mu = mesh.variables["mesh_mu"][gll_point_ids[npol/2, npol/2]]
+            return data, mu
 
     def get_seismograms_finite_source(self, sources, receiver, 
                                      components=("Z", "N", "E")):
         data_summed = {}
         for source in sources:
-            data = self.get_seismograms(source, receiver, components,
+            data, mu = self.get_seismograms(source, receiver, components,
                 reconvolve_stf=True, return_obspy_stream=False)
             for comp in components:
                 if comp in data_summed:
-                    data_summed[comp] += data[comp]
+                    data_summed[comp] += data[comp] * mu / DEFAULT_MU
                 else:
-                    data_summed[comp] = data[comp]
+                    data_summed[comp] = data[comp] * mu / DEFAULT_MU
 
         # Convert to an ObsPy Stream object.
         st = Stream()
