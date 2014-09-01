@@ -133,6 +133,16 @@ class Mesh(object):
         self.s_mp = self.f.groups["Mesh"].variables["mp_mesh_S"]
         self.z_mp = self.f.groups["Mesh"].variables["mp_mesh_Z"]
 
+        # Store some more index types in memory. While this increases memory
+        # use it should be acceptable and result in much less netCDF reads.
+        self.fem_mesh = self.f.groups["Mesh"].variables["fem_mesh"][:]
+        self.eltypes = self.f.groups["Mesh"].variables["eltype"][:]
+        self.mesh_S = self.f.groups["Mesh"].variables["mesh_S"][:]
+        self.mesh_Z = self.f.groups["Mesh"].variables["mesh_Z"][:]
+        self.sem_mesh = self.f.groups["Mesh"].variables["sem_mesh"][:]
+        self.axis = self.f.groups["Mesh"].variables["axis"][:]
+        self.mesh_mu = self.f.groups["Mesh"].variables["mesh_mu"][:]
+
         self.mesh = np.empty((self.s_mp.shape[0], 2), dtype=self.s_mp.dtype)
         self.mesh[:, 0] = self.s_mp[:]
         self.mesh[:, 1] = self.z_mp[:]
