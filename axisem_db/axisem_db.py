@@ -178,26 +178,26 @@ class AxiSEMDB(object):
                     raise RuntimeError("source has no source time function")
 
                 stf_deconv_f = np.fft.rfft(
-                    self.get_sliprate(), n=self.get_ndumps() * 2)
+                    self.sliprate, n=self.ndumps * 2)
 
-                if abs((source.dt - self.get_dt()) / self.get_dt()) > 1e-7:
+                if abs((source.dt - self.dt) / self.dt) > 1e-7:
                     raise ValueError("dt of the source not compatible")
 
                 stf_conv_f = np.fft.rfft(source.sliprate,
-                                         n=self.get_ndumps() * 2)
+                                         n=self.ndumps * 2)
 
                 if source.time_shift is not None:
                     stf_conv_f *= \
-                        np.exp(- 1j * np.fft.rfftfreq(self.get_ndumps() * 2)
+                        np.exp(- 1j * np.fft.rfftfreq(self.ndumps * 2)
                                * 2. * np.pi * source.time_shift /
-                               self.get_dt())
+                               self.dt)
 
                 # TODO: double check wether a taper is needed at the end of the
                 #       trace
-                dataf = np.fft.rfft(data[comp], n=self.get_ndumps() * 2)
+                dataf = np.fft.rfft(data[comp], n=self.ndumps * 2)
 
                 data[comp] = np.fft.irfft(
-                    dataf * stf_conv_f / stf_deconv_f)[:self.get_ndumps()]
+                    dataf * stf_conv_f / stf_deconv_f)[:self.ndumps]
 
             if dt is not None:
                 data[comp] = lanczos.lanczos_resamp(
@@ -320,17 +320,22 @@ class AxiSEMDB(object):
 
         return final_strain
 
-    def get_dt(self):
+    @property
+    def dt(self):
         return self.parsed_mesh.dt
 
-    def get_ndumps(self):
+    @property
+    def ndumps(self):
         return self.parsed_mesh.ndumps
 
-    def get_background_model(self):
+    @property
+    def background_model(self):
         return self.parsed_mesh.background_model
 
-    def get_sliprate(self):
+    @property
+    def sliprate(self):
         return self.parsed_mesh.stf_d_norm
 
-    def get_slip(self):
+    @property
+    def slip(self):
         return self.parsed_mesh.stf
