@@ -85,13 +85,12 @@ class AxiSEMDB(object):
         # Find the element containing the point of interest.
         mesh = self.parsed_mesh.f.groups["Mesh"]
         for idx in nextpoints[1]:
-            fem_mesh = mesh.variables["fem_mesh"]
-            corner_point_ids = fem_mesh[idx][:4]
-            eltype = mesh.variables["eltype"][idx]
+            corner_point_ids = self.parsed_mesh.fem_mesh[idx][:4]
+            eltype = self.parsed_mesh.eltypes[idx]
 
             corner_points = np.empty((4, 2), dtype="float64")
-            corner_points[:, 0] = mesh.variables["mesh_S"][corner_point_ids]
-            corner_points[:, 1] = mesh.variables["mesh_Z"][corner_point_ids]
+            corner_points[:, 0] = self.parsed_mesh.mesh_S[corner_point_ids]
+            corner_points[:, 1] = self.parsed_mesh.mesh_Z[corner_point_ids]
 
             isin, xi, eta = finite_elem_mapping.inside_element(
                 rotmesh_s, rotmesh_z, corner_points, eltype,
@@ -102,8 +101,8 @@ class AxiSEMDB(object):
         else:
             raise ValueError("Element not found")
 
-        gll_point_ids = mesh.variables["sem_mesh"][id_elem]
-        axis = bool(mesh.variables["axis"][id_elem])
+        gll_point_ids = self.parsed_mesh.sem_mesh[id_elem]
+        axis = bool(self.parsed_mesh.axis[id_elem])
 
         if axis:
             G = self.parsed_mesh.G2
@@ -220,7 +219,7 @@ class AxiSEMDB(object):
             return st
         else:
             npol = self.parsed_mesh.npol
-            mu = mesh.variables["mesh_mu"][gll_point_ids[npol/2, npol/2]]
+            mu = self.parsed_mesh.mesh_mu[gll_point_ids[npol/2, npol/2]]
             return data, mu
 
     def get_seismograms_finite_source(self, sources, receiver,
