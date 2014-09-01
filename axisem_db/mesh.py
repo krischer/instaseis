@@ -18,6 +18,7 @@ from collections import OrderedDict
 
 from . import spectral_basis
 
+
 class Buffer(object):
     def __init__(self, max_size_in_mb=100):
         self._max_size_in_bytes = max_size_in_mb * 1024**2
@@ -57,7 +58,7 @@ class Buffer(object):
         if (self._hits + self._fails) == 0:
             return 0.
         else:
-           return float(self._hits) / float(self._hits + self._fails)
+            return float(self._hits) / float(self._hits + self._fails)
 
 
 class Mesh(object):
@@ -96,7 +97,8 @@ class Mesh(object):
         self.amplitude = getattr(self.f, "scalar source magnitude")
         self.dt = getattr(self.f, "strain dump sampling rate in sec")
         self.source_shift = getattr(self.f, "source shift factor in sec")
-        self.source_shift_samp = getattr(self.f, "source shift factor for deltat_coarse")
+        self.source_shift_samp = getattr(
+            self.f, "source shift factor for deltat_coarse")
 
         self.stf_d = self.f.groups["Surface"].variables["stf_d_dump"][:]
         self.stf = self.f.groups["Surface"].variables["stf_dump"][:]

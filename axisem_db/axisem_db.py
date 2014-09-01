@@ -13,7 +13,6 @@ from __future__ import absolute_import
 
 import collections
 import numpy as np
-import obspy
 from obspy.core import Stream, Trace
 import os
 
@@ -28,6 +27,7 @@ from . import lanczos
 MeshCollection = collections.namedtuple("MeshCollection", ["px", "pz"])
 
 DEFAULT_MU = 32e9
+
 
 class AxiSEMDB(object):
     def __init__(self, folder, buffer_size_in_mb=100):
@@ -52,19 +52,19 @@ class AxiSEMDB(object):
         # full_parse will force the kd-tree to be built
         if x_exists and z_exists:
             px_m = mesh.Mesh(px_file, full_parse=True,
-                buffer_size_in_mb=self.buffer_size_in_mb)
+                             buffer_size_in_mb=self.buffer_size_in_mb)
             pz_m = mesh.Mesh(pz_file, full_parse=False,
-                buffer_size_in_mb=self.buffer_size_in_mb)
+                             buffer_size_in_mb=self.buffer_size_in_mb)
             self.parsed_mesh = px_m
         elif x_exists:
             px_m = mesh.Mesh(px_file, full_parse=True,
-                buffer_size_in_mb=self.buffer_size_in_mb)
+                             buffer_size_in_mb=self.buffer_size_in_mb)
             pz_m = None
             self.parsed_mesh = px_m
         elif z_exists:
             px_m = None
             pz_m = mesh.Mesh(pz_file, full_parse=True,
-                buffer_size_in_mb=self.buffer_size_in_mb)
+                             buffer_size_in_mb=self.buffer_size_in_mb)
             self.parsed_mesh = pz_m
         else:
             raise ValueError("ordered_output.nc4 files must exist in the "
@@ -121,13 +121,15 @@ class AxiSEMDB(object):
 
         # Minor optimization: Only read if actually requested.
         if "Z" in components:
-            strain_z = self.__get_strain(self.meshes.pz, id_elem, gll_point_ids,
-                                         G, GT, col_points_xi, col_points_eta,
+            strain_z = self.__get_strain(self.meshes.pz, id_elem,
+                                         gll_point_ids, G, GT, col_points_xi,
+                                         col_points_eta,
                                          corner_points, eltype, axis, xi, eta)
         if "N" in components or "E" in components:
-            strain_x = self.__get_strain(self.meshes.px, id_elem, gll_point_ids,
-                                         G, GT, col_points_xi, col_points_eta,
-                                         corner_points, eltype, axis, xi, eta)
+            strain_x = self.__get_strain(self.meshes.px, id_elem,
+                                         gll_point_ids, G, GT, col_points_xi,
+                                         col_points_eta, corner_points, eltype,
+                                         axis, xi, eta)
 
         mij = rotations.rotate_symm_tensor_voigt_xyz_src_to_xyz_earth_1d(
             source.tensor_voigt, np.deg2rad(source.longitude),
@@ -169,35 +171,38 @@ class AxiSEMDB(object):
                 final *= -1.0
             data[comp] = final
 
-
         for comp in components:
-
             if remove_source_shift and not reconvolve_stf:
                 data[comp] = data[comp][self.parsed_mesh.source_shift_samp:]
             elif reconvolve_stf:
                 if source.dt is None or source.sliprate is None:
                     raise RuntimeError("source has no source time function")
 
-                stf_deconv_f = np.fft.rfft(self.get_sliprate(), n=self.get_ndumps() * 2)
+                stf_deconv_f = np.fft.rfft(
+                    self.get_sliprate(), n=self.get_ndumps() * 2)
 
                 if abs((source.dt - self.get_dt()) / self.get_dt()) > 1e-7:
                     raise ValueError("dt of the source not compatible")
 
-                stf_conv_f = np.fft.rfft(source.sliprate, n=self.get_ndumps() * 2)
+                stf_conv_f = np.fft.rfft(source.sliprate,
+                                         n=self.get_ndumps() * 2)
 
-                if not source.time_shift is None:
-                    stf_conv_f *= np.exp(- 1j * np.fft.rfftfreq(self.get_ndumps() * 2)
-                                         * 2. * np.pi * source.time_shift / self.get_dt())
+                if source.time_shift is not None:
+                    stf_conv_f *= \
+                        np.exp(- 1j * np.fft.rfftfreq(self.get_ndumps() * 2)
+                               * 2. * np.pi * source.time_shift /
+                               self.get_dt())
 
                 # TODO: double check wether a taper is needed at the end of the
                 #       trace
                 dataf = np.fft.rfft(data[comp], n=self.get_ndumps() * 2)
 
-                data[comp] = np.fft.irfft(dataf * stf_conv_f / stf_deconv_f)[:self.get_ndumps()]
+                data[comp] = np.fft.irfft(
+                    dataf * stf_conv_f / stf_deconv_f)[:self.get_ndumps()]
 
-            if not dt is None:
-                data[comp] = lanczos.lanczos_resamp(data[comp], self.parsed_mesh.dt, dt, a_lanczos)
-
+            if dt is not None:
+                data[comp] = lanczos.lanczos_resamp(
+                    data[comp], self.parsed_mesh.dt, dt, a_lanczos)
 
         if return_obspy_stream:
             # Convert to an ObsPy Stream object.
@@ -223,18 +228,19 @@ class AxiSEMDB(object):
                                       a_lanczos=5):
         data_summed = {}
         for source in sources:
-            data, mu = self.get_seismograms(source, receiver, components,
-                reconvolve_stf=True, return_obspy_stream=False)
+            data, mu = self.get_seismograms(
+                source, receiver, components, reconvolve_stf=True,
+                return_obspy_stream=False)
             for comp in components:
                 if comp in data_summed:
                     data_summed[comp] += data[comp] * mu / DEFAULT_MU
                 else:
                     data_summed[comp] = data[comp] * mu / DEFAULT_MU
 
-        if not dt is None:
+        if dt is not None:
             for comp in components:
-                data_summed[comp] = lanczos.lanczos_resamp(data_summed[comp],
-                    self.parsed_mesh.dt, dt, a_lanczos)
+                data_summed[comp] = lanczos.lanczos_resamp(
+                    data_summed[comp], self.parsed_mesh.dt, dt, a_lanczos)
 
         # Convert to an ObsPy Stream object.
         st = Stream()
@@ -271,8 +277,7 @@ class AxiSEMDB(object):
 
     def __get_strain(self, mesh, id_elem, gll_point_ids, G, GT, col_points_xi,
                      col_points_eta, corner_points, eltype, axis, xi, eta):
-
-        if not id_elem in mesh.strain_buffer:
+        if id_elem not in mesh.strain_buffer:
             # Single precision in the NetCDF files but the later interpolation
             # routines require double precision. Assignment to this array will
             # force a cast.
@@ -304,7 +309,6 @@ class AxiSEMDB(object):
             strain = mesh.strain_buffer.get(id_elem)
 
         # TODO: Could this be order="F"
-        #final_strain = np.empty((strain.shape[0], 6), order="F")
         final_strain = np.empty((strain.shape[0], 6))
 
         for i in xrange(6):

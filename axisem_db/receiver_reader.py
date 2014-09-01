@@ -11,8 +11,8 @@ Function to read STATIONS file
 """
 from __future__ import absolute_import
 
-import numpy as np
 from .source import Receiver
+
 
 def read_STATIONS(filename):
     f = open(filename, 'r')

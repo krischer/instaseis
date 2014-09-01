@@ -16,12 +16,13 @@ from .source import Source
 
 DEFAULT_MU = 32e9
 
+
 def read_srf(filename, normalize=False):
     f = open(filename, 'r')
 
     # go to POINTS block
     line = f.readline()
-    while not 'POINTS' in line:
+    while 'POINTS' not in line:
         line = f.readline()
 
     npoints = int(line.split()[1])
@@ -32,18 +33,18 @@ def read_srf(filename, normalize=False):
         lon, lat, dep, stk, dip, area, tinit, dt = f.readline().split()
         rake, slip1, nt1, slip2, nt2, slip3, nt3 = f.readline().split()
 
-        lon   = float(lon  )
-        lat   = float(lat  )
-        dep   = float(dep  ) * 1e3 # km    > m
-        stk   = float(stk  )
-        dip   = float(dip  )
-        area  = float(area ) * 1e-4 # cm^2 > m^2
+        lon = float(lon)
+        lat = float(lat)
+        dep = float(dep) * 1e3  # km    > m
+        stk = float(stk)
+        dip = float(dip)
+        area = float(area) * 1e-4  # cm^2 > m^2
         tinit = float(tinit)
-        dt    = float(dt   )
-        rake  = float(rake )
-        slip1 = float(slip1) * 1e-2 # cm   > m
-        slip2 = float(slip2) * 1e-2 # cm   > m
-        slip3 = float(slip3) * 1e-2 # cm   > m
+        dt = float(dt)
+        rake = float(rake)
+        slip1 = float(slip1) * 1e-2  # cm   > m
+        slip2 = float(slip2) * 1e-2  # cm   > m
+        slip3 = float(slip3) * 1e-2  # cm   > m
 
         nt1 = int(nt1)
         nt2 = int(nt2)
@@ -60,7 +61,7 @@ def read_srf(filename, normalize=False):
             M0 = area * DEFAULT_MU * slip1
 
             sources.append(Source.from_strike_dip_rake(lat, lon, dep, stk, dip,
-                             rake, M0, time_shift=tinit, sliprate=stf, dt=dt))
+                           rake, M0, time_shift=tinit, sliprate=stf, dt=dt))
 
         if nt2 > 0:
             line = f.readline()
@@ -73,7 +74,7 @@ def read_srf(filename, normalize=False):
             M0 = area * DEFAULT_MU * slip2
 
             sources.append(Source.from_strike_dip_rake(lat, lon, dep, stk, dip,
-                             rake, M0, time_shift=tinit, sliprate=stf, dt=dt))
+                           rake, M0, time_shift=tinit, sliprate=stf, dt=dt))
 
         if nt3 > 0:
             line = f.readline()
