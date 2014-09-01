@@ -58,7 +58,7 @@ class Source(SourceOrReceiver):
         self.m_tp = m_tp
         self.time_shift = time_shift
 
-        if not sliprate is None:
+        if sliprate is not None:
             self.sliprate = np.array(sliprate)
         else:
             self.sliprate = None
@@ -88,26 +88,26 @@ class Source(SourceOrReceiver):
                     m_rp, m_tp, time_shift)
 
     @classmethod
-    def from_strike_dip_rake(self, latitude, longitude, depth_in_m, strike, dip,
-                             rake, M0, time_shift=None, sliprate=None, dt=None):
-
-        # formulas in Udias (17.24) are in geographic system North, East, Down, which
-        # transforms to the geocentric as:
+    def from_strike_dip_rake(self, latitude, longitude, depth_in_m, strike,
+                             dip, rake, M0, time_shift=None, sliprate=None,
+                             dt=None):
+        # formulas in Udias (17.24) are in geographic system North, East,
+        # Down, which # transforms to the geocentric as:
         # Mtt =  Mxx, Mpp = Myy, Mrr =  Mzz
         # Mrp = -Myz, Mrt = Mxz, Mtp = -Mxy
         # voigt in tpr: Mtt Mpp Mrr Mrp Mrt Mtp
 
-        phi   = np.deg2rad(strike)
+        phi = np.deg2rad(strike)
         delta = np.deg2rad(dip)
         lambd = np.deg2rad(rake)
 
         m_tt = (- np.sin(delta) * np.cos(lambd) * np.sin(2. * phi)
                 - np.sin(2. * delta) * np.sin(phi)**2. * np.sin(lambd)) * M0
 
-        m_pp = (  np.sin(delta) * np.cos(lambd) * np.sin(2. * phi)
+        m_pp = (np.sin(delta) * np.cos(lambd) * np.sin(2. * phi)
                 - np.sin(2. * delta) * np.cos(phi)**2. * np.sin(lambd)) * M0
 
-        m_rr = (  np.sin(2. * delta) * np.sin(lambd)) * M0
+        m_rr = (np.sin(2. * delta) * np.sin(lambd)) * M0
 
         m_rp = (- np.cos(phi) * np.sin(lambd) * np.cos(2. * delta)
                 + np.cos(delta) * np.cos(lambd) * np.sin(phi)) * M0
@@ -116,7 +116,8 @@ class Source(SourceOrReceiver):
                 - np.cos(delta) * np.cos(lambd) * np.cos(phi)) * M0
 
         m_tp = (- np.sin(delta) * np.cos(lambd) * np.cos(2. * phi)
-                - np.sin(2. * delta) * np.sin(2.* phi) * np.sin(lambd) / 2.) * M0
+                - np.sin(2. * delta) * np.sin(2. * phi) * np.sin(lambd) / 2.) \
+            * M0
 
         return self(latitude, longitude, depth_in_m, m_rr, m_tt, m_pp, m_rt,
                     m_rp, m_tp, time_shift, sliprate, dt)
@@ -139,8 +140,8 @@ class Source(SourceOrReceiver):
 
     def resample_sliprate(self, dt, nsamp):
         t_new = np.linspace(0, nsamp * dt, nsamp, endpoint=False)
-        t_old = np.linspace(0, self.dt * len(self.sliprate), len(self.sliprate),
-                            endpoint=False)
+        t_old = np.linspace(0, self.dt * len(self.sliprate),
+                            len(self.sliprate), endpoint=False)
 
         self.sliprate = interp(t_new, t_old, self.sliprate)
         self.dt = dt
