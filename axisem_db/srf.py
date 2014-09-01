@@ -12,7 +12,7 @@ Function to read 'standard rupture format' (*.srf) files
 from __future__ import absolute_import
 
 import numpy as np
-from source import Source
+from .source import Source
 
 DEFAULT_MU = 32e9
 

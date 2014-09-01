@@ -89,13 +89,9 @@ class AxiSEMDB(object):
             corner_point_ids = fem_mesh[idx][:4]
             eltype = mesh.variables["eltype"][idx]
 
-            corner_points = []
-            for i in corner_point_ids:
-                corner_points.append((
-                    mesh.variables["mesh_S"][i],
-                    mesh.variables["mesh_Z"][i]
-                ))
-            corner_points = np.array(corner_points, dtype=np.float64)
+            corner_points = np.empty((4, 2), dtype="float64")
+            corner_points[:, 0] = mesh.variables["mesh_S"][corner_point_ids]
+            corner_points[:, 1] = mesh.variables["mesh_Z"][corner_point_ids]
 
             isin, xi, eta = finite_elem_mapping.inside_element(
                 rotmesh_s, rotmesh_z, corner_points, eltype,
@@ -175,7 +171,7 @@ class AxiSEMDB(object):
 
 
         for comp in components:
-            
+
             if remove_source_shift and not reconvolve_stf:
                 data[comp] = data[comp][self.parsed_mesh.source_shift_samp:]
             elif reconvolve_stf:
@@ -190,7 +186,7 @@ class AxiSEMDB(object):
                 stf_conv_f = np.fft.rfft(source.sliprate, n=self.get_ndumps() * 2)
 
                 if not source.time_shift is None:
-                    stf_conv_f *= np.exp(- 1j * np.fft.rfftfreq(self.get_ndumps() * 2) 
+                    stf_conv_f *= np.exp(- 1j * np.fft.rfftfreq(self.get_ndumps() * 2)
                                          * 2. * np.pi * source.time_shift / self.get_dt())
 
                 # TODO: double check wether a taper is needed at the end of the
@@ -222,8 +218,9 @@ class AxiSEMDB(object):
             mu = mesh.variables["mesh_mu"][gll_point_ids[npol/2, npol/2]]
             return data, mu
 
-    def get_seismograms_finite_source(self, sources, receiver, 
-                                     components=("Z", "N", "E"), dt=None, a_lanczos=5):
+    def get_seismograms_finite_source(self, sources, receiver,
+                                      components=("Z", "N", "E"), dt=None,
+                                      a_lanczos=5):
         data_summed = {}
         for source in sources:
             data, mu = self.get_seismograms(source, receiver, components,
@@ -285,17 +282,13 @@ class AxiSEMDB(object):
             mesh_dict = mesh.f.groups["Snapshots"].variables
 
             # Load displacement from all GLL points.
-            for ipol in xrange(mesh.npol + 1):
-                for jpol in xrange(mesh.npol + 1):
-                    start_chunk = gll_point_ids[ipol, jpol]
-
-                    for i, var in enumerate(["disp_s", "disp_p", "disp_z"]):
-                        if var not in mesh_dict:
-                            continue
-                        # Interesting indexing once again...but consistent with
-                        # the Fortran output.
-                        utemp[:, jpol, ipol, i] = \
-                            mesh_dict[var][:, start_chunk]
+            for i, var in enumerate(["disp_s", "disp_p", "disp_z"]):
+                if var not in mesh_dict:
+                    continue
+                temp = mesh_dict[var][:, gll_point_ids.flatten()]
+                for ipol in xrange(mesh.npol + 1):
+                    for jpol in xrange(mesh.npol + 1):
+                        utemp[:, jpol, ipol, i] = temp[:, ipol * 5 + jpol]
 
             strain_fct_map = {
                 "monopole": sem_derivatives.strain_monopole_td,
