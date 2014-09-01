@@ -32,6 +32,7 @@ class Buffer(object):
             self._hits += 1
         else:
             self._fails += 1
+        return contains
 
     def get(self, key):
         # Move it to the end, so it is removed last.
