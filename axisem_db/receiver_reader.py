@@ -15,15 +15,13 @@ from .source import Receiver
 
 
 def read_STATIONS(filename):
-    f = open(filename, 'r')
-    receivers = []
+    with open(filename, 'rt') as f:
+        receivers = []
 
-    for line in f:
-        name, network, lat, lon, elev, bury = line.split()
-        lat = float(lat)
-        lon = float(lon)
-        receivers.append(Receiver(lat, lon, name, network))
-
-    f.close
+        for line in f:
+            name, network, lat, lon, elev, bury = line.split()
+            lat = float(lat)
+            lon = float(lon)
+            receivers.append(Receiver(lat, lon, name, network))
 
     return receivers
