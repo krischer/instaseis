@@ -22,6 +22,7 @@ from . import mesh
 from . import rotations
 from . import sem_derivatives
 from . import spectral_basis
+from . import lanczos
 
 
 MeshCollection = collections.namedtuple("MeshCollection", ["px", "pz"])
@@ -73,7 +74,7 @@ class AxiSEMDB(object):
 
     def get_seismograms(self, source, receiver, components=("Z", "N", "E"),
                         remove_source_shift=True, reconvolve_stf=False,
-                        return_obspy_stream=True):
+                        return_obspy_stream=True, dt=None, a_lanczos=5):
 
         rotmesh_s, rotmesh_phi, rotmesh_z = rotations.rotate_frame_rd(
             source.x * 1000.0, source.y * 1000.0, source.z * 1000.0,
@@ -198,10 +199,15 @@ class AxiSEMDB(object):
 
                 data[comp] = np.fft.irfft(dataf * stf_conv_f / stf_deconv_f)[:self.get_ndumps()]
 
+            if not dt is None:
+                data[comp] = lanczos.lanczos_resamp(data[comp], self.parsed_mesh.dt, dt, a_lanczos)
+
+
         if return_obspy_stream:
             # Convert to an ObsPy Stream object.
             st = Stream()
-            dt = self.parsed_mesh.dt
+            if dt is None:
+                dt = self.parsed_mesh.dt
             band_code = self._get_band_code(dt)
             for comp in components:
                 tr = Trace(data=data[comp],
@@ -217,7 +223,7 @@ class AxiSEMDB(object):
             return data, mu
 
     def get_seismograms_finite_source(self, sources, receiver, 
-                                     components=("Z", "N", "E")):
+                                     components=("Z", "N", "E"), dt=None, a_lanczos=5):
         data_summed = {}
         for source in sources:
             data, mu = self.get_seismograms(source, receiver, components,
@@ -228,9 +234,15 @@ class AxiSEMDB(object):
                 else:
                     data_summed[comp] = data[comp] * mu / DEFAULT_MU
 
+        if not dt is None:
+            for comp in components:
+                data_summed[comp] = lanczos.lanczos_resamp(data_summed[comp],
+                    self.parsed_mesh.dt, dt, a_lanczos)
+
         # Convert to an ObsPy Stream object.
         st = Stream()
-        dt = self.parsed_mesh.dt
+        if dt is None:
+            dt = self.parsed_mesh.dt
         band_code = self._get_band_code(dt)
         for comp in components:
             tr = Trace(data=data_summed[comp],
