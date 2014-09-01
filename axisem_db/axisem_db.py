@@ -298,13 +298,17 @@ class AxiSEMDB(object):
         else:
             strain = mesh.strain_buffer.get(id_elem)
 
+        # TODO: Could this be order="F"
+        #final_strain = np.empty((strain.shape[0], 6), order="F")
         final_strain = np.empty((strain.shape[0], 6))
 
         for i in xrange(6):
             final_strain[:, i] = spectral_basis.lagrange_interpol_2D_td(
                 col_points_xi, col_points_eta, strain[:, :, :, i], xi, eta)
-        final_strain[:, 3] *= -1.0
-        final_strain[:, 5] *= -1.0
+
+        if not mesh.excitation_type == "monopole":
+            final_strain[:, 3] *= -1.0
+            final_strain[:, 5] *= -1.0
 
         return final_strain
 
