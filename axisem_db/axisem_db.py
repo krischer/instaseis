@@ -30,9 +30,10 @@ DEFAULT_MU = 32e9
 
 
 class AxiSEMDB(object):
-    def __init__(self, folder, buffer_size_in_mb=100):
+    def __init__(self, folder, buffer_size_in_mb=100, read_on_demand=True):
         self.folder = folder
         self.buffer_size_in_mb = buffer_size_in_mb
+        self.read_on_demand = read_on_demand
         self._find_and_open_files()
 
     def _find_and_open_files(self):
@@ -52,19 +53,23 @@ class AxiSEMDB(object):
         # full_parse will force the kd-tree to be built
         if x_exists and z_exists:
             px_m = mesh.Mesh(px_file, full_parse=True,
-                             buffer_size_in_mb=self.buffer_size_in_mb)
+                             buffer_size_in_mb=self.buffer_size_in_mb,
+                             read_on_demand=self.read_on_demand)
             pz_m = mesh.Mesh(pz_file, full_parse=False,
-                             buffer_size_in_mb=self.buffer_size_in_mb)
+                             buffer_size_in_mb=self.buffer_size_in_mb,
+                             read_on_demand=self.read_on_demand)
             self.parsed_mesh = px_m
         elif x_exists:
             px_m = mesh.Mesh(px_file, full_parse=True,
-                             buffer_size_in_mb=self.buffer_size_in_mb)
+                             buffer_size_in_mb=self.buffer_size_in_mb,
+                             read_on_demand=self.read_on_demand)
             pz_m = None
             self.parsed_mesh = px_m
         elif z_exists:
             px_m = None
             pz_m = mesh.Mesh(pz_file, full_parse=True,
-                             buffer_size_in_mb=self.buffer_size_in_mb)
+                             buffer_size_in_mb=self.buffer_size_in_mb,
+                             read_on_demand=self.read_on_demand)
             self.parsed_mesh = pz_m
         else:
             raise ValueError("ordered_output.nc4 files must exist in the "
@@ -85,12 +90,18 @@ class AxiSEMDB(object):
         # Find the element containing the point of interest.
         mesh = self.parsed_mesh.f.groups["Mesh"]
         for idx in nextpoints[1]:
-            corner_point_ids = self.parsed_mesh.fem_mesh[idx][:4]
-            eltype = self.parsed_mesh.eltypes[idx]
-
             corner_points = np.empty((4, 2), dtype="float64")
-            corner_points[:, 0] = self.parsed_mesh.mesh_S[corner_point_ids]
-            corner_points[:, 1] = self.parsed_mesh.mesh_Z[corner_point_ids]
+
+            if not self.read_on_demand:
+                corner_point_ids = self.parsed_mesh.fem_mesh[idx][:4]
+                eltype = self.parsed_mesh.eltypes[idx]
+                corner_points[:, 0] = self.parsed_mesh.mesh_S[corner_point_ids]
+                corner_points[:, 1] = self.parsed_mesh.mesh_Z[corner_point_ids]
+            else:
+                corner_point_ids = mesh.variables["fem_mesh"][idx][:4]
+                eltype = mesh.variables["eltype"][idx]
+                corner_points[:, 0] = mesh.variables["mesh_S"][corner_point_ids]
+                corner_points[:, 1] = mesh.variables["mesh_Z"][corner_point_ids]
 
             isin, xi, eta = finite_elem_mapping.inside_element(
                 rotmesh_s, rotmesh_z, corner_points, eltype,
@@ -101,8 +112,12 @@ class AxiSEMDB(object):
         else:
             raise ValueError("Element not found")
 
-        gll_point_ids = self.parsed_mesh.sem_mesh[id_elem]
-        axis = bool(self.parsed_mesh.axis[id_elem])
+        if not self.read_on_demand:
+            gll_point_ids = self.parsed_mesh.sem_mesh[id_elem]
+            axis = bool(self.parsed_mesh.axis[id_elem])
+        else:
+            gll_point_ids = mesh.variables["sem_mesh"][id_elem]
+            axis = bool(mesh.variables["axis"][id_elem])
 
         if axis:
             G = self.parsed_mesh.G2
@@ -219,7 +234,10 @@ class AxiSEMDB(object):
             return st
         else:
             npol = self.parsed_mesh.npol
-            mu = self.parsed_mesh.mesh_mu[gll_point_ids[npol/2, npol/2]]
+            if not self.read_on_demand:
+                mu = self.parsed_mesh.mesh_mu[gll_point_ids[npol/2, npol/2]]
+            else:
+                mu = mesh.variables["mesh_mu"][gll_point_ids[npol/2, npol/2]]
             return data, mu
 
     def get_seismograms_finite_source(self, sources, receiver,
@@ -307,8 +325,7 @@ class AxiSEMDB(object):
         else:
             strain = mesh.strain_buffer.get(id_elem)
 
-        # TODO: Could this be order="F"
-        final_strain = np.empty((strain.shape[0], 6))
+        final_strain = np.empty((strain.shape[0], 6), order="F")
 
         for i in xrange(6):
             final_strain[:, i] = spectral_basis.lagrange_interpol_2D_td(
