@@ -14,6 +14,7 @@ from __future__ import absolute_import
 import collections
 import numpy as np
 from obspy.core import Stream, Trace
+from obspy.signal.util import nextpow2
 import os
 
 from . import finite_elem_mapping
@@ -35,6 +36,7 @@ class AxiSEMDB(object):
         self.buffer_size_in_mb = buffer_size_in_mb
         self.read_on_demand = read_on_demand
         self._find_and_open_files()
+        self.nfft = nextpow2(self.ndumps) * 2
 
     def _find_and_open_files(self):
         px = os.path.join(self.folder, "PX")
@@ -193,23 +195,22 @@ class AxiSEMDB(object):
                     raise RuntimeError("source has no source time function")
 
                 stf_deconv_f = np.fft.rfft(
-                    self.sliprate, n=self.ndumps * 2)
+                    self.sliprate, n=self.nfft)
 
                 if abs((source.dt - self.dt) / self.dt) > 1e-7:
                     raise ValueError("dt of the source not compatible")
 
                 stf_conv_f = np.fft.rfft(source.sliprate,
-                                         n=self.ndumps * 2)
+                                         n=self.nfft)
 
                 if source.time_shift is not None:
                     stf_conv_f *= \
-                        np.exp(- 1j * np.fft.rfftfreq(self.ndumps * 2)
-                               * 2. * np.pi * source.time_shift /
-                               self.dt)
+                        np.exp(- 1j * np.fft.rfftfreq(self.nfft)
+                               * 2. * np.pi * source.time_shift / self.dt)
 
                 # TODO: double check wether a taper is needed at the end of the
                 #       trace
-                dataf = np.fft.rfft(data[comp], n=self.ndumps * 2)
+                dataf = np.fft.rfft(data[comp], n=self.nfft)
 
                 data[comp] = np.fft.irfft(
                     dataf * stf_conv_f / stf_deconv_f)[:self.ndumps]
