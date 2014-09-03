@@ -19,9 +19,9 @@ def read_STATIONS(filename):
         receivers = []
 
         for line in f:
-            name, network, lat, lon, elev, bury = line.split()
+            station, network, lat, lon, elev, bury = line.split()
             lat = float(lat)
             lon = float(lon)
-            receivers.append(Receiver(lat, lon, name, network))
+            receivers.append(Receiver(lat, lon, network, station))
 
     return receivers
