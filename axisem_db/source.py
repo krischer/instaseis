@@ -217,13 +217,13 @@ class Receiver(SourceOrReceiver):
     """
     A class to handle a receiver including the name and network.
     """
-    def __init__(self, latitude, longitude, name='', network=''):
+    def __init__(self, latitude, longitude, network=None, station=None):
         """
         latitude -- latitude of the source in degree
         longitude -- longitude of the source in degree
-        name --  receiver name
-        network --  network name
+        network -- network id
+        station -- station id
         """
         super(Receiver, self).__init__(latitude, longitude, depth_in_m=0.0)
-        self.name = name
-        self.network = network
+        self.network = network or ""
+        self.station = station or ""
