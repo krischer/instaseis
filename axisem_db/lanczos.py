@@ -25,8 +25,8 @@ def lanczos_resamp(si, dt_old, dt_new, a):
     In contrast to frequency domain sinc resampling it allows for arbitrary
     sampling rates but due to the finite support of the kernel is a lot faster
     then sinc resampling in time domain (linear instead of quadratic scaling
-    with the number of samples). If used for downsampling, make sure to apply a
-    lowpass filter first.
+    with the number of samples). For large a, converges towards sinc resampling.
+    If used for downsampling, make sure to apply a lowpass filter first.
 
     Parameters:
     si -- input signal
