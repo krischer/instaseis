@@ -1,3 +1,4 @@
+!=========================================================================================
 module lanczos
 
     use iso_c_binding, only: c_double, c_int
@@ -11,7 +12,9 @@ module lanczos
 
 contains
 
+!-----------------------------------------------------------------------------------------
 pure subroutine lanczos_resamp(si, n_in, so, n_out, dt, a) bind(c, name="lanczos_resamp")
+    ! lanczos resampling, see http://en.wikipedia.org/wiki/Lanczos_resampling
     real(c_double), intent(in)          :: si(1:n_in)
     integer(c_int), intent(in), value   :: n_in
     real(c_double), intent(out)         :: so(1:n_out)
@@ -34,7 +37,9 @@ pure subroutine lanczos_resamp(si, n_in, so, n_out, dt, a) bind(c, name="lanczos
     enddo
 
 end subroutine
+!-----------------------------------------------------------------------------------------
 
+!-----------------------------------------------------------------------------------------
 pure subroutine lanczos_kern(x, a, kern) bind(c, name="lanczos_kern")
     real(c_double), intent(in), value   :: x
     integer(c_int), intent(in), value   :: a
@@ -47,7 +52,9 @@ pure subroutine lanczos_kern(x, a, kern) bind(c, name="lanczos_kern")
     endif
 
 end subroutine
+!-----------------------------------------------------------------------------------------
 
+!-----------------------------------------------------------------------------------------
 pure function sinc(x)
     double precision, intent(in) :: x
     double precision             :: sinc
@@ -59,5 +66,7 @@ pure function sinc(x)
     endif
 
 end function
+!-----------------------------------------------------------------------------------------
 
 end module lanczos
+!=========================================================================================

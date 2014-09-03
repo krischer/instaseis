@@ -75,9 +75,10 @@ module finite_elem_mapping
 contains
 
 !-----------------------------------------------------------------------------------------
-subroutine inside_element(s, z, nodes, element_type, tolerance, in_element, xi, eta) bind(c, name="inside_element")
+subroutine inside_element(s, z, nodes, element_type, tolerance, in_element, xi, eta) &
+    bind(c, name="inside_element")
 !< test whether a point described by global coordinates s,z is inside an element
-!< optionally return reference coordinates
+!< and return reference coordinates xi and eta
 
   real(c_double), intent(in), value             :: s, z
   real(c_double), intent(in)                    :: nodes(4,2)
@@ -88,7 +89,7 @@ subroutine inside_element(s, z, nodes, element_type, tolerance, in_element, xi, 
   real(c_double)                                :: tolerance_loc
   real(c_double)                                :: inv_mapping(2)
 
- tolerance_loc = tolerance
+  tolerance_loc = tolerance
 
   select case(element_type)
      case(0)
@@ -104,7 +105,7 @@ subroutine inside_element(s, z, nodes, element_type, tolerance, in_element, xi, 
         stop
   end select
 
-  in_element = (inv_mapping(1) >= -1 - tolerance_loc .and.  &
+  in_element = (inv_mapping(1) >= -1 - tolerance_loc .and. &
                 inv_mapping(1) <=  1 + tolerance_loc .and. &
                 inv_mapping(2) >= -1 - tolerance_loc .and. &
                 inv_mapping(2) <=  1 + tolerance_loc)
