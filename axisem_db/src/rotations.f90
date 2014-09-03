@@ -1,7 +1,7 @@
 !=========================================================================================
 module rotations
 
-    use global_parameters
+    use global_parameters, only: sp, dp, pi
     use iso_c_binding, only: c_double, c_int
 
     implicit none
@@ -131,9 +131,8 @@ function azim_factor(phi, mij, isim, ikind)
        end if
 
     case default
-       azim_factor = 0
-       write(6,*) myrank,': unknown number of simulations',isim
-       !call pabort
+       write(6,*) ': unknown number of simulations',isim
+       call abort
     end select
 
 end function
@@ -165,9 +164,8 @@ function azim_factor_bw(phi, fi, isim, ikind) bind(c, name="azim_factor_bw")
        end if
 
     case default
-       azim_factor_bw = 0
-       write(6,*) myrank,': unknown number of simulations',isim
-       !call pabort
+       write(6,*) ': unknown number of simulations',isim
+       call abort
     end select
 
 end function
