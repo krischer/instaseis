@@ -1,4 +1,14 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""
+Hacky code to generate some finite source in a .srf file
+
+:copyright:
+    Martin van Driel (Martin@vanDriel.de)
+:license:
+    GNU General Public License, Version 3
+    (http://www.gnu.org/copyleft/gpl.html)
+"""
 import matplotlib.pyplot as plt
 import numpy as np
 from obspy.signal.filter import lowpass
