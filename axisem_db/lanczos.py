@@ -20,6 +20,20 @@ lib = load_lib()
 
 
 def lanczos_resamp(si, dt_old, dt_new, a):
+    """
+    Lanczos resampling, see http://en.wikipedia.org/wiki/Lanczos_resampling
+    In contrast to frequency domain sinc resampling it allows for arbitrary
+    sampling rates but due to the finite support of the kernel is a lot faster
+    then sinc resampling in time domain (linear instead of quadratic scaling
+    with the number of samples). If used for downsampling, make sure to apply a
+    lowpass filter first.
+
+    Parameters:
+    si -- input signal
+    dt_old -- sampling of the input sampling
+    dt_new -- desired sampling
+    a -- width of the kernel
+    """
     si = np.require(si, dtype=np.float64, requirements=["F_CONTIGUOUS"])
     n_old = len(si)
     n_new = int(n_old * dt_old / dt_new)
@@ -39,7 +53,9 @@ def lanczos_resamp(si, dt_old, dt_new, a):
 
 
 def lanczos_kern(x, a):
-
+    """
+    Lanczos kernel L_a(x), see http://en.wikipedia.org/wiki/Lanczos_resampling
+    """
     kern = C.c_double(0.0)
     lib.lanczos_kern(
         C.c_double(x),
