@@ -20,6 +20,10 @@ from . import spectral_basis
 
 
 class Buffer(object):
+    """
+    A simple buffer class based on a dictionary with a maximum memory. Last
+    accessed items are removed last when the memory limit is hit.
+    """
     def __init__(self, max_size_in_mb=100):
         self._max_size_in_bytes = max_size_in_mb * 1024**2
         self._total_size = 0
@@ -36,12 +40,19 @@ class Buffer(object):
         return contains
 
     def get(self, key):
-        # Move it to the end, so it is removed last.
+        """
+        Return an item from the buffer and move it to the end, so it is removed
+        last.
+        """
         value = self._buffer.pop(key)
         self._buffer[key] = value
         return value
 
     def add(self, key, value):
+        """
+        Add an item to the buffer and make sure that the buffer does not exceed
+        the maximum size in memory.
+        """
         self._buffer[key] = value
         # Assuming value is a numpy array
         self._total_size += value.nbytes
@@ -55,6 +66,10 @@ class Buffer(object):
         return float(self._total_size) / 1024**2
 
     def efficiency(self):
+        """
+        Return the fraction of call to the __contains__() routine that
+        returned True.
+        """
         if (self._hits + self._fails) == 0:
             return 0.
         else:
@@ -62,6 +77,9 @@ class Buffer(object):
 
 
 class Mesh(object):
+    """
+    A class to handle the netcdf output written by AxiSEM.
+    """
     def __init__(self, filename, full_parse=False, buffer_size_in_mb=100,
                  read_on_demand=True):
         self.f = netCDF4.Dataset(filename, "r", format="NETCDF4")
