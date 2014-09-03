@@ -17,6 +17,14 @@ from .source import Source
 DEFAULT_MU = 32e9
 
 def read_srf(filename, normalize=False):
+    """
+    Read a 'standard rupture format' (.srf) file and return a list of axisem_db.Source
+    objects.
+
+    Keyword arguments:
+    filename -- path to the .srf file
+    normalize -- normalize the sliprate to 1
+    """
     with open(filename, "rt") as fh:
         return _read_srf(fh, normalize=normalize)
 
