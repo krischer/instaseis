@@ -29,10 +29,10 @@ def lanczos_resamp(si, dt_old, dt_new, a):
     If used for downsampling, make sure to apply a lowpass filter first.
 
     Parameters:
-    si -- input signal
-    dt_old -- sampling of the input sampling
-    dt_new -- desired sampling
-    a -- width of the kernel
+    si      -- input signal
+    dt_old  -- sampling of the input sampling
+    dt_new  -- desired sampling
+    a       -- width of the kernel
     """
     si = np.require(si, dtype=np.float64, requirements=["F_CONTIGUOUS"])
     n_old = len(si)

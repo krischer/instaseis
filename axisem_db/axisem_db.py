@@ -95,18 +95,22 @@ class AxiSEMDB(object):
         database.
 
         Parameters:
-        source -- axisem_db.Source object
-        receiver -- axisem_db.Receiver object
-        components -- a tuple containing any combination of the strings "Z", "N" and "E"
-        remove_source_shift -- move the starttime to the peak of the sliprate
-        reconvolve_stf -- deconvolve the source time function used in the AxiSEM
-        run and convolve with the stf attached to the source. For this to be
-        stable, the new stf needs to bandlimited.
-        return_obspy_stream -- return format is either an obspy.Stream object or
-        a plain array containing the data
-        dt -- desired sampling of the seismograms. resampling is done using a
-        lanczos kernel
-        a_lanczos -- width of the kernel used in resampling
+        source      -- axisem_db.Source object
+        receiver    -- axisem_db.Receiver object
+        components  -- a tuple containing any combination of the strings "Z",
+                       "N" and "E"
+        remove_source_shift 
+                    -- move the starttime to the peak of the sliprate
+        reconvolve_stf 
+                    -- deconvolve the source time function used in the AxiSEM
+                       run and convolve with the stf attached to the source. For
+                       this to be stable, the new stf needs to bandlimited.
+        return_obspy_stream 
+                    -- return format is either an obspy.Stream object or a plain
+                       array containing the data
+        dt          -- desired sampling of the seismograms. resampling is done
+                       using a lanczos kernel
+        a_lanczos   -- width of the kernel used in resampling
         """
         rotmesh_s, rotmesh_phi, rotmesh_z = rotations.rotate_frame_rd(
             source.x * 1000.0, source.y * 1000.0, source.z * 1000.0,
@@ -275,12 +279,13 @@ class AxiSEMDB(object):
         and time shifts.
         
         Parameters:
-        sources -- a list of axisem_db.Source object
-        receiver -- axisem_db.Receiver object
-        components -- a tuple containing any combination of the strings "Z", "N" and "E"
-        dt -- desired sampling of the seismograms. resampling is done using a
-        lanczos kernel
-        a_lanczos -- width of the kernel used in resampling
+        sources     -- a list of axisem_db.Source object
+        receiver    -- axisem_db.Receiver object
+        components  -- a tuple containing any combination of the strings "Z",
+                       "N" and "E"
+        dt          -- desired sampling of the seismograms. resampling is done
+                       using a lanczos kernel
+        a_lanczos   -- width of the kernel used in resampling
         """
         data_summed = {}
         for source in sources:
@@ -405,7 +410,8 @@ class AxiSEMDB(object):
         elif self.meshes.pz is not None and self.meshes.px is None:
             components = 'vertical only'
 
-        return_str  = 'AxiSEM Database\n'
+        return_str  = "AxiSEM reciprocal Green's function Database\n"
+        return_str  = "generated with these parameters:\n"
         return_str += 'velocity model        : %s\n' % (self.background_model,)
         return_str += 'dominant period       : %6.3f s\n' % \
                                         (self.parsed_mesh.dominant_period,)

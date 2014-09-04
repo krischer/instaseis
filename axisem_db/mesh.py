@@ -67,8 +67,8 @@ class Buffer(object):
 
     def efficiency(self):
         """
-        Return the fraction of call to the __contains__() routine that
-        returned True.
+        Return the fraction of call to the __contains__() routine that returned
+        True.
         """
         if (self._hits + self._fails) == 0:
             return 0.
@@ -141,7 +141,8 @@ class Mesh(object):
             getattr(self.f, "host name"))
 
 
-        # wrapping this into try except, because these where only now added to the file
+        # wrapping this into try except, because these where only now added to
+        # the file
         try:
             self.kwf_rmin = getattr(self.f, "kernel wavefield rmin")
             self.kwf_rmax = getattr(self.f, "kernel wavefield rmax")
