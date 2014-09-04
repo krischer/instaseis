@@ -395,3 +395,28 @@ class AxiSEMDB(object):
     @property
     def slip(self):
         return self.parsed_mesh.stf
+
+    def __str__(self):
+
+        if self.meshes.pz is not None and self.meshes.px is not None:
+            components = 'vertical and horizontal'
+        elif self.meshes.pz is None and self.meshes.px is not None:
+            components = 'horizontal only'
+        elif self.meshes.pz is not None and self.meshes.px is None:
+            components = 'vertical only'
+
+        return_str  = 'AxiSEM Database\n'
+        return_str += 'velocity model    : %s\n' % (self.background_model,)
+        return_str += 'dominant period   : %6.3f s\n' % (self.parsed_mesh.dominant_period,)
+        return_str += 'components        : %s\n' % (components,)
+        return_str += 'time step         : %6.3f s\n' % (self.dt,)
+        return_str += 'sampling rate     : %6.3f Hz\n' % (1./self.dt,)
+        return_str += 'number of samples : %6i\n' % (self.ndumps,)
+        return_str += 'seismogram length : %6.1f s\n' % (self.dt * (self.ndumps - 1),)
+        return_str += 'source shift      : %6.3f s\n' % (self.parsed_mesh.source_shift,)
+        return_str += 'spatial order     : %6i\n' % (self.parsed_mesh.npol,)
+        
+        # TODO: need to be added to netcdf file:
+        # minlat, maxlat, mindep, maxdep
+        # time scheme
+        return return_str
