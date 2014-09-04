@@ -406,17 +406,29 @@ class AxiSEMDB(object):
             components = 'vertical only'
 
         return_str  = 'AxiSEM Database\n'
-        return_str += 'velocity model    : %s\n' % (self.background_model,)
-        return_str += 'dominant period   : %6.3f s\n' % (self.parsed_mesh.dominant_period,)
-        return_str += 'components        : %s\n' % (components,)
-        return_str += 'time step         : %6.3f s\n' % (self.dt,)
-        return_str += 'sampling rate     : %6.3f Hz\n' % (1./self.dt,)
-        return_str += 'number of samples : %6i\n' % (self.ndumps,)
-        return_str += 'seismogram length : %6.1f s\n' % (self.dt * (self.ndumps - 1),)
-        return_str += 'source shift      : %6.3f s\n' % (self.parsed_mesh.source_shift,)
-        return_str += 'spatial order     : %6i\n' % (self.parsed_mesh.npol,)
+        return_str += 'velocity model        : %s\n' % (self.background_model,)
+        return_str += 'dominant period       : %6.3f s\n' % \
+                                        (self.parsed_mesh.dominant_period,)
+        return_str += 'components            : %s\n' % (components,)
+        return_str += 'time step             : %6.3f s\n' % (self.dt,)
+        return_str += 'sampling rate         : %6.3f Hz\n' % (1./self.dt,)
+        return_str += 'number of samples     : %6i\n' % (self.ndumps,)
+        return_str += 'seismogram length     : %6.1f s\n' % \
+                                        (self.dt * (self.ndumps - 1),)
+        return_str += 'source shift          : %6.3f s\n' % \
+                                        (self.parsed_mesh.source_shift,)
+        return_str += 'spatial order         : %6i\n' % (self.parsed_mesh.npol,)
+
+        # some old databases do not contain this info, hence the if
+        if (self.parsed_mesh.kwf_rmin is not None and 
+                self.parsed_mesh.kwf_rmax is not None and 
+                self.parsed_mesh.kwf_colatmin is not None and 
+                self.parsed_mesh.kwf_colatmax is not None):
+            return_str += 'min/max radius [km]   : %6.1f %6.1f\n' % \
+                (self.parsed_mesh.kwf_rmin, self.parsed_mesh.kwf_rmax)
+            return_str += 'min/max dist [degree] : %6.1f %6.1f\n' % \
+                (self.parsed_mesh.kwf_colatmin, self.parsed_mesh.kwf_colatmax)
         
         # TODO: need to be added to netcdf file:
-        # minlat, maxlat, mindep, maxdep
         # time scheme
         return return_str
