@@ -55,15 +55,15 @@ class Source(SourceOrReceiver):
                  m_rp, m_tp, time_shift=None, sliprate=None, dt=None):
         """
         Parameters:
-        latitude -- latitude of the source in degree
-        longitude -- longitude of the source in degree
-        depth_in_m -- source depth in m
-        m_rr, m_tt, m_pp, m_rt, m_rp, m_tp -- moment tensor components in r,
-        theta, phi coordinates in Nm
-        time_shift -- correction of the origin time in seconds. only useful in
-        the context of finite sources
-        sliprate -- normalized source time function (sliprate)
-        dt -- sampling of the source time function
+        latitude    -- latitude of the source in degree
+        longitude   -- longitude of the source in degree
+        depth_in_m  -- source depth in m
+        m_rr, m_tt, m_pp, m_rt, m_rp, m_tp
+                    -- moment tensor components in r, theta, phi in Nm
+        time_shift  -- correction of the origin time in seconds. only useful in
+                       the context of finite sources
+        sliprate    -- normalized source time function (sliprate)
+        dt          -- sampling of the source time function
         """
         super(Source, self).__init__(latitude, longitude, depth_in_m)
         self.m_rr = m_rr
@@ -118,17 +118,17 @@ class Source(SourceOrReceiver):
         dip and rake.
 
         parameter:
-        latitude -- latitude of the source in degree
-        longitude -- longitude of the source in degree
-        depth_in_m -- source depth in m
-        strike -- strike of the fault in degree
-        dip -- dip of the fault in degree
-        rake -- rake of the fault in degree
-        M0 -- scalar moment
-        time_shift -- correction of the origin time in seconds. only useful in
-        the context of finite sources
-        sliprate -- normalized source time function (sliprate)
-        dt -- sampling of the source time function
+        latitude    -- latitude of the source in degree
+        longitude   -- longitude of the source in degree
+        depth_in_m  -- source depth in m
+        strike      -- strike of the fault in degree
+        dip         -- dip of the fault in degree
+        rake        -- rake of the fault in degree
+        M0          -- scalar moment
+        time_shift  -- correction of the origin time in seconds. only useful in
+                       the context of finite sources
+        sliprate    -- normalized source time function (sliprate)
+        dt          -- sampling of the source time function
         """
         # formulas in Udias (17.24) are in geographic system North, East,
         # Down, which # transforms to the geocentric as:
@@ -185,10 +185,10 @@ class Source(SourceOrReceiver):
         Add a source time function (sliprate) to a initialized source object.
 
         Parameters:
-        sliprate -- (normalized) sliprate
-        dt -- sampling of the sliprate
-        normalize -- if sliprate is not normalized, set this to true to
-        normalize it using trapezoidal rule style integration
+        sliprate    -- (normalized) sliprate
+        dt          -- sampling of the sliprate
+        normalize   -- if sliprate is not normalized, set this to true to
+                       normalize it using trapezoidal rule style integration
         """
         self.sliprate = np.array(sliprate)
         if normalize:
@@ -202,8 +202,8 @@ class Source(SourceOrReceiver):
         interpolation.
 
         Parameters:
-        dt -- desired sampling
-        nsamp -- desired number of samples
+        dt      -- desired sampling
+        nsamp   -- desired number of samples
         """
         t_new = np.linspace(0, nsamp * dt, nsamp, endpoint=False)
         t_old = np.linspace(0, self.dt * len(self.sliprate),
@@ -212,6 +212,19 @@ class Source(SourceOrReceiver):
         self.sliprate = interp(t_new, t_old, self.sliprate)
         self.dt = dt
 
+    def __str__(self):
+        return_str  = 'AxiSEM Database Source:\n'
+        return_str += 'longitude : %6.1f s\n' % (self.longitude)
+        return_str += 'latitude  : %6.1f s\n' % (self.latitude)
+        return_str += 'Mrr       : %10.2e Nm\n' % (self.m_rr)
+        return_str += 'Mtt       : %10.2e Nm\n' % (self.m_tt)
+        return_str += 'Mpp       : %10.2e Nm\n' % (self.m_pp)
+        return_str += 'Mrt       : %10.2e Nm\n' % (self.m_rt)
+        return_str += 'Mrp       : %10.2e Nm\n' % (self.m_rp)
+        return_str += 'Mtp       : %10.2e Nm\n' % (self.m_tp)
+
+        return return_str
+
 
 class Receiver(SourceOrReceiver):
     """
@@ -219,11 +232,20 @@ class Receiver(SourceOrReceiver):
     """
     def __init__(self, latitude, longitude, name='', network=''):
         """
-        latitude -- latitude of the source in degree
-        longitude -- longitude of the source in degree
-        name --  receiver name
-        network --  network name
+        latitude    -- latitude of the source in degree
+        longitude   -- longitude of the source in degree
+        name        -- receiver name
+        network     -- network name
         """
         super(Receiver, self).__init__(latitude, longitude, depth_in_m=0.0)
         self.name = name
         self.network = network
+
+    def __str__(self):
+        return_str  = 'AxiSEM Database Receiver:\n'
+        return_str += 'longitude : %6.1f s\n' % (self.longitude)
+        return_str += 'latitude  : %6.1f s\n' % (self.latitude)
+        return_str += 'name      : %s\n' % (self.name)
+        return_str += 'network   : %s\n' % (self.network)
+
+        return return_str
