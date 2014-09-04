@@ -40,6 +40,18 @@ class AxiSEMDB(object):
     order spatial accuracy and short access times.
     """
     def __init__(self, db_path, buffer_size_in_mb=100, read_on_demand=True):
+        """
+        Parameters:
+        db_path -- Path to the AxiSEM Database containing subdirectories PZ
+                   and/or PX each containing a order_output.nc4 file
+        buffer_size_in_mb
+                -- Strain is buffered to avoid unnecessary file access when
+                   sources are located in the same SEM element
+        read_on_demand
+                -- read several global fields on demand (faster initialization,
+                   default) or on initialization (faster in individual
+                   seismogram extraction, useful e.g. for finite sources)
+        """
         self.db_path = db_path
         self.buffer_size_in_mb = buffer_size_in_mb
         self.read_on_demand = read_on_demand
