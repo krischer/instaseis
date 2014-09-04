@@ -39,16 +39,16 @@ class AxiSEMDB(object):
     equals the SEM basis functions of AxiSEM, resulting in high order spatial
     accuracy and short access times.
     """
-    def __init__(self, folder, buffer_size_in_mb=100, read_on_demand=True):
-        self.folder = folder
+    def __init__(self, db_path, buffer_size_in_mb=100, read_on_demand=True):
+        self.db_path = db_path
         self.buffer_size_in_mb = buffer_size_in_mb
         self.read_on_demand = read_on_demand
         self._find_and_open_files()
         self.nfft = nextpow2(self.ndumps) * 2
 
     def _find_and_open_files(self):
-        px = os.path.join(self.folder, "PX")
-        pz = os.path.join(self.folder, "PZ")
+        px = os.path.join(self.db_path, "PX")
+        pz = os.path.join(self.db_path, "PZ")
         if not os.path.exists(px) and not os.path.exists(pz):
             raise ValueError(
                 "Expecting the 'PX' or 'PZ' subfolders to be present.")
@@ -395,3 +395,43 @@ class AxiSEMDB(object):
     @property
     def slip(self):
         return self.parsed_mesh.stf
+
+    def __str__(self):
+
+        if self.meshes.pz is not None and self.meshes.px is not None:
+            components = 'vertical and horizontal'
+        elif self.meshes.pz is None and self.meshes.px is not None:
+            components = 'horizontal only'
+        elif self.meshes.pz is not None and self.meshes.px is None:
+            components = 'vertical only'
+
+        return_str  = 'AxiSEM Database\n'
+        return_str += 'velocity model        : %s\n' % (self.background_model,)
+        return_str += 'dominant period       : %6.3f s\n' % \
+                                        (self.parsed_mesh.dominant_period,)
+        return_str += 'components            : %s\n' % (components,)
+        return_str += 'time step             : %6.3f s\n' % (self.dt,)
+        return_str += 'sampling rate         : %6.3f Hz\n' % (1./self.dt,)
+        return_str += 'number of samples     : %6i\n' % (self.ndumps,)
+        return_str += 'seismogram length     : %6.1f s\n' % \
+                                        (self.dt * (self.ndumps - 1),)
+        return_str += 'source shift          : %6.3f s\n' % \
+                                        (self.parsed_mesh.source_shift,)
+        return_str += 'spatial order         : %6i\n' % (self.parsed_mesh.npol,)
+
+        # some old databases do not contain this info, hence the if
+        if (self.parsed_mesh.kwf_rmin is not None and 
+                self.parsed_mesh.kwf_rmax is not None and 
+                self.parsed_mesh.kwf_colatmin is not None and 
+                self.parsed_mesh.kwf_colatmax is not None):
+            return_str += 'min/max radius [km]   : %6.1f %6.1f\n' % \
+                (self.parsed_mesh.kwf_rmin, self.parsed_mesh.kwf_rmax)
+            return_str += 'min/max dist [degree] : %6.1f %6.1f\n' % \
+                (self.parsed_mesh.kwf_colatmin, self.parsed_mesh.kwf_colatmax)
+
+        if self.parsed_mesh.time_scheme is not None:
+            return_str += 'time scheme           : %s\n' % (self.parsed_mesh.time_scheme,)
+        
+        # TODO: need to be added to netcdf file:
+        # time scheme
+        return return_str
