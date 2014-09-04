@@ -39,16 +39,16 @@ class AxiSEMDB(object):
     equals the SEM basis functions of AxiSEM, resulting in high order spatial
     accuracy and short access times.
     """
-    def __init__(self, folder, buffer_size_in_mb=100, read_on_demand=True):
-        self.folder = folder
+    def __init__(self, db_path, buffer_size_in_mb=100, read_on_demand=True):
+        self.db_path = db_path
         self.buffer_size_in_mb = buffer_size_in_mb
         self.read_on_demand = read_on_demand
         self._find_and_open_files()
         self.nfft = nextpow2(self.ndumps) * 2
 
     def _find_and_open_files(self):
-        px = os.path.join(self.folder, "PX")
-        pz = os.path.join(self.folder, "PZ")
+        px = os.path.join(self.db_path, "PX")
+        pz = os.path.join(self.db_path, "PZ")
         if not os.path.exists(px) and not os.path.exists(pz):
             raise ValueError(
                 "Expecting the 'PX' or 'PZ' subfolders to be present.")
