@@ -197,8 +197,8 @@ class Source(SourceOrReceiver):
 
     def resample_sliprate(self, dt, nsamp):
         """
-        For convolution, the sliprate is needed at the sampling of the fields in
-        the database. This function resamples the sliprate using linear
+        For convolution, the sliprate is needed at the sampling of the fields
+        in the database. This function resamples the sliprate using linear
         interpolation.
 
         Parameters:
@@ -213,7 +213,7 @@ class Source(SourceOrReceiver):
         self.dt = dt
 
     def __str__(self):
-        return_str  = 'AxiSEM Database Source:\n'
+        return_str = 'AxiSEM Database Source:\n'
         return_str += 'longitude : %6.1f s\n' % (self.longitude)
         return_str += 'latitude  : %6.1f s\n' % (self.latitude)
         return_str += 'Mrr       : %10.2e Nm\n' % (self.m_rr)
@@ -242,7 +242,7 @@ class Receiver(SourceOrReceiver):
         self.network = network
 
     def __str__(self):
-        return_str  = 'AxiSEM Database Receiver:\n'
+        return_str = 'AxiSEM Database Receiver:\n'
         return_str += 'longitude : %6.1f s\n' % (self.longitude)
         return_str += 'latitude  : %6.1f s\n' % (self.latitude)
         return_str += 'name      : %s\n' % (self.name)

@@ -140,7 +140,6 @@ class Mesh(object):
             getattr(self.f, "user name"),
             getattr(self.f, "host name"))
 
-
         # wrapping this into try except, because these where only now added to
         # the file
         try:
