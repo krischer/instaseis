@@ -152,6 +152,10 @@ class Mesh(object):
             self.kwf_rmax = None
             self.kwf_colatmin = None
             self.kwf_colatmax = None
+        try:
+            self.time_scheme = getattr(self.f, "time scheme")
+        except AttributeError:
+            self.time_scheme = None
 
         self.gll_points = spectral_basis.zelegl(self.npol)
         self.glj_points = spectral_basis.zemngl2(self.npol)

@@ -428,6 +428,9 @@ class AxiSEMDB(object):
                 (self.parsed_mesh.kwf_rmin, self.parsed_mesh.kwf_rmax)
             return_str += 'min/max dist [degree] : %6.1f %6.1f\n' % \
                 (self.parsed_mesh.kwf_colatmin, self.parsed_mesh.kwf_colatmax)
+
+        if self.parsed_mesh.time_scheme is not None:
+            return_str += 'time scheme           : %s\n' % (self.parsed_mesh.time_scheme,)
         
         # TODO: need to be added to netcdf file:
         # time scheme
