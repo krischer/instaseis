@@ -140,6 +140,19 @@ class Mesh(object):
             getattr(self.f, "user name"),
             getattr(self.f, "host name"))
 
+
+        # wrapping this into try except, because these where only now added to the file
+        try:
+            self.kwf_rmin = getattr(self.f, "kernel wavefield rmin")
+            self.kwf_rmax = getattr(self.f, "kernel wavefield rmax")
+            self.kwf_colatmin = getattr(self.f, "kernel wavefield colatmin")
+            self.kwf_colatmax = getattr(self.f, "kernel wavefield colatmax")
+        except AttributeError:
+            self.kwf_rmin = None
+            self.kwf_rmax = None
+            self.kwf_colatmin = None
+            self.kwf_colatmax = None
+
         self.gll_points = spectral_basis.zelegl(self.npol)
         self.glj_points = spectral_basis.zemngl2(self.npol)
         self.G0, self.G1 = spectral_basis.def_lagrange_derivs_glj(self.npol)
