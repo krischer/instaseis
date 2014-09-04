@@ -93,12 +93,12 @@ In [3]: receiver = Receiver(latitude=42.6390, longitude=74.4940)
 
 In [4]: source = Source(
    ...:     latitude=89.91, longitude=0.0, depth_in_m=12000,
-   ...:     m_rr=4.710000e+24 / 1E7,
-   ...:     m_tt=3.810000e+22 / 1E7,,
-   ...:     m_pp=-4.740000e+24 / 1E7,
-   ...:     m_rt=3.990000e+23 / 1E7,
-   ...:     m_rp=-8.050000e+23 / 1E7,
-   ...:     m_tp=-1.230000e+24 / 1E7)
+   ...:     m_rr = 4.710000e+24 / 1E7,
+   ...:     m_tt = 3.810000e+22 / 1E7,
+   ...:     m_pp =-4.740000e+24 / 1E7,
+   ...:     m_rt = 3.990000e+23 / 1E7,
+   ...:     m_rp =-8.050000e+23 / 1E7,
+   ...:     m_tp =-1.230000e+24 / 1E7)
 
 In [5]: st = axisem_db.get_seismograms(source=source, receiver=receiver)
 
