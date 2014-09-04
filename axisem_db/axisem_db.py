@@ -411,7 +411,7 @@ class AxiSEMDB(object):
             components = 'vertical only'
 
         return_str  = "AxiSEM reciprocal Green's function Database\n"
-        return_str  = "generated with these parameters:\n"
+        return_str += "generated with these parameters:\n"
         return_str += 'velocity model        : %s\n' % (self.background_model,)
         return_str += 'dominant period       : %6.3f s\n' % \
                                         (self.parsed_mesh.dominant_period,)
@@ -438,6 +438,4 @@ class AxiSEMDB(object):
         if self.parsed_mesh.time_scheme is not None:
             return_str += 'time scheme           : %s\n' % (self.parsed_mesh.time_scheme,)
         
-        # TODO: need to be added to netcdf file:
-        # time scheme
         return return_str
