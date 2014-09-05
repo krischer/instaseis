@@ -118,3 +118,21 @@ def test_parse_obspy_waveform_objects():
     assert (round(rec.latitude, 3), round(rec.longitude, 3),
             rec.network, rec.station) == \
            (round(34.94598, 3), round(-106.45713, 3), 'IU', 'ANMO')
+
+
+def test_duplicate_receivers():
+    """
+    Many waveform files contain multiple channels of the same stations. Of
+    course these duplicates need to be purged.
+    """
+    filename = os.path.join(DATA, "example.sac")
+    st = obspy.read(filename)
+    st += st.copy()
+    st[1].stats.channel = "LHZ"
+
+    receivers = Receiver.parse(st)
+    assert len(receivers) == 1
+    rec = receivers[0]
+    assert (round(rec.latitude, 3), round(rec.longitude, 3),
+            rec.network, rec.station) == \
+           (round(34.94598, 3), round(-106.45713, 3), 'IU', 'ANMO')
