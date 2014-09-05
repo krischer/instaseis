@@ -5,6 +5,7 @@ Source and Receiver classes used for the AxiSEM DB Python interface.
 
 :copyright:
     Lion Krischer (krischer@geophysik.uni-muenchen.de), 2014
+    Martin van Driel (Martin@vanDriel.de), 2014
 :license:
     GNU General Public License, Version 3
     (http://www.gnu.org/copyleft/gpl.html)
@@ -12,6 +13,7 @@ Source and Receiver classes used for the AxiSEM DB Python interface.
 from __future__ import absolute_import
 
 import numpy as np
+import obspy
 from scipy import interp
 
 EARTH_RADIUS = 6371.0 * 1000.0
@@ -215,7 +217,7 @@ class Source(SourceOrReceiver):
 
 class Receiver(SourceOrReceiver):
     """
-    A class to handle a receiver including the name and network.
+    Class dealing with seismic receivers.
     """
     def __init__(self, latitude, longitude, network=None, station=None):
         """
@@ -227,3 +229,111 @@ class Receiver(SourceOrReceiver):
         super(Receiver, self).__init__(latitude, longitude, depth_in_m=0.0)
         self.network = network or ""
         self.station = station or ""
+
+    @staticmethod
+    def parse(filename_or_obj, network_code=None):
+        """
+        Attempts to parse anything to a list of Receiver objects. Always
+        returns a list, even if it only contains a single element. It is
+        meant as a single entry point for receiver information from any source.
+
+        Supports StationXML, the custom STATIONS fileformat, SAC files,
+        and a number of ObsPy objects. This method can furthermore work with
+        anything ObsPy can deal with (filename, URL, memory files, ...).
+
+        :param filename_or_obj: Filename/URL/Python object
+        :param network_code: Network code needed to parse ObsPy station
+            objects. Likely only needed for the recursive part of this method.
+        :return: List of :class:`~axisem_db.source.Receiver` objects.
+        """
+        receivers = []
+
+        # STATIONS file.
+        if isinstance(filename_or_obj, basestring):
+            try:
+                return Receiver.parse_stations_file(filename_or_obj)
+            except:
+                pass
+        # ObsPy inventory.
+        elif isinstance(filename_or_obj, obspy.station.Inventory):
+            for network in filename_or_obj:
+                receivers.extend(Receiver.parse(network))
+            return receivers
+        # ObsPy network.
+        elif isinstance(filename_or_obj, obspy.station.Network):
+            for station in filename_or_obj:
+                receivers.extend(Receiver.parse(
+                    station, network_code=filename_or_obj.code))
+            return receivers
+        # ObsPy station.
+        elif isinstance(filename_or_obj, obspy.station.Station):
+            if network_code is None:
+                raise ValueError("network_code must be given.")
+            # If there are no channels, use the station coordinates.
+            if not filename_or_obj.channels:
+                return [Receiver(
+                    latitude=filename_or_obj.latitude,
+                    longitude=filename_or_obj.longitude,
+                    network=network_code, station=filename_or_obj.code)]
+            # Otherwise use the channel information. Raise an error if the
+            # coordinates are not identical for each channel. Only parse
+            # latitude and longitude, as the DB currently cannot deal with
+            # varying receiver heights.
+            else:
+                coords = set((_i.latitude, _i.longitude) for _i in
+                             filename_or_obj.channels)
+                if len(coords) != 1:
+                    raise ValueError(
+                        "The coordinates of the channels of station '%s.%s' "
+                        "are not identical." % (network_code,
+                                                filename_or_obj.code))
+                coords = coords.pop()
+                return [Receiver(latitude=coords[0], longitude=coords[1],
+                                 network=network_code,
+                                 station=filename_or_obj.code)]
+        # ObsPy Stream (SAC files contain coordinates).
+        elif isinstance(filename_or_obj, obspy.Stream):
+            for tr in filename_or_obj:
+                receivers.extend(Receiver.parse(tr))
+        elif isinstance(filename_or_obj, obspy.Trace):
+            if not hasattr("sac") in filename_or_obj.stats:
+                raise ValueError("ObsPy Trace must have an sac attribute.")
+            coords = (filename_or_obj.stats.sac.stla,
+                      filename_or_obj.stats.sac.stlo)
+            if -12345.0 in coords:
+                raise ValueError(
+                    "SAC file does not coordinates for channel '%s'" %
+                    filename_or_obj.id)
+            return [Receiver(latitude=coords[0], longitude=coords[1],
+                             network=filename_or_obj.stats.network,
+                             station=filename_or_obj.stats.station)]
+        # Check if its anything ObsPy can read and recurse.
+        try:
+            return Receiver.parse(obspy.read_inventory(filename_or_obj))
+        except:
+            pass
+        try:
+            return Receiver.parse(obspy.read(filename_or_obj))
+        except:
+            pass
+
+        raise ValueError("'%' could not be parsed." % repr(filename_or_obj))
+
+    @staticmethod
+    def parse_stations_file(filename):
+        """
+        Parses a custom STATIONS file format to a list of Receiver objects.
+
+        :param filename: Filename
+        :return: List of :class:`~axisem_db.source.Receiver` objects.
+        """
+        with open(filename, 'rt') as f:
+            receivers = []
+
+            for line in f:
+                station, network, lat, lon, _, _ = line.split()
+                lat = float(lat)
+                lon = float(lon)
+                receivers.append(Receiver(lat, lon, network, station))
+
+        return receivers
