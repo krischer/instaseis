@@ -10,9 +10,13 @@ Tests for the receiver handling.
     (http://www.gnu.org/copyleft/gpl.html)
 """
 from __future__ import absolute_import
+
+import obspy
 import os
 
 from ..source import Receiver
+
+DATA = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
 
 def test_parse_STATIONS_file(tmpdir):
@@ -38,3 +42,37 @@ def test_parse_STATIONS_file(tmpdir):
     rec = receivers[1]
     assert (rec.latitude, rec.longitude, rec.network, rec.station) == \
            (20.0, 30.0, "AA", "BBK")
+
+
+def test_parse_StationXML():
+    filename = os.path.join(DATA, "TA.Q56A..BH.xml")
+    receivers = Receiver.parse(filename)
+
+    assert len(receivers) == 1
+    rec = receivers[0]
+
+    assert (rec.latitude, rec.longitude, rec.network, rec.station) == \
+       (39.041, -79.1871, "TA", "Q56A")
+
+
+def test_parse_obspy_objects():
+    filename = os.path.join(DATA, "TA.Q56A..BH.xml")
+    inv = obspy.read_inventory(filename)
+
+    receivers = Receiver.parse(inv)
+    assert len(receivers) == 1
+    rec = receivers[0]
+    assert (rec.latitude, rec.longitude, rec.network, rec.station) == \
+           (39.041, -79.1871, "TA", "Q56A")
+
+    receivers = Receiver.parse(inv[0])
+    assert len(receivers) == 1
+    rec = receivers[0]
+    assert (rec.latitude, rec.longitude, rec.network, rec.station) == \
+           (39.041, -79.1871, "TA", "Q56A")
+
+    receivers = Receiver.parse(inv[0][0], network_code="TA")
+    assert len(receivers) == 1
+    rec = receivers[0]
+    assert (rec.latitude, rec.longitude, rec.network, rec.station) == \
+           (39.041, -79.1871, "TA", "Q56A")
