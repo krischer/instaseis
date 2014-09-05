@@ -19,6 +19,10 @@ from scipy import interp
 EARTH_RADIUS = 6371.0 * 1000.0
 
 
+class ReceiverParseError(Exception):
+    pass
+
+
 class SourceOrReceiver(object):
     def __init__(self, latitude, longitude, depth_in_m):
         self.latitude = latitude
@@ -268,7 +272,7 @@ class Receiver(SourceOrReceiver):
         # ObsPy station.
         elif isinstance(filename_or_obj, obspy.station.Station):
             if network_code is None:
-                raise ValueError("network_code must be given.")
+                raise ReceiverParseError("network_code must be given.")
             # If there are no channels, use the station coordinates.
             if not filename_or_obj.channels:
                 return [Receiver(
@@ -283,7 +287,7 @@ class Receiver(SourceOrReceiver):
                 coords = set((_i.latitude, _i.longitude) for _i in
                              filename_or_obj.channels)
                 if len(coords) != 1:
-                    raise ValueError(
+                    raise ReceiverParseError(
                         "The coordinates of the channels of station '%s.%s' "
                         "are not identical." % (network_code,
                                                 filename_or_obj.code))
@@ -295,14 +299,16 @@ class Receiver(SourceOrReceiver):
         elif isinstance(filename_or_obj, obspy.Stream):
             for tr in filename_or_obj:
                 receivers.extend(Receiver.parse(tr))
+            return receivers
         elif isinstance(filename_or_obj, obspy.Trace):
-            if not hasattr("sac") in filename_or_obj.stats:
-                raise ValueError("ObsPy Trace must have an sac attribute.")
+            if not hasattr(filename_or_obj.stats, "sac"):
+                raise ReceiverParseError("ObsPy Trace must have an sac "
+                                         "attribute.")
             coords = (filename_or_obj.stats.sac.stla,
                       filename_or_obj.stats.sac.stlo)
             if -12345.0 in coords:
-                raise ValueError(
-                    "SAC file does not coordinates for channel '%s'" %
+                raise ReceiverParseError(
+                    "SAC file does not contain coordinates for channel '%s'" %
                     filename_or_obj.id)
             return [Receiver(latitude=coords[0], longitude=coords[1],
                              network=filename_or_obj.stats.network,
@@ -310,6 +316,8 @@ class Receiver(SourceOrReceiver):
         # Check if its anything ObsPy can read and recurse.
         try:
             return Receiver.parse(obspy.read_inventory(filename_or_obj))
+        except ReceiverParseError as e:
+            raise e
         except:
             pass
         # Many StationXML files do not conform to the standard, thus the
@@ -317,11 +325,14 @@ class Receiver(SourceOrReceiver):
         try:
             return Receiver.parse(obspy.read_inventory(filename_or_obj,
                                                        format="stationxml"))
+        except ReceiverParseError as e:
+            raise e
         except:
             pass
-        from IPython.core.debugger import Tracer; Tracer(colors="Linux")()
         try:
             return Receiver.parse(obspy.read(filename_or_obj))
+        except ReceiverParseError as e:
+            raise e
         except:
             pass
 

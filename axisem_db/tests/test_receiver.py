@@ -13,8 +13,9 @@ from __future__ import absolute_import
 
 import obspy
 import os
+import pytest
 
-from ..source import Receiver
+from ..source import Receiver, ReceiverParseError
 
 DATA = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
@@ -52,7 +53,7 @@ def test_parse_StationXML():
     rec = receivers[0]
 
     assert (rec.latitude, rec.longitude, rec.network, rec.station) == \
-       (39.041, -79.1871, "TA", "Q56A")
+        (39.041, -79.1871, "TA", "Q56A")
 
 
 def test_parse_obspy_objects():
@@ -76,3 +77,44 @@ def test_parse_obspy_objects():
     rec = receivers[0]
     assert (rec.latitude, rec.longitude, rec.network, rec.station) == \
            (39.041, -79.1871, "TA", "Q56A")
+
+
+def test_parse_sac_files():
+    filename = os.path.join(DATA, "example.sac")
+    receivers = Receiver.parse(filename)
+
+    assert len(receivers) == 1
+    rec = receivers[0]
+    assert (round(rec.latitude, 3), round(rec.longitude, 3),
+            rec.network, rec.station) == \
+        (round(34.94598, 3), round(-106.45713, 3), 'IU', 'ANMO')
+
+
+def test_parse_sac_file_without_coordinates():
+    filename = os.path.join(DATA, "example_without_coordinates.sac")
+    with pytest.raises(ReceiverParseError) as e:
+        Receiver.parse(filename)
+
+    assert "SAC file does not contain coordinates for channel".lower() in \
+        str(e).lower()
+
+
+def test_parse_obspy_waveform_objects():
+    filename = os.path.join(DATA, "example.sac")
+    st = obspy.read(filename)
+
+    # From stream.
+    receivers = Receiver.parse(st)
+    assert len(receivers) == 1
+    rec = receivers[0]
+    assert (round(rec.latitude, 3), round(rec.longitude, 3),
+            rec.network, rec.station) == \
+           (round(34.94598, 3), round(-106.45713, 3), 'IU', 'ANMO')
+
+    # From trace.
+    receivers = Receiver.parse(st[0])
+    assert len(receivers) == 1
+    rec = receivers[0]
+    assert (round(rec.latitude, 3), round(rec.longitude, 3),
+            rec.network, rec.station) == \
+           (round(34.94598, 3), round(-106.45713, 3), 'IU', 'ANMO')
