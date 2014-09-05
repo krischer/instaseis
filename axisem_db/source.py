@@ -312,12 +312,20 @@ class Receiver(SourceOrReceiver):
             return Receiver.parse(obspy.read_inventory(filename_or_obj))
         except:
             pass
+        # Many StationXML files do not conform to the standard, thus the
+        # ObsPy format detection fails. Catch those here.
+        try:
+            return Receiver.parse(obspy.read_inventory(filename_or_obj,
+                                                       format="stationxml"))
+        except:
+            pass
+        from IPython.core.debugger import Tracer; Tracer(colors="Linux")()
         try:
             return Receiver.parse(obspy.read(filename_or_obj))
         except:
             pass
 
-        raise ValueError("'%' could not be parsed." % repr(filename_or_obj))
+        raise ValueError("'%s' could not be parsed." % repr(filename_or_obj))
 
     @staticmethod
     def parse_stations_file(filename):
