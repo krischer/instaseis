@@ -12,6 +12,7 @@ Source and Receiver classes used for the AxiSEM DB Python interface.
 """
 from __future__ import absolute_import
 
+import functools
 import numpy as np
 import obspy
 from scipy import interp
@@ -23,11 +24,36 @@ class ReceiverParseError(Exception):
     pass
 
 
+def purge_duplicates(f):
+    """
+    Simple decorator removing duplicates in the returned list. Preserves the
+    order and will remove duplicates occuring later in the list.
+    """
+    @functools.wraps(f)
+    def wrapper(*args, **kwds):
+        ret_val = f(*args, **kwds)
+        new_list = []
+        for item in ret_val:
+            if item in new_list:
+                continue
+            new_list.append(item)
+        return new_list
+    return wrapper
+
+
 class SourceOrReceiver(object):
     def __init__(self, latitude, longitude, depth_in_m):
         self.latitude = latitude
         self.longitude = longitude
         self.depth_in_m = depth_in_m
+
+    def __eq__(self, other):
+        if type(self) != type(other):
+            return False
+        return self.__dict__ == other.__dict__
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
 
     @property
     def colatitude(self):
@@ -235,6 +261,7 @@ class Receiver(SourceOrReceiver):
         self.station = station or ""
 
     @staticmethod
+    @purge_duplicates
     def parse(filename_or_obj, network_code=None):
         """
         Attempts to parse anything to a list of Receiver objects. Always
