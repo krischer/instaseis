@@ -12,9 +12,12 @@ Source and Receiver classes used for the AxiSEM DB Python interface.
 """
 from __future__ import absolute_import
 
+import collections
 import functools
 import numpy as np
 import obspy
+import obspy.xseed
+import os
 from scipy import interp
 
 EARTH_RADIUS = 6371.0 * 1000.0
@@ -269,8 +272,9 @@ class Receiver(SourceOrReceiver):
         meant as a single entry point for receiver information from any source.
 
         Supports StationXML, the custom STATIONS fileformat, SAC files,
-        and a number of ObsPy objects. This method can furthermore work with
-        anything ObsPy can deal with (filename, URL, memory files, ...).
+        SEED files, and a number of ObsPy objects. This method can
+        furthermore work with anything ObsPy can deal with (filename, URL,
+        memory files, ...).
 
         :param filename_or_obj: Filename/URL/Python object
         :param network_code: Network code needed to parse ObsPy station
@@ -280,7 +284,8 @@ class Receiver(SourceOrReceiver):
         receivers = []
 
         # STATIONS file.
-        if isinstance(filename_or_obj, basestring):
+        if isinstance(filename_or_obj, basestring) and \
+                os.path.exists(filename_or_obj):
             try:
                 return Receiver.parse_stations_file(filename_or_obj)
             except:
@@ -340,6 +345,24 @@ class Receiver(SourceOrReceiver):
             return [Receiver(latitude=coords[0], longitude=coords[1],
                              network=filename_or_obj.stats.network,
                              station=filename_or_obj.stats.station)]
+        elif isinstance(filename_or_obj, obspy.xseed.Parser):
+            inv = filename_or_obj.getInventory()
+            stations = collections.defaultdict(list)
+            for chan in inv["channels"]:
+                stat = tuple(chan["channel_id"].split(".")[:2])
+                stations[stat].append((chan["latitude"], chan["longitude"]))
+            receivers = []
+            for key, value in stations.items():
+                if len(set(value)) != 1:
+                    raise ReceiverParseError(
+                        "The coordinates of the channels of station '%s.%s' "
+                        "are not identical" % key)
+                receivers.append(Receiver(latitude=value[0][0],
+                                          longitude=value[0][1],
+                                          network=key[0],
+                                          station=key[1]))
+            return receivers
+
         # Check if its anything ObsPy can read and recurse.
         try:
             return Receiver.parse(obspy.read_inventory(filename_or_obj))
@@ -356,8 +379,18 @@ class Receiver(SourceOrReceiver):
             raise e
         except:
             pass
+
+        # SAC files contain station coordinates.
         try:
             return Receiver.parse(obspy.read(filename_or_obj))
+        except ReceiverParseError as e:
+            raise e
+        except:
+            pass
+
+        # Last but not least try to parse it as a SEED file.
+        try:
+            return Receiver.parse(obspy.xseed.Parser(filename_or_obj))
         except ReceiverParseError as e:
             raise e
         except:
