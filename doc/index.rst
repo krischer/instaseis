@@ -15,13 +15,3 @@ Contents:
    mesh
    source
    srf
-
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
