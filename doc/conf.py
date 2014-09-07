@@ -272,3 +272,5 @@ intersphinx_mapping = {
     'python': ('http://docs.python.org/', None),
     'obspy': ('http://docs.obspy.org/', None)
 }
+
+autoclass_content = "both"
