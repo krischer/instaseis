@@ -5,7 +5,7 @@
 is done with sphinx and will be hosted somewhere as soon as the project becomes
 open to the public.
 
-To build the documentations locally run
+To build the documentation locally run
 
 ```bash
 $ pip install sphinx sphinx-bootstrap-theme
