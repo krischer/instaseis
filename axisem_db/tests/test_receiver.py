@@ -136,3 +136,13 @@ def test_duplicate_receivers():
     assert (round(rec.latitude, 3), round(rec.longitude, 3),
             rec.network, rec.station) == \
            (round(34.94598, 3), round(-106.45713, 3), 'IU', 'ANMO')
+
+
+def test_dataless_seed_files():
+    filename = os.path.join(DATA, "dataless.seed.BW_FURT")
+    receivers = Receiver.parse(filename)
+    assert len(receivers) == 1
+    rec = receivers[0]
+    assert (round(rec.latitude, 3), round(rec.longitude, 3),
+            rec.network, rec.station) == \
+           (round(48.162899, 3), round(11.2752, 3), 'BW', 'FURT')
