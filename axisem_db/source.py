@@ -89,16 +89,19 @@ class Source(SourceOrReceiver):
     def __init__(self, latitude, longitude, depth_in_m, m_rr, m_tt, m_pp, m_rt,
                  m_rp, m_tp, time_shift=None, sliprate=None, dt=None):
         """
-        Parameters:
-        latitude    -- latitude of the source in degree
-        longitude   -- longitude of the source in degree
-        depth_in_m  -- source depth in m
-        m_rr, m_tt, m_pp, m_rt, m_rp, m_tp
-                    -- moment tensor components in r, theta, phi in Nm
-        time_shift  -- correction of the origin time in seconds. only useful in
-                       the context of finite sources
-        sliprate    -- normalized source time function (sliprate)
-        dt          -- sampling of the source time function
+        :param latitude: latitude of the source in degree
+        :param longitude: longitude of the source in degree
+        :param depth_in_m: source depth in m
+        :param m_rr: moment tensor components in r, theta, phi in Nm
+        :param m_tt: moment tensor components in r, theta, phi in Nm
+        :param m_pp: moment tensor components in r, theta, phi in Nm
+        :param m_rt: moment tensor components in r, theta, phi in Nm
+        :param m_rp: moment tensor components in r, theta, phi in Nm
+        :param m_tp: moment tensor components in r, theta, phi in Nm
+        :param time_shift: correction of the origin time in seconds. only
+            useful in the context of finite sources
+        :param sliprate: normalized source time function (sliprate)
+        :param dt: sampling of the source time function
         """
         super(Source, self).__init__(latitude, longitude, depth_in_m)
         self.m_rr = m_rr
@@ -121,8 +124,7 @@ class Source(SourceOrReceiver):
         """
         Initialize a source object from a CMTSOLUTION file.
 
-        parameter:
-        filename -- path to the CMTSOLUTION file
+        :param filename: path to the CMTSOLUTION file
         """
         f = open(filename, 'r')
         f.readline()
@@ -152,18 +154,17 @@ class Source(SourceOrReceiver):
         Initialize a source object from a shear source parameterized by strike,
         dip and rake.
 
-        parameter:
-        latitude    -- latitude of the source in degree
-        longitude   -- longitude of the source in degree
-        depth_in_m  -- source depth in m
-        strike      -- strike of the fault in degree
-        dip         -- dip of the fault in degree
-        rake        -- rake of the fault in degree
-        M0          -- scalar moment
-        time_shift  -- correction of the origin time in seconds. only useful in
-                       the context of finite sources
-        sliprate    -- normalized source time function (sliprate)
-        dt          -- sampling of the source time function
+        :param latitude: latitude of the source in degree
+        :param longitude: longitude of the source in degree
+        :param depth_in_m: source depth in m
+        :param strike: strike of the fault in degree
+        :param dip: dip of the fault in degree
+        :param rake: rake of the fault in degree
+        :param M0: scalar moment
+        :param time_shift: correction of the origin time in seconds. only
+            useful in the context of finite sources
+        :param sliprate: normalized source time function (sliprate)
+        :param dt: sampling of the source time function
         """
         # formulas in Udias (17.24) are in geographic system North, East,
         # Down, which # transforms to the geocentric as:
@@ -219,11 +220,10 @@ class Source(SourceOrReceiver):
         """
         Add a source time function (sliprate) to a initialized source object.
 
-        Parameters:
-        sliprate    -- (normalized) sliprate
-        dt          -- sampling of the sliprate
-        normalize   -- if sliprate is not normalized, set this to true to
-                       normalize it using trapezoidal rule style integration
+        :param sliprate: (normalized) sliprate
+        :param dt: sampling of the sliprate
+        :param normalize: if sliprate is not normalized, set this to true to
+            normalize it using trapezoidal rule style integration
         """
         self.sliprate = np.array(sliprate)
         if normalize:
@@ -236,9 +236,8 @@ class Source(SourceOrReceiver):
         in the database. This function resamples the sliprate using linear
         interpolation.
 
-        Parameters:
-        dt      -- desired sampling
-        nsamp   -- desired number of samples
+        :param dt: desired sampling
+        :param nsamp: desired number of samples
         """
         t_new = np.linspace(0, nsamp * dt, nsamp, endpoint=False)
         t_old = np.linspace(0, self.dt * len(self.sliprate),
@@ -267,10 +266,10 @@ class Receiver(SourceOrReceiver):
     """
     def __init__(self, latitude, longitude, network=None, station=None):
         """
-        latitude -- latitude of the source in degree
-        longitude -- longitude of the source in degree
-        network -- network id
-        station -- station id
+        :param latitude: latitude of the source in degree
+        :param longitude: longitude of the source in degree
+        :param network: network id
+        :param station: station id
         """
         super(Receiver, self).__init__(latitude, longitude, depth_in_m=0.0)
         self.network = network or ""

@@ -2,5 +2,5 @@
 Axisem DB Class
 ===============
 
-.. automodule:: axisem_db.axisem_db
+.. autoclass:: axisem_db.axisem_db.AxiSEMDB
     :members:
