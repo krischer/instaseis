@@ -36,6 +36,7 @@ extensions = [
     'sphinx.ext.todo',
     'sphinx.ext.mathjax',
     'sphinx.ext.viewcode',
+    'sphinx.ext.intersphinx'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -266,3 +267,8 @@ texinfo_documents = [
 
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 #texinfo_no_detailmenu = False
+
+intersphinx_mapping = {
+    'python': ('http://docs.python.org/', None),
+    'obspy': ('http://docs.obspy.org/', None)
+}
