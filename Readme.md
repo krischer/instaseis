@@ -3,6 +3,8 @@
 
 ### Requirements
 
+* gfortran >= 4.7
+
 It has only been tested with Python 2.7 and requires the following Python modules:
 
 * netCDF4
@@ -40,7 +42,7 @@ $ conda install basemap
 
 ### Installation
 
-Install it by cloning the git repository and installing with an editable installation. The Makefile currently has to executed to build the shared library until a proper installation routine has been written.
+Install it by cloning the git repository and installing with an editable installation. The Makefile currently has to be executed to build the shared library until a proper installation routine has been written.
 
 ```bash
 $ git clone https://github.com/krischer/axisem_db.git
@@ -93,12 +95,12 @@ In [3]: receiver = Receiver(latitude=42.6390, longitude=74.4940)
 
 In [4]: source = Source(
    ...:     latitude=89.91, longitude=0.0, depth_in_m=12000,
-   ...:     m_rr=4.710000e+24 / 1E7,
-   ...:     m_tt=3.810000e+22 / 1E7,,
-   ...:     m_pp=-4.740000e+24 / 1E7,
-   ...:     m_rt=3.990000e+23 / 1E7,
-   ...:     m_rp=-8.050000e+23 / 1E7,
-   ...:     m_tp=-1.230000e+24 / 1E7)
+   ...:     m_rr = 4.710000e+24 / 1E7,
+   ...:     m_tt = 3.810000e+22 / 1E7,
+   ...:     m_pp =-4.740000e+24 / 1E7,
+   ...:     m_rt = 3.990000e+23 / 1E7,
+   ...:     m_rp =-8.050000e+23 / 1E7,
+   ...:     m_tp =-1.230000e+24 / 1E7)
 
 In [5]: st = axisem_db.get_seismograms(source=source, receiver=receiver)
 
