@@ -79,6 +79,25 @@ and execute
 in the modules source code directory. The command will discover and execute all
 defined tests.
 
+Build the Documentation
+-----------------------
+
+The documentation requires sphinx and the Bootstrap theme. Install both with
+
+.. code-block:: bash
+
+    $ pip install sphinx sphinx-bootstrap-theme
+
+Build the doc with
+
+.. code-block:: bash
+
+    $ cd doc
+    $ make html
+
+Finally open the ``doc/_build/html/index.html`` file with the browser of your
+choice or host it somewhere.
+
 
 Usage
 -----
