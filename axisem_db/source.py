@@ -27,7 +27,7 @@ class ReceiverParseError(Exception):
     pass
 
 
-def purge_duplicates(f):
+def _purge_duplicates(f):
     """
     Simple decorator removing duplicates in the returned list. Preserves the
     order and will remove duplicates occuring later in the list.
@@ -264,7 +264,7 @@ class Receiver(SourceOrReceiver):
         self.station = station or ""
 
     @staticmethod
-    @purge_duplicates
+    @_purge_duplicates
     def parse(filename_or_obj, network_code=None):
         """
         Attempts to parse anything to a list of Receiver objects. Always
@@ -287,7 +287,7 @@ class Receiver(SourceOrReceiver):
         if isinstance(filename_or_obj, basestring) and \
                 os.path.exists(filename_or_obj):
             try:
-                return Receiver.parse_stations_file(filename_or_obj)
+                return Receiver._parse_stations_file(filename_or_obj)
             except:
                 pass
         # ObsPy inventory.
@@ -399,7 +399,7 @@ class Receiver(SourceOrReceiver):
         raise ValueError("'%s' could not be parsed." % repr(filename_or_obj))
 
     @staticmethod
-    def parse_stations_file(filename):
+    def _parse_stations_file(filename):
         """
         Parses a custom STATIONS file format to a list of Receiver objects.
 
