@@ -270,7 +270,7 @@ class AxiSEMDB(object):
             for comp in components:
                 tr = Trace(data=data[comp],
                            header={"delta": dt,
-                                   "station": receiver.name,
+                                   "station": receiver.station,
                                    "network": receiver.network,
                                    "channel": "%sX%s" % (band_code, comp)})
                 st += tr
@@ -325,7 +325,7 @@ class AxiSEMDB(object):
         for comp in components:
             tr = Trace(data=data_summed[comp],
                        header={"delta": dt,
-                               "station": receiver.name,
+                               "station": receiver.station,
                                "network": receiver.network,
                                "channel": "%sX%s" % (band_code, comp)})
             st += tr
