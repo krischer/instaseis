@@ -113,7 +113,7 @@ class AxiSEMDB(object):
         :param components: a tuple containing any combination of the
             strings ``"Z"``, ``"N"``, and ``"E"``
         :param remove_source_shift: move the starttime to the peak of the
-            sliprate
+            sliprate from the source time function used to generate the database
         :param reconvolve_stf: deconvolve the source time function used in
             the AxiSEM run and convolve with the stf attached to the source.
             For this to be stable, the new stf needs to bandlimited.
