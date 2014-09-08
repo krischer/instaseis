@@ -41,16 +41,16 @@ class AxiSEMDB(object):
     """
     def __init__(self, db_path, buffer_size_in_mb=100, read_on_demand=True):
         """
-        Parameters:
-        db_path -- Path to the AxiSEM Database containing subdirectories PZ
-                   and/or PX each containing a order_output.nc4 file
-        buffer_size_in_mb
-                -- Strain is buffered to avoid unnecessary file access when
-                   sources are located in the same SEM element
-        read_on_demand
-                -- read several global fields on demand (faster initialization,
-                   default) or on initialization (faster in individual
-                   seismogram extraction, useful e.g. for finite sources)
+        :param db_path: Path to the AxiSEM Database containing subdirectories PZ
+            and/or PX each containing a order_output.nc4 file
+        :type db_path: str
+        :param buffer_size_in_mb: Strain is buffered to avoid unnecessary
+            file access when sources are located in the same SEM element
+        :type buffer_size_in_mb: int, optional
+        :param read_on_demand: read several global fields on demand (faster
+            initialization, default) or on initialization (faster in individual
+            seismogram extraction, useful e.g. for finite sources)
+        :type read_on_demand: bool, optional
         """
         self.db_path = db_path
         self.buffer_size_in_mb = buffer_size_in_mb
@@ -106,24 +106,22 @@ class AxiSEMDB(object):
         Extract seismograms for a moment tensor point source from the AxiSEM
         database.
 
-        Parameters:
-        source      -- axisem_db.Source object
-        receiver    -- axisem_db.Receiver object
-        components  -- a tuple containing any combination of the strings "Z",
-                       "N" and "E"
-        remove_source_shift
-                    -- move the starttime to the peak of the sliprate from the
-                       source time function used to generat the database
-        reconvolve_stf
-                    -- deconvolve the source time function used in the AxiSEM
-                       run and convolve with the stf attached to the source.
-                       For this to be stable, the new stf needs to bandlimited.
-        return_obspy_stream
-                    -- return format is either an obspy.Stream object or a
-                       plain array containing the data
-        dt          -- desired sampling of the seismograms. resampling is done
-                       using a lanczos kernel
-        a_lanczos   -- width of the kernel used in resampling
+        :param source: axisem_db.Source object
+        :type source: :class:`axisem_db.source.Source`
+        :param receiver: axisem_db.Receiver object
+        :type receiver: :class:`axisem_db.source.Receiver`
+        :param components: a tuple containing any combination of the
+            strings ``"Z"``, ``"N"``, and ``"E"``
+        :param remove_source_shift: move the starttime to the peak of the
+            sliprate
+        :param reconvolve_stf: deconvolve the source time function used in
+            the AxiSEM run and convolve with the stf attached to the source.
+            For this to be stable, the new stf needs to bandlimited.
+        :param return_obspy_stream: return format is either an obspy.Stream
+            object or a plain array containing the data
+        :param dt: desired sampling of the seismograms. resampling is done
+            using a lanczos kernel
+        :param a_lanczos: width of the kernel used in resampling
         """
         rotmesh_s, rotmesh_phi, rotmesh_z = rotations.rotate_frame_rd(
             source.x * 1000.0, source.y * 1000.0, source.z * 1000.0,
@@ -293,14 +291,15 @@ class AxiSEMDB(object):
         provided as a list of point sources attached with source time functions
         and time shifts.
 
-        Parameters:
-        sources     -- a list of axisem_db.Source object
-        receiver    -- axisem_db.Receiver object
-        components  -- a tuple containing any combination of the strings "Z",
-                       "N" and "E"
-        dt          -- desired sampling of the seismograms. resampling is done
-                       using a lanczos kernel
-        a_lanczos   -- width of the kernel used in resampling
+        :param sources: A collection of point sources.
+        :type sources: list of :class:`axisem_db.source.Source` objects
+        :param receiver: The receiver location.
+        :type receiver: :class:`axisem_db.source.Receiver`
+        :param components: a tuple containing any combination of the strings
+            ``"Z"``, ``"N"``, and ``"E"``
+        :param dt: desired sampling of the seismograms.resampling is done
+            using a lanczos kernel
+        :param a_lanczos: width of the kernel used in resampling
         """
         data_summed = {}
         for source in sources:

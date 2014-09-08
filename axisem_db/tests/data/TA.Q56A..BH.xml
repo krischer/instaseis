@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<FDSNStationXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.fdsn.org/xml/station/1" schemaVersion="1.0" xsi:schemaLocation="http://www.fdsn.org/xml/station/1 http://www.fdsn.org/xml/station/fdsn-station-1.0.xsd">
+ <Source>IRIS-DMC</Source>
+ <Sender>IRIS-DMC</Sender>
+ <Module>IRIS WEB SERVICE: fdsnws-station | version: 1.0.10</Module>
+ <ModuleURI>http://service.iris.edu/fdsnws/station/1/query?channel=BH%2A&amp;station=Q56A&amp;network=TA&amp;starttime=2013-05-24T05%3A40%3A00.000000&amp;level=response</ModuleURI>
+ <Created>2014-02-08T22:23:18</Created>
+ <Network code="TA" startDate="2003-01-01T00:00:00" endDate="2500-12-12T23:59:59" restrictedStatus="open">
+  <Description>USArray Transportable Array (NSF EarthScope Project)</Description>
+  <TotalNumberStations>1691</TotalNumberStations>
+  <SelectedNumberStations>1</SelectedNumberStations>
+  <Station code="Q56A" startDate="2013-05-23T00:00:00" endDate="2599-12-31T23:59:59" restrictedStatus="open">
+   <Latitude>39.041</Latitude>
+   <Longitude>-79.1871</Longitude>
+   <Elevation>430.0</Elevation>
+   <Site>
+    <Name>Snyder Ridge, Maysville, WV, USA</Name>
+   </Site>
+   <CreationDate>2013-05-23T00:00:00</CreationDate>
+   <TotalNumberChannels>40</TotalNumberChannels>
+   <SelectedNumberChannels>3</SelectedNumberChannels>
+   <Channel locationCode="  " startDate="2013-05-23T00:00:00" restrictedStatus="open" endDate="2599-12-31T23:59:59" code="BHE">
+    <Comment>
+     <Value>70854 0100000FF5BA777D</Value>
+    </Comment>
+    <Latitude>39.041</Latitude>
+    <Longitude>-79.1871</Longitude>
+    <Elevation>430.0</Elevation>
+    <Depth>0.0</Depth>
+    <Azimuth>90.0</Azimuth>
+    <Dip>0.0</Dip>
+    <Type>GEOPHYSICAL</Type>
+    <SampleRate>40.0</SampleRate>
+    <ClockDrift>2.5E-4</ClockDrift>
+    <CalibrationUnits>
+     <Name>V</Name>
+     <Description>emf in volts</Description>
+    </CalibrationUnits>
+    <Sensor>
+     <Type>Streckeisen STS-2 G3/Quanterra 330 Linear Phase Co</Type>
+    </Sensor>
+   </Channel>
+   <Channel locationCode="  " startDate="2013-05-23T00:00:00" restrictedStatus="open" endDate="2599-12-31T23:59:59" code="BHN">
+    <Comment>
+     <Value>70854 0100000FF5BA777D</Value>
+    </Comment>
+    <Latitude>39.041</Latitude>
+    <Longitude>-79.1871</Longitude>
+    <Elevation>430.0</Elevation>
+    <Depth>0.0</Depth>
+    <Azimuth>0.0</Azimuth>
+    <Dip>0.0</Dip>
+    <Type>GEOPHYSICAL</Type>
+    <SampleRate>40.0</SampleRate>
+    <ClockDrift>2.5E-4</ClockDrift>
+    <CalibrationUnits>
+     <Name>V</Name>
+     <Description>emf in volts</Description>
+    </CalibrationUnits>
+    <Sensor>
+     <Type>Streckeisen STS-2 G3/Quanterra 330 Linear Phase Co</Type>
+    </Sensor>
+   </Channel>
+   <Channel locationCode="  " startDate="2013-05-23T00:00:00" restrictedStatus="open" endDate="2599-12-31T23:59:59" code="BHZ">
+    <Comment>
+     <Value>70854 0100000FF5BA777D</Value>
+    </Comment>
+    <Latitude>39.041</Latitude>
+    <Longitude>-79.1871</Longitude>
+    <Elevation>430.0</Elevation>
+    <Depth>0.0</Depth>
+    <Azimuth>0.0</Azimuth>
+    <Dip>-90.0</Dip>
+    <Type>GEOPHYSICAL</Type>
+    <SampleRate>40.0</SampleRate>
+    <ClockDrift>2.5E-4</ClockDrift>
+    <CalibrationUnits>
+     <Name>V</Name>
+     <Description>emf in volts</Description>
+    </CalibrationUnits>
+    <Sensor>
+     <Type>Streckeisen STS-2 G3/Quanterra 330 Linear Phase Co</Type>
+    </Sensor>
+   </Channel>
+  </Station>
+ </Network>
+</FDSNStationXML>
