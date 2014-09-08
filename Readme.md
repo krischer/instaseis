@@ -1,6 +1,20 @@
 ## Python Interface to AxiSEM's netCDF Databases
 
 
+**WARNING:** This readme will likely be outdated soon. The actual documentation
+is done with sphinx and will be hosted somewhere as soon as the project becomes
+open to the public.
+
+To build the documentation locally run
+
+```bash
+$ pip install sphinx sphinx-bootstrap-theme
+$ cd doc
+$ make html
+```
+
+and open `_build/html/index.html` with the browser of your choice.
+
 ### Requirements
 
 * gfortran >= 4.7
