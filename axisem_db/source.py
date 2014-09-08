@@ -279,7 +279,7 @@ class Receiver(SourceOrReceiver):
         return_str = 'AxiSEM Database Receiver:\n'
         return_str += 'longitude : %6.1f s\n' % (self.longitude)
         return_str += 'latitude  : %6.1f s\n' % (self.latitude)
-        return_str += 'name      : %s\n' % (self.name)
+        return_str += 'name      : %s\n' % (self.station)
         return_str += 'network   : %s\n' % (self.network)
 
         return return_str
