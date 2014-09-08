@@ -112,7 +112,8 @@ class AxiSEMDB(object):
         components  -- a tuple containing any combination of the strings "Z",
                        "N" and "E"
         remove_source_shift
-                    -- move the starttime to the peak of the sliprate
+                    -- move the starttime to the peak of the sliprate from the
+                       source time function used to generat the database
         reconvolve_stf
                     -- deconvolve the source time function used in the AxiSEM
                        run and convolve with the stf attached to the source.
