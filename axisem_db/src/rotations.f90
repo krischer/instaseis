@@ -42,16 +42,16 @@ contains
 
 
 !--C Wrappers-------------------------------------------------------------------------------
-subroutine rotate_straintensor_wrapped(tensor_vector, phi, mij, isim, tensor_return) &
-    bind(c, name="rotate_straintensor")
-    real(kind=dp), intent(in)    :: tensor_vector(:,:)
-    real(kind=dp), intent(in)    :: phi, mij(6)
-    integer      , intent(in)    :: isim
-
-    real(kind=dp), intent(out)   :: tensor_return(:,:)
-
-    tensor_return =  rotate_straintensor(tensor_vector, phi, mij, isim)
-end subroutine rotate_straintensor_wrapped
+!subroutine rotate_straintensor_wrapped(tensor_vector, phi, mij, isim, tensor_return) &
+!    bind(c, name="rotate_straintensor")
+!    real(kind=dp), intent(in)    :: tensor_vector(:,:)
+!    real(kind=dp), intent(in)    :: phi, mij(6)
+!    integer      , intent(in)    :: isim
+!
+!    real(kind=dp), intent(out)   :: tensor_return(:,:)
+!
+!    tensor_return =  rotate_straintensor(tensor_vector, phi, mij, isim)
+!end subroutine rotate_straintensor_wrapped
 
 
 subroutine rotate_symm_tensor_voigt_xyz_earth_to_xyz_src_1d_wrapped(tensor_voigt, phi, theta, &
