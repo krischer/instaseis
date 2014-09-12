@@ -41,8 +41,8 @@ class AxiSEMDB(object):
     """
     def __init__(self, db_path, buffer_size_in_mb=100, read_on_demand=True):
         """
-        :param db_path: Path to the AxiSEM Database containing subdirectories PZ
-            and/or PX each containing a order_output.nc4 file
+        :param db_path: Path to the AxiSEM Database containing subdirectories
+            PZ and/or PX each containing a order_output.nc4 file
         :type db_path: str
         :param buffer_size_in_mb: Strain is buffered to avoid unnecessary
             file access when sources are located in the same SEM element
@@ -113,7 +113,8 @@ class AxiSEMDB(object):
         :param components: a tuple containing any combination of the
             strings ``"Z"``, ``"N"``, and ``"E"``
         :param remove_source_shift: move the starttime to the peak of the
-            sliprate from the source time function used to generate the database
+            sliprate from the source time function used to generate the
+            database
         :param reconvolve_stf: deconvolve the source time function used in
             the AxiSEM run and convolve with the stf attached to the source.
             For this to be stable, the new stf needs to bandlimited.
@@ -208,15 +209,17 @@ class AxiSEMDB(object):
             final += 2.0 * mij[4] * strain_z[:, 4]
             data["Z"] = final
 
-        ax_map = {"N": np.array([0.0, 1.0, 0.0]),
-                  "E": np.array([0.0, 0.0, 1.0])}
+        fac_1_map = {"N": np.cos,
+                     "E": np.sin}
+        fac_2_map = {"N": lambda x: - np.sin(x),
+                     "E": np.cos}
 
         for comp in ["E", "N"]:
             if comp not in components:
                 continue
 
-            fac_1 = rotations.azim_factor_bw(rotmesh_phi, ax_map[comp], 2, 1)
-            fac_2 = rotations.azim_factor_bw(rotmesh_phi, ax_map[comp], 2, 2)
+            fac_1 = fac_1_map[comp](rotmesh_phi)
+            fac_2 = fac_2_map[comp](rotmesh_phi)
 
             final = np.zeros(strain_x.shape[0], dtype="float64")
             final += strain_x[:, 0] * mij[0] * 1.0 * fac_1

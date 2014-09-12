@@ -45,15 +45,6 @@ def rotate_frame_rd(x, y, z, phi, theta):
     return srd, phird, zrd
 
 
-def azim_factor_bw(phi, fi, isim, ikind):
-    fi = np.require(fi, dtype=np.float64)
-    factor = lib.azim_factor_bw(
-        C.c_double(phi),
-        fi.ctypes.data_as(C.POINTER(C.c_double)),
-        C.c_int(isim), C.c_int(ikind))
-    return factor
-
-
 def rotate_symm_tensor_voigt_xyz_earth_to_xyz_src_1d(mt, phi, theta):
     mt = np.require(mt, dtype=np.float64)
     out = np.empty(mt.shape, dtype=np.float64)
