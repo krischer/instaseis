@@ -18,6 +18,8 @@ from collections import OrderedDict
 
 from . import spectral_basis
 
+MIN_FILE_VERSION = 2
+
 
 class Buffer(object):
     """
@@ -102,6 +104,16 @@ class Mesh(object):
             raise NotImplementedError
 
         self.npol = self.f.npol
+
+        try:
+            self.file_version = self.f.file_version
+        except AttributeError:
+            # very old files don't even have this attribute
+            raise ValueError("Database file to old.")
+
+        if self.file_version < MIN_FILE_VERSION:
+            raise ValueError("Database file to old.")
+
         self.ndumps = getattr(self.f, "number of strain dumps")
         self.chunks = \
             self.f.groups["Snapshots"].variables.values()[0].chunking()
