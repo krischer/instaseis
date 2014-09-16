@@ -324,11 +324,11 @@ function strain_dipole_td(u, G, GT, xi, eta, npol, nsamp, nodes, element_type, a
   real(kind=dp)                 :: grad_buff3(1:nsamp,0:npol,0:npol,2)
 
   ! 1: dsus, 2: dzus
-  grad_buff1 = axisym_gradient(u(:,:,:,1) + u(:,:,:,2), G, GT, xi, eta, npol, nsamp, &
+  grad_buff1 = axisym_gradient(u(:,:,:,1), G, GT, xi, eta, npol, nsamp, &
                                nodes, element_type)
 
   ! 1: dsup, 2: dzup
-  grad_buff2 = axisym_gradient(u(:,:,:,1) - u(:,:,:,2), G, GT, xi, eta, npol, nsamp, &
+  grad_buff2 = axisym_gradient(u(:,:,:,2), G, GT, xi, eta, npol, nsamp, &
                                nodes, element_type)
 
   ! 1: dsuz, 2: dzuz
@@ -336,15 +336,15 @@ function strain_dipole_td(u, G, GT, xi, eta, npol, nsamp, nodes, element_type, a
                                element_type)
 
   strain_dipole_td(:,:,:,1) = grad_buff1(:,:,:,1)
-  strain_dipole_td(:,:,:,2) = 2 * f_over_s(u(:,:,:,2), G, GT, xi, eta, npol, nsamp, &
-                                           nodes, element_type, axial)
+  strain_dipole_td(:,:,:,2) = f_over_s(u(:,:,:,1) - u(:,:,:,2), G, GT, xi, eta, npol, &
+                                       nsamp, nodes, element_type, axial)
   strain_dipole_td(:,:,:,3) = grad_buff3(:,:,:,2)
   strain_dipole_td(:,:,:,4) = - 0.5d0 * (f_over_s(u(:,:,:,3), G, GT, xi, eta, npol, &
                                                   nsamp, nodes, element_type, axial) &
                                          + grad_buff2(:,:,:,2))
   strain_dipole_td(:,:,:,5) = (grad_buff1(:,:,:,2) + grad_buff3(:,:,:,1)) / 2d0
-  strain_dipole_td(:,:,:,6) = - f_over_s(u(:,:,:,2), G, GT, xi, eta, npol, nsamp, nodes, &
-                                  element_type, axial) &
+  strain_dipole_td(:,:,:,6) = - f_over_s((u(:,:,:,1) - u(:,:,:,2)) / 2, G, GT, xi, eta, &
+                                         npol, nsamp, nodes, element_type, axial) &
                               - grad_buff2(:,:,:,1) / 2d0
 
 end function
@@ -373,25 +373,25 @@ function strain_dipole(u, G, GT, xi, eta, npol, nodes, element_type, axial)
   real(kind=dp)                 :: grad_buff3(0:npol,0:npol,2)
 
   ! 1: dsus, 2: dzus
-  grad_buff1 = axisym_gradient(u(:,:,1) + u(:,:,2), G, GT, xi, eta, npol, nodes, &
+  grad_buff1 = axisym_gradient(u(:,:,1), G, GT, xi, eta, npol, nodes, &
                                element_type)
 
   ! 1: dsup, 2: dzup
-  grad_buff2 = axisym_gradient(u(:,:,1) - u(:,:,2), G, GT, xi, eta, npol, nodes, &
+  grad_buff2 = axisym_gradient(u(:,:,2), G, GT, xi, eta, npol, nodes, &
                                element_type)
 
   ! 1: dsuz, 2: dzuz
   grad_buff3 = axisym_gradient(u(:,:,3), G, GT, xi, eta, npol, nodes, element_type)
 
   strain_dipole(:,:,1) = grad_buff1(:,:,1)
-  strain_dipole(:,:,2) = 2 * f_over_s(u(:,:,2), G, GT, xi, eta, npol, nodes, &
+  strain_dipole(:,:,2) = f_over_s(u(:,:,1) - u(:,:,2), G, GT, xi, eta, npol, nodes, &
                                   element_type, axial)
   strain_dipole(:,:,3) = grad_buff3(:,:,2)
   strain_dipole(:,:,4) = - 0.5d0 * (f_over_s(u(:,:,3), G, GT, xi, eta, npol, nodes, &
                                              element_type, axial) &
                                     + grad_buff2(:,:,2))
   strain_dipole(:,:,5) = (grad_buff1(:,:,2) + grad_buff3(:,:,1)) / 2d0
-  strain_dipole(:,:,6) = - f_over_s(u(:,:,2), G, GT, xi, eta, npol, nodes, &
+  strain_dipole(:,:,6) = - f_over_s((u(:,:,1) - u(:,:,2)) / 2, G, GT, xi, eta, npol, nodes, &
                                   element_type, axial) &
                          - grad_buff2(:,:,1) / 2d0
 
@@ -419,7 +419,7 @@ function straintrace_dipole_td(u, G, GT, xi, eta, npol, nsamp, nodes, element_ty
   real(kind=dp)                 :: grad_buff3(1:nsamp,0:npol,0:npol,2)
 
   ! 1: dsus, 2: dzus
-  grad_buff1 = axisym_gradient(u(:,:,:,1) + u(:,:,:,2), G, GT, xi, eta, npol, nsamp, &
+  grad_buff1 = axisym_gradient(u(:,:,:,1), G, GT, xi, eta, npol, nsamp, &
                                nodes, element_type)
 
   ! 1: dsuz, 2: dzuz
@@ -427,8 +427,8 @@ function straintrace_dipole_td(u, G, GT, xi, eta, npol, nsamp, nodes, element_ty
                                element_type)
 
   straintrace_dipole_td(:,:,:) = grad_buff1(:,:,:,1) &
-                                 + 2 * f_over_s(u(:,:,:,2), G, GT, xi, eta, npol, nsamp, &
-                                 +         nodes, element_type, axial) &
+                                 + f_over_s(u(:,:,:,1) - u(:,:,:,2), G, GT, xi, eta, &
+                                            npol, nsamp, nodes, element_type, axial) &
                                  + grad_buff3(:,:,:,2)
 
 end function
@@ -455,15 +455,15 @@ function straintrace_dipole(u, G, GT, xi, eta, npol, nodes, element_type, axial)
   real(kind=dp)                 :: grad_buff3(0:npol,0:npol,2)
 
   ! 1: dsus, 2: dzus
-  grad_buff1 = axisym_gradient(u(:,:,1) + u(:,:,2), G, GT, xi, eta, npol, nodes, &
+  grad_buff1 = axisym_gradient(u(:,:,1), G, GT, xi, eta, npol, nodes, &
                                element_type)
 
   ! 1: dsuz, 2: dzuz
   grad_buff3 = axisym_gradient(u(:,:,3), G, GT, xi, eta, npol, nodes, element_type)
 
   straintrace_dipole(:,:) = grad_buff1(:,:,1) &
-                            + 2 * f_over_s(u(:,:,2), G, GT, xi, eta, npol, nodes, &
-                            +     element_type, axial) &
+                            + f_over_s(u(:,:,1) - u(:,:,2), G, GT, xi, eta, npol, nodes, &
+                                       element_type, axial) &
                             + grad_buff3(:,:,2)
 
 end function
