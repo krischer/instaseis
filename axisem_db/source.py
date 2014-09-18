@@ -260,6 +260,51 @@ class Source(SourceOrReceiver):
         return return_str
 
 
+class ForceSource(SourceOrReceiver):
+    """
+    A class to handle a seimic force source.
+    """
+    def __init__(self, latitude, longitude, depth_in_m, f_r, f_t, f_p):
+        """
+        :param latitude: latitude of the source in degree
+        :param longitude: longitude of the source in degree
+        :param depth_in_m: source depth in m
+        :param f_r: force components in r, theta, phi in N
+        :param f_t: force components in r, theta, phi in N
+        :param f_p: force components in r, theta, phi in N
+        """
+        super(Source, self).__init__(latitude, longitude, depth_in_m)
+        self.f_r = f_r
+        self.f_t = f_t
+        self.f_p = f_p
+
+    @property
+    def force_tpr(self):
+        """
+        List of force components in theta, phi, r coordinates:
+        [f_t, f_p, f_r]
+        """
+        return np.array([self.f_t, self.f_p, self.f_r])
+
+    @property
+    def force_rtp(self):
+        """
+        List of force components in r, theta, phi, coordinates:
+        [f_r, f_t, f_p]
+        """
+        return np.array([self.f_t, self.f_p, self.f_r])
+
+    def __str__(self):
+        return_str = 'AxiSEM Database Force Source:\n'
+        return_str += 'longitude : %6.1f deg\n' % (self.longitude)
+        return_str += 'latitude  : %6.1f deg\n' % (self.latitude)
+        return_str += 'Fr       : %10.2e N\n' % (self.f_r)
+        return_str += 'Ft       : %10.2e N\n' % (self.f_t)
+        return_str += 'Fp       : %10.2e N\n' % (self.f_p)
+
+        return return_str
+
+
 class Receiver(SourceOrReceiver):
     """
     Class dealing with seismic receivers.
