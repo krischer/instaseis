@@ -106,7 +106,7 @@ class Mesh(object):
         self.npol = self.f.npol
 
         try:
-            self.file_version = self.f.file_version
+            self.file_version = getattr(self.f, "file version")
         except AttributeError:
             # very old files don't even have this attribute
             raise ValueError("Database file to old.")
