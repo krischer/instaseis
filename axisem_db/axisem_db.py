@@ -255,6 +255,19 @@ class AxiSEMDB(object):
         else:
             raise NotImplementedError
 
+            if "Z" in components:
+                displ_z = self.__get_displacement(self.meshes.pz, id_elem,
+                                                  gll_point_ids, col_points_xi,
+                                                  col_points_eta, xi, eta)
+
+            if any(comp in components for comp in ['N', 'E', 'R', 'T']):
+                displ_x = self.__get_displacement(self.meshes.px, id_elem,
+                                                  gll_point_ids, col_points_xi,
+                                                  col_points_eta, xi, eta)
+
+            # TODO: implement rotation of the force vector into the s,phi,z
+            #       system
+
         for comp in components:
             if remove_source_shift and not reconvolve_stf:
                 data[comp] = data[comp][self.parsed_mesh.source_shift_samp:]
@@ -420,6 +433,31 @@ class AxiSEMDB(object):
             final_strain[:, 5] *= -1.0
 
         return final_strain
+
+    def __get_displacement(self, mesh, id_elem, gll_point_ids, col_points_xi,
+                           col_points_eta, xi, eta):
+        # Todo: implement a buffer for displacement
+        utemp = np.zeros((mesh.ndumps, mesh.npol + 1, mesh.npol + 1, 3),
+                         dtype=np.float64, order="F")
+
+        mesh_dict = mesh.f.groups["Snapshots"].variables
+
+        # Load displacement from all GLL points.
+        for i, var in enumerate(["disp_s", "disp_p", "disp_z"]):
+            if var not in mesh_dict:
+                continue
+            temp = mesh_dict[var][:, gll_point_ids.flatten()]
+            for ipol in xrange(mesh.npol + 1):
+                for jpol in xrange(mesh.npol + 1):
+                    utemp[:, jpol, ipol, i] = temp[:, ipol * 5 + jpol]
+
+        final_displacement = np.empty((utemp.shape[0], 3), order="F")
+
+        for i in xrange(3):
+            final_displacement[:, i] = spectral_basis.lagrange_interpol_2D_td(
+                col_points_xi, col_points_eta, utemp[:, :, :, i], xi, eta)
+
+        return final_displacement
 
     @property
     def dt(self):
