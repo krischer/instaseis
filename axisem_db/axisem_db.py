@@ -184,7 +184,8 @@ class AxiSEMDB(object):
                                          gll_point_ids, G, GT, col_points_xi,
                                          col_points_eta,
                                          corner_points, eltype, axis, xi, eta)
-        if "N" in components or "E" in components or "R" in components or "T" in components:
+
+        if any(comp in components for comp in ['N', 'E', 'R', 'T']):
             strain_x = self.__get_strain(self.meshes.px, id_elem,
                                          gll_point_ids, G, GT, col_points_xi,
                                          col_points_eta, corner_points, eltype,
@@ -209,6 +210,20 @@ class AxiSEMDB(object):
             final += 2.0 * mij[4] * strain_z[:, 4]
             data["Z"] = final
 
+        if "R" in components:
+            final = np.zeros(strain_x.shape[0], dtype="float64")
+            final -= strain_x[:, 0] * mij[0] * 1.0
+            final -= strain_x[:, 1] * mij[1] * 1.0
+            final -= strain_x[:, 2] * mij[2] * 1.0
+            final -= strain_x[:, 4] * mij[4] * 2.0
+            data["R"] = final
+
+        if "T" in components:
+            final = np.zeros(strain_x.shape[0], dtype="float64")
+            final += strain_x[:, 3] * mij[3] * 2.0
+            final += strain_x[:, 5] * mij[5] * 2.0
+            data["T"] = final
+
         fac_1_map = {"N": np.cos,
                      "E": np.sin}
         fac_2_map = {"N": lambda x: - np.sin(x),
@@ -230,25 +245,6 @@ class AxiSEMDB(object):
             final += strain_x[:, 5] * mij[5] * 2.0 * fac_2
             if comp == "N":
                 final *= -1.0
-            data[comp] = final
-
-        for comp in ["R"]:
-            if comp not in components:
-                continue
-
-            final = np.zeros(strain_x.shape[0], dtype="float64")
-            final -= strain_x[:, 0] * mij[0] * 1.0
-            final -= strain_x[:, 1] * mij[1] * 1.0
-            final -= strain_x[:, 2] * mij[2] * 1.0
-            final -= strain_x[:, 4] * mij[4] * 2.0
-            data[comp] = final
-
-        for comp in ["T"]:
-            if comp not in components:
-                continue
-            final = np.zeros(strain_x.shape[0], dtype="float64")
-            final += strain_x[:, 3] * mij[3] * 2.0
-            final += strain_x[:, 5] * mij[5] * 2.0
             data[comp] = final
 
         for comp in components:
