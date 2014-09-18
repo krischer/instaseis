@@ -237,10 +237,10 @@ class AxiSEMDB(object):
                 continue
 
             final = np.zeros(strain_x.shape[0], dtype="float64")
-            final += strain_x[:, 0] * mij[0] * 1.0
-            final += strain_x[:, 1] * mij[1] * 1.0
-            final += strain_x[:, 2] * mij[2] * 1.0
-            final += strain_x[:, 4] * mij[4] * 2.0
+            final -= strain_x[:, 0] * mij[0] * 1.0
+            final -= strain_x[:, 1] * mij[1] * 1.0
+            final -= strain_x[:, 2] * mij[2] * 1.0
+            final -= strain_x[:, 4] * mij[4] * 2.0
             data[comp] = final
 
         for comp in ["T"]:
