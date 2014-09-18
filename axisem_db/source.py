@@ -248,8 +248,8 @@ class Source(SourceOrReceiver):
 
     def __str__(self):
         return_str = 'AxiSEM Database Source:\n'
-        return_str += 'longitude : %6.1f s\n' % (self.longitude)
-        return_str += 'latitude  : %6.1f s\n' % (self.latitude)
+        return_str += 'longitude : %6.1f deg\n' % (self.longitude)
+        return_str += 'latitude  : %6.1f deg\n' % (self.latitude)
         return_str += 'Mrr       : %10.2e Nm\n' % (self.m_rr)
         return_str += 'Mtt       : %10.2e Nm\n' % (self.m_tt)
         return_str += 'Mpp       : %10.2e Nm\n' % (self.m_pp)
@@ -277,8 +277,8 @@ class Receiver(SourceOrReceiver):
 
     def __str__(self):
         return_str = 'AxiSEM Database Receiver:\n'
-        return_str += 'longitude : %6.1f s\n' % (self.longitude)
-        return_str += 'latitude  : %6.1f s\n' % (self.latitude)
+        return_str += 'longitude : %6.1f deg\n' % (self.longitude)
+        return_str += 'latitude  : %6.1f deg\n' % (self.latitude)
         return_str += 'name      : %s\n' % (self.station)
         return_str += 'network   : %s\n' % (self.network)
 
