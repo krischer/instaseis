@@ -23,6 +23,7 @@ from . import rotations
 from . import sem_derivatives
 from . import spectral_basis
 from . import lanczos
+from axisem_db.source import Source
 
 
 MeshCollection = collections.namedtuple("MeshCollection", ["px", "pz"])
@@ -106,8 +107,9 @@ class AxiSEMDB(object):
         Extract seismograms for a moment tensor point source from the AxiSEM
         database.
 
-        :param source: axisem_db.Source object
-        :type source: :class:`axisem_db.source.Source`
+        :param source: axisem_db.Source or axisem_db.ForceSource object
+        :type source: :class:`axisem_db.source.Source` or
+            :class:`axisem_db.source.ForceSource`
         :param receiver: axisem_db.Receiver object
         :type receiver: :class:`axisem_db.source.Receiver`
         :param components: a tuple containing any combination of the
@@ -164,88 +166,94 @@ class AxiSEMDB(object):
             gll_point_ids = mesh.variables["sem_mesh"][id_elem]
             axis = bool(mesh.variables["axis"][id_elem])
 
-        if axis:
-            G = self.parsed_mesh.G2
-            GT = self.parsed_mesh.G1T
-            col_points_xi = self.parsed_mesh.glj_points
-            col_points_eta = self.parsed_mesh.gll_points
+        if isinstance(source, Source):
+
+            if axis:
+                G = self.parsed_mesh.G2
+                GT = self.parsed_mesh.G1T
+                col_points_xi = self.parsed_mesh.glj_points
+                col_points_eta = self.parsed_mesh.gll_points
+            else:
+                G = self.parsed_mesh.G2
+                GT = self.parsed_mesh.G2T
+                col_points_xi = self.parsed_mesh.gll_points
+                col_points_eta = self.parsed_mesh.gll_points
+
+            strain_x = None
+            strain_z = None
+
+            # Minor optimization: Only read if actually requested.
+            if "Z" in components:
+                strain_z = self.__get_strain(self.meshes.pz, id_elem,
+                                             gll_point_ids, G, GT,
+                                             col_points_xi, col_points_eta,
+                                             corner_points, eltype, axis, xi,
+                                             eta)
+
+            if any(comp in components for comp in ['N', 'E', 'R', 'T']):
+                strain_x = self.__get_strain(self.meshes.px, id_elem,
+                                             gll_point_ids, G, GT,
+                                             col_points_xi, col_points_eta,
+                                             corner_points, eltype,
+                                             axis, xi, eta)
+
+            mij = rotations.rotate_symm_tensor_voigt_xyz_src_to_xyz_earth_1d(
+                source.tensor_voigt, np.deg2rad(source.longitude),
+                np.deg2rad(source.colatitude))
+            mij = rotations.rotate_symm_tensor_voigt_xyz_earth_to_xyz_src_1d(
+                mij, np.deg2rad(receiver.longitude),
+                np.deg2rad(receiver.colatitude))
+            mij = rotations.rotate_symm_tensor_voigt_xyz_to_src_1d(
+                mij, rotmesh_phi)
+            mij /= self.parsed_mesh.amplitude
+
+            data = {}
+
+            if "Z" in components:
+                final = np.zeros(strain_z.shape[0], dtype="float64")
+                for i in xrange(3):
+                    final += mij[i] * strain_z[:, i]
+                final += 2.0 * mij[4] * strain_z[:, 4]
+                data["Z"] = final
+
+            if "R" in components:
+                final = np.zeros(strain_x.shape[0], dtype="float64")
+                final -= strain_x[:, 0] * mij[0] * 1.0
+                final -= strain_x[:, 1] * mij[1] * 1.0
+                final -= strain_x[:, 2] * mij[2] * 1.0
+                final -= strain_x[:, 4] * mij[4] * 2.0
+                data["R"] = final
+
+            if "T" in components:
+                final = np.zeros(strain_x.shape[0], dtype="float64")
+                final += strain_x[:, 3] * mij[3] * 2.0
+                final += strain_x[:, 5] * mij[5] * 2.0
+                data["T"] = final
+
+            fac_1_map = {"N": np.cos,
+                         "E": np.sin}
+            fac_2_map = {"N": lambda x: - np.sin(x),
+                         "E": np.cos}
+
+            for comp in ["E", "N"]:
+                if comp not in components:
+                    continue
+
+                fac_1 = fac_1_map[comp](rotmesh_phi)
+                fac_2 = fac_2_map[comp](rotmesh_phi)
+
+                final = np.zeros(strain_x.shape[0], dtype="float64")
+                final += strain_x[:, 0] * mij[0] * 1.0 * fac_1
+                final += strain_x[:, 1] * mij[1] * 1.0 * fac_1
+                final += strain_x[:, 2] * mij[2] * 1.0 * fac_1
+                final += strain_x[:, 3] * mij[3] * 2.0 * fac_2
+                final += strain_x[:, 4] * mij[4] * 2.0 * fac_1
+                final += strain_x[:, 5] * mij[5] * 2.0 * fac_2
+                if comp == "N":
+                    final *= -1.0
+                data[comp] = final
         else:
-            G = self.parsed_mesh.G2
-            GT = self.parsed_mesh.G2T
-            col_points_xi = self.parsed_mesh.gll_points
-            col_points_eta = self.parsed_mesh.gll_points
-
-        strain_x = None
-        strain_z = None
-
-        # Minor optimization: Only read if actually requested.
-        if "Z" in components:
-            strain_z = self.__get_strain(self.meshes.pz, id_elem,
-                                         gll_point_ids, G, GT, col_points_xi,
-                                         col_points_eta,
-                                         corner_points, eltype, axis, xi, eta)
-
-        if any(comp in components for comp in ['N', 'E', 'R', 'T']):
-            strain_x = self.__get_strain(self.meshes.px, id_elem,
-                                         gll_point_ids, G, GT, col_points_xi,
-                                         col_points_eta, corner_points, eltype,
-                                         axis, xi, eta)
-
-        mij = rotations.rotate_symm_tensor_voigt_xyz_src_to_xyz_earth_1d(
-            source.tensor_voigt, np.deg2rad(source.longitude),
-            np.deg2rad(source.colatitude))
-        mij = rotations.rotate_symm_tensor_voigt_xyz_earth_to_xyz_src_1d(
-            mij, np.deg2rad(receiver.longitude),
-            np.deg2rad(receiver.colatitude))
-        mij = rotations.rotate_symm_tensor_voigt_xyz_to_src_1d(
-            mij, rotmesh_phi)
-        mij /= self.parsed_mesh.amplitude
-
-        data = {}
-
-        if "Z" in components:
-            final = np.zeros(strain_z.shape[0], dtype="float64")
-            for i in xrange(3):
-                final += mij[i] * strain_z[:, i]
-            final += 2.0 * mij[4] * strain_z[:, 4]
-            data["Z"] = final
-
-        if "R" in components:
-            final = np.zeros(strain_x.shape[0], dtype="float64")
-            final -= strain_x[:, 0] * mij[0] * 1.0
-            final -= strain_x[:, 1] * mij[1] * 1.0
-            final -= strain_x[:, 2] * mij[2] * 1.0
-            final -= strain_x[:, 4] * mij[4] * 2.0
-            data["R"] = final
-
-        if "T" in components:
-            final = np.zeros(strain_x.shape[0], dtype="float64")
-            final += strain_x[:, 3] * mij[3] * 2.0
-            final += strain_x[:, 5] * mij[5] * 2.0
-            data["T"] = final
-
-        fac_1_map = {"N": np.cos,
-                     "E": np.sin}
-        fac_2_map = {"N": lambda x: - np.sin(x),
-                     "E": np.cos}
-
-        for comp in ["E", "N"]:
-            if comp not in components:
-                continue
-
-            fac_1 = fac_1_map[comp](rotmesh_phi)
-            fac_2 = fac_2_map[comp](rotmesh_phi)
-
-            final = np.zeros(strain_x.shape[0], dtype="float64")
-            final += strain_x[:, 0] * mij[0] * 1.0 * fac_1
-            final += strain_x[:, 1] * mij[1] * 1.0 * fac_1
-            final += strain_x[:, 2] * mij[2] * 1.0 * fac_1
-            final += strain_x[:, 3] * mij[3] * 2.0 * fac_2
-            final += strain_x[:, 4] * mij[4] * 2.0 * fac_1
-            final += strain_x[:, 5] * mij[5] * 2.0 * fac_2
-            if comp == "N":
-                final *= -1.0
-            data[comp] = final
+            raise NotImplementedError
 
         for comp in components:
             if remove_source_shift and not reconvolve_stf:
