@@ -273,7 +273,7 @@ class ForceSource(SourceOrReceiver):
         :param f_t: force components in r, theta, phi in N
         :param f_p: force components in r, theta, phi in N
         """
-        super(Source, self).__init__(latitude, longitude, depth_in_m)
+        super(ForceSource, self).__init__(latitude, longitude, depth_in_m)
         self.f_r = f_r
         self.f_t = f_t
         self.f_p = f_p
