@@ -19,7 +19,7 @@ from .helpers import load_lib
 
 
 lib = load_lib()
-lib.azim_factor_bw.restype = C.c_double
+#lib.azim_factor_bw.restype = C.c_double
 
 
 def rotate_frame_rd(x, y, z, phi, theta):
@@ -75,3 +75,45 @@ def rotate_symm_tensor_voigt_xyz_to_src_1d(mt, phi):
         C.c_double(phi),
         out.ctypes.data_as(C.POINTER(C.c_double)))
     return out
+
+
+def rotate_vector_xyz_earth_to_xyz_src(vec, phi, theta):
+    sp = np.sin(phi)
+    cp = np.cos(phi)
+
+    st = np.sin(theta)
+    ct = np.cos(theta)
+
+    return np.array([cp * ct * vec[0] + ct * sp * vec[1] - st * vec[2],
+                     -(sp * vec[0]) + cp * vec[1],
+                     cp * st * vec[0] + sp * st * vec[1] + ct * vec[2]])
+
+
+def rotate_vector_xyz_src_to_xyz_earth(vec, phi, theta):
+    sp = np.sin(phi)
+    cp = np.cos(phi)
+
+    st = np.sin(theta)
+    ct = np.cos(theta)
+
+    return np.array([cp * ct * vec[0] - sp * vec[1] + cp * st * vec[2],
+                     ct * sp * vec[0] + cp * vec[1] + sp * st * vec[2],
+                     -(st * vec[0]) + ct * vec[2]])
+
+
+def rotate_vector_xyz_to_src(vec, phi):
+    sp = np.sin(phi)
+    cp = np.cos(phi)
+
+    return np.array([cp * vec[0] + sp * vec[1],
+                     - sp * vec[0] + cp * vec[1],
+                     vec[2]])
+
+
+def rotate_vector_src_to_xyz(vec, phi):
+    sp = np.sin(phi)
+    cp = np.cos(phi)
+
+    return np.array([cp * vec[0] - sp * vec[1],
+                     sp * vec[0] + cp * vec[1],
+                     vec[2]])
