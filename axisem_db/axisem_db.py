@@ -23,7 +23,7 @@ from . import rotations
 from . import sem_derivatives
 from . import spectral_basis
 from . import lanczos
-from axisem_db.source import Source
+from axisem_db.source import Source, ForceSource
 
 
 MeshCollection = collections.namedtuple("MeshCollection", ["px", "pz"])
@@ -166,18 +166,27 @@ class AxiSEMDB(object):
             gll_point_ids = mesh.variables["sem_mesh"][id_elem]
             axis = bool(mesh.variables["axis"][id_elem])
 
-        if isinstance(source, Source):
+        fac_1_map = {"N": np.cos,
+                     "E": np.sin}
+        fac_2_map = {"N": lambda x: - np.sin(x),
+                     "E": np.cos}
 
+        if axis:
+            col_points_xi = self.parsed_mesh.glj_points
+            col_points_eta = self.parsed_mesh.gll_points
+        else:
+            col_points_xi = self.parsed_mesh.gll_points
+            col_points_eta = self.parsed_mesh.gll_points
+
+        data = {}
+
+        if isinstance(source, Source):
             if axis:
                 G = self.parsed_mesh.G2
                 GT = self.parsed_mesh.G1T
-                col_points_xi = self.parsed_mesh.glj_points
-                col_points_eta = self.parsed_mesh.gll_points
             else:
                 G = self.parsed_mesh.G2
                 GT = self.parsed_mesh.G2T
-                col_points_xi = self.parsed_mesh.gll_points
-                col_points_eta = self.parsed_mesh.gll_points
 
             strain_x = None
             strain_z = None
@@ -207,8 +216,6 @@ class AxiSEMDB(object):
                 mij, rotmesh_phi)
             mij /= self.parsed_mesh.amplitude
 
-            data = {}
-
             if "Z" in components:
                 final = np.zeros(strain_z.shape[0], dtype="float64")
                 for i in xrange(3):
@@ -230,11 +237,6 @@ class AxiSEMDB(object):
                 final += strain_x[:, 5] * mij[5] * 2.0
                 data["T"] = final
 
-            fac_1_map = {"N": np.cos,
-                         "E": np.sin}
-            fac_2_map = {"N": lambda x: - np.sin(x),
-                         "E": np.cos}
-
             for comp in ["E", "N"]:
                 if comp not in components:
                     continue
@@ -252,8 +254,8 @@ class AxiSEMDB(object):
                 if comp == "N":
                     final *= -1.0
                 data[comp] = final
-        else:
-            raise NotImplementedError
+
+        elif isinstance(source, ForceSource):
 
             if "Z" in components:
                 displ_z = self.__get_displacement(self.meshes.pz, id_elem,
@@ -265,8 +267,50 @@ class AxiSEMDB(object):
                                                   gll_point_ids, col_points_xi,
                                                   col_points_eta, xi, eta)
 
-            # TODO: implement rotation of the force vector into the s,phi,z
-            #       system
+            force = rotations.rotate_vector_xyz_src_to_xyz_earth(
+                source.force_tpr, np.deg2rad(source.longitude),
+                np.deg2rad(source.colatitude))
+            force = rotations.rotate_vector_xyz_earth_to_xyz_src(
+                force, np.deg2rad(receiver.longitude),
+                np.deg2rad(receiver.colatitude))
+            force = rotations.rotate_vector_xyz_to_src(
+                force, rotmesh_phi)
+            force /= self.parsed_mesh.amplitude
+
+            if "Z" in components:
+                final = np.zeros(displ_z.shape[0], dtype="float64")
+                final += displ_z[:, 0] * force[0]
+                final += displ_z[:, 2] * force[2]
+                data["Z"] = final
+
+            if "R" in components:
+                final = np.zeros(displ_x.shape[0], dtype="float64")
+                final += displ_x[:, 0] * force[0]
+                final += displ_x[:, 2] * force[2]
+                data["R"] = final
+
+            if "T" in components:
+                final = np.zeros(displ_x.shape[0], dtype="float64")
+                final += displ_x[:, 1] * force[1]
+                data["T"] = final
+
+            for comp in ["E", "N"]:
+                if comp not in components:
+                    continue
+
+                fac_1 = fac_1_map[comp](rotmesh_phi)
+                fac_2 = fac_2_map[comp](rotmesh_phi)
+
+                final = np.zeros(displ_x.shape[0], dtype="float64")
+                final += displ_x[:, 0] * force[0] * fac_1
+                final += displ_x[:, 1] * force[1] * fac_2
+                final += displ_x[:, 2] * force[2] * fac_1
+                if comp == "N":
+                    final *= -1.0
+                data[comp] = final
+
+        else:
+            raise NotImplementedError
 
         for comp in components:
             if remove_source_shift and not reconvolve_stf:
