@@ -179,9 +179,14 @@ class AxiSEMDB(object):
             using a lanczos kernel
         :param a_lanczos: width of the kernel used in resampling
         """
-        rotmesh_s, rotmesh_phi, rotmesh_z = rotations.rotate_frame_rd(
-            source.x * 1000.0, source.y * 1000.0, source.z * 1000.0,
-            receiver.longitude, receiver.colatitude)
+        if self.reciprocal:
+            rotmesh_s, rotmesh_phi, rotmesh_z = rotations.rotate_frame_rd(
+                source.x, source.y, source.z, receiver.longitude,
+                receiver.colatitude)
+        else:
+            rotmesh_s, rotmesh_phi, rotmesh_z = rotations.rotate_frame_rd(
+                receiver.x, receiver.y, receiver.z, source.longitude,
+                source.colatitude)
 
         nextpoints = self.parsed_mesh.kdtree.query([rotmesh_s, rotmesh_z], k=6)
 
@@ -394,26 +399,32 @@ class AxiSEMDB(object):
             final[:, 0] += displ_1[:, 0] * mij[0]
             final[:, 2] += displ_1[:, 2] * mij[0]
 
-            final[:, 0] += displ_2[:, 0] * 0.5 * (mij[1] + mij[2])
-            final[:, 2] += displ_2[:, 2] * 0.5 * (mij[1] + mij[2])
+            final[:, 0] += displ_2[:, 0] * (mij[1] + mij[2])
+            final[:, 2] += displ_2[:, 2] * (mij[1] + mij[2])
 
             fac_1 = mij[3] * np.cos(rotmesh_phi) \
                 + mij[4] * np.sin(rotmesh_phi)
             fac_2 = -mij[3] * np.sin(rotmesh_phi) \
                 + mij[4] * np.cos(rotmesh_phi)
 
-            final[:, 0] += displ_3[:, 0] * mij[3] * fac_1
-            final[:, 1] += displ_3[:, 1] * mij[4] * fac_2
-            final[:, 2] += displ_3[:, 2] * mij[3] * fac_1
+            #print fac_1
+            #print fac_2
 
-            fac_1 = 0.5 * (mij[1] - mij[2]) * np.cos(2 * rotmesh_phi) \
-                + mij[5] * np.sin(2 * rotmesh_phi)
-            fac_2 = -0.5 * (mij[1] - mij[2]) * np.sin(2 * rotmesh_phi) \
-                + mij[5] * np.cos(2 * rotmesh_phi)
+            final[:, 0] += displ_3[:, 0] * fac_1
+            final[:, 1] += displ_3[:, 1] * fac_2
+            final[:, 2] += displ_3[:, 2] * fac_1
 
-            final[:, 0] += displ_4[:, 0] * mij[3] * fac_1
-            final[:, 1] += displ_4[:, 1] * mij[4] * fac_2
-            final[:, 2] += displ_4[:, 2] * mij[3] * fac_1
+            fac_1 = (mij[1] - mij[2]) * np.cos(2 * rotmesh_phi) \
+                + 2 * mij[5] * np.sin(2 * rotmesh_phi)
+            fac_2 = -(mij[1] - mij[2]) * np.sin(2 * rotmesh_phi) \
+                + 2 * mij[5] * np.cos(2 * rotmesh_phi)
+
+            #print fac_1
+            #print fac_2
+
+            final[:, 0] += displ_4[:, 0] * fac_1
+            final[:, 1] += displ_4[:, 1] * fac_2
+            final[:, 2] += displ_4[:, 2] * fac_1
 
             rotmesh_colat = np.arctan2(rotmesh_s, rotmesh_z)
 
