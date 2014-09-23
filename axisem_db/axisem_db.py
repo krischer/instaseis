@@ -408,6 +408,7 @@ class AxiSEMDB(object):
             final[:,2] += displ_4[:,2] * mij[3] * fac_1
 
             rotmesh_colat = np.arctan2(rotmesh_s, rotmesh_z)
+
             if "T" in components:
                 data["T"] = final[:,1]
 
@@ -417,12 +418,16 @@ class AxiSEMDB(object):
             if "R" in components:
                 data["R"] = final[:,0] * np.cos(rotmesh_colat) - final[:,2] * np.sin(rotmesh_colat)
 
-            if "N" in components:
-                raise NotImplementedError
+            if "N" in components or "E" in components:
+                # transpose needed because rotations assume different slicing (ugly)
+                final = rotations.rotate_vector_src_to_xyz(final.T, rotmesh_phi)
+                final = rotations.rotate_vector_xyz_src_to_xyz_earth(final, rotmesh_phi, rotmesh_colat)
+                final = rotations.rotate_vector_xyz_earth_to_xyz_src(final, receiver.longitude, receiver.colatitude).T
 
-            if "E" in components:
-                raise NotImplementedError
-
+                if "N" in components:
+                    data["N"] = -final[:,0]
+                if "E" in components:
+                    data["E"] = final[:,1]
 
         for comp in components:
             if remove_source_shift and not reconvolve_stf:
