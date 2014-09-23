@@ -673,6 +673,8 @@ class AxiSEMDB(object):
         return_str += 'number of samples     : %6i\n' % (self.ndumps,)
         return_str += 'seismogram length     : %6.1f s\n' % \
             (self.dt * (self.ndumps - 1),)
+        return_str += 'source time function  : %s\n' % \
+            (self.parsed_mesh.stf,)
         return_str += 'source shift          : %6.3f s\n' % \
             (self.parsed_mesh.source_shift,)
         return_str += 'spatial order         : %6i\n' % \
