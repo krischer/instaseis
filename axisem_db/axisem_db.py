@@ -26,7 +26,9 @@ from . import lanczos
 from axisem_db.source import Source, ForceSource
 
 
-MeshCollection = collections.namedtuple("MeshCollection", ["px", "pz"])
+MeshCollection_bwd = collections.namedtuple("MeshCollection_bwd", ["px", "pz"])
+MeshCollection_fwd = collections.namedtuple("MeshCollection_fwd", ["m1", "m2",
+                                                                   "m3", "m4"])
 
 DEFAULT_MU = 32e9
 
@@ -63,6 +65,7 @@ class AxiSEMDB(object):
         self.read_on_demand = read_on_demand
         self._find_and_open_files(reciprocal=reciprocal)
         self.nfft = nextpow2(self.ndumps) * 2
+        self.reciprocal = reciprocal
 
     def _find_and_open_files(self, reciprocal=True):
         if reciprocal:
@@ -103,8 +106,51 @@ class AxiSEMDB(object):
                 raise ValueError("ordered_output.nc4 files must exist in the "
                                  "PZ/Data and/or PX/Data subfolders")
 
-            self.meshes = MeshCollection(px_m, pz_m)
+            self.meshes = MeshCollection_bwd(px_m, pz_m)
         else:
+            m1 = os.path.join(self.db_path, "MZZ")
+            m2 = os.path.join(self.db_path, "MXX_P_MYY")
+            m3 = os.path.join(self.db_path, "MXZ_MYZ")
+            m4 = os.path.join(self.db_path, "MXY_MXX_M_MYY")
+
+            # important difference to reciprocal: forward only makes sens if
+            # all subfolders are present
+            if (not os.path.exists(m1) or not os.path.exists(m2) or not
+               os.path.exists(m3) or not os.path.exists(m4)):
+                raise ValueError(
+                    "Expecting the four elemental moment tensor subfolders "
+                    "to be present.")
+
+            m1_file = os.path.join(m1, "Data", "ordered_output.nc4")
+            m2_file = os.path.join(m2, "Data", "ordered_output.nc4")
+            m3_file = os.path.join(m3, "Data", "ordered_output.nc4")
+            m4_file = os.path.join(m4, "Data", "ordered_output.nc4")
+
+            m1_exists = os.path.exists(m1_file)
+            m2_exists = os.path.exists(m2_file)
+            m3_exists = os.path.exists(m3_file)
+            m4_exists = os.path.exists(m4_file)
+
+            if m1_exists and m2_exists and m3_exists and m4_exists:
+                m1_m = mesh.Mesh(m1_file, full_parse=True,
+                                 buffer_size_in_mb=self.buffer_size_in_mb,
+                                 read_on_demand=self.read_on_demand)
+                m2_m = mesh.Mesh(m2_file, full_parse=False,
+                                 buffer_size_in_mb=self.buffer_size_in_mb,
+                                 read_on_demand=self.read_on_demand)
+                m3_m = mesh.Mesh(m3_file, full_parse=False,
+                                 buffer_size_in_mb=self.buffer_size_in_mb,
+                                 read_on_demand=self.read_on_demand)
+                m4_m = mesh.Mesh(m4_file, full_parse=False,
+                                 buffer_size_in_mb=self.buffer_size_in_mb,
+                                 read_on_demand=self.read_on_demand)
+                self.parsed_mesh = m1_m
+            else:
+                raise ValueError("ordered_output.nc4 files must exist in the "
+                                 "*/Data subfolders")
+
+            self.meshes = MeshCollection_fwd(m1_m, m2_m, m3_m, m4_m)
+
             raise NotImplementedError
 
     def get_seismograms(self, source, receiver, components=("Z", "N", "E"),
