@@ -219,11 +219,6 @@ class AxiSEMDB(object):
             gll_point_ids = mesh.variables["sem_mesh"][id_elem]
             axis = bool(mesh.variables["axis"][id_elem])
 
-        fac_1_di_map = {"N": np.cos,
-                        "E": np.sin}
-        fac_2_di_map = {"N": lambda x: - np.sin(x),
-                        "E": np.cos}
-
         if axis:
             col_points_xi = self.parsed_mesh.glj_points
             col_points_eta = self.parsed_mesh.gll_points
@@ -234,6 +229,12 @@ class AxiSEMDB(object):
         data = {}
 
         if self.reciprocal:
+
+            fac_1_map = {"N": np.cos,
+                         "E": np.sin}
+            fac_2_map = {"N": lambda x: - np.sin(x),
+                            "E": np.cos}
+
             if isinstance(source, Source):
                 if axis:
                     G = self.parsed_mesh.G2
@@ -295,16 +296,16 @@ class AxiSEMDB(object):
                     if comp not in components:
                         continue
 
-                    fac_1_di = fac_1_map[comp](rotmesh_phi)
-                    fac_2_di = fac_2_map[comp](rotmesh_phi)
+                    fac_1 = fac_1_map[comp](rotmesh_phi)
+                    fac_2 = fac_2_map[comp](rotmesh_phi)
 
                     final = np.zeros(strain_x.shape[0], dtype="float64")
-                    final += strain_x[:, 0] * mij[0] * 1.0 * fac_1_di
-                    final += strain_x[:, 1] * mij[1] * 1.0 * fac_1_di
-                    final += strain_x[:, 2] * mij[2] * 1.0 * fac_1_di
-                    final += strain_x[:, 3] * mij[3] * 2.0 * fac_2_di
-                    final += strain_x[:, 4] * mij[4] * 2.0 * fac_1_di
-                    final += strain_x[:, 5] * mij[5] * 2.0 * fac_2_di
+                    final += strain_x[:, 0] * mij[0] * 1.0 * fac_1
+                    final += strain_x[:, 1] * mij[1] * 1.0 * fac_1
+                    final += strain_x[:, 2] * mij[2] * 1.0 * fac_1
+                    final += strain_x[:, 3] * mij[3] * 2.0 * fac_2
+                    final += strain_x[:, 4] * mij[4] * 2.0 * fac_1
+                    final += strain_x[:, 5] * mij[5] * 2.0 * fac_2
                     if comp == "N":
                         final *= -1.0
                     data[comp] = final
@@ -352,13 +353,13 @@ class AxiSEMDB(object):
                     if comp not in components:
                         continue
 
-                    fac_1_di = fac_1_map[comp](rotmesh_phi)
-                    fac_2_di = fac_2_map[comp](rotmesh_phi)
+                    fac_1 = fac_1_map[comp](rotmesh_phi)
+                    fac_2 = fac_2_map[comp](rotmesh_phi)
 
                     final = np.zeros(displ_x.shape[0], dtype="float64")
-                    final += displ_x[:, 0] * force[0] * fac_1_di
-                    final += displ_x[:, 1] * force[1] * fac_2_di
-                    final += displ_x[:, 2] * force[2] * fac_1_di
+                    final += displ_x[:, 0] * force[0] * fac_1
+                    final += displ_x[:, 1] * force[1] * fac_2
+                    final += displ_x[:, 2] * force[2] * fac_1
                     if comp == "N":
                         final *= -1.0
                     data[comp] = final
@@ -385,6 +386,8 @@ class AxiSEMDB(object):
 
             
             mij = source.tensor / self.parsed_mesh.amplitude
+            # mij is [m_rr, m_tt, m_pp, m_rt, m_rp, m_tp]
+            # final is in s, phi, z coordinates
             final = np.zeros((displ_1.shape[0], 3), dtype="float64")
 
             final[:,0] += displ_1[:,0] * mij[0]
@@ -425,7 +428,7 @@ class AxiSEMDB(object):
                 final = rotations.rotate_vector_xyz_earth_to_xyz_src(final, receiver.longitude, receiver.colatitude).T
 
                 if "N" in components:
-                    data["N"] = -final[:,0]
+                    data["N"] = -final[:,0] # N = - theta
                 if "E" in components:
                     data["E"] = final[:,1]
 
