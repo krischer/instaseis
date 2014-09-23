@@ -233,7 +233,7 @@ class AxiSEMDB(object):
             fac_1_map = {"N": np.cos,
                          "E": np.sin}
             fac_2_map = {"N": lambda x: - np.sin(x),
-                            "E": np.cos}
+                         "E": np.cos}
 
             if isinstance(source, Source):
                 if axis:
@@ -314,12 +314,14 @@ class AxiSEMDB(object):
 
                 if "Z" in components:
                     displ_z = self.__get_displacement(self.meshes.pz, id_elem,
-                                                      gll_point_ids, col_points_xi,
+                                                      gll_point_ids,
+                                                      col_points_xi,
                                                       col_points_eta, xi, eta)
 
                 if any(comp in components for comp in ['N', 'E', 'R', 'T']):
                     displ_x = self.__get_displacement(self.meshes.px, id_elem,
-                                                      gll_point_ids, col_points_xi,
+                                                      gll_point_ids,
+                                                      col_points_xi,
                                                       col_points_eta, xi, eta)
 
                 force = rotations.rotate_vector_xyz_src_to_xyz_earth(
@@ -384,53 +386,62 @@ class AxiSEMDB(object):
                                               gll_point_ids, col_points_xi,
                                               col_points_eta, xi, eta)
 
-            
             mij = source.tensor / self.parsed_mesh.amplitude
             # mij is [m_rr, m_tt, m_pp, m_rt, m_rp, m_tp]
             # final is in s, phi, z coordinates
             final = np.zeros((displ_1.shape[0], 3), dtype="float64")
 
-            final[:,0] += displ_1[:,0] * mij[0]
-            final[:,2] += displ_1[:,2] * mij[0]
+            final[:, 0] += displ_1[:, 0] * mij[0]
+            final[:, 2] += displ_1[:, 2] * mij[0]
 
-            final[:,0] += displ_2[:,0] * 0.5 * (mij[1] + mij[2])
-            final[:,2] += displ_2[:,2] * 0.5 * (mij[1] + mij[2])
+            final[:, 0] += displ_2[:, 0] * 0.5 * (mij[1] + mij[2])
+            final[:, 2] += displ_2[:, 2] * 0.5 * (mij[1] + mij[2])
 
-            fac_1 =  mij[3] * np.cos(rotmesh_phi) + mij[4] * np.sin(rotmesh_phi) 
-            fac_2 = -mij[3] * np.sin(rotmesh_phi) + mij[4] * np.cos(rotmesh_phi) 
+            fac_1 = mij[3] * np.cos(rotmesh_phi) \
+                + mij[4] * np.sin(rotmesh_phi)
+            fac_2 = -mij[3] * np.sin(rotmesh_phi) \
+                + mij[4] * np.cos(rotmesh_phi)
 
-            final[:,0] += displ_3[:,0] * mij[3] * fac_1
-            final[:,1] += displ_3[:,1] * mij[4] * fac_2
-            final[:,2] += displ_3[:,2] * mij[3] * fac_1
+            final[:, 0] += displ_3[:, 0] * mij[3] * fac_1
+            final[:, 1] += displ_3[:, 1] * mij[4] * fac_2
+            final[:, 2] += displ_3[:, 2] * mij[3] * fac_1
 
-            fac_1 =  0.5 * (mij[1] - mij[2]) * np.cos(2 * rotmesh_phi) + mij[5] * np.sin(2 * rotmesh_phi) 
-            fac_2 = -0.5 * (mij[1] - mij[2]) * np.sin(2 * rotmesh_phi) + mij[5] * np.cos(2 * rotmesh_phi) 
+            fac_1 = 0.5 * (mij[1] - mij[2]) * np.cos(2 * rotmesh_phi) \
+                + mij[5] * np.sin(2 * rotmesh_phi)
+            fac_2 = -0.5 * (mij[1] - mij[2]) * np.sin(2 * rotmesh_phi) \
+                + mij[5] * np.cos(2 * rotmesh_phi)
 
-            final[:,0] += displ_4[:,0] * mij[3] * fac_1
-            final[:,1] += displ_4[:,1] * mij[4] * fac_2
-            final[:,2] += displ_4[:,2] * mij[3] * fac_1
+            final[:, 0] += displ_4[:, 0] * mij[3] * fac_1
+            final[:, 1] += displ_4[:, 1] * mij[4] * fac_2
+            final[:, 2] += displ_4[:, 2] * mij[3] * fac_1
 
             rotmesh_colat = np.arctan2(rotmesh_s, rotmesh_z)
 
             if "T" in components:
-                data["T"] = final[:,1]
+                data["T"] = final[:, 1]
 
             if "Z" in components:
-                data["Z"] = final[:,0] * np.sin(rotmesh_colat) + final[:,2] * np.cos(rotmesh_colat)
+                data["Z"] = final[:, 0] * np.sin(rotmesh_colat) \
+                    + final[:, 2] * np.cos(rotmesh_colat)
 
             if "R" in components:
-                data["R"] = final[:,0] * np.cos(rotmesh_colat) - final[:,2] * np.sin(rotmesh_colat)
+                data["R"] = final[:, 0] * np.cos(rotmesh_colat) \
+                    - final[:, 2] * np.sin(rotmesh_colat)
 
             if "N" in components or "E" in components:
-                # transpose needed because rotations assume different slicing (ugly)
-                final = rotations.rotate_vector_src_to_xyz(final.T, rotmesh_phi)
-                final = rotations.rotate_vector_xyz_src_to_xyz_earth(final, rotmesh_phi, rotmesh_colat)
-                final = rotations.rotate_vector_xyz_earth_to_xyz_src(final, receiver.longitude, receiver.colatitude).T
+                # transpose needed because rotations assume different slicing
+                # (ugly)
+                final = rotations.rotate_vector_src_to_xyz(final.T,
+                                                           rotmesh_phi)
+                final = rotations.rotate_vector_xyz_src_to_xyz_earth(
+                    final, rotmesh_phi, rotmesh_colat)
+                final = rotations.rotate_vector_xyz_earth_to_xyz_src(
+                    final, receiver.longitude, receiver.colatitude).T
 
                 if "N" in components:
-                    data["N"] = -final[:,0] # N = - theta
+                    data["N"] = -final[:, 0]  # N = - theta
                 if "E" in components:
-                    data["E"] = final[:,1]
+                    data["E"] = final[:, 1]
 
         for comp in components:
             if remove_source_shift and not reconvolve_stf:
