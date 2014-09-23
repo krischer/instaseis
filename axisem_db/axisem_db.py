@@ -367,11 +367,6 @@ class AxiSEMDB(object):
                 raise NotImplementedError
 
         else:
-            fac_1_qu_map = {"N": lambda x: np.cos(2 * x),
-                            "E": lambda x: np.sin(2 * x)}
-            fac_2_qu_map = {"N": lambda x: - np.sin(2 * x),
-                            "E": lambda x: np.cos(2 * x)}
-
             if not isinstance(source, Source):
                 raise NotImplementedError
 
@@ -412,10 +407,21 @@ class AxiSEMDB(object):
             final[:,1] += displ_4[:,1] * mij[4] * fac_2
             final[:,2] += displ_4[:,2] * mij[3] * fac_1
 
-            #TODO: rotate to some useful coordinate system
+            rotmesh_colat = np.arctan2(rotmesh_s, rotmesh_z)
+            if "T" in components:
+                data["T"] = final[:,1]
 
-            raise NotImplementedError
+            if "Z" in components:
+                data["Z"] = final[:,0] * np.sin(rotmesh_colat) + final[:,2] * np.cos(rotmesh_colat)
 
+            if "R" in components:
+                data["R"] = final[:,0] * np.cos(rotmesh_colat) - final[:,2] * np.sin(rotmesh_colat)
+
+            if "N" in components:
+                raise NotImplementedError
+
+            if "E" in components:
+                raise NotImplementedError
 
 
         for comp in components:
