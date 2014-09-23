@@ -69,16 +69,16 @@ class SourceOrReceiver(object):
     @property
     def x(self):
         return np.cos(np.deg2rad(self.latitude)) * \
-            np.cos(np.deg2rad(self.longitude)) * self.radius_in_m / 1000.0
+            np.cos(np.deg2rad(self.longitude)) * self.radius_in_m
 
     @property
     def y(self):
         return np.cos(np.deg2rad(self.latitude)) * \
-            np.sin(np.deg2rad(self.longitude)) * self.radius_in_m / 1000.0
+            np.sin(np.deg2rad(self.longitude)) * self.radius_in_m
 
     @property
     def z(self):
-        return np.sin(np.deg2rad(self.latitude)) * self.radius_in_m / 1000.0
+        return np.sin(np.deg2rad(self.latitude)) * self.radius_in_m
 
 
 class Source(SourceOrReceiver):
