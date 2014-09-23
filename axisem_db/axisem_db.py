@@ -151,7 +151,7 @@ class AxiSEMDB(object):
 
             self.meshes = MeshCollection_fwd(m1_m, m2_m, m3_m, m4_m)
 
-            raise NotImplementedError
+            #raise NotImplementedError
 
     def get_seismograms(self, source, receiver, components=("Z", "N", "E"),
                         remove_source_shift=True, reconvolve_stf=False,
@@ -578,19 +578,26 @@ class AxiSEMDB(object):
 
     def __str__(self):
 
-        if self.meshes.pz is not None and self.meshes.px is not None:
-            components = 'vertical and horizontal'
-        elif self.meshes.pz is None and self.meshes.px is not None:
-            components = 'horizontal only'
-        elif self.meshes.pz is not None and self.meshes.px is None:
-            components = 'vertical only'
+        if self.reciprocal:
+            if self.meshes.pz is not None and self.meshes.px is not None:
+                components = 'vertical and horizontal'
+            elif self.meshes.pz is None and self.meshes.px is not None:
+                components = 'horizontal only'
+            elif self.meshes.pz is not None and self.meshes.px is None:
+                components = 'vertical only'
 
-        return_str = "AxiSEM reciprocal Green's function Database\n"
-        return_str += "generated with these parameters:\n"
+            return_str = "AxiSEM reciprocal Green's function Database\n"
+            return_str += "generated with these parameters:\n"
+            return_str += 'components            : %s\n' % (components,)
+        else:
+            return_str = "AxiSEM forward Green's function Database\n"
+            return_str += "generated with these parameters:\n"
+            return_str += 'source depth          : %s\n' % \
+                (self.parsed_mesh.source_depth,)
+
         return_str += 'velocity model        : %s\n' % (self.background_model,)
         return_str += 'dominant period       : %6.3f s\n' % \
             (self.parsed_mesh.dominant_period,)
-        return_str += 'components            : %s\n' % (components,)
         return_str += 'time step             : %6.3f s\n' % (self.dt,)
         return_str += 'sampling rate         : %6.3f Hz\n' % (1./self.dt,)
         return_str += 'number of samples     : %6i\n' % (self.ndumps,)
@@ -601,18 +608,12 @@ class AxiSEMDB(object):
         return_str += 'spatial order         : %6i\n' % \
             (self.parsed_mesh.npol,)
 
-        # some old databases do not contain this info, hence the if
-        if (self.parsed_mesh.kwf_rmin is not None and
-                self.parsed_mesh.kwf_rmax is not None and
-                self.parsed_mesh.kwf_colatmin is not None and
-                self.parsed_mesh.kwf_colatmax is not None):
-            return_str += 'min/max radius [km]   : %6.1f %6.1f\n' % \
-                (self.parsed_mesh.kwf_rmin, self.parsed_mesh.kwf_rmax)
-            return_str += 'min/max dist [degree] : %6.1f %6.1f\n' % \
-                (self.parsed_mesh.kwf_colatmin, self.parsed_mesh.kwf_colatmax)
+        return_str += 'min/max radius [km]   : %6.1f %6.1f\n' % \
+            (self.parsed_mesh.kwf_rmin, self.parsed_mesh.kwf_rmax)
+        return_str += 'min/max dist [degree] : %6.1f %6.1f\n' % \
+            (self.parsed_mesh.kwf_colatmin, self.parsed_mesh.kwf_colatmax)
 
-        if self.parsed_mesh.time_scheme is not None:
-            return_str += 'time scheme           : %s\n' % \
-                (self.parsed_mesh.time_scheme,)
+        return_str += 'time scheme           : %s\n' % \
+            (self.parsed_mesh.time_scheme,)
 
         return return_str
