@@ -158,6 +158,7 @@ class Mesh(object):
         self.kwf_colatmax = getattr(self.f, "kernel wavefield colatmax")
         self.time_scheme = getattr(self.f, "time scheme")
         self.source_depth = getattr(self.f, "source depth in km")
+        self.stf = getattr(self.f, "source time function")
 
         self.gll_points = spectral_basis.zelegl(self.npol)
         self.glj_points = spectral_basis.zemngl2(self.npol)
