@@ -40,7 +40,8 @@ class AxiSEMDB(object):
     discretization equals the SEM basis functions of AxiSEM, resulting in high
     order spatial accuracy and short access times.
     """
-    def __init__(self, db_path, buffer_size_in_mb=100, read_on_demand=True):
+    def __init__(self, db_path, buffer_size_in_mb=100, read_on_demand=True,
+                 reciprocal=True):
         """
         :param db_path: Path to the AxiSEM Database containing subdirectories
             PZ and/or PX each containing a order_output.nc4 file
@@ -52,53 +53,59 @@ class AxiSEMDB(object):
             initialization, default) or on initialization (faster in individual
             seismogram extraction, useful e.g. for finite sources)
         :type read_on_demand: bool, optional
+        :param reciprocal: assume a reciprocal database (fixed receiver depth,
+            sources anywhere) or a forward database (fixed source depth,
+            receiver anywhere)
+        :type reciprocal: bool, optional
         """
         self.db_path = db_path
         self.buffer_size_in_mb = buffer_size_in_mb
         self.read_on_demand = read_on_demand
-        self._find_and_open_files()
+        self._find_and_open_files(reciprocal=reciprocal)
         self.nfft = nextpow2(self.ndumps) * 2
 
-    def _find_and_open_files(self):
-        px = os.path.join(self.db_path, "PX")
-        pz = os.path.join(self.db_path, "PZ")
-        if not os.path.exists(px) and not os.path.exists(pz):
-            raise ValueError(
-                "Expecting the 'PX' or 'PZ' subfolders to be present.")
-        px_file = os.path.join(px, "Data", "ordered_output.nc4")
-        pz_file = os.path.join(pz, "Data", "ordered_output.nc4")
-        x_exists, z_exists = False, False
-        if os.path.exists(px_file):
-            x_exists = True
-        if os.path.exists(pz_file):
-            z_exists = True
+    def _find_and_open_files(self, reciprocal=True):
+        if reciprocal:
+            px = os.path.join(self.db_path, "PX")
+            pz = os.path.join(self.db_path, "PZ")
+            if not os.path.exists(px) and not os.path.exists(pz):
+                raise ValueError(
+                    "Expecting the 'PX' or 'PZ' subfolders to be present.")
 
-        # full_parse will force the kd-tree to be built
-        if x_exists and z_exists:
-            px_m = mesh.Mesh(px_file, full_parse=True,
-                             buffer_size_in_mb=self.buffer_size_in_mb,
-                             read_on_demand=self.read_on_demand)
-            pz_m = mesh.Mesh(pz_file, full_parse=False,
-                             buffer_size_in_mb=self.buffer_size_in_mb,
-                             read_on_demand=self.read_on_demand)
-            self.parsed_mesh = px_m
-        elif x_exists:
-            px_m = mesh.Mesh(px_file, full_parse=True,
-                             buffer_size_in_mb=self.buffer_size_in_mb,
-                             read_on_demand=self.read_on_demand)
-            pz_m = None
-            self.parsed_mesh = px_m
-        elif z_exists:
-            px_m = None
-            pz_m = mesh.Mesh(pz_file, full_parse=True,
-                             buffer_size_in_mb=self.buffer_size_in_mb,
-                             read_on_demand=self.read_on_demand)
-            self.parsed_mesh = pz_m
+            px_file = os.path.join(px, "Data", "ordered_output.nc4")
+            pz_file = os.path.join(pz, "Data", "ordered_output.nc4")
+
+            x_exists = os.path.exists(px_file)
+            z_exists = os.path.exists(pz_file)
+
+            # full_parse will force the kd-tree to be built
+            if x_exists and z_exists:
+                px_m = mesh.Mesh(px_file, full_parse=True,
+                                 buffer_size_in_mb=self.buffer_size_in_mb,
+                                 read_on_demand=self.read_on_demand)
+                pz_m = mesh.Mesh(pz_file, full_parse=False,
+                                 buffer_size_in_mb=self.buffer_size_in_mb,
+                                 read_on_demand=self.read_on_demand)
+                self.parsed_mesh = px_m
+            elif x_exists:
+                px_m = mesh.Mesh(px_file, full_parse=True,
+                                 buffer_size_in_mb=self.buffer_size_in_mb,
+                                 read_on_demand=self.read_on_demand)
+                pz_m = None
+                self.parsed_mesh = px_m
+            elif z_exists:
+                px_m = None
+                pz_m = mesh.Mesh(pz_file, full_parse=True,
+                                 buffer_size_in_mb=self.buffer_size_in_mb,
+                                 read_on_demand=self.read_on_demand)
+                self.parsed_mesh = pz_m
+            else:
+                raise ValueError("ordered_output.nc4 files must exist in the "
+                                 "PZ/Data and/or PX/Data subfolders")
+
+            self.meshes = MeshCollection(px_m, pz_m)
         else:
-            raise ValueError("ordered_output.nc4 files must exist in the "
-                             "PZ/Data and/or PX/Data subfolders")
-
-        self.meshes = MeshCollection(px_m, pz_m)
+            raise NotImplementedError
 
     def get_seismograms(self, source, receiver, components=("Z", "N", "E"),
                         remove_source_shift=True, reconvolve_stf=False,
