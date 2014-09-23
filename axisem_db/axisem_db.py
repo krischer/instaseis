@@ -219,10 +219,10 @@ class AxiSEMDB(object):
             gll_point_ids = mesh.variables["sem_mesh"][id_elem]
             axis = bool(mesh.variables["axis"][id_elem])
 
-        fac_1_map = {"N": np.cos,
-                     "E": np.sin}
-        fac_2_map = {"N": lambda x: - np.sin(x),
-                     "E": np.cos}
+        fac_1_di_map = {"N": np.cos,
+                        "E": np.sin}
+        fac_2_di_map = {"N": lambda x: - np.sin(x),
+                        "E": np.cos}
 
         if axis:
             col_points_xi = self.parsed_mesh.glj_points
@@ -233,137 +233,190 @@ class AxiSEMDB(object):
 
         data = {}
 
-        if isinstance(source, Source):
-            if axis:
-                G = self.parsed_mesh.G2
-                GT = self.parsed_mesh.G1T
+        if self.reciprocal:
+            if isinstance(source, Source):
+                if axis:
+                    G = self.parsed_mesh.G2
+                    GT = self.parsed_mesh.G1T
+                else:
+                    G = self.parsed_mesh.G2
+                    GT = self.parsed_mesh.G2T
+
+                strain_x = None
+                strain_z = None
+
+                # Minor optimization: Only read if actually requested.
+                if "Z" in components:
+                    strain_z = self.__get_strain(self.meshes.pz, id_elem,
+                                                 gll_point_ids, G, GT,
+                                                 col_points_xi, col_points_eta,
+                                                 corner_points, eltype, axis,
+                                                 xi, eta)
+
+                if any(comp in components for comp in ['N', 'E', 'R', 'T']):
+                    strain_x = self.__get_strain(self.meshes.px, id_elem,
+                                                 gll_point_ids, G, GT,
+                                                 col_points_xi, col_points_eta,
+                                                 corner_points, eltype,
+                                                 axis, xi, eta)
+
+                mij = rotations.rotate_symm_tensor_voigt_xyz_src_to_xyz_earth_1d(
+                    source.tensor_voigt, np.deg2rad(source.longitude),
+                    np.deg2rad(source.colatitude))
+                mij = rotations.rotate_symm_tensor_voigt_xyz_earth_to_xyz_src_1d(
+                    mij, np.deg2rad(receiver.longitude),
+                    np.deg2rad(receiver.colatitude))
+                mij = rotations.rotate_symm_tensor_voigt_xyz_to_src_1d(
+                    mij, rotmesh_phi)
+                mij /= self.parsed_mesh.amplitude
+
+                if "Z" in components:
+                    final = np.zeros(strain_z.shape[0], dtype="float64")
+                    for i in xrange(3):
+                        final += mij[i] * strain_z[:, i]
+                    final += 2.0 * mij[4] * strain_z[:, 4]
+                    data["Z"] = final
+
+                if "R" in components:
+                    final = np.zeros(strain_x.shape[0], dtype="float64")
+                    final -= strain_x[:, 0] * mij[0] * 1.0
+                    final -= strain_x[:, 1] * mij[1] * 1.0
+                    final -= strain_x[:, 2] * mij[2] * 1.0
+                    final -= strain_x[:, 4] * mij[4] * 2.0
+                    data["R"] = final
+
+                if "T" in components:
+                    final = np.zeros(strain_x.shape[0], dtype="float64")
+                    final += strain_x[:, 3] * mij[3] * 2.0
+                    final += strain_x[:, 5] * mij[5] * 2.0
+                    data["T"] = final
+
+                for comp in ["E", "N"]:
+                    if comp not in components:
+                        continue
+
+                    fac_1_di = fac_1_map[comp](rotmesh_phi)
+                    fac_2_di = fac_2_map[comp](rotmesh_phi)
+
+                    final = np.zeros(strain_x.shape[0], dtype="float64")
+                    final += strain_x[:, 0] * mij[0] * 1.0 * fac_1_di
+                    final += strain_x[:, 1] * mij[1] * 1.0 * fac_1_di
+                    final += strain_x[:, 2] * mij[2] * 1.0 * fac_1_di
+                    final += strain_x[:, 3] * mij[3] * 2.0 * fac_2_di
+                    final += strain_x[:, 4] * mij[4] * 2.0 * fac_1_di
+                    final += strain_x[:, 5] * mij[5] * 2.0 * fac_2_di
+                    if comp == "N":
+                        final *= -1.0
+                    data[comp] = final
+
+            elif isinstance(source, ForceSource):
+
+                if "Z" in components:
+                    displ_z = self.__get_displacement(self.meshes.pz, id_elem,
+                                                      gll_point_ids, col_points_xi,
+                                                      col_points_eta, xi, eta)
+
+                if any(comp in components for comp in ['N', 'E', 'R', 'T']):
+                    displ_x = self.__get_displacement(self.meshes.px, id_elem,
+                                                      gll_point_ids, col_points_xi,
+                                                      col_points_eta, xi, eta)
+
+                force = rotations.rotate_vector_xyz_src_to_xyz_earth(
+                    source.force_tpr, np.deg2rad(source.longitude),
+                    np.deg2rad(source.colatitude))
+                force = rotations.rotate_vector_xyz_earth_to_xyz_src(
+                    force, np.deg2rad(receiver.longitude),
+                    np.deg2rad(receiver.colatitude))
+                force = rotations.rotate_vector_xyz_to_src(
+                    force, rotmesh_phi)
+                force /= self.parsed_mesh.amplitude
+
+                if "Z" in components:
+                    final = np.zeros(displ_z.shape[0], dtype="float64")
+                    final += displ_z[:, 0] * force[0]
+                    final += displ_z[:, 2] * force[2]
+                    data["Z"] = final
+
+                if "R" in components:
+                    final = np.zeros(displ_x.shape[0], dtype="float64")
+                    final += displ_x[:, 0] * force[0]
+                    final += displ_x[:, 2] * force[2]
+                    data["R"] = final
+
+                if "T" in components:
+                    final = np.zeros(displ_x.shape[0], dtype="float64")
+                    final += displ_x[:, 1] * force[1]
+                    data["T"] = final
+
+                for comp in ["E", "N"]:
+                    if comp not in components:
+                        continue
+
+                    fac_1_di = fac_1_map[comp](rotmesh_phi)
+                    fac_2_di = fac_2_map[comp](rotmesh_phi)
+
+                    final = np.zeros(displ_x.shape[0], dtype="float64")
+                    final += displ_x[:, 0] * force[0] * fac_1_di
+                    final += displ_x[:, 1] * force[1] * fac_2_di
+                    final += displ_x[:, 2] * force[2] * fac_1_di
+                    if comp == "N":
+                        final *= -1.0
+                    data[comp] = final
+
             else:
-                G = self.parsed_mesh.G2
-                GT = self.parsed_mesh.G2T
-
-            strain_x = None
-            strain_z = None
-
-            # Minor optimization: Only read if actually requested.
-            if "Z" in components:
-                strain_z = self.__get_strain(self.meshes.pz, id_elem,
-                                             gll_point_ids, G, GT,
-                                             col_points_xi, col_points_eta,
-                                             corner_points, eltype, axis, xi,
-                                             eta)
-
-            if any(comp in components for comp in ['N', 'E', 'R', 'T']):
-                strain_x = self.__get_strain(self.meshes.px, id_elem,
-                                             gll_point_ids, G, GT,
-                                             col_points_xi, col_points_eta,
-                                             corner_points, eltype,
-                                             axis, xi, eta)
-
-            mij = rotations.rotate_symm_tensor_voigt_xyz_src_to_xyz_earth_1d(
-                source.tensor_voigt, np.deg2rad(source.longitude),
-                np.deg2rad(source.colatitude))
-            mij = rotations.rotate_symm_tensor_voigt_xyz_earth_to_xyz_src_1d(
-                mij, np.deg2rad(receiver.longitude),
-                np.deg2rad(receiver.colatitude))
-            mij = rotations.rotate_symm_tensor_voigt_xyz_to_src_1d(
-                mij, rotmesh_phi)
-            mij /= self.parsed_mesh.amplitude
-
-            if "Z" in components:
-                final = np.zeros(strain_z.shape[0], dtype="float64")
-                for i in xrange(3):
-                    final += mij[i] * strain_z[:, i]
-                final += 2.0 * mij[4] * strain_z[:, 4]
-                data["Z"] = final
-
-            if "R" in components:
-                final = np.zeros(strain_x.shape[0], dtype="float64")
-                final -= strain_x[:, 0] * mij[0] * 1.0
-                final -= strain_x[:, 1] * mij[1] * 1.0
-                final -= strain_x[:, 2] * mij[2] * 1.0
-                final -= strain_x[:, 4] * mij[4] * 2.0
-                data["R"] = final
-
-            if "T" in components:
-                final = np.zeros(strain_x.shape[0], dtype="float64")
-                final += strain_x[:, 3] * mij[3] * 2.0
-                final += strain_x[:, 5] * mij[5] * 2.0
-                data["T"] = final
-
-            for comp in ["E", "N"]:
-                if comp not in components:
-                    continue
-
-                fac_1 = fac_1_map[comp](rotmesh_phi)
-                fac_2 = fac_2_map[comp](rotmesh_phi)
-
-                final = np.zeros(strain_x.shape[0], dtype="float64")
-                final += strain_x[:, 0] * mij[0] * 1.0 * fac_1
-                final += strain_x[:, 1] * mij[1] * 1.0 * fac_1
-                final += strain_x[:, 2] * mij[2] * 1.0 * fac_1
-                final += strain_x[:, 3] * mij[3] * 2.0 * fac_2
-                final += strain_x[:, 4] * mij[4] * 2.0 * fac_1
-                final += strain_x[:, 5] * mij[5] * 2.0 * fac_2
-                if comp == "N":
-                    final *= -1.0
-                data[comp] = final
-
-        elif isinstance(source, ForceSource):
-
-            if "Z" in components:
-                displ_z = self.__get_displacement(self.meshes.pz, id_elem,
-                                                  gll_point_ids, col_points_xi,
-                                                  col_points_eta, xi, eta)
-
-            if any(comp in components for comp in ['N', 'E', 'R', 'T']):
-                displ_x = self.__get_displacement(self.meshes.px, id_elem,
-                                                  gll_point_ids, col_points_xi,
-                                                  col_points_eta, xi, eta)
-
-            force = rotations.rotate_vector_xyz_src_to_xyz_earth(
-                source.force_tpr, np.deg2rad(source.longitude),
-                np.deg2rad(source.colatitude))
-            force = rotations.rotate_vector_xyz_earth_to_xyz_src(
-                force, np.deg2rad(receiver.longitude),
-                np.deg2rad(receiver.colatitude))
-            force = rotations.rotate_vector_xyz_to_src(
-                force, rotmesh_phi)
-            force /= self.parsed_mesh.amplitude
-
-            if "Z" in components:
-                final = np.zeros(displ_z.shape[0], dtype="float64")
-                final += displ_z[:, 0] * force[0]
-                final += displ_z[:, 2] * force[2]
-                data["Z"] = final
-
-            if "R" in components:
-                final = np.zeros(displ_x.shape[0], dtype="float64")
-                final += displ_x[:, 0] * force[0]
-                final += displ_x[:, 2] * force[2]
-                data["R"] = final
-
-            if "T" in components:
-                final = np.zeros(displ_x.shape[0], dtype="float64")
-                final += displ_x[:, 1] * force[1]
-                data["T"] = final
-
-            for comp in ["E", "N"]:
-                if comp not in components:
-                    continue
-
-                fac_1 = fac_1_map[comp](rotmesh_phi)
-                fac_2 = fac_2_map[comp](rotmesh_phi)
-
-                final = np.zeros(displ_x.shape[0], dtype="float64")
-                final += displ_x[:, 0] * force[0] * fac_1
-                final += displ_x[:, 1] * force[1] * fac_2
-                final += displ_x[:, 2] * force[2] * fac_1
-                if comp == "N":
-                    final *= -1.0
-                data[comp] = final
+                raise NotImplementedError
 
         else:
+            fac_1_qu_map = {"N": lambda x: np.cos(2 * x),
+                            "E": lambda x: np.sin(2 * x)}
+            fac_2_qu_map = {"N": lambda x: - np.sin(2 * x),
+                            "E": lambda x: np.cos(2 * x)}
+
+            if not isinstance(source, Source):
+                raise NotImplementedError
+
+            displ_1 = self.__get_displacement(self.meshes.m1, id_elem,
+                                              gll_point_ids, col_points_xi,
+                                              col_points_eta, xi, eta)
+            displ_2 = self.__get_displacement(self.meshes.m2, id_elem,
+                                              gll_point_ids, col_points_xi,
+                                              col_points_eta, xi, eta)
+            displ_3 = self.__get_displacement(self.meshes.m3, id_elem,
+                                              gll_point_ids, col_points_xi,
+                                              col_points_eta, xi, eta)
+            displ_4 = self.__get_displacement(self.meshes.m4, id_elem,
+                                              gll_point_ids, col_points_xi,
+                                              col_points_eta, xi, eta)
+
+            
+            mij = source.tensor / self.parsed_mesh.amplitude
+            final = np.zeros((displ_1.shape[0], 3), dtype="float64")
+
+            final[:,0] += displ_1[:,0] * mij[0]
+            final[:,2] += displ_1[:,2] * mij[0]
+
+            final[:,0] += displ_2[:,0] * 0.5 * (mij[1] + mij[2])
+            final[:,2] += displ_2[:,2] * 0.5 * (mij[1] + mij[2])
+
+            fac_1 =  mij[3] * np.cos(rotmesh_phi) + mij[4] * np.sin(rotmesh_phi) 
+            fac_2 = -mij[3] * np.sin(rotmesh_phi) + mij[4] * np.cos(rotmesh_phi) 
+
+            final[:,0] += displ_3[:,0] * mij[3] * fac_1
+            final[:,1] += displ_3[:,1] * mij[4] * fac_2
+            final[:,2] += displ_3[:,2] * mij[3] * fac_1
+
+            fac_1 =  0.5 * (mij[1] - mij[2]) * np.cos(2 * rotmesh_phi) + mij[5] * np.sin(2 * rotmesh_phi) 
+            fac_2 = -0.5 * (mij[1] - mij[2]) * np.sin(2 * rotmesh_phi) + mij[5] * np.cos(2 * rotmesh_phi) 
+
+            final[:,0] += displ_4[:,0] * mij[3] * fac_1
+            final[:,1] += displ_4[:,1] * mij[4] * fac_2
+            final[:,2] += displ_4[:,2] * mij[3] * fac_1
+
+            #TODO: rotate to some useful coordinate system
+
             raise NotImplementedError
+
+
 
         for comp in components:
             if remove_source_shift and not reconvolve_stf:
@@ -437,6 +490,9 @@ class AxiSEMDB(object):
             using a lanczos kernel
         :param a_lanczos: width of the kernel used in resampling
         """
+        if not self.reciprocal:
+            raise NotImplementedError
+
         data_summed = {}
         for source in sources:
             data, mu = self.get_seismograms(
