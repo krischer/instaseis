@@ -407,9 +407,6 @@ class AxiSEMDB(object):
             fac_2 = -mij[3] * np.sin(rotmesh_phi) \
                 + mij[4] * np.cos(rotmesh_phi)
 
-            #print fac_1
-            #print fac_2
-
             final[:, 0] += displ_3[:, 0] * fac_1
             final[:, 1] += displ_3[:, 1] * fac_2
             final[:, 2] += displ_3[:, 2] * fac_1
@@ -418,9 +415,6 @@ class AxiSEMDB(object):
                 + 2 * mij[5] * np.sin(2 * rotmesh_phi)
             fac_2 = -(mij[1] - mij[2]) * np.sin(2 * rotmesh_phi) \
                 + 2 * mij[5] * np.cos(2 * rotmesh_phi)
-
-            #print fac_1
-            #print fac_2
 
             final[:, 0] += displ_4[:, 0] * fac_1
             final[:, 1] += displ_4[:, 1] * fac_2
@@ -433,28 +427,24 @@ class AxiSEMDB(object):
                                           # reciprocal mode, need external
                                           # verification still
 
-            if "Z" in components:
-                data["Z"] = final[:, 0] * np.sin(rotmesh_colat) \
-                    + final[:, 2] * np.cos(rotmesh_colat)
-
             if "R" in components:
                 data["R"] = final[:, 0] * np.cos(rotmesh_colat) \
                     - final[:, 2] * np.sin(rotmesh_colat)
 
-            if "N" in components or "E" in components:
+            if "N" in components or "E" in components or "Z" in components:
                 # transpose needed because rotations assume different slicing
                 # (ugly)
-                final = rotations.rotate_vector_src_to_xyz(final.T,
-                                                           rotmesh_phi)
-                final = rotations.rotate_vector_xyz_src_to_xyz_earth(
-                    final, rotmesh_phi, rotmesh_colat)
-                final = rotations.rotate_vector_xyz_earth_to_xyz_src(
-                    final, receiver.longitude, receiver.colatitude).T
+                final = rotations.rotate_vector_src_to_NEZ(
+                    final.T, rotmesh_phi,
+                    source.longitude_rad, source.colatitude_rad,
+                    receiver.longitude_rad, receiver.colatitude_rad).T
 
                 if "N" in components:
-                    data["N"] = -final[:, 0]  # N = - theta
+                    data["N"] = final[:, 0]
                 if "E" in components:
                     data["E"] = final[:, 1]
+                if "Z" in components:
+                    data["Z"] = final[:, 2]
 
         for comp in components:
             if remove_source_shift and not reconvolve_stf:
