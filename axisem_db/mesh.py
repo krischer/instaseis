@@ -82,13 +82,15 @@ class Mesh(object):
     """
     A class to handle the netcdf output written by AxiSEM.
     """
-    def __init__(self, filename, full_parse=False, buffer_size_in_mb=100,
+    def __init__(self, filename, full_parse=False,
+                 strain_buffer_size_in_mb=100, displ_buffer_size_in_mb=100,
                  read_on_demand=True):
         self.f = netCDF4.Dataset(filename, "r", format="NETCDF4")
         self.filename = filename
         self.read_on_demand = read_on_demand
         self._parse(full_parse=full_parse)
-        self.strain_buffer = Buffer(buffer_size_in_mb)
+        self.strain_buffer = Buffer(strain_buffer_size_in_mb)
+        self.displ_buffer = Buffer(displ_buffer_size_in_mb)
 
     def __del__(self):
         try:

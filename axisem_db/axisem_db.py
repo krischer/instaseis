@@ -84,22 +84,26 @@ class AxiSEMDB(object):
             # full_parse will force the kd-tree to be built
             if x_exists and z_exists:
                 px_m = mesh.Mesh(px_file, full_parse=True,
-                                 buffer_size_in_mb=self.buffer_size_in_mb,
+                                 strain_buffer_size_in_mb=self.buffer_size_in_mb,
+                                 displ_buffer_size_in_mb=0,
                                  read_on_demand=self.read_on_demand)
                 pz_m = mesh.Mesh(pz_file, full_parse=False,
-                                 buffer_size_in_mb=self.buffer_size_in_mb,
+                                 strain_buffer_size_in_mb=self.buffer_size_in_mb,
+                                 displ_buffer_size_in_mb=0,
                                  read_on_demand=self.read_on_demand)
                 self.parsed_mesh = px_m
             elif x_exists:
                 px_m = mesh.Mesh(px_file, full_parse=True,
-                                 buffer_size_in_mb=self.buffer_size_in_mb,
+                                 strain_buffer_size_in_mb=self.buffer_size_in_mb,
+                                 displ_buffer_size_in_mb=0,
                                  read_on_demand=self.read_on_demand)
                 pz_m = None
                 self.parsed_mesh = px_m
             elif z_exists:
                 px_m = None
                 pz_m = mesh.Mesh(pz_file, full_parse=True,
-                                 buffer_size_in_mb=self.buffer_size_in_mb,
+                                 strain_buffer_size_in_mb=self.buffer_size_in_mb,
+                                 displ_buffer_size_in_mb=0,
                                  read_on_demand=self.read_on_demand)
                 self.parsed_mesh = pz_m
             else:
@@ -133,16 +137,20 @@ class AxiSEMDB(object):
 
             if m1_exists and m2_exists and m3_exists and m4_exists:
                 m1_m = mesh.Mesh(m1_file, full_parse=True,
-                                 buffer_size_in_mb=self.buffer_size_in_mb,
+                                 strain_buffer_size_in_mb=0,
+                                 displ_buffer_size_in_mb=self.buffer_size_in_mb,
                                  read_on_demand=self.read_on_demand)
                 m2_m = mesh.Mesh(m2_file, full_parse=False,
-                                 buffer_size_in_mb=self.buffer_size_in_mb,
+                                 strain_buffer_size_in_mb=0,
+                                 displ_buffer_size_in_mb=self.buffer_size_in_mb,
                                  read_on_demand=self.read_on_demand)
                 m3_m = mesh.Mesh(m3_file, full_parse=False,
-                                 buffer_size_in_mb=self.buffer_size_in_mb,
+                                 strain_buffer_size_in_mb=0,
+                                 displ_buffer_size_in_mb=self.buffer_size_in_mb,
                                  read_on_demand=self.read_on_demand)
                 m4_m = mesh.Mesh(m4_file, full_parse=False,
-                                 buffer_size_in_mb=self.buffer_size_in_mb,
+                                 strain_buffer_size_in_mb=0,
+                                 displ_buffer_size_in_mb=self.buffer_size_in_mb,
                                  read_on_demand=self.read_on_demand)
                 self.parsed_mesh = m1_m
             else:
@@ -617,20 +625,24 @@ class AxiSEMDB(object):
 
     def __get_displacement(self, mesh, id_elem, gll_point_ids, col_points_xi,
                            col_points_eta, xi, eta):
-        # Todo: implement a buffer for displacement
-        utemp = np.zeros((mesh.ndumps, mesh.npol + 1, mesh.npol + 1, 3),
-                         dtype=np.float64, order="F")
+        if id_elem not in mesh.displ_buffer:
+            utemp = np.zeros((mesh.ndumps, mesh.npol + 1, mesh.npol + 1, 3),
+                             dtype=np.float64, order="F")
 
-        mesh_dict = mesh.f.groups["Snapshots"].variables
+            mesh_dict = mesh.f.groups["Snapshots"].variables
 
-        # Load displacement from all GLL points.
-        for i, var in enumerate(["disp_s", "disp_p", "disp_z"]):
-            if var not in mesh_dict:
-                continue
-            temp = mesh_dict[var][:, gll_point_ids.flatten()]
-            for ipol in xrange(mesh.npol + 1):
-                for jpol in xrange(mesh.npol + 1):
-                    utemp[:, jpol, ipol, i] = temp[:, ipol * 5 + jpol]
+            # Load displacement from all GLL points.
+            for i, var in enumerate(["disp_s", "disp_p", "disp_z"]):
+                if var not in mesh_dict:
+                    continue
+                temp = mesh_dict[var][:, gll_point_ids.flatten()]
+                for ipol in xrange(mesh.npol + 1):
+                    for jpol in xrange(mesh.npol + 1):
+                        utemp[:, jpol, ipol, i] = temp[:, ipol * 5 + jpol]
+
+            mesh.displ_buffer.add(id_elem, utemp)
+        else:
+            utemp = mesh.displ_buffer.get(id_elem)
 
         final_displacement = np.empty((utemp.shape[0], 3), order="F")
 
