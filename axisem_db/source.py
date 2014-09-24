@@ -310,9 +310,9 @@ class ForceSource(SourceOrReceiver):
         return_str = 'AxiSEM Database Force Source:\n'
         return_str += 'longitude : %6.1f deg\n' % (self.longitude)
         return_str += 'latitude  : %6.1f deg\n' % (self.latitude)
-        return_str += 'Fr       : %10.2e N\n' % (self.f_r)
-        return_str += 'Ft       : %10.2e N\n' % (self.f_t)
-        return_str += 'Fp       : %10.2e N\n' % (self.f_p)
+        return_str += 'Fr        : %10.2e N\n' % (self.f_r)
+        return_str += 'Ft        : %10.2e N\n' % (self.f_t)
+        return_str += 'Fp        : %10.2e N\n' % (self.f_p)
 
         return return_str
 
