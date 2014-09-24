@@ -429,7 +429,9 @@ class AxiSEMDB(object):
             rotmesh_colat = np.arctan2(rotmesh_s, rotmesh_z)
 
             if "T" in components:
-                data["T"] = final[:, 1]
+                data["T"] = -final[:, 1]  # need the - for consistency with
+                                          # reciprocal mode, need external
+                                          # verification still
 
             if "Z" in components:
                 data["Z"] = final[:, 0] * np.sin(rotmesh_colat) \
