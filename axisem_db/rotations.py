@@ -117,3 +117,13 @@ def rotate_vector_src_to_xyz(vec, phi):
     return np.array([cp * vec[0] - sp * vec[1],
                      sp * vec[0] + cp * vec[1],
                      vec[2]])
+
+
+def rotate_vector_src_to_NEZ(vec, phi, srclon, srccolat, reclon, reccolat):
+    rotmat = np.eye(3)
+    rotmat = rotate_vector_src_to_xyz(rotmat, phi)
+    rotmat = rotate_vector_xyz_src_to_xyz_earth(rotmat, srclon, srccolat)
+    rotmat = rotate_vector_xyz_earth_to_xyz_src(rotmat, reclon, reccolat)
+    rotmat[0, :] *= -1  # N = - theta
+
+    return np.dot(rotmat, vec)
