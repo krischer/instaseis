@@ -63,6 +63,18 @@ class SourceOrReceiver(object):
         return 90.0 - self.latitude
 
     @property
+    def colatitude_rad(self):
+        return np.deg2rad(90.0 - self.latitude)
+
+    @property
+    def longitude_rad(self):
+        return np.deg2rad(self.longitude)
+
+    @property
+    def latitude_rad(self):
+        return np.deg2rad(self.latitude)
+
+    @property
     def radius_in_m(self):
         return EARTH_RADIUS - self.depth_in_m
 
