@@ -20,8 +20,6 @@ import obspy.xseed
 import os
 from scipy import interp
 
-EARTH_RADIUS = 6371.0 * 1000.0
-
 
 class ReceiverParseError(Exception):
     pass
@@ -74,23 +72,22 @@ class SourceOrReceiver(object):
     def latitude_rad(self):
         return np.deg2rad(self.latitude)
 
-    @property
-    def radius_in_m(self):
-        return EARTH_RADIUS - self.depth_in_m
+    def radius_in_m(self, planet_radius=6371e3):
+        return planet_radius - self.depth_in_m
 
-    @property
-    def x(self):
+    def x(self, planet_radius=6371e3):
         return np.cos(np.deg2rad(self.latitude)) * \
-            np.cos(np.deg2rad(self.longitude)) * self.radius_in_m
+            np.cos(np.deg2rad(self.longitude)) * \
+            self.radius_in_m(planet_radius=planet_radius)
 
-    @property
-    def y(self):
+    def y(self, planet_radius=6371e3):
         return np.cos(np.deg2rad(self.latitude)) * \
-            np.sin(np.deg2rad(self.longitude)) * self.radius_in_m
+            np.sin(np.deg2rad(self.longitude)) * \
+            self.radius_in_m(planet_radius=planet_radius)
 
-    @property
-    def z(self):
-        return np.sin(np.deg2rad(self.latitude)) * self.radius_in_m
+    def z(self, planet_radius=6371e3):
+        return np.sin(np.deg2rad(self.latitude)) * \
+            self.radius_in_m(planet_radius=planet_radius)
 
 
 class Source(SourceOrReceiver):
