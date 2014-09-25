@@ -66,6 +66,7 @@ class AxiSEMDB(object):
         self._find_and_open_files(reciprocal=reciprocal)
         self.nfft = nextpow2(self.ndumps) * 2
         self.reciprocal = reciprocal
+        self.planet_radius = self.parsed_mesh.planet_radius
 
     def _find_and_open_files(self, reciprocal=True):
         if reciprocal:
@@ -189,12 +190,16 @@ class AxiSEMDB(object):
         """
         if self.reciprocal:
             rotmesh_s, rotmesh_phi, rotmesh_z = rotations.rotate_frame_rd(
-                source.x, source.y, source.z, receiver.longitude,
-                receiver.colatitude)
+                source.x(planet_radius=self.planet_radius),
+                source.y(planet_radius=self.planet_radius),
+                source.z(planet_radius=self.planet_radius), 
+                receiver.longitude, receiver.colatitude)
         else:
             rotmesh_s, rotmesh_phi, rotmesh_z = rotations.rotate_frame_rd(
-                receiver.x, receiver.y, receiver.z, source.longitude,
-                source.colatitude)
+                receiver.x(planet_radius=self.planet_radius),
+                receiver.y(planet_radius=self.planet_radius),
+                receiver.z(planet_radius=self.planet_radius), 
+                source.longitude, source.colatitude)
 
         nextpoints = self.parsed_mesh.kdtree.query([rotmesh_s, rotmesh_z], k=6)
 

@@ -145,6 +145,7 @@ class Mesh(object):
             .filters()["complevel"]
 
         self.background_model = getattr(self.f, "background model")
+        self.planet_radius = getattr(self.f, "planet radius") * 1e3
         self.dominant_period = getattr(self.f, "dominant source period")
         self.axisem_version = getattr(self.f, "SVN revision")
         self.axisem_compiler = "%s %s" % (
