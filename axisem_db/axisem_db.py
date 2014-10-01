@@ -670,6 +670,10 @@ class AxiSEMDB(object):
         return self.parsed_mesh.background_model
 
     @property
+    def attenuation(self):
+        return self.parsed_mesh.attenuation
+
+    @property
     def sliprate(self):
         return self.parsed_mesh.stf_d_norm
 
@@ -697,6 +701,7 @@ class AxiSEMDB(object):
                 (self.parsed_mesh.source_depth,)
 
         return_str += 'velocity model        : %s\n' % (self.background_model,)
+        return_str += 'attenuation           : %s\n' % (self.attenuation,)
         return_str += 'dominant period       : %6.3f s\n' % \
             (self.parsed_mesh.dominant_period,)
         return_str += 'time step             : %6.3f s\n' % (self.dt,)
