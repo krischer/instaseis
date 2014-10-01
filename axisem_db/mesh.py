@@ -18,7 +18,7 @@ from collections import OrderedDict
 
 from . import spectral_basis
 
-MIN_FILE_VERSION = 2
+MIN_FILE_VERSION = 4
 
 
 class Buffer(object):
@@ -145,6 +145,7 @@ class Mesh(object):
             .filters()["complevel"]
 
         self.background_model = getattr(self.f, "background model")
+        self.attenuation = bool(getattr(self.f, "attenuation"))
         self.planet_radius = getattr(self.f, "planet radius") * 1e3
         self.dominant_period = getattr(self.f, "dominant source period")
         self.axisem_version = getattr(self.f, "SVN revision")
