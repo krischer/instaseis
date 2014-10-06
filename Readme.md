@@ -59,10 +59,10 @@ $ conda install basemap
 Install it by cloning the git repository and installing with an editable installation. The Makefile currently has to be executed to build the shared library until a proper installation routine has been written.
 
 ```bash
-$ git clone https://github.com/krischer/axisem_db.git
-$ cd axisem_db
+$ git clone https://github.com/krischer/instaseis.git
+$ cd instaseis
 $ pip install -v -e .
-$ cd axisem_db
+$ cd instaseis
 $ make
 ```
 
@@ -88,7 +88,7 @@ defined tests.
 
 ### Usage
 
-Use it by creating an `AxiSEMDB` object which needs to know the path to the
+Use it by creating an `InstaSeis` object which needs to know the path to the
 output folder containing the netCDF files from an AxiSEM run. All information
 is determined from the netCDF files so no other files have to be present.
 
@@ -97,13 +97,13 @@ Then a source and receiver pair is defined. The moment tensor components are in
 a three component ObsPy `Stream` object with the waveform data. This can then
 be used process and save the data in any format supported by ObsPy.
 
-The initialization of an `AxiSEMDB` object is the most expensive part so make
+The initialization of an `InstaSeis` object is the most expensive part so make
 sure to do it only once if possible.
 
 ```python
-In [1]: from axisem_db import AxiSEMDB, Source, Receiver
+In [1]: from instaseis import InstaSeis, Source, Receiver
 
-In [2]: axisem_db = AxiSEMDB("./prem50s_forces")
+In [2]: instaseis_db = InstaSeis("./prem50s_forces")
 
 In [3]: receiver = Receiver(latitude=42.6390, longitude=74.4940)
 
@@ -116,7 +116,7 @@ In [4]: source = Source(
    ...:     m_rp =-8.050000e+23 / 1E7,
    ...:     m_tp =-1.230000e+24 / 1E7)
 
-In [5]: st = axisem_db.get_seismograms(source=source, receiver=receiver)
+In [5]: st = instaseis_db.get_seismograms(source=source, receiver=receiver)
 
 In [6]: print st
 3 Trace(s) in Stream:
@@ -130,7 +130,7 @@ In [6]: print st
 The GUI is just an experimental feature and will likely crash for some reason. To try it, just execute the correct file
 
 ```bash
-$ python axisem_db/experimental_gui/axisem_db_gui.py
+$ python instaseis/experimental_gui/instaseis_gui.py
 ```
 
 ![Imgur](http://i.imgur.com/FVmua2X.png)

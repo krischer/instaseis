@@ -15,7 +15,7 @@ from setuptools import setup, find_packages
 
 
 setup_config = dict(
-    name="axisem_db",
+    name="instaseis",
     version="0.0.1",
     description="Python Interface to AxiSEM's DB mode",
     author=u"Lion Krischer, Martin van Driel, and Simon Stähler",

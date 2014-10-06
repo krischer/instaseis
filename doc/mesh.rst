@@ -2,5 +2,5 @@
 Meshes
 ======
 
-.. automodule:: axisem_db.mesh
+.. automodule:: instaseis.mesh
     :members:

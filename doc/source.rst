@@ -2,5 +2,5 @@
 Sources and Receivers
 =====================
 
-.. automodule:: axisem_db.source
+.. automodule:: instaseis.source
     :members:
