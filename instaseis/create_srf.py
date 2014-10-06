@@ -18,7 +18,7 @@ dip = 90.
 rake = 0.
 rupture_velo = 0.9
 rupture_len = 1000
-npoints = 10
+npoints = 1000
 slip = 10.
 dep = 50
 vs = 5.
@@ -28,7 +28,7 @@ nts = 100
 
 lonstart = 0.
 
-area = rupture_len * dep * 2 / npoints
+area = rupture_len * dep * 2 / npoints * 1e10 # in cm**2
 
 equator_len = 2 * np.pi * 6371
 
@@ -39,7 +39,7 @@ tinit = np.linspace(0., rupture_len, npoints) / (rupture_velo * vs)
 
 stf = np.zeros(nts)
 stf[1] = 1./dt
-stf = lowpass(stf, 1./50., 1./dt)
+stf = lowpass(stf, 1./100., 1./dt)
 
 plt.plot(stf)
 plt.show()
