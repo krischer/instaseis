@@ -2,5 +2,5 @@
 Standard Rupture Format
 =======================
 
-.. automodule:: axisem_db.srf
+.. automodule:: instaseis.srf
     :members:

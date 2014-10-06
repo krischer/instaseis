@@ -354,7 +354,7 @@ class Receiver(SourceOrReceiver):
         :param filename_or_obj: Filename/URL/Python object
         :param network_code: Network code needed to parse ObsPy station
             objects. Likely only needed for the recursive part of this method.
-        :return: List of :class:`~axisem_db.source.Receiver` objects.
+        :return: List of :class:`~instaseis.source.Receiver` objects.
         """
         receivers = []
 
@@ -479,7 +479,7 @@ class Receiver(SourceOrReceiver):
         Parses a custom STATIONS file format to a list of Receiver objects.
 
         :param filename: Filename
-        :return: List of :class:`~axisem_db.source.Receiver` objects.
+        :return: List of :class:`~instaseis.source.Receiver` objects.
         """
         with open(filename, 'rt') as f:
             receivers = []

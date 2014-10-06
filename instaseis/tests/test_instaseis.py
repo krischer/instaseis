@@ -17,7 +17,7 @@ from __future__ import absolute_import
 
 import numpy as np
 
-from ..axisem_db import AxiSEMDB
+from ..instaseis import InstaSeis
 from ..source import Source, Receiver
 
 
@@ -25,8 +25,8 @@ def test_basic_output():
     """
     Test against output directly from the axisem DB reader.
     """
-    axisem_db = \
-        AxiSEMDB("/Users/lion/workspace/code/axisem/SOLVER/prem50s_forces")
+    instaseis_db = \
+        InstaSeis("/Users/lion/workspace/code/axisem/SOLVER/prem50s_forces")
     receiver = Receiver(latitude=42.6390, longitude=74.4940)
     source = Source(
         latitude=89.91, longitude=0.0, depth_in_m=12000,
@@ -36,7 +36,7 @@ def test_basic_output():
         m_rt=3.990000e+23 / 1E7,
         m_rp=-8.050000e+23 / 1E7,
         m_tp=-1.230000e+24 / 1E7)
-    st = axisem_db.get_seismograms(source=source, receiver=receiver)
+    st = instaseis_db.get_seismograms(source=source, receiver=receiver)
 
     n_data = np.array([
         -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0,

@@ -20,7 +20,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>AxiSEM Database GUI</string>
+   <string>Instaseis GUI</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="sizePolicy">

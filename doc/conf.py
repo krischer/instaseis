@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# axisem_db documentation build configuration file, created by
+# instaseis documentation build configuration file, created by
 # sphinx-quickstart on Sun Sep  7 23:52:26 2014.
 #
 # This file is execfile()d with the current directory set to its
@@ -52,7 +52,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'axisem_db'
+project = u'instaseis'
 copyright = u'2014, Lion Krischer and Martin van Driel'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -207,7 +207,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  ('index', 'axisem_db.tex', u'axisem\\_db Documentation',
+  ('index', 'instaseis.tex', u'axisem\\_db Documentation',
    u'Lion Krischer and Martin van Driel', 'manual'),
 ]
 
@@ -237,7 +237,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'axisem_db', u'axisem_db Documentation',
+    ('index', 'instaseis', u'instaseis Documentation',
      [u'Lion Krischer and Martin van Driel'], 1)
 ]
 
@@ -251,8 +251,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'axisem_db', u'axisem_db Documentation',
-   u'Lion Krischer and Martin van Driel', 'axisem_db', 'One line description of project.',
+  ('index', 'instaseis', u'instaseis Documentation',
+   u'Lion Krischer and Martin van Driel', 'instaseis', 'One line description of project.',
    'Miscellaneous'),
 ]
 

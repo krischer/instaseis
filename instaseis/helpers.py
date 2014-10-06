@@ -26,7 +26,7 @@ def load_lib():
     if cache:
         return cache[0]
     else:
-        filename = os.path.join(LIB_DIR, "axisem_helpers.so")
+        filename = os.path.join(LIB_DIR, "instaseis_helpers.so")
         lib = C.CDLL(filename)
         cache.append(lib)
         return lib

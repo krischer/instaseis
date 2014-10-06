@@ -1,4 +1,4 @@
-.. axisem_db documentation master file, created by
+.. instaseis documentation master file, created by
    sphinx-quickstart on Sun Sep  7 23:52:26 2014.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
@@ -53,10 +53,10 @@ Install it by cloning the git repository and installing with an editable install
 
 .. code-block:: bash
 
-    $ git clone https://github.com/krischer/axisem_db.git
-    $ cd axisem_db
+    $ git clone https://github.com/krischer/instaseis.git
+    $ cd instaseis
     $ pip install -v -e .
-    $ cd axisem_db
+    $ cd instaseis
     $ make
 
 Testing
@@ -102,25 +102,25 @@ choice or host it somewhere.
 Usage
 -----
 
-Use it by creating an :class:`~axisem_db.axisem_db.AxiSEMDB` object which needs
+Use it by creating an :class:`~instaseis.instaseis.InstaSeis` object which needs
 to know the path to the output folder containing the netCDF files from an
 AxiSEM run. All information is determined from the netCDF files so no other
 files have to be present.
 
 Then a source and receiver pair is defined. The moment tensor components are in
-``N m``. Lastly the :meth:`~axisem_db.axisem_db.AxiSEMDB.get_seismograms()`
+``N m``. Lastly the :meth:`~instaseis.instaseis.InstaSeis.get_seismograms()`
 method is called which by default returns a three component ObsPy
 :class:`~obspy.core.stream.Stream` object with the waveform data. This can then
 be used process and save the data in any format supported by ObsPy.
 
-The initialization of an :class:`~axisem_db.axisem_db.AxiSEMDB` object is the
+The initialization of an :class:`~instaseis.instaseis.InstaSeis` object is the
 most expensive part so make sure to do it only once if possible.
 
 .. code-block:: python
 
-    In [1]: from axisem_db import AxiSEMDB, Source, Receiver
+    In [1]: from instaseis import InstaSeis, Source, Receiver
 
-    In [2]: axisem_db = AxiSEMDB("./prem50s_forces")
+    In [2]: instaseis_db = InstaSeis("./prem50s_forces")
 
     In [3]: receiver = Receiver(latitude=42.6390, longitude=74.4940)
 
@@ -133,7 +133,7 @@ most expensive part so make sure to do it only once if possible.
        ...:     m_rp =-8.050000e+23 / 1E7,
        ...:     m_tp =-1.230000e+24 / 1E7)
 
-    In [5]: st = axisem_db.get_seismograms(source=source, receiver=receiver)
+    In [5]: st = instaseis_db.get_seismograms(source=source, receiver=receiver)
 
     In [6]: print st
     3 Trace(s) in Stream:
@@ -148,7 +148,7 @@ The GUI is just an experimental feature and will likely crash for some reason. T
 
 .. code-block:: bash
 
-    $ python axisem_db/experimental_gui/axisem_db_gui.py
+    $ python instaseis/experimental_gui/instaseis_gui.py
 
 .. image:: http://i.imgur.com/FVmua2X.png
 
@@ -159,7 +159,7 @@ Detailed Documentation
 .. toctree::
    :maxdepth: 2
 
-   axisem_db
+   instaseis
    mesh
    source
    srf

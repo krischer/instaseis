@@ -16,7 +16,7 @@ from obspy.imaging.mopad_wrapper import Beach
 import os
 import sys
 
-from axisem_db import AxiSEMDB, Source, Receiver
+from instaseis import InstaSeis, Source, Receiver
 
 
 def compile_and_import_ui_files():
@@ -215,8 +215,8 @@ class Window(QtGui.QMainWindow):
         try:
             self._plot_event()
             self._plot_receiver()
-            st = self.axisem_db.get_seismograms(source=self.source,
-                                                receiver=self.receiver)
+            st = self.instaseis_db.get_seismograms(source=self.source,
+                                                   receiver=self.receiver)
         except AttributeError:
             return
 
@@ -238,7 +238,7 @@ class Window(QtGui.QMainWindow):
             os.path.expanduser("~")))
         if not self.folder:
             return
-        self.axisem_db = AxiSEMDB(self.folder)
+        self.instaseis_db = InstaSeis(self.folder)
         self.update()
         self.set_info()
 
@@ -252,10 +252,10 @@ class Window(QtGui.QMainWindow):
             "AxiSEM User: {user}\n"
             "Size of both NetCDF Files: {filesize}"
         )
-        m = self.axisem_db.meshes.px
+        m = self.instaseis_db.meshes.px
 
         filesize = os.path.getsize(m.filename) + os.path.getsize(
-            self.axisem_db.meshes.pz.filename)
+            self.instaseis_db.meshes.pz.filename)
         filesize = sizeof_fmt(filesize)
 
         self.ui.info_label.setText(info.format(

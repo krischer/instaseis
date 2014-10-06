@@ -20,7 +20,7 @@ DEFAULT_MU = 32e9
 def read_srf(filename, normalize=False):
     """
     Read a 'standard rupture format' (.srf) file and return a list of
-    axisem_db.Source objects.
+    instaseis.Source objects.
 
     :param filename: path to the .srf file
     :param normalize: normalize the sliprate to 1
