@@ -138,3 +138,31 @@ def test_basic_output():
                                n_data, rtol=1E-4, atol=1E-15)
     np.testing.assert_allclose(st.select(component="E")[0].data,
                                e_data, rtol=1E-4, atol=1E-15)
+
+def test_fwd_vs_bwd():
+    """
+    Test against output directly from the axisem DB reader.
+    """
+    instaseis_fwd = InstaSeis("data/100s_db_fwd/", reciprocal=False)
+    instaseis_bwd = InstaSeis("data/100s_db_bwd/")
+
+    source = Source(latitude=0., longitude=0.0, depth_in_m=0,
+                    m_rr=4.71e+17, m_tt=3.81e+15, m_pp=-4.74e+17,
+                    m_rt=3.99e+17, m_rp=-8.05e+17, m_tp=-1.23e+17)
+
+    receiver = Receiver(latitude=10., longitude=20.)
+
+    st_fwd = instaseis_fwd.get_seismograms(source=source, receiver=receiver)
+    st_bwd = instaseis_bwd.get_seismograms(source=source, receiver=receiver)
+
+    st_bwd.filter('lowpass', freq=0.002)
+    st_fwd.filter('lowpass', freq=0.002)
+
+    np.testing.assert_allclose(st_fwd.select(component="Z")[0].data,
+                               st_bwd.select(component="Z")[0].data,
+                               rtol=1E-3, atol=1E-10)
+
+    #import matplotlib.pyplot as plt
+    #plt.plot(st_fwd.select(component="Z")[0].data)
+    #plt.plot(st_bwd.select(component="Z")[0].data)
+    #plt.show()
