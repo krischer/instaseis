@@ -28,12 +28,6 @@ def test_rotate_frame_rd():
     assert abs(z - 4309398.5475913) < 1E-2
 
 
-# def test_azim_factor_bw():
-#     factor = rotations.azim_factor_bw(3.143651018669930,
-#                                       np.array([0.0, 1.0, 0.0]), 2, 1)
-#     assert abs(factor - -0.99999788156734637) < 1E-7
-
-
 def test_inside_element():
     nodes = np.array([
         [4668274.5, 4313461.5],
@@ -49,34 +43,3 @@ def test_inside_element():
     assert is_in
     assert abs(xi - -0.68507753579755248 < 1E-5)
     assert abs(eta - -0.60000654152462352 < 1E-5)
-
-
-def test_zelegl():
-    out = spectral_basis.zelegl(4)
-    np.testing.assert_allclose(
-        out,
-        np.array([-1.0, -0.65465367070797720, 0.0, 0.65465367070797720, 1.00]))
-
-
-def test_zemngl2():
-    out = spectral_basis.zemngl2(4)
-    np.testing.assert_allclose(
-        out,
-        np.array([-1.0, -0.507787629, 0.13230082, 0.70882014, 1.0]))
-
-
-def test_def_lagrange_derivs_gll():
-    G = spectral_basis.def_lagrange_derivs_gll(4)
-    assert G.shape == (5, 5)
-    np.testing.assert_allclose(
-        G[:, 0],
-        np.array([-5.000, 6.75650248, -2.66666666, 1.4101641, -0.5]))
-
-
-def test_def_lagrange_derivs_glj():
-    G0, G1 = spectral_basis.def_lagrange_derivs_glj(4)
-    assert G0.shape == (5,)
-    assert G1.shape == (5, 5)
-    np.testing.assert_allclose(
-        G1[:, 0],
-        np.array([-4.0, 6.695837, -4.639743, 3.1939065, -1.25]), rtol=1e-5)
