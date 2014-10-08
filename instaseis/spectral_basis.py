@@ -43,9 +43,9 @@ def def_lagrange_derivs_gll(npol):
 def def_lagrange_derivs_glj(npol):
     G0 = np.zeros(npol + 1, order="F")
     G1 = np.zeros((npol + 1, npol + 1), order="F")
-    lib.def_lagrange_derivs_gll(C.c_int(npol),
-                                G1.ctypes.data_as(C.POINTER(C.c_double)),
-                                G0.ctypes.data_as(C.POINTER(C.c_double)))
+    lib.def_lagrange_derivs_glj(C.c_int(npol),
+                                G0.ctypes.data_as(C.POINTER(C.c_double)),
+                                G1.ctypes.data_as(C.POINTER(C.c_double)))
     return G0, G1
 
 
