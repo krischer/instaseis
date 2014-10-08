@@ -79,4 +79,4 @@ def test_def_lagrange_derivs_glj():
     assert G1.shape == (5, 5)
     np.testing.assert_allclose(
         G1[:, 0],
-        np.array([-5.000, 6.75650248, -2.66666666, 1.4101641, -0.5]))
+        np.array([-4.0, 6.695837, -4.639743, 3.1939065, -1.25]), rtol=1e-5)
