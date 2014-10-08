@@ -28,10 +28,10 @@ def test_rotate_frame_rd():
     assert abs(z - 4309398.5475913) < 1E-2
 
 
-#def test_azim_factor_bw():
-#    factor = rotations.azim_factor_bw(3.143651018669930,
-#                                      np.array([0.0, 1.0, 0.0]), 2, 1)
-#    assert abs(factor - -0.99999788156734637) < 1E-7
+# def test_azim_factor_bw():
+#     factor = rotations.azim_factor_bw(3.143651018669930,
+#                                       np.array([0.0, 1.0, 0.0]), 2, 1)
+#     assert abs(factor - -0.99999788156734637) < 1E-7
 
 
 def test_inside_element():

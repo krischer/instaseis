@@ -19,7 +19,7 @@ from .helpers import load_lib
 
 
 lib = load_lib()
-#lib.azim_factor_bw.restype = C.c_double
+# lib.azim_factor_bw.restype = C.c_double
 
 
 def rotate_frame_rd(x, y, z, phi, theta):

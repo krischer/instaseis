@@ -28,7 +28,7 @@ nts = 100
 
 lonstart = 0.
 
-area = rupture_len * dep * 2 / npoints * 1e10 # in cm**2
+area = rupture_len * dep * 2 / npoints * 1e10  # in cm**2
 
 equator_len = 2 * np.pi * 6371
 
