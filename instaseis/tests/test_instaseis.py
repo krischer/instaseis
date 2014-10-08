@@ -186,15 +186,15 @@ def test_incremental_bwd():
         -4.22134573e-10, 6.74504566e-10])
 
     np.testing.assert_allclose(st_bwd.select(component='Z')[0].data, z_data,
-                               rtol=1E-7, atol=1E-16)
+                               rtol=1E-7, atol=1E-12)
     np.testing.assert_allclose(st_bwd.select(component='N')[0].data, n_data,
-                               rtol=1E-7, atol=1E-16)
+                               rtol=1E-7, atol=1E-12)
     np.testing.assert_allclose(st_bwd.select(component='E')[0].data, e_data,
-                               rtol=1E-7, atol=1E-16)
+                               rtol=1E-7, atol=1E-12)
     np.testing.assert_allclose(st_bwd.select(component='R')[0].data, r_data,
-                               rtol=1E-7, atol=1E-16)
+                               rtol=1E-7, atol=1E-12)
     np.testing.assert_allclose(st_bwd.select(component='T')[0].data, t_data,
-                               rtol=1E-7, atol=1E-16)
+                               rtol=1E-7, atol=1E-12)
 
 
 def test_incremental_fwd():

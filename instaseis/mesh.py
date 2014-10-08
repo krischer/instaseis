@@ -18,7 +18,7 @@ from collections import OrderedDict
 
 from . import spectral_basis
 
-MIN_FILE_VERSION = 4
+MIN_FILE_VERSION = 5
 
 
 class Buffer(object):
@@ -164,10 +164,12 @@ class Mesh(object):
         self.source_depth = getattr(self.f, "source depth in km")
         self.stf = getattr(self.f, "source time function")
 
-        self.gll_points = spectral_basis.zelegl(self.npol)
-        self.glj_points = spectral_basis.zemngl2(self.npol)
-        self.G0, self.G1 = spectral_basis.def_lagrange_derivs_glj(self.npol)
-        self.G2 = spectral_basis.def_lagrange_derivs_gll(self.npol)
+        self.gll_points = self.f.groups["Mesh"].variables["gll"][:]
+        self.glj_points = self.f.groups["Mesh"].variables["gll"][:]
+        self.G0 = self.f.groups["Mesh"].variables["G0"][:]
+        self.G1 = self.f.groups["Mesh"].variables["G1"][:].T
+        self.G2 = self.f.groups["Mesh"].variables["G2"][:].T
+
         self.G1T = np.require(self.G1.transpose(),
                               requirements=["F_CONTIGUOUS"])
         self.G2T = np.require(self.G2.transpose(),
