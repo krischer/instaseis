@@ -282,14 +282,14 @@ class InstaSeis(object):
                                                  axis, xi, eta)
 
                 mij = rotations\
-                    .rotate_symm_tensor_voigt_xyz_src_to_xyz_earth_1d(
+                    .rotate_symm_tensor_voigt_xyz_src_to_xyz_earth(
                         source.tensor_voigt, np.deg2rad(source.longitude),
                         np.deg2rad(source.colatitude))
                 mij = rotations\
-                    .rotate_symm_tensor_voigt_xyz_earth_to_xyz_src_1d(
+                    .rotate_symm_tensor_voigt_xyz_earth_to_xyz_src(
                         mij, np.deg2rad(receiver.longitude),
                         np.deg2rad(receiver.colatitude))
-                mij = rotations.rotate_symm_tensor_voigt_xyz_to_src_1d(
+                mij = rotations.rotate_symm_tensor_voigt_xyz_to_src(
                     mij, rotmesh_phi)
                 mij /= self.parsed_mesh.amplitude
 

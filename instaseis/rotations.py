@@ -45,37 +45,82 @@ def rotate_frame_rd(x, y, z, phi, theta):
     return srd, phird, zrd
 
 
-def rotate_symm_tensor_voigt_xyz_earth_to_xyz_src_1d(mt, phi, theta):
-    mt = np.require(mt, dtype=np.float64)
-    out = np.empty(mt.shape, dtype=np.float64)
-    lib.rotate_symm_tensor_voigt_xyz_earth_to_xyz_src_1d(
-        mt.ctypes.data_as(C.POINTER(C.c_double)),
-        C.c_double(phi),
-        C.c_double(theta),
-        out.ctypes.data_as(C.POINTER(C.c_double)))
-    return out
+def rotate_symm_tensor_voigt_xyz_earth_to_xyz_src(mt, phi, theta):
+    """
+    rotates a tensor from a cartesian system xyz with z axis aligned with the north pole to a
+    cartesian system x,y,z where z is aligned with the source / receiver
+    
+    input symmetric tensor in voigt notation:
+    A = {{a1, a6, a5}, {a6, a2, a4}, {a5, a4, a3}};
+    rotation matrix from TNM 2007 eq 14
+    R = {{ct*cp, -sp, st*cp}, {ct*sp , cp, st*sp}, {-st, 0, ct}}
+    
+    compute and ouput in voigt notation:
+    Rt.A.R
+    """
+    A = np.array([[mt[0], mt[5], mt[4]], [mt[5], mt[1], mt[3]], [mt[4], mt[3], mt[2]]])
+
+    ct = np.cos(theta)
+    cp = np.cos(phi)
+    st = np.sin(theta)
+    sp = np.sin(phi)
+
+    R = np.array([[ct * cp, -sp, st * cp], [ct * sp , cp, st * sp], [-st, 0, ct]])
+
+    B = np.dot(np.dot(R.T, A), R)
+    return np.array([B[0,0], B[1,1], B[2,2], B[1,2], B[0,2], B[0,1]])
 
 
-def rotate_symm_tensor_voigt_xyz_src_to_xyz_earth_1d(mt, phi, theta):
-    np.require(mt, dtype=np.float64)
-    out = np.empty(mt.shape, dtype=np.float64)
-    lib.rotate_symm_tensor_voigt_xyz_src_to_xyz_earth_1d(
-        mt.ctypes.data_as(C.POINTER(C.c_double)),
-        C.c_double(phi),
-        C.c_double(theta),
-        out.ctypes.data_as(C.POINTER(C.c_double)))
-    return out
+def rotate_symm_tensor_voigt_xyz_src_to_xyz_earth(mt, phi, theta):
+    """
+    rotates a tensor from a cartesian system xyz with z axis aligned with the north pole to a
+    cartesian system x,y,z where z is aligned with the source / receiver
+    
+    input symmetric tensor in voigt notation:
+    A = {{a1, a6, a5}, {a6, a2, a4}, {a5, a4, a3}};
+    rotation matrix from TNM 2007 eq 14
+    R = {{ct*cp, -sp, st*cp}, {ct*sp , cp, st*sp}, {-st, 0, ct}}
+    
+    compute and ouput in voigt notation:
+    R.A.Rt
+    """
+    A = np.array([[mt[0], mt[5], mt[4]], [mt[5], mt[1], mt[3]], [mt[4], mt[3], mt[2]]])
+
+    ct = np.cos(theta)
+    cp = np.cos(phi)
+    st = np.sin(theta)
+    sp = np.sin(phi)
+
+    R = np.array([[ct * cp, -sp, st * cp], [ct * sp , cp, st * sp], [-st, 0, ct]])
+
+    B = np.dot(np.dot(R, A), R.T)
+    return np.array([B[0,0], B[1,1], B[2,2], B[1,2], B[0,2], B[0,1]])
 
 
-def rotate_symm_tensor_voigt_xyz_to_src_1d(mt, phi):
-    mt = np.require(mt, dtype=np.float64)
-    out = np.empty(mt.shape, dtype=np.float64)
-    lib.rotate_symm_tensor_voigt_xyz_to_src_1d(
-        mt.ctypes.data_as(C.POINTER(C.c_double)),
-        C.c_double(phi),
-        out.ctypes.data_as(C.POINTER(C.c_double)))
-    return out
+def rotate_symm_tensor_voigt_xyz_to_src(mt, phi):
+    """
+    rotates a tensor from a cartesian system x,y,z where z is aligned with the source
+    and x with phi = 0 to the AxiSEM s, phi, z system aligned with the source on the
+    s = 0 axis
+    
+    input symmetric tensor in voigt notation:
+    A = {{a1, a6, a5}, {a6, a2, a4}, {a5, a4, a3}};
+    rotation matrix
+    R = {{Cos[phi], Sin[phi], 0}, {-Sin[phi] , Cos[phi], 0}, {0, 0, 1}};
+    
+    compute and ouput in voigt notation:
+    R.A.Rt
+    """
+    A = np.array([[mt[0], mt[5], mt[4]], [mt[5], mt[1], mt[3]], [mt[4], mt[3], mt[2]]])
 
+    cp = np.cos(phi)
+    sp = np.sin(phi)
+
+    R = np.array([[cp, sp, 0.], [-sp, cp, 0], [0, 0, 1.]])
+
+    B = np.dot(np.dot(R, A), R.T)
+    return np.array([B[0,0], B[1,1], B[2,2], B[1,2], B[0,2], B[0,1]])
+    
 
 def rotate_vector_xyz_earth_to_xyz_src(vec, phi, theta):
     sp = np.sin(phi)
