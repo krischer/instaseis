@@ -15,18 +15,26 @@ to just generate a smaller database.
 """
 from __future__ import absolute_import
 
+import inspect
 import numpy as np
+import os
 
 from ..instaseis import InstaSeis
 from ..source import Source, Receiver
+
+
+# Most generic way to get the data folder path.
+DATA = os.path.join(os.path.dirname(os.path.abspath(
+    inspect.getfile(inspect.currentframe()))), "data")
 
 
 def test_fwd_vs_bwd():
     """
     Test fwd against bwd mode
     """
-    instaseis_fwd = InstaSeis("data/100s_db_fwd/", reciprocal=False)
-    instaseis_bwd = InstaSeis("data/100s_db_bwd/")
+    instaseis_fwd = InstaSeis(os.path.join(DATA, "100s_db_fwd"),
+                              reciprocal=False)
+    instaseis_bwd = InstaSeis(os.path.join(DATA, "100s_db_bwd"))
 
     source = Source(latitude=4., longitude=3.0, depth_in_m=0,
                     m_rr=4.71e+17, m_tt=3.81e+17, m_pp=-4.74e+17,
@@ -67,7 +75,7 @@ def test_incremental_bwd():
     """
     incremental tests of bwd mode
     """
-    instaseis_bwd = InstaSeis("data/100s_db_bwd/")
+    instaseis_bwd = InstaSeis(os.path.join(DATA, "100s_db_bwd/"))
 
     receiver = Receiver(latitude=42.6390, longitude=74.4940)
     source = Source(
@@ -177,22 +185,23 @@ def test_incremental_bwd():
         -7.14648363e-10,   1.01728234e-09,  -3.45955805e-10,   6.96030825e-10,
         -4.22134573e-10,   6.74504566e-10])
 
-    np.testing.assert_allclose(st_bwd.select(component='Z')[0].data, z_data, 
+    np.testing.assert_allclose(st_bwd.select(component='Z')[0].data, z_data,
                                rtol=1E-7, atol=1E-16)
-    np.testing.assert_allclose(st_bwd.select(component='N')[0].data, n_data, 
+    np.testing.assert_allclose(st_bwd.select(component='N')[0].data, n_data,
                                rtol=1E-7, atol=1E-16)
-    np.testing.assert_allclose(st_bwd.select(component='E')[0].data, e_data, 
+    np.testing.assert_allclose(st_bwd.select(component='E')[0].data, e_data,
                                rtol=1E-7, atol=1E-16)
-    np.testing.assert_allclose(st_bwd.select(component='R')[0].data, r_data, 
+    np.testing.assert_allclose(st_bwd.select(component='R')[0].data, r_data,
                                rtol=1E-7, atol=1E-16)
-    np.testing.assert_allclose(st_bwd.select(component='T')[0].data, t_data, 
+    np.testing.assert_allclose(st_bwd.select(component='T')[0].data, t_data,
                                rtol=1E-7, atol=1E-16)
 
 def test_incremental_fwd():
     """
     incremental tests of fwd mode
     """
-    instaseis_fwd = InstaSeis("data/100s_db_fwd/", reciprocal=False)
+    instaseis_fwd = InstaSeis(os.path.join(DATA, "100s_db_fwd"),
+                              reciprocal=False)
 
     receiver = Receiver(latitude=42.6390, longitude=74.4940)
     source = Source(
@@ -302,13 +311,13 @@ def test_incremental_fwd():
          5.70806995e-10, -2.89153287e-10,  9.85120645e-10, -3.70156042e-10,
          3.77016695e-10,  1.59211410e-10])
 
-    np.testing.assert_allclose(st_fwd.select(component='Z')[0].data, z_data, 
+    np.testing.assert_allclose(st_fwd.select(component='Z')[0].data, z_data,
                                rtol=1E-7, atol=1E-16)
-    np.testing.assert_allclose(st_fwd.select(component='N')[0].data, n_data, 
+    np.testing.assert_allclose(st_fwd.select(component='N')[0].data, n_data,
                                rtol=1E-7, atol=1E-16)
-    np.testing.assert_allclose(st_fwd.select(component='E')[0].data, e_data, 
+    np.testing.assert_allclose(st_fwd.select(component='E')[0].data, e_data,
                                rtol=1E-7, atol=1E-16)
-    np.testing.assert_allclose(st_fwd.select(component='R')[0].data, r_data, 
+    np.testing.assert_allclose(st_fwd.select(component='R')[0].data, r_data,
                                rtol=1E-7, atol=1E-16)
-    np.testing.assert_allclose(st_fwd.select(component='T')[0].data, t_data, 
+    np.testing.assert_allclose(st_fwd.select(component='T')[0].data, t_data,
                                rtol=1E-7, atol=1E-16)
