@@ -52,7 +52,8 @@ def compile_and_import_ui_files():
 class Window(QtGui.QMainWindow):
     def __init__(self):
         QtGui.QMainWindow.__init__(self)
-        self.ui = qt_window.Ui_MainWindow()
+        # Injected by the compile_and_import_ui_files() function.
+        self.ui = qt_window.Ui_MainWindow()  # NOQA
         self.ui.setupUi(self)
 
         for component in ["z", "n", "e"]:

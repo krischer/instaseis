@@ -84,28 +84,32 @@ class InstaSeis(object):
 
             # full_parse will force the kd-tree to be built
             if x_exists and z_exists:
-                px_m = mesh.Mesh(px_file, full_parse=True,
-                                 strain_buffer_size_in_mb=self.buffer_size_in_mb,
-                                 displ_buffer_size_in_mb=0,
-                                 read_on_demand=self.read_on_demand)
-                pz_m = mesh.Mesh(pz_file, full_parse=False,
-                                 strain_buffer_size_in_mb=self.buffer_size_in_mb,
-                                 displ_buffer_size_in_mb=0,
-                                 read_on_demand=self.read_on_demand)
+                px_m = mesh.Mesh(
+                    px_file, full_parse=True,
+                    strain_buffer_size_in_mb=self.buffer_size_in_mb,
+                    displ_buffer_size_in_mb=0,
+                    read_on_demand=self.read_on_demand)
+                pz_m = mesh.Mesh(
+                    pz_file, full_parse=False,
+                    strain_buffer_size_in_mb=self.buffer_size_in_mb,
+                    displ_buffer_size_in_mb=0,
+                    read_on_demand=self.read_on_demand)
                 self.parsed_mesh = px_m
             elif x_exists:
-                px_m = mesh.Mesh(px_file, full_parse=True,
-                                 strain_buffer_size_in_mb=self.buffer_size_in_mb,
-                                 displ_buffer_size_in_mb=0,
-                                 read_on_demand=self.read_on_demand)
+                px_m = mesh.Mesh(
+                    px_file, full_parse=True,
+                    strain_buffer_size_in_mb=self.buffer_size_in_mb,
+                    displ_buffer_size_in_mb=0,
+                    read_on_demand=self.read_on_demand)
                 pz_m = None
                 self.parsed_mesh = px_m
             elif z_exists:
                 px_m = None
-                pz_m = mesh.Mesh(pz_file, full_parse=True,
-                                 strain_buffer_size_in_mb=self.buffer_size_in_mb,
-                                 displ_buffer_size_in_mb=0,
-                                 read_on_demand=self.read_on_demand)
+                pz_m = mesh.Mesh(
+                    pz_file, full_parse=True,
+                    strain_buffer_size_in_mb=self.buffer_size_in_mb,
+                    displ_buffer_size_in_mb=0,
+                    read_on_demand=self.read_on_demand)
                 self.parsed_mesh = pz_m
             else:
                 raise ValueError("ordered_output.nc4 files must exist in the "
@@ -137,30 +141,28 @@ class InstaSeis(object):
             m4_exists = os.path.exists(m4_file)
 
             if m1_exists and m2_exists and m3_exists and m4_exists:
-                m1_m = mesh.Mesh(m1_file, full_parse=True,
-                                 strain_buffer_size_in_mb=0,
-                                 displ_buffer_size_in_mb=self.buffer_size_in_mb,
-                                 read_on_demand=self.read_on_demand)
-                m2_m = mesh.Mesh(m2_file, full_parse=False,
-                                 strain_buffer_size_in_mb=0,
-                                 displ_buffer_size_in_mb=self.buffer_size_in_mb,
-                                 read_on_demand=self.read_on_demand)
-                m3_m = mesh.Mesh(m3_file, full_parse=False,
-                                 strain_buffer_size_in_mb=0,
-                                 displ_buffer_size_in_mb=self.buffer_size_in_mb,
-                                 read_on_demand=self.read_on_demand)
-                m4_m = mesh.Mesh(m4_file, full_parse=False,
-                                 strain_buffer_size_in_mb=0,
-                                 displ_buffer_size_in_mb=self.buffer_size_in_mb,
-                                 read_on_demand=self.read_on_demand)
+                m1_m = mesh.Mesh(
+                    m1_file, full_parse=True, strain_buffer_size_in_mb=0,
+                    displ_buffer_size_in_mb=self.buffer_size_in_mb,
+                    read_on_demand=self.read_on_demand)
+                m2_m = mesh.Mesh(
+                    m2_file, full_parse=False, strain_buffer_size_in_mb=0,
+                    displ_buffer_size_in_mb=self.buffer_size_in_mb,
+                    read_on_demand=self.read_on_demand)
+                m3_m = mesh.Mesh(
+                    m3_file, full_parse=False, strain_buffer_size_in_mb=0,
+                    displ_buffer_size_in_mb=self.buffer_size_in_mb,
+                    read_on_demand=self.read_on_demand)
+                m4_m = mesh.Mesh(
+                    m4_file, full_parse=False, strain_buffer_size_in_mb=0,
+                    displ_buffer_size_in_mb=self.buffer_size_in_mb,
+                    read_on_demand=self.read_on_demand)
                 self.parsed_mesh = m1_m
             else:
                 raise ValueError("ordered_output.nc4 files must exist in the "
                                  "*/Data subfolders")
 
             self.meshes = MeshCollection_fwd(m1_m, m2_m, m3_m, m4_m)
-
-            #raise NotImplementedError
 
     def get_seismograms(self, source, receiver, components=("Z", "N", "E"),
                         remove_source_shift=True, reconvolve_stf=False,
@@ -279,12 +281,14 @@ class InstaSeis(object):
                                                  corner_points, eltype,
                                                  axis, xi, eta)
 
-                mij = rotations.rotate_symm_tensor_voigt_xyz_src_to_xyz_earth_1d(
-                    source.tensor_voigt, np.deg2rad(source.longitude),
-                    np.deg2rad(source.colatitude))
-                mij = rotations.rotate_symm_tensor_voigt_xyz_earth_to_xyz_src_1d(
-                    mij, np.deg2rad(receiver.longitude),
-                    np.deg2rad(receiver.colatitude))
+                mij = rotations\
+                    .rotate_symm_tensor_voigt_xyz_src_to_xyz_earth_1d(
+                        source.tensor_voigt, np.deg2rad(source.longitude),
+                        np.deg2rad(source.colatitude))
+                mij = rotations\
+                    .rotate_symm_tensor_voigt_xyz_earth_to_xyz_src_1d(
+                        mij, np.deg2rad(receiver.longitude),
+                        np.deg2rad(receiver.colatitude))
                 mij = rotations.rotate_symm_tensor_voigt_xyz_to_src_1d(
                     mij, rotmesh_phi)
                 mij /= self.parsed_mesh.amplitude
@@ -436,9 +440,9 @@ class InstaSeis(object):
             rotmesh_colat = np.arctan2(rotmesh_s, rotmesh_z)
 
             if "T" in components:
-                data["T"] = -final[:, 1]  # need the - for consistency with
-                                          # reciprocal mode, need external
-                                          # verification still
+                # need the - for consistency with reciprocal mode,
+                # need external verification still
+                data["T"] = -final[:, 1]
 
             if "R" in components:
                 data["R"] = final[:, 0] * np.cos(rotmesh_colat) \
