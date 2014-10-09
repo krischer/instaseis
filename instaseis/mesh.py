@@ -165,7 +165,7 @@ class Mesh(object):
         self.stf = getattr(self.f, "source time function")
 
         self.gll_points = self.f.groups["Mesh"].variables["gll"][:]
-        self.glj_points = self.f.groups["Mesh"].variables["gll"][:]
+        self.glj_points = self.f.groups["Mesh"].variables["glj"][:]
         self.G0 = self.f.groups["Mesh"].variables["G0"][:]
         self.G1 = self.f.groups["Mesh"].variables["G1"][:].T
         self.G2 = self.f.groups["Mesh"].variables["G2"][:].T
