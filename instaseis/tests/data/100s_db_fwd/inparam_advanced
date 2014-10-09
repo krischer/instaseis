@@ -134,7 +134,7 @@ KERNEL_SPP          4
 # igno
 # mask  (default)
 # anal 
-KERNEL_SOURCE       mask
+KERNEL_SOURCE       igno
 
 # GLL points to save, starting and ending GLL point index 
 # (ignored for dumptype displ_only)
