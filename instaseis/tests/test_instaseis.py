@@ -3,10 +3,6 @@
 """
 Basic integration tests for the AxiSEM database Python interface.
 
-XXX: Right now the path to the database is hardcoded! It is too big to commit
-it with the repository so something needs to be figured out. Best way is likely
-to just generate a smaller database.
-
 :copyright:
     Lion Krischer (krischer@geophysik.uni-muenchen.de), 2014
 :license:
@@ -69,6 +65,55 @@ def test_fwd_vs_bwd():
     np.testing.assert_allclose(st_fwd.select(component="T")[0].data,
                                st_bwd.select(component="T")[0].data,
                                rtol=1E-3, atol=1E-10)
+
+
+def test_fwd_vs_bwd_axial():
+    """
+    Test fwd against bwd mode, axial element. Differences are a bit larger then
+    in non axial case, presumably because the close source, which is not
+    exactly a point source in the SEM representation.
+    """
+    instaseis_fwd = InstaSeis(os.path.join(DATA, "100s_db_fwd_deep"),
+                              reciprocal=False)
+    instaseis_bwd = InstaSeis(os.path.join(DATA, "100s_db_bwd"))
+
+    source = Source(latitude=0., longitude=0., depth_in_m=310000,
+                    m_rr=4.71e+17, m_tt=3.81e+17, m_pp=-4.74e+17,
+                    m_rt=3.99e+17, m_rp=-8.05e+17, m_tp=-1.23e+17)
+
+    receiver = Receiver(latitude=0., longitude=0.1)
+
+    st_fwd = instaseis_fwd.get_seismograms(
+        source=source, receiver=receiver, components=('Z', 'N', 'E', 'R', 'T'))
+    st_bwd = instaseis_bwd.get_seismograms(
+        source=source, receiver=receiver, components=('Z', 'N', 'E', 'R', 'T'))
+
+    st_bwd.filter('lowpass', freq=0.01)
+    st_fwd.filter('lowpass', freq=0.01)
+    st_bwd.filter('lowpass', freq=0.01)
+    st_fwd.filter('lowpass', freq=0.01)
+    st_bwd.differentiate()
+    st_fwd.differentiate()
+
+    np.testing.assert_allclose(st_fwd.select(component="Z")[0].data,
+                               st_bwd.select(component="Z")[0].data,
+                               rtol=1E-2, atol=5E-9)
+
+    np.testing.assert_allclose(st_fwd.select(component="N")[0].data,
+                               st_bwd.select(component="N")[0].data,
+                               rtol=1E-2, atol=5E-9)
+
+    np.testing.assert_allclose(st_fwd.select(component="E")[0].data,
+                               st_bwd.select(component="E")[0].data,
+                               rtol=1E-2, atol=6E-9)
+
+    np.testing.assert_allclose(st_fwd.select(component="R")[0].data,
+                               st_bwd.select(component="R")[0].data,
+                               rtol=1E-2, atol=6E-9)
+
+    np.testing.assert_allclose(st_fwd.select(component="T")[0].data,
+                               st_bwd.select(component="T")[0].data,
+                               rtol=1E-2, atol=5E-9)
 
 
 def test_incremental_bwd():
