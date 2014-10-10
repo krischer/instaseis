@@ -67,6 +67,7 @@ class InstaSeis(object):
         self.nfft = nextpow2(self.ndumps) * 2
         self.reciprocal = reciprocal
         self.planet_radius = self.parsed_mesh.planet_radius
+        self.dump_type = self.parsed_mesh.dump_type
 
     def _find_and_open_files(self, reciprocal=True):
         if reciprocal:
@@ -203,48 +204,55 @@ class InstaSeis(object):
                 receiver.z(planet_radius=self.planet_radius),
                 source.longitude, source.colatitude)
 
-        nextpoints = self.parsed_mesh.kdtree.query([rotmesh_s, rotmesh_z], k=6)
+        k_map = {"displ_only": 6,
+                 "fullfields": 1}
+
+        nextpoints = self.parsed_mesh.kdtree.query([rotmesh_s, rotmesh_z],
+                                                   k=k_map[self.dump_type])
 
         # Find the element containing the point of interest.
         mesh = self.parsed_mesh.f.groups["Mesh"]
-        for idx in nextpoints[1]:
-            corner_points = np.empty((4, 2), dtype="float64")
+        if self.dump_type == 'displ_only':
+            for idx in nextpoints[1]:
+                corner_points = np.empty((4, 2), dtype="float64")
+
+                if not self.read_on_demand:
+                    corner_point_ids = self.parsed_mesh.fem_mesh[idx][:4]
+                    eltype = self.parsed_mesh.eltypes[idx]
+                    corner_points[:, 0] = self.parsed_mesh.mesh_S[corner_point_ids]
+                    corner_points[:, 1] = self.parsed_mesh.mesh_Z[corner_point_ids]
+                else:
+                    corner_point_ids = mesh.variables["fem_mesh"][idx][:4]
+                    eltype = mesh.variables["eltype"][idx]
+                    corner_points[:, 0] = \
+                        mesh.variables["mesh_S"][corner_point_ids]
+                    corner_points[:, 1] = \
+                        mesh.variables["mesh_Z"][corner_point_ids]
+
+                isin, xi, eta = finite_elem_mapping.inside_element(
+                    rotmesh_s, rotmesh_z, corner_points, eltype,
+                    tolerance=1E-3)
+                if isin:
+                    id_elem = idx
+                    break
+            else:
+                raise ValueError("Element not found")
 
             if not self.read_on_demand:
-                corner_point_ids = self.parsed_mesh.fem_mesh[idx][:4]
-                eltype = self.parsed_mesh.eltypes[idx]
-                corner_points[:, 0] = self.parsed_mesh.mesh_S[corner_point_ids]
-                corner_points[:, 1] = self.parsed_mesh.mesh_Z[corner_point_ids]
+                gll_point_ids = self.parsed_mesh.sem_mesh[id_elem]
+                axis = bool(self.parsed_mesh.axis[id_elem])
             else:
-                corner_point_ids = mesh.variables["fem_mesh"][idx][:4]
-                eltype = mesh.variables["eltype"][idx]
-                corner_points[:, 0] = \
-                    mesh.variables["mesh_S"][corner_point_ids]
-                corner_points[:, 1] = \
-                    mesh.variables["mesh_Z"][corner_point_ids]
+                gll_point_ids = mesh.variables["sem_mesh"][id_elem]
+                axis = bool(mesh.variables["axis"][id_elem])
 
-            isin, xi, eta = finite_elem_mapping.inside_element(
-                rotmesh_s, rotmesh_z, corner_points, eltype,
-                tolerance=1E-3)
-            if isin:
-                id_elem = idx
-                break
+            if axis:
+                col_points_xi = self.parsed_mesh.glj_points
+                col_points_eta = self.parsed_mesh.gll_points
+            else:
+                col_points_xi = self.parsed_mesh.gll_points
+                col_points_eta = self.parsed_mesh.gll_points
         else:
-            raise ValueError("Element not found")
-
-        if not self.read_on_demand:
-            gll_point_ids = self.parsed_mesh.sem_mesh[id_elem]
-            axis = bool(self.parsed_mesh.axis[id_elem])
-        else:
-            gll_point_ids = mesh.variables["sem_mesh"][id_elem]
-            axis = bool(mesh.variables["axis"][id_elem])
-
-        if axis:
-            col_points_xi = self.parsed_mesh.glj_points
-            col_points_eta = self.parsed_mesh.gll_points
-        else:
-            col_points_xi = self.parsed_mesh.gll_points
-            col_points_eta = self.parsed_mesh.gll_points
+            id_elem = nextpoints[1]
 
         data = {}
 
@@ -256,30 +264,37 @@ class InstaSeis(object):
                          "E": np.cos}
 
             if isinstance(source, Source):
-                if axis:
-                    G = self.parsed_mesh.G2
-                    GT = self.parsed_mesh.G1T
-                else:
-                    G = self.parsed_mesh.G2
-                    GT = self.parsed_mesh.G2T
+                if self.dump_type == 'displ_only':
+                    if axis:
+                        G = self.parsed_mesh.G2
+                        GT = self.parsed_mesh.G1T
+                    else:
+                        G = self.parsed_mesh.G2
+                        GT = self.parsed_mesh.G2T
 
                 strain_x = None
                 strain_z = None
 
                 # Minor optimization: Only read if actually requested.
                 if "Z" in components:
-                    strain_z = self.__get_strain(self.meshes.pz, id_elem,
-                                                 gll_point_ids, G, GT,
-                                                 col_points_xi, col_points_eta,
-                                                 corner_points, eltype, axis,
-                                                 xi, eta)
+                    if self.dump_type == 'displ_only':
+                        strain_z = self.__get_strain_interp(self.meshes.pz, id_elem,
+                                                     gll_point_ids, G, GT,
+                                                     col_points_xi, col_points_eta,
+                                                     corner_points, eltype, axis,
+                                                     xi, eta)
+                    elif self.dump_type == 'fullfields':
+                        strain_z = self.__get_strain(self.meshes.pz, id_elem)
 
                 if any(comp in components for comp in ['N', 'E', 'R', 'T']):
-                    strain_x = self.__get_strain(self.meshes.px, id_elem,
-                                                 gll_point_ids, G, GT,
-                                                 col_points_xi, col_points_eta,
-                                                 corner_points, eltype,
-                                                 axis, xi, eta)
+                    if self.dump_type == 'displ_only':
+                        strain_x = self.__get_strain_interp(self.meshes.px, id_elem,
+                                                     gll_point_ids, G, GT,
+                                                     col_points_xi, col_points_eta,
+                                                     corner_points, eltype,
+                                                     axis, xi, eta)
+                    elif self.dump_type == 'fullfields':
+                        strain_x = self.__get_strain(self.meshes.px, id_elem)
 
                 mij = rotations\
                     .rotate_symm_tensor_voigt_xyz_src_to_xyz_earth(
@@ -587,7 +602,7 @@ class InstaSeis(object):
             band_code = "L"
         return band_code
 
-    def __get_strain(self, mesh, id_elem, gll_point_ids, G, GT, col_points_xi,
+    def __get_strain_interp(self, mesh, id_elem, gll_point_ids, G, GT, col_points_xi,
                      col_points_eta, corner_points, eltype, axis, xi, eta):
         if id_elem not in mesh.strain_buffer:
             # Single precision in the NetCDF files but the later interpolation
@@ -629,6 +644,30 @@ class InstaSeis(object):
         if not mesh.excitation_type == "monopole":
             final_strain[:, 3] *= -1.0
             final_strain[:, 5] *= -1.0
+
+        return final_strain
+
+    def __get_strain(self, mesh, id_elem):
+        # for now just a stub, needs to be implemented
+
+        strain_temp = np.zeros((self.ndumps, 6), order="F")
+
+        mesh_dict = mesh.f.groups["Snapshots"].variables
+
+        for i, var in enumerate([
+                'strain_dsus', 'strain_dsuz', 'strain_dpup',
+                'strain_dsup', 'strain_dzup', 'straintrace']):
+            if var not in mesh_dict:
+                continue
+            strain_temp[:,i] = mesh_dict[var][:, id_elem]
+
+        final_strain = np.empty((self.ndumps, 6), order="F")
+        final_strain[:,0] = strain_temp[:,0]
+        final_strain[:,1] = strain_temp[:,2]
+        final_strain[:,2] = strain_temp[:,5] - strain_temp[:,0] - strain_temp[:,2]
+        final_strain[:,3] = -strain_temp[:,4]
+        final_strain[:,4] = strain_temp[:,1]
+        final_strain[:,5] = -strain_temp[:,3]
 
         return final_strain
 
