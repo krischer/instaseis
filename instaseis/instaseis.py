@@ -348,6 +348,8 @@ class InstaSeis(object):
                     data[comp] = final
 
             elif isinstance(source, ForceSource):
+                if self.dump_type != 'displ_only':
+                    raise ValueError("Force sources only in displ_only mode")
 
                 if "Z" in components:
                     displ_z = self.__get_displacement(self.meshes.pz, id_elem,
@@ -408,6 +410,8 @@ class InstaSeis(object):
 
         else:
             if not isinstance(source, Source):
+                raise NotImplementedError
+            if self.dump_type != 'displ_only':
                 raise NotImplementedError
 
             displ_1 = self.__get_displacement(self.meshes.m1, id_elem,
@@ -753,6 +757,7 @@ class InstaSeis(object):
         return_str += 'attenuation           : %s\n' % (self.attenuation,)
         return_str += 'dominant period       : %6.3f s\n' % \
             (self.parsed_mesh.dominant_period,)
+        return_str += 'dump type             : %s\n' % (self.dump_type,)
         return_str += 'time step             : %6.3f s\n' % (self.dt,)
         return_str += 'sampling rate         : %6.3f Hz\n' % (1./self.dt,)
         return_str += 'number of samples     : %6i\n' % (self.ndumps,)
