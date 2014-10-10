@@ -318,14 +318,14 @@ class Receiver(SourceOrReceiver):
     """
     Class dealing with seismic receivers.
     """
-    def __init__(self, latitude, longitude, network=None, station=None):
+    def __init__(self, latitude, longitude, network=None, station=None, depth_in_m=0):
         """
         :param latitude: latitude of the source in degree
         :param longitude: longitude of the source in degree
         :param network: network id
         :param station: station id
         """
-        super(Receiver, self).__init__(latitude, longitude, depth_in_m=0.0)
+        super(Receiver, self).__init__(latitude, longitude, depth_in_m=depth_in_m)
         self.network = network or ""
         self.station = station or ""
 
