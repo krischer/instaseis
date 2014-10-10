@@ -102,7 +102,7 @@ class Mesh(object):
         # Cheap sanity check. No need to parse the rest.
         self.dump_type = \
             getattr(self.f, "dump type (displ_only, displ_velo, fullfields)")
-        if self.dump_type != "displ_only":
+        if self.dump_type != "displ_only" and self.dump_type != "fullfields":
             raise NotImplementedError
 
         self.npol = self.f.npol
@@ -140,9 +140,15 @@ class Mesh(object):
         self.stf_d_norm = self.stf_d / np.trapz(self.stf_d, dx=self.dt)
 
         self.npoints = self.f.npoints
-        self.compression_level = \
-            self.f.groups["Snapshots"].variables["disp_s"]\
-            .filters()["complevel"]
+
+        if self.dump_type == "displ_only":
+            self.compression_level = \
+                self.f.groups["Snapshots"].variables["disp_s"]\
+                .filters()["complevel"]
+        elif self.dump_type == "fullfields":
+            self.compression_level = \
+                self.f.groups["Snapshots"].variables["strain_dsus"]\
+                .filters()["complevel"]
 
         self.background_model = getattr(self.f, "background model")
         self.attenuation = bool(getattr(self.f, "attenuation"))
@@ -164,37 +170,55 @@ class Mesh(object):
         self.source_depth = getattr(self.f, "source depth in km")
         self.stf = getattr(self.f, "source time function")
 
-        self.gll_points = self.f.groups["Mesh"].variables["gll"][:]
-        self.glj_points = self.f.groups["Mesh"].variables["glj"][:]
-        self.G0 = self.f.groups["Mesh"].variables["G0"][:]
-        self.G1 = self.f.groups["Mesh"].variables["G1"][:].T
-        self.G2 = self.f.groups["Mesh"].variables["G2"][:].T
+        if self.dump_type == "displ_only":
+            self.gll_points = self.f.groups["Mesh"].variables["gll"][:]
+            self.glj_points = self.f.groups["Mesh"].variables["glj"][:]
+            self.G0 = self.f.groups["Mesh"].variables["G0"][:]
+            self.G1 = self.f.groups["Mesh"].variables["G1"][:].T
+            self.G2 = self.f.groups["Mesh"].variables["G2"][:].T
 
-        self.G1T = np.require(self.G1.transpose(),
-                              requirements=["F_CONTIGUOUS"])
-        self.G2T = np.require(self.G2.transpose(),
-                              requirements=["F_CONTIGUOUS"])
+            self.G1T = np.require(self.G1.transpose(),
+                                  requirements=["F_CONTIGUOUS"])
+            self.G2T = np.require(self.G2.transpose(),
+                                  requirements=["F_CONTIGUOUS"])
 
-        # Build a kdtree of the element midpoints.
-        self.s_mp = self.f.groups["Mesh"].variables["mp_mesh_S"]
-        self.z_mp = self.f.groups["Mesh"].variables["mp_mesh_Z"]
+            # Build a kdtree of the element midpoints.
+            self.s_mp = self.f.groups["Mesh"].variables["mp_mesh_S"]
+            self.z_mp = self.f.groups["Mesh"].variables["mp_mesh_Z"]
 
-        self.mesh = np.empty((self.s_mp.shape[0], 2), dtype=self.s_mp.dtype)
-        self.mesh[:, 0] = self.s_mp[:]
-        self.mesh[:, 1] = self.z_mp[:]
+            self.mesh = np.empty((self.s_mp.shape[0], 2),
+                                 dtype=self.s_mp.dtype)
+            self.mesh[:, 0] = self.s_mp[:]
+            self.mesh[:, 1] = self.z_mp[:]
 
-        # Store some more index types in memory. While this increases memory
-        # use it should be acceptable and result in much less netCDF reads.
-        if not self.read_on_demand:
-            self.fem_mesh = self.f.groups["Mesh"].variables["fem_mesh"][:]
-            self.eltypes = self.f.groups["Mesh"].variables["eltype"][:]
-            self.mesh_S = self.f.groups["Mesh"].variables["mesh_S"][:]
-            self.mesh_Z = self.f.groups["Mesh"].variables["mesh_Z"][:]
-            self.sem_mesh = self.f.groups["Mesh"].variables["sem_mesh"][:]
-            self.axis = self.f.groups["Mesh"].variables["axis"][:]
-            self.mesh_mu = self.f.groups["Mesh"].variables["mesh_mu"][:]
+            self.kdtree = cKDTree(data=self.mesh)
 
-        self.kdtree = cKDTree(data=self.mesh)
+            # Store some more index types in memory. While this increases
+            # memory use it should be acceptable and result in much less netCDF
+            # reads.
+            if not self.read_on_demand:
+                self.fem_mesh = self.f.groups["Mesh"].variables["fem_mesh"][:]
+                self.eltypes = self.f.groups["Mesh"].variables["eltype"][:]
+                self.mesh_S = self.f.groups["Mesh"].variables["mesh_S"][:]
+                self.mesh_Z = self.f.groups["Mesh"].variables["mesh_Z"][:]
+                self.sem_mesh = self.f.groups["Mesh"].variables["sem_mesh"][:]
+                self.axis = self.f.groups["Mesh"].variables["axis"][:]
+                self.mesh_mu = self.f.groups["Mesh"].variables["mesh_mu"][:]
+
+        elif self.dump_type == "fullfields":
+            # Build a kdtree of the stored gll points.
+            self.mesh_S = self.f.groups["Mesh"].variables["mesh_S"]
+            self.mesh_Z = self.f.groups["Mesh"].variables["mesh_Z"]
+
+            self.mesh = np.empty((self.mesh_S.shape[0], 2),
+                                 dtype=self.mesh_S.dtype)
+            self.mesh[:, 0] = self.mesh_S[:]
+            self.mesh[:, 1] = self.mesh_Z[:]
+
+            self.kdtree = cKDTree(data=self.mesh)
+
+            if not self.read_on_demand:
+                self.mesh_mu = self.f.groups["Mesh"].variables["mesh_mu"][:]
 
     def get_n_closests_points(self, s, z, n=6):
         _, idx = self.kdtree.query([s, z], k=6)
