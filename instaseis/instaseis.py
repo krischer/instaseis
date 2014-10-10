@@ -219,8 +219,10 @@ class InstaSeis(object):
                 if not self.read_on_demand:
                     corner_point_ids = self.parsed_mesh.fem_mesh[idx][:4]
                     eltype = self.parsed_mesh.eltypes[idx]
-                    corner_points[:, 0] = self.parsed_mesh.mesh_S[corner_point_ids]
-                    corner_points[:, 1] = self.parsed_mesh.mesh_Z[corner_point_ids]
+                    corner_points[:, 0] = \
+                        self.parsed_mesh.mesh_S[corner_point_ids]
+                    corner_points[:, 1] = \
+                        self.parsed_mesh.mesh_Z[corner_point_ids]
                 else:
                     corner_point_ids = mesh.variables["fem_mesh"][idx][:4]
                     eltype = mesh.variables["eltype"][idx]
@@ -278,21 +280,19 @@ class InstaSeis(object):
                 # Minor optimization: Only read if actually requested.
                 if "Z" in components:
                     if self.dump_type == 'displ_only':
-                        strain_z = self.__get_strain_interp(self.meshes.pz, id_elem,
-                                                     gll_point_ids, G, GT,
-                                                     col_points_xi, col_points_eta,
-                                                     corner_points, eltype, axis,
-                                                     xi, eta)
+                        strain_z = self.__get_strain_interp(
+                            self.meshes.pz, id_elem, gll_point_ids, G, GT,
+                            col_points_xi, col_points_eta, corner_points,
+                            eltype, axis, xi, eta)
                     elif self.dump_type == 'fullfields':
                         strain_z = self.__get_strain(self.meshes.pz, id_elem)
 
                 if any(comp in components for comp in ['N', 'E', 'R', 'T']):
                     if self.dump_type == 'displ_only':
-                        strain_x = self.__get_strain_interp(self.meshes.px, id_elem,
-                                                     gll_point_ids, G, GT,
-                                                     col_points_xi, col_points_eta,
-                                                     corner_points, eltype,
-                                                     axis, xi, eta)
+                        strain_x = self.__get_strain_interp(
+                            self.meshes.px, id_elem, gll_point_ids, G, GT,
+                            col_points_xi, col_points_eta, corner_points,
+                            eltype, axis, xi, eta)
                     elif self.dump_type == 'fullfields':
                         strain_x = self.__get_strain(self.meshes.px, id_elem)
 
@@ -602,8 +602,9 @@ class InstaSeis(object):
             band_code = "L"
         return band_code
 
-    def __get_strain_interp(self, mesh, id_elem, gll_point_ids, G, GT, col_points_xi,
-                     col_points_eta, corner_points, eltype, axis, xi, eta):
+    def __get_strain_interp(self, mesh, id_elem, gll_point_ids, G, GT,
+                            col_points_xi, col_points_eta, corner_points,
+                            eltype, axis, xi, eta):
         if id_elem not in mesh.strain_buffer:
             # Single precision in the NetCDF files but the later interpolation
             # routines require double precision. Assignment to this array will
@@ -659,15 +660,16 @@ class InstaSeis(object):
                 'strain_dsup', 'strain_dzup', 'straintrace']):
             if var not in mesh_dict:
                 continue
-            strain_temp[:,i] = mesh_dict[var][:, id_elem]
+            strain_temp[:, i] = mesh_dict[var][:, id_elem]
 
         final_strain = np.empty((self.ndumps, 6), order="F")
-        final_strain[:,0] = strain_temp[:,0]
-        final_strain[:,1] = strain_temp[:,2]
-        final_strain[:,2] = strain_temp[:,5] - strain_temp[:,0] - strain_temp[:,2]
-        final_strain[:,3] = -strain_temp[:,4]
-        final_strain[:,4] = strain_temp[:,1]
-        final_strain[:,5] = -strain_temp[:,3]
+        final_strain[:, 0] = strain_temp[:, 0]
+        final_strain[:, 1] = strain_temp[:, 2]
+        final_strain[:, 2] = (strain_temp[:, 5] - strain_temp[:, 0]
+                              - strain_temp[:, 2])
+        final_strain[:, 3] = -strain_temp[:, 4]
+        final_strain[:, 4] = strain_temp[:, 1]
+        final_strain[:, 5] = -strain_temp[:, 3]
 
         return final_strain
 
