@@ -649,27 +649,31 @@ class InstaSeis(object):
         return final_strain
 
     def __get_strain(self, mesh, id_elem):
-        # for now just a stub, needs to be implemented
+        if id_elem not in mesh.strain_buffer:
+            strain_temp = np.zeros((self.ndumps, 6), order="F")
 
-        strain_temp = np.zeros((self.ndumps, 6), order="F")
+            mesh_dict = mesh.f.groups["Snapshots"].variables
 
-        mesh_dict = mesh.f.groups["Snapshots"].variables
+            for i, var in enumerate([
+                    'strain_dsus', 'strain_dsuz', 'strain_dpup',
+                    'strain_dsup', 'strain_dzup', 'straintrace']):
+                if var not in mesh_dict:
+                    continue
+                strain_temp[:, i] = mesh_dict[var][:, id_elem]
 
-        for i, var in enumerate([
-                'strain_dsus', 'strain_dsuz', 'strain_dpup',
-                'strain_dsup', 'strain_dzup', 'straintrace']):
-            if var not in mesh_dict:
-                continue
-            strain_temp[:, i] = mesh_dict[var][:, id_elem]
-
-        final_strain = np.empty((self.ndumps, 6), order="F")
-        final_strain[:, 0] = strain_temp[:, 0]
-        final_strain[:, 1] = strain_temp[:, 2]
-        final_strain[:, 2] = (strain_temp[:, 5] - strain_temp[:, 0]
-                              - strain_temp[:, 2])
-        final_strain[:, 3] = -strain_temp[:, 4]
-        final_strain[:, 4] = strain_temp[:, 1]
-        final_strain[:, 5] = -strain_temp[:, 3]
+            # transform strain to voigt mapping
+            # dsus, dpup, dzuz, dzup, dsuz, dsup
+            final_strain = np.empty((self.ndumps, 6), order="F")
+            final_strain[:, 0] = strain_temp[:, 0]
+            final_strain[:, 1] = strain_temp[:, 2]
+            final_strain[:, 2] = (strain_temp[:, 5] - strain_temp[:, 0]
+                                  - strain_temp[:, 2])
+            final_strain[:, 3] = -strain_temp[:, 4]
+            final_strain[:, 4] = strain_temp[:, 1]
+            final_strain[:, 5] = -strain_temp[:, 3]
+            mesh.strain_buffer.add(id_elem, final_strain)
+        else:
+            final_strain = mesh.strain_buffer.get(id_elem)
 
         return final_strain
 
