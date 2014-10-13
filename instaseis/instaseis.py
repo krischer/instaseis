@@ -205,6 +205,7 @@ class InstaSeis(object):
                 source.longitude, source.colatitude)
 
         k_map = {"displ_only": 6,
+                 "strain_only": 1,
                  "fullfields": 1}
 
         nextpoints = self.parsed_mesh.kdtree.query([rotmesh_s, rotmesh_z],
@@ -284,7 +285,8 @@ class InstaSeis(object):
                             self.meshes.pz, id_elem, gll_point_ids, G, GT,
                             col_points_xi, col_points_eta, corner_points,
                             eltype, axis, xi, eta)
-                    elif self.dump_type == 'fullfields':
+                    elif (self.dump_type == 'fullfields'
+                            or self.dump_type == 'strain_only'):
                         strain_z = self.__get_strain(self.meshes.pz, id_elem)
 
                 if any(comp in components for comp in ['N', 'E', 'R', 'T']):
@@ -293,7 +295,8 @@ class InstaSeis(object):
                             self.meshes.px, id_elem, gll_point_ids, G, GT,
                             col_points_xi, col_points_eta, corner_points,
                             eltype, axis, xi, eta)
-                    elif self.dump_type == 'fullfields':
+                    elif (self.dump_type == 'fullfields'
+                            or self.dump_type == 'strain_only'):
                         strain_x = self.__get_strain(self.meshes.px, id_elem)
 
                 mij = rotations\

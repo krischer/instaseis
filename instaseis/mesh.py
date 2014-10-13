@@ -18,7 +18,7 @@ from collections import OrderedDict
 
 from . import spectral_basis
 
-MIN_FILE_VERSION = 5
+MIN_FILE_VERSION = 6
 
 
 class Buffer(object):
@@ -102,7 +102,8 @@ class Mesh(object):
         # Cheap sanity check. No need to parse the rest.
         self.dump_type = \
             getattr(self.f, "dump type (displ_only, displ_velo, fullfields)")
-        if self.dump_type != "displ_only" and self.dump_type != "fullfields":
+        if (self.dump_type != "displ_only" and self.dump_type != "fullfields"
+                and self.dump_type != "strain_only"):
             raise NotImplementedError
 
         self.npol = self.f.npol
@@ -145,7 +146,7 @@ class Mesh(object):
             self.compression_level = \
                 self.f.groups["Snapshots"].variables["disp_s"]\
                 .filters()["complevel"]
-        elif self.dump_type == "fullfields":
+        elif self.dump_type == "fullfields" or self.dump_type == "strain_only":
             self.compression_level = \
                 self.f.groups["Snapshots"].variables["strain_dsus"]\
                 .filters()["complevel"]
@@ -205,7 +206,7 @@ class Mesh(object):
                 self.axis = self.f.groups["Mesh"].variables["axis"][:]
                 self.mesh_mu = self.f.groups["Mesh"].variables["mesh_mu"][:]
 
-        elif self.dump_type == "fullfields":
+        elif self.dump_type == "fullfields" or self.dump_type == "strain_only":
             # Build a kdtree of the stored gll points.
             self.mesh_S = self.f.groups["Mesh"].variables["mesh_S"]
             self.mesh_Z = self.f.groups["Mesh"].variables["mesh_Z"]
