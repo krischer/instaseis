@@ -1,4 +1,11 @@
 !=========================================================================================
+! copyright:
+!     Martin van Driel (Martin@vanDriel.de), 2014
+!     Lion Krischer (krischer@geophysik.uni-muenchen.de), 2014
+! license:
+!     GNU General Public License, Version 3
+!     (http://www.gnu.org/copyleft/gpl.html)
+
 module spectral_basis
     use global_parameters, only: sp, dp, pi
     use iso_c_binding, only: c_double, c_int
@@ -10,7 +17,9 @@ module spectral_basis
 
 contains
 
-!--- C Wrapper ---------------------------------------------------------------------------
+!== C Wrappers ===========================================================================
+
+!-----------------------------------------------------------------------------------------
 subroutine lagrange_interpol_2D_td_wrapped(N, nsamp, points1, points2, coefficients, &
                                            x1, x2, interpolant) &
   bind(c, name="lagrange_interpol_2D_td")
@@ -24,6 +33,8 @@ subroutine lagrange_interpol_2D_td_wrapped(N, nsamp, points1, points2, coefficie
   interpolant = lagrange_interpol_2D_td(points1, points2, coefficients, x1, x2)
 end subroutine
 !-----------------------------------------------------------------------------------------
+
+!== END  C Wrappers ======================================================================
 
 !-----------------------------------------------------------------------------------------
 !> computes the Lagrangian interpolation polynomial of a function defined by its values at

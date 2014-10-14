@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Functions dealing with rotations. Mostly wrappers using ctypes around Fortran
-code from the AxiSEM kernel module.
+Functions dealing with rotations.
 
 :copyright:
+    Martin van Driel (Martin@vanDriel.de), 2014
     Lion Krischer (krischer@geophysik.uni-muenchen.de), 2014
 :license:
     GNU General Public License, Version 3
@@ -12,14 +12,7 @@ code from the AxiSEM kernel module.
 """
 from __future__ import absolute_import
 
-import ctypes as C
 import numpy as np
-
-from .helpers import load_lib
-
-
-lib = load_lib()
-# lib.azim_factor_bw.restype = C.c_double
 
 
 def rotate_frame_rd(x, y, z, phi, theta):

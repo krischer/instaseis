@@ -4,6 +4,7 @@
 Python interface to an AxiSEM database in a netCDF file.
 
 :copyright:
+    Martin van Driel (Martin@vanDriel.de), 2014
     Lion Krischer (krischer@geophysik.uni-muenchen.de), 2014
 :license:
     GNU General Public License, Version 3
