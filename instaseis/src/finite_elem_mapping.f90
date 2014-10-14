@@ -37,6 +37,13 @@
 ! 1 - - - - - - - 2
 !
 ! for axial elements, xi is hence the normal and eta the parallel direction to the axis
+!
+! copyright:
+!     Martin van Driel (Martin@vanDriel.de), 2014
+!     Lion Krischer (krischer@geophysik.uni-muenchen.de), 2014
+! license:
+!     GNU General Public License, Version 3
+!     (http://www.gnu.org/copyleft/gpl.html)
 
 module finite_elem_mapping
     use global_parameters, only            : sp, dp, pi

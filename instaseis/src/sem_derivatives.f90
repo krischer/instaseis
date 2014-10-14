@@ -1,4 +1,11 @@
 !=========================================================================================
+! copyright:
+!     Martin van Driel (Martin@vanDriel.de), 2014
+!     Lion Krischer (krischer@geophysik.uni-muenchen.de), 2014
+! license:
+!     GNU General Public License, Version 3
+!     (http://www.gnu.org/copyleft/gpl.html)
+
 module sem_derivatives
   use global_parameters,      only : dp
   use finite_elem_mapping,    only : inv_jacobian
@@ -76,18 +83,20 @@ module sem_derivatives
 
 contains
 
-!--C Wrappers-------------------------------------------------------------------------------
+!== C Wrappers ===========================================================================
 
-subroutine strain_monopole_td_wrapped(u, G, GT, xi, eta, npol, nsamp, nodes, element_type, axial, strain_tensor) &
-    bind(c, name="strain_monopole_td")
+!-----------------------------------------------------------------------------------------
+subroutine strain_monopole_td_wrapped(u, G, GT, xi, eta, npol, nsamp, nodes, &
+                                      element_type, axial, strain_tensor) &
+  bind(c, name="strain_monopole_td")
 
   integer(c_int), intent(in), value   :: npol, nsamp
   real(c_double), intent(in)          :: u(1:nsamp,0:npol,0:npol, 3)
   real(c_double), intent(in)          :: G(0:npol,0:npol)  ! same for all elements (GLL)
   real(c_double), intent(in)          :: GT(0:npol,0:npol) ! GLL for non-axial and GLJ for
-                                                     ! axial elements
+                                                           ! axial elements
   real(c_double), intent(in)          :: xi(0:npol)  ! GLL for non-axial and GLJ for axial
-                                               ! elements
+                                                     ! elements
   real(c_double), intent(in)          :: eta(0:npol) ! same for all elements (GLL)
   real(c_double), intent(in)          :: nodes(4,2)
   integer(c_int), intent(in), value   :: element_type
@@ -97,19 +106,23 @@ subroutine strain_monopole_td_wrapped(u, G, GT, xi, eta, npol, nsamp, nodes, ele
   real(kind=dp)                       :: grad_buff1(1:nsamp,0:npol,0:npol,2)
   real(kind=dp)                       :: grad_buff2(1:nsamp,0:npol,0:npol,2)
 
-  strain_tensor = strain_monopole_td(u, G, GT, xi, eta, npol, nsamp, nodes, element_type, logical(axial))
+  strain_tensor = strain_monopole_td(u, G, GT, xi, eta, npol, nsamp, nodes, &
+                                     element_type, logical(axial))
 end subroutine strain_monopole_td_wrapped
+!-----------------------------------------------------------------------------------------
 
+!-----------------------------------------------------------------------------------------
+subroutine strain_dipole_td_wrapped(u, G, GT, xi, eta, npol, nsamp, nodes, &
+                                    element_type, axial, strain_tensor) &
 
-subroutine strain_dipole_td_wrapped(u, G, GT, xi, eta, npol, nsamp, nodes, element_type, axial, strain_tensor) &
-    bind(c, name="strain_dipole_td")
+  bind(c, name="strain_dipole_td")
   integer(c_int), intent(in), value  :: npol, nsamp
   real(c_double), intent(in)         :: u(1:nsamp,0:npol,0:npol, 3)
   real(c_double), intent(in)         :: G(0:npol,0:npol)  ! same for all elements (GLL)
   real(c_double), intent(in)         :: GT(0:npol,0:npol) ! GLL for non-axial and GLJ for
-                                                     ! axial elements
+                                                          ! axial elements
   real(c_double), intent(in)         :: xi(0:npol)  ! GLL for non-axial and GLJ for axial
-                                               ! elements
+                                                    ! elements
   real(c_double), intent(in)         :: eta(0:npol) ! same for all elements (GLL)
   real(c_double), intent(in)         :: nodes(4,2)
   integer(c_int), intent(in), value  :: element_type
@@ -119,12 +132,15 @@ subroutine strain_dipole_td_wrapped(u, G, GT, xi, eta, npol, nsamp, nodes, eleme
   real(kind=dp)                      :: grad_buff1(1:nsamp,0:npol,0:npol,2)
   real(kind=dp)                      :: grad_buff2(1:nsamp,0:npol,0:npol,2)
   real(kind=dp)                      :: grad_buff3(1:nsamp,0:npol,0:npol,2)
-  strain_tensor = strain_dipole_td(u, G, GT, xi, eta, npol, nsamp, nodes, element_type, logical(axial))
+  strain_tensor = strain_dipole_td(u, G, GT, xi, eta, npol, nsamp, nodes, &
+                                   element_type, logical(axial))
 end subroutine strain_dipole_td_wrapped
+!-----------------------------------------------------------------------------------------
 
-
-subroutine strain_quadpole_td_wrapped(u, G, GT, xi, eta, npol, nsamp, nodes, element_type, axial, strain_tensor) &
-    bind(c, name="strain_quadpole_td")
+!-----------------------------------------------------------------------------------------
+subroutine strain_quadpole_td_wrapped(u, G, GT, xi, eta, npol, nsamp, nodes, &
+                                      element_type, axial, strain_tensor) &
+  bind(c, name="strain_quadpole_td")
   ! Computes the strain tensor for displacement u excited bz a quadpole_td source
   ! in Voigt notation: [dsus, dpup, dzuz, dzup, dsuz, dsup]
 
@@ -144,9 +160,12 @@ subroutine strain_quadpole_td_wrapped(u, G, GT, xi, eta, npol, nsamp, nodes, ele
   real(kind=dp)                 :: grad_buff1(1:nsamp,0:npol,0:npol,2)
   real(kind=dp)                 :: grad_buff2(1:nsamp,0:npol,0:npol,2)
   real(kind=dp)                 :: grad_buff3(1:nsamp,0:npol,0:npol,2)
-  strain_tensor = strain_quadpole_td(u, G, GT, xi, eta, npol, nsamp, nodes, element_type, logical(axial))
+  strain_tensor = strain_quadpole_td(u, G, GT, xi, eta, npol, nsamp, nodes, &
+                                     element_type, logical(axial))
 end subroutine
+!-----------------------------------------------------------------------------------------
 
+!== END C Wrappers =======================================================================
 
 !-----------------------------------------------------------------------------------------
 function strain_monopole_td(u, G, GT, xi, eta, npol, nsamp, nodes, element_type, axial)

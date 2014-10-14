@@ -1,4 +1,10 @@
 !=========================================================================================
+! copyright:
+!     Martin van Driel (Martin@vanDriel.de), 2014
+! license:
+!     GNU General Public License, Version 3
+!     (http://www.gnu.org/copyleft/gpl.html)
+
 module lanczos
 
     use iso_c_binding, only: c_double, c_int
