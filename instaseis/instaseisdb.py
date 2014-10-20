@@ -17,6 +17,7 @@ import numpy as np
 from obspy.core import Stream, Trace
 from obspy.signal.util import nextpow2
 import os
+import warnings
 
 from . import finite_elem_mapping
 from . import mesh
@@ -193,20 +194,28 @@ class InstaSeisDB(object):
         :param a_lanczos: width of the kernel used in resampling
         """
         if self.reciprocal:
+            if any(comp in components for comp in ['N', 'E', 'R', 'T']) and \
+                    self.meshes.px is None:
+                raise ValueError("vertical component only DB")
+
+            if 'Z' in components and self.meshes.pz is None:
+                raise ValueError("horizontal component only DB")
+
+            if receiver.depth_in_m is not None:
+                warnings.warn('Receiver depth cannot be changed when reading '
+                              'from reciprocal DB. Using depth from the DB.')
+
             rotmesh_s, rotmesh_phi, rotmesh_z = rotations.rotate_frame_rd(
                 source.x(planet_radius=self.planet_radius),
                 source.y(planet_radius=self.planet_radius),
                 source.z(planet_radius=self.planet_radius),
                 receiver.longitude, receiver.colatitude)
 
-            if any(comp in components for comp in ['N', 'E', 'R', 'T']) and \
-                    self.meshes.px == None:
-                raise ValueError("vertical component only DB")
-
-            if 'Z' in components  and self.meshes.pz == None:
-                raise ValueError("horizontal component only DB")
-
         else:
+            if source.depth_in_m is not None:
+                warnings.warn('Source depth cannot be changed when reading '
+                              'from forward DB. Using depth from the DB.')
+
             rotmesh_s, rotmesh_phi, rotmesh_z = rotations.rotate_frame_rd(
                 receiver.x(planet_radius=self.planet_radius),
                 receiver.y(planet_radius=self.planet_radius),

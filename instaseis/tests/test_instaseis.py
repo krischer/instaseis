@@ -32,16 +32,20 @@ def test_fwd_vs_bwd():
                                 reciprocal=False)
     instaseis_bwd = InstaSeisDB(os.path.join(DATA, "100s_db_bwd"))
 
-    source = Source(latitude=4., longitude=3.0, depth_in_m=0,
-                    m_rr=4.71e+17, m_tt=3.81e+17, m_pp=-4.74e+17,
-                    m_rt=3.99e+17, m_rp=-8.05e+17, m_tp=-1.23e+17)
+    source_fwd = Source(latitude=4., longitude=3.0, depth_in_m=None,
+                        m_rr=4.71e+17, m_tt=3.81e+17, m_pp=-4.74e+17,
+                        m_rt=3.99e+17, m_rp=-8.05e+17, m_tp=-1.23e+17)
+    source_bwd = Source(latitude=4., longitude=3.0, depth_in_m=0,
+                        m_rr=4.71e+17, m_tt=3.81e+17, m_pp=-4.74e+17,
+                        m_rt=3.99e+17, m_rp=-8.05e+17, m_tp=-1.23e+17)
 
-    receiver = Receiver(latitude=10., longitude=20.)
+    receiver_fwd = Receiver(latitude=10., longitude=20., depth_in_m=0)
+    receiver_bwd = Receiver(latitude=10., longitude=20., depth_in_m=None)
 
     st_fwd = instaseis_fwd.get_seismograms(
-        source=source, receiver=receiver, components=('Z', 'N', 'E', 'R', 'T'))
+        source=source_fwd, receiver=receiver_fwd, components=('Z', 'N', 'E', 'R', 'T'))
     st_bwd = instaseis_bwd.get_seismograms(
-        source=source, receiver=receiver, components=('Z', 'N', 'E', 'R', 'T'))
+        source=source_bwd, receiver=receiver_bwd, components=('Z', 'N', 'E', 'R', 'T'))
 
     st_bwd.filter('lowpass', freq=0.002)
     st_fwd.filter('lowpass', freq=0.002)
@@ -77,16 +81,20 @@ def test_fwd_vs_bwd_axial():
                                 reciprocal=False)
     instaseis_bwd = InstaSeisDB(os.path.join(DATA, "100s_db_bwd"))
 
-    source = Source(latitude=0., longitude=0., depth_in_m=310000,
-                    m_rr=4.71e+17, m_tt=3.81e+17, m_pp=-4.74e+17,
-                    m_rt=3.99e+17, m_rp=-8.05e+17, m_tp=-1.23e+17)
+    source_fwd = Source(latitude=0., longitude=0., depth_in_m=None,
+                        m_rr=4.71e+17, m_tt=3.81e+17, m_pp=-4.74e+17,
+                        m_rt=3.99e+17, m_rp=-8.05e+17, m_tp=-1.23e+17)
+    source_bwd = Source(latitude=0., longitude=0., depth_in_m=310000,
+                        m_rr=4.71e+17, m_tt=3.81e+17, m_pp=-4.74e+17,
+                        m_rt=3.99e+17, m_rp=-8.05e+17, m_tp=-1.23e+17)
 
-    receiver = Receiver(latitude=0., longitude=0.1)
+    receiver_fwd = Receiver(latitude=0., longitude=0.1, depth_in_m=0)
+    receiver_bwd = Receiver(latitude=0., longitude=0.1, depth_in_m=None)
 
     st_fwd = instaseis_fwd.get_seismograms(
-        source=source, receiver=receiver, components=('Z', 'N', 'E', 'R', 'T'))
+        source=source_fwd, receiver=receiver_fwd, components=('Z', 'N', 'E', 'R', 'T'))
     st_bwd = instaseis_bwd.get_seismograms(
-        source=source, receiver=receiver, components=('Z', 'N', 'E', 'R', 'T'))
+        source=source_bwd, receiver=receiver_bwd, components=('Z', 'N', 'E', 'R', 'T'))
 
     st_bwd.filter('lowpass', freq=0.01)
     st_fwd.filter('lowpass', freq=0.01)
@@ -308,7 +316,7 @@ def test_incremental_fwd():
 
     receiver = Receiver(latitude=42.6390, longitude=74.4940)
     source = Source(
-        latitude=89.91, longitude=0.0, depth_in_m=0,
+        latitude=89.91, longitude=0.0, depth_in_m=None,
         m_rr=4.710000e+24 / 1E7,
         m_tt=3.810000e+22 / 1E7,
         m_pp=-4.740000e+24 / 1E7,
