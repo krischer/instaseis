@@ -14,15 +14,39 @@ Python interface to AxiSEM's netCDF based database mode.
 from distutils.ccompiler import CCompiler
 from distutils.errors import DistutilsExecError, CompileError
 from distutils.unixccompiler import UnixCCompiler
-import os
 from setuptools import find_packages, setup
 from setuptools.extension import Extension
+
+import inspect
+import os
 import sys
 
 
 # Monkey patch the compilers to treat Fortran files like C files.
 CCompiler.language_map['.f90'] = "c"
 UnixCCompiler.src_extensions.append(".f90")
+
+def get_package_data():
+    """
+    Returns a list of all files needed for the installation relativ to the
+    "instaseis" subfolder.
+    """
+    filenames = []
+    # The lasif root dir.
+    root_dir = os.path.join(os.path.dirname(os.path.abspath(
+        inspect.getfile(inspect.currentframe()))), "instaseis")
+    # Recursively include all files in these folders:
+    folders = [os.path.join(root_dir, "tests", "data")]
+    for folder in folders:
+        for directory, _, files in os.walk(folder):
+            for filename in files:
+                # Exclude hidden files.
+                if filename.startswith("."):
+                    continue
+                filenames.append(os.path.relpath(
+                    os.path.join(directory, filename),
+                    root_dir))
+    return filenames
 
 
 def _compile(self, obj, src, ext, cc_args, extra_postargs, pp_opts):
@@ -71,7 +95,8 @@ setup_config = dict(
     url="",
     packages=find_packages(),
     package_data={
-        "instaseis": [os.path.join("lib", "instaseis.so")]},
+        "instaseis": [os.path.join("lib", "instaseis.so")] +
+            get_package_data()},
     license="GNU General Public License, version 3 (GPLv3)",
     platforms="OS Independent",
     install_requires=["netCDF4", "numpy", "obspy"],
