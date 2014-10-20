@@ -146,3 +146,13 @@ def test_dataless_seed_files():
     assert (round(rec.latitude, 3), round(rec.longitude, 3),
             rec.network, rec.station) == \
            (round(48.162899, 3), round(11.2752, 3), 'BW', 'FURT')
+
+
+def test_station_x_y_z():
+    station = Receiver(latitude=42.6390, longitude=74.4940, depth_in_m=0.0)
+    assert abs(station.x() - 1252949.21995) < 1E-5
+    assert abs(station.y() - 4516152.38916) < 1E-5
+    assert abs(station.z() - 4315567.96379) < 1E-5
+    assert abs(station.colatitude - 47.3609999) < 1E-5
+    assert station.depth_in_m == 0.0
+    assert station.radius_in_m() == 6371000.0
