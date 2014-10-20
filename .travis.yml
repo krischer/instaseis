@@ -29,7 +29,7 @@ install:
   - pip install --no-deps .
 
 script:
-  - cd $TRAVIS_BUILD_DIR; py.test
+  - cd $HOME; python -m instaseis.tests
   - cd $TRAVIS_BUILD_DIR/doc; make html
 
 after_success:
