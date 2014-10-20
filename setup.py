@@ -11,7 +11,6 @@ Python interface to AxiSEM's netCDF based database mode.
     GNU General Public License, Version 3
     (http://www.gnu.org/copyleft/gpl.html)
 """
-
 from distutils.ccompiler import CCompiler
 from distutils.errors import DistutilsExecError, CompileError
 from distutils.unixccompiler import UnixCCompiler
@@ -21,25 +20,13 @@ from setuptools.extension import Extension
 import sys
 
 
-from setuptools import setup, find_packages
-
-macros = []
-extra_link_args = []
-extra_compile_args = []
-
-# Monkey patch CCompiler. We pretend that .f90 is a C extension and overwrite
-# the corresponding compilation calls
+# Monkey patch the compilers to treat Fortran files like C files.
 CCompiler.language_map['.f90'] = "c"
-# Monkey patch UnixCCompiler for Unix, Linux and darwin
 UnixCCompiler.src_extensions.append(".f90")
 
 
 def _compile(self, obj, src, ext, cc_args, extra_postargs, pp_opts):
     compiler_so = self.compiler_so
-    #if sys.platform == 'darwin':
-        #from distutils.unixccompiler import _darwin_compiler_fixup
-        #compiler_so = _darwin_compiler_fixup(compiler_so, cc_args + \
-                #extra_postargs)
     if ext == ".f90":
         if sys.platform == 'darwin' or sys.platform == 'linux2':
             compiler_so = ["gfortran"]
@@ -50,27 +37,23 @@ def _compile(self, obj, src, ext, cc_args, extra_postargs, pp_opts):
     except DistutilsExecError, msg:
         raise CompileError(msg)
 UnixCCompiler._compile = _compile
-# set library dir for mac and linux
-libs = ['gfortran']
 
-### Hack to prevent build_ext from trying to append "init" to the export
-### symbols
+
+# Hack to prevent build_ext from trying to append "init" to the export symbols.
 class finallist(list):
     def append(self, object):
         return
+
 
 class MyExtension(Extension):
     def __init__(self, *args, **kwargs):
         Extension.__init__(self, *args, **kwargs)
         self.export_symbols = finallist(self.export_symbols)
 
-src = os.path.join('instaseis', 'src') + os.sep
-
+src = os.path.join('instaseis', 'src')
 lib = MyExtension('instaseis',
-                  define_macros=macros,
-                  libraries=libs,
-                  extra_link_args=extra_link_args,
-                  extra_compile_args=extra_compile_args,
+                  libraries=["gfortran"],
+                  # Be careful with the order.
                   sources=[
                       os.path.join(src, "global_parameters.f90"),
                       os.path.join(src, "finite_elem_mapping.f90"),
@@ -97,3 +80,12 @@ setup_config = dict(
 
 if __name__ == "__main__":
     setup(**setup_config)
+
+    # Attempt to remove the mod files once again.
+    for filename in ["finite_elem_mapping.mod", "global_parameters.mod",
+                     "lanczos.mod", "sem_derivatives.mod",
+                     "spectral_basis.mod"]:
+        try:
+            os.remove(filename)
+        except:
+            pass
