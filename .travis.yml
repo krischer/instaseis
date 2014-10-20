@@ -1,0 +1,36 @@
+language: python
+
+python:
+  - "2.7"
+
+env:
+  global:
+    secure: GStdSQ10ql5pKTEH0HGpZsZjlQnX2CgRAccZ0Pr4aTk7KbaCpZyAJQXdBTSaM1qzZo5QFn5tmIwBXljI4nncdwhAMM5NIKSTZwY+wmpCrLvRI0WrJarfGuK8lwV4NrPWkfCd8qfKx/6MERgrCvCUviXLFZf3YamB5o8icuur7jo=
+
+before_install:
+  - sudo apt-get install -qq gfortran
+  - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
+  - chmod +x miniconda.sh
+  - ./miniconda.sh -b
+  - export PATH=/home/travis/miniconda/bin:$PATH
+  - conda update --yes conda
+  - conda create --yes -n condaenv python=$TRAVIS_PYTHON_VERSION
+  - conda install --yes -n condaenv pip
+  - source activate condaenv
+  # The next couple lines fix a crash with multiprocessing on Travis and are not specific to using Miniconda
+  - sudo rm -rf /dev/shm
+  - sudo ln -s /run/shm /dev/shm
+  - conda install --yes python=$TRAVIS_PYTHON_VERSION atlas numpy scipy matplotlib nose pytest flake8 sphinx lxml sqlalchemy mock netcdf4
+  - pip install --use-mirrors suds
+  - pip install --use-mirrors-suds sphinx-bootstrap-theme
+  - pip install obspy
+
+install:
+  - pip install --no-deps .
+
+script:
+  - cd $TRAVIS_BUILD_DIR; py.test
+  - cd $TRAVIS_BUILD_DIR/doc; make html
+
+after_success:
+  - bash $TRAVIS_BUILD_DIR/.travis-update-gh-pages.sh
