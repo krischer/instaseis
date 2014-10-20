@@ -5,7 +5,7 @@ python:
 
 env:
   global:
-    secure: GStdSQ10ql5pKTEH0HGpZsZjlQnX2CgRAccZ0Pr4aTk7KbaCpZyAJQXdBTSaM1qzZo5QFn5tmIwBXljI4nncdwhAMM5NIKSTZwY+wmpCrLvRI0WrJarfGuK8lwV4NrPWkfCd8qfKx/6MERgrCvCUviXLFZf3YamB5o8icuur7jo=
+    secure: omFMs9SEGjhu4q4oVpF08LaPhh8q9ytaerRVyo1TrAdWsxNGfqjgUFHEFUN56AecmP31atwcA0EdBc+qmbxH/fHQIlQAU38vlfn6b9VuAW8h2pjhimxYuz6eAob47nLyPxMDqKeJSpNhmj1CN+fxWL2SxZWIsWHqq4jGlkn+Ft0=
 
 before_install:
   - sudo apt-get install -qq gfortran
