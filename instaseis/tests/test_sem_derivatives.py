@@ -16,8 +16,7 @@ import os
 import inspect
 
 
-from .. import sem_derivatives
-from ..instaseisdb import InstaSeisDB
+from instaseis import sem_derivatives, InstaSeisDB
 
 
 # Most generic way to get the data folder path.

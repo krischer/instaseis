@@ -14,7 +14,7 @@ from __future__ import absolute_import
 import numpy as np
 
 
-from .. import rotations
+from instaseis import rotations
 
 
 def test_rotate_tensor_xyz_earth_to_xyz_src():

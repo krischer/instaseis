@@ -15,7 +15,7 @@ import obspy
 import os
 import pytest
 
-from ..source import Receiver, ReceiverParseError
+from instaseis import Receiver, ReceiverParseError
 
 DATA = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 

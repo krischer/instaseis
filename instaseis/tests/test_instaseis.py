@@ -15,8 +15,8 @@ import inspect
 import numpy as np
 import os
 
-from ..instaseisdb import InstaSeisDB
-from ..source import Source, Receiver
+from instaseis import InstaSeisDB
+from instaseis import Source, Receiver
 
 
 # Most generic way to get the data folder path.

@@ -11,12 +11,11 @@ Tests the source and receiver objects.
 """
 from __future__ import absolute_import
 
-from .. import source
+from instaseis import Receiver
 
 
 def test_station_x_y_z():
-    station = source.SourceOrReceiver(
-        latitude=42.6390, longitude=74.4940, depth_in_m=0.0)
+    station = Receiver(latitude=42.6390, longitude=74.4940, depth_in_m=0.0)
     assert abs(station.x() - 1252949.21995) < 1E-5
     assert abs(station.y() - 4516152.38916) < 1E-5
     assert abs(station.z() - 4315567.96379) < 1E-5
