@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>instaseis.instaseisdb &mdash; instaseis 0.0.1a documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/bootswatch-3.2.0/united/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.0.1a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../../_static/bootstrap-3.2.0/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../../_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="instaseis 0.0.1a documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../index.html">
+          instaseis</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.1a</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            <li class="divider-vertical"></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../instaseis.html">InstaSeisDB</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mesh.html">Meshes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../source.html">Sources and Receivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../srf.html">Standard Rupture Format</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+              
+                
+              
+            
+            
+            
+            
+              <li class="hidden-sm"></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      
+  <h1>Source code for instaseis.instaseisdb</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/env python</span>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Python interface to an AxiSEM database in a netCDF file.</span>
+
+<span class="sd">:copyright:</span>
+<span class="sd">    Martin van Driel (Martin@vanDriel.de), 2014</span>
+<span class="sd">    Lion Krischer (krischer@geophysik.uni-muenchen.de), 2014</span>
+<span class="sd">:license:</span>
+<span class="sd">    GNU General Public License, Version 3</span>
+<span class="sd">    (http://www.gnu.org/copyleft/gpl.html)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span>
+
+<span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">obspy.core</span> <span class="kn">import</span> <span class="n">Stream</span><span class="p">,</span> <span class="n">Trace</span>
+<span class="kn">from</span> <span class="nn">obspy.signal.util</span> <span class="kn">import</span> <span class="n">nextpow2</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">finite_elem_mapping</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">mesh</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">rotations</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">sem_derivatives</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">spectral_basis</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">lanczos</span>
+<span class="kn">from</span> <span class="nn">instaseis.source</span> <span class="kn">import</span> <span class="n">Source</span><span class="p">,</span> <span class="n">ForceSource</span>
+
+
+<span class="n">MeshCollection_bwd</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">namedtuple</span><span class="p">(</span><span class="s">&quot;MeshCollection_bwd&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s">&quot;px&quot;</span><span class="p">,</span> <span class="s">&quot;pz&quot;</span><span class="p">])</span>
+<span class="n">MeshCollection_fwd</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">namedtuple</span><span class="p">(</span><span class="s">&quot;MeshCollection_fwd&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s">&quot;m1&quot;</span><span class="p">,</span> <span class="s">&quot;m2&quot;</span><span class="p">,</span>
+                                                                   <span class="s">&quot;m3&quot;</span><span class="p">,</span> <span class="s">&quot;m4&quot;</span><span class="p">])</span>
+
+<span class="n">DEFAULT_MU</span> <span class="o">=</span> <span class="mf">32e9</span>
+
+
+<div class="viewcode-block" id="InstaSeisDB"><a class="viewcode-back" href="../../instaseis.html#instaseis.instaseisdb.InstaSeisDB">[docs]</a><span class="k">class</span> <span class="nc">InstaSeisDB</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class to extract Seismograms from a set of wavefields generated by</span>
+<span class="sd">    AxiSEM. Taking advantage of reciprocity of the Green&#39;s function, two</span>
+<span class="sd">    simulations with single force sources (vertical and horizontal) to build a</span>
+<span class="sd">    complete Database of Green&#39;s function in global 1D models. The spatial</span>
+<span class="sd">    discretization equals the SEM basis functions of AxiSEM, resulting in high</span>
+<span class="sd">    order spatial accuracy and short access times.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_path</span><span class="p">,</span> <span class="n">buffer_size_in_mb</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">read_on_demand</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                 <span class="n">reciprocal</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param db_path: Path to the AxiSEM Database containing subdirectories</span>
+<span class="sd">            PZ and/or PX each containing a order_output.nc4 file</span>
+<span class="sd">        :type db_path: str</span>
+<span class="sd">        :param buffer_size_in_mb: Strain is buffered to avoid unnecessary</span>
+<span class="sd">            file access when sources are located in the same SEM element</span>
+<span class="sd">        :type buffer_size_in_mb: int, optional</span>
+<span class="sd">        :param read_on_demand: read several global fields on demand (faster</span>
+<span class="sd">            initialization, default) or on initialization (faster in individual</span>
+<span class="sd">            seismogram extraction, useful e.g. for finite sources)</span>
+<span class="sd">        :type read_on_demand: bool, optional</span>
+<span class="sd">        :param reciprocal: assume a reciprocal database (fixed receiver depth,</span>
+<span class="sd">            sources anywhere) or a forward database (fixed source depth,</span>
+<span class="sd">            receiver anywhere)</span>
+<span class="sd">        :type reciprocal: bool, optional</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db_path</span> <span class="o">=</span> <span class="n">db_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">buffer_size_in_mb</span> <span class="o">=</span> <span class="n">buffer_size_in_mb</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">read_on_demand</span> <span class="o">=</span> <span class="n">read_on_demand</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_find_and_open_files</span><span class="p">(</span><span class="n">reciprocal</span><span class="o">=</span><span class="n">reciprocal</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nfft</span> <span class="o">=</span> <span class="n">nextpow2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ndumps</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reciprocal</span> <span class="o">=</span> <span class="n">reciprocal</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">planet_radius</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">planet_radius</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dump_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">dump_type</span>
+
+    <span class="k">def</span> <span class="nf">_find_and_open_files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reciprocal</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">reciprocal</span><span class="p">:</span>
+            <span class="n">px</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db_path</span><span class="p">,</span> <span class="s">&quot;PX&quot;</span><span class="p">)</span>
+            <span class="n">pz</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db_path</span><span class="p">,</span> <span class="s">&quot;PZ&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">px</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">pz</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s">&quot;Expecting the &#39;PX&#39; or &#39;PZ&#39; subfolders to be present.&quot;</span><span class="p">)</span>
+
+            <span class="n">px_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">px</span><span class="p">,</span> <span class="s">&quot;Data&quot;</span><span class="p">,</span> <span class="s">&quot;ordered_output.nc4&quot;</span><span class="p">)</span>
+            <span class="n">pz_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pz</span><span class="p">,</span> <span class="s">&quot;Data&quot;</span><span class="p">,</span> <span class="s">&quot;ordered_output.nc4&quot;</span><span class="p">)</span>
+
+            <span class="n">x_exists</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">px_file</span><span class="p">)</span>
+            <span class="n">z_exists</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">pz_file</span><span class="p">)</span>
+
+            <span class="c"># full_parse will force the kd-tree to be built</span>
+            <span class="k">if</span> <span class="n">x_exists</span> <span class="ow">and</span> <span class="n">z_exists</span><span class="p">:</span>
+                <span class="n">px_m</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">Mesh</span><span class="p">(</span>
+                    <span class="n">px_file</span><span class="p">,</span> <span class="n">full_parse</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                    <span class="n">strain_buffer_size_in_mb</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">buffer_size_in_mb</span><span class="p">,</span>
+                    <span class="n">displ_buffer_size_in_mb</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                    <span class="n">read_on_demand</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">read_on_demand</span><span class="p">)</span>
+                <span class="n">pz_m</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">Mesh</span><span class="p">(</span>
+                    <span class="n">pz_file</span><span class="p">,</span> <span class="n">full_parse</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                    <span class="n">strain_buffer_size_in_mb</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">buffer_size_in_mb</span><span class="p">,</span>
+                    <span class="n">displ_buffer_size_in_mb</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                    <span class="n">read_on_demand</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">read_on_demand</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span> <span class="o">=</span> <span class="n">px_m</span>
+            <span class="k">elif</span> <span class="n">x_exists</span><span class="p">:</span>
+                <span class="n">px_m</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">Mesh</span><span class="p">(</span>
+                    <span class="n">px_file</span><span class="p">,</span> <span class="n">full_parse</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                    <span class="n">strain_buffer_size_in_mb</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">buffer_size_in_mb</span><span class="p">,</span>
+                    <span class="n">displ_buffer_size_in_mb</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                    <span class="n">read_on_demand</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">read_on_demand</span><span class="p">)</span>
+                <span class="n">pz_m</span> <span class="o">=</span> <span class="bp">None</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span> <span class="o">=</span> <span class="n">px_m</span>
+            <span class="k">elif</span> <span class="n">z_exists</span><span class="p">:</span>
+                <span class="n">px_m</span> <span class="o">=</span> <span class="bp">None</span>
+                <span class="n">pz_m</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">Mesh</span><span class="p">(</span>
+                    <span class="n">pz_file</span><span class="p">,</span> <span class="n">full_parse</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                    <span class="n">strain_buffer_size_in_mb</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">buffer_size_in_mb</span><span class="p">,</span>
+                    <span class="n">displ_buffer_size_in_mb</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                    <span class="n">read_on_demand</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">read_on_demand</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span> <span class="o">=</span> <span class="n">pz_m</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;ordered_output.nc4 files must exist in the &quot;</span>
+                                 <span class="s">&quot;PZ/Data and/or PX/Data subfolders&quot;</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">meshes</span> <span class="o">=</span> <span class="n">MeshCollection_bwd</span><span class="p">(</span><span class="n">px_m</span><span class="p">,</span> <span class="n">pz_m</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">m1</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db_path</span><span class="p">,</span> <span class="s">&quot;MZZ&quot;</span><span class="p">)</span>
+            <span class="n">m2</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db_path</span><span class="p">,</span> <span class="s">&quot;MXX_P_MYY&quot;</span><span class="p">)</span>
+            <span class="n">m3</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db_path</span><span class="p">,</span> <span class="s">&quot;MXZ_MYZ&quot;</span><span class="p">)</span>
+            <span class="n">m4</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db_path</span><span class="p">,</span> <span class="s">&quot;MXY_MXX_M_MYY&quot;</span><span class="p">)</span>
+
+            <span class="c"># important difference to reciprocal: forward only makes sens if</span>
+            <span class="c"># all subfolders are present</span>
+            <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">m1</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">m2</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span>
+               <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">m3</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">m4</span><span class="p">)):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s">&quot;Expecting the four elemental moment tensor subfolders &quot;</span>
+                    <span class="s">&quot;to be present.&quot;</span><span class="p">)</span>
+
+            <span class="n">m1_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">m1</span><span class="p">,</span> <span class="s">&quot;Data&quot;</span><span class="p">,</span> <span class="s">&quot;ordered_output.nc4&quot;</span><span class="p">)</span>
+            <span class="n">m2_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">m2</span><span class="p">,</span> <span class="s">&quot;Data&quot;</span><span class="p">,</span> <span class="s">&quot;ordered_output.nc4&quot;</span><span class="p">)</span>
+            <span class="n">m3_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">m3</span><span class="p">,</span> <span class="s">&quot;Data&quot;</span><span class="p">,</span> <span class="s">&quot;ordered_output.nc4&quot;</span><span class="p">)</span>
+            <span class="n">m4_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">m4</span><span class="p">,</span> <span class="s">&quot;Data&quot;</span><span class="p">,</span> <span class="s">&quot;ordered_output.nc4&quot;</span><span class="p">)</span>
+
+            <span class="n">m1_exists</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">m1_file</span><span class="p">)</span>
+            <span class="n">m2_exists</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">m2_file</span><span class="p">)</span>
+            <span class="n">m3_exists</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">m3_file</span><span class="p">)</span>
+            <span class="n">m4_exists</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">m4_file</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">m1_exists</span> <span class="ow">and</span> <span class="n">m2_exists</span> <span class="ow">and</span> <span class="n">m3_exists</span> <span class="ow">and</span> <span class="n">m4_exists</span><span class="p">:</span>
+                <span class="n">m1_m</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">Mesh</span><span class="p">(</span>
+                    <span class="n">m1_file</span><span class="p">,</span> <span class="n">full_parse</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">strain_buffer_size_in_mb</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                    <span class="n">displ_buffer_size_in_mb</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">buffer_size_in_mb</span><span class="p">,</span>
+                    <span class="n">read_on_demand</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">read_on_demand</span><span class="p">)</span>
+                <span class="n">m2_m</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">Mesh</span><span class="p">(</span>
+                    <span class="n">m2_file</span><span class="p">,</span> <span class="n">full_parse</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">strain_buffer_size_in_mb</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                    <span class="n">displ_buffer_size_in_mb</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">buffer_size_in_mb</span><span class="p">,</span>
+                    <span class="n">read_on_demand</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">read_on_demand</span><span class="p">)</span>
+                <span class="n">m3_m</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">Mesh</span><span class="p">(</span>
+                    <span class="n">m3_file</span><span class="p">,</span> <span class="n">full_parse</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">strain_buffer_size_in_mb</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                    <span class="n">displ_buffer_size_in_mb</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">buffer_size_in_mb</span><span class="p">,</span>
+                    <span class="n">read_on_demand</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">read_on_demand</span><span class="p">)</span>
+                <span class="n">m4_m</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">Mesh</span><span class="p">(</span>
+                    <span class="n">m4_file</span><span class="p">,</span> <span class="n">full_parse</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">strain_buffer_size_in_mb</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                    <span class="n">displ_buffer_size_in_mb</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">buffer_size_in_mb</span><span class="p">,</span>
+                    <span class="n">read_on_demand</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">read_on_demand</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span> <span class="o">=</span> <span class="n">m1_m</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;ordered_output.nc4 files must exist in the &quot;</span>
+                                 <span class="s">&quot;*/Data subfolders&quot;</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">meshes</span> <span class="o">=</span> <span class="n">MeshCollection_fwd</span><span class="p">(</span><span class="n">m1_m</span><span class="p">,</span> <span class="n">m2_m</span><span class="p">,</span> <span class="n">m3_m</span><span class="p">,</span> <span class="n">m4_m</span><span class="p">)</span>
+
+<div class="viewcode-block" id="InstaSeisDB.get_seismograms"><a class="viewcode-back" href="../../instaseis.html#instaseis.instaseisdb.InstaSeisDB.get_seismograms">[docs]</a>    <span class="k">def</span> <span class="nf">get_seismograms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">receiver</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="p">(</span><span class="s">&quot;Z&quot;</span><span class="p">,</span> <span class="s">&quot;N&quot;</span><span class="p">,</span> <span class="s">&quot;E&quot;</span><span class="p">),</span>
+                        <span class="n">remove_source_shift</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">reconvolve_stf</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                        <span class="n">return_obspy_stream</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">a_lanczos</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extract seismograms for a moment tensor point source from the AxiSEM</span>
+<span class="sd">        database.</span>
+
+<span class="sd">        :param source: instaseis.Source or instaseis.ForceSource object</span>
+<span class="sd">        :type source: :class:`instaseis.source.Source` or</span>
+<span class="sd">            :class:`instaseis.source.ForceSource`</span>
+<span class="sd">        :param receiver: instaseis.Receiver object</span>
+<span class="sd">        :type receiver: :class:`instaseis.source.Receiver`</span>
+<span class="sd">        :param components: a tuple containing any combination of the</span>
+<span class="sd">            strings ``&quot;Z&quot;``, ``&quot;N&quot;`, ``&quot;E&quot;`, ``&quot;R&quot;``, and ``&quot;T&quot;``</span>
+<span class="sd">        :param remove_source_shift: move the starttime to the peak of the</span>
+<span class="sd">            sliprate from the source time function used to generate the</span>
+<span class="sd">            database</span>
+<span class="sd">        :param reconvolve_stf: deconvolve the source time function used in</span>
+<span class="sd">            the AxiSEM run and convolve with the stf attached to the source.</span>
+<span class="sd">            For this to be stable, the new stf needs to bandlimited.</span>
+<span class="sd">        :param return_obspy_stream: return format is either an obspy.Stream</span>
+<span class="sd">            object or a plain array containing the data</span>
+<span class="sd">        :param dt: desired sampling of the seismograms. resampling is done</span>
+<span class="sd">            using a lanczos kernel</span>
+<span class="sd">        :param a_lanczos: width of the kernel used in resampling</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reciprocal</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">comp</span> <span class="ow">in</span> <span class="n">components</span> <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">,</span> <span class="s">&#39;E&#39;</span><span class="p">,</span> <span class="s">&#39;R&#39;</span><span class="p">,</span> <span class="s">&#39;T&#39;</span><span class="p">])</span> <span class="ow">and</span> \
+                    <span class="bp">self</span><span class="o">.</span><span class="n">meshes</span><span class="o">.</span><span class="n">px</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;vertical component only DB&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="s">&#39;Z&#39;</span> <span class="ow">in</span> <span class="n">components</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">meshes</span><span class="o">.</span><span class="n">pz</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;horizontal component only DB&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">receiver</span><span class="o">.</span><span class="n">depth_in_m</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&#39;Receiver depth cannot be changed when reading &#39;</span>
+                              <span class="s">&#39;from reciprocal DB. Using depth from the DB.&#39;</span><span class="p">)</span>
+
+            <span class="n">rotmesh_s</span><span class="p">,</span> <span class="n">rotmesh_phi</span><span class="p">,</span> <span class="n">rotmesh_z</span> <span class="o">=</span> <span class="n">rotations</span><span class="o">.</span><span class="n">rotate_frame_rd</span><span class="p">(</span>
+                <span class="n">source</span><span class="o">.</span><span class="n">x</span><span class="p">(</span><span class="n">planet_radius</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">planet_radius</span><span class="p">),</span>
+                <span class="n">source</span><span class="o">.</span><span class="n">y</span><span class="p">(</span><span class="n">planet_radius</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">planet_radius</span><span class="p">),</span>
+                <span class="n">source</span><span class="o">.</span><span class="n">z</span><span class="p">(</span><span class="n">planet_radius</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">planet_radius</span><span class="p">),</span>
+                <span class="n">receiver</span><span class="o">.</span><span class="n">longitude</span><span class="p">,</span> <span class="n">receiver</span><span class="o">.</span><span class="n">colatitude</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">source</span><span class="o">.</span><span class="n">depth_in_m</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&#39;Source depth cannot be changed when reading &#39;</span>
+                              <span class="s">&#39;from forward DB. Using depth from the DB.&#39;</span><span class="p">)</span>
+
+            <span class="n">rotmesh_s</span><span class="p">,</span> <span class="n">rotmesh_phi</span><span class="p">,</span> <span class="n">rotmesh_z</span> <span class="o">=</span> <span class="n">rotations</span><span class="o">.</span><span class="n">rotate_frame_rd</span><span class="p">(</span>
+                <span class="n">receiver</span><span class="o">.</span><span class="n">x</span><span class="p">(</span><span class="n">planet_radius</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">planet_radius</span><span class="p">),</span>
+                <span class="n">receiver</span><span class="o">.</span><span class="n">y</span><span class="p">(</span><span class="n">planet_radius</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">planet_radius</span><span class="p">),</span>
+                <span class="n">receiver</span><span class="o">.</span><span class="n">z</span><span class="p">(</span><span class="n">planet_radius</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">planet_radius</span><span class="p">),</span>
+                <span class="n">source</span><span class="o">.</span><span class="n">longitude</span><span class="p">,</span> <span class="n">source</span><span class="o">.</span><span class="n">colatitude</span><span class="p">)</span>
+
+        <span class="n">k_map</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;displ_only&quot;</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span>
+                 <span class="s">&quot;strain_only&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                 <span class="s">&quot;fullfields&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
+
+        <span class="n">nextpoints</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">kdtree</span><span class="o">.</span><span class="n">query</span><span class="p">([</span><span class="n">rotmesh_s</span><span class="p">,</span> <span class="n">rotmesh_z</span><span class="p">],</span>
+                                                   <span class="n">k</span><span class="o">=</span><span class="n">k_map</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">dump_type</span><span class="p">])</span>
+
+        <span class="c"># Find the element containing the point of interest.</span>
+        <span class="n">mesh</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">groups</span><span class="p">[</span><span class="s">&quot;Mesh&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dump_type</span> <span class="o">==</span> <span class="s">&#39;displ_only&#39;</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">nextpoints</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">corner_points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s">&quot;float64&quot;</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_on_demand</span><span class="p">:</span>
+                    <span class="n">corner_point_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">fem_mesh</span><span class="p">[</span><span class="n">idx</span><span class="p">][:</span><span class="mi">4</span><span class="p">]</span>
+                    <span class="n">eltype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">eltypes</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+                    <span class="n">corner_points</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> \
+                        <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">mesh_S</span><span class="p">[</span><span class="n">corner_point_ids</span><span class="p">]</span>
+                    <span class="n">corner_points</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> \
+                        <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">mesh_Z</span><span class="p">[</span><span class="n">corner_point_ids</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">corner_point_ids</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s">&quot;fem_mesh&quot;</span><span class="p">][</span><span class="n">idx</span><span class="p">][:</span><span class="mi">4</span><span class="p">]</span>
+                    <span class="n">eltype</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s">&quot;eltype&quot;</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span>
+                    <span class="n">corner_points</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> \
+                        <span class="n">mesh</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s">&quot;mesh_S&quot;</span><span class="p">][</span><span class="n">corner_point_ids</span><span class="p">]</span>
+                    <span class="n">corner_points</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> \
+                        <span class="n">mesh</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s">&quot;mesh_Z&quot;</span><span class="p">][</span><span class="n">corner_point_ids</span><span class="p">]</span>
+
+                <span class="n">isin</span><span class="p">,</span> <span class="n">xi</span><span class="p">,</span> <span class="n">eta</span> <span class="o">=</span> <span class="n">finite_elem_mapping</span><span class="o">.</span><span class="n">inside_element</span><span class="p">(</span>
+                    <span class="n">rotmesh_s</span><span class="p">,</span> <span class="n">rotmesh_z</span><span class="p">,</span> <span class="n">corner_points</span><span class="p">,</span> <span class="n">eltype</span><span class="p">,</span>
+                    <span class="n">tolerance</span><span class="o">=</span><span class="mf">1E-3</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">isin</span><span class="p">:</span>
+                    <span class="n">id_elem</span> <span class="o">=</span> <span class="n">idx</span>
+                    <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Element not found&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_on_demand</span><span class="p">:</span>
+                <span class="n">gll_point_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">sem_mesh</span><span class="p">[</span><span class="n">id_elem</span><span class="p">]</span>
+                <span class="n">axis</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">axis</span><span class="p">[</span><span class="n">id_elem</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">gll_point_ids</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s">&quot;sem_mesh&quot;</span><span class="p">][</span><span class="n">id_elem</span><span class="p">]</span>
+                <span class="n">axis</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">mesh</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s">&quot;axis&quot;</span><span class="p">][</span><span class="n">id_elem</span><span class="p">])</span>
+
+            <span class="k">if</span> <span class="n">axis</span><span class="p">:</span>
+                <span class="n">col_points_xi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">glj_points</span>
+                <span class="n">col_points_eta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">gll_points</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">col_points_xi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">gll_points</span>
+                <span class="n">col_points_eta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">gll_points</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">id_elem</span> <span class="o">=</span> <span class="n">nextpoints</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reciprocal</span><span class="p">:</span>
+
+            <span class="n">fac_1_map</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;N&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">,</span>
+                         <span class="s">&quot;E&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">}</span>
+            <span class="n">fac_2_map</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;N&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">),</span>
+                         <span class="s">&quot;E&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">}</span>
+
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">Source</span><span class="p">):</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dump_type</span> <span class="o">==</span> <span class="s">&#39;displ_only&#39;</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">axis</span><span class="p">:</span>
+                        <span class="n">G</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">G2</span>
+                        <span class="n">GT</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">G1T</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">G</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">G2</span>
+                        <span class="n">GT</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">G2T</span>
+
+                <span class="n">strain_x</span> <span class="o">=</span> <span class="bp">None</span>
+                <span class="n">strain_z</span> <span class="o">=</span> <span class="bp">None</span>
+
+                <span class="c"># Minor optimization: Only read if actually requested.</span>
+                <span class="k">if</span> <span class="s">&quot;Z&quot;</span> <span class="ow">in</span> <span class="n">components</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dump_type</span> <span class="o">==</span> <span class="s">&#39;displ_only&#39;</span><span class="p">:</span>
+                        <span class="n">strain_z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_strain_interp</span><span class="p">(</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">meshes</span><span class="o">.</span><span class="n">pz</span><span class="p">,</span> <span class="n">id_elem</span><span class="p">,</span> <span class="n">gll_point_ids</span><span class="p">,</span> <span class="n">G</span><span class="p">,</span> <span class="n">GT</span><span class="p">,</span>
+                            <span class="n">col_points_xi</span><span class="p">,</span> <span class="n">col_points_eta</span><span class="p">,</span> <span class="n">corner_points</span><span class="p">,</span>
+                            <span class="n">eltype</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">xi</span><span class="p">,</span> <span class="n">eta</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dump_type</span> <span class="o">==</span> <span class="s">&#39;fullfields&#39;</span>
+                            <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">dump_type</span> <span class="o">==</span> <span class="s">&#39;strain_only&#39;</span><span class="p">):</span>
+                        <span class="n">strain_z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_strain</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">meshes</span><span class="o">.</span><span class="n">pz</span><span class="p">,</span> <span class="n">id_elem</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">comp</span> <span class="ow">in</span> <span class="n">components</span> <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">,</span> <span class="s">&#39;E&#39;</span><span class="p">,</span> <span class="s">&#39;R&#39;</span><span class="p">,</span> <span class="s">&#39;T&#39;</span><span class="p">]):</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dump_type</span> <span class="o">==</span> <span class="s">&#39;displ_only&#39;</span><span class="p">:</span>
+                        <span class="n">strain_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_strain_interp</span><span class="p">(</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">meshes</span><span class="o">.</span><span class="n">px</span><span class="p">,</span> <span class="n">id_elem</span><span class="p">,</span> <span class="n">gll_point_ids</span><span class="p">,</span> <span class="n">G</span><span class="p">,</span> <span class="n">GT</span><span class="p">,</span>
+                            <span class="n">col_points_xi</span><span class="p">,</span> <span class="n">col_points_eta</span><span class="p">,</span> <span class="n">corner_points</span><span class="p">,</span>
+                            <span class="n">eltype</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">xi</span><span class="p">,</span> <span class="n">eta</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dump_type</span> <span class="o">==</span> <span class="s">&#39;fullfields&#39;</span>
+                            <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">dump_type</span> <span class="o">==</span> <span class="s">&#39;strain_only&#39;</span><span class="p">):</span>
+                        <span class="n">strain_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_strain</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">meshes</span><span class="o">.</span><span class="n">px</span><span class="p">,</span> <span class="n">id_elem</span><span class="p">)</span>
+
+                <span class="n">mij</span> <span class="o">=</span> <span class="n">rotations</span>\
+                    <span class="o">.</span><span class="n">rotate_symm_tensor_voigt_xyz_src_to_xyz_earth</span><span class="p">(</span>
+                        <span class="n">source</span><span class="o">.</span><span class="n">tensor_voigt</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">longitude</span><span class="p">),</span>
+                        <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">colatitude</span><span class="p">))</span>
+                <span class="n">mij</span> <span class="o">=</span> <span class="n">rotations</span>\
+                    <span class="o">.</span><span class="n">rotate_symm_tensor_voigt_xyz_earth_to_xyz_src</span><span class="p">(</span>
+                        <span class="n">mij</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">receiver</span><span class="o">.</span><span class="n">longitude</span><span class="p">),</span>
+                        <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">receiver</span><span class="o">.</span><span class="n">colatitude</span><span class="p">))</span>
+                <span class="n">mij</span> <span class="o">=</span> <span class="n">rotations</span><span class="o">.</span><span class="n">rotate_symm_tensor_voigt_xyz_to_src</span><span class="p">(</span>
+                    <span class="n">mij</span><span class="p">,</span> <span class="n">rotmesh_phi</span><span class="p">)</span>
+                <span class="n">mij</span> <span class="o">/=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">amplitude</span>
+
+                <span class="k">if</span> <span class="s">&quot;Z&quot;</span> <span class="ow">in</span> <span class="n">components</span><span class="p">:</span>
+                    <span class="n">final</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">strain_z</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s">&quot;float64&quot;</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+                        <span class="n">final</span> <span class="o">+=</span> <span class="n">mij</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">strain_z</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span>
+                    <span class="n">final</span> <span class="o">+=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">mij</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">*</span> <span class="n">strain_z</span><span class="p">[:,</span> <span class="mi">4</span><span class="p">]</span>
+                    <span class="n">data</span><span class="p">[</span><span class="s">&quot;Z&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">final</span>
+
+                <span class="k">if</span> <span class="s">&quot;R&quot;</span> <span class="ow">in</span> <span class="n">components</span><span class="p">:</span>
+                    <span class="n">final</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">strain_x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s">&quot;float64&quot;</span><span class="p">)</span>
+                    <span class="n">final</span> <span class="o">-=</span> <span class="n">strain_x</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">mij</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mf">1.0</span>
+                    <span class="n">final</span> <span class="o">-=</span> <span class="n">strain_x</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">mij</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="mf">1.0</span>
+                    <span class="n">final</span> <span class="o">-=</span> <span class="n">strain_x</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">mij</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="mf">1.0</span>
+                    <span class="n">final</span> <span class="o">-=</span> <span class="n">strain_x</span><span class="p">[:,</span> <span class="mi">4</span><span class="p">]</span> <span class="o">*</span> <span class="n">mij</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">*</span> <span class="mf">2.0</span>
+                    <span class="n">data</span><span class="p">[</span><span class="s">&quot;R&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">final</span>
+
+                <span class="k">if</span> <span class="s">&quot;T&quot;</span> <span class="ow">in</span> <span class="n">components</span><span class="p">:</span>
+                    <span class="n">final</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">strain_x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s">&quot;float64&quot;</span><span class="p">)</span>
+                    <span class="n">final</span> <span class="o">+=</span> <span class="n">strain_x</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">*</span> <span class="n">mij</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">*</span> <span class="mf">2.0</span>
+                    <span class="n">final</span> <span class="o">+=</span> <span class="n">strain_x</span><span class="p">[:,</span> <span class="mi">5</span><span class="p">]</span> <span class="o">*</span> <span class="n">mij</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">*</span> <span class="mf">2.0</span>
+                    <span class="n">data</span><span class="p">[</span><span class="s">&quot;T&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">final</span>
+
+                <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&quot;E&quot;</span><span class="p">,</span> <span class="s">&quot;N&quot;</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="n">comp</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">components</span><span class="p">:</span>
+                        <span class="k">continue</span>
+
+                    <span class="n">fac_1</span> <span class="o">=</span> <span class="n">fac_1_map</span><span class="p">[</span><span class="n">comp</span><span class="p">](</span><span class="n">rotmesh_phi</span><span class="p">)</span>
+                    <span class="n">fac_2</span> <span class="o">=</span> <span class="n">fac_2_map</span><span class="p">[</span><span class="n">comp</span><span class="p">](</span><span class="n">rotmesh_phi</span><span class="p">)</span>
+
+                    <span class="n">final</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">strain_x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s">&quot;float64&quot;</span><span class="p">)</span>
+                    <span class="n">final</span> <span class="o">+=</span> <span class="n">strain_x</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">mij</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="n">fac_1</span>
+                    <span class="n">final</span> <span class="o">+=</span> <span class="n">strain_x</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">mij</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="n">fac_1</span>
+                    <span class="n">final</span> <span class="o">+=</span> <span class="n">strain_x</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">mij</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="n">fac_1</span>
+                    <span class="n">final</span> <span class="o">+=</span> <span class="n">strain_x</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">*</span> <span class="n">mij</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">*</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">fac_2</span>
+                    <span class="n">final</span> <span class="o">+=</span> <span class="n">strain_x</span><span class="p">[:,</span> <span class="mi">4</span><span class="p">]</span> <span class="o">*</span> <span class="n">mij</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">*</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">fac_1</span>
+                    <span class="n">final</span> <span class="o">+=</span> <span class="n">strain_x</span><span class="p">[:,</span> <span class="mi">5</span><span class="p">]</span> <span class="o">*</span> <span class="n">mij</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">*</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">fac_2</span>
+                    <span class="k">if</span> <span class="n">comp</span> <span class="o">==</span> <span class="s">&quot;N&quot;</span><span class="p">:</span>
+                        <span class="n">final</span> <span class="o">*=</span> <span class="o">-</span><span class="mf">1.0</span>
+                    <span class="n">data</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">=</span> <span class="n">final</span>
+
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">ForceSource</span><span class="p">):</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dump_type</span> <span class="o">!=</span> <span class="s">&#39;displ_only&#39;</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Force sources only in displ_only mode&quot;</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="s">&quot;Z&quot;</span> <span class="ow">in</span> <span class="n">components</span><span class="p">:</span>
+                    <span class="n">displ_z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_displacement</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">meshes</span><span class="o">.</span><span class="n">pz</span><span class="p">,</span> <span class="n">id_elem</span><span class="p">,</span>
+                                                      <span class="n">gll_point_ids</span><span class="p">,</span>
+                                                      <span class="n">col_points_xi</span><span class="p">,</span>
+                                                      <span class="n">col_points_eta</span><span class="p">,</span> <span class="n">xi</span><span class="p">,</span> <span class="n">eta</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">comp</span> <span class="ow">in</span> <span class="n">components</span> <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">,</span> <span class="s">&#39;E&#39;</span><span class="p">,</span> <span class="s">&#39;R&#39;</span><span class="p">,</span> <span class="s">&#39;T&#39;</span><span class="p">]):</span>
+                    <span class="n">displ_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_displacement</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">meshes</span><span class="o">.</span><span class="n">px</span><span class="p">,</span> <span class="n">id_elem</span><span class="p">,</span>
+                                                      <span class="n">gll_point_ids</span><span class="p">,</span>
+                                                      <span class="n">col_points_xi</span><span class="p">,</span>
+                                                      <span class="n">col_points_eta</span><span class="p">,</span> <span class="n">xi</span><span class="p">,</span> <span class="n">eta</span><span class="p">)</span>
+
+                <span class="n">force</span> <span class="o">=</span> <span class="n">rotations</span><span class="o">.</span><span class="n">rotate_vector_xyz_src_to_xyz_earth</span><span class="p">(</span>
+                    <span class="n">source</span><span class="o">.</span><span class="n">force_tpr</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">longitude</span><span class="p">),</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">colatitude</span><span class="p">))</span>
+                <span class="n">force</span> <span class="o">=</span> <span class="n">rotations</span><span class="o">.</span><span class="n">rotate_vector_xyz_earth_to_xyz_src</span><span class="p">(</span>
+                    <span class="n">force</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">receiver</span><span class="o">.</span><span class="n">longitude</span><span class="p">),</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">receiver</span><span class="o">.</span><span class="n">colatitude</span><span class="p">))</span>
+                <span class="n">force</span> <span class="o">=</span> <span class="n">rotations</span><span class="o">.</span><span class="n">rotate_vector_xyz_to_src</span><span class="p">(</span>
+                    <span class="n">force</span><span class="p">,</span> <span class="n">rotmesh_phi</span><span class="p">)</span>
+                <span class="n">force</span> <span class="o">/=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">amplitude</span>
+
+                <span class="k">if</span> <span class="s">&quot;Z&quot;</span> <span class="ow">in</span> <span class="n">components</span><span class="p">:</span>
+                    <span class="n">final</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">displ_z</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s">&quot;float64&quot;</span><span class="p">)</span>
+                    <span class="n">final</span> <span class="o">+=</span> <span class="n">displ_z</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">force</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">final</span> <span class="o">+=</span> <span class="n">displ_z</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">force</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+                    <span class="n">data</span><span class="p">[</span><span class="s">&quot;Z&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">final</span>
+
+                <span class="k">if</span> <span class="s">&quot;R&quot;</span> <span class="ow">in</span> <span class="n">components</span><span class="p">:</span>
+                    <span class="n">final</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">displ_x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s">&quot;float64&quot;</span><span class="p">)</span>
+                    <span class="n">final</span> <span class="o">+=</span> <span class="n">displ_x</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">force</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">final</span> <span class="o">+=</span> <span class="n">displ_x</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">force</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+                    <span class="n">data</span><span class="p">[</span><span class="s">&quot;R&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">final</span>
+
+                <span class="k">if</span> <span class="s">&quot;T&quot;</span> <span class="ow">in</span> <span class="n">components</span><span class="p">:</span>
+                    <span class="n">final</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">displ_x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s">&quot;float64&quot;</span><span class="p">)</span>
+                    <span class="n">final</span> <span class="o">+=</span> <span class="n">displ_x</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">force</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">data</span><span class="p">[</span><span class="s">&quot;T&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">final</span>
+
+                <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&quot;E&quot;</span><span class="p">,</span> <span class="s">&quot;N&quot;</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="n">comp</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">components</span><span class="p">:</span>
+                        <span class="k">continue</span>
+
+                    <span class="n">fac_1</span> <span class="o">=</span> <span class="n">fac_1_map</span><span class="p">[</span><span class="n">comp</span><span class="p">](</span><span class="n">rotmesh_phi</span><span class="p">)</span>
+                    <span class="n">fac_2</span> <span class="o">=</span> <span class="n">fac_2_map</span><span class="p">[</span><span class="n">comp</span><span class="p">](</span><span class="n">rotmesh_phi</span><span class="p">)</span>
+
+                    <span class="n">final</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">displ_x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s">&quot;float64&quot;</span><span class="p">)</span>
+                    <span class="n">final</span> <span class="o">+=</span> <span class="n">displ_x</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">force</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">fac_1</span>
+                    <span class="n">final</span> <span class="o">+=</span> <span class="n">displ_x</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">force</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">fac_2</span>
+                    <span class="n">final</span> <span class="o">+=</span> <span class="n">displ_x</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">force</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">fac_1</span>
+                    <span class="k">if</span> <span class="n">comp</span> <span class="o">==</span> <span class="s">&quot;N&quot;</span><span class="p">:</span>
+                        <span class="n">final</span> <span class="o">*=</span> <span class="o">-</span><span class="mf">1.0</span>
+                    <span class="n">data</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">=</span> <span class="n">final</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">Source</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dump_type</span> <span class="o">!=</span> <span class="s">&#39;displ_only&#39;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+            <span class="n">displ_1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_displacement</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">meshes</span><span class="o">.</span><span class="n">m1</span><span class="p">,</span> <span class="n">id_elem</span><span class="p">,</span>
+                                              <span class="n">gll_point_ids</span><span class="p">,</span> <span class="n">col_points_xi</span><span class="p">,</span>
+                                              <span class="n">col_points_eta</span><span class="p">,</span> <span class="n">xi</span><span class="p">,</span> <span class="n">eta</span><span class="p">)</span>
+            <span class="n">displ_2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_displacement</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">meshes</span><span class="o">.</span><span class="n">m2</span><span class="p">,</span> <span class="n">id_elem</span><span class="p">,</span>
+                                              <span class="n">gll_point_ids</span><span class="p">,</span> <span class="n">col_points_xi</span><span class="p">,</span>
+                                              <span class="n">col_points_eta</span><span class="p">,</span> <span class="n">xi</span><span class="p">,</span> <span class="n">eta</span><span class="p">)</span>
+            <span class="n">displ_3</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_displacement</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">meshes</span><span class="o">.</span><span class="n">m3</span><span class="p">,</span> <span class="n">id_elem</span><span class="p">,</span>
+                                              <span class="n">gll_point_ids</span><span class="p">,</span> <span class="n">col_points_xi</span><span class="p">,</span>
+                                              <span class="n">col_points_eta</span><span class="p">,</span> <span class="n">xi</span><span class="p">,</span> <span class="n">eta</span><span class="p">)</span>
+            <span class="n">displ_4</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_displacement</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">meshes</span><span class="o">.</span><span class="n">m4</span><span class="p">,</span> <span class="n">id_elem</span><span class="p">,</span>
+                                              <span class="n">gll_point_ids</span><span class="p">,</span> <span class="n">col_points_xi</span><span class="p">,</span>
+                                              <span class="n">col_points_eta</span><span class="p">,</span> <span class="n">xi</span><span class="p">,</span> <span class="n">eta</span><span class="p">)</span>
+
+            <span class="n">mij</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">tensor</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">amplitude</span>
+            <span class="c"># mij is [m_rr, m_tt, m_pp, m_rt, m_rp, m_tp]</span>
+            <span class="c"># final is in s, phi, z coordinates</span>
+            <span class="n">final</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">displ_1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s">&quot;float64&quot;</span><span class="p">)</span>
+
+            <span class="n">final</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="n">displ_1</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">mij</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">final</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">+=</span> <span class="n">displ_1</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">mij</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="n">final</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="n">displ_2</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">mij</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">mij</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+            <span class="n">final</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">+=</span> <span class="n">displ_2</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">mij</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">mij</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+            <span class="n">fac_1</span> <span class="o">=</span> <span class="n">mij</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">rotmesh_phi</span><span class="p">)</span> \
+                <span class="o">+</span> <span class="n">mij</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">rotmesh_phi</span><span class="p">)</span>
+            <span class="n">fac_2</span> <span class="o">=</span> <span class="o">-</span><span class="n">mij</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">rotmesh_phi</span><span class="p">)</span> \
+                <span class="o">+</span> <span class="n">mij</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">rotmesh_phi</span><span class="p">)</span>
+
+            <span class="n">final</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="n">displ_3</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">fac_1</span>
+            <span class="n">final</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">displ_3</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">fac_2</span>
+            <span class="n">final</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">+=</span> <span class="n">displ_3</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">fac_1</span>
+
+            <span class="n">fac_1</span> <span class="o">=</span> <span class="p">(</span><span class="n">mij</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">mij</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">rotmesh_phi</span><span class="p">)</span> \
+                <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">mij</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">rotmesh_phi</span><span class="p">)</span>
+            <span class="n">fac_2</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">mij</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">mij</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">rotmesh_phi</span><span class="p">)</span> \
+                <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">mij</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">rotmesh_phi</span><span class="p">)</span>
+
+            <span class="n">final</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="n">displ_4</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">fac_1</span>
+            <span class="n">final</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">displ_4</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">fac_2</span>
+            <span class="n">final</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">+=</span> <span class="n">displ_4</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">fac_1</span>
+
+            <span class="n">rotmesh_colat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">rotmesh_s</span><span class="p">,</span> <span class="n">rotmesh_z</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="s">&quot;T&quot;</span> <span class="ow">in</span> <span class="n">components</span><span class="p">:</span>
+                <span class="c"># need the - for consistency with reciprocal mode,</span>
+                <span class="c"># need external verification still</span>
+                <span class="n">data</span><span class="p">[</span><span class="s">&quot;T&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">final</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="s">&quot;R&quot;</span> <span class="ow">in</span> <span class="n">components</span><span class="p">:</span>
+                <span class="n">data</span><span class="p">[</span><span class="s">&quot;R&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">final</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">rotmesh_colat</span><span class="p">)</span> \
+                    <span class="o">-</span> <span class="n">final</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">rotmesh_colat</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="s">&quot;N&quot;</span> <span class="ow">in</span> <span class="n">components</span> <span class="ow">or</span> <span class="s">&quot;E&quot;</span> <span class="ow">in</span> <span class="n">components</span> <span class="ow">or</span> <span class="s">&quot;Z&quot;</span> <span class="ow">in</span> <span class="n">components</span><span class="p">:</span>
+                <span class="c"># transpose needed because rotations assume different slicing</span>
+                <span class="c"># (ugly)</span>
+                <span class="n">final</span> <span class="o">=</span> <span class="n">rotations</span><span class="o">.</span><span class="n">rotate_vector_src_to_NEZ</span><span class="p">(</span>
+                    <span class="n">final</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">rotmesh_phi</span><span class="p">,</span>
+                    <span class="n">source</span><span class="o">.</span><span class="n">longitude_rad</span><span class="p">,</span> <span class="n">source</span><span class="o">.</span><span class="n">colatitude_rad</span><span class="p">,</span>
+                    <span class="n">receiver</span><span class="o">.</span><span class="n">longitude_rad</span><span class="p">,</span> <span class="n">receiver</span><span class="o">.</span><span class="n">colatitude_rad</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+
+                <span class="k">if</span> <span class="s">&quot;N&quot;</span> <span class="ow">in</span> <span class="n">components</span><span class="p">:</span>
+                    <span class="n">data</span><span class="p">[</span><span class="s">&quot;N&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">final</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+                <span class="k">if</span> <span class="s">&quot;E&quot;</span> <span class="ow">in</span> <span class="n">components</span><span class="p">:</span>
+                    <span class="n">data</span><span class="p">[</span><span class="s">&quot;E&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">final</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+                <span class="k">if</span> <span class="s">&quot;Z&quot;</span> <span class="ow">in</span> <span class="n">components</span><span class="p">:</span>
+                    <span class="n">data</span><span class="p">[</span><span class="s">&quot;Z&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">final</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">components</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">remove_source_shift</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">reconvolve_stf</span><span class="p">:</span>
+                <span class="n">data</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">comp</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">source_shift_samp</span><span class="p">:]</span>
+            <span class="k">elif</span> <span class="n">reconvolve_stf</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">source</span><span class="o">.</span><span class="n">dt</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">source</span><span class="o">.</span><span class="n">sliprate</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&quot;source has no source time function&quot;</span><span class="p">)</span>
+
+                <span class="n">stf_deconv_f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfft</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nfft</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="nb">abs</span><span class="p">((</span><span class="n">source</span><span class="o">.</span><span class="n">dt</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1e-7</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;dt of the source not compatible&quot;</span><span class="p">)</span>
+
+                <span class="n">stf_conv_f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfft</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">sliprate</span><span class="p">,</span>
+                                         <span class="n">n</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nfft</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">source</span><span class="o">.</span><span class="n">time_shift</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="n">stf_conv_f</span> <span class="o">*=</span> \
+                        <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span> <span class="mi">1j</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfftfreq</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nfft</span><span class="p">)</span>
+                               <span class="o">*</span> <span class="mf">2.</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">source</span><span class="o">.</span><span class="n">time_shift</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
+
+                <span class="c"># TODO: double check wether a taper is needed at the end of the</span>
+                <span class="c">#       trace</span>
+                <span class="n">dataf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfft</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">comp</span><span class="p">],</span> <span class="n">n</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nfft</span><span class="p">)</span>
+
+                <span class="n">data</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">irfft</span><span class="p">(</span>
+                    <span class="n">dataf</span> <span class="o">*</span> <span class="n">stf_conv_f</span> <span class="o">/</span> <span class="n">stf_deconv_f</span><span class="p">)[:</span><span class="bp">self</span><span class="o">.</span><span class="n">ndumps</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">dt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">data</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">=</span> <span class="n">lanczos</span><span class="o">.</span><span class="n">lanczos_resamp</span><span class="p">(</span>
+                    <span class="n">data</span><span class="p">[</span><span class="n">comp</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">a_lanczos</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">return_obspy_stream</span><span class="p">:</span>
+            <span class="c"># Convert to an ObsPy Stream object.</span>
+            <span class="n">st</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">dt</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">dt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">dt</span>
+            <span class="n">band_code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_band_code</span><span class="p">(</span><span class="n">dt</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">components</span><span class="p">:</span>
+                <span class="n">tr</span> <span class="o">=</span> <span class="n">Trace</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="n">comp</span><span class="p">],</span>
+                           <span class="n">header</span><span class="o">=</span><span class="p">{</span><span class="s">&quot;delta&quot;</span><span class="p">:</span> <span class="n">dt</span><span class="p">,</span>
+                                   <span class="s">&quot;station&quot;</span><span class="p">:</span> <span class="n">receiver</span><span class="o">.</span><span class="n">station</span><span class="p">,</span>
+                                   <span class="s">&quot;network&quot;</span><span class="p">:</span> <span class="n">receiver</span><span class="o">.</span><span class="n">network</span><span class="p">,</span>
+                                   <span class="s">&quot;channel&quot;</span><span class="p">:</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">X</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">band_code</span><span class="p">,</span> <span class="n">comp</span><span class="p">)})</span>
+                <span class="n">st</span> <span class="o">+=</span> <span class="n">tr</span>
+            <span class="k">return</span> <span class="n">st</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">npol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">npol</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_on_demand</span><span class="p">:</span>
+                <span class="n">mu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">mesh_mu</span><span class="p">[</span><span class="n">gll_point_ids</span><span class="p">[</span><span class="n">npol</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">npol</span><span class="o">/</span><span class="mi">2</span><span class="p">]]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">mu</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s">&quot;mesh_mu&quot;</span><span class="p">][</span><span class="n">gll_point_ids</span><span class="p">[</span><span class="n">npol</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">npol</span><span class="o">/</span><span class="mi">2</span><span class="p">]]</span>
+            <span class="k">return</span> <span class="n">data</span><span class="p">,</span> <span class="n">mu</span>
+</div>
+<div class="viewcode-block" id="InstaSeisDB.get_seismograms_finite_source"><a class="viewcode-back" href="../../instaseis.html#instaseis.instaseisdb.InstaSeisDB.get_seismograms_finite_source">[docs]</a>    <span class="k">def</span> <span class="nf">get_seismograms_finite_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sources</span><span class="p">,</span> <span class="n">receiver</span><span class="p">,</span>
+                                      <span class="n">components</span><span class="o">=</span><span class="p">(</span><span class="s">&quot;Z&quot;</span><span class="p">,</span> <span class="s">&quot;N&quot;</span><span class="p">,</span> <span class="s">&quot;E&quot;</span><span class="p">),</span> <span class="n">dt</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                                      <span class="n">a_lanczos</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extract seismograms for a finite source from the AxiSEM database</span>
+<span class="sd">        provided as a list of point sources attached with source time functions</span>
+<span class="sd">        and time shifts.</span>
+
+<span class="sd">        :param sources: A collection of point sources.</span>
+<span class="sd">        :type sources: list of :class:`instaseis.source.Source` objects</span>
+<span class="sd">        :param receiver: The receiver location.</span>
+<span class="sd">        :type receiver: :class:`instaseis.source.Receiver`</span>
+<span class="sd">        :param components: a tuple containing any combination of the strings</span>
+<span class="sd">            ``&quot;Z&quot;``, ``&quot;N&quot;``, and ``&quot;E&quot;``</span>
+<span class="sd">        :param dt: desired sampling of the seismograms.resampling is done</span>
+<span class="sd">            using a lanczos kernel</span>
+<span class="sd">        :param a_lanczos: width of the kernel used in resampling</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">reciprocal</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+        <span class="n">data_summed</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">source</span> <span class="ow">in</span> <span class="n">sources</span><span class="p">:</span>
+            <span class="n">data</span><span class="p">,</span> <span class="n">mu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_seismograms</span><span class="p">(</span>
+                <span class="n">source</span><span class="p">,</span> <span class="n">receiver</span><span class="p">,</span> <span class="n">components</span><span class="p">,</span> <span class="n">reconvolve_stf</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                <span class="n">return_obspy_stream</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">components</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">data_summed</span><span class="p">:</span>
+                    <span class="n">data_summed</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">+=</span> <span class="n">data</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">*</span> <span class="n">mu</span> <span class="o">/</span> <span class="n">DEFAULT_MU</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">data_summed</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">*</span> <span class="n">mu</span> <span class="o">/</span> <span class="n">DEFAULT_MU</span>
+
+        <span class="k">if</span> <span class="n">dt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">components</span><span class="p">:</span>
+                <span class="n">data_summed</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">=</span> <span class="n">lanczos</span><span class="o">.</span><span class="n">lanczos_resamp</span><span class="p">(</span>
+                    <span class="n">data_summed</span><span class="p">[</span><span class="n">comp</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">a_lanczos</span><span class="p">)</span>
+
+        <span class="c"># Convert to an ObsPy Stream object.</span>
+        <span class="n">st</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">dt</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">dt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">dt</span>
+        <span class="n">band_code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_band_code</span><span class="p">(</span><span class="n">dt</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">components</span><span class="p">:</span>
+            <span class="n">tr</span> <span class="o">=</span> <span class="n">Trace</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data_summed</span><span class="p">[</span><span class="n">comp</span><span class="p">],</span>
+                       <span class="n">header</span><span class="o">=</span><span class="p">{</span><span class="s">&quot;delta&quot;</span><span class="p">:</span> <span class="n">dt</span><span class="p">,</span>
+                               <span class="s">&quot;station&quot;</span><span class="p">:</span> <span class="n">receiver</span><span class="o">.</span><span class="n">station</span><span class="p">,</span>
+                               <span class="s">&quot;network&quot;</span><span class="p">:</span> <span class="n">receiver</span><span class="o">.</span><span class="n">network</span><span class="p">,</span>
+                               <span class="s">&quot;channel&quot;</span><span class="p">:</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">X</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">band_code</span><span class="p">,</span> <span class="n">comp</span><span class="p">)})</span>
+            <span class="n">st</span> <span class="o">+=</span> <span class="n">tr</span>
+        <span class="k">return</span> <span class="n">st</span>
+</div>
+    <span class="k">def</span> <span class="nf">_get_band_code</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Figure out the channel band code. Done as in SPECFEM.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sr</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">dt</span>
+        <span class="k">if</span> <span class="n">sr</span> <span class="o">&lt;=</span> <span class="mf">0.001</span><span class="p">:</span>
+            <span class="n">band_code</span> <span class="o">=</span> <span class="s">&quot;F&quot;</span>
+        <span class="k">elif</span> <span class="n">sr</span> <span class="o">&lt;=</span> <span class="mf">0.004</span><span class="p">:</span>
+            <span class="n">band_code</span> <span class="o">=</span> <span class="s">&quot;C&quot;</span>
+        <span class="k">elif</span> <span class="n">sr</span> <span class="o">&lt;=</span> <span class="mf">0.0125</span><span class="p">:</span>
+            <span class="n">band_code</span> <span class="o">=</span> <span class="s">&quot;H&quot;</span>
+        <span class="k">elif</span> <span class="n">sr</span> <span class="o">&lt;=</span> <span class="mf">0.1</span><span class="p">:</span>
+            <span class="n">band_code</span> <span class="o">=</span> <span class="s">&quot;B&quot;</span>
+        <span class="k">elif</span> <span class="n">sr</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">band_code</span> <span class="o">=</span> <span class="s">&quot;M&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">band_code</span> <span class="o">=</span> <span class="s">&quot;L&quot;</span>
+        <span class="k">return</span> <span class="n">band_code</span>
+
+    <span class="k">def</span> <span class="nf">__get_strain_interp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mesh</span><span class="p">,</span> <span class="n">id_elem</span><span class="p">,</span> <span class="n">gll_point_ids</span><span class="p">,</span> <span class="n">G</span><span class="p">,</span> <span class="n">GT</span><span class="p">,</span>
+                            <span class="n">col_points_xi</span><span class="p">,</span> <span class="n">col_points_eta</span><span class="p">,</span> <span class="n">corner_points</span><span class="p">,</span>
+                            <span class="n">eltype</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">xi</span><span class="p">,</span> <span class="n">eta</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">id_elem</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mesh</span><span class="o">.</span><span class="n">strain_buffer</span><span class="p">:</span>
+            <span class="c"># Single precision in the NetCDF files but the later interpolation</span>
+            <span class="c"># routines require double precision. Assignment to this array will</span>
+            <span class="c"># force a cast.</span>
+            <span class="n">utemp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">mesh</span><span class="o">.</span><span class="n">ndumps</span><span class="p">,</span> <span class="n">mesh</span><span class="o">.</span><span class="n">npol</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">mesh</span><span class="o">.</span><span class="n">npol</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+                             <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s">&quot;F&quot;</span><span class="p">)</span>
+
+            <span class="n">mesh_dict</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">groups</span><span class="p">[</span><span class="s">&quot;Snapshots&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">variables</span>
+
+            <span class="c"># Load displacement from all GLL points.</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">var</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">([</span><span class="s">&quot;disp_s&quot;</span><span class="p">,</span> <span class="s">&quot;disp_p&quot;</span><span class="p">,</span> <span class="s">&quot;disp_z&quot;</span><span class="p">]):</span>
+                <span class="k">if</span> <span class="n">var</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mesh_dict</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">temp</span> <span class="o">=</span> <span class="n">mesh_dict</span><span class="p">[</span><span class="n">var</span><span class="p">][:,</span> <span class="n">gll_point_ids</span><span class="o">.</span><span class="n">flatten</span><span class="p">()]</span>
+                <span class="k">for</span> <span class="n">ipol</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">mesh</span><span class="o">.</span><span class="n">npol</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                    <span class="k">for</span> <span class="n">jpol</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">mesh</span><span class="o">.</span><span class="n">npol</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                        <span class="n">utemp</span><span class="p">[:,</span> <span class="n">jpol</span><span class="p">,</span> <span class="n">ipol</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp</span><span class="p">[:,</span> <span class="n">ipol</span> <span class="o">*</span> <span class="mi">5</span> <span class="o">+</span> <span class="n">jpol</span><span class="p">]</span>
+
+            <span class="n">strain_fct_map</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s">&quot;monopole&quot;</span><span class="p">:</span> <span class="n">sem_derivatives</span><span class="o">.</span><span class="n">strain_monopole_td</span><span class="p">,</span>
+                <span class="s">&quot;dipole&quot;</span><span class="p">:</span> <span class="n">sem_derivatives</span><span class="o">.</span><span class="n">strain_dipole_td</span><span class="p">,</span>
+                <span class="s">&quot;quadpole&quot;</span><span class="p">:</span> <span class="n">sem_derivatives</span><span class="o">.</span><span class="n">strain_quadpole_td</span><span class="p">}</span>
+
+            <span class="n">strain</span> <span class="o">=</span> <span class="n">strain_fct_map</span><span class="p">[</span><span class="n">mesh</span><span class="o">.</span><span class="n">excitation_type</span><span class="p">](</span>
+                <span class="n">utemp</span><span class="p">,</span> <span class="n">G</span><span class="p">,</span> <span class="n">GT</span><span class="p">,</span> <span class="n">col_points_xi</span><span class="p">,</span> <span class="n">col_points_eta</span><span class="p">,</span> <span class="n">mesh</span><span class="o">.</span><span class="n">npol</span><span class="p">,</span>
+                <span class="n">mesh</span><span class="o">.</span><span class="n">ndumps</span><span class="p">,</span> <span class="n">corner_points</span><span class="p">,</span> <span class="n">eltype</span><span class="p">,</span> <span class="n">axis</span><span class="p">)</span>
+
+            <span class="n">mesh</span><span class="o">.</span><span class="n">strain_buffer</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">id_elem</span><span class="p">,</span> <span class="n">strain</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">strain</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">strain_buffer</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">id_elem</span><span class="p">)</span>
+
+        <span class="n">final_strain</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">strain</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">6</span><span class="p">),</span> <span class="n">order</span><span class="o">=</span><span class="s">&quot;F&quot;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">6</span><span class="p">):</span>
+            <span class="n">final_strain</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">spectral_basis</span><span class="o">.</span><span class="n">lagrange_interpol_2D_td</span><span class="p">(</span>
+                <span class="n">col_points_xi</span><span class="p">,</span> <span class="n">col_points_eta</span><span class="p">,</span> <span class="n">strain</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="n">i</span><span class="p">],</span> <span class="n">xi</span><span class="p">,</span> <span class="n">eta</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">mesh</span><span class="o">.</span><span class="n">excitation_type</span> <span class="o">==</span> <span class="s">&quot;monopole&quot;</span><span class="p">:</span>
+            <span class="n">final_strain</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">*=</span> <span class="o">-</span><span class="mf">1.0</span>
+            <span class="n">final_strain</span><span class="p">[:,</span> <span class="mi">5</span><span class="p">]</span> <span class="o">*=</span> <span class="o">-</span><span class="mf">1.0</span>
+
+        <span class="k">return</span> <span class="n">final_strain</span>
+
+    <span class="k">def</span> <span class="nf">__get_strain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mesh</span><span class="p">,</span> <span class="n">id_elem</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">id_elem</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mesh</span><span class="o">.</span><span class="n">strain_buffer</span><span class="p">:</span>
+            <span class="n">strain_temp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">ndumps</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">order</span><span class="o">=</span><span class="s">&quot;F&quot;</span><span class="p">)</span>
+
+            <span class="n">mesh_dict</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">groups</span><span class="p">[</span><span class="s">&quot;Snapshots&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">variables</span>
+
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">var</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">([</span>
+                    <span class="s">&#39;strain_dsus&#39;</span><span class="p">,</span> <span class="s">&#39;strain_dsuz&#39;</span><span class="p">,</span> <span class="s">&#39;strain_dpup&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;strain_dsup&#39;</span><span class="p">,</span> <span class="s">&#39;strain_dzup&#39;</span><span class="p">,</span> <span class="s">&#39;straintrace&#39;</span><span class="p">]):</span>
+                <span class="k">if</span> <span class="n">var</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mesh_dict</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">strain_temp</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh_dict</span><span class="p">[</span><span class="n">var</span><span class="p">][:,</span> <span class="n">id_elem</span><span class="p">]</span>
+
+            <span class="c"># transform strain to voigt mapping</span>
+            <span class="c"># dsus, dpup, dzuz, dzup, dsuz, dsup</span>
+            <span class="n">final_strain</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">ndumps</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">order</span><span class="o">=</span><span class="s">&quot;F&quot;</span><span class="p">)</span>
+            <span class="n">final_strain</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">strain_temp</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="n">final_strain</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">strain_temp</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span>
+            <span class="n">final_strain</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">strain_temp</span><span class="p">[:,</span> <span class="mi">5</span><span class="p">]</span> <span class="o">-</span> <span class="n">strain_temp</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+                                  <span class="o">-</span> <span class="n">strain_temp</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">])</span>
+            <span class="n">final_strain</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">strain_temp</span><span class="p">[:,</span> <span class="mi">4</span><span class="p">]</span>
+            <span class="n">final_strain</span><span class="p">[:,</span> <span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="n">strain_temp</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="n">final_strain</span><span class="p">[:,</span> <span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">strain_temp</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">]</span>
+            <span class="n">mesh</span><span class="o">.</span><span class="n">strain_buffer</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">id_elem</span><span class="p">,</span> <span class="n">final_strain</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">final_strain</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">strain_buffer</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">id_elem</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">final_strain</span>
+
+    <span class="k">def</span> <span class="nf">__get_displacement</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mesh</span><span class="p">,</span> <span class="n">id_elem</span><span class="p">,</span> <span class="n">gll_point_ids</span><span class="p">,</span> <span class="n">col_points_xi</span><span class="p">,</span>
+                           <span class="n">col_points_eta</span><span class="p">,</span> <span class="n">xi</span><span class="p">,</span> <span class="n">eta</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">id_elem</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mesh</span><span class="o">.</span><span class="n">displ_buffer</span><span class="p">:</span>
+            <span class="n">utemp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">mesh</span><span class="o">.</span><span class="n">ndumps</span><span class="p">,</span> <span class="n">mesh</span><span class="o">.</span><span class="n">npol</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">mesh</span><span class="o">.</span><span class="n">npol</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+                             <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s">&quot;F&quot;</span><span class="p">)</span>
+
+            <span class="n">mesh_dict</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">groups</span><span class="p">[</span><span class="s">&quot;Snapshots&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">variables</span>
+
+            <span class="c"># Load displacement from all GLL points.</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">var</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">([</span><span class="s">&quot;disp_s&quot;</span><span class="p">,</span> <span class="s">&quot;disp_p&quot;</span><span class="p">,</span> <span class="s">&quot;disp_z&quot;</span><span class="p">]):</span>
+                <span class="k">if</span> <span class="n">var</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mesh_dict</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">temp</span> <span class="o">=</span> <span class="n">mesh_dict</span><span class="p">[</span><span class="n">var</span><span class="p">][:,</span> <span class="n">gll_point_ids</span><span class="o">.</span><span class="n">flatten</span><span class="p">()]</span>
+                <span class="k">for</span> <span class="n">ipol</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">mesh</span><span class="o">.</span><span class="n">npol</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                    <span class="k">for</span> <span class="n">jpol</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">mesh</span><span class="o">.</span><span class="n">npol</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                        <span class="n">utemp</span><span class="p">[:,</span> <span class="n">jpol</span><span class="p">,</span> <span class="n">ipol</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp</span><span class="p">[:,</span> <span class="n">ipol</span> <span class="o">*</span> <span class="mi">5</span> <span class="o">+</span> <span class="n">jpol</span><span class="p">]</span>
+
+            <span class="n">mesh</span><span class="o">.</span><span class="n">displ_buffer</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">id_elem</span><span class="p">,</span> <span class="n">utemp</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">utemp</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">displ_buffer</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">id_elem</span><span class="p">)</span>
+
+        <span class="n">final_displacement</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">utemp</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">3</span><span class="p">),</span> <span class="n">order</span><span class="o">=</span><span class="s">&quot;F&quot;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+            <span class="n">final_displacement</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">spectral_basis</span><span class="o">.</span><span class="n">lagrange_interpol_2D_td</span><span class="p">(</span>
+                <span class="n">col_points_xi</span><span class="p">,</span> <span class="n">col_points_eta</span><span class="p">,</span> <span class="n">utemp</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="n">i</span><span class="p">],</span> <span class="n">xi</span><span class="p">,</span> <span class="n">eta</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">final_displacement</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">dt</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">dt</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ndumps</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">ndumps</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">background_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">background_model</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">attenuation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">attenuation</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sliprate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">stf_d_norm</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">slip</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">stf</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reciprocal</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">meshes</span><span class="o">.</span><span class="n">pz</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">meshes</span><span class="o">.</span><span class="n">px</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">components</span> <span class="o">=</span> <span class="s">&#39;vertical and horizontal&#39;</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">meshes</span><span class="o">.</span><span class="n">pz</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">meshes</span><span class="o">.</span><span class="n">px</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">components</span> <span class="o">=</span> <span class="s">&#39;horizontal only&#39;</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">meshes</span><span class="o">.</span><span class="n">pz</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">meshes</span><span class="o">.</span><span class="n">px</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">components</span> <span class="o">=</span> <span class="s">&#39;vertical only&#39;</span>
+
+            <span class="n">return_str</span> <span class="o">=</span> <span class="s">&quot;AxiSEM reciprocal Green&#39;s function Database</span><span class="se">\n</span><span class="s">&quot;</span>
+            <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&quot;generated with these parameters:</span><span class="se">\n</span><span class="s">&quot;</span>
+            <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;components            : </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">components</span><span class="p">,)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">return_str</span> <span class="o">=</span> <span class="s">&quot;AxiSEM forward Green&#39;s function Database</span><span class="se">\n</span><span class="s">&quot;</span>
+            <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&quot;generated with these parameters:</span><span class="se">\n</span><span class="s">&quot;</span>
+            <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;source depth          : </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> \
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">source_depth</span><span class="p">,)</span>
+
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;velocity model        : </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">background_model</span><span class="p">,)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;attenuation           : </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">attenuation</span><span class="p">,)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;dominant period       : </span><span class="si">%6.3f</span><span class="s"> s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> \
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">dominant_period</span><span class="p">,)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;dump type             : </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dump_type</span><span class="p">,)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;time step             : </span><span class="si">%6.3f</span><span class="s"> s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">,)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;sampling rate         : </span><span class="si">%6.3f</span><span class="s"> Hz</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">,)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;number of samples     : </span><span class="si">%6i</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ndumps</span><span class="p">,)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;seismogram length     : </span><span class="si">%6.1f</span><span class="s"> s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> \
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ndumps</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;source time function  : </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> \
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">stf</span><span class="p">,)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;source shift          : </span><span class="si">%6.3f</span><span class="s"> s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> \
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">source_shift</span><span class="p">,)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;spatial order         : </span><span class="si">%6i</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> \
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">npol</span><span class="p">,)</span>
+
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;min/max radius [km]   : </span><span class="si">%6.1f</span><span class="s"> </span><span class="si">%6.1f</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> \
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">kwf_rmin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">kwf_rmax</span><span class="p">)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;min/max dist [degree] : </span><span class="si">%6.1f</span><span class="s"> </span><span class="si">%6.1f</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> \
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">kwf_colatmin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">kwf_colatmax</span><span class="p">)</span>
+
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;time scheme           : </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> \
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">time_scheme</span><span class="p">,)</span>
+
+        <span class="k">return</span> <span class="n">return_str</span></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2014, Lion Krischer and Martin van Driel.<br/>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2.3.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

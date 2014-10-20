@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Python Interface to AxiSEM’s netCDF Databases &mdash; instaseis 0.0.1a documentation</title>
+    
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootswatch-3.2.0/united/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.0.1a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.2.0/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="instaseis 0.0.1a documentation" href="#" />
+    <link rel="next" title="InstaSeisDB" href="instaseis.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#">
+          instaseis</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.1a</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            <li class="divider-vertical"></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="instaseis.html">InstaSeisDB</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mesh.html">Meshes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="source.html">Sources and Receivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="srf.html">Standard Rupture Format</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">Python Interface to AxiSEM&#8217;s netCDF Databases</a><ul>
+<li><a class="reference internal" href="#requirements">Requirements</a></li>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#testing">Testing</a></li>
+<li><a class="reference internal" href="#build-the-documentation">Build the Documentation</a></li>
+<li><a class="reference internal" href="#usage">Usage</a></li>
+<li><a class="reference internal" href="#gui">GUI</a></li>
+<li><a class="reference internal" href="#detailed-documentation">Detailed Documentation</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+  <li>
+    <a href="instaseis.html" title="Next Chapter: InstaSeisDB"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm">InstaSeisDB &raquo;</span>
+    </a>
+  </li>
+              
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="_sources/index.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      
+  <div class="section" id="python-interface-to-axisem-s-netcdf-databases">
+<h1>Python Interface to AxiSEM&#8217;s netCDF Databases<a class="headerlink" href="#python-interface-to-axisem-s-netcdf-databases" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>gfortran &gt;= 4.7</li>
+</ul>
+<p>It has only been tested with Python 2.7 and requires the following Python modules:</p>
+<ul class="simple">
+<li>netCDF4</li>
+<li>ObsPy</li>
+<li>numpy</li>
+</ul>
+<p>The experimental GUI furthermore requires</p>
+<ul class="simple">
+<li>PyQt4</li>
+<li>pyqtgraph</li>
+<li>matplolitb</li>
+<li>basemap</li>
+</ul>
+<p>If you are new to Python, first make sure to have a Fortran compiler. On Linux just run</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>sudo apt-get install gfortran
+</pre></div>
+</div>
+<p>or the equivalent of your distribution. On OSX I recommend to install <a class="reference external" href="http://brew.sh/">Homebrew</a> and then type</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>brew install gcc
+</pre></div>
+</div>
+<p>Finally download <a class="reference external" href="https://store.continuum.io/cshop/anaconda/">Anaconda</a> for Python version 2.7 and finish the installation of the requirements with</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>pip install obspy
+<span class="nv">$ </span>pip install pyqtgraph
+<span class="nv">$ </span>conda install basemap
+</pre></div>
+</div>
+</div>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>Install it by cloning the git repository and installing with an editable installation. The Makefile currently has to be executed to build the shared library until a proper installation routine has been written.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>git clone https://github.com/krischer/instaseis.git
+<span class="nv">$ </span><span class="nb">cd </span>instaseis
+<span class="nv">$ </span>pip install -v -e .
+<span class="nv">$ </span><span class="nb">cd </span>instaseis
+<span class="nv">$ </span>make
+</pre></div>
+</div>
+</div>
+<div class="section" id="testing">
+<h2>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h2>
+<p>Testing right now is fairly minimal and machine dependent...</p>
+<p>To test, make sure pytest is installed</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>pip install pytest
+</pre></div>
+</div>
+<p>and execute</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>py.test
+</pre></div>
+</div>
+<p>in the modules source code directory. The command will discover and execute all
+defined tests.</p>
+</div>
+<div class="section" id="build-the-documentation">
+<h2>Build the Documentation<a class="headerlink" href="#build-the-documentation" title="Permalink to this headline">¶</a></h2>
+<p>The documentation requires sphinx and the Bootstrap theme. Install both with</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>pip install sphinx sphinx-bootstrap-theme
+</pre></div>
+</div>
+<p>Build the doc with</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span><span class="nb">cd </span>doc
+<span class="nv">$ </span>make html
+</pre></div>
+</div>
+<p>Finally open the <tt class="docutils literal"><span class="pre">doc/_build/html/index.html</span></tt> file with the browser of your
+choice or host it somewhere.</p>
+</div>
+<div class="section" id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>Use it by creating an <tt class="xref py py-class docutils literal"><span class="pre">InstaSeisDB</span></tt> object which needs
+to know the path to the output folder containing the netCDF files from an
+AxiSEM run. All information is determined from the netCDF files so no other
+files have to be present.</p>
+<p>Then a source and receiver pair is defined. The moment tensor components are in
+<tt class="docutils literal"><span class="pre">N</span> <span class="pre">m</span></tt>. Lastly the <tt class="xref py py-meth docutils literal"><span class="pre">get_seismograms()</span></tt>
+method is called which by default returns a three component ObsPy
+<a class="reference external" href="http://docs.obspy.org/packages/autogen/obspy.core.stream.Stream.html#obspy.core.stream.Stream" title="(in ObsPy Documentation (0.9.2) v0.9)"><tt class="xref py py-class docutils literal"><span class="pre">Stream</span></tt></a> object with the waveform data. This can then
+be used process and save the data in any format supported by ObsPy.</p>
+<p>The initialization of an <tt class="xref py py-class docutils literal"><span class="pre">InstaSeisDB</span></tt> object is the
+most expensive part so make sure to do it only once if possible.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="kn">from</span> <span class="nn">instaseis</span> <span class="kn">import</span> <span class="n">InstaSeisDB</span><span class="p">,</span> <span class="n">Source</span><span class="p">,</span> <span class="n">Receiver</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="n">db</span> <span class="o">=</span> <span class="n">InstaSeisDB</span><span class="p">(</span><span class="s">&quot;./prem50s_forces&quot;</span><span class="p">)</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">3</span><span class="p">]:</span> <span class="n">receiver</span> <span class="o">=</span> <span class="n">Receiver</span><span class="p">(</span><span class="n">latitude</span><span class="o">=</span><span class="mf">42.6390</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="mf">74.4940</span><span class="p">)</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">4</span><span class="p">]:</span> <span class="n">source</span> <span class="o">=</span> <span class="n">Source</span><span class="p">(</span>
+   <span class="o">...</span><span class="p">:</span>     <span class="n">latitude</span><span class="o">=</span><span class="mf">89.91</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">depth_in_m</span><span class="o">=</span><span class="mi">12000</span><span class="p">,</span>
+   <span class="o">...</span><span class="p">:</span>     <span class="n">m_rr</span> <span class="o">=</span> <span class="mf">4.710000e+24</span> <span class="o">/</span> <span class="mf">1E7</span><span class="p">,</span>
+   <span class="o">...</span><span class="p">:</span>     <span class="n">m_tt</span> <span class="o">=</span> <span class="mf">3.810000e+22</span> <span class="o">/</span> <span class="mf">1E7</span><span class="p">,</span>
+   <span class="o">...</span><span class="p">:</span>     <span class="n">m_pp</span> <span class="o">=-</span><span class="mf">4.740000e+24</span> <span class="o">/</span> <span class="mf">1E7</span><span class="p">,</span>
+   <span class="o">...</span><span class="p">:</span>     <span class="n">m_rt</span> <span class="o">=</span> <span class="mf">3.990000e+23</span> <span class="o">/</span> <span class="mf">1E7</span><span class="p">,</span>
+   <span class="o">...</span><span class="p">:</span>     <span class="n">m_rp</span> <span class="o">=-</span><span class="mf">8.050000e+23</span> <span class="o">/</span> <span class="mf">1E7</span><span class="p">,</span>
+   <span class="o">...</span><span class="p">:</span>     <span class="n">m_tp</span> <span class="o">=-</span><span class="mf">1.230000e+24</span> <span class="o">/</span> <span class="mf">1E7</span><span class="p">)</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">5</span><span class="p">]:</span> <span class="n">st</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_seismograms</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">receiver</span><span class="o">=</span><span class="n">receiver</span><span class="p">)</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">6</span><span class="p">]:</span> <span class="k">print</span> <span class="n">st</span>
+<span class="mi">3</span> <span class="n">Trace</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="ow">in</span> <span class="n">Stream</span><span class="p">:</span>
+<span class="o">...</span><span class="n">BXZ</span> <span class="o">|</span> <span class="mi">1970</span><span class="o">-</span><span class="mo">01</span><span class="o">-</span><span class="mo">01</span><span class="n">T00</span><span class="p">:</span><span class="mo">00</span><span class="p">:</span><span class="mf">00.000000</span><span class="n">Z</span> <span class="o">-</span> <span class="o">...</span> <span class="o">|</span> <span class="mf">12.5</span> <span class="n">s</span><span class="p">,</span> <span class="mi">144</span> <span class="n">samples</span>
+<span class="o">...</span><span class="n">BXN</span> <span class="o">|</span> <span class="mi">1970</span><span class="o">-</span><span class="mo">01</span><span class="o">-</span><span class="mo">01</span><span class="n">T00</span><span class="p">:</span><span class="mo">00</span><span class="p">:</span><span class="mf">00.000000</span><span class="n">Z</span> <span class="o">-</span> <span class="o">...</span> <span class="o">|</span> <span class="mf">12.5</span> <span class="n">s</span><span class="p">,</span> <span class="mi">144</span> <span class="n">samples</span>
+<span class="o">...</span><span class="n">BXE</span> <span class="o">|</span> <span class="mi">1970</span><span class="o">-</span><span class="mo">01</span><span class="o">-</span><span class="mo">01</span><span class="n">T00</span><span class="p">:</span><span class="mo">00</span><span class="p">:</span><span class="mf">00.000000</span><span class="n">Z</span> <span class="o">-</span> <span class="o">...</span> <span class="o">|</span> <span class="mf">12.5</span> <span class="n">s</span><span class="p">,</span> <span class="mi">144</span> <span class="n">samples</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="gui">
+<h2>GUI<a class="headerlink" href="#gui" title="Permalink to this headline">¶</a></h2>
+<p>The GUI is just an experimental feature and will likely crash for some reason. To try it, just execute the correct file</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>python instaseis/experimental_gui/instaseis_gui.py
+</pre></div>
+</div>
+<img alt="http://i.imgur.com/FVmua2X.png" src="http://i.imgur.com/FVmua2X.png" />
+</div>
+<div class="section" id="detailed-documentation">
+<h2>Detailed Documentation<a class="headerlink" href="#detailed-documentation" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="instaseis.html">InstaSeisDB</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mesh.html">Meshes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="source.html">Sources and Receivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="srf.html">Standard Rupture Format</a></li>
+</ul>
+</div>
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2014, Lion Krischer and Martin van Driel.<br/>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2.3.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Sources and Receivers &mdash; instaseis 0.0.1a documentation</title>
+    
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootswatch-3.2.0/united/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.0.1a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.2.0/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="instaseis 0.0.1a documentation" href="index.html" />
+    <link rel="next" title="Standard Rupture Format" href="srf.html" />
+    <link rel="prev" title="Meshes" href="mesh.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">
+          instaseis</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.1a</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            <li class="divider-vertical"></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="instaseis.html">InstaSeisDB</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mesh.html">Meshes</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Sources and Receivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="srf.html">Standard Rupture Format</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">Sources and Receivers</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+  <li>
+    <a href="mesh.html" title="Previous Chapter: Meshes"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm">&laquo; Meshes</span>
+    </a>
+  </li>
+  <li>
+    <a href="srf.html" title="Next Chapter: Standard Rupture Format"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm">Standard Rupture... &raquo;</span>
+    </a>
+  </li>
+              
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="_sources/source.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      
+  <div class="section" id="module-instaseis.source">
+<span id="sources-and-receivers"></span><h1>Sources and Receivers<a class="headerlink" href="#module-instaseis.source" title="Permalink to this headline">¶</a></h1>
+<p>Source and Receiver classes used for the AxiSEM DB Python interface.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">copyright:</th><td class="field-body">Lion Krischer (<a class="reference external" href="mailto:krischer&#37;&#52;&#48;geophysik&#46;uni-muenchen&#46;de">krischer<span>&#64;</span>geophysik<span>&#46;</span>uni-muenchen<span>&#46;</span>de</a>), 2014
+Martin van Driel (<a class="reference external" href="mailto:Martin&#37;&#52;&#48;vanDriel&#46;de">Martin<span>&#64;</span>vanDriel<span>&#46;</span>de</a>), 2014</td>
+</tr>
+<tr class="field-even field"><th class="field-name">license:</th><td class="field-body">GNU General Public License, Version 3
+(<a class="reference external" href="http://www.gnu.org/copyleft/gpl.html">http://www.gnu.org/copyleft/gpl.html</a>)</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="instaseis.source.ForceSource">
+<em class="property">class </em><tt class="descclassname">instaseis.source.</tt><tt class="descname">ForceSource</tt><big>(</big><em>latitude</em>, <em>longitude</em>, <em>depth_in_m=None</em>, <em>f_r=0.0</em>, <em>f_t=0.0</em>, <em>f_p=0.0</em><big>)</big><a class="reference internal" href="_modules/instaseis/source.html#ForceSource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.ForceSource" title="Permalink to this definition">¶</a></dt>
+<dd><p>A class to handle a seimic force source.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>latitude</strong> &#8211; latitude of the source in degree</li>
+<li><strong>longitude</strong> &#8211; longitude of the source in degree</li>
+<li><strong>depth_in_m</strong> &#8211; source depth in m</li>
+<li><strong>f_r</strong> &#8211; force components in r, theta, phi in N</li>
+<li><strong>f_t</strong> &#8211; force components in r, theta, phi in N</li>
+<li><strong>f_p</strong> &#8211; force components in r, theta, phi in N</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="instaseis.source.ForceSource.force_rtp">
+<tt class="descname">force_rtp</tt><a class="reference internal" href="_modules/instaseis/source.html#ForceSource.force_rtp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.ForceSource.force_rtp" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of force components in r, theta, phi, coordinates:
+[f_r, f_t, f_p]</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="instaseis.source.ForceSource.force_tpr">
+<tt class="descname">force_tpr</tt><a class="reference internal" href="_modules/instaseis/source.html#ForceSource.force_tpr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.ForceSource.force_tpr" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of force components in theta, phi, r coordinates:
+[f_t, f_p, f_r]</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="instaseis.source.Receiver">
+<em class="property">class </em><tt class="descclassname">instaseis.source.</tt><tt class="descname">Receiver</tt><big>(</big><em>latitude</em>, <em>longitude</em>, <em>network=None</em>, <em>station=None</em>, <em>depth_in_m=None</em><big>)</big><a class="reference internal" href="_modules/instaseis/source.html#Receiver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.Receiver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class dealing with seismic receivers.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>latitude</strong> &#8211; latitude of the source in degree</li>
+<li><strong>longitude</strong> &#8211; longitude of the source in degree</li>
+<li><strong>network</strong> &#8211; network id</li>
+<li><strong>station</strong> &#8211; station id</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="staticmethod">
+<dt id="instaseis.source.Receiver.parse">
+<em class="property">static </em><tt class="descname">parse</tt><big>(</big><em>*args</em>, <em>**kwds</em><big>)</big><a class="reference internal" href="_modules/instaseis/source.html#Receiver.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.Receiver.parse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Attempts to parse anything to a list of Receiver objects. Always
+returns a list, even if it only contains a single element. It is
+meant as a single entry point for receiver information from any source.</p>
+<p>Supports StationXML, the custom STATIONS fileformat, SAC files,
+SEED files, and a number of ObsPy objects. This method can
+furthermore work with anything ObsPy can deal with (filename, URL,
+memory files, ...).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>filename_or_obj</strong> &#8211; Filename/URL/Python object</li>
+<li><strong>network_code</strong> &#8211; Network code needed to parse ObsPy station
+objects. Likely only needed for the recursive part of this method.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">List of <a class="reference internal" href="#instaseis.source.Receiver" title="instaseis.source.Receiver"><tt class="xref py py-class docutils literal"><span class="pre">Receiver</span></tt></a> objects.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="instaseis.source.Source">
+<em class="property">class </em><tt class="descclassname">instaseis.source.</tt><tt class="descname">Source</tt><big>(</big><em>latitude</em>, <em>longitude</em>, <em>depth_in_m=None</em>, <em>m_rr=0.0</em>, <em>m_tt=0.0</em>, <em>m_pp=0.0</em>, <em>m_rt=0.0</em>, <em>m_rp=0.0</em>, <em>m_tp=0.0</em>, <em>time_shift=None</em>, <em>sliprate=None</em>, <em>dt=None</em><big>)</big><a class="reference internal" href="_modules/instaseis/source.html#Source"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.Source" title="Permalink to this definition">¶</a></dt>
+<dd><p>A class to handle a seimic moment tensor source including a source time
+function.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>latitude</strong> &#8211; latitude of the source in degree</li>
+<li><strong>longitude</strong> &#8211; longitude of the source in degree</li>
+<li><strong>depth_in_m</strong> &#8211; source depth in m</li>
+<li><strong>m_rr</strong> &#8211; moment tensor components in r, theta, phi in Nm</li>
+<li><strong>m_tt</strong> &#8211; moment tensor components in r, theta, phi in Nm</li>
+<li><strong>m_pp</strong> &#8211; moment tensor components in r, theta, phi in Nm</li>
+<li><strong>m_rt</strong> &#8211; moment tensor components in r, theta, phi in Nm</li>
+<li><strong>m_rp</strong> &#8211; moment tensor components in r, theta, phi in Nm</li>
+<li><strong>m_tp</strong> &#8211; moment tensor components in r, theta, phi in Nm</li>
+<li><strong>time_shift</strong> &#8211; correction of the origin time in seconds. only
+useful in the context of finite sources</li>
+<li><strong>sliprate</strong> &#8211; normalized source time function (sliprate)</li>
+<li><strong>dt</strong> &#8211; sampling of the source time function</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="classmethod">
+<dt id="instaseis.source.Source.from_CMTSOLUTION_file">
+<em class="property">classmethod </em><tt class="descname">from_CMTSOLUTION_file</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="_modules/instaseis/source.html#Source.from_CMTSOLUTION_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.Source.from_CMTSOLUTION_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize a source object from a CMTSOLUTION file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filename</strong> &#8211; path to the CMTSOLUTION file</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="instaseis.source.Source.from_strike_dip_rake">
+<em class="property">classmethod </em><tt class="descname">from_strike_dip_rake</tt><big>(</big><em>latitude</em>, <em>longitude</em>, <em>depth_in_m</em>, <em>strike</em>, <em>dip</em>, <em>rake</em>, <em>M0</em>, <em>time_shift=None</em>, <em>sliprate=None</em>, <em>dt=None</em><big>)</big><a class="reference internal" href="_modules/instaseis/source.html#Source.from_strike_dip_rake"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.Source.from_strike_dip_rake" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize a source object from a shear source parameterized by strike,
+dip and rake.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>latitude</strong> &#8211; latitude of the source in degree</li>
+<li><strong>longitude</strong> &#8211; longitude of the source in degree</li>
+<li><strong>depth_in_m</strong> &#8211; source depth in m</li>
+<li><strong>strike</strong> &#8211; strike of the fault in degree</li>
+<li><strong>dip</strong> &#8211; dip of the fault in degree</li>
+<li><strong>rake</strong> &#8211; rake of the fault in degree</li>
+<li><strong>M0</strong> &#8211; scalar moment</li>
+<li><strong>time_shift</strong> &#8211; correction of the origin time in seconds. only
+useful in the context of finite sources</li>
+<li><strong>sliprate</strong> &#8211; normalized source time function (sliprate)</li>
+<li><strong>dt</strong> &#8211; sampling of the source time function</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="instaseis.source.Source.resample_sliprate">
+<tt class="descname">resample_sliprate</tt><big>(</big><em>dt</em>, <em>nsamp</em><big>)</big><a class="reference internal" href="_modules/instaseis/source.html#Source.resample_sliprate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.Source.resample_sliprate" title="Permalink to this definition">¶</a></dt>
+<dd><p>For convolution, the sliprate is needed at the sampling of the fields
+in the database. This function resamples the sliprate using linear
+interpolation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>dt</strong> &#8211; desired sampling</li>
+<li><strong>nsamp</strong> &#8211; desired number of samples</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="instaseis.source.Source.set_sliprate">
+<tt class="descname">set_sliprate</tt><big>(</big><em>sliprate</em>, <em>dt</em>, <em>normalize=True</em><big>)</big><a class="reference internal" href="_modules/instaseis/source.html#Source.set_sliprate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.Source.set_sliprate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a source time function (sliprate) to a initialized source object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>sliprate</strong> &#8211; (normalized) sliprate</li>
+<li><strong>dt</strong> &#8211; sampling of the sliprate</li>
+<li><strong>normalize</strong> &#8211; if sliprate is not normalized, set this to true to
+normalize it using trapezoidal rule style integration</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="instaseis.source.Source.tensor">
+<tt class="descname">tensor</tt><a class="reference internal" href="_modules/instaseis/source.html#Source.tensor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.Source.tensor" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of moment tensor components in r, theta, phi coordinates:
+[m_rr, m_tt, m_pp, m_rt, m_rp, m_tp]</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="instaseis.source.Source.tensor_voigt">
+<tt class="descname">tensor_voigt</tt><a class="reference internal" href="_modules/instaseis/source.html#Source.tensor_voigt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.Source.tensor_voigt" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of moment tensor components in theta, phi, r coordinates in Voigt
+notation:
+[m_tt, m_pp, m_rr, m_rp, m_rt, m_tp]</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2014, Lion Krischer and Martin van Driel.<br/>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2.3.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

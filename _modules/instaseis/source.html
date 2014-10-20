@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>instaseis.source &mdash; instaseis 0.0.1a documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/bootswatch-3.2.0/united/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.0.1a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../../_static/bootstrap-3.2.0/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../../_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="instaseis 0.0.1a documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../index.html">
+          instaseis</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.1a</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            <li class="divider-vertical"></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../instaseis.html">InstaSeisDB</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mesh.html">Meshes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../source.html">Sources and Receivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../srf.html">Standard Rupture Format</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+              
+                
+              
+            
+            
+            
+            
+              <li class="hidden-sm"></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      
+  <h1>Source code for instaseis.source</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/env python</span>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Source and Receiver classes used for the AxiSEM DB Python interface.</span>
+
+<span class="sd">:copyright:</span>
+<span class="sd">    Lion Krischer (krischer@geophysik.uni-muenchen.de), 2014</span>
+<span class="sd">    Martin van Driel (Martin@vanDriel.de), 2014</span>
+<span class="sd">:license:</span>
+<span class="sd">    GNU General Public License, Version 3</span>
+<span class="sd">    (http://www.gnu.org/copyleft/gpl.html)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span>
+
+<span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">obspy</span>
+<span class="kn">import</span> <span class="nn">obspy.xseed</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">interp</span>
+
+
+<span class="k">class</span> <span class="nc">ReceiverParseError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+
+<span class="k">def</span> <span class="nf">_purge_duplicates</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Simple decorator removing duplicates in the returned list. Preserves the</span>
+<span class="sd">    order and will remove duplicates occuring later in the list.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nd">@functools.wraps</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">):</span>
+        <span class="n">ret_val</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">)</span>
+        <span class="n">new_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">ret_val</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">new_list</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">new_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">new_list</span>
+    <span class="k">return</span> <span class="n">wrapper</span>
+
+
+<span class="k">class</span> <span class="nc">SourceOrReceiver</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="p">,</span> <span class="n">depth_in_m</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">latitude</span> <span class="o">=</span> <span class="n">latitude</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">longitude</span> <span class="o">=</span> <span class="n">longitude</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">depth_in_m</span> <span class="o">=</span> <span class="n">depth_in_m</span>
+
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">__dict__</span>
+
+    <span class="k">def</span> <span class="nf">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__eq__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">colatitude</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mf">90.0</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">latitude</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">colatitude_rad</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="mf">90.0</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">latitude</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">longitude_rad</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">longitude</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">latitude_rad</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">latitude</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">radius_in_m</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">planet_radius</span><span class="o">=</span><span class="mf">6371e3</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">depth_in_m</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">planet_radius</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">planet_radius</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">depth_in_m</span>
+
+    <span class="k">def</span> <span class="nf">x</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">planet_radius</span><span class="o">=</span><span class="mf">6371e3</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">latitude</span><span class="p">))</span> <span class="o">*</span> \
+            <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">longitude</span><span class="p">))</span> <span class="o">*</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">radius_in_m</span><span class="p">(</span><span class="n">planet_radius</span><span class="o">=</span><span class="n">planet_radius</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">y</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">planet_radius</span><span class="o">=</span><span class="mf">6371e3</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">latitude</span><span class="p">))</span> <span class="o">*</span> \
+            <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">longitude</span><span class="p">))</span> <span class="o">*</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">radius_in_m</span><span class="p">(</span><span class="n">planet_radius</span><span class="o">=</span><span class="n">planet_radius</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">z</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">planet_radius</span><span class="o">=</span><span class="mf">6371e3</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">latitude</span><span class="p">))</span> <span class="o">*</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">radius_in_m</span><span class="p">(</span><span class="n">planet_radius</span><span class="o">=</span><span class="n">planet_radius</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Source"><a class="viewcode-back" href="../../source.html#instaseis.source.Source">[docs]</a><span class="k">class</span> <span class="nc">Source</span><span class="p">(</span><span class="n">SourceOrReceiver</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class to handle a seimic moment tensor source including a source time</span>
+<span class="sd">    function.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="p">,</span> <span class="n">depth_in_m</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">m_rr</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">m_tt</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">m_pp</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span>
+                 <span class="n">m_rt</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">m_rp</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">m_tp</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">time_shift</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">sliprate</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param latitude: latitude of the source in degree</span>
+<span class="sd">        :param longitude: longitude of the source in degree</span>
+<span class="sd">        :param depth_in_m: source depth in m</span>
+<span class="sd">        :param m_rr: moment tensor components in r, theta, phi in Nm</span>
+<span class="sd">        :param m_tt: moment tensor components in r, theta, phi in Nm</span>
+<span class="sd">        :param m_pp: moment tensor components in r, theta, phi in Nm</span>
+<span class="sd">        :param m_rt: moment tensor components in r, theta, phi in Nm</span>
+<span class="sd">        :param m_rp: moment tensor components in r, theta, phi in Nm</span>
+<span class="sd">        :param m_tp: moment tensor components in r, theta, phi in Nm</span>
+<span class="sd">        :param time_shift: correction of the origin time in seconds. only</span>
+<span class="sd">            useful in the context of finite sources</span>
+<span class="sd">        :param sliprate: normalized source time function (sliprate)</span>
+<span class="sd">        :param dt: sampling of the source time function</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Source</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="p">,</span> <span class="n">depth_in_m</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">m_rr</span> <span class="o">=</span> <span class="n">m_rr</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">m_tt</span> <span class="o">=</span> <span class="n">m_tt</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">m_pp</span> <span class="o">=</span> <span class="n">m_pp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">m_rt</span> <span class="o">=</span> <span class="n">m_rt</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">m_rp</span> <span class="o">=</span> <span class="n">m_rp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">m_tp</span> <span class="o">=</span> <span class="n">m_tp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time_shift</span> <span class="o">=</span> <span class="n">time_shift</span>
+
+        <span class="k">if</span> <span class="n">sliprate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sliprate</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="n">dt</span>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="Source.from_CMTSOLUTION_file"><a class="viewcode-back" href="../../source.html#instaseis.source.Source.from_CMTSOLUTION_file">[docs]</a>    <span class="k">def</span> <span class="nf">from_CMTSOLUTION_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize a source object from a CMTSOLUTION file.</span>
+
+<span class="sd">        :param filename: path to the CMTSOLUTION file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="n">time_shift</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">2</span><span class="p">])</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="n">latitude</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">longitude</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">depth_in_m</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="mf">1e3</span>
+
+        <span class="n">m_rr</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="mf">1e7</span>
+        <span class="n">m_tt</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="mf">1e7</span>
+        <span class="n">m_pp</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="mf">1e7</span>
+        <span class="n">m_rt</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="mf">1e7</span>
+        <span class="n">m_rp</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="mf">1e7</span>
+        <span class="n">m_tp</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="mf">1e7</span>
+
+        <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">(</span><span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="p">,</span> <span class="n">depth_in_m</span><span class="p">,</span> <span class="n">m_rr</span><span class="p">,</span> <span class="n">m_tt</span><span class="p">,</span> <span class="n">m_pp</span><span class="p">,</span> <span class="n">m_rt</span><span class="p">,</span>
+                    <span class="n">m_rp</span><span class="p">,</span> <span class="n">m_tp</span><span class="p">,</span> <span class="n">time_shift</span><span class="p">)</span>
+</div>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="Source.from_strike_dip_rake"><a class="viewcode-back" href="../../source.html#instaseis.source.Source.from_strike_dip_rake">[docs]</a>    <span class="k">def</span> <span class="nf">from_strike_dip_rake</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="p">,</span> <span class="n">depth_in_m</span><span class="p">,</span> <span class="n">strike</span><span class="p">,</span>
+                             <span class="n">dip</span><span class="p">,</span> <span class="n">rake</span><span class="p">,</span> <span class="n">M0</span><span class="p">,</span> <span class="n">time_shift</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">sliprate</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                             <span class="n">dt</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize a source object from a shear source parameterized by strike,</span>
+<span class="sd">        dip and rake.</span>
+
+<span class="sd">        :param latitude: latitude of the source in degree</span>
+<span class="sd">        :param longitude: longitude of the source in degree</span>
+<span class="sd">        :param depth_in_m: source depth in m</span>
+<span class="sd">        :param strike: strike of the fault in degree</span>
+<span class="sd">        :param dip: dip of the fault in degree</span>
+<span class="sd">        :param rake: rake of the fault in degree</span>
+<span class="sd">        :param M0: scalar moment</span>
+<span class="sd">        :param time_shift: correction of the origin time in seconds. only</span>
+<span class="sd">            useful in the context of finite sources</span>
+<span class="sd">        :param sliprate: normalized source time function (sliprate)</span>
+<span class="sd">        :param dt: sampling of the source time function</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># formulas in Udias (17.24) are in geographic system North, East,</span>
+        <span class="c"># Down, which # transforms to the geocentric as:</span>
+        <span class="c"># Mtt =  Mxx, Mpp = Myy, Mrr =  Mzz</span>
+        <span class="c"># Mrp = -Myz, Mrt = Mxz, Mtp = -Mxy</span>
+        <span class="c"># voigt in tpr: Mtt Mpp Mrr Mrp Mrt Mtp</span>
+
+        <span class="n">phi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">strike</span><span class="p">)</span>
+        <span class="n">delta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">dip</span><span class="p">)</span>
+        <span class="n">lambd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">rake</span><span class="p">)</span>
+
+        <span class="n">m_tt</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">delta</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lambd</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mf">2.</span> <span class="o">*</span> <span class="n">phi</span><span class="p">)</span>
+                <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mf">2.</span> <span class="o">*</span> <span class="n">delta</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span><span class="o">**</span><span class="mf">2.</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">lambd</span><span class="p">))</span> <span class="o">*</span> <span class="n">M0</span>
+
+        <span class="n">m_pp</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">delta</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lambd</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mf">2.</span> <span class="o">*</span> <span class="n">phi</span><span class="p">)</span>
+                <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mf">2.</span> <span class="o">*</span> <span class="n">delta</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span><span class="o">**</span><span class="mf">2.</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">lambd</span><span class="p">))</span> <span class="o">*</span> <span class="n">M0</span>
+
+        <span class="n">m_rr</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mf">2.</span> <span class="o">*</span> <span class="n">delta</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">lambd</span><span class="p">))</span> <span class="o">*</span> <span class="n">M0</span>
+
+        <span class="n">m_rp</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">lambd</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mf">2.</span> <span class="o">*</span> <span class="n">delta</span><span class="p">)</span>
+                <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">delta</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lambd</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">phi</span><span class="p">))</span> <span class="o">*</span> <span class="n">M0</span>
+
+        <span class="n">m_rt</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">lambd</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mf">2.</span> <span class="o">*</span> <span class="n">delta</span><span class="p">)</span>
+                <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">delta</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lambd</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phi</span><span class="p">))</span> <span class="o">*</span> <span class="n">M0</span>
+
+        <span class="n">m_tp</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">delta</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lambd</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mf">2.</span> <span class="o">*</span> <span class="n">phi</span><span class="p">)</span>
+                <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mf">2.</span> <span class="o">*</span> <span class="n">delta</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mf">2.</span> <span class="o">*</span> <span class="n">phi</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">lambd</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">)</span> \
+            <span class="o">*</span> <span class="n">M0</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="p">(</span><span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="p">,</span> <span class="n">depth_in_m</span><span class="p">,</span> <span class="n">m_rr</span><span class="p">,</span> <span class="n">m_tt</span><span class="p">,</span> <span class="n">m_pp</span><span class="p">,</span> <span class="n">m_rt</span><span class="p">,</span>
+                    <span class="n">m_rp</span><span class="p">,</span> <span class="n">m_tp</span><span class="p">,</span> <span class="n">time_shift</span><span class="p">,</span> <span class="n">sliprate</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+</div>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="Source.tensor"><a class="viewcode-back" href="../../source.html#instaseis.source.Source.tensor">[docs]</a>    <span class="k">def</span> <span class="nf">tensor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        List of moment tensor components in r, theta, phi coordinates:</span>
+<span class="sd">        [m_rr, m_tt, m_pp, m_rt, m_rp, m_tp]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">m_rr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_tt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_pp</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_rt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_rp</span><span class="p">,</span>
+                         <span class="bp">self</span><span class="o">.</span><span class="n">m_tp</span><span class="p">])</span>
+</div>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="Source.tensor_voigt"><a class="viewcode-back" href="../../source.html#instaseis.source.Source.tensor_voigt">[docs]</a>    <span class="k">def</span> <span class="nf">tensor_voigt</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        List of moment tensor components in theta, phi, r coordinates in Voigt</span>
+<span class="sd">        notation:</span>
+<span class="sd">        [m_tt, m_pp, m_rr, m_rp, m_rt, m_tp]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">m_tt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_pp</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_rr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_rp</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_rt</span><span class="p">,</span>
+                         <span class="bp">self</span><span class="o">.</span><span class="n">m_tp</span><span class="p">])</span>
+</div>
+<div class="viewcode-block" id="Source.set_sliprate"><a class="viewcode-back" href="../../source.html#instaseis.source.Source.set_sliprate">[docs]</a>    <span class="k">def</span> <span class="nf">set_sliprate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sliprate</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add a source time function (sliprate) to a initialized source object.</span>
+
+<span class="sd">        :param sliprate: (normalized) sliprate</span>
+<span class="sd">        :param dt: sampling of the sliprate</span>
+<span class="sd">        :param normalize: if sliprate is not normalized, set this to true to</span>
+<span class="sd">            normalize it using trapezoidal rule style integration</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sliprate</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">normalize</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">trapz</span><span class="p">(</span><span class="n">sliprate</span><span class="p">,</span> <span class="n">dx</span><span class="o">=</span><span class="n">dt</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="n">dt</span>
+</div>
+<div class="viewcode-block" id="Source.resample_sliprate"><a class="viewcode-back" href="../../source.html#instaseis.source.Source.resample_sliprate">[docs]</a>    <span class="k">def</span> <span class="nf">resample_sliprate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">nsamp</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        For convolution, the sliprate is needed at the sampling of the fields</span>
+<span class="sd">        in the database. This function resamples the sliprate using linear</span>
+<span class="sd">        interpolation.</span>
+
+<span class="sd">        :param dt: desired sampling</span>
+<span class="sd">        :param nsamp: desired number of samples</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">t_new</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">nsamp</span> <span class="o">*</span> <span class="n">dt</span><span class="p">,</span> <span class="n">nsamp</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="n">t_old</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span><span class="p">),</span>
+                            <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span><span class="p">),</span> <span class="n">endpoint</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span> <span class="o">=</span> <span class="n">interp</span><span class="p">(</span><span class="n">t_new</span><span class="p">,</span> <span class="n">t_old</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="n">dt</span>
+</div>
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">return_str</span> <span class="o">=</span> <span class="s">&#39;AxiSEM Database Source:</span><span class="se">\n</span><span class="s">&#39;</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;longitude : </span><span class="si">%6.1f</span><span class="s"> deg</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">longitude</span><span class="p">)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;latitude  : </span><span class="si">%6.1f</span><span class="s"> deg</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">latitude</span><span class="p">)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;Mrr       : </span><span class="si">%10.2e</span><span class="s"> Nm</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m_rr</span><span class="p">)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;Mtt       : </span><span class="si">%10.2e</span><span class="s"> Nm</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m_tt</span><span class="p">)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;Mpp       : </span><span class="si">%10.2e</span><span class="s"> Nm</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m_pp</span><span class="p">)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;Mrt       : </span><span class="si">%10.2e</span><span class="s"> Nm</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m_rt</span><span class="p">)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;Mrp       : </span><span class="si">%10.2e</span><span class="s"> Nm</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m_rp</span><span class="p">)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;Mtp       : </span><span class="si">%10.2e</span><span class="s"> Nm</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m_tp</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">return_str</span>
+
+</div>
+<div class="viewcode-block" id="ForceSource"><a class="viewcode-back" href="../../source.html#instaseis.source.ForceSource">[docs]</a><span class="k">class</span> <span class="nc">ForceSource</span><span class="p">(</span><span class="n">SourceOrReceiver</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class to handle a seimic force source.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="p">,</span> <span class="n">depth_in_m</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">f_r</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">f_t</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span>
+                 <span class="n">f_p</span><span class="o">=</span><span class="mf">0.</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param latitude: latitude of the source in degree</span>
+<span class="sd">        :param longitude: longitude of the source in degree</span>
+<span class="sd">        :param depth_in_m: source depth in m</span>
+<span class="sd">        :param f_r: force components in r, theta, phi in N</span>
+<span class="sd">        :param f_t: force components in r, theta, phi in N</span>
+<span class="sd">        :param f_p: force components in r, theta, phi in N</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ForceSource</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="p">,</span> <span class="n">depth_in_m</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">f_r</span> <span class="o">=</span> <span class="n">f_r</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">f_t</span> <span class="o">=</span> <span class="n">f_t</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">f_p</span> <span class="o">=</span> <span class="n">f_p</span>
+
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="ForceSource.force_tpr"><a class="viewcode-back" href="../../source.html#instaseis.source.ForceSource.force_tpr">[docs]</a>    <span class="k">def</span> <span class="nf">force_tpr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        List of force components in theta, phi, r coordinates:</span>
+<span class="sd">        [f_t, f_p, f_r]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">f_t</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_r</span><span class="p">])</span>
+</div>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="ForceSource.force_rtp"><a class="viewcode-back" href="../../source.html#instaseis.source.ForceSource.force_rtp">[docs]</a>    <span class="k">def</span> <span class="nf">force_rtp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        List of force components in r, theta, phi, coordinates:</span>
+<span class="sd">        [f_r, f_t, f_p]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">f_t</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_r</span><span class="p">])</span>
+</div>
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">return_str</span> <span class="o">=</span> <span class="s">&#39;AxiSEM Database Force Source:</span><span class="se">\n</span><span class="s">&#39;</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;longitude : </span><span class="si">%6.1f</span><span class="s"> deg</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">longitude</span><span class="p">)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;latitude  : </span><span class="si">%6.1f</span><span class="s"> deg</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">latitude</span><span class="p">)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;Fr        : </span><span class="si">%10.2e</span><span class="s"> N</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f_r</span><span class="p">)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;Ft        : </span><span class="si">%10.2e</span><span class="s"> N</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f_t</span><span class="p">)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;Fp        : </span><span class="si">%10.2e</span><span class="s"> N</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f_p</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">return_str</span>
+
+</div>
+<div class="viewcode-block" id="Receiver"><a class="viewcode-back" href="../../source.html#instaseis.source.Receiver">[docs]</a><span class="k">class</span> <span class="nc">Receiver</span><span class="p">(</span><span class="n">SourceOrReceiver</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class dealing with seismic receivers.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="p">,</span> <span class="n">network</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">station</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">depth_in_m</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param latitude: latitude of the source in degree</span>
+<span class="sd">        :param longitude: longitude of the source in degree</span>
+<span class="sd">        :param network: network id</span>
+<span class="sd">        :param station: station id</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Receiver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="p">,</span>
+                                       <span class="n">depth_in_m</span><span class="o">=</span><span class="n">depth_in_m</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">network</span> <span class="o">=</span> <span class="n">network</span> <span class="ow">or</span> <span class="s">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">station</span> <span class="o">=</span> <span class="n">station</span> <span class="ow">or</span> <span class="s">&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">return_str</span> <span class="o">=</span> <span class="s">&#39;AxiSEM Database Receiver:</span><span class="se">\n</span><span class="s">&#39;</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;longitude : </span><span class="si">%6.1f</span><span class="s"> deg</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">longitude</span><span class="p">)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;latitude  : </span><span class="si">%6.1f</span><span class="s"> deg</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">latitude</span><span class="p">)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;name      : </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">station</span><span class="p">)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;network   : </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">return_str</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="nd">@_purge_duplicates</span>
+<div class="viewcode-block" id="Receiver.parse"><a class="viewcode-back" href="../../source.html#instaseis.source.Receiver.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="n">filename_or_obj</span><span class="p">,</span> <span class="n">network_code</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Attempts to parse anything to a list of Receiver objects. Always</span>
+<span class="sd">        returns a list, even if it only contains a single element. It is</span>
+<span class="sd">        meant as a single entry point for receiver information from any source.</span>
+
+<span class="sd">        Supports StationXML, the custom STATIONS fileformat, SAC files,</span>
+<span class="sd">        SEED files, and a number of ObsPy objects. This method can</span>
+<span class="sd">        furthermore work with anything ObsPy can deal with (filename, URL,</span>
+<span class="sd">        memory files, ...).</span>
+
+<span class="sd">        :param filename_or_obj: Filename/URL/Python object</span>
+<span class="sd">        :param network_code: Network code needed to parse ObsPy station</span>
+<span class="sd">            objects. Likely only needed for the recursive part of this method.</span>
+<span class="sd">        :return: List of :class:`~instaseis.source.Receiver` objects.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">receivers</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c"># STATIONS file.</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">filename_or_obj</span><span class="p">,</span> <span class="nb">basestring</span><span class="p">)</span> <span class="ow">and</span> \
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">filename_or_obj</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">Receiver</span><span class="o">.</span><span class="n">_parse_stations_file</span><span class="p">(</span><span class="n">filename_or_obj</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">pass</span>
+        <span class="c"># ObsPy inventory.</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">filename_or_obj</span><span class="p">,</span> <span class="n">obspy</span><span class="o">.</span><span class="n">station</span><span class="o">.</span><span class="n">Inventory</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">network</span> <span class="ow">in</span> <span class="n">filename_or_obj</span><span class="p">:</span>
+                <span class="n">receivers</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">Receiver</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">network</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">receivers</span>
+        <span class="c"># ObsPy network.</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">filename_or_obj</span><span class="p">,</span> <span class="n">obspy</span><span class="o">.</span><span class="n">station</span><span class="o">.</span><span class="n">Network</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">station</span> <span class="ow">in</span> <span class="n">filename_or_obj</span><span class="p">:</span>
+                <span class="n">receivers</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">Receiver</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span>
+                    <span class="n">station</span><span class="p">,</span> <span class="n">network_code</span><span class="o">=</span><span class="n">filename_or_obj</span><span class="o">.</span><span class="n">code</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">receivers</span>
+        <span class="c"># ObsPy station.</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">filename_or_obj</span><span class="p">,</span> <span class="n">obspy</span><span class="o">.</span><span class="n">station</span><span class="o">.</span><span class="n">Station</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">network_code</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">ReceiverParseError</span><span class="p">(</span><span class="s">&quot;network_code must be given.&quot;</span><span class="p">)</span>
+            <span class="c"># If there are no channels, use the station coordinates.</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">filename_or_obj</span><span class="o">.</span><span class="n">channels</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">[</span><span class="n">Receiver</span><span class="p">(</span>
+                    <span class="n">latitude</span><span class="o">=</span><span class="n">filename_or_obj</span><span class="o">.</span><span class="n">latitude</span><span class="p">,</span>
+                    <span class="n">longitude</span><span class="o">=</span><span class="n">filename_or_obj</span><span class="o">.</span><span class="n">longitude</span><span class="p">,</span>
+                    <span class="n">network</span><span class="o">=</span><span class="n">network_code</span><span class="p">,</span> <span class="n">station</span><span class="o">=</span><span class="n">filename_or_obj</span><span class="o">.</span><span class="n">code</span><span class="p">)]</span>
+            <span class="c"># Otherwise use the channel information. Raise an error if the</span>
+            <span class="c"># coordinates are not identical for each channel. Only parse</span>
+            <span class="c"># latitude and longitude, as the DB currently cannot deal with</span>
+            <span class="c"># varying receiver heights.</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">coords</span> <span class="o">=</span> <span class="nb">set</span><span class="p">((</span><span class="n">_i</span><span class="o">.</span><span class="n">latitude</span><span class="p">,</span> <span class="n">_i</span><span class="o">.</span><span class="n">longitude</span><span class="p">)</span> <span class="k">for</span> <span class="n">_i</span> <span class="ow">in</span>
+                             <span class="n">filename_or_obj</span><span class="o">.</span><span class="n">channels</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">ReceiverParseError</span><span class="p">(</span>
+                        <span class="s">&quot;The coordinates of the channels of station &#39;</span><span class="si">%s</span><span class="s">.</span><span class="si">%s</span><span class="s">&#39; &quot;</span>
+                        <span class="s">&quot;are not identical.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">network_code</span><span class="p">,</span>
+                                                <span class="n">filename_or_obj</span><span class="o">.</span><span class="n">code</span><span class="p">))</span>
+                <span class="n">coords</span> <span class="o">=</span> <span class="n">coords</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+                <span class="k">return</span> <span class="p">[</span><span class="n">Receiver</span><span class="p">(</span><span class="n">latitude</span><span class="o">=</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">longitude</span><span class="o">=</span><span class="n">coords</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                                 <span class="n">network</span><span class="o">=</span><span class="n">network_code</span><span class="p">,</span>
+                                 <span class="n">station</span><span class="o">=</span><span class="n">filename_or_obj</span><span class="o">.</span><span class="n">code</span><span class="p">)]</span>
+        <span class="c"># ObsPy Stream (SAC files contain coordinates).</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">filename_or_obj</span><span class="p">,</span> <span class="n">obspy</span><span class="o">.</span><span class="n">Stream</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">tr</span> <span class="ow">in</span> <span class="n">filename_or_obj</span><span class="p">:</span>
+                <span class="n">receivers</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">Receiver</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">tr</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">receivers</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">filename_or_obj</span><span class="p">,</span> <span class="n">obspy</span><span class="o">.</span><span class="n">Trace</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">filename_or_obj</span><span class="o">.</span><span class="n">stats</span><span class="p">,</span> <span class="s">&quot;sac&quot;</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">ReceiverParseError</span><span class="p">(</span><span class="s">&quot;ObsPy Trace must have an sac &quot;</span>
+                                         <span class="s">&quot;attribute.&quot;</span><span class="p">)</span>
+            <span class="n">coords</span> <span class="o">=</span> <span class="p">(</span><span class="n">filename_or_obj</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">sac</span><span class="o">.</span><span class="n">stla</span><span class="p">,</span>
+                      <span class="n">filename_or_obj</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">sac</span><span class="o">.</span><span class="n">stlo</span><span class="p">)</span>
+            <span class="k">if</span> <span class="o">-</span><span class="mf">12345.0</span> <span class="ow">in</span> <span class="n">coords</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">ReceiverParseError</span><span class="p">(</span>
+                    <span class="s">&quot;SAC file does not contain coordinates for channel &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span>
+                    <span class="n">filename_or_obj</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">Receiver</span><span class="p">(</span><span class="n">latitude</span><span class="o">=</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">longitude</span><span class="o">=</span><span class="n">coords</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                             <span class="n">network</span><span class="o">=</span><span class="n">filename_or_obj</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">network</span><span class="p">,</span>
+                             <span class="n">station</span><span class="o">=</span><span class="n">filename_or_obj</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">station</span><span class="p">)]</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">filename_or_obj</span><span class="p">,</span> <span class="n">obspy</span><span class="o">.</span><span class="n">xseed</span><span class="o">.</span><span class="n">Parser</span><span class="p">):</span>
+            <span class="n">inv</span> <span class="o">=</span> <span class="n">filename_or_obj</span><span class="o">.</span><span class="n">getInventory</span><span class="p">()</span>
+            <span class="n">stations</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">chan</span> <span class="ow">in</span> <span class="n">inv</span><span class="p">[</span><span class="s">&quot;channels&quot;</span><span class="p">]:</span>
+                <span class="n">stat</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">chan</span><span class="p">[</span><span class="s">&quot;channel_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;.&quot;</span><span class="p">)[:</span><span class="mi">2</span><span class="p">])</span>
+                <span class="n">stations</span><span class="p">[</span><span class="n">stat</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">chan</span><span class="p">[</span><span class="s">&quot;latitude&quot;</span><span class="p">],</span> <span class="n">chan</span><span class="p">[</span><span class="s">&quot;longitude&quot;</span><span class="p">]))</span>
+            <span class="n">receivers</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">stations</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">value</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">ReceiverParseError</span><span class="p">(</span>
+                        <span class="s">&quot;The coordinates of the channels of station &#39;</span><span class="si">%s</span><span class="s">.</span><span class="si">%s</span><span class="s">&#39; &quot;</span>
+                        <span class="s">&quot;are not identical&quot;</span> <span class="o">%</span> <span class="n">key</span><span class="p">)</span>
+                <span class="n">receivers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Receiver</span><span class="p">(</span><span class="n">latitude</span><span class="o">=</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                                          <span class="n">longitude</span><span class="o">=</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+                                          <span class="n">network</span><span class="o">=</span><span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                          <span class="n">station</span><span class="o">=</span><span class="n">key</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="k">return</span> <span class="n">receivers</span>
+
+        <span class="c"># Check if its anything ObsPy can read and recurse.</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Receiver</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">obspy</span><span class="o">.</span><span class="n">read_inventory</span><span class="p">(</span><span class="n">filename_or_obj</span><span class="p">))</span>
+        <span class="k">except</span> <span class="n">ReceiverParseError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">e</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="c"># Many StationXML files do not conform to the standard, thus the</span>
+        <span class="c"># ObsPy format detection fails. Catch those here.</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Receiver</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">obspy</span><span class="o">.</span><span class="n">read_inventory</span><span class="p">(</span><span class="n">filename_or_obj</span><span class="p">,</span>
+                                                       <span class="n">format</span><span class="o">=</span><span class="s">&quot;stationxml&quot;</span><span class="p">))</span>
+        <span class="k">except</span> <span class="n">ReceiverParseError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">e</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="c"># SAC files contain station coordinates.</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Receiver</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">obspy</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">filename_or_obj</span><span class="p">))</span>
+        <span class="k">except</span> <span class="n">ReceiverParseError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">e</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="c"># Last but not least try to parse it as a SEED file.</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Receiver</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">obspy</span><span class="o">.</span><span class="n">xseed</span><span class="o">.</span><span class="n">Parser</span><span class="p">(</span><span class="n">filename_or_obj</span><span class="p">))</span>
+        <span class="k">except</span> <span class="n">ReceiverParseError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">e</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;&#39;</span><span class="si">%s</span><span class="s">&#39; could not be parsed.&quot;</span> <span class="o">%</span> <span class="nb">repr</span><span class="p">(</span><span class="n">filename_or_obj</span><span class="p">))</span>
+</div>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_parse_stations_file</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parses a custom STATIONS file format to a list of Receiver objects.</span>
+
+<span class="sd">        :param filename: Filename</span>
+<span class="sd">        :return: List of :class:`~instaseis.source.Receiver` objects.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&#39;rt&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">receivers</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">station</span><span class="p">,</span> <span class="n">network</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+                <span class="n">lat</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span>
+                <span class="n">lon</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">lon</span><span class="p">)</span>
+                <span class="n">receivers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Receiver</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">network</span><span class="p">,</span> <span class="n">station</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">receivers</span></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2014, Lion Krischer and Martin van Driel.<br/>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2.3.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>
