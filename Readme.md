@@ -88,7 +88,7 @@ defined tests.
 
 ### Usage
 
-Use it by creating an `InstaSeis` object which needs to know the path to the
+Use it by creating an `InstaSeisDB` object which needs to know the path to the
 output folder containing the netCDF files from an AxiSEM run. All information
 is determined from the netCDF files so no other files have to be present.
 
@@ -97,13 +97,13 @@ Then a source and receiver pair is defined. The moment tensor components are in
 a three component ObsPy `Stream` object with the waveform data. This can then
 be used process and save the data in any format supported by ObsPy.
 
-The initialization of an `InstaSeis` object is the most expensive part so make
+The initialization of an `InstaSeisDB` object is the most expensive part so make
 sure to do it only once if possible.
 
 ```python
-In [1]: from instaseis import InstaSeis, Source, Receiver
+In [1]: from instaseis import InstaSeisDB, Source, Receiver
 
-In [2]: instaseis_db = InstaSeis("./prem50s_forces")
+In [2]: instaseis_db = InstaSeisDB("./prem50s_forces")
 
 In [3]: receiver = Receiver(latitude=42.6390, longitude=74.4940)
 

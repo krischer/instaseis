@@ -102,25 +102,25 @@ choice or host it somewhere.
 Usage
 -----
 
-Use it by creating an :class:`~instaseis.instaseis.InstaSeis` object which needs
+Use it by creating an :class:`~instaseis.instaseis.InstaSeisDB` object which needs
 to know the path to the output folder containing the netCDF files from an
 AxiSEM run. All information is determined from the netCDF files so no other
 files have to be present.
 
 Then a source and receiver pair is defined. The moment tensor components are in
-``N m``. Lastly the :meth:`~instaseis.instaseis.InstaSeis.get_seismograms()`
+``N m``. Lastly the :meth:`~instaseis.instaseis.InstaSeisDB.get_seismograms()`
 method is called which by default returns a three component ObsPy
 :class:`~obspy.core.stream.Stream` object with the waveform data. This can then
 be used process and save the data in any format supported by ObsPy.
 
-The initialization of an :class:`~instaseis.instaseis.InstaSeis` object is the
+The initialization of an :class:`~instaseis.instaseis.InstaSeisDB` object is the
 most expensive part so make sure to do it only once if possible.
 
 .. code-block:: python
 
-    In [1]: from instaseis import InstaSeis, Source, Receiver
+    In [1]: from instaseis import InstaSeisDB, Source, Receiver
 
-    In [2]: instaseis_db = InstaSeis("./prem50s_forces")
+    In [2]: db = InstaSeisDB("./prem50s_forces")
 
     In [3]: receiver = Receiver(latitude=42.6390, longitude=74.4940)
 
@@ -133,7 +133,7 @@ most expensive part so make sure to do it only once if possible.
        ...:     m_rp =-8.050000e+23 / 1E7,
        ...:     m_tp =-1.230000e+24 / 1E7)
 
-    In [5]: st = instaseis_db.get_seismograms(source=source, receiver=receiver)
+    In [5]: st = db.get_seismograms(source=source, receiver=receiver)
 
     In [6]: print st
     3 Trace(s) in Stream:

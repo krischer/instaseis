@@ -17,7 +17,7 @@ import inspect
 
 
 from .. import sem_derivatives
-from ..instaseis import InstaSeis
+from ..instaseisdb import InstaSeisDB
 
 
 # Most generic way to get the data folder path.
@@ -25,7 +25,7 @@ DATA = os.path.join(os.path.dirname(os.path.abspath(
     inspect.getfile(inspect.currentframe()))), "data")
 
 #def test_strain_monopole():
-#    instaseis_bwd = InstaSeis(os.path.join(DATA, "100s_db_bwd"))
+#    instaseis_bwd = InstaSeisDB(os.path.join(DATA, "100s_db_bwd"))
 #
 #    G = instaseis_bwd.parsed_mesh.G2
 #    GT = instaseis_bwd.parsed_mesh.G2T
@@ -84,7 +84,7 @@ DATA = os.path.join(os.path.dirname(os.path.abspath(
 #    #                           rtol=1E-7, atol=1E-10)
 
 def test_strain_monopole():
-    instaseis_bwd = InstaSeis(os.path.join(DATA, "100s_db_bwd"))
+    instaseis_bwd = InstaSeisDB(os.path.join(DATA, "100s_db_bwd"))
 
     G = np.array([[-.5, -.5], [.5, .5]])
     GT = G.T

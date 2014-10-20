@@ -1,6 +1,6 @@
-=========
-InstaSeis
-=========
+===========
+InstaSeisDB
+===========
 
-.. autoclass:: instaseis.instaseis.InstaSeis
+.. autoclass:: instaseis.instaseisdb.InstaSeisDB
     :members:
