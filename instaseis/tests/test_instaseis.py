@@ -291,6 +291,13 @@ def test_incremental_bwd():
     np.testing.assert_allclose(st_bwd.select(component='T')[0].data, t_data,
                                rtol=1E-7, atol=1E-12)
 
+    # test resampling
+    dt = instaseis_bwd.dt
+    st_bwd = instaseis_bwd.get_seismograms(
+        source=source, receiver=receiver, components=('Z'), dt=dt)
+    np.testing.assert_allclose(st_bwd.select(component='Z')[0].data, z_data,
+                               rtol=1E-7, atol=1E-12)
+
 
 def test_incremental_fwd():
     """
