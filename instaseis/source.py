@@ -73,7 +73,10 @@ class SourceOrReceiver(object):
         return np.deg2rad(self.latitude)
 
     def radius_in_m(self, planet_radius=6371e3):
-        return planet_radius - self.depth_in_m
+        if self.depth_in_m is None:
+            return planet_radius
+        else:
+            return planet_radius - self.depth_in_m
 
     def x(self, planet_radius=6371e3):
         return np.cos(np.deg2rad(self.latitude)) * \
@@ -95,8 +98,8 @@ class Source(SourceOrReceiver):
     A class to handle a seimic moment tensor source including a source time
     function.
     """
-    def __init__(self, latitude, longitude, depth_in_m, m_rr, m_tt, m_pp, m_rt,
-                 m_rp, m_tp, time_shift=None, sliprate=None, dt=None):
+    def __init__(self, latitude, longitude, depth_in_m=None, m_rr=0., m_tt=0., m_pp=0.,
+                 m_rt=0., m_rp=0., m_tp=0., time_shift=None, sliprate=None, dt=None):
         """
         :param latitude: latitude of the source in degree
         :param longitude: longitude of the source in degree
@@ -273,7 +276,8 @@ class ForceSource(SourceOrReceiver):
     """
     A class to handle a seimic force source.
     """
-    def __init__(self, latitude, longitude, depth_in_m, f_r, f_t, f_p):
+    def __init__(self, latitude, longitude, depth_in_m=None, f_r=0., f_t=0.,
+                 f_p=0.):
         """
         :param latitude: latitude of the source in degree
         :param longitude: longitude of the source in degree
@@ -318,14 +322,16 @@ class Receiver(SourceOrReceiver):
     """
     Class dealing with seismic receivers.
     """
-    def __init__(self, latitude, longitude, network=None, station=None, depth_in_m=0):
+    def __init__(self, latitude, longitude, network=None, station=None,
+                 depth_in_m=None):
         """
         :param latitude: latitude of the source in degree
         :param longitude: longitude of the source in degree
         :param network: network id
         :param station: station id
         """
-        super(Receiver, self).__init__(latitude, longitude, depth_in_m=depth_in_m)
+        super(Receiver, self).__init__(latitude, longitude,
+                                       depth_in_m=depth_in_m)
         self.network = network or ""
         self.station = station or ""
 
