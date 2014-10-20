@@ -14,9 +14,7 @@ from __future__ import absolute_import
 import numpy as np
 
 
-from .. import finite_elem_mapping
-from .. import rotations
-from .. import spectral_basis
+from instaseis import finite_elem_mapping, rotations
 
 
 def test_rotate_frame_rd():
