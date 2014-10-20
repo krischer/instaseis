@@ -70,6 +70,8 @@ setup_config = dict(
     author_email="krischer@geophysik.uni-muenchen.de",
     url="",
     packages=find_packages(),
+    package_data={
+        "instaseis": [os.path.join("lib", "instaseis.so")]},
     license="GNU General Public License, version 3 (GPLv3)",
     platforms="OS Independent",
     install_requires=["netCDF4", "numpy", "obspy"],
