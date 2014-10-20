@@ -221,7 +221,3 @@ class Mesh(object):
 
             if not self.read_on_demand:
                 self.mesh_mu = self.f.groups["Mesh"].variables["mesh_mu"][:]
-
-    def get_n_closests_points(self, s, z, n=6):
-        _, idx = self.kdtree.query([s, z], k=6)
-        return self.mesh[idx]
