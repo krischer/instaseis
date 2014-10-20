@@ -277,6 +277,20 @@ def test_incremental_bwd():
     np.testing.assert_allclose(st_bwd.select(component='T')[0].data, t_data,
                                rtol=1E-7, atol=1E-12)
 
+    # read the same again to test buffer
+    st_bwd = instaseis_bwd.get_seismograms(
+        source=source, receiver=receiver, components=('Z', 'N', 'E', 'R', 'T'))
+    np.testing.assert_allclose(st_bwd.select(component='Z')[0].data, z_data,
+                               rtol=1E-7, atol=1E-12)
+    np.testing.assert_allclose(st_bwd.select(component='N')[0].data, n_data,
+                               rtol=1E-7, atol=1E-12)
+    np.testing.assert_allclose(st_bwd.select(component='E')[0].data, e_data,
+                               rtol=1E-7, atol=1E-12)
+    np.testing.assert_allclose(st_bwd.select(component='R')[0].data, r_data,
+                               rtol=1E-7, atol=1E-12)
+    np.testing.assert_allclose(st_bwd.select(component='T')[0].data, t_data,
+                               rtol=1E-7, atol=1E-12)
+
 
 def test_incremental_fwd():
     """
@@ -393,6 +407,20 @@ def test_incremental_fwd():
         5.70806995e-10, -2.89153287e-10, 9.85120645e-10, -3.70156042e-10,
         3.77016695e-10, 1.59211410e-10])
 
+    np.testing.assert_allclose(st_fwd.select(component='Z')[0].data, z_data,
+                               rtol=1E-7, atol=1E-16)
+    np.testing.assert_allclose(st_fwd.select(component='N')[0].data, n_data,
+                               rtol=1E-7, atol=1E-16)
+    np.testing.assert_allclose(st_fwd.select(component='E')[0].data, e_data,
+                               rtol=1E-7, atol=1E-16)
+    np.testing.assert_allclose(st_fwd.select(component='R')[0].data, r_data,
+                               rtol=1E-7, atol=1E-16)
+    np.testing.assert_allclose(st_fwd.select(component='T')[0].data, t_data,
+                               rtol=1E-7, atol=1E-16)
+
+    # read the same again to test buffer
+    st_fwd = instaseis_fwd.get_seismograms(
+        source=source, receiver=receiver, components=('Z', 'N', 'E', 'R', 'T'))
     np.testing.assert_allclose(st_fwd.select(component='Z')[0].data, z_data,
                                rtol=1E-7, atol=1E-16)
     np.testing.assert_allclose(st_fwd.select(component='N')[0].data, n_data,
