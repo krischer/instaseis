@@ -22,7 +22,7 @@ before_install:
   - sudo ln -s /run/shm /dev/shm
   - conda install --yes python=$TRAVIS_PYTHON_VERSION atlas numpy scipy matplotlib nose pytest flake8 sphinx lxml sqlalchemy mock netcdf4
   - pip install --use-mirrors suds
-  - pip install --use-mirrors-suds sphinx-bootstrap-theme
+  - pip install --use-mirrors sphinx-bootstrap-theme
   - pip install obspy
 
 install:
