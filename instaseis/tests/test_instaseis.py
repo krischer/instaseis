@@ -259,6 +259,24 @@ def test_incremental_bwd():
     np.testing.assert_allclose(st_bwd.select(component='N')[0].data, n_data,
                                rtol=1E-7, atol=1E-12)
 
+    # read on init
+    instaseis_bwd = InstaSeisDB(os.path.join(DATA, "100s_db_bwd/"),
+                                read_on_demand=False)
+
+    st_bwd = instaseis_bwd.get_seismograms(
+        source=source, receiver=receiver, components=('Z', 'N', 'E', 'R', 'T'))
+
+    np.testing.assert_allclose(st_bwd.select(component='Z')[0].data, z_data,
+                               rtol=1E-7, atol=1E-12)
+    np.testing.assert_allclose(st_bwd.select(component='N')[0].data, n_data,
+                               rtol=1E-7, atol=1E-12)
+    np.testing.assert_allclose(st_bwd.select(component='E')[0].data, e_data,
+                               rtol=1E-7, atol=1E-12)
+    np.testing.assert_allclose(st_bwd.select(component='R')[0].data, r_data,
+                               rtol=1E-7, atol=1E-12)
+    np.testing.assert_allclose(st_bwd.select(component='T')[0].data, t_data,
+                               rtol=1E-7, atol=1E-12)
+
 
 def test_incremental_fwd():
     """
