@@ -198,6 +198,14 @@ class InstaSeisDB(object):
                 source.y(planet_radius=self.planet_radius),
                 source.z(planet_radius=self.planet_radius),
                 receiver.longitude, receiver.colatitude)
+
+            if any(comp in components for comp in ['N', 'E', 'R', 'T']) and \
+                    self.meshes.px == None:
+                raise ValueError("vertical component only DB")
+
+            if 'Z' in components  and self.meshes.pz == None:
+                raise ValueError("horizontal component only DB")
+
         else:
             rotmesh_s, rotmesh_phi, rotmesh_z = rotations.rotate_frame_rd(
                 receiver.x(planet_radius=self.planet_radius),
