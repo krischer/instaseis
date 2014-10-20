@@ -16,7 +16,7 @@ from obspy.imaging.mopad_wrapper import Beach
 import os
 import sys
 
-from instaseis import InstaSeis, Source, Receiver
+from instaseis import InstaSeisDB, Source, Receiver
 
 
 def compile_and_import_ui_files():
@@ -239,7 +239,7 @@ class Window(QtGui.QMainWindow):
             os.path.expanduser("~")))
         if not self.folder:
             return
-        self.instaseis_db = InstaSeis(self.folder)
+        self.instaseis_db = InstaSeisDB(self.folder)
         self.update()
         self.set_info()
 
