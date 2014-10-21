@@ -9,7 +9,7 @@
     
     <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/bootswatch-3.2.0/united/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/bootswatch-3.2.0/simplex/bootstrap.min.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
     
     <script type="text/javascript">
@@ -49,13 +49,16 @@
           <span class="icon-bar"></span>
         </button>
         <a class="navbar-brand" href="../../index.html">
-          instaseis</a>
+          Instaseis</a>
         <span class="navbar-text navbar-version pull-left"><b>0.0.1a</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
           <ul class="nav navbar-nav">
             <li class="divider-vertical"></li>
+            
+                <li><a href="http://axisem.info">AxiSEM</a></li>
+                <li><a href="http://obspy.org">ObsPy</a></li>
             
             
               <li class="dropdown globaltoc-container">
@@ -75,17 +78,6 @@
 </ul>
 </li>
               
-                <li class="dropdown">
-  <a role="button"
-     id="dLabelLocalToc"
-     data-toggle="dropdown"
-     data-target="#"
-     href="#">Page <b class="caret"></b></a>
-  <ul class="dropdown-menu localtoc"
-      role="menu"
-      aria-labelledby="dLabelLocalToc"></ul>
-</li>
-              
             
             
               
@@ -94,8 +86,6 @@
             
             
             
-            
-              <li class="hidden-sm"></li>
             
           </ul>
 
@@ -169,7 +159,7 @@
         <span class="n">area</span> <span class="o">*=</span> <span class="mf">1e-4</span>  <span class="c"># cm^2 &gt; m^2</span>
         <span class="n">slip1</span> <span class="o">*=</span> <span class="mf">1e-2</span>  <span class="c"># cm   &gt; m</span>
         <span class="n">slip2</span> <span class="o">*=</span> <span class="mf">1e-2</span>  <span class="c"># cm   &gt; m</span>
-        <span class="n">slip3</span> <span class="o">*=</span> <span class="mf">1e-2</span>  <span class="c"># cm   &gt; m</span>
+        <span class="c"># slip3 *= 1e-2  # cm   &gt; m</span>
 
         <span class="n">nt1</span><span class="p">,</span> <span class="n">nt2</span><span class="p">,</span> <span class="n">nt3</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="p">(</span><span class="n">nt1</span><span class="p">,</span> <span class="n">nt2</span><span class="p">,</span> <span class="n">nt3</span><span class="p">))</span>
 
@@ -200,10 +190,7 @@
                            <span class="n">rake</span><span class="p">,</span> <span class="n">M0</span><span class="p">,</span> <span class="n">time_shift</span><span class="o">=</span><span class="n">tinit</span><span class="p">,</span> <span class="n">sliprate</span><span class="o">=</span><span class="n">stf</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="n">nt3</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
-            <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">())</span> <span class="o">&lt;</span> <span class="n">nt3</span><span class="p">:</span>
-                <span class="n">line</span> <span class="o">=</span> <span class="n">line</span> <span class="o">+</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
-            <span class="n">stf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 
     <span class="k">return</span> <span class="n">sources</span>
 </pre></div>

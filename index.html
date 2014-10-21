@@ -5,11 +5,11 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Python Interface to AxiSEM’s netCDF Databases &mdash; instaseis 0.0.1a documentation</title>
+    <title>Instaseis - Instant high frequency seismograms &mdash; instaseis 0.0.1a documentation</title>
     
     <link rel="stylesheet" href="_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/bootswatch-3.2.0/united/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootswatch-3.2.0/simplex/bootstrap.min.css" type="text/css" />
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     
     <script type="text/javascript">
@@ -49,13 +49,16 @@
           <span class="icon-bar"></span>
         </button>
         <a class="navbar-brand" href="#">
-          instaseis</a>
+          Instaseis</a>
         <span class="navbar-text navbar-version pull-left"><b>0.0.1a</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
           <ul class="nav navbar-nav">
             <li class="divider-vertical"></li>
+            
+                <li><a href="http://axisem.info">AxiSEM</a></li>
+                <li><a href="http://obspy.org">ObsPy</a></li>
             
             
               <li class="dropdown globaltoc-container">
@@ -75,29 +78,6 @@
 </ul>
 </li>
               
-                <li class="dropdown">
-  <a role="button"
-     id="dLabelLocalToc"
-     data-toggle="dropdown"
-     data-target="#"
-     href="#">Page <b class="caret"></b></a>
-  <ul class="dropdown-menu localtoc"
-      role="menu"
-      aria-labelledby="dLabelLocalToc"><ul>
-<li><a class="reference internal" href="#">Python Interface to AxiSEM&#8217;s netCDF Databases</a><ul>
-<li><a class="reference internal" href="#requirements">Requirements</a></li>
-<li><a class="reference internal" href="#installation">Installation</a></li>
-<li><a class="reference internal" href="#testing">Testing</a></li>
-<li><a class="reference internal" href="#build-the-documentation">Build the Documentation</a></li>
-<li><a class="reference internal" href="#usage">Usage</a></li>
-<li><a class="reference internal" href="#gui">GUI</a></li>
-<li><a class="reference internal" href="#detailed-documentation">Detailed Documentation</a></li>
-</ul>
-</li>
-</ul>
-</ul>
-</li>
-              
             
             
               
@@ -110,12 +90,6 @@
             
             
             
-            
-              <li class="hidden-sm">
-<div id="sourcelink">
-  <a href="_sources/index.txt"
-     rel="nofollow">Source</a>
-</div></li>
             
           </ul>
 
@@ -137,69 +111,98 @@
   <div class="row">
     <div class="col-md-12">
       
-  <div class="section" id="python-interface-to-axisem-s-netcdf-databases">
-<h1>Python Interface to AxiSEM&#8217;s netCDF Databases<a class="headerlink" href="#python-interface-to-axisem-s-netcdf-databases" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="instaseis-instant-high-frequency-seismograms">
+<h1>Instaseis - Instant high frequency seismograms<a class="headerlink" href="#instaseis-instant-high-frequency-seismograms" title="Permalink to this headline">¶</a></h1>
+<p>Instaseis calculates high frequency seismograms from Green&#8217;s function databases
+generated with <a class="reference external" href="http://axisem.info">AxiSEM</a>.</p>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="requirements">
-<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+<h3>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h3>
+<p>Instaseis is implemented as a Python library and has a number of
+dependencies which are listed here. It might well work with other versions but
+that has not been tested and we do not officially support it. It currently runs
+on Linux and Mac OS X. Adding support for Windows is mainly a question of
+compiling the shared Fortran library. Pull requests are welcome.</p>
 <ul class="simple">
-<li>gfortran &gt;= 4.7</li>
+<li><tt class="docutils literal"><span class="pre">gfortran</span> <span class="pre">&gt;=</span> <span class="pre">4.7</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Python</span> <span class="pre">2.7</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">NumPy</span> <span class="pre">&gt;=</span> <span class="pre">1.7</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">ObsPy</span> <span class="pre">&gt;=</span> <span class="pre">0.9.2</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">netCDF4</span> <span class="pre">&gt;=</span> <span class="pre">4.3</span></tt> including Python bindings (<tt class="docutils literal"><span class="pre">&gt;=</span> <span class="pre">1.1</span></tt>)</li>
 </ul>
-<p>It has only been tested with Python 2.7 and requires the following Python modules:</p>
+<p>The graphical user interface (which is optional and not needed to run
+Instaseis) furthermore requires</p>
 <ul class="simple">
-<li>netCDF4</li>
-<li>ObsPy</li>
-<li>numpy</li>
+<li><tt class="docutils literal"><span class="pre">PyQt4</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">pyqtgraph</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">matplolitb</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">basemap</span></tt></li>
 </ul>
-<p>The experimental GUI furthermore requires</p>
+<p>Additionally the tests need</p>
 <ul class="simple">
-<li>PyQt4</li>
-<li>pyqtgraph</li>
-<li>matplolitb</li>
-<li>basemap</li>
+<li><tt class="docutils literal"><span class="pre">pytest</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">flake8</span></tt></li>
 </ul>
-<p>If you are new to Python, first make sure to have a Fortran compiler. On Linux just run</p>
+<div class="section" id="fortran-compiler">
+<h4>Fortran Compiler<a class="headerlink" href="#fortran-compiler" title="Permalink to this headline">¶</a></h4>
+<p>If you don&#8217;t have <tt class="docutils literal"><span class="pre">gfortran</span></tt>, please install it (on Linux) with</p>
 <div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>sudo apt-get install gfortran
 </pre></div>
 </div>
-<p>or the equivalent of your distribution. On OSX I recommend to install <a class="reference external" href="http://brew.sh/">Homebrew</a> and then type</p>
+<p>or the equivalent of your distribution. On OSX we recommend to install
+<a class="reference external" href="http://brew.sh/">Homebrew</a> and then use it to install <tt class="docutils literal"><span class="pre">gfortran</span></tt>:</p>
 <div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>brew install gcc
 </pre></div>
 </div>
-<p>Finally download <a class="reference external" href="https://store.continuum.io/cshop/anaconda/">Anaconda</a> for Python version 2.7 and finish the installation of the requirements with</p>
+</div>
+<div class="section" id="python-and-dependencies">
+<h4>Python and Dependencies<a class="headerlink" href="#python-and-dependencies" title="Permalink to this headline">¶</a></h4>
+<p>If you know what you are doing, just make sure the aforementioned
+dependencies are installed. Otherwise do yourself a favor and download the
+<a class="reference external" href="https://store.continuum.io/cshop/anaconda/">Anaconda</a> Python distribution.
+It is a free scientific Python distribution bundling almost all necessary
+modules with a convenient installer (does not require root access!). Make sure
+to use the distribution for Python 2.7. Once installed assert that <tt class="docutils literal"><span class="pre">pip</span></tt> and
+<tt class="docutils literal"><span class="pre">conda</span></tt> point to the Anaconda installation folder (you need to open a new
+terminal after installing Anaconda) and install the missing dependencies with</p>
 <div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>pip install obspy
-<span class="nv">$ </span>pip install pyqtgraph
+<span class="nv">$ </span>pip install pyqtgraph pytest flake8
 <span class="nv">$ </span>conda install basemap
 </pre></div>
 </div>
 </div>
-<div class="section" id="installation">
-<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
-<p>Install it by cloning the git repository and installing with an editable installation. The Makefile currently has to be executed to build the shared library until a proper installation routine has been written.</p>
+</div>
+<div class="section" id="installing-instaseis">
+<h3>Installing Instaseis<a class="headerlink" href="#installing-instaseis" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="user-installation">
+<h4>User Installation<a class="headerlink" href="#user-installation" title="Permalink to this headline">¶</a></h4>
+<p>Once released, installation of Instaseis is as easy as</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>pip install instaseis
+</pre></div>
+</div>
+</div>
+<div class="section" id="developer-installation">
+<h4>Developer Installation<a class="headerlink" href="#developer-installation" title="Permalink to this headline">¶</a></h4>
+<p>Clone the git repository and install in an editable fashion.</p>
 <div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>git clone https://github.com/krischer/instaseis.git
 <span class="nv">$ </span><span class="nb">cd </span>instaseis
 <span class="nv">$ </span>pip install -v -e .
-<span class="nv">$ </span><span class="nb">cd </span>instaseis
-<span class="nv">$ </span>make
 </pre></div>
+</div>
 </div>
 </div>
 <div class="section" id="testing">
-<h2>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h2>
-<p>Testing right now is fairly minimal and machine dependent...</p>
-<p>To test, make sure pytest is installed</p>
-<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>pip install pytest
+<h3>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h3>
+<p>Tests are executed with</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>python -m instaseis.tests
 </pre></div>
 </div>
-<p>and execute</p>
-<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>py.test
-</pre></div>
-</div>
-<p>in the modules source code directory. The command will discover and execute all
-defined tests.</p>
 </div>
 <div class="section" id="build-the-documentation">
-<h2>Build the Documentation<a class="headerlink" href="#build-the-documentation" title="Permalink to this headline">¶</a></h2>
-<p>The documentation requires sphinx and the Bootstrap theme. Install both with</p>
+<h3>Build the Documentation<a class="headerlink" href="#build-the-documentation" title="Permalink to this headline">¶</a></h3>
+<p>The documentation requires <tt class="docutils literal"><span class="pre">sphinx</span></tt> and the Bootstrap theme. Install both
+with</p>
 <div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>pip install sphinx sphinx-bootstrap-theme
 </pre></div>
 </div>
@@ -210,6 +213,7 @@ defined tests.</p>
 </div>
 <p>Finally open the <tt class="docutils literal"><span class="pre">doc/_build/html/index.html</span></tt> file with the browser of your
 choice or host it somewhere.</p>
+</div>
 </div>
 <div class="section" id="usage">
 <h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
