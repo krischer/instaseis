@@ -34,7 +34,7 @@ def test_fwd_vs_bwd():
     """
     instaseis_fwd = InstaSeisDB(os.path.join(DATA, "100s_db_fwd"),
                                 reciprocal=False)
-    instaseis_bwd = InstaSeisDB(os.path.join(DATA, "100s_db_bwd"))
+    instaseis_bwd = InstaSeisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
 
     source_fwd = Source(latitude=4., longitude=3.0, depth_in_m=None,
                         m_rr=4.71e+17, m_tt=3.81e+17, m_pp=-4.74e+17,
@@ -85,7 +85,7 @@ def test_fwd_vs_bwd_axial():
     """
     instaseis_fwd = InstaSeisDB(os.path.join(DATA, "100s_db_fwd_deep"),
                                 reciprocal=False)
-    instaseis_bwd = InstaSeisDB(os.path.join(DATA, "100s_db_bwd"))
+    instaseis_bwd = InstaSeisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
 
     source_fwd = Source(latitude=0., longitude=0., depth_in_m=None,
                         m_rr=4.71e+17, m_tt=3.81e+17, m_pp=-4.74e+17,
@@ -136,7 +136,7 @@ def test_incremental_bwd():
     """
     incremental tests of bwd mode
     """
-    instaseis_bwd = InstaSeisDB(os.path.join(DATA, "100s_db_bwd"))
+    instaseis_bwd = InstaSeisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
 
     receiver = Receiver(latitude=42.6390, longitude=74.4940)
     source = Source(
@@ -165,7 +165,7 @@ def test_incremental_bwd():
     assert instaseis_bwd.meshes.pz.strain_buffer.efficiency == 0.0
 
     # read on init
-    instaseis_bwd = InstaSeisDB(os.path.join(DATA, "100s_db_bwd"),
+    instaseis_bwd = InstaSeisDB(os.path.join(DATA, "100s_db_bwd_displ_only"),
                                 read_on_demand=False)
 
     st_bwd = instaseis_bwd.get_seismograms(
@@ -217,8 +217,8 @@ def test_vertical_only_db(tmpdir):
     path = os.path.join(tmpdir, "PZ", "Data", "ordered_output.nc4")
     os.makedirs(os.path.dirname(path))
     shutil.copy(
-        os.path.join(DATA, "100s_db_bwd", "PZ", "Data", "ordered_output.nc4"),
-        path)
+        os.path.join(DATA, "100s_db_bwd_displ_only", "PZ", "Data",
+                     "ordered_output.nc4"), path)
 
     receiver = Receiver(latitude=42.6390, longitude=74.4940)
     source = Source(
@@ -249,7 +249,8 @@ def test_horizontal_only_db(tmpdir):
     path = os.path.join(tmpdir, "PX", "Data", "ordered_output.nc4")
     os.makedirs(os.path.dirname(path))
     shutil.copy(
-        os.path.join(DATA, "100s_db_bwd", "PX", "Data", "ordered_output.nc4"),
+        os.path.join(DATA, "100s_db_bwd_displ_only", "PX", "Data",
+                     "ordered_output.nc4"),
         path)
 
     receiver = Receiver(latitude=42.6390, longitude=74.4940)
