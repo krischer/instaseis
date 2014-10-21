@@ -19,6 +19,7 @@ from setuptools.extension import Extension
 
 import inspect
 import os
+from subprocess import Popen, PIPE
 import sys
 
 
@@ -75,9 +76,32 @@ class MyExtension(Extension):
         Extension.__init__(self, *args, **kwargs)
         self.export_symbols = finallist(self.export_symbols)
 
+
+def get_libgfortran_dir():
+    """
+    Helper function returning the library directory of libgfortran. Useful
+    on OSX where the C compiler oftentimes has no knowledge of the library
+    directories of the Fortran compiler. I don't think it can do any harm on
+    Linux.
+    """
+    for ending in [".3.dylib", ".dylib", ".3.so", ".so"]:
+        try:
+            p = Popen(['gfortran', "-print-file-name=libgfortran" + ending],
+                      stdout=PIPE, stderr=PIPE)
+            p.stderr.close()
+            line = p.stdout.readline().decode().strip()
+            p.stdout.close()
+            if os.path.exists(line):
+                return [os.path.dirname(line)]
+        except:
+            continue
+        return []
+
+
 src = os.path.join('instaseis', 'src')
 lib = MyExtension('instaseis',
                   libraries=["gfortran"],
+                  library_dirs=get_libgfortran_dir(),
                   # Be careful with the order.
                   sources=[
                       os.path.join(src, "global_parameters.f90"),
