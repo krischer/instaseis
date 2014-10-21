@@ -14,6 +14,7 @@ from __future__ import absolute_import
 import inspect
 import numpy as np
 import os
+import pytest
 import shutil
 
 from instaseis import InstaSeisDB
@@ -263,6 +264,69 @@ def test_horizontal_only_db(tmpdir):
 
     np.testing.assert_allclose(st_bwd.select(component='N')[0].data,
                                BWD_TEST_DATA["N"], rtol=1E-7, atol=1E-12)
+
+
+def test_requesting_wrong_component_horizontal(tmpdir):
+    # Copy only the horizontal component data.
+    tmpdir = str(tmpdir)
+    path = os.path.join(tmpdir, "PX", "Data", "ordered_output.nc4")
+    os.makedirs(os.path.dirname(path))
+    shutil.copy(
+        os.path.join(DATA, "100s_db_bwd", "PX", "Data", "ordered_output.nc4"),
+        path)
+
+    receiver = Receiver(latitude=42.6390, longitude=74.4940)
+    source = Source(
+        latitude=89.91, longitude=0.0, depth_in_m=12000,
+        m_rr=4.710000e+24 / 1E7,
+        m_tt=3.810000e+22 / 1E7,
+        m_pp=-4.740000e+24 / 1E7,
+        m_rt=3.990000e+23 / 1E7,
+        m_rp=-8.050000e+23 / 1E7,
+        m_tp=-1.230000e+24 / 1E7)
+
+    # vertical only DB
+    instaseis_bwd = InstaSeisDB(tmpdir)
+
+    with pytest.raises(ValueError):
+        instaseis_bwd.get_seismograms(
+            source=source, receiver=receiver, components=('Z'))
+
+
+def test_requesting_wrong_component_vertical(tmpdir):
+    # Copy only the horizontal component data.
+    tmpdir = str(tmpdir)
+    path = os.path.join(tmpdir, "PZ", "Data", "ordered_output.nc4")
+    os.makedirs(os.path.dirname(path))
+    shutil.copy(
+        os.path.join(DATA, "100s_db_bwd", "PZ", "Data", "ordered_output.nc4"),
+        path)
+
+    receiver = Receiver(latitude=42.6390, longitude=74.4940)
+    source = Source(
+        latitude=89.91, longitude=0.0, depth_in_m=12000,
+        m_rr=4.710000e+24 / 1E7,
+        m_tt=3.810000e+22 / 1E7,
+        m_pp=-4.740000e+24 / 1E7,
+        m_rt=3.990000e+23 / 1E7,
+        m_rp=-8.050000e+23 / 1E7,
+        m_tp=-1.230000e+24 / 1E7)
+
+    # vertical only DB
+    instaseis_bwd = InstaSeisDB(tmpdir)
+
+    with pytest.raises(ValueError):
+        instaseis_bwd.get_seismograms(
+            source=source, receiver=receiver, components=('E'))
+    with pytest.raises(ValueError):
+        instaseis_bwd.get_seismograms(
+            source=source, receiver=receiver, components=('N'))
+    with pytest.raises(ValueError):
+        instaseis_bwd.get_seismograms(
+            source=source, receiver=receiver, components=('T'))
+    with pytest.raises(ValueError):
+        instaseis_bwd.get_seismograms(
+            source=source, receiver=receiver, components=('R'))
 
 
 def test_incremental_fwd():
