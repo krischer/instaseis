@@ -24,13 +24,15 @@ before_install:
   - pip install --use-mirrors suds
   - pip install --use-mirrors sphinx-bootstrap-theme
   - pip install obspy
+  - pip install coveralls
 
 install:
   - pip install --no-deps .
 
 script:
-  - cd $HOME; python -m instaseis.tests
+  - cd $HOME; coverage run --source=instaseis -m instaseis.tests
   - cd $TRAVIS_BUILD_DIR/doc; make html
 
 after_success:
+  - coveralls
   - bash $TRAVIS_BUILD_DIR/.travis-update-gh-pages.sh
