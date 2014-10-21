@@ -180,7 +180,7 @@ class InstaSeisDB(object):
         :param receiver: instaseis.Receiver object
         :type receiver: :class:`instaseis.source.Receiver`
         :param components: a tuple containing any combination of the
-            strings ``"Z"``, ``"N"`, ``"E"`, ``"R"``, and ``"T"``
+            strings ``"Z"``, ``"N"``, ``"E"``, ``"R"``, and ``"T"``
         :param remove_source_shift: move the starttime to the peak of the
             sliprate from the source time function used to generate the
             database
