@@ -1,14 +1,20 @@
 Instaseis - Instant high frequency seismograms
 ==============================================
 
-Instaseis calculates high frequency seismograms from Greens function databases
-calculated with AxiSEM.
+Instaseis calculates high frequency seismograms from Green's function databases
+generated with `AxiSEM <http://axisem.info>`_.
 
-Requirements
+Installation
 ------------
 
-Instaseis has the following dependencies. It might well work with other
-versions but that has not been tested and we do not officially support it.
+Requirements
+^^^^^^^^^^^^
+
+Instaseis is implemented as a Python library and has a number of
+dependencies which are listed here. It might well work with other versions but
+that has not been tested and we do not officially support it. It currently runs
+on Linux and Mac OS X. Adding support for Windows is mainly a question of
+compiling the shared Fortran library. Pull requests are welcome.
 
 * ``gfortran >= 4.7``
 * ``Python 2.7``
@@ -16,20 +22,21 @@ versions but that has not been tested and we do not officially support it.
 * ``ObsPy >= 0.9.2``
 * ``netCDF4 >= 4.3`` including Python bindings (``>= 1.1``)
 
-The graphical user interface (which is not needed to run Instaseis) furthermore requires:
+The graphical user interface (which is optional and not needed to run
+Instaseis) furthermore requires
 
 * ``PyQt4``
 * ``pyqtgraph``
 * ``matplolitb``
 * ``basemap``
 
-Furthermore the tests require
+Additionally the tests need
 
 * ``pytest``
 * ``flake8``
 
 Fortran Compiler
-^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~
 
 If you don't have ``gfortran``, please install it (on Linux) with
 
@@ -38,19 +45,19 @@ If you don't have ``gfortran``, please install it (on Linux) with
     $ sudo apt-get install gfortran
 
 or the equivalent of your distribution. On OSX we recommend to install
-`Homebrew <http://brew.sh/>`_ and then use it to install ``gfortran``.
+`Homebrew <http://brew.sh/>`_ and then use it to install ``gfortran``:
 
 .. code-block:: bash
 
     $ brew install gcc
 
 Python and Dependencies
-^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~
 
 If you know what you are doing, just make sure the aforementioned
 dependencies are installed. Otherwise do yourself a favor and download the
 `Anaconda <https://store.continuum.io/cshop/anaconda/>`_ Python distribution.
-It is free scientific Python distribution bundling almost all necessary
+It is a free scientific Python distribution bundling almost all necessary
 modules with a convenient installer (does not require root access!). Make sure
 to use the distribution for Python 2.7. Once installed assert that ``pip`` and
 ``conda`` point to the Anaconda installation folder (you need to open a new
@@ -64,21 +71,19 @@ terminal after installing Anaconda) and install the missing dependencies with
 
 
 Installing Instaseis
---------------------
-
-Once all dependencies have been installed, you can now install Instaseis.
+^^^^^^^^^^^^^^^^^^^^
 
 User Installation
-^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~
 
 Once released, installation of Instaseis is as easy as
 
-.. code-block::
+.. code-block:: bash
 
     $ pip install instaseis
 
 Developer Installation
-^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~
 
 Clone the git repository and install in an editable fashion.
 
@@ -90,7 +95,7 @@ Clone the git repository and install in an editable fashion.
 
 
 Testing
--------
+^^^^^^^
 
 Tests are executed with
 
@@ -100,9 +105,10 @@ Tests are executed with
 
 
 Build the Documentation
------------------------
+^^^^^^^^^^^^^^^^^^^^^^^
 
-The documentation requires sphinx and the Bootstrap theme. Install both with
+The documentation requires ``sphinx`` and the Bootstrap theme. Install both
+with
 
 .. code-block:: bash
 
