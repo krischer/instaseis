@@ -1,3 +1,7 @@
+.. image:: http://lionkrischer.de/scratch/instaseis_logo.png
+     :scale: 40%
+     :align: right
+
 Instaseis - Instant high frequency seismograms
 ==============================================
 
