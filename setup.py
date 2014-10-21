@@ -26,6 +26,7 @@ import sys
 CCompiler.language_map['.f90'] = "c"
 UnixCCompiler.src_extensions.append(".f90")
 
+
 def get_package_data():
     """
     Returns a list of all files needed for the installation relativ to the
@@ -100,9 +101,10 @@ setup_config = dict(
     license="GNU General Public License, version 3 (GPLv3)",
     platforms="OS Independent",
     install_requires=["netCDF4", "numpy", "obspy"],
+    extras_require={
+        'tests': ['flake8>=2', 'pytest']},
     ext_package='instaseis.lib',
     ext_modules=[lib],
-
 )
 
 if __name__ == "__main__":
