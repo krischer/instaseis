@@ -455,3 +455,52 @@ def test_incremental_bwd_force_source():
                                BWD_FORCE_TEST_DATA["R"], rtol=1E-7, atol=1E-12)
     np.testing.assert_allclose(st_bwd.select(component='T')[0].data,
                                BWD_FORCE_TEST_DATA["T"], rtol=1E-7, atol=1E-12)
+
+
+def test_finite_source():
+    """
+    incremental tests of bwd mode with source force
+    """
+    from obspy.signal.filter import lowpass
+    instaseis_bwd = InstaSeisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
+
+    receiver = Receiver(latitude=42.6390, longitude=74.4940)
+
+    source = Source(
+        latitude=89.91, longitude=0.0, depth_in_m=12000,
+        m_rr=4.710000e+24 / 1E7,
+        m_tt=3.810000e+22 / 1E7,
+        m_pp=-4.740000e+24 / 1E7,
+        m_rt=3.990000e+23 / 1E7,
+        m_rp=-8.050000e+23 / 1E7,
+        m_tp=-1.230000e+24 / 1E7)
+
+    dt = instaseis_bwd.dt
+    sliprate = np.zeros(1000)
+    sliprate[0] = 1.
+    sliprate = lowpass(sliprate, 1./100., 1./dt, corners=4)
+
+    source.set_sliprate(sliprate, dt, time_shift=0., normalize=True)
+
+    st_fin = instaseis_bwd.get_seismograms_finite_source(
+        sources=[source], receiver=receiver,
+        components=('Z', 'N', 'E', 'R', 'T'), dt=0.1)
+    st_ref = instaseis_bwd.get_seismograms(
+        source=source, receiver=receiver,
+        components=('Z', 'N', 'E', 'R', 'T'), dt=0.1, reconvolve_stf=True)
+
+    np.testing.assert_allclose(st_fin.select(component='Z')[0].data,
+                               st_ref.select(component='Z')[0].data,
+                               rtol=1E-7, atol=1E-12)
+    np.testing.assert_allclose(st_fin.select(component='N')[0].data,
+                               st_ref.select(component='N')[0].data,
+                               rtol=1E-7, atol=1E-12)
+    np.testing.assert_allclose(st_fin.select(component='E')[0].data,
+                               st_ref.select(component='E')[0].data,
+                               rtol=1E-7, atol=1E-12)
+    np.testing.assert_allclose(st_fin.select(component='R')[0].data,
+                               st_ref.select(component='R')[0].data,
+                               rtol=1E-7, atol=1E-12)
+    np.testing.assert_allclose(st_fin.select(component='T')[0].data,
+                               st_ref.select(component='T')[0].data,
+                               rtol=1E-7, atol=1E-12)

@@ -585,9 +585,11 @@ class InstaSeisDB(object):
                 return_obspy_stream=False)
             for comp in components:
                 if comp in data_summed:
-                    data_summed[comp] += data[comp] * mu / DEFAULT_MU
+                    #data_summed[comp] += data[comp] * mu / DEFAULT_MU
+                    data_summed[comp] += data[comp]
                 else:
-                    data_summed[comp] = data[comp] * mu / DEFAULT_MU
+                    #data_summed[comp] = data[comp] * mu / DEFAULT_MU
+                    data_summed[comp] = data[comp]
 
         if dt is not None:
             for comp in components:
