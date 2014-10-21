@@ -161,6 +161,8 @@ def test_incremental_bwd():
                                BWD_TEST_DATA["R"], rtol=1E-7, atol=1E-12)
     np.testing.assert_allclose(st_bwd.select(component='T')[0].data,
                                BWD_TEST_DATA["T"], rtol=1E-7, atol=1E-12)
+    assert instaseis_bwd.meshes.px.strain_buffer.efficiency == 0.0
+    assert instaseis_bwd.meshes.pz.strain_buffer.efficiency == 0.0
 
     # read on init
     instaseis_bwd = InstaSeisDB(os.path.join(DATA, "100s_db_bwd"),
@@ -179,6 +181,8 @@ def test_incremental_bwd():
                                BWD_TEST_DATA["R"], rtol=1E-7, atol=1E-12)
     np.testing.assert_allclose(st_bwd.select(component='T')[0].data,
                                BWD_TEST_DATA["T"], rtol=1E-7, atol=1E-12)
+    assert instaseis_bwd.meshes.px.strain_buffer.efficiency == 0.0
+    assert instaseis_bwd.meshes.pz.strain_buffer.efficiency == 0.0
 
     # read the same again to test buffer
     st_bwd = instaseis_bwd.get_seismograms(
@@ -193,6 +197,8 @@ def test_incremental_bwd():
                                BWD_TEST_DATA["R"], rtol=1E-7, atol=1E-12)
     np.testing.assert_allclose(st_bwd.select(component='T')[0].data,
                                BWD_TEST_DATA["T"], rtol=1E-7, atol=1E-12)
+    assert instaseis_bwd.meshes.px.strain_buffer.efficiency == 1.0 / 2.0
+    assert instaseis_bwd.meshes.pz.strain_buffer.efficiency == 1.0 / 2.0
 
     # test resampling
     dt = instaseis_bwd.dt
@@ -359,6 +365,10 @@ def test_incremental_fwd():
                                FWD_TEST_DATA["R"], rtol=1E-7, atol=1E-16)
     np.testing.assert_allclose(st_fwd.select(component='T')[0].data,
                                FWD_TEST_DATA["T"], rtol=1E-7, atol=1E-16)
+    assert instaseis_fwd.meshes.m1.displ_buffer.efficiency == 0.0
+    assert instaseis_fwd.meshes.m2.displ_buffer.efficiency == 0.0
+    assert instaseis_fwd.meshes.m3.displ_buffer.efficiency == 0.0
+    assert instaseis_fwd.meshes.m4.displ_buffer.efficiency == 0.0
 
     # read the same again to test buffer
     st_fwd = instaseis_fwd.get_seismograms(
@@ -373,3 +383,7 @@ def test_incremental_fwd():
                                FWD_TEST_DATA["R"], rtol=1E-7, atol=1E-16)
     np.testing.assert_allclose(st_fwd.select(component='T')[0].data,
                                FWD_TEST_DATA["T"], rtol=1E-7, atol=1E-16)
+    assert instaseis_fwd.meshes.m1.displ_buffer.efficiency == 1.0 / 2.0
+    assert instaseis_fwd.meshes.m2.displ_buffer.efficiency == 1.0 / 2.0
+    assert instaseis_fwd.meshes.m3.displ_buffer.efficiency == 1.0 / 2.0
+    assert instaseis_fwd.meshes.m4.displ_buffer.efficiency == 1.0 / 2.0

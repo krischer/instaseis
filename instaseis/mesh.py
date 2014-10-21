@@ -66,6 +66,7 @@ class Buffer(object):
     def get_size_mb(self):
         return float(self._total_size) / 1024**2
 
+    @property
     def efficiency(self):
         """
         Return the fraction of call to the __contains__() routine that returned
