@@ -340,7 +340,7 @@
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">m_tt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_pp</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_rr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_rp</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_rt</span><span class="p">,</span>
                          <span class="bp">self</span><span class="o">.</span><span class="n">m_tp</span><span class="p">])</span>
 </div>
-<div class="viewcode-block" id="Source.set_sliprate"><a class="viewcode-back" href="../../source.html#instaseis.source.Source.set_sliprate">[docs]</a>    <span class="k">def</span> <span class="nf">set_sliprate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sliprate</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+<div class="viewcode-block" id="Source.set_sliprate"><a class="viewcode-back" href="../../source.html#instaseis.source.Source.set_sliprate">[docs]</a>    <span class="k">def</span> <span class="nf">set_sliprate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sliprate</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">time_shift</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add a source time function (sliprate) to a initialized source object.</span>
 
@@ -353,6 +353,7 @@
         <span class="k">if</span> <span class="n">normalize</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">trapz</span><span class="p">(</span><span class="n">sliprate</span><span class="p">,</span> <span class="n">dx</span><span class="o">=</span><span class="n">dt</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="n">dt</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time_shift</span> <span class="o">=</span> <span class="n">time_shift</span>
 </div>
 <div class="viewcode-block" id="Source.resample_sliprate"><a class="viewcode-back" href="../../source.html#instaseis.source.Source.resample_sliprate">[docs]</a>    <span class="k">def</span> <span class="nf">resample_sliprate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">nsamp</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>

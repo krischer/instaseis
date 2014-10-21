@@ -669,7 +669,7 @@
 </div>
 <div class="viewcode-block" id="InstaSeisDB.get_seismograms_finite_source"><a class="viewcode-back" href="../../instaseis.html#instaseis.instaseisdb.InstaSeisDB.get_seismograms_finite_source">[docs]</a>    <span class="k">def</span> <span class="nf">get_seismograms_finite_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sources</span><span class="p">,</span> <span class="n">receiver</span><span class="p">,</span>
                                       <span class="n">components</span><span class="o">=</span><span class="p">(</span><span class="s">&quot;Z&quot;</span><span class="p">,</span> <span class="s">&quot;N&quot;</span><span class="p">,</span> <span class="s">&quot;E&quot;</span><span class="p">),</span> <span class="n">dt</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                                      <span class="n">a_lanczos</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+                                      <span class="n">a_lanczos</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">correct_mu</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Extract seismograms for a finite source from the AxiSEM database</span>
 <span class="sd">        provided as a list of point sources attached with source time functions</span>
@@ -684,6 +684,8 @@
 <span class="sd">        :param dt: desired sampling of the seismograms.resampling is done</span>
 <span class="sd">            using a lanczos kernel</span>
 <span class="sd">        :param a_lanczos: width of the kernel used in resampling</span>
+<span class="sd">        :param correct_mu: correct the source magnitude for the actual shear</span>
+<span class="sd">            modulus from the model</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">reciprocal</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span>
@@ -693,11 +695,17 @@
             <span class="n">data</span><span class="p">,</span> <span class="n">mu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_seismograms</span><span class="p">(</span>
                 <span class="n">source</span><span class="p">,</span> <span class="n">receiver</span><span class="p">,</span> <span class="n">components</span><span class="p">,</span> <span class="n">reconvolve_stf</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
                 <span class="n">return_obspy_stream</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">correct_mu</span><span class="p">:</span>
+                <span class="n">corr_fac</span> <span class="o">=</span> <span class="n">mu</span> <span class="o">/</span> <span class="n">DEFAULT_MU</span><span class="p">,</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">corr_fac</span> <span class="o">=</span> <span class="mi">1</span>
+
             <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">components</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">data_summed</span><span class="p">:</span>
-                    <span class="n">data_summed</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">+=</span> <span class="n">data</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">*</span> <span class="n">mu</span> <span class="o">/</span> <span class="n">DEFAULT_MU</span>
+                    <span class="n">data_summed</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">+=</span> <span class="n">data</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">*</span> <span class="n">corr_fac</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">data_summed</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">*</span> <span class="n">mu</span> <span class="o">/</span> <span class="n">DEFAULT_MU</span>
+                    <span class="n">data_summed</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">*</span> <span class="n">corr_fac</span>
 
         <span class="k">if</span> <span class="n">dt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">components</span><span class="p">:</span>

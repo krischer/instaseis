@@ -182,7 +182,7 @@ using a lanczos kernel</li>
 
 <dl class="method">
 <dt id="instaseis.instaseisdb.InstaSeisDB.get_seismograms_finite_source">
-<tt class="descname">get_seismograms_finite_source</tt><big>(</big><em>sources</em>, <em>receiver</em>, <em>components=('Z'</em>, <em>'N'</em>, <em>'E')</em>, <em>dt=None</em>, <em>a_lanczos=5</em><big>)</big><a class="reference internal" href="_modules/instaseis/instaseisdb.html#InstaSeisDB.get_seismograms_finite_source"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.instaseisdb.InstaSeisDB.get_seismograms_finite_source" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">get_seismograms_finite_source</tt><big>(</big><em>sources</em>, <em>receiver</em>, <em>components=('Z'</em>, <em>'N'</em>, <em>'E')</em>, <em>dt=None</em>, <em>a_lanczos=5</em>, <em>correct_mu=False</em><big>)</big><a class="reference internal" href="_modules/instaseis/instaseisdb.html#InstaSeisDB.get_seismograms_finite_source"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.instaseisdb.InstaSeisDB.get_seismograms_finite_source" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extract seismograms for a finite source from the AxiSEM database
 provided as a list of point sources attached with source time functions
 and time shifts.</p>
@@ -198,6 +198,8 @@ and time shifts.</p>
 <li><strong>dt</strong> &#8211; desired sampling of the seismograms.resampling is done
 using a lanczos kernel</li>
 <li><strong>a_lanczos</strong> &#8211; width of the kernel used in resampling</li>
+<li><strong>correct_mu</strong> &#8211; correct the source magnitude for the actual shear
+modulus from the model</li>
 </ul>
 </td>
 </tr>
