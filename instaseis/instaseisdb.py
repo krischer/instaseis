@@ -559,7 +559,7 @@ class InstaSeisDB(object):
 
     def get_seismograms_finite_source(self, sources, receiver,
                                       components=("Z", "N", "E"), dt=None,
-                                      a_lanczos=5):
+                                      a_lanczos=5, correct_mu=False):
         """
         Extract seismograms for a finite source from the AxiSEM database
         provided as a list of point sources attached with source time functions
@@ -574,6 +574,8 @@ class InstaSeisDB(object):
         :param dt: desired sampling of the seismograms.resampling is done
             using a lanczos kernel
         :param a_lanczos: width of the kernel used in resampling
+        :param correct_mu: correct the source magnitude for the actual shear
+            modulus from the model
         """
         if not self.reciprocal:
             raise NotImplementedError
@@ -583,13 +585,17 @@ class InstaSeisDB(object):
             data, mu = self.get_seismograms(
                 source, receiver, components, reconvolve_stf=True,
                 return_obspy_stream=False)
+
+            if correct_mu:
+                corr_fac = mu / DEFAULT_MU,
+            else:
+                corr_fac = 1
+
             for comp in components:
                 if comp in data_summed:
-                    #data_summed[comp] += data[comp] * mu / DEFAULT_MU
-                    data_summed[comp] += data[comp]
+                    data_summed[comp] += data[comp] * corr_fac
                 else:
-                    #data_summed[comp] = data[comp] * mu / DEFAULT_MU
-                    data_summed[comp] = data[comp]
+                    data_summed[comp] = data[comp] * corr_fac
 
         if dt is not None:
             for comp in components:
