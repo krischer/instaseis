@@ -46,9 +46,11 @@ def test_fwd_vs_bwd():
     receiver_bwd = Receiver(latitude=10., longitude=20., depth_in_m=None)
 
     st_fwd = instaseis_fwd.get_seismograms(
-        source=source_fwd, receiver=receiver_fwd, components=('Z', 'N', 'E', 'R', 'T'))
+        source=source_fwd, receiver=receiver_fwd,
+        components=('Z', 'N', 'E', 'R', 'T'))
     st_bwd = instaseis_bwd.get_seismograms(
-        source=source_bwd, receiver=receiver_bwd, components=('Z', 'N', 'E', 'R', 'T'))
+        source=source_bwd, receiver=receiver_bwd,
+        components=('Z', 'N', 'E', 'R', 'T'))
 
     st_bwd.filter('lowpass', freq=0.002)
     st_fwd.filter('lowpass', freq=0.002)
@@ -95,9 +97,11 @@ def test_fwd_vs_bwd_axial():
     receiver_bwd = Receiver(latitude=0., longitude=0.1, depth_in_m=None)
 
     st_fwd = instaseis_fwd.get_seismograms(
-        source=source_fwd, receiver=receiver_fwd, components=('Z', 'N', 'E', 'R', 'T'))
+        source=source_fwd, receiver=receiver_fwd,
+        components=('Z', 'N', 'E', 'R', 'T'))
     st_bwd = instaseis_bwd.get_seismograms(
-        source=source_bwd, receiver=receiver_bwd, components=('Z', 'N', 'E', 'R', 'T'))
+        source=source_bwd, receiver=receiver_bwd,
+        components=('Z', 'N', 'E', 'R', 'T'))
 
     st_bwd.filter('lowpass', freq=0.01)
     st_fwd.filter('lowpass', freq=0.01)
@@ -280,7 +284,6 @@ def test_incremental_fwd():
 
     st_fwd = instaseis_fwd.get_seismograms(
         source=source, receiver=receiver, components=('Z', 'N', 'E', 'R', 'T'))
-
 
     np.testing.assert_allclose(st_fwd.select(component='Z')[0].data,
                                FWD_TEST_DATA["Z"], rtol=1E-7, atol=1E-16)

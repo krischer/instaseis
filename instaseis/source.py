@@ -98,8 +98,10 @@ class Source(SourceOrReceiver):
     A class to handle a seimic moment tensor source including a source time
     function.
     """
-    def __init__(self, latitude, longitude, depth_in_m=None, m_rr=0., m_tt=0., m_pp=0.,
-                 m_rt=0., m_rp=0., m_tp=0., time_shift=None, sliprate=None, dt=None):
+
+    def __init__(self, latitude, longitude, depth_in_m=None, m_rr=0.0,
+                 m_tt=0.0, m_pp=0.0, m_rt=0.0, m_rp=0.0, m_tp=0.0,
+                 time_shift=None, sliprate=None, dt=None):
         """
         :param latitude: latitude of the source in degree
         :param longitude: longitude of the source in degree
