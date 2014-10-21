@@ -20,7 +20,7 @@ import shutil
 from instaseis import InstaSeisDB
 from instaseis import Source, Receiver
 
-from .testdata import BWD_TEST_DATA, FWD_TEST_DATA
+from .testdata import BWD_TEST_DATA, FWD_TEST_DATA, BWD_STRAIN_ONLY_TEST_DATA
 
 
 # Most generic way to get the data folder path.
@@ -390,3 +390,39 @@ def test_incremental_fwd():
     assert instaseis_fwd.meshes.m2.displ_buffer.efficiency == 1.0 / 2.0
     assert instaseis_fwd.meshes.m3.displ_buffer.efficiency == 1.0 / 2.0
     assert instaseis_fwd.meshes.m4.displ_buffer.efficiency == 1.0 / 2.0
+
+
+def test_incremental_bwd_strain_only():
+    """
+    incremental tests of bwd mode
+    """
+    instaseis_bwd = InstaSeisDB(os.path.join(DATA, "100s_db_bwd_strain_only"))
+
+    receiver = Receiver(latitude=42.6390, longitude=74.4940)
+    source = Source(
+        latitude=89.91, longitude=0.0, depth_in_m=12000,
+        m_rr=4.710000e+24 / 1E7,
+        m_tt=3.810000e+22 / 1E7,
+        m_pp=-4.740000e+24 / 1E7,
+        m_rt=3.990000e+23 / 1E7,
+        m_rp=-8.050000e+23 / 1E7,
+        m_tp=-1.230000e+24 / 1E7)
+
+    st_bwd = instaseis_bwd.get_seismograms(
+        source=source, receiver=receiver, components=('Z', 'N', 'E', 'R', 'T'))
+
+    np.testing.assert_allclose(st_bwd.select(component='Z')[0].data,
+                               BWD_STRAIN_ONLY_TEST_DATA["Z"], rtol=1E-7,
+                               atol=1E-12)
+    np.testing.assert_allclose(st_bwd.select(component='N')[0].data,
+                               BWD_STRAIN_ONLY_TEST_DATA["N"], rtol=1E-7,
+                               atol=1E-12)
+    np.testing.assert_allclose(st_bwd.select(component='E')[0].data,
+                               BWD_STRAIN_ONLY_TEST_DATA["E"], rtol=1E-7,
+                               atol=1E-12)
+    np.testing.assert_allclose(st_bwd.select(component='R')[0].data,
+                               BWD_STRAIN_ONLY_TEST_DATA["R"], rtol=1E-7,
+                               atol=1E-12)
+    np.testing.assert_allclose(st_bwd.select(component='T')[0].data,
+                               BWD_STRAIN_ONLY_TEST_DATA["T"], rtol=1E-7,
+                               atol=1E-12)
