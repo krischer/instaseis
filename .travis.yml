@@ -30,9 +30,9 @@ install:
   - pip install --no-deps .
 
 script:
-  - cd $HOME; coverage run --source=instaseis -m instaseis.tests
+  - coverage run --source=instaseis -m instaseis.tests
   - cd $TRAVIS_BUILD_DIR/doc; make html
 
 after_success:
-  - cd $HOME; coveralls
+  - coveralls
   - bash $TRAVIS_BUILD_DIR/.travis-update-gh-pages.sh
