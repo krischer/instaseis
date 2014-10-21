@@ -230,7 +230,7 @@ class Source(SourceOrReceiver):
         return np.array([self.m_tt, self.m_pp, self.m_rr, self.m_rp, self.m_rt,
                          self.m_tp])
 
-    def set_sliprate(self, sliprate, dt, normalize=True):
+    def set_sliprate(self, sliprate, dt, time_shift=None, normalize=True):
         """
         Add a source time function (sliprate) to a initialized source object.
 
@@ -243,6 +243,7 @@ class Source(SourceOrReceiver):
         if normalize:
             self.sliprate /= np.trapz(sliprate, dx=dt)
         self.dt = dt
+        self.time_shift = time_shift
 
     def resample_sliprate(self, dt, nsamp):
         """
