@@ -14,6 +14,7 @@ from __future__ import absolute_import
 
 import netCDF4
 import numpy as np
+from obspy import UTCDateTime
 from scipy.spatial import cKDTree
 from collections import OrderedDict
 
@@ -156,6 +157,7 @@ class Mesh(object):
         self.planet_radius = getattr(self.f, "planet radius") * 1e3
         self.dominant_period = getattr(self.f, "dominant source period")
         self.axisem_version = getattr(self.f, "git commit hash")
+        self.creation_time = UTCDateTime(self.f.datetime)
         self.axisem_compiler = "%s %s" % (
             getattr(self.f, "compiler brand"),
             getattr(self.f, "compiler version"))

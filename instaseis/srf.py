@@ -49,7 +49,7 @@ def _read_srf(f, normalize=False):
         area *= 1e-4  # cm^2 > m^2
         slip1 *= 1e-2  # cm   > m
         slip2 *= 1e-2  # cm   > m
-        slip3 *= 1e-2  # cm   > m
+        # slip3 *= 1e-2  # cm   > m
 
         nt1, nt2, nt3 = map(int, (nt1, nt2, nt3))
 
@@ -80,9 +80,6 @@ def _read_srf(f, normalize=False):
                            rake, M0, time_shift=tinit, sliprate=stf, dt=dt))
 
         if nt3 > 0:
-            line = f.readline()
-            while len(line.split()) < nt3:
-                line = line + f.readline()
-            stf = np.array(line.split(), dtype=float)
+            raise NotImplementedError
 
     return sources
