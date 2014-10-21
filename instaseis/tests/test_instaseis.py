@@ -18,9 +18,10 @@ import pytest
 import shutil
 
 from instaseis import InstaSeisDB
-from instaseis import Source, Receiver
+from instaseis import Source, Receiver, ForceSource
 
-from .testdata import BWD_TEST_DATA, FWD_TEST_DATA, BWD_STRAIN_ONLY_TEST_DATA
+from .testdata import BWD_TEST_DATA, FWD_TEST_DATA
+from .testdata import BWD_STRAIN_ONLY_TEST_DATA, BWD_FORCE_TEST_DATA
 
 
 # Most generic way to get the data folder path.
@@ -134,7 +135,7 @@ def test_fwd_vs_bwd_axial():
 
 def test_incremental_bwd():
     """
-    incremental tests of bwd mode
+    incremental tests of bwd mode with displ_only db
     """
     instaseis_bwd = InstaSeisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
 
@@ -394,7 +395,7 @@ def test_incremental_fwd():
 
 def test_incremental_bwd_strain_only():
     """
-    incremental tests of bwd mode
+    incremental tests of bwd mode with strain_only DB
     """
     instaseis_bwd = InstaSeisDB(os.path.join(DATA, "100s_db_bwd_strain_only"))
 
@@ -426,3 +427,31 @@ def test_incremental_bwd_strain_only():
     np.testing.assert_allclose(st_bwd.select(component='T')[0].data,
                                BWD_STRAIN_ONLY_TEST_DATA["T"], rtol=1E-7,
                                atol=1E-12)
+
+
+def test_incremental_bwd_force_source():
+    """
+    incremental tests of bwd mode with source force
+    """
+    instaseis_bwd = InstaSeisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
+
+    receiver = Receiver(latitude=42.6390, longitude=74.4940)
+    source = ForceSource(
+        latitude=89.91, longitude=0.0, depth_in_m=12000,
+        f_r=1.23E10,
+        f_t=2.55E10,
+        f_p=1.73E10)
+
+    st_bwd = instaseis_bwd.get_seismograms(
+        source=source, receiver=receiver, components=('Z', 'N', 'E', 'R', 'T'))
+
+    np.testing.assert_allclose(st_bwd.select(component='Z')[0].data,
+                               BWD_FORCE_TEST_DATA["Z"], rtol=1E-7, atol=1E-12)
+    np.testing.assert_allclose(st_bwd.select(component='N')[0].data,
+                               BWD_FORCE_TEST_DATA["N"], rtol=1E-7, atol=1E-12)
+    np.testing.assert_allclose(st_bwd.select(component='E')[0].data,
+                               BWD_FORCE_TEST_DATA["E"], rtol=1E-7, atol=1E-12)
+    np.testing.assert_allclose(st_bwd.select(component='R')[0].data,
+                               BWD_FORCE_TEST_DATA["R"], rtol=1E-7, atol=1E-12)
+    np.testing.assert_allclose(st_bwd.select(component='T')[0].data,
+                               BWD_FORCE_TEST_DATA["T"], rtol=1E-7, atol=1E-12)
