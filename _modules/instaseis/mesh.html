@@ -137,9 +137,7 @@
 <span class="kn">from</span> <span class="nn">scipy.spatial</span> <span class="kn">import</span> <span class="n">cKDTree</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
 
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">spectral_basis</span>
-
-<span class="n">MIN_FILE_VERSION</span> <span class="o">=</span> <span class="mi">6</span>
+<span class="n">MIN_FILE_VERSION</span> <span class="o">=</span> <span class="mi">7</span>
 
 
 <div class="viewcode-block" id="Buffer"><a class="viewcode-back" href="../../mesh.html#instaseis.mesh.Buffer">[docs]</a><span class="k">class</span> <span class="nc">Buffer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -276,7 +274,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">attenuation</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">,</span> <span class="s">&quot;attenuation&quot;</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">planet_radius</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">,</span> <span class="s">&quot;planet radius&quot;</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1e3</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dominant_period</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">,</span> <span class="s">&quot;dominant source period&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">axisem_version</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">,</span> <span class="s">&quot;SVN revision&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">axisem_version</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">,</span> <span class="s">&quot;git commit hash&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">axisem_compiler</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s"> </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span>
             <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">,</span> <span class="s">&quot;compiler brand&quot;</span><span class="p">),</span>
             <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">,</span> <span class="s">&quot;compiler version&quot;</span><span class="p">))</span>
