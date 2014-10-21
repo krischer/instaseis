@@ -279,7 +279,8 @@ def test_requesting_wrong_component_horizontal(tmpdir):
     path = os.path.join(tmpdir, "PX", "Data", "ordered_output.nc4")
     os.makedirs(os.path.dirname(path))
     shutil.copy(
-        os.path.join(DATA, "100s_db_bwd", "PX", "Data", "ordered_output.nc4"),
+        os.path.join(DATA, "100s_db_bwd_displ_only", "PX", "Data",
+                     "ordered_output.nc4"),
         path)
 
     receiver = Receiver(latitude=42.6390, longitude=74.4940)
@@ -306,7 +307,8 @@ def test_requesting_wrong_component_vertical(tmpdir):
     path = os.path.join(tmpdir, "PZ", "Data", "ordered_output.nc4")
     os.makedirs(os.path.dirname(path))
     shutil.copy(
-        os.path.join(DATA, "100s_db_bwd", "PZ", "Data", "ordered_output.nc4"),
+        os.path.join(DATA, "100s_db_bwd_displ_only", "PZ", "Data",
+                     "ordered_output.nc4"),
         path)
 
     receiver = Receiver(latitude=42.6390, longitude=74.4940)
