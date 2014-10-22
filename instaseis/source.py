@@ -20,11 +20,7 @@ import obspy.xseed
 import os
 from scipy import interp
 
-from . import InstaseisError
-
-
-class ReceiverParseError(Exception):
-    pass
+from . import ReceiverParseError, SourceParseError
 
 
 def _purge_duplicates(f):
@@ -130,40 +126,49 @@ class Source(SourceOrReceiver):
         self.dt = dt
 
     @staticmethod
-    def parse(self, filename_or_obj):
+    def parse(filename_or_obj):
         """
-        Attempts to parse anything to a Source object.
+        Attempts to parse anything to a Source object. Can currently read
+        anything ObsPy can read, ObsPy event related objects,
+        and CMTSOLUTION files.
+
+        For anything ObsPy related, it must contain a full moment tensor,
+        otherwise it will raise an error.
+
+        :param filename_or_obj: The object or filename to parse.
         """
         if isinstance(filename_or_obj, basestring):
             # Anything ObsPy can read.
             try:
-                return self.parse(obspy.readEvents(filename_or_obj))
+                src = obspy.readEvents(filename_or_obj)
             except:
                 pass
+            else:
+                return Source.parse(src)
             # CMT solution file.
             try:
-                return self.from_CMTSOLUTION_file(filename_or_obj)
+                return Source.from_CMTSOLUTION_file(filename_or_obj)
             except:
                 pass
-            raise InstaseisError("Could not parse the given source.")
+            raise SourceParseError("Could not parse the given source.")
         elif isinstance(filename_or_obj, obspy.Catalog):
             if len(filename_or_obj) == 0:
-                raise InstaseisError("Event catalog contains zero events.")
+                raise SourceParseError("Event catalog contains zero events.")
             elif len(filename_or_obj) > 1:
-                raise InstaseisError(
+                raise SourceParseError(
                     "Event catalog contains %i events. Only one is allowed. "
                     "Please parse seperately." % len(filename_or_obj))
-            return self.parse(filename_or_obj[0])
+            return Source.parse(filename_or_obj[0])
         elif isinstance(filename_or_obj, obspy.core.event.Event):
             ev = filename_or_obj
             if not ev.origins:
-                raise InstaseisError("Event must contain an origin.")
-            if not ev.focal_mechansism:
-                raise InstaseisError("Event must contain a focal mechanism.")
+                raise SourceParseError("Event must contain an origin.")
+            if not ev.focal_mechanisms:
+                raise SourceParseError("Event must contain a focal mechanism.")
             org = ev.preferred_origin() or ev.origins[0]
             fm = ev.preferred_focal_mechanism() or ev.focal_mechansisms[0]
             if not fm.moment_tensor:
-                raise InstaseisError("Event must contain a moment tensor.")
+                raise SourceParseError("Event must contain a moment tensor.")
             t = fm.moment_tensor.tensor
             return Source(
                 latitude=org.latitude,

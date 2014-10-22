@@ -20,6 +20,7 @@ from obspy.signal.util import nextpow2
 import os
 import warnings
 
+from . import InstaseisError, InstaseisNotFoundError
 from . import finite_elem_mapping
 from . import mesh
 from . import rotations
@@ -34,14 +35,6 @@ MeshCollection_fwd = collections.namedtuple("MeshCollection_fwd", ["m1", "m2",
                                                                    "m3", "m4"])
 
 DEFAULT_MU = 32e9
-
-
-class InstaseisError(Exception):
-    pass
-
-
-class InstaseisNotFoundError(InstaseisError):
-    pass
 
 
 class InstaSeisDB(object):
