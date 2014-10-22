@@ -53,8 +53,7 @@ class InstaSeisDB(object):
     discretization equals the SEM basis functions of AxiSEM, resulting in high
     order spatial accuracy and short access times.
     """
-    def __init__(self, db_path, buffer_size_in_mb=100, read_on_demand=True,
-                 reciprocal=True):
+    def __init__(self, db_path, buffer_size_in_mb=100, read_on_demand=True):
         """
         :param db_path: Path to the AxiSEM Database containing subdirectories
             PZ and/or PX each containing a order_output.nc4 file
@@ -67,17 +66,12 @@ class InstaSeisDB(object):
             initialization, faster in individual seismogram extraction,
             useful e.g. for finite sources)
         :type read_on_demand: bool, optional
-        :param reciprocal: assume a reciprocal database (fixed receiver depth,
-            sources anywhere) or a forward database (fixed source depth,
-            receiver anywhere)
-        :type reciprocal: bool, optional
         """
         self.db_path = db_path
         self.buffer_size_in_mb = buffer_size_in_mb
         self.read_on_demand = read_on_demand
         self._find_and_open_files()
         self.nfft = nextpow2(self.ndumps) * 2
-        self.reciprocal = reciprocal
         self.planet_radius = self.parsed_mesh.planet_radius
         self.dump_type = self.parsed_mesh.dump_type
 
@@ -179,9 +173,10 @@ class InstaSeisDB(object):
                 read_on_demand=self.read_on_demand)
             self.parsed_mesh = pz_m
         else:
-            raise ValueError("ordered_output.nc4 files must exist in the "
-                             "PZ/Data and/or PX/Data subfolders")
+            # Should not happen.
+            raise NotImplementedError
         self.meshes = MeshCollection_bwd(px=px_m, pz=pz_m)
+        self.reciprocal = True
 
     def _parse_mt_meshes(self, files):
         m1_m = mesh.Mesh(
@@ -204,6 +199,7 @@ class InstaSeisDB(object):
         self.parsed_mesh = m1_m
 
         self.meshes = MeshCollection_fwd(m1_m, m2_m, m3_m, m4_m)
+        self.reciprocal = False
 
     def get_seismograms(self, source, receiver, components=("Z", "N", "E"),
                         remove_source_shift=True, reconvolve_stf=False,

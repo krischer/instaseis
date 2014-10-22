@@ -34,8 +34,8 @@ def test_fwd_vs_bwd():
     """
     Test fwd against bwd mode
     """
-    instaseis_fwd = InstaSeisDB(os.path.join(DATA, "100s_db_fwd"),
-                                reciprocal=False)
+    instaseis_fwd = InstaSeisDB(os.path.join(DATA, "100s_db_fwd"))
+
     instaseis_bwd = InstaSeisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
 
     source_fwd = Source(latitude=4., longitude=3.0, depth_in_m=None,
@@ -85,8 +85,8 @@ def test_fwd_vs_bwd_axial():
     in non axial case, presumably because the close source, which is not
     exactly a point source in the SEM representation.
     """
-    instaseis_fwd = InstaSeisDB(os.path.join(DATA, "100s_db_fwd_deep"),
-                                reciprocal=False)
+    instaseis_fwd = InstaSeisDB(os.path.join(DATA, "100s_db_fwd_deep"))
+
     instaseis_bwd = InstaSeisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
 
     source_fwd = Source(latitude=0., longitude=0., depth_in_m=None,
@@ -344,8 +344,7 @@ def test_incremental_fwd():
     """
     incremental tests of fwd mode
     """
-    instaseis_fwd = InstaSeisDB(os.path.join(DATA, "100s_db_fwd"),
-                                reciprocal=False)
+    instaseis_fwd = InstaSeisDB(os.path.join(DATA, "100s_db_fwd"))
 
     receiver = Receiver(latitude=42.6390, longitude=74.4940)
     source = Source(
