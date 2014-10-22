@@ -163,8 +163,7 @@
 <span class="sd">    discretization equals the SEM basis functions of AxiSEM, resulting in high</span>
 <span class="sd">    order spatial accuracy and short access times.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_path</span><span class="p">,</span> <span class="n">buffer_size_in_mb</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">read_on_demand</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-                 <span class="n">reciprocal</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_path</span><span class="p">,</span> <span class="n">buffer_size_in_mb</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">read_on_demand</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param db_path: Path to the AxiSEM Database containing subdirectories</span>
 <span class="sd">            PZ and/or PX each containing a order_output.nc4 file</span>
@@ -177,17 +176,12 @@
 <span class="sd">            initialization, faster in individual seismogram extraction,</span>
 <span class="sd">            useful e.g. for finite sources)</span>
 <span class="sd">        :type read_on_demand: bool, optional</span>
-<span class="sd">        :param reciprocal: assume a reciprocal database (fixed receiver depth,</span>
-<span class="sd">            sources anywhere) or a forward database (fixed source depth,</span>
-<span class="sd">            receiver anywhere)</span>
-<span class="sd">        :type reciprocal: bool, optional</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">db_path</span> <span class="o">=</span> <span class="n">db_path</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">buffer_size_in_mb</span> <span class="o">=</span> <span class="n">buffer_size_in_mb</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">read_on_demand</span> <span class="o">=</span> <span class="n">read_on_demand</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_find_and_open_files</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nfft</span> <span class="o">=</span> <span class="n">nextpow2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ndumps</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">reciprocal</span> <span class="o">=</span> <span class="n">reciprocal</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">planet_radius</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">planet_radius</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dump_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">dump_type</span>
 
@@ -289,9 +283,10 @@
                 <span class="n">read_on_demand</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">read_on_demand</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span> <span class="o">=</span> <span class="n">pz_m</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;ordered_output.nc4 files must exist in the &quot;</span>
-                             <span class="s">&quot;PZ/Data and/or PX/Data subfolders&quot;</span><span class="p">)</span>
+            <span class="c"># Should not happen.</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">meshes</span> <span class="o">=</span> <span class="n">MeshCollection_bwd</span><span class="p">(</span><span class="n">px</span><span class="o">=</span><span class="n">px_m</span><span class="p">,</span> <span class="n">pz</span><span class="o">=</span><span class="n">pz_m</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reciprocal</span> <span class="o">=</span> <span class="bp">True</span>
 
     <span class="k">def</span> <span class="nf">_parse_mt_meshes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">files</span><span class="p">):</span>
         <span class="n">m1_m</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">Mesh</span><span class="p">(</span>
@@ -314,6 +309,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span> <span class="o">=</span> <span class="n">m1_m</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">meshes</span> <span class="o">=</span> <span class="n">MeshCollection_fwd</span><span class="p">(</span><span class="n">m1_m</span><span class="p">,</span> <span class="n">m2_m</span><span class="p">,</span> <span class="n">m3_m</span><span class="p">,</span> <span class="n">m4_m</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reciprocal</span> <span class="o">=</span> <span class="bp">False</span>
 
 <div class="viewcode-block" id="InstaSeisDB.get_seismograms"><a class="viewcode-back" href="../../instaseis.html#instaseis.instaseisdb.InstaSeisDB.get_seismograms">[docs]</a>    <span class="k">def</span> <span class="nf">get_seismograms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">receiver</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="p">(</span><span class="s">&quot;Z&quot;</span><span class="p">,</span> <span class="s">&quot;N&quot;</span><span class="p">,</span> <span class="s">&quot;E&quot;</span><span class="p">),</span>
                         <span class="n">remove_source_shift</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">reconvolve_stf</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
