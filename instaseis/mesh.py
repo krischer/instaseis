@@ -87,7 +87,7 @@ class Mesh(object):
     MIN_FILE_VERSION = 7
 
     def __init__(self, filename, full_parse=False,
-                 strain_buffer_size_in_mb=100, displ_buffer_size_in_mb=100,
+                 strain_buffer_size_in_mb=0, displ_buffer_size_in_mb=0,
                  read_on_demand=True):
         self.f = netCDF4.Dataset(filename, "r", format="NETCDF4")
         self.filename = filename

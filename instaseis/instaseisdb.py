@@ -71,9 +71,6 @@ class InstaSeisDB(object):
         self.buffer_size_in_mb = buffer_size_in_mb
         self.read_on_demand = read_on_demand
         self._find_and_open_files()
-        self.nfft = nextpow2(self.ndumps) * 2
-        self.planet_radius = self.parsed_mesh.planet_radius
-        self.dump_type = self.parsed_mesh.dump_type
 
     def _find_and_open_files(self):
         """
@@ -130,6 +127,11 @@ class InstaSeisDB(object):
             self._parse_mt_meshes(netcdf_files)
         else:
             raise InstaseisError("Could not find any suitable netCDF files.")
+
+        # Set some common variables.
+        self.nfft = nextpow2(self.ndumps) * 2
+        self.planet_radius = self.parsed_mesh.planet_radius
+        self.dump_type = self.parsed_mesh.dump_type
 
     def _parse_fs_meshes(self, files):
         if "PX" in files:
