@@ -174,11 +174,13 @@ most expensive part so make sure to do it only once if possible.
 GUI
 ---
 
-The GUI is just an experimental feature and will likely crash for some reason. To try it, just execute the correct file
+Instaseis contains an optional graphical user interface which might be
+useful for some purposes. To execute it just type
+
 
 .. code-block:: bash
 
-    $ python instaseis/experimental_gui/instaseis_gui.py
+    $ python -m instaseis.gui
 
 .. image:: http://i.imgur.com/FVmua2X.png
 
