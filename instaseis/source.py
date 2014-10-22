@@ -193,18 +193,18 @@ class Source(SourceOrReceiver):
         f = open(filename, 'r')
         f.readline()
         f.readline()
-        time_shift = float(f.readline().split()[2])
+        time_shift = float(f.readline().strip().split()[-1])
         f.readline()
-        latitude = float(f.readline().split()[1])
-        longitude = float(f.readline().split()[1])
-        depth_in_m = float(f.readline().split()[1]) * 1e3
+        latitude = float(f.readline().strip().split()[-1])
+        longitude = float(f.readline().strip().split()[-1])
+        depth_in_m = float(f.readline().strip().split()[-1]) * 1e3
 
-        m_rr = float(f.readline().split()[1]) / 1e7
-        m_tt = float(f.readline().split()[1]) / 1e7
-        m_pp = float(f.readline().split()[1]) / 1e7
-        m_rt = float(f.readline().split()[1]) / 1e7
-        m_rp = float(f.readline().split()[1]) / 1e7
-        m_tp = float(f.readline().split()[1]) / 1e7
+        m_rr = float(f.readline().strip().split()[-1]) / 1e7
+        m_tt = float(f.readline().strip().split()[-1]) / 1e7
+        m_pp = float(f.readline().strip().split()[-1]) / 1e7
+        m_rt = float(f.readline().strip().split()[-1]) / 1e7
+        m_rp = float(f.readline().strip().split()[-1]) / 1e7
+        m_tp = float(f.readline().strip().split()[-1]) / 1e7
 
         f.close()
         return self(latitude, longitude, depth_in_m, m_rr, m_tt, m_pp, m_rt,

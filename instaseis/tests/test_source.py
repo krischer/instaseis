@@ -13,6 +13,7 @@ from __future__ import absolute_import
 
 import obspy
 import os
+import numpy as np
 
 from instaseis import Source
 
@@ -20,29 +21,36 @@ DATA = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 EVENT_FILE = os.path.join(DATA, "GCMT_event_STRAIT_OF_GIBRALTAR.xml")
 
 
-# def test_parse_STATIONS_file(tmpdir):
-#     """
-#     Tests parsing from a STATIONS file. tmpdir is a pytest fixture.
-#     """
-#     filename = os.path.join(tmpdir.dirname, "STATIONS")
-#     lines = (
-#         "AAK        II       10.     20.   1645.0    30.0",
-#         "BBK        AA       20.     30.   1645.0    30.0"
-#     )
-#     with open(filename, "wt") as fh:
-#         fh.write("\n".join(lines))
-#
-#     receivers = Receiver.parse(filename)
-#
-#     assert len(receivers) == 2
-#
-#     rec = receivers[0]
-#     assert (rec.latitude, rec.longitude, rec.network, rec.station) == \
-#            (10.0, 20.0, "II", "AAK")
-#
-#     rec = receivers[1]
-#     assert (rec.latitude, rec.longitude, rec.network, rec.station) == \
-#            (20.0, 30.0, "AA", "BBK")
+def test_parse_CMTSOLUTIONS_file(tmpdir):
+    """
+    Tests parsing from a CMTSOLUTIONS file.
+    """
+    filename = os.path.join(str(tmpdir), "CMTSOLUTIONS")
+    lines = (
+        "PDEW2011  8 23 17 51  4.60  37.9400  -77.9300   6.0 5.9 5.8 VIRGINIA",
+        "event name:     201108231751A",
+        "time shift:      1.1100",
+        "half duration:   1.8000",
+        "latitude:       37.9100",
+        "longitude:     -77.9300",
+        "depth:          12.0000",
+        "Mrr:       4.710000e+24",
+        "Mtt:       3.810000e+22",
+        "Mpp:      -4.740000e+24",
+        "Mrt:       3.990000e+23",
+        "Mrp:      -8.050000e+23",
+        "Mtp:      -1.230000e+24")
+    with open(filename, "wt") as fh:
+        fh.write("\n".join(lines))
+
+    src = Source.parse(filename)
+    src_params = np.array([src.latitude, src.longitude, src.depth_in_m,
+                           src.m_rr, src.m_tt, src.m_pp, src.m_rt, src.m_rp,
+                           src.m_tp], dtype="float64")
+    np.testing.assert_allclose(src_params, np.array(
+        (37.91, -77.93, 12000, 4.71E17, 3.81E15, -4.74E17, 3.99E16, -8.05E16,
+         -1.23E17), dtype="float64"))
+
 
 def _assert_src(src):
     """
