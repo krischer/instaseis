@@ -120,7 +120,9 @@ setup_config = dict(
     url="",
     packages=find_packages(),
     package_data={
-        "instaseis": [os.path.join("lib", "instaseis.so")] +
+        "instaseis":
+            [os.path.join("lib", "instaseis.so")] +
+            [os.path.join("gui", "qt_window.ui")] +
             get_package_data()},
     license="GNU General Public License, version 3 (GPLv3)",
     platforms="OS Independent",
