@@ -134,8 +134,10 @@ Martin van Driel (<a class="reference external" href="mailto:Martin&#37;&#52;&#4
 <dl class="class">
 <dt id="instaseis.mesh.Buffer">
 <em class="property">class </em><tt class="descclassname">instaseis.mesh.</tt><tt class="descname">Buffer</tt><big>(</big><em>max_size_in_mb=100</em><big>)</big><a class="reference internal" href="_modules/instaseis/mesh.html#Buffer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.mesh.Buffer" title="Permalink to this definition">¶</a></dt>
-<dd><p>A simple buffer class based on a dictionary with a maximum memory. Last
-accessed items are removed last when the memory limit is hit.</p>
+<dd><p>A simple memory-limited buffer with a dictionary-like interface.
+Implemented as a kind of priority queue where priority is highest for
+recently accessed items. Thus the &#8220;stalest&#8221; items are removed first once
+the memory limit it reached.</p>
 <dl class="method">
 <dt id="instaseis.mesh.Buffer.add">
 <tt class="descname">add</tt><big>(</big><em>key</em>, <em>value</em><big>)</big><a class="reference internal" href="_modules/instaseis/mesh.html#Buffer.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.mesh.Buffer.add" title="Permalink to this definition">¶</a></dt>
@@ -146,8 +148,8 @@ the maximum size in memory.</p>
 <dl class="attribute">
 <dt id="instaseis.mesh.Buffer.efficiency">
 <tt class="descname">efficiency</tt><a class="reference internal" href="_modules/instaseis/mesh.html#Buffer.efficiency"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.mesh.Buffer.efficiency" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the fraction of call to the __contains__() routine that returned
-True.</p>
+<dd><p>Return the fraction of calls to the __contains__() routine that
+returned True.</p>
 </dd></dl>
 
 <dl class="method">
@@ -162,7 +164,7 @@ last.</p>
 <dl class="class">
 <dt id="instaseis.mesh.Mesh">
 <em class="property">class </em><tt class="descclassname">instaseis.mesh.</tt><tt class="descname">Mesh</tt><big>(</big><em>filename</em>, <em>full_parse=False</em>, <em>strain_buffer_size_in_mb=100</em>, <em>displ_buffer_size_in_mb=100</em>, <em>read_on_demand=True</em><big>)</big><a class="reference internal" href="_modules/instaseis/mesh.html#Mesh"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.mesh.Mesh" title="Permalink to this definition">¶</a></dt>
-<dd><p>A class to handle the netcdf output written by AxiSEM.</p>
+<dd><p>A class to handle the actual netCDF files written by AxiSEM.</p>
 </dd></dl>
 
 </div>

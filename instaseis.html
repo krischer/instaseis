@@ -137,8 +137,9 @@ PZ and/or PX each containing a order_output.nc4 file</li>
 <li><strong>buffer_size_in_mb</strong> (<em>int, optional</em>) &#8211; Strain is buffered to avoid unnecessary
 file access when sources are located in the same SEM element</li>
 <li><strong>read_on_demand</strong> (<em>bool, optional</em>) &#8211; read several global fields on demand (faster
-initialization, default) or on initialization (faster in individual
-seismogram extraction, useful e.g. for finite sources)</li>
+initialization, default) or on initialization (slower
+initialization, faster in individual seismogram extraction,
+useful e.g. for finite sources)</li>
 <li><strong>reciprocal</strong> (<em>bool, optional</em>) &#8211; assume a reciprocal database (fixed receiver depth,
 sources anywhere) or a forward database (fixed source depth,
 receiver anywhere)</li>
