@@ -18,16 +18,15 @@ from obspy import UTCDateTime
 from scipy.spatial import cKDTree
 from collections import OrderedDict
 
-MIN_FILE_VERSION = 7
-
-
 class Buffer(object):
     """
-    A simple buffer class based on a dictionary with a maximum memory. Last
-    accessed items are removed last when the memory limit is hit.
+    A simple memory-limited buffer with a dictionary-like interface.
+    Implemented as a kind of priority queue where priority is highest for
+    recently accessed items. Thus the "stalest" items are removed first once
+    the memory limit it reached.
     """
     def __init__(self, max_size_in_mb=100):
-        self._max_size_in_bytes = max_size_in_mb * 1024**2
+        self._max_size_in_bytes = max_size_in_mb * 1024 ** 2
         self._total_size = 0
         self._buffer = OrderedDict()
         self._hits = 0
@@ -65,24 +64,27 @@ class Buffer(object):
             self._total_size -= v.nbytes
 
     def get_size_mb(self):
-        return float(self._total_size) / 1024**2
+        return float(self._total_size) / 1024 ** 2
 
     @property
     def efficiency(self):
         """
-        Return the fraction of call to the __contains__() routine that returned
-        True.
+        Return the fraction of calls to the __contains__() routine that
+        returned True.
         """
         if (self._hits + self._fails) == 0:
-            return 0.
+            return 0.0
         else:
             return float(self._hits) / float(self._hits + self._fails)
 
 
 class Mesh(object):
     """
-    A class to handle the netcdf output written by AxiSEM.
+    A class to handle the actual netCDF files written by AxiSEM.
     """
+    # Minimal acceptable version of the netCDF database files.
+    MIN_FILE_VERSION = 7
+
     def __init__(self, filename, full_parse=False,
                  strain_buffer_size_in_mb=100, displ_buffer_size_in_mb=100,
                  read_on_demand=True):
@@ -113,10 +115,10 @@ class Mesh(object):
             self.file_version = getattr(self.f, "file version")
         except AttributeError:
             # very old files don't even have this attribute
-            raise ValueError("Database file to old.")
+            raise ValueError("Database file too old.")
 
-        if self.file_version < MIN_FILE_VERSION:
-            raise ValueError("Database file to old.")
+        if self.file_version < self.MIN_FILE_VERSION:
+            raise ValueError("Database file too old.")
 
         self.ndumps = getattr(self.f, "number of strain dumps")
         self.chunks = \
