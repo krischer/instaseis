@@ -28,7 +28,7 @@ def test_flake8():
     instaseis_dir = os.path.dirname(test_dir)
 
     # Ignore automatically generated files.
-    ignore_files = [os.path.join("experimental_gui", "qt_window.py")]
+    ignore_files = [os.path.join("gui", "qt_window.py")]
     ignore_files = [os.path.join(instaseis_dir, _i) for _i in ignore_files]
     files = []
     for dirpath, _, filenames in os.walk(instaseis_dir):

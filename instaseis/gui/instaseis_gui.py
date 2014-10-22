@@ -1,5 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+"""
+Graphical user interface for Instaseis.
+
+:copyright:
+    Lion Krischer (krischer@geophysik.uni-muenchen.de), 2013-2014
+:license:
+    GNU General Public License, Version 3
+    (http://www.gnu.org/copyleft/gpl.html)
+"""
 from __future__ import absolute_import
 
 from PyQt4 import QtGui
@@ -328,7 +337,7 @@ def sizeof_fmt(num):
     return "%3.1f %s" % (num, "TB")
 
 
-if __name__ == "__main__":
+def launch():
     # Automatically compile all ui files if they have been changed.
     compile_and_import_ui_files()
 

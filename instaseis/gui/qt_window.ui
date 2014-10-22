@@ -485,7 +485,7 @@
   <customwidget>
    <class>Qt4MplCanvas</class>
    <extends>QGraphicsView</extends>
-   <header>qt4mplcanvas.h</header>
+   <header>instaseis.gui.qt4mplcanvas.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
