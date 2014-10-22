@@ -130,6 +130,7 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">InstaseisError</span><span class="p">,</span> <span class="n">InstaseisNotFoundError</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">finite_elem_mapping</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">mesh</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">rotations</span>
@@ -144,14 +145,6 @@
                                                                    <span class="s">&quot;m3&quot;</span><span class="p">,</span> <span class="s">&quot;m4&quot;</span><span class="p">])</span>
 
 <span class="n">DEFAULT_MU</span> <span class="o">=</span> <span class="mf">32e9</span>
-
-
-<span class="k">class</span> <span class="nc">InstaseisError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="k">pass</span>
-
-
-<span class="k">class</span> <span class="nc">InstaseisNotFoundError</span><span class="p">(</span><span class="n">InstaseisError</span><span class="p">):</span>
-    <span class="k">pass</span>
 
 
 <div class="viewcode-block" id="InstaSeisDB"><a class="viewcode-back" href="../../instaseis.html#instaseis.instaseisdb.InstaSeisDB">[docs]</a><span class="k">class</span> <span class="nc">InstaSeisDB</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -181,9 +174,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">buffer_size_in_mb</span> <span class="o">=</span> <span class="n">buffer_size_in_mb</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">read_on_demand</span> <span class="o">=</span> <span class="n">read_on_demand</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_find_and_open_files</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">nfft</span> <span class="o">=</span> <span class="n">nextpow2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ndumps</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">planet_radius</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">planet_radius</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dump_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">dump_type</span>
 
     <span class="k">def</span> <span class="nf">_find_and_open_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -240,6 +230,11 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_parse_mt_meshes</span><span class="p">(</span><span class="n">netcdf_files</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">InstaseisError</span><span class="p">(</span><span class="s">&quot;Could not find any suitable netCDF files.&quot;</span><span class="p">)</span>
+
+        <span class="c"># Set some common variables.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nfft</span> <span class="o">=</span> <span class="n">nextpow2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ndumps</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">planet_radius</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">planet_radius</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dump_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">dump_type</span>
 
     <span class="k">def</span> <span class="nf">_parse_fs_meshes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">files</span><span class="p">):</span>
         <span class="k">if</span> <span class="s">&quot;PX&quot;</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>

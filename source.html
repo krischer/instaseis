@@ -285,6 +285,24 @@ useful in the context of finite sources</li>
 </table>
 </dd></dl>
 
+<dl class="staticmethod">
+<dt id="instaseis.source.Source.parse">
+<em class="property">static </em><tt class="descname">parse</tt><big>(</big><em>filename_or_obj</em><big>)</big><a class="reference internal" href="_modules/instaseis/source.html#Source.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.Source.parse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Attempts to parse anything to a Source object. Can currently read
+anything ObsPy can read, ObsPy event related objects,
+and CMTSOLUTION files.</p>
+<p>For anything ObsPy related, it must contain a full moment tensor,
+otherwise it will raise an error.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filename_or_obj</strong> &#8211; The object or filename to parse.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="method">
 <dt id="instaseis.source.Source.resample_sliprate">
 <tt class="descname">resample_sliprate</tt><big>(</big><em>dt</em>, <em>nsamp</em><big>)</big><a class="reference internal" href="_modules/instaseis/source.html#Source.resample_sliprate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.Source.resample_sliprate" title="Permalink to this definition">¶</a></dt>
