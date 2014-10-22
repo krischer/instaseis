@@ -505,3 +505,26 @@ def test_finite_source():
     np.testing.assert_allclose(st_fin.select(component='T')[0].data,
                                st_ref.select(component='T')[0].data,
                                rtol=1E-7, atol=1E-12)
+
+
+def test_get_band_code_method():
+    """
+    Dummy test assuring the band code is determined correctly.
+    """
+    codes = {
+        0.0005: "F",
+        0.001: "F",
+        0.0011: "C",
+        0.004: "C",
+        0.0041: "H",
+        0.0125: "H",
+        0.0126: "B",
+        0.1: "B",
+        0.11: "M",
+        0.99: "M",
+        1.0: "L",
+        10.0: "L",
+        33.0: "L"
+    }
+    for sr, letter in codes.items():
+        assert InstaSeisDB._get_band_code(1.0 / sr) == letter

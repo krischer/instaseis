@@ -616,7 +616,8 @@ class InstaSeisDB(object):
             st += tr
         return st
 
-    def _get_band_code(self, dt):
+    @staticmethod
+    def _get_band_code(dt):
         """
         Figure out the channel band code. Done as in SPECFEM.
         """
@@ -629,7 +630,7 @@ class InstaSeisDB(object):
             band_code = "H"
         elif sr <= 0.1:
             band_code = "B"
-        elif sr <= 1:
+        elif sr < 1:
             band_code = "M"
         else:
             band_code = "L"
