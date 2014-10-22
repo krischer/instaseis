@@ -18,6 +18,7 @@ from obspy import UTCDateTime
 from scipy.spatial import cKDTree
 from collections import OrderedDict
 
+
 class Buffer(object):
     """
     A simple memory-limited buffer with a dictionary-like interface.
