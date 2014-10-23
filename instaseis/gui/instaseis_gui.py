@@ -27,6 +27,8 @@ import sys
 
 from instaseis import InstaSeisDB, Source, Receiver
 
+SCALING_FACTOR = 1E16
+
 
 def compile_and_import_ui_files():
     """
@@ -74,12 +76,12 @@ class Window(QtGui.QMainWindow):
             p.setTitle(label[component].capitalize() + " component")
 
         # Set some random mt at startup.
-        m_rr = 4.71E17 / 1E16
-        m_tt = 3.81E15 / 1E16
-        m_pp = -4.74E17 / 1E16
-        m_rt = 3.99E16 / 1E16
-        m_rp = -8.05E16 / 1E16
-        m_tp = -1.23E17 / 1E16
+        m_rr = 4.71E17 / SCALING_FACTOR
+        m_tt = 3.81E15 / SCALING_FACTOR
+        m_pp = -4.74E17 / SCALING_FACTOR
+        m_rt = 3.99E16 / SCALING_FACTOR
+        m_rp = -8.05E16 / SCALING_FACTOR
+        m_tp = -1.23E17 / SCALING_FACTOR
         self.ui.m_rr.setValue(m_rr)
         self.ui.m_tt.setValue(m_tt)
         self.ui.m_pp.setValue(m_pp)
@@ -93,15 +95,11 @@ class Window(QtGui.QMainWindow):
 
     @property
     def focmec(self):
-        print 'BLAA'
-        print self.ui.source_tab.currentIndex()
         if self.ui.source_tab.currentIndex() == 0:
-            print 'MT'
             return [float(self.ui.m_rr.value()), float(self.ui.m_tt.value()),
                     float(self.ui.m_pp.value()), float(self.ui.m_rt.value()),
                     float(self.ui.m_rp.value()), float(self.ui.m_tp.value())]
         elif self.ui.source_tab.currentIndex() == 1:
-            print 'strike %s' % (float(self.ui.strike_slider.value()), )
             source = Source.from_strike_dip_rake(
                 latitude=float(self.ui.source_latitude.value()),
                 longitude=float(self.ui.source_longitude.value()),
@@ -109,7 +107,7 @@ class Window(QtGui.QMainWindow):
                 strike=float(self.ui.strike_slider.value()),
                 dip=float(self.ui.dip_slider.value()),
                 rake=float(self.ui.rake_slider.value()),
-                M0=1e17)
+                M0=1)
             return [source.m_rr, source.m_tt,
                     source.m_pp, source.m_rt,
                     source.m_rp, source.m_tp]
@@ -224,7 +222,7 @@ class Window(QtGui.QMainWindow):
     @property
     def source(self):
         fm = self.focmec
-        fm = [_i * 1e16 for _i in fm]
+        fm = [_i * SCALING_FACTOR for _i in fm]
         return Source(
             latitude=float(self.ui.source_latitude.value()),
             longitude=float(self.ui.source_longitude.value()),
@@ -242,15 +240,14 @@ class Window(QtGui.QMainWindow):
         try:
             self._plot_event()
             self._plot_receiver()
-            st = self.instaseis_db.get_seismograms(source=self.source,
-                                                   receiver=self.receiver)
+            st = self.instaseis_db.get_seismograms(
+                source=self.source, receiver=self.receiver,
+                dt=self.instaseis_db.dt / 10.0,
+                a_lanczos=5)
         except AttributeError:
             return
 
         self._reset_all_plots()
-        st.taper(max_percentage=0.05, type='cosine')
-        st.resample(1.0)
-        st.taper(max_percentage=0.05, type='cosine')
 
         for component in ["Z", "N", "E"]:
             plot_widget = getattr(self.ui, "%s_graph" % component.lower())
@@ -343,14 +340,17 @@ class Window(QtGui.QMainWindow):
     def on_strike_slider_valueChanged(self, *args):
         self.ui.strike_value.setText("%i" % self.ui.strike_slider.value())
         self._draw_mt()
+        self.update()
 
     def on_dip_slider_valueChanged(self, *args):
         self.ui.dip_value.setText("%i" % self.ui.dip_slider.value())
         self._draw_mt()
+        self.update()
 
     def on_rake_slider_valueChanged(self, *args):
         self.ui.rake_value.setText("%i" % self.ui.rake_slider.value())
         self._draw_mt()
+        self.update()
 
 
 def sizeof_fmt(num):

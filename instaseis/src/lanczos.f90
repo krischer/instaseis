@@ -10,7 +10,7 @@ module lanczos
     use iso_c_binding, only: c_double, c_int
     implicit none
     private
-    
+
     double precision, parameter   :: pi = 3.1415926535898D0
 
     public :: lanczos_resamp, lanczos_kern
@@ -35,7 +35,7 @@ pure subroutine lanczos_resamp(si, n_in, so, n_out, dt, a) bind(c, name="lanczos
     do l=1, n_out
         x = dt * (l - 1)
         do m=-a, a
-            i = floor(x - m) + 1
+            i = floor(x) - m + 1
             if (i < 1 .or. i > n_in) cycle
             call lanczos_kern(x - i + 1, a, kern)
             so(l) = so(l) + si(i) * kern
