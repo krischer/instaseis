@@ -93,9 +93,26 @@ class Window(QtGui.QMainWindow):
 
     @property
     def focmec(self):
-        return [float(self.ui.m_rr.value()), float(self.ui.m_tt.value()),
-                float(self.ui.m_pp.value()), float(self.ui.m_rt.value()),
-                float(self.ui.m_rp.value()), float(self.ui.m_tp.value())]
+        print 'BLAA'
+        print self.ui.source_tab.currentIndex()
+        if self.ui.source_tab.currentIndex() == 0:
+            print 'MT'
+            return [float(self.ui.m_rr.value()), float(self.ui.m_tt.value()),
+                    float(self.ui.m_pp.value()), float(self.ui.m_rt.value()),
+                    float(self.ui.m_rp.value()), float(self.ui.m_tp.value())]
+        elif self.ui.source_tab.currentIndex() == 1:
+            print 'strike %s' % (float(self.ui.strike_slider.value()), )
+            source = Source.from_strike_dip_rake(
+                latitude=float(self.ui.source_latitude.value()),
+                longitude=float(self.ui.source_longitude.value()),
+                depth_in_m=float(self.source_depth) * 1000.0,
+                strike=float(self.ui.strike_slider.value()),
+                dip=float(self.ui.dip_slider.value()),
+                rake=float(self.ui.rake_slider.value()),
+                M0=1e17)
+            return [source.m_rr, source.m_tt,
+                    source.m_pp, source.m_rt,
+                    source.m_rp, source.m_tp]
 
     def plot_mt(self):
         self.mpl_mt_figure = self.ui.mt_fig.fig
@@ -322,6 +339,18 @@ class Window(QtGui.QMainWindow):
     def on_depth_slider_valueChanged(self, *args):
         self.ui.depth_label.setText("Depth: %i km" % self.source_depth)
         self.update()
+
+    def on_strike_slider_valueChanged(self, *args):
+        self.ui.strike_value.setText("%i" % self.ui.strike_slider.value())
+        self._draw_mt()
+
+    def on_dip_slider_valueChanged(self, *args):
+        self.ui.dip_value.setText("%i" % self.ui.dip_slider.value())
+        self._draw_mt()
+
+    def on_rake_slider_valueChanged(self, *args):
+        self.ui.rake_value.setText("%i" % self.ui.rake_slider.value())
+        self._draw_mt()
 
 
 def sizeof_fmt(num):
