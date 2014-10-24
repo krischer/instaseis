@@ -373,18 +373,6 @@
             </property>
            </widget>
           </item>
-          <item>
-           <widget class="QLabel" name="db_path_label">
-            <property name="font">
-             <font>
-              <pointsize>10</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
          </layout>
         </item>
         <item>

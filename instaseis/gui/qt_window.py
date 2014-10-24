@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '/Users/lion/workspace/code/instaseis/instaseis/gui/qt_window.ui'
+# Form implementation generated from reading ui file '/home/ex/local/src/instaseis/instaseis/gui/qt_window.ui'
 #
-# Created: Fri Oct 24 14:25:40 2014
+# Created: Fri Oct 24 21:27:09 2014
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -197,13 +197,6 @@ class Ui_MainWindow(object):
         self.select_folder_button.setFont(font)
         self.select_folder_button.setObjectName(_fromUtf8("select_folder_button"))
         self.horizontalLayout_2.addWidget(self.select_folder_button)
-        self.db_path_label = QtGui.QLabel(self.centralwidget)
-        font = QtGui.QFont()
-        font.setPointSize(10)
-        self.db_path_label.setFont(font)
-        self.db_path_label.setText(_fromUtf8(""))
-        self.db_path_label.setObjectName(_fromUtf8("db_path_label"))
-        self.horizontalLayout_2.addWidget(self.db_path_label)
         self.verticalLayout_3.addLayout(self.horizontalLayout_2)
         self.info_label = QtGui.QLabel(self.centralwidget)
         font = QtGui.QFont()

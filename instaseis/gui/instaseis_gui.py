@@ -317,7 +317,6 @@ class Window(QtGui.QMainWindow):
         self.ui.depth_slider.setMinimum(min_rad - max_rad)
         self.ui.depth_slider.setMaximum(0)
 
-        self.ui.db_path_label.setText(os.path.relpath(self.folder))
         self.update(autorange=True)
         self.set_info()
 
