@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file '/Users/lion/workspace/code/instaseis/instaseis/gui/qt_window.ui'
 #
-# Created: Fri Oct 24 10:50:03 2014
+# Created: Fri Oct 24 11:08:33 2014
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -270,6 +270,7 @@ class Ui_MainWindow(object):
         self.gridLayout_4.addWidget(self.label_3, 0, 0, 1, 1)
         self.dip_slider = QtGui.QSlider(self.tab_2)
         self.dip_slider.setMaximum(90)
+        self.dip_slider.setProperty("value", 90)
         self.dip_slider.setOrientation(QtCore.Qt.Horizontal)
         self.dip_slider.setObjectName(_fromUtf8("dip_slider"))
         self.gridLayout_4.addWidget(self.dip_slider, 1, 1, 1, 1)

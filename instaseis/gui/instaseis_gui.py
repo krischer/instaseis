@@ -22,6 +22,8 @@ import imp
 import inspect
 from mpl_toolkits.basemap import Basemap
 from obspy.imaging.mopad_wrapper import Beach
+from obspy.core.util.geodetics import locations2degrees
+from obspy.taup.taup import getTravelTimes
 import os
 import sys
 
@@ -219,12 +221,6 @@ class Window(QtGui.QMainWindow):
         self.__receiver_map_obj.latitude = lat
         self.mpl_map_figure.canvas.draw()
 
-    def _reset_all_plots(self):
-        for component in ["z", "n", "e"]:
-            p = getattr(self.ui, "%s_graph" % component)
-            p.clear()
-            p.autoRange()
-
     @property
     def source(self):
         fm = self.focmec
@@ -242,7 +238,9 @@ class Window(QtGui.QMainWindow):
             latitude=float(self.ui.receiver_latitude.value()),
             longitude=float(self.ui.receiver_longitude.value()))
 
-    def update(self):
+    def update(self, autorange=False):
+        src = self.source
+        rec = self.receiver
         try:
             # Grab resampling settings from the UI.
             if bool(self.ui.resample_check_box.checkState()):
@@ -255,19 +253,35 @@ class Window(QtGui.QMainWindow):
             self._plot_event()
             self._plot_receiver()
             st = self.instaseis_db.get_seismograms(
-                source=self.source, receiver=self.receiver,
+                source=src, receiver=rec,
                 dt=dt, a_lanczos=a_lanczos)
         except AttributeError:
             return
 
-        self._reset_all_plots()
+        great_circle_distance = locations2degrees(
+            src.latitude, src.longitude,
+            rec.latitude, rec.longitude)
+        tts = getTravelTimes(great_circle_distance, src.depth_in_m / 1000.0,
+                             model="ak135")
 
         for component in ["Z", "N", "E"]:
             plot_widget = getattr(self.ui, "%s_graph" % component.lower())
+            plot_widget.clear()
             tr = st.select(component=component)[0]
             times = tr.times()
             plot_widget.plot(times, tr.data, pen="k")
-            plot_widget.autoRange()
+
+            for tt in tts:
+                if tt["time"] >= times[-1]:
+                    continue
+                if tt["phase_name"][0].lower() == "p":
+                    pen = "#008c2866"
+                else:
+                    pen = "#95000066"
+                plot_widget.addLine(x=tt["time"], pen=pen, z=-10)
+
+            if autorange:
+                plot_widget.autoRange()
 
     def on_select_folder_button_released(self):
         self.folder = str(QtGui.QFileDialog.getExistingDirectory(
@@ -277,7 +291,7 @@ class Window(QtGui.QMainWindow):
             return
         self.instaseis_db = InstaSeisDB(self.folder)
         self.ui.db_path_label.setText(os.path.relpath(self.folder))
-        self.update()
+        self.update(autorange=True)
         self.set_info()
 
     def set_info(self):
