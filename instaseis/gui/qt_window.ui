@@ -99,7 +99,7 @@
          <widget class="QCheckBox" name="tt_times">
           <property name="font">
            <font>
-            <pointsize>11</pointsize>
+            <pointsize>9</pointsize>
            </font>
           </property>
           <property name="text">
@@ -147,7 +147,7 @@
           </property>
           <property name="font">
            <font>
-            <pointsize>11</pointsize>
+            <pointsize>9</pointsize>
            </font>
           </property>
           <property name="text">
@@ -190,7 +190,7 @@
           </property>
           <property name="font">
            <font>
-            <pointsize>11</pointsize>
+            <pointsize>9</pointsize>
            </font>
           </property>
           <property name="text">
@@ -205,7 +205,7 @@
           </property>
           <property name="font">
            <font>
-            <pointsize>11</pointsize>
+            <pointsize>9</pointsize>
            </font>
           </property>
           <property name="text">
@@ -248,7 +248,7 @@
           </property>
           <property name="font">
            <font>
-            <pointsize>11</pointsize>
+            <pointsize>9</pointsize>
            </font>
           </property>
           <property name="text">
@@ -270,10 +270,23 @@
          </spacer>
         </item>
         <item>
-         <widget class="Line" name="line_5">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
+         <widget class="QComboBox" name="components_combo">
+          <property name="editable">
+           <bool>false</bool>
           </property>
+          <property name="currentIndex">
+           <number>0</number>
+          </property>
+          <item>
+           <property name="text">
+            <string>ZNE</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>ZRT</string>
+           </property>
+          </item>
          </widget>
         </item>
         <item>
@@ -296,7 +309,7 @@
           </property>
           <property name="font">
            <font>
-            <pointsize>11</pointsize>
+            <pointsize>9</pointsize>
            </font>
           </property>
           <property name="text">
@@ -333,7 +346,7 @@
           </property>
           <property name="font">
            <font>
-            <pointsize>11</pointsize>
+            <pointsize>9</pointsize>
            </font>
           </property>
           <property name="text">

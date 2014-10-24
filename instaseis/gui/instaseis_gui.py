@@ -69,13 +69,14 @@ class Window(QtGui.QMainWindow):
         self.ui = qt_window.Ui_MainWindow()  # NOQA
         self.ui.setupUi(self)
 
+        label = {"z": "vertical", "e": "east", "n": "north"}
         for component in ["z", "n", "e"]:
             p = getattr(self.ui, "%s_graph" % component)
             p.setLabel("left", "Displacement", units="m")
             p.setLabel("bottom", "Time since event", units="s")
 
-            label = {"z": "vertical", "e": "east", "n": "north"}
             p.setTitle(label[component].capitalize() + " component")
+
         self.ui.n_graph.setXLink(self.ui.e_graph)
         self.ui.n_graph.setXLink(self.ui.z_graph)
         self.ui.e_graph.setXLink(self.ui.z_graph)
@@ -239,6 +240,21 @@ class Window(QtGui.QMainWindow):
             longitude=float(self.ui.receiver_longitude.value()))
 
     def update(self, autorange=False):
+
+        components = ["z", "n", "e"]
+        components_map = {0: ("Z", "N", "E"),
+                          1: ("Z", "R", "T")}
+
+        components_choice = int(self.ui.components_combo.currentIndex())
+
+        label_map = {0: {"z": "vertical", "n": "east", "e": "north"},
+                     1: {"z": "vertical", "n": "radial", "e": "transverse"}}
+
+        for component in components:
+            p = getattr(self.ui, "%s_graph" % component)
+            p.setTitle(label_map[components_choice][component].capitalize()
+                       + " component")
+
         src = self.source
         rec = self.receiver
         try:
@@ -251,7 +267,8 @@ class Window(QtGui.QMainWindow):
             self._plot_event()
             self._plot_receiver()
             st = self.instaseis_db.get_seismograms(
-                source=src, receiver=rec, dt=dt)
+                source=src, receiver=rec, dt=dt,
+                components=components_map[components_choice])
 
             # check filter values from the UI
             if bool(self.ui.lowpass_check_box.checkState()):
@@ -280,10 +297,11 @@ class Window(QtGui.QMainWindow):
             tts = getTravelTimes(great_circle_distance,
                                  src.depth_in_m / 1000.0, model="ak135")
 
-        for component in ["Z", "N", "E"]:
+
+        for ic, component in enumerate(components):
             plot_widget = getattr(self.ui, "%s_graph" % component.lower())
             plot_widget.clear()
-            tr = st.select(component=component)[0]
+            tr = st.select(component=components_map[components_choice][ic])[0]
             times = tr.times()
             plot_widget.plot(times, tr.data, pen="k")
 
@@ -319,7 +337,6 @@ class Window(QtGui.QMainWindow):
 
     def set_info(self):
         self.ui.info_text.setText(str(self.instaseis_db))
-        print str(self.instaseis_db)
 
     def on_source_latitude_valueChanged(self, *args):
         self.update()
@@ -412,6 +429,9 @@ class Window(QtGui.QMainWindow):
         self.update()
 
     def on_highpass_period_valueChanged(self, *args):
+        self.update()
+
+    def on_components_combo_currentIndexChanged(self):
         self.update()
 
 
