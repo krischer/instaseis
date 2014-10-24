@@ -255,6 +255,24 @@ class Window(QtGui.QMainWindow):
             st = self.instaseis_db.get_seismograms(
                 source=src, receiver=rec,
                 dt=dt, a_lanczos=a_lanczos)
+
+            # check filter values from the UI
+            if bool(self.ui.lowpass_check_box.checkState()):
+                try:
+                    freq = 1.0 / float(self.ui.lowpass_period.value())
+                    st.filter('lowpass', freq=freq)
+                except ZeroDivisionError:
+                    # this happens when typing in the lowpass_period box
+                    pass
+
+            if bool(self.ui.highpass_check_box.checkState()):
+                try:
+                    freq = 1.0 / float(self.ui.highpass_period.value())
+                    st.filter('highpass', freq=freq)
+                except ZeroDivisionError:
+                    # this happens when typing in the highpass_period box
+                    pass
+
         except AttributeError:
             return
 
@@ -384,6 +402,24 @@ class Window(QtGui.QMainWindow):
         self.update()
 
     def on_tt_times_stateChanged(self, state):
+        self.update()
+
+    def on_lowpass_check_box_stateChanged(self, state):
+        resample = bool(state)
+        self.ui.lowpass_period.setEnabled(resample)
+        self.ui.lowpass_label.setEnabled(resample)
+        self.update()
+
+    def on_lowpass_period_valueChanged(self, *args):
+        self.update()
+
+    def on_highpass_check_box_stateChanged(self, state):
+        resample = bool(state)
+        self.ui.highpass_period.setEnabled(resample)
+        self.ui.highpass_label.setEnabled(resample)
+        self.update()
+
+    def on_highpass_period_valueChanged(self, *args):
         self.update()
 
 
