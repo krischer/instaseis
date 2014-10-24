@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file '/Users/lion/workspace/code/instaseis/instaseis/gui/qt_window.ui'
 #
-# Created: Fri Oct 24 11:13:49 2014
+# Created: Fri Oct 24 11:18:48 2014
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
