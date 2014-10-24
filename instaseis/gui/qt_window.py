@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file '/home/ex/local/src/instaseis/instaseis/gui/qt_window.ui'
 #
-# Created: Fri Oct 24 22:38:08 2014
+# Created: Fri Oct 24 22:47:26 2014
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -316,14 +316,17 @@ class Ui_MainWindow(object):
         self.label_4.setAlignment(QtCore.Qt.AlignCenter)
         self.label_4.setObjectName(_fromUtf8("label_4"))
         self.gridLayout.addWidget(self.label_4, 1, 0, 1, 1)
+        self.gridLayout.setColumnStretch(1, 10)
+        self.gridLayout.setColumnStretch(2, 10)
+        self.gridLayout.setColumnStretch(3, 10)
         self.source_tab.addTab(self.tab, _fromUtf8(""))
         self.tab_2 = QtGui.QWidget()
         self.tab_2.setObjectName(_fromUtf8("tab_2"))
         self.gridLayout_4 = QtGui.QGridLayout(self.tab_2)
-        self.gridLayout_4.setMargin(2)
+        self.gridLayout_4.setMargin(9)
         self.gridLayout_4.setObjectName(_fromUtf8("gridLayout_4"))
         self.strike_value = QtGui.QLabel(self.tab_2)
-        self.strike_value.setMinimumSize(QtCore.QSize(50, 0))
+        self.strike_value.setMinimumSize(QtCore.QSize(30, 0))
         self.strike_value.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.strike_value.setObjectName(_fromUtf8("strike_value"))
         self.gridLayout_4.addWidget(self.strike_value, 0, 2, 1, 1)
@@ -340,7 +343,7 @@ class Ui_MainWindow(object):
         self.dip_slider.setObjectName(_fromUtf8("dip_slider"))
         self.gridLayout_4.addWidget(self.dip_slider, 1, 1, 1, 1)
         self.dip_value = QtGui.QLabel(self.tab_2)
-        self.dip_value.setMinimumSize(QtCore.QSize(50, 0))
+        self.dip_value.setMinimumSize(QtCore.QSize(30, 0))
         self.dip_value.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.dip_value.setObjectName(_fromUtf8("dip_value"))
         self.gridLayout_4.addWidget(self.dip_value, 1, 2, 1, 1)
@@ -354,7 +357,7 @@ class Ui_MainWindow(object):
         self.rake_slider.setObjectName(_fromUtf8("rake_slider"))
         self.gridLayout_4.addWidget(self.rake_slider, 2, 1, 1, 1)
         self.rake_value = QtGui.QLabel(self.tab_2)
-        self.rake_value.setMinimumSize(QtCore.QSize(50, 0))
+        self.rake_value.setMinimumSize(QtCore.QSize(30, 0))
         self.rake_value.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.rake_value.setObjectName(_fromUtf8("rake_value"))
         self.gridLayout_4.addWidget(self.rake_value, 2, 2, 1, 1)
