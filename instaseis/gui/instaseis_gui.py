@@ -321,7 +321,8 @@ class Window(QtGui.QMainWindow):
         self.set_info()
 
     def set_info(self):
-        self.ui.info_label.setText(str(self.instaseis_db))
+        self.ui.info_text.setText(str(self.instaseis_db))
+        print str(self.instaseis_db)
 
     def on_source_latitude_valueChanged(self, *args):
         self.update()
