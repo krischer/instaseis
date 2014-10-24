@@ -74,6 +74,12 @@ class Window(QtGui.QMainWindow):
 
             label = {"z": "vertical", "e": "east", "n": "north"}
             p.setTitle(label[component].capitalize() + " component")
+        self.ui.n_graph.setXLink(self.ui.e_graph)
+        self.ui.n_graph.setXLink(self.ui.z_graph)
+        self.ui.e_graph.setXLink(self.ui.z_graph)
+        self.ui.n_graph.setYLink(self.ui.e_graph)
+        self.ui.n_graph.setYLink(self.ui.z_graph)
+        self.ui.e_graph.setYLink(self.ui.z_graph)
 
         # Set some random mt at startup.
         m_rr = 4.71E17 / SCALING_FACTOR
