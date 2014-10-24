@@ -923,33 +923,33 @@
         <span class="n">return_str</span> <span class="o">=</span> <span class="p">(</span>
             <span class="s">&quot;AxiSEM {reciprocal} Green&#39;s function Database (v{format_v}) &quot;</span>
             <span class="s">&quot;generated with these parameters:</span><span class="se">\n</span><span class="s">&quot;</span>
-            <span class="s">&quot;</span><span class="se">\t</span><span class="s">components               : {components}</span><span class="se">\n</span><span class="s">&quot;</span>
+            <span class="s">&quot;</span><span class="se">\t</span><span class="s">components           : {components}</span><span class="se">\n</span><span class="s">&quot;</span>
             <span class="s">&quot;{source_depth}&quot;</span>
-            <span class="s">&quot;</span><span class="se">\t</span><span class="s">velocity model           : {velocity_model}</span><span class="se">\n</span><span class="s">&quot;</span>
-            <span class="s">&quot;</span><span class="se">\t</span><span class="s">attentuation             : {attenuation}</span><span class="se">\n</span><span class="s">&quot;</span>
-            <span class="s">&quot;</span><span class="se">\t</span><span class="s">dominant period          : {period:.3f} s</span><span class="se">\n</span><span class="s">&quot;</span>
-            <span class="s">&quot;</span><span class="se">\t</span><span class="s">dump type                : {dump_type}</span><span class="se">\n</span><span class="s">&quot;</span>
-            <span class="s">&quot;</span><span class="se">\t</span><span class="s">excitation type          : {excitation_type}</span><span class="se">\n</span><span class="s">&quot;</span>
-            <span class="s">&quot;</span><span class="se">\t</span><span class="s">time step                : {dt:.3f} s</span><span class="se">\n</span><span class="s">&quot;</span>
-            <span class="s">&quot;</span><span class="se">\t</span><span class="s">sampling rate            : {sampling_rate:.3f} Hz</span><span class="se">\n</span><span class="s">&quot;</span>
-            <span class="s">&quot;</span><span class="se">\t</span><span class="s">number of samples        : {npts}</span><span class="se">\n</span><span class="s">&quot;</span>
-            <span class="s">&quot;</span><span class="se">\t</span><span class="s">seismogram length        : {length:.1f} s</span><span class="se">\n</span><span class="s">&quot;</span>
-            <span class="s">&quot;</span><span class="se">\t</span><span class="s">source time function     : {stf}</span><span class="se">\n</span><span class="s">&quot;</span>
-            <span class="s">&quot;</span><span class="se">\t</span><span class="s">source shift             : {src_shift:.3f} s</span><span class="se">\n</span><span class="s">&quot;</span>
-            <span class="s">&quot;</span><span class="se">\t</span><span class="s">spatial order            : {spatial_order}</span><span class="se">\n</span><span class="s">&quot;</span>
-            <span class="s">&quot;</span><span class="se">\t</span><span class="s">min/max radius           : {min_rad:.1f} - {max_rad:.1f} km &quot;</span>
-            <span class="s">&quot;(Planet radius: {planet_rad:.1f} km)</span><span class="se">\n</span><span class="s">&quot;</span>
-            <span class="s">&quot;</span><span class="se">\t</span><span class="s">min/max distance         : {min_d:.1f} - {max_d:.1f} deg</span><span class="se">\n</span><span class="s">&quot;</span>
-            <span class="s">&quot;</span><span class="se">\t</span><span class="s">time stepping scheme     : {time_scheme}</span><span class="se">\n</span><span class="s">&quot;</span>
-            <span class="s">&quot;</span><span class="se">\t</span><span class="s">compiler/user            : {compiler} by {user}</span><span class="se">\n</span><span class="s">&quot;</span>
-            <span class="s">&quot;</span><span class="se">\t</span><span class="s">directory                : {directory}</span><span class="se">\n</span><span class="s">&quot;</span>
-            <span class="s">&quot;</span><span class="se">\t</span><span class="s">size of netCDF files     : {filesize}</span><span class="se">\n</span><span class="s">&quot;</span>
+            <span class="s">&quot;</span><span class="se">\t</span><span class="s">velocity model       : {velocity_model}</span><span class="se">\n</span><span class="s">&quot;</span>
+            <span class="s">&quot;</span><span class="se">\t</span><span class="s">attenuation          : {attenuation}</span><span class="se">\n</span><span class="s">&quot;</span>
+            <span class="s">&quot;</span><span class="se">\t</span><span class="s">dominant period      : {period:.3f} s</span><span class="se">\n</span><span class="s">&quot;</span>
+            <span class="s">&quot;</span><span class="se">\t</span><span class="s">dump type            : {dump_type}</span><span class="se">\n</span><span class="s">&quot;</span>
+            <span class="s">&quot;</span><span class="se">\t</span><span class="s">excitation type      : {excitation_type}</span><span class="se">\n</span><span class="s">&quot;</span>
+            <span class="s">&quot;</span><span class="se">\t</span><span class="s">time step            : {dt:.3f} s</span><span class="se">\n</span><span class="s">&quot;</span>
+            <span class="s">&quot;</span><span class="se">\t</span><span class="s">sampling rate        : {sampling_rate:.3f} Hz</span><span class="se">\n</span><span class="s">&quot;</span>
+            <span class="s">&quot;</span><span class="se">\t</span><span class="s">number of samples    : {npts}</span><span class="se">\n</span><span class="s">&quot;</span>
+            <span class="s">&quot;</span><span class="se">\t</span><span class="s">seismogram length    : {length:.1f} s</span><span class="se">\n</span><span class="s">&quot;</span>
+            <span class="s">&quot;</span><span class="se">\t</span><span class="s">source time function : {stf}</span><span class="se">\n</span><span class="s">&quot;</span>
+            <span class="s">&quot;</span><span class="se">\t</span><span class="s">source shift         : {src_shift:.3f} s</span><span class="se">\n</span><span class="s">&quot;</span>
+            <span class="s">&quot;</span><span class="se">\t</span><span class="s">spatial order        : {spatial_order}</span><span class="se">\n</span><span class="s">&quot;</span>
+            <span class="s">&quot;</span><span class="se">\t</span><span class="s">min/max radius       : {min_rad:.1f} - {max_rad:.1f} km</span><span class="se">\n</span><span class="s">&quot;</span>
+            <span class="s">&quot;</span><span class="se">\t</span><span class="s">Planet radius        : {planet_rad:.1f} km</span><span class="se">\n</span><span class="s">&quot;</span>
+            <span class="s">&quot;</span><span class="se">\t</span><span class="s">min/max distance     : {min_d:.1f} - {max_d:.1f} deg</span><span class="se">\n</span><span class="s">&quot;</span>
+            <span class="s">&quot;</span><span class="se">\t</span><span class="s">time stepping scheme : {time_scheme}</span><span class="se">\n</span><span class="s">&quot;</span>
+            <span class="s">&quot;</span><span class="se">\t</span><span class="s">compiler/user        : {compiler} by {user}</span><span class="se">\n</span><span class="s">&quot;</span>
+            <span class="s">&quot;</span><span class="se">\t</span><span class="s">directory            : {directory}</span><span class="se">\n</span><span class="s">&quot;</span>
+            <span class="s">&quot;</span><span class="se">\t</span><span class="s">size of netCDF files : {filesize}</span><span class="se">\n</span><span class="s">&quot;</span>
             <span class="s">&quot;</span><span class="se">\t</span><span class="s">generated by AxiSEM version {axisem_v} at {datetime}</span><span class="se">\n</span><span class="s">&quot;</span>
         <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
             <span class="n">reciprocal</span><span class="o">=</span><span class="s">&quot;reciprocal&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reciprocal</span> <span class="k">else</span> <span class="s">&quot;forward&quot;</span><span class="p">,</span>
             <span class="n">components</span><span class="o">=</span><span class="n">components</span><span class="p">,</span>
             <span class="n">source_depth</span><span class="o">=</span><span class="p">(</span>
-                <span class="s">&quot;</span><span class="se">\t</span><span class="s">source depth             : </span><span class="si">%.2f</span><span class="s"> km</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span>
+                <span class="s">&quot;</span><span class="se">\t</span><span class="s">source depth         : </span><span class="si">%.2f</span><span class="s"> km</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">source_depth</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reciprocal</span> <span class="ow">is</span> <span class="bp">False</span>
             <span class="k">else</span> <span class="s">&quot;&quot;</span><span class="p">,</span>
             <span class="n">velocity_model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">background_model</span><span class="p">,</span>
