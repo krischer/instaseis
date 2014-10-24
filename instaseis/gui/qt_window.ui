@@ -35,7 +35,7 @@
       <x>11</x>
       <y>9</y>
       <width>1328</width>
-      <height>661</height>
+      <height>675</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_9" stretch="10,0,0">
@@ -870,9 +870,6 @@
           <string>Receiver</string>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_7">
-          <property name="margin">
-           <number>2</number>
-          </property>
           <item>
            <widget class="QLabel" name="label_11">
             <property name="text">
@@ -912,6 +909,19 @@
              <double>45.000000000000000</double>
             </property>
            </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_5">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>163</width>
+              <height>24</height>
+             </size>
+            </property>
+           </spacer>
           </item>
          </layout>
         </widget>

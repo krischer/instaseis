@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file '/home/ex/local/src/instaseis/instaseis/gui/qt_window.ui'
 #
-# Created: Fri Oct 24 13:29:50 2014
+# Created: Fri Oct 24 13:48:25 2014
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -37,7 +37,7 @@ class Ui_MainWindow(object):
         self.centralwidget.setSizePolicy(sizePolicy)
         self.centralwidget.setObjectName(_fromUtf8("centralwidget"))
         self.widget = QtGui.QWidget(self.centralwidget)
-        self.widget.setGeometry(QtCore.QRect(11, 9, 1328, 661))
+        self.widget.setGeometry(QtCore.QRect(11, 9, 1328, 675))
         self.widget.setObjectName(_fromUtf8("widget"))
         self.horizontalLayout_9 = QtGui.QHBoxLayout(self.widget)
         self.horizontalLayout_9.setMargin(0)
@@ -401,7 +401,6 @@ class Ui_MainWindow(object):
         self.groupBox_2 = QtGui.QGroupBox(self.widget)
         self.groupBox_2.setObjectName(_fromUtf8("groupBox_2"))
         self.horizontalLayout_7 = QtGui.QHBoxLayout(self.groupBox_2)
-        self.horizontalLayout_7.setMargin(2)
         self.horizontalLayout_7.setObjectName(_fromUtf8("horizontalLayout_7"))
         self.label_11 = QtGui.QLabel(self.groupBox_2)
         self.label_11.setObjectName(_fromUtf8("label_11"))
@@ -421,6 +420,8 @@ class Ui_MainWindow(object):
         self.receiver_longitude.setProperty("value", 45.0)
         self.receiver_longitude.setObjectName(_fromUtf8("receiver_longitude"))
         self.horizontalLayout_7.addWidget(self.receiver_longitude)
+        spacerItem5 = QtGui.QSpacerItem(163, 24, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.horizontalLayout_7.addItem(spacerItem5)
         self.verticalLayout_3.addWidget(self.groupBox_2)
         self.horizontalLayout_9.addLayout(self.verticalLayout_3)
         self.horizontalLayout_9.setStretch(0, 10)
