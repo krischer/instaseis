@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file '/Users/lion/workspace/code/instaseis/instaseis/gui/qt_window.ui'
 #
-# Created: Fri Oct 24 11:08:33 2014
+# Created: Fri Oct 24 11:13:49 2014
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -47,8 +47,19 @@ class Ui_MainWindow(object):
         self.horizontalLayout_6.addWidget(self.reset_view_button)
         spacerItem = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.horizontalLayout_6.addItem(spacerItem)
+        self.tt_times = QtGui.QCheckBox(self.centralwidget)
+        font = QtGui.QFont()
+        font.setPointSize(11)
+        self.tt_times.setFont(font)
+        self.tt_times.setObjectName(_fromUtf8("tt_times"))
+        self.horizontalLayout_6.addWidget(self.tt_times)
+        spacerItem1 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.horizontalLayout_6.addItem(spacerItem1)
         self.resample_check_box = QtGui.QCheckBox(self.centralwidget)
         self.resample_check_box.setEnabled(True)
+        font = QtGui.QFont()
+        font.setPointSize(11)
+        self.resample_check_box.setFont(font)
         self.resample_check_box.setChecked(False)
         self.resample_check_box.setTristate(False)
         self.resample_check_box.setObjectName(_fromUtf8("resample_check_box"))
@@ -60,6 +71,9 @@ class Ui_MainWindow(object):
         self.horizontalLayout_6.addWidget(self.resample_factor)
         self.sr_ref_label = QtGui.QLabel(self.centralwidget)
         self.sr_ref_label.setEnabled(True)
+        font = QtGui.QFont()
+        font.setPointSize(11)
+        self.sr_ref_label.setFont(font)
         self.sr_ref_label.setObjectName(_fromUtf8("sr_ref_label"))
         self.horizontalLayout_6.addWidget(self.sr_ref_label)
         self.line_2 = QtGui.QFrame(self.centralwidget)
@@ -68,6 +82,9 @@ class Ui_MainWindow(object):
         self.line_2.setObjectName(_fromUtf8("line_2"))
         self.horizontalLayout_6.addWidget(self.line_2)
         self.lanczos_a_label = QtGui.QLabel(self.centralwidget)
+        font = QtGui.QFont()
+        font.setPointSize(11)
+        self.lanczos_a_label.setFont(font)
         self.lanczos_a_label.setObjectName(_fromUtf8("lanczos_a_label"))
         self.horizontalLayout_6.addWidget(self.lanczos_a_label)
         self.lanczos_a = QtGui.QSpinBox(self.centralwidget)
@@ -134,8 +151,8 @@ class Ui_MainWindow(object):
         self.info_label.setText(_fromUtf8(""))
         self.info_label.setObjectName(_fromUtf8("info_label"))
         self.verticalLayout_3.addWidget(self.info_label)
-        spacerItem1 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
-        self.verticalLayout_3.addItem(spacerItem1)
+        spacerItem2 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
+        self.verticalLayout_3.addItem(spacerItem2)
         self.horizontalLayout_4 = QtGui.QHBoxLayout()
         self.horizontalLayout_4.setObjectName(_fromUtf8("horizontalLayout_4"))
         self.verticalLayout_3.addLayout(self.horizontalLayout_4)
@@ -243,8 +260,8 @@ class Ui_MainWindow(object):
         self.label_8.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.label_8.setObjectName(_fromUtf8("label_8"))
         self.gridLayout.addWidget(self.label_8, 3, 0, 1, 2)
-        spacerItem2 = QtGui.QSpacerItem(110, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
-        self.gridLayout.addItem(spacerItem2, 3, 2, 1, 1)
+        spacerItem3 = QtGui.QSpacerItem(110, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.gridLayout.addItem(spacerItem3, 3, 2, 1, 1)
         self.m_pp = QtGui.QDoubleSpinBox(self.tab)
         self.m_pp.setPrefix(_fromUtf8(""))
         self.m_pp.setMinimum(-99.0)
@@ -356,6 +373,7 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(_translate("MainWindow", "Instaseis GUI", None))
         self.reset_view_button.setText(_translate("MainWindow", "Reset View (R)", None))
         self.reset_view_button.setShortcut(_translate("MainWindow", "R", None))
+        self.tt_times.setText(_translate("MainWindow", "Plot Taup Times (AK135)", None))
         self.resample_check_box.setText(_translate("MainWindow", "Resample", None))
         self.sr_ref_label.setText(_translate("MainWindow", "x sampling rate", None))
         self.lanczos_a_label.setText(_translate("MainWindow", "Lanczos a", None))

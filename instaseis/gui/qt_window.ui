@@ -58,9 +58,39 @@
          </spacer>
         </item>
         <item>
+         <widget class="QCheckBox" name="tt_times">
+          <property name="font">
+           <font>
+            <pointsize>11</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Plot Taup Times (AK135)</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
          <widget class="QCheckBox" name="resample_check_box">
           <property name="enabled">
            <bool>true</bool>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>11</pointsize>
+           </font>
           </property>
           <property name="text">
            <string>Resample</string>
@@ -88,6 +118,11 @@
           <property name="enabled">
            <bool>true</bool>
           </property>
+          <property name="font">
+           <font>
+            <pointsize>11</pointsize>
+           </font>
+          </property>
           <property name="text">
            <string>x sampling rate</string>
           </property>
@@ -102,6 +137,11 @@
         </item>
         <item>
          <widget class="QLabel" name="lanczos_a_label">
+          <property name="font">
+           <font>
+            <pointsize>11</pointsize>
+           </font>
+          </property>
           <property name="text">
            <string>Lanczos a</string>
           </property>

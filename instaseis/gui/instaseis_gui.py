@@ -258,11 +258,12 @@ class Window(QtGui.QMainWindow):
         except AttributeError:
             return
 
-        great_circle_distance = locations2degrees(
-            src.latitude, src.longitude,
-            rec.latitude, rec.longitude)
-        tts = getTravelTimes(great_circle_distance, src.depth_in_m / 1000.0,
-                             model="ak135")
+        if bool(self.ui.tt_times.checkState()):
+            great_circle_distance = locations2degrees(
+                src.latitude, src.longitude,
+                rec.latitude, rec.longitude)
+            tts = getTravelTimes(great_circle_distance,
+                                 src.depth_in_m / 1000.0, model="ak135")
 
         for component in ["Z", "N", "E"]:
             plot_widget = getattr(self.ui, "%s_graph" % component.lower())
@@ -271,14 +272,15 @@ class Window(QtGui.QMainWindow):
             times = tr.times()
             plot_widget.plot(times, tr.data, pen="k")
 
-            for tt in tts:
-                if tt["time"] >= times[-1]:
-                    continue
-                if tt["phase_name"][0].lower() == "p":
-                    pen = "#008c2866"
-                else:
-                    pen = "#95000066"
-                plot_widget.addLine(x=tt["time"], pen=pen, z=-10)
+            if bool(self.ui.tt_times.checkState()):
+                for tt in tts:
+                    if tt["time"] >= times[-1]:
+                        continue
+                    if tt["phase_name"][0].lower() == "p":
+                        pen = "#008c2866"
+                    else:
+                        pen = "#95000066"
+                    plot_widget.addLine(x=tt["time"], pen=pen, z=-10)
 
             if autorange:
                 plot_widget.autoRange()
@@ -372,6 +374,9 @@ class Window(QtGui.QMainWindow):
         self.update()
 
     def on_lanczos_a_valueChanged(self, *args):
+        self.update()
+
+    def on_tt_times_stateChanged(self, state):
         self.update()
 
 
