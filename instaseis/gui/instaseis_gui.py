@@ -147,9 +147,9 @@ class Window(QtGui.QMainWindow):
 
     def plot_map(self):
         self.mpl_map_figure = self.ui.map_fig.fig
-        self.mpl_map_ax = self.mpl_map_figure.add_axes([0.0, 0.0, 1.0, 1.0])
+        self.mpl_map_ax = self.mpl_map_figure.add_axes([0.01, 0.01, .98, .98])
         self.mpl_map_ax.set_title("Left click: Set Receiver; Right click: Set "
-                                  "Station")
+                                  "Source")
 
         self.map = Basemap(projection='moll', lon_0=0, resolution="c",
                            ax=self.mpl_map_ax)
@@ -246,15 +246,12 @@ class Window(QtGui.QMainWindow):
             if bool(self.ui.resample_check_box.checkState()):
                 dt = float(self.ui.resample_factor.value())
                 dt = self.instaseis_db.dt / dt
-                a_lanczos = int(self.ui.lanczos_a.value())
             else:
                 dt = None
-                a_lanczos = 5
             self._plot_event()
             self._plot_receiver()
             st = self.instaseis_db.get_seismograms(
-                source=src, receiver=rec,
-                dt=dt, a_lanczos=a_lanczos)
+                source=src, receiver=rec, dt=dt)
 
             # check filter values from the UI
             if bool(self.ui.lowpass_check_box.checkState()):
@@ -391,14 +388,9 @@ class Window(QtGui.QMainWindow):
         resample = bool(state)
         self.ui.resample_factor.setEnabled(resample)
         self.ui.sr_ref_label.setEnabled(resample)
-        self.ui.lanczos_a_label.setEnabled(resample)
-        self.ui.lanczos_a.setEnabled(resample)
         self.update()
 
     def on_resample_factor_valueChanged(self, *args):
-        self.update()
-
-    def on_lanczos_a_valueChanged(self, *args):
         self.update()
 
     def on_tt_times_stateChanged(self, state):
