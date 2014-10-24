@@ -260,7 +260,7 @@ class Window(QtGui.QMainWindow):
             if bool(self.ui.lowpass_check_box.checkState()):
                 try:
                     freq = 1.0 / float(self.ui.lowpass_period.value())
-                    st.filter('lowpass', freq=freq)
+                    st.filter('lowpass', freq=freq, zerophase=True)
                 except ZeroDivisionError:
                     # this happens when typing in the lowpass_period box
                     pass
@@ -268,7 +268,7 @@ class Window(QtGui.QMainWindow):
             if bool(self.ui.highpass_check_box.checkState()):
                 try:
                     freq = 1.0 / float(self.ui.highpass_period.value())
-                    st.filter('highpass', freq=freq)
+                    st.filter('highpass', freq=freq, zerophase=True)
                 except ZeroDivisionError:
                     # this happens when typing in the highpass_period box
                     pass
