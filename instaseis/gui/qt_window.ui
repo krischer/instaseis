@@ -15,7 +15,7 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>1350</width>
+    <width>800</width>
     <height>900</height>
    </size>
   </property>
@@ -83,6 +83,11 @@
             <height>50</height>
            </size>
           </property>
+          <property name="font">
+           <font>
+            <pointsize>12</pointsize>
+           </font>
+          </property>
           <property name="text">
            <string>Select Folder</string>
           </property>
@@ -90,12 +95,30 @@
         </item>
         <item>
          <widget class="QLabel" name="db_path_label">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
           <property name="text">
            <string/>
           </property>
          </widget>
         </item>
        </layout>
+      </item>
+      <item>
+       <widget class="QLabel" name="info_label">
+        <property name="font">
+         <font>
+          <family>Courier</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
       </item>
       <item>
        <spacer name="verticalSpacer">
@@ -111,13 +134,6 @@
        </spacer>
       </item>
       <item>
-       <widget class="QLabel" name="info_label">
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item>
        <layout class="QHBoxLayout" name="horizontalLayout_4"/>
       </item>
       <item>
@@ -126,13 +142,16 @@
          <string>Source</string>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <property name="margin">
+          <number>2</number>
+         </property>
          <item>
           <layout class="QVBoxLayout" name="verticalLayout">
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_3">
              <item>
               <layout class="QGridLayout" name="gridLayout_2">
-               <item row="0" column="0">
+               <item row="1" column="0">
                 <widget class="QLabel" name="label">
                  <property name="text">
                   <string>Latitude</string>
@@ -142,17 +161,7 @@
                  </property>
                 </widget>
                </item>
-               <item row="0" column="1">
-                <widget class="QLabel" name="label_2">
-                 <property name="text">
-                  <string>Longitude</string>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignCenter</set>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="0">
+               <item row="1" column="1">
                 <widget class="QDoubleSpinBox" name="source_latitude">
                  <property name="minimum">
                   <double>-90.000000000000000</double>
@@ -162,13 +171,23 @@
                  </property>
                 </widget>
                </item>
-               <item row="1" column="1">
+               <item row="1" column="3">
                 <widget class="QDoubleSpinBox" name="source_longitude">
                  <property name="minimum">
                   <double>-180.000000000000000</double>
                  </property>
                  <property name="maximum">
                   <double>180.000000000000000</double>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="2">
+                <widget class="QLabel" name="label_2">
+                 <property name="text">
+                  <string>Longitude</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignCenter</set>
                  </property>
                 </widget>
                </item>
@@ -220,6 +239,9 @@
                  <string>Moment Tensor</string>
                 </attribute>
                 <layout class="QGridLayout" name="gridLayout">
+                 <property name="margin">
+                  <number>2</number>
+                 </property>
                  <item row="0" column="1">
                   <widget class="QLabel" name="label_5">
                    <property name="text">
@@ -396,6 +418,9 @@
                  <string>Strike Dip Rake</string>
                 </attribute>
                 <layout class="QGridLayout" name="gridLayout_4">
+                 <property name="margin">
+                  <number>2</number>
+                 </property>
                  <item row="0" column="2">
                   <widget class="QLabel" name="strike_value">
                    <property name="minimumSize">
@@ -530,8 +555,6 @@
          </item>
         </layout>
         <zorder>depth_slider</zorder>
-        <zorder>depth_slider</zorder>
-        <zorder>depth_label</zorder>
         <zorder></zorder>
        </widget>
       </item>
@@ -556,15 +579,18 @@
         <property name="title">
          <string>Receiver</string>
         </property>
-        <layout class="QGridLayout" name="gridLayout_3">
-         <item row="0" column="0">
+        <layout class="QHBoxLayout" name="horizontalLayout_7">
+         <property name="margin">
+          <number>2</number>
+         </property>
+         <item>
           <widget class="QLabel" name="label_11">
            <property name="text">
             <string>Latitude</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="1">
+         <item>
           <widget class="QDoubleSpinBox" name="receiver_latitude">
            <property name="minimum">
             <double>-90.000000000000000</double>
@@ -577,7 +603,14 @@
            </property>
           </widget>
          </item>
-         <item row="1" column="1">
+         <item>
+          <widget class="QLabel" name="label_12">
+           <property name="text">
+            <string>Longitude</string>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QDoubleSpinBox" name="receiver_longitude">
            <property name="minimum">
             <double>-180.000000000000000</double>
@@ -590,24 +623,15 @@
            </property>
           </widget>
          </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="label_12">
-           <property name="text">
-            <string>Longitude</string>
-           </property>
-          </widget>
-         </item>
         </layout>
        </widget>
       </item>
      </layout>
     </item>
    </layout>
+   <zorder></zorder>
+   <zorder></zorder>
    <zorder>line</zorder>
-   <zorder></zorder>
-   <zorder></zorder>
-   <zorder></zorder>
-   <zorder>verticalSpacer</zorder>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>

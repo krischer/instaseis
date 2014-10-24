@@ -263,6 +263,7 @@ class Window(QtGui.QMainWindow):
         if not self.folder:
             return
         self.instaseis_db = InstaSeisDB(self.folder)
+        self.ui.db_path_label.setText(os.path.relpath(self.folder))
         self.update()
         self.set_info()
 
