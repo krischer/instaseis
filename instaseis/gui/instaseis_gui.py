@@ -267,30 +267,7 @@ class Window(QtGui.QMainWindow):
         self.set_info()
 
     def set_info(self):
-        info = (
-            "Folder: {folder}\n"
-            "Background Model: {bg_model}\n"
-            "Dominant Period: {period:.2f} sec\n"
-            "AxiSEM Version: {version}\n"
-            "AxiSEM Compiler: {compiler}\n"
-            "AxiSEM User: {user}\n"
-            "Size of both NetCDF Files: {filesize}"
-        )
-        m = self.instaseis_db.meshes.px
-
-        filesize = os.path.getsize(m.filename) + os.path.getsize(
-            self.instaseis_db.meshes.pz.filename)
-        filesize = sizeof_fmt(filesize)
-
-        self.ui.info_label.setText(info.format(
-            folder=os.path.relpath(self.folder),
-            bg_model=m.background_model,
-            period=m.dominant_period,
-            version=m.axisem_version,
-            compiler=m.axisem_compiler,
-            user=m.axisem_user,
-            filesize=filesize
-        ))
+        self.ui.info_label.setText(str(self.instaseis_db))
 
     def on_source_latitude_valueChanged(self, *args):
         self.update()
@@ -351,19 +328,6 @@ class Window(QtGui.QMainWindow):
         self.ui.rake_value.setText("%i" % self.ui.rake_slider.value())
         self._draw_mt()
         self.update()
-
-
-def sizeof_fmt(num):
-    """
-    Handy formatting for human readable filesize.
-
-    From http://stackoverflow.com/a/1094933/1657047
-    """
-    for x in ["bytes", "KB", "MB", "GB"]:
-        if num < 1024.0 and num > -1024.0:
-            return "%3.1f %s" % (num, x)
-        num /= 1024.0
-    return "%3.1f %s" % (num, "TB")
 
 
 def launch():
