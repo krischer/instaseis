@@ -244,12 +244,19 @@ class Window(QtGui.QMainWindow):
 
     def update(self):
         try:
+            # Grab resampling settings from the UI.
+            if bool(self.ui.resample_check_box.checkState()):
+                dt = float(self.ui.resample_factor.value())
+                dt = self.instaseis_db.dt / dt
+                a_lanczos = int(self.ui.lanczos_a.value())
+            else:
+                dt = None
+                a_lanczos = 5
             self._plot_event()
             self._plot_receiver()
             st = self.instaseis_db.get_seismograms(
                 source=self.source, receiver=self.receiver,
-                dt=self.instaseis_db.dt / 10.0,
-                a_lanczos=5)
+                dt=dt, a_lanczos=a_lanczos)
         except AttributeError:
             return
 
@@ -334,6 +341,23 @@ class Window(QtGui.QMainWindow):
     def on_rake_slider_valueChanged(self, *args):
         self.ui.rake_value.setText("%i" % self.ui.rake_slider.value())
         self._draw_mt()
+        self.update()
+
+    def on_reset_view_button_released(self, *args):
+        self.ui.z_graph.autoRange()
+
+    def on_resample_check_box_stateChanged(self, state):
+        resample = bool(state)
+        self.ui.resample_factor.setEnabled(resample)
+        self.ui.sr_ref_label.setEnabled(resample)
+        self.ui.lanczos_a_label.setEnabled(resample)
+        self.ui.lanczos_a.setEnabled(resample)
+        self.update()
+
+    def on_resample_factor_valueChanged(self, *args):
+        self.update()
+
+    def on_lanczos_a_valueChanged(self, *args):
         self.update()
 
 

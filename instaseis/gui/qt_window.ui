@@ -29,9 +29,99 @@
      <verstretch>0</verstretch>
     </sizepolicy>
    </property>
-   <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="10,0,0">
+   <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="10,0,0">
     <item>
      <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_6">
+        <item>
+         <widget class="QPushButton" name="reset_view_button">
+          <property name="text">
+           <string>Reset View (R)</string>
+          </property>
+          <property name="shortcut">
+           <string>R</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="resample_check_box">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+          <property name="text">
+           <string>Resample</string>
+          </property>
+          <property name="checked">
+           <bool>false</bool>
+          </property>
+          <property name="tristate">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QDoubleSpinBox" name="resample_factor">
+          <property name="minimum">
+           <double>1.000000000000000</double>
+          </property>
+          <property name="value">
+           <double>10.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="sr_ref_label">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+          <property name="text">
+           <string>x sampling rate</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="Line" name="line_2">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="lanczos_a_label">
+          <property name="text">
+           <string>Lanczos a</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSpinBox" name="lanczos_a">
+          <property name="minimum">
+           <number>1</number>
+          </property>
+          <property name="maximum">
+           <number>20</number>
+          </property>
+          <property name="value">
+           <number>5</number>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
       <item>
        <widget class="PlotWidget" name="z_graph">
         <property name="sizePolicy">
@@ -632,6 +722,14 @@
    <zorder></zorder>
    <zorder></zorder>
    <zorder>line</zorder>
+   <zorder>reset_view_button</zorder>
+   <zorder>resample_check_box</zorder>
+   <zorder>resample_factor</zorder>
+   <zorder>sr_ref_label</zorder>
+   <zorder>lanczos_a</zorder>
+   <zorder>horizontalSpacer_2</zorder>
+   <zorder>line_2</zorder>
+   <zorder>lanczos_a_label</zorder>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
