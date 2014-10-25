@@ -11,7 +11,7 @@ Graphical user interface for Instaseis.
 """
 from __future__ import absolute_import
 
-from PyQt4 import QtGui
+from PyQt4 import QtGui, QtCore
 import pyqtgraph as pg
 # Default to antialiased drawing.
 pg.setConfigOptions(antialias=True, foreground=(50, 50, 50), background=None)
@@ -294,9 +294,8 @@ class Window(QtGui.QMainWindow):
             great_circle_distance = locations2degrees(
                 src.latitude, src.longitude,
                 rec.latitude, rec.longitude)
-            tts = getTravelTimes(great_circle_distance,
-                                 src.depth_in_m / 1000.0, model="ak135")
-
+            self.tts = getTravelTimes(great_circle_distance,
+                                      src.depth_in_m / 1000.0, model="ak135")
 
         for ic, component in enumerate(components):
             plot_widget = getattr(self.ui, "%s_graph" % component.lower())
@@ -306,8 +305,9 @@ class Window(QtGui.QMainWindow):
             plot_widget.plot(times, tr.data, pen="k")
 
             if bool(self.ui.tt_times.checkState()):
-                for tt in tts:
+                for tt in self.tts:
                     if tt["time"] >= times[-1]:
+                        self.tts.remove(tt)
                         continue
                     if tt["phase_name"][0].lower() == "p":
                         pen = "#008c2866"
@@ -434,6 +434,29 @@ class Window(QtGui.QMainWindow):
     def on_components_combo_currentIndexChanged(self):
         self.update()
 
+    def eventFilter(self, source, event):
+        if event.type() == QtCore.QEvent.MouseMove:
+            if source.parent() in [self.ui.z_graph, self.ui.n_graph,
+                                   self.ui.e_graph] \
+                    and event.buttons() == QtCore.Qt.NoButton:
+                try:
+                    tt = float(self.ui.z_graph.mapToView(
+                        pg.Point(event.pos().x(), event.pos().y())).x())
+                    closest_phase = \
+                        min(self.tts, key=lambda x: abs(x["time"] - tt))
+                    tooltipstr = 'Mouse at %6.2f s, closest phase = %s, ' \
+                        'arriving at %6.2f s' % \
+                        (tt, closest_phase["phase_name"],
+                         closest_phase["time"])
+                except:
+                    tooltipstr = ''
+
+                self.ui.z_graph.setToolTip(tooltipstr)
+                self.ui.n_graph.setToolTip(tooltipstr)
+                self.ui.e_graph.setToolTip(tooltipstr)
+
+        return QtGui.QMainWindow.eventFilter(self, source, event)
+
 
 def launch():
     # Automatically compile all ui files if they have been changed.
@@ -445,5 +468,6 @@ def launch():
 
     # Show and bring window to foreground.
     window.show()
+    app.installEventFilter(window)
     window.raise_()
     os._exit(app.exec_())

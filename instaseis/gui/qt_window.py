@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file '/home/ex/local/src/instaseis/instaseis/gui/qt_window.ui'
 #
-# Created: Sat Oct 25 00:55:30 2014
+# Created: Sat Oct 25 17:59:09 2014
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -175,6 +175,8 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.z_graph.sizePolicy().hasHeightForWidth())
         self.z_graph.setSizePolicy(sizePolicy)
+        self.z_graph.setMouseTracking(False)
+        self.z_graph.setToolTip(_fromUtf8(""))
         self.z_graph.setObjectName(_fromUtf8("z_graph"))
         self.verticalLayout_2.addWidget(self.z_graph)
         self.n_graph = PlotWidget(self.centralwidget)
@@ -183,6 +185,7 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.n_graph.sizePolicy().hasHeightForWidth())
         self.n_graph.setSizePolicy(sizePolicy)
+        self.n_graph.setToolTip(_fromUtf8(""))
         self.n_graph.setObjectName(_fromUtf8("n_graph"))
         self.verticalLayout_2.addWidget(self.n_graph)
         self.e_graph = PlotWidget(self.centralwidget)

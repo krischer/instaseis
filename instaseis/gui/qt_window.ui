@@ -375,6 +375,12 @@
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
+            <property name="mouseTracking">
+             <bool>false</bool>
+            </property>
+            <property name="toolTip">
+             <string/>
+            </property>
            </widget>
           </item>
           <item>
@@ -384,6 +390,9 @@
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
+            </property>
+            <property name="toolTip">
+             <string/>
             </property>
            </widget>
           </item>
@@ -862,7 +871,6 @@
              </layout>
              <zorder>depth_slider</zorder>
              <zorder></zorder>
-             <zorder>source_tab</zorder>
             </widget>
             <widget class="QWidget" name="tab_10">
              <attribute name="title">
