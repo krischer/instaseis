@@ -22,6 +22,8 @@ from scipy import interp
 
 from . import ReceiverParseError, SourceParseError
 
+DEFAULT_MU = 32e9
+
 
 def _purge_duplicates(f):
     """
@@ -549,3 +551,123 @@ class Receiver(SourceOrReceiver):
                 receivers.append(Receiver(lat, lon, network, station))
 
         return receivers
+
+
+class FiniteSource(object):
+    """
+    A class to handle finite sources represented my a number of point sources.
+    """
+    def __init__(self, pointsources=None, CMT=None, magnitude=None,
+                 event_duration=None, hypocenter_longitude=None,
+                 hypocenter_latitude=None, hypocenter_depth_in_m=None):
+        self.pointsources = pointsources
+        self.CMT = CMT
+        self.magnitude = magnitude
+        self.event_duration = event_duration
+        self.hypocenter_longitude = hypocenter_longitude
+        self.hypocenter_latitude = hypocenter_latitude
+        self.hypocenter_depth_in_m = hypocenter_depth_in_m
+        self.current = 0
+
+    def __iter__(self):
+        return self
+
+    def next(self):
+        if self.pointsources is None:
+            raise ValueError('FiniteSource not Initialized')
+        if self.current > len(self.pointsources) - 1:
+            self.current = 0
+            raise StopIteration
+        else:
+            self.current += 1
+            return self.pointsources[self.current - 1]
+
+    def __getitem__(self, index):
+        return self.pointsources[index]
+
+    @classmethod
+    def from_srf_file(self, filename, normalize=False):
+        """
+        Initialize a finite source object from a 'standard rupture format'
+        (.srf) file
+
+        :param filename: path to the .srf file
+        :param normalize: normalize the sliprate to 1
+        """
+        with open(filename, "rt") as f:
+            # go to POINTS block
+            line = f.readline()
+            while 'POINTS' not in line:
+                line = f.readline()
+
+            npoints = int(line.split()[1])
+            sources = []
+
+            for _ in np.arange(npoints):
+                lon, lat, dep, stk, dip, area, tinit, dt = \
+                    map(float, f.readline().split())
+                rake, slip1, nt1, slip2, nt2, slip3, nt3 = \
+                    map(float, f.readline().split())
+
+                dep *= 1e3  # km    > m
+                area *= 1e-4  # cm^2 > m^2
+                slip1 *= 1e-2  # cm   > m
+                slip2 *= 1e-2  # cm   > m
+                # slip3 *= 1e-2  # cm   > m
+
+                nt1, nt2, nt3 = map(int, (nt1, nt2, nt3))
+
+                if nt1 > 0:
+                    line = f.readline()
+                    while len(line.split()) < nt1:
+                        line = line + f.readline()
+                    stf = np.array(line.split(), dtype=float)
+                    if normalize:
+                        stf /= np.trapz(stf, dx=dt)
+
+                    M0 = area * DEFAULT_MU * slip1
+
+                    sources.append(
+                        Source.from_strike_dip_rake(
+                            lat, lon, dep, stk, dip, rake, M0,
+                            time_shift=tinit, sliprate=stf, dt=dt))
+
+                if nt2 > 0:
+                    line = f.readline()
+                    while len(line.split()) < nt2:
+                        line = line + f.readline()
+                    stf = np.array(line.split(), dtype=float)
+                    if normalize:
+                        stf /= np.trapz(stf, dx=dt)
+
+                    M0 = area * DEFAULT_MU * slip2
+
+                    sources.append(
+                        Source.from_strike_dip_rake(
+                            lat, lon, dep, stk, dip, rake, M0,
+                            time_shift=tinit, sliprate=stf, dt=dt))
+
+                if nt3 > 0:
+                    raise NotImplementedError('Slip along u3 axis')
+
+            return self(pointsources=sources)
+
+    def resample_sliprate(self, dt, nsamp):
+        """
+        For convolution, the sliprate is needed at the sampling of the fields
+        in the database. This function resamples the sliprate using linear
+        interpolation for all pointsources in the finite source.
+
+        :param dt: desired sampling
+        :param nsamp: desired number of samples
+        """
+        for ps in self.pointsources:
+            ps.resample_sliprate(dt, nsamp)
+
+    @property
+    def epicenter_latitude(self):
+        return self.hypocenter_latitude
+
+    @property
+    def epicenter_longitude(self):
+        return self.hypocenter_longitude

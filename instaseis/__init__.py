@@ -19,4 +19,4 @@ class SourceParseError(InstaseisError):
 
 
 from .instaseisdb import InstaSeisDB  # NoQa
-from .source import Source, Receiver, ForceSource  # NoQa
+from .source import Source, Receiver, ForceSource, FiniteSource  # NoQa
