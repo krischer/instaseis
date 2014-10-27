@@ -323,14 +323,15 @@ class Source(SourceOrReceiver):
 
     def __str__(self):
         return_str = 'AxiSEM Database Source:\n'
-        return_str += 'longitude : %6.1f deg\n' % (self.longitude)
-        return_str += 'latitude  : %6.1f deg\n' % (self.latitude)
-        return_str += 'Mrr       : %10.2e Nm\n' % (self.m_rr)
-        return_str += 'Mtt       : %10.2e Nm\n' % (self.m_tt)
-        return_str += 'Mpp       : %10.2e Nm\n' % (self.m_pp)
-        return_str += 'Mrt       : %10.2e Nm\n' % (self.m_rt)
-        return_str += 'Mrp       : %10.2e Nm\n' % (self.m_rp)
-        return_str += 'Mtp       : %10.2e Nm\n' % (self.m_tp)
+        return_str += 'longitude     : %6.1f deg\n' % (self.longitude)
+        return_str += 'latitude      : %6.1f deg\n' % (self.latitude)
+        return_str += 'scalar Moment : %10.2e Nm\n' % (self.M0)
+        return_str += 'Mrr           : %10.2e Nm\n' % (self.m_rr)
+        return_str += 'Mtt           : %10.2e Nm\n' % (self.m_tt)
+        return_str += 'Mpp           : %10.2e Nm\n' % (self.m_pp)
+        return_str += 'Mrt           : %10.2e Nm\n' % (self.m_rt)
+        return_str += 'Mrp           : %10.2e Nm\n' % (self.m_rp)
+        return_str += 'Mtp           : %10.2e Nm\n' % (self.m_tp)
 
         return return_str
 
@@ -725,3 +726,38 @@ class FiniteSource(object):
     @property
     def npointsources(self):
         return len(self.pointsources)
+
+    def __str__(self):
+        if (self.hypocenter_latitude is None
+                and self.hypocenter_longitude) is None:
+            self.find_hypocenter()
+
+        return_str = 'AxiSEM Database Finite Source:\n'
+        return_str += 'scalar Moment        : %10.2e Nm\n' \
+                      % (self.M0)
+        return_str += '#point sources       : %d\n' \
+                      % (self.npointsources)
+
+        return_str += 'min depth            : %6.1f m\n' \
+                      % (self.min_depth_in_m)
+        return_str += 'max depth            : %6.1f m\n' \
+                      % (self.max_depth_in_m)
+        return_str += 'hypocenter depth     : %6.1f m\n' \
+                      % (self.max_depth_in_m)
+
+        return_str += 'min latitude         : %6.1f deg\n' \
+                      % (self.min_latitude)
+        return_str += 'max latitude         : %6.1f deg\n' \
+                      % (self.max_latitude)
+        return_str += 'hypocenter latitude  : %6.1f deg\n' \
+                      % (self.hypocenter_latitude)
+
+        return_str += 'min longitude        : %6.1f deg\n' \
+                      % (self.min_longitude)
+        return_str += 'max longitude        : %6.1f deg\n' \
+                      % (self.max_longitude)
+        return_str += 'hypocenter longitude : %6.1f deg\n' \
+                      % (self.hypocenter_longitude)
+
+
+        return return_str
