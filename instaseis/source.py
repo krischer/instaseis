@@ -671,3 +671,7 @@ class FiniteSource(object):
     @property
     def epicenter_longitude(self):
         return self.hypocenter_longitude
+
+    @property
+    def npointsources(self):
+        return len(self.pointsources)

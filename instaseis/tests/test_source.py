@@ -15,10 +15,11 @@ import obspy
 import os
 import numpy as np
 
-from instaseis import Source
+from instaseis import Source, FiniteSource
 
 DATA = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 EVENT_FILE = os.path.join(DATA, "GCMT_event_STRAIT_OF_GIBRALTAR.xml")
+SRF_FILE = os.path.join(DATA, "strike_slip_eq_10pts.srf")
 
 
 def test_parse_CMTSOLUTIONS_file(tmpdir):
@@ -79,3 +80,40 @@ def test_parse_obspy_objects():
 
     _assert_src(Source.parse(cat))
     _assert_src(Source.parse(ev))
+
+
+def test_parse_srf_file():
+    """
+    Tests parsing from a .srf file.
+    """
+    finitesource = FiniteSource.from_srf_file(SRF_FILE, True)
+    assert finitesource.npointsources == 10
+    longitudes = np.array([0.0, 0.99925, 1.99849, 2.99774, 3.99698, 4.99623,
+                           5.99548, 6.99472, 7.99397, 8.99322])
+
+    for isrc, src in enumerate(finitesource):
+        src_params = np.array([src.latitude, src.longitude, src.depth_in_m,
+                               src.m_rr, src.m_tt, src.m_pp, src.m_rt,
+                               src.m_rp, src.m_tp], dtype="float64")
+
+        src_params_ref = np.array([
+            0.00000000e+00, longitudes[isrc], 5.00000000e+04, 0.00000000e+00,
+            -3.91886976e+03, 3.91886976e+03, -1.19980783e-13, 1.95943488e+03,
+            3.20000000e+19])
+        np.testing.assert_allclose(src_params, src_params_ref)
+
+
+def test_resample_stf():
+    """
+    Tests resampling sliprates
+    """
+    finitesource = FiniteSource.from_srf_file(SRF_FILE, True)
+    finitesource.resample_sliprate(dt=1., nsamp=10)
+
+    stf_ref = np.array([
+        0.00000000e+00, 1.60000000e-05, 3.20000000e-05, 4.80000000e-05,
+        6.40000000e-05, 8.00000000e-05, 1.84000000e-04, 2.88000000e-04,
+        3.92000000e-04, 4.96000000e-04])
+
+    for isrc, src in enumerate(finitesource):
+        np.testing.assert_allclose(stf_ref, src.sliprate)
