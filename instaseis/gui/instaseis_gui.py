@@ -27,7 +27,7 @@ from obspy.taup.taup import getTravelTimes
 import os
 import sys
 
-from instaseis import InstaSeisDB, Source, Receiver
+from instaseis import InstaSeisDB, Source, Receiver, FiniteSource
 
 SCALING_FACTOR = 1E16
 
@@ -97,6 +97,9 @@ class Window(QtGui.QMainWindow):
         self.ui.m_rt.setValue(m_rt)
         self.ui.m_rp.setValue(m_rp)
         self.ui.m_tp.setValue(m_tp)
+
+        self.instaseis_db = None
+        self.finite_source = None
 
         self.plot_map()
         self.plot_mt()
@@ -172,13 +175,19 @@ class Window(QtGui.QMainWindow):
             self.ui.receiver_longitude.setValue(lng)
             self.ui.receiver_latitude.setValue(lat)
         # Right click: set event
-        elif event.button == 3:
+        elif (event.button == 3 and self.ui.finsource_tab.currentIndex() == 0):
             self.ui.source_longitude.setValue(lng)
             self.ui.source_latitude.setValue(lat)
 
     def _plot_event(self):
-        s = self.source
-        lng, lat = s.longitude, s.latitude
+        if self.ui.finsource_tab.currentIndex() == 0:
+            s = self.source
+            lng, lat = s.longitude, s.latitude
+        elif self.ui.finsource_tab.currentIndex() == 1:
+            s = self.finite_source
+            s.find_hypocenter()
+            lng, lat = s.hypocenter_longitude, s.hypocenter_latitude
+
         try:
             if self.__event_map_obj.longitude == lng and \
                     self.__event_map_obj.latitude == lat:
@@ -239,7 +248,17 @@ class Window(QtGui.QMainWindow):
             latitude=float(self.ui.receiver_latitude.value()),
             longitude=float(self.ui.receiver_longitude.value()))
 
-    def update(self, autorange=False):
+    def update(self, autorange=False, force=False):
+
+        try:
+            self._plot_receiver()
+            self._plot_event()
+        except AttributeError:
+            return
+
+        if (not bool(self.ui.auto_update_check_box.checkState())
+                and self.ui.finsource_tab.currentIndex() == 1 and not force):
+            return
 
         components = ["z", "n", "e"]
         components_map = {0: ("Z", "N", "E"),
@@ -255,7 +274,15 @@ class Window(QtGui.QMainWindow):
             p.setTitle(label_map[components_choice][component].capitalize()
                        + " component")
 
-        src = self.source
+        if self.ui.finsource_tab.currentIndex() == 0:
+            src_latitude = self.source.latitude
+            src_longitude = self.source.longitude
+            src_depth_in_m = self.source.depth_in_m
+        else:
+            src_latitude = self.finite_source.hypocenter_latitude
+            src_longitude = self.finite_source.hypocenter_longitude
+            src_depth_in_m = self.finite_source.hypocenter_depth_in_m
+
         rec = self.receiver
         try:
             # Grab resampling settings from the UI.
@@ -264,11 +291,14 @@ class Window(QtGui.QMainWindow):
                 dt = self.instaseis_db.dt / dt
             else:
                 dt = None
-            self._plot_event()
-            self._plot_receiver()
-            st = self.instaseis_db.get_seismograms(
-                source=src, receiver=rec, dt=dt,
-                components=components_map[components_choice])
+            if self.ui.finsource_tab.currentIndex() == 0:
+                st = self.instaseis_db.get_seismograms(
+                    source=self.source, receiver=self.receiver, dt=dt,
+                    components=components_map[components_choice])
+            elif self.ui.finsource_tab.currentIndex() == 1:
+                st = self.instaseis_db.get_seismograms_finite_source(
+                    sources=self.finite_source, receiver=self.receiver, dt=dt,
+                    components=components_map[components_choice])
 
             # check filter values from the UI
             if bool(self.ui.lowpass_check_box.checkState()):
@@ -292,10 +322,10 @@ class Window(QtGui.QMainWindow):
 
         if bool(self.ui.tt_times.checkState()):
             great_circle_distance = locations2degrees(
-                src.latitude, src.longitude,
+                src_latitude, src_longitude,
                 rec.latitude, rec.longitude)
             self.tts = getTravelTimes(great_circle_distance,
-                                      src.depth_in_m / 1000.0, model="ak135")
+                                      src_depth_in_m / 1000.0, model="ak135")
 
         for ic, component in enumerate(components):
             plot_widget = getattr(self.ui, "%s_graph" % component.lower())
@@ -332,11 +362,35 @@ class Window(QtGui.QMainWindow):
         self.ui.depth_slider.setMinimum(min_rad - max_rad)
         self.ui.depth_slider.setMaximum(0)
 
+        if self.finite_source is not None:
+            self.finite_source.resample_sliprate(
+                dt=self.instaseis_db.dt, nsamp=self.instaseis_db.ndumps)
+
         self.update(autorange=True)
         self.set_info()
 
+    def on_open_srf_file_button_released(self):
+        self.srf_file = str(QtGui.QFileDialog.getOpenFileName(
+            self, "Choose *.srf File",
+            os.path.expanduser("~")))
+        if not self.srf_file:
+            return
+        self.finite_source = FiniteSource.from_srf_file(self.srf_file)
+
+        if self.instaseis_db is not None:
+            self.finite_source.resample_sliprate(
+                dt=self.instaseis_db.dt, nsamp=self.instaseis_db.ndumps)
+
+        self.update()
+        self.set_info()
+
     def set_info(self):
-        self.ui.info_text.setText(str(self.instaseis_db))
+        info_str = ''
+        if self.instaseis_db is not None:
+            info_str += str(self.instaseis_db) + '\n'
+        if self.finite_source is not None:
+            info_str += str(self.finite_source)
+        self.ui.info_text.setText(info_str)
 
     def on_source_latitude_valueChanged(self, *args):
         self.update()
@@ -433,6 +487,12 @@ class Window(QtGui.QMainWindow):
 
     def on_components_combo_currentIndexChanged(self):
         self.update()
+
+    def on_finsource_tab_currentChanged(self):
+        self.update()
+
+    def on_update_button_released(self):
+        self.update(force=True)
 
     def eventFilter(self, source, event):
         if event.type() == QtCore.QEvent.MouseMove:

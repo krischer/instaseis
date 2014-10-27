@@ -275,7 +275,7 @@
            <bool>false</bool>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
           <item>
            <property name="text">
@@ -876,6 +876,35 @@
              <attribute name="title">
               <string>Finite Source</string>
              </attribute>
+             <layout class="QHBoxLayout" name="horizontalLayout_2">
+              <item>
+               <widget class="QPushButton" name="open_srf_file_button">
+                <property name="text">
+                 <string>Open *.srf</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="update_button">
+                <property name="text">
+                 <string>update seismograms (U)</string>
+                </property>
+                <property name="shortcut">
+                 <string>U</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="auto_update_check_box">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
+                <property name="text">
+                 <string>auto update</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </widget>
            </widget>
           </item>

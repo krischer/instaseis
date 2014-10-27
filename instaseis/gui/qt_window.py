@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file '/home/ex/local/src/instaseis/instaseis/gui/qt_window.ui'
 #
-# Created: Sat Oct 25 17:59:09 2014
+# Created: Mon Oct 27 17:57:29 2014
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -395,6 +395,18 @@ class Ui_MainWindow(object):
         self.finsource_tab.addTab(self.tab_9, _fromUtf8(""))
         self.tab_10 = QtGui.QWidget()
         self.tab_10.setObjectName(_fromUtf8("tab_10"))
+        self.horizontalLayout_2 = QtGui.QHBoxLayout(self.tab_10)
+        self.horizontalLayout_2.setObjectName(_fromUtf8("horizontalLayout_2"))
+        self.open_srf_file_button = QtGui.QPushButton(self.tab_10)
+        self.open_srf_file_button.setObjectName(_fromUtf8("open_srf_file_button"))
+        self.horizontalLayout_2.addWidget(self.open_srf_file_button)
+        self.update_button = QtGui.QPushButton(self.tab_10)
+        self.update_button.setObjectName(_fromUtf8("update_button"))
+        self.horizontalLayout_2.addWidget(self.update_button)
+        self.auto_update_check_box = QtGui.QCheckBox(self.tab_10)
+        self.auto_update_check_box.setEnabled(True)
+        self.auto_update_check_box.setObjectName(_fromUtf8("auto_update_check_box"))
+        self.horizontalLayout_2.addWidget(self.auto_update_check_box)
         self.finsource_tab.addTab(self.tab_10, _fromUtf8(""))
         self.verticalLayout_3.addWidget(self.finsource_tab)
         self.map_fig = Qt4MplCanvas(self.centralwidget)
@@ -437,7 +449,7 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
 
         self.retranslateUi(MainWindow)
-        self.components_combo.setCurrentIndex(0)
+        self.components_combo.setCurrentIndex(1)
         self.finsource_tab.setCurrentIndex(0)
         self.source_tab.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -480,6 +492,10 @@ class Ui_MainWindow(object):
         self.rake_value.setText(_translate("MainWindow", "0", None))
         self.source_tab.setTabText(self.source_tab.indexOf(self.tab_2), _translate("MainWindow", "Strike Dip Rake", None))
         self.finsource_tab.setTabText(self.finsource_tab.indexOf(self.tab_9), _translate("MainWindow", "Point Source", None))
+        self.open_srf_file_button.setText(_translate("MainWindow", "Open *.srf", None))
+        self.update_button.setText(_translate("MainWindow", "update seismograms (U)", None))
+        self.update_button.setShortcut(_translate("MainWindow", "U", None))
+        self.auto_update_check_box.setText(_translate("MainWindow", "auto update", None))
         self.finsource_tab.setTabText(self.finsource_tab.indexOf(self.tab_10), _translate("MainWindow", "Finite Source", None))
         self.groupBox_2.setTitle(_translate("MainWindow", "Receiver", None))
         self.label_11.setText(_translate("MainWindow", "Latitude", None))
