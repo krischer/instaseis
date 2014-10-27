@@ -263,6 +263,15 @@ class Source(SourceOrReceiver):
                     m_rp, m_tp, time_shift, sliprate, dt)
 
     @property
+    def M0(self):
+        """
+        Scalar Moment M0 in Nm
+        """
+        return (self.m_rr ** 2 + self.m_tt ** 2 + self.m_pp ** 2
+                + 2 * self.m_rt ** 2 + 2 * self.m_rp ** 2
+                + 2 * self.m_tp ** 2) ** 0.5 * 0.5 ** 0.5
+
+    @property
     def tensor(self):
         """
         List of moment tensor components in r, theta, phi coordinates:
@@ -673,6 +682,13 @@ class FiniteSource(object):
         self.hypocenter_longitude = ps_hypo.longitude
         self.hypocenter_latitude = ps_hypo.latitude
         self.hypocenter_depth_in_m = ps_hypo.depth_in_m
+
+    @property
+    def M0(self):
+        """
+        Scalar Moment M0 in Nm
+        """
+        return sum(ps.M0 for ps in self.pointsources)
 
     @property
     def min_depth_in_m(self):

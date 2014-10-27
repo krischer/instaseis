@@ -148,3 +148,26 @@ def test_min_max_functions():
 
     assert finitesource.min_latitude == 0.0
     assert finitesource.max_latitude == 0.0
+
+
+def test_M0():
+    """
+    Tests computation of scalar Moment.
+    """
+    strike = 10.
+    dip = 20.
+    rake = 30.
+    M0 = 1e16
+    source = Source.from_strike_dip_rake(0., 0., 0., strike, dip, rake, M0)
+
+    assert source.M0 == M0
+
+
+def test_M0_finite_source():
+    """
+    Tests computation of scalar Moment.
+    """
+    finitesource = FiniteSource.from_srf_file(SRF_FILE, True)
+    finitesource.find_hypocenter()
+
+    np.testing.assert_allclose(np.array([finitesource.M0]), np.array([3.2e20]))
