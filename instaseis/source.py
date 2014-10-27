@@ -759,5 +759,4 @@ class FiniteSource(object):
         return_str += '\thypocenter longitude : %6.1f deg\n' \
                       % (self.hypocenter_longitude)
 
-
         return return_str
