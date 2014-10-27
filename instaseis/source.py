@@ -733,30 +733,30 @@ class FiniteSource(object):
             self.find_hypocenter()
 
         return_str = 'AxiSEM Database Finite Source:\n'
-        return_str += 'scalar Moment        : %10.2e Nm\n' \
+        return_str += '\tscalar Moment        : %10.2e Nm\n' \
                       % (self.M0)
-        return_str += '#point sources       : %d\n' \
+        return_str += '\t#point sources       : %d\n' \
                       % (self.npointsources)
 
-        return_str += 'min depth            : %6.1f m\n' \
+        return_str += '\tmin depth            : %6.1f m\n' \
                       % (self.min_depth_in_m)
-        return_str += 'max depth            : %6.1f m\n' \
+        return_str += '\tmax depth            : %6.1f m\n' \
                       % (self.max_depth_in_m)
-        return_str += 'hypocenter depth     : %6.1f m\n' \
+        return_str += '\thypocenter depth     : %6.1f m\n' \
                       % (self.max_depth_in_m)
 
-        return_str += 'min latitude         : %6.1f deg\n' \
+        return_str += '\tmin latitude         : %6.1f deg\n' \
                       % (self.min_latitude)
-        return_str += 'max latitude         : %6.1f deg\n' \
+        return_str += '\tmax latitude         : %6.1f deg\n' \
                       % (self.max_latitude)
-        return_str += 'hypocenter latitude  : %6.1f deg\n' \
+        return_str += '\thypocenter latitude  : %6.1f deg\n' \
                       % (self.hypocenter_latitude)
 
-        return_str += 'min longitude        : %6.1f deg\n' \
+        return_str += '\tmin longitude        : %6.1f deg\n' \
                       % (self.min_longitude)
-        return_str += 'max longitude        : %6.1f deg\n' \
+        return_str += '\tmax longitude        : %6.1f deg\n' \
                       % (self.max_longitude)
-        return_str += 'hypocenter longitude : %6.1f deg\n' \
+        return_str += '\thypocenter longitude : %6.1f deg\n' \
                       % (self.hypocenter_longitude)
 
 
