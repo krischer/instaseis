@@ -132,6 +132,8 @@
 
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">ReceiverParseError</span><span class="p">,</span> <span class="n">SourceParseError</span>
 
+<span class="n">DEFAULT_MU</span> <span class="o">=</span> <span class="mf">32e9</span>
+
 
 <span class="k">def</span> <span class="nf">_purge_duplicates</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -658,7 +660,127 @@
                 <span class="n">lon</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">lon</span><span class="p">)</span>
                 <span class="n">receivers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Receiver</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">network</span><span class="p">,</span> <span class="n">station</span><span class="p">))</span>
 
-        <span class="k">return</span> <span class="n">receivers</span></div>
+        <span class="k">return</span> <span class="n">receivers</span>
+
+</div>
+<div class="viewcode-block" id="FiniteSource"><a class="viewcode-back" href="../../source.html#instaseis.source.FiniteSource">[docs]</a><span class="k">class</span> <span class="nc">FiniteSource</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class to handle finite sources represented my a number of point sources.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pointsources</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">CMT</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">magnitude</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">event_duration</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">hypocenter_longitude</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">hypocenter_latitude</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">hypocenter_depth_in_m</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pointsources</span> <span class="o">=</span> <span class="n">pointsources</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">CMT</span> <span class="o">=</span> <span class="n">CMT</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">magnitude</span> <span class="o">=</span> <span class="n">magnitude</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_duration</span> <span class="o">=</span> <span class="n">event_duration</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hypocenter_longitude</span> <span class="o">=</span> <span class="n">hypocenter_longitude</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hypocenter_latitude</span> <span class="o">=</span> <span class="n">hypocenter_latitude</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hypocenter_depth_in_m</span> <span class="o">=</span> <span class="n">hypocenter_depth_in_m</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pointsources</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;FiniteSource not Initialized&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">current</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointsources</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">raise</span> <span class="ne">StopIteration</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pointsources</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">current</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pointsources</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="FiniteSource.from_srf_file"><a class="viewcode-back" href="../../source.html#instaseis.source.FiniteSource.from_srf_file">[docs]</a>    <span class="k">def</span> <span class="nf">from_srf_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize a finite source object from a &#39;standard rupture format&#39;</span>
+<span class="sd">        (.srf) file</span>
+
+<span class="sd">        :param filename: path to the .srf file</span>
+<span class="sd">        :param normalize: normalize the sliprate to 1</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&quot;rt&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="c"># go to POINTS block</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+            <span class="k">while</span> <span class="s">&#39;POINTS&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+
+            <span class="n">npoints</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">sources</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">npoints</span><span class="p">):</span>
+                <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">dep</span><span class="p">,</span> <span class="n">stk</span><span class="p">,</span> <span class="n">dip</span><span class="p">,</span> <span class="n">area</span><span class="p">,</span> <span class="n">tinit</span><span class="p">,</span> <span class="n">dt</span> <span class="o">=</span> \
+                    <span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+                <span class="n">rake</span><span class="p">,</span> <span class="n">slip1</span><span class="p">,</span> <span class="n">nt1</span><span class="p">,</span> <span class="n">slip2</span><span class="p">,</span> <span class="n">nt2</span><span class="p">,</span> <span class="n">slip3</span><span class="p">,</span> <span class="n">nt3</span> <span class="o">=</span> \
+                    <span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+
+                <span class="n">dep</span> <span class="o">*=</span> <span class="mf">1e3</span>  <span class="c"># km    &gt; m</span>
+                <span class="n">area</span> <span class="o">*=</span> <span class="mf">1e-4</span>  <span class="c"># cm^2 &gt; m^2</span>
+                <span class="n">slip1</span> <span class="o">*=</span> <span class="mf">1e-2</span>  <span class="c"># cm   &gt; m</span>
+                <span class="n">slip2</span> <span class="o">*=</span> <span class="mf">1e-2</span>  <span class="c"># cm   &gt; m</span>
+                <span class="c"># slip3 *= 1e-2  # cm   &gt; m</span>
+
+                <span class="n">nt1</span><span class="p">,</span> <span class="n">nt2</span><span class="p">,</span> <span class="n">nt3</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="p">(</span><span class="n">nt1</span><span class="p">,</span> <span class="n">nt2</span><span class="p">,</span> <span class="n">nt3</span><span class="p">))</span>
+
+                <span class="k">if</span> <span class="n">nt1</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+                    <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">())</span> <span class="o">&lt;</span> <span class="n">nt1</span><span class="p">:</span>
+                        <span class="n">line</span> <span class="o">=</span> <span class="n">line</span> <span class="o">+</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+                    <span class="n">stf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">normalize</span><span class="p">:</span>
+                        <span class="n">stf</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">trapz</span><span class="p">(</span><span class="n">stf</span><span class="p">,</span> <span class="n">dx</span><span class="o">=</span><span class="n">dt</span><span class="p">)</span>
+
+                    <span class="n">M0</span> <span class="o">=</span> <span class="n">area</span> <span class="o">*</span> <span class="n">DEFAULT_MU</span> <span class="o">*</span> <span class="n">slip1</span>
+
+                    <span class="n">sources</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="n">Source</span><span class="o">.</span><span class="n">from_strike_dip_rake</span><span class="p">(</span>
+                            <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">dep</span><span class="p">,</span> <span class="n">stk</span><span class="p">,</span> <span class="n">dip</span><span class="p">,</span> <span class="n">rake</span><span class="p">,</span> <span class="n">M0</span><span class="p">,</span>
+                            <span class="n">time_shift</span><span class="o">=</span><span class="n">tinit</span><span class="p">,</span> <span class="n">sliprate</span><span class="o">=</span><span class="n">stf</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">))</span>
+
+                <span class="k">if</span> <span class="n">nt2</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+                    <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">())</span> <span class="o">&lt;</span> <span class="n">nt2</span><span class="p">:</span>
+                        <span class="n">line</span> <span class="o">=</span> <span class="n">line</span> <span class="o">+</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+                    <span class="n">stf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">normalize</span><span class="p">:</span>
+                        <span class="n">stf</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">trapz</span><span class="p">(</span><span class="n">stf</span><span class="p">,</span> <span class="n">dx</span><span class="o">=</span><span class="n">dt</span><span class="p">)</span>
+
+                    <span class="n">M0</span> <span class="o">=</span> <span class="n">area</span> <span class="o">*</span> <span class="n">DEFAULT_MU</span> <span class="o">*</span> <span class="n">slip2</span>
+
+                    <span class="n">sources</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="n">Source</span><span class="o">.</span><span class="n">from_strike_dip_rake</span><span class="p">(</span>
+                            <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">dep</span><span class="p">,</span> <span class="n">stk</span><span class="p">,</span> <span class="n">dip</span><span class="p">,</span> <span class="n">rake</span><span class="p">,</span> <span class="n">M0</span><span class="p">,</span>
+                            <span class="n">time_shift</span><span class="o">=</span><span class="n">tinit</span><span class="p">,</span> <span class="n">sliprate</span><span class="o">=</span><span class="n">stf</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">))</span>
+
+                <span class="k">if</span> <span class="n">nt3</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&#39;Slip along u3 axis&#39;</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="bp">self</span><span class="p">(</span><span class="n">pointsources</span><span class="o">=</span><span class="n">sources</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="FiniteSource.resample_sliprate"><a class="viewcode-back" href="../../source.html#instaseis.source.FiniteSource.resample_sliprate">[docs]</a>    <span class="k">def</span> <span class="nf">resample_sliprate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">nsamp</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        For convolution, the sliprate is needed at the sampling of the fields</span>
+<span class="sd">        in the database. This function resamples the sliprate using linear</span>
+<span class="sd">        interpolation for all pointsources in the finite source.</span>
+
+<span class="sd">        :param dt: desired sampling</span>
+<span class="sd">        :param nsamp: desired number of samples</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">ps</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pointsources</span><span class="p">:</span>
+            <span class="n">ps</span><span class="o">.</span><span class="n">resample_sliprate</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">nsamp</span><span class="p">)</span>
+</div>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">epicenter_latitude</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">hypocenter_latitude</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">epicenter_longitude</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">hypocenter_longitude</span></div>
 </pre></div>
 
     </div>

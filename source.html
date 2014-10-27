@@ -132,6 +132,51 @@ Martin van Driel (<a class="reference external" href="mailto:Martin&#37;&#52;&#4
 </tbody>
 </table>
 <dl class="class">
+<dt id="instaseis.source.FiniteSource">
+<em class="property">class </em><tt class="descclassname">instaseis.source.</tt><tt class="descname">FiniteSource</tt><big>(</big><em>pointsources=None</em>, <em>CMT=None</em>, <em>magnitude=None</em>, <em>event_duration=None</em>, <em>hypocenter_longitude=None</em>, <em>hypocenter_latitude=None</em>, <em>hypocenter_depth_in_m=None</em><big>)</big><a class="reference internal" href="_modules/instaseis/source.html#FiniteSource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.FiniteSource" title="Permalink to this definition">¶</a></dt>
+<dd><p>A class to handle finite sources represented my a number of point sources.</p>
+<dl class="classmethod">
+<dt id="instaseis.source.FiniteSource.from_srf_file">
+<em class="property">classmethod </em><tt class="descname">from_srf_file</tt><big>(</big><em>filename</em>, <em>normalize=False</em><big>)</big><a class="reference internal" href="_modules/instaseis/source.html#FiniteSource.from_srf_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.FiniteSource.from_srf_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize a finite source object from a &#8216;standard rupture format&#8217;
+(.srf) file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>filename</strong> &#8211; path to the .srf file</li>
+<li><strong>normalize</strong> &#8211; normalize the sliprate to 1</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="instaseis.source.FiniteSource.resample_sliprate">
+<tt class="descname">resample_sliprate</tt><big>(</big><em>dt</em>, <em>nsamp</em><big>)</big><a class="reference internal" href="_modules/instaseis/source.html#FiniteSource.resample_sliprate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.FiniteSource.resample_sliprate" title="Permalink to this definition">¶</a></dt>
+<dd><p>For convolution, the sliprate is needed at the sampling of the fields
+in the database. This function resamples the sliprate using linear
+interpolation for all pointsources in the finite source.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>dt</strong> &#8211; desired sampling</li>
+<li><strong>nsamp</strong> &#8211; desired number of samples</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
 <dt id="instaseis.source.ForceSource">
 <em class="property">class </em><tt class="descclassname">instaseis.source.</tt><tt class="descname">ForceSource</tt><big>(</big><em>latitude</em>, <em>longitude</em>, <em>depth_in_m=None</em>, <em>f_r=0.0</em>, <em>f_t=0.0</em>, <em>f_p=0.0</em><big>)</big><a class="reference internal" href="_modules/instaseis/source.html#ForceSource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.ForceSource" title="Permalink to this definition">¶</a></dt>
 <dd><p>A class to handle a seimic force source.</p>
