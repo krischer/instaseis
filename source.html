@@ -135,6 +135,19 @@ Martin van Driel (<a class="reference external" href="mailto:Martin&#37;&#52;&#4
 <dt id="instaseis.source.FiniteSource">
 <em class="property">class </em><tt class="descclassname">instaseis.source.</tt><tt class="descname">FiniteSource</tt><big>(</big><em>pointsources=None</em>, <em>CMT=None</em>, <em>magnitude=None</em>, <em>event_duration=None</em>, <em>hypocenter_longitude=None</em>, <em>hypocenter_latitude=None</em>, <em>hypocenter_depth_in_m=None</em><big>)</big><a class="reference internal" href="_modules/instaseis/source.html#FiniteSource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.FiniteSource" title="Permalink to this definition">¶</a></dt>
 <dd><p>A class to handle finite sources represented my a number of point sources.</p>
+<dl class="attribute">
+<dt id="instaseis.source.FiniteSource.M0">
+<tt class="descname">M0</tt><a class="reference internal" href="_modules/instaseis/source.html#FiniteSource.M0"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.FiniteSource.M0" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scalar Moment M0 in Nm</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="instaseis.source.FiniteSource.find_hypocenter">
+<tt class="descname">find_hypocenter</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/instaseis/source.html#FiniteSource.find_hypocenter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.FiniteSource.find_hypocenter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds the hypo- and epicenter based on the point source that has the
+smallest timeshift</p>
+</dd></dl>
+
 <dl class="classmethod">
 <dt id="instaseis.source.FiniteSource.from_srf_file">
 <em class="property">classmethod </em><tt class="descname">from_srf_file</tt><big>(</big><em>filename</em>, <em>normalize=False</em><big>)</big><a class="reference internal" href="_modules/instaseis/source.html#FiniteSource.from_srf_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.FiniteSource.from_srf_file" title="Permalink to this definition">¶</a></dt>
@@ -288,6 +301,12 @@ useful in the context of finite sources</li>
 </tr>
 </tbody>
 </table>
+<dl class="attribute">
+<dt id="instaseis.source.Source.M0">
+<tt class="descname">M0</tt><a class="reference internal" href="_modules/instaseis/source.html#Source.M0"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.Source.M0" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scalar Moment M0 in Nm</p>
+</dd></dl>
+
 <dl class="classmethod">
 <dt id="instaseis.source.Source.from_CMTSOLUTION_file">
 <em class="property">classmethod </em><tt class="descname">from_CMTSOLUTION_file</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="_modules/instaseis/source.html#Source.from_CMTSOLUTION_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.Source.from_CMTSOLUTION_file" title="Permalink to this definition">¶</a></dt>

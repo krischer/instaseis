@@ -373,6 +373,15 @@
                     <span class="n">m_rp</span><span class="p">,</span> <span class="n">m_tp</span><span class="p">,</span> <span class="n">time_shift</span><span class="p">,</span> <span class="n">sliprate</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
 </div>
     <span class="nd">@property</span>
+<div class="viewcode-block" id="Source.M0"><a class="viewcode-back" href="../../source.html#instaseis.source.Source.M0">[docs]</a>    <span class="k">def</span> <span class="nf">M0</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Scalar Moment M0 in Nm</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m_rr</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_tt</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_pp</span> <span class="o">**</span> <span class="mi">2</span>
+                <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_rt</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_rp</span> <span class="o">**</span> <span class="mi">2</span>
+                <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_tp</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="mf">0.5</span> <span class="o">**</span> <span class="mf">0.5</span>
+</div>
+    <span class="nd">@property</span>
 <div class="viewcode-block" id="Source.tensor"><a class="viewcode-back" href="../../source.html#instaseis.source.Source.tensor">[docs]</a>    <span class="k">def</span> <span class="nf">tensor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        List of moment tensor components in r, theta, phi coordinates:</span>
@@ -774,6 +783,47 @@
         <span class="k">for</span> <span class="n">ps</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pointsources</span><span class="p">:</span>
             <span class="n">ps</span><span class="o">.</span><span class="n">resample_sliprate</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">nsamp</span><span class="p">)</span>
 </div>
+<div class="viewcode-block" id="FiniteSource.find_hypocenter"><a class="viewcode-back" href="../../source.html#instaseis.source.FiniteSource.find_hypocenter">[docs]</a>    <span class="k">def</span> <span class="nf">find_hypocenter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Finds the hypo- and epicenter based on the point source that has the</span>
+<span class="sd">        smallest timeshift</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ps_hypo</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointsources</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">time_shift</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hypocenter_longitude</span> <span class="o">=</span> <span class="n">ps_hypo</span><span class="o">.</span><span class="n">longitude</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hypocenter_latitude</span> <span class="o">=</span> <span class="n">ps_hypo</span><span class="o">.</span><span class="n">latitude</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hypocenter_depth_in_m</span> <span class="o">=</span> <span class="n">ps_hypo</span><span class="o">.</span><span class="n">depth_in_m</span>
+</div>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="FiniteSource.M0"><a class="viewcode-back" href="../../source.html#instaseis.source.FiniteSource.M0">[docs]</a>    <span class="k">def</span> <span class="nf">M0</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Scalar Moment M0 in Nm</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">ps</span><span class="o">.</span><span class="n">M0</span> <span class="k">for</span> <span class="n">ps</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pointsources</span><span class="p">)</span>
+</div>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">min_depth_in_m</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointsources</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">depth_in_m</span><span class="p">)</span><span class="o">.</span><span class="n">depth_in_m</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">max_depth_in_m</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointsources</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">depth_in_m</span><span class="p">)</span><span class="o">.</span><span class="n">depth_in_m</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">min_longitude</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointsources</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">longitude</span><span class="p">)</span><span class="o">.</span><span class="n">longitude</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">max_longitude</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointsources</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">longitude</span><span class="p">)</span><span class="o">.</span><span class="n">longitude</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">min_latitude</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointsources</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">latitude</span><span class="p">)</span><span class="o">.</span><span class="n">latitude</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">max_latitude</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointsources</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">latitude</span><span class="p">)</span><span class="o">.</span><span class="n">latitude</span>
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">epicenter_latitude</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">hypocenter_latitude</span>
