@@ -117,3 +117,34 @@ def test_resample_stf():
 
     for isrc, src in enumerate(finitesource):
         np.testing.assert_allclose(stf_ref, src.sliprate)
+
+
+def test_hypocenter():
+    """
+    Tests finding the hypocenter
+    """
+    finitesource = FiniteSource.from_srf_file(SRF_FILE, True)
+    finitesource.find_hypocenter()
+
+    assert finitesource.hypocenter_longitude == 0.0
+    assert finitesource.hypocenter_latitude == 0.0
+    assert finitesource.hypocenter_depth_in_m == 50e3
+    assert finitesource.epicenter_longitude == 0.0
+    assert finitesource.epicenter_latitude == 0.0
+
+
+def test_min_max_functions():
+    """
+    Tests the min/max convenience functions
+    """
+    finitesource = FiniteSource.from_srf_file(SRF_FILE, True)
+    finitesource.find_hypocenter()
+
+    assert finitesource.min_depth_in_m == 50e3
+    assert finitesource.max_depth_in_m == 50e3
+
+    assert finitesource.min_longitude == 0.0
+    assert finitesource.max_longitude == 8.99322
+
+    assert finitesource.min_latitude == 0.0
+    assert finitesource.max_latitude == 0.0

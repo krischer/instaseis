@@ -664,6 +664,40 @@ class FiniteSource(object):
         for ps in self.pointsources:
             ps.resample_sliprate(dt, nsamp)
 
+    def find_hypocenter(self):
+        """
+        Finds the hypo- and epicenter based on the point source that has the
+        smallest timeshift
+        """
+        ps_hypo = min(self.pointsources, key=lambda x: x.time_shift)
+        self.hypocenter_longitude = ps_hypo.longitude
+        self.hypocenter_latitude = ps_hypo.latitude
+        self.hypocenter_depth_in_m = ps_hypo.depth_in_m
+
+    @property
+    def min_depth_in_m(self):
+        return min(self.pointsources, key=lambda x: x.depth_in_m).depth_in_m
+
+    @property
+    def max_depth_in_m(self):
+        return max(self.pointsources, key=lambda x: x.depth_in_m).depth_in_m
+
+    @property
+    def min_longitude(self):
+        return min(self.pointsources, key=lambda x: x.longitude).longitude
+
+    @property
+    def max_longitude(self):
+        return max(self.pointsources, key=lambda x: x.longitude).longitude
+
+    @property
+    def min_latitude(self):
+        return min(self.pointsources, key=lambda x: x.latitude).latitude
+
+    @property
+    def max_latitude(self):
+        return max(self.pointsources, key=lambda x: x.latitude).latitude
+
     @property
     def epicenter_latitude(self):
         return self.hypocenter_latitude
