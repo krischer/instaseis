@@ -259,8 +259,15 @@ class Source(SourceOrReceiver):
                 - np.sin(2. * delta) * np.sin(2. * phi) * np.sin(lambd) / 2.) \
             * M0
 
-        return self(latitude, longitude, depth_in_m, m_rr, m_tt, m_pp, m_rt,
-                    m_rp, m_tp, time_shift, sliprate, dt)
+        source = self(latitude, longitude, depth_in_m, m_rr, m_tt, m_pp, m_rt,
+                      m_rp, m_tp, time_shift, sliprate, dt)
+
+        # storing strike, dip and rake for plotting purposes
+        source.phi = phi
+        source.delta = delta
+        source.lambd = lambd
+
+        return source
 
     @property
     def M0(self):
