@@ -144,6 +144,26 @@ class Buffered2DegreeLatLngDepthScatter(InstaSeisBenchmark):
         return "Buffered, 2 Degree/200 km source position scatter"
 
 
+class BufferedHalfDegreeLatLngDepthScatter(InstaSeisBenchmark):
+    def setup(self):
+        self.db = InstaSeisDB(self.path, read_on_demand=False,
+                              buffer_size_in_mb=250)
+
+    def iterate(self):
+        rec = Receiver(latitude=20, longitude=20)
+        lat = random.random() * 0.5
+        lat += 44
+        lng = random.random() * 0.5
+        lng += 44
+        depth_in_m = random.random() * 100000
+        src = Source(latitude=lat, longitude=lng, depth_in_m=depth_in_m)
+        self.db.get_seismograms(source=src, receiver=rec)
+
+    @property
+    def description(self):
+        return "Buffered, 0.5 Degree/100 km (depth) source position scatter"
+
+
 parser = argparse.ArgumentParser(
     prog="python -m instaseis.benchmark",
     description='Benchmark InstaSeis.')
