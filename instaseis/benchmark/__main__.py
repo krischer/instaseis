@@ -106,6 +106,23 @@ class BufferedFixedSrcRecRoDOffSeismogramGeneration(InstaSeisBenchmark):
                "read_on_demand=False"
 
 
+class BufferedFixedSrcRecRoDOffSeismogramGenerationNoObsPy(InstaSeisBenchmark):
+    def setup(self):
+        self.db = InstaSeisDB(self.path, read_on_demand=False,
+                              buffer_size_in_mb=250)
+
+    def iterate(self):
+        src = Source(latitude=10, longitude=10)
+        rec = Receiver(latitude=20, longitude=20)
+        self.db.get_seismograms(source=src, receiver=rec,
+                                return_obspy_stream=False)
+
+    @property
+    def description(self):
+        return "Buffered, fixed source and receiver, " \
+               "read_on_demand=False, no ObsPy output"
+
+
 class BufferedFixedSrcRecRoDOnSeismogramGeneration(InstaSeisBenchmark):
     def setup(self):
         self.db = InstaSeisDB(self.path, read_on_demand=True,
