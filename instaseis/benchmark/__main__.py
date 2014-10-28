@@ -37,7 +37,7 @@ def plot_gnuplot(times):
         gnuplot.stdin.write("plot '-' using 1:2 title 'time per sm' with "
                             "linespoints \n")
         for i, j in zip(np.arange(len(times)), times):
-           gnuplot.stdin.write("%f %f\n" % (i, j))
+            gnuplot.stdin.write("%f %f\n" % (i, j))
         gnuplot.stdin.write("e\n")
         gnuplot.stdin.flush()
         sys.stdout.flush()

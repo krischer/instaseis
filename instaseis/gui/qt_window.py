@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '/home/ex/local/src/instaseis/instaseis/gui/qt_window.ui'
+# Form implementation generated from reading ui file '/Users/lion/workspace/code/instaseis_backup/instaseis/gui/qt_window.ui'
 #
-# Created: Mon Oct 27 17:57:29 2014
+# Created: Tue Oct 28 16:57:53 2014
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
