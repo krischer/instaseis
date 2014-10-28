@@ -15,6 +15,7 @@ from abc import ABCMeta, abstractmethod, abstractproperty
 import argparse
 import numpy as np
 import os
+import random
 import sys
 import timeit
 
@@ -91,7 +92,7 @@ class InstaSeisBenchmark(object):
                   p, np.percentile(all_times, p)))
 
 
-class FullyBufferedFixedSrcRecRoDOffSeismogramGeneration(InstaSeisBenchmark):
+class BufferedFixedSrcRecRoDOffSeismogramGeneration(InstaSeisBenchmark):
     def setup(self):
         self.db = InstaSeisDB(self.path, read_on_demand=False,
                               buffer_size_in_mb=250)
@@ -103,11 +104,11 @@ class FullyBufferedFixedSrcRecRoDOffSeismogramGeneration(InstaSeisBenchmark):
 
     @property
     def description(self):
-        return "Fully buffered, fixed source and receiver, " \
+        return "Buffered, fixed source and receiver, " \
                "read_on_demand=False"
 
 
-class FullyBufferedFixedSrcRecRoDOnSeismogramGeneration(InstaSeisBenchmark):
+class BufferedFixedSrcRecRoDOnSeismogramGeneration(InstaSeisBenchmark):
     def setup(self):
         self.db = InstaSeisDB(self.path, read_on_demand=True,
                               buffer_size_in_mb=250)
@@ -119,8 +120,28 @@ class FullyBufferedFixedSrcRecRoDOnSeismogramGeneration(InstaSeisBenchmark):
 
     @property
     def description(self):
-        return "Fully buffered, fixed source and receiver, " \
+        return "Buffered, fixed source and receiver, " \
                "read_on_demand=True"
+
+
+class Buffered2DegreeLatLngDepthScatter(InstaSeisBenchmark):
+    def setup(self):
+        self.db = InstaSeisDB(self.path, read_on_demand=False,
+                              buffer_size_in_mb=250)
+
+    def iterate(self):
+        rec = Receiver(latitude=20, longitude=20)
+        lat = random.random() * 2
+        lat += 44
+        lng = random.random() * 2
+        lng += 44
+        depth_in_m = random.random() * 200000
+        src = Source(latitude=lat, longitude=lng, depth_in_m=depth_in_m)
+        self.db.get_seismograms(source=src, receiver=rec)
+
+    @property
+    def description(self):
+        return "Buffered, 2 Degree/200 km source position scatter"
 
 
 parser = argparse.ArgumentParser(
@@ -132,7 +153,11 @@ args = parser.parse_args()
 path = os.path.abspath(args.folder)
 
 db = InstaSeisDB(path, read_on_demand=True, buffer_size_in_mb=0)
+if not db.reciprocal:
+    print("Benchmark currently only works with a reciprocal database.")
+    sys.exit(1)
 print(db)
+
 
 
 # Recursively get all subclasses of the benchmark class.
