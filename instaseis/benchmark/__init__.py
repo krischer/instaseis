@@ -164,6 +164,75 @@ class BufferedHalfDegreeLatLngDepthScatter(InstaSeisBenchmark):
         return "Buffered, 0.5 Degree/100 km (depth) source position scatter"
 
 
+class BufferedFullyRandom(InstaSeisBenchmark):
+    def setup(self):
+        self.db = InstaSeisDB(self.path, read_on_demand=False,
+                              buffer_size_in_mb=250)
+
+    def iterate(self):
+        # Random points on a sphere.
+        lat = np.rad2deg(np.arcsin(2 * random.random() - 1))
+        lng = random.random() * 360.0 - 180.0
+        rec = Receiver(latitude=lat, longitude=lng)
+
+        lat = np.rad2deg(np.arcsin(2 * random.random() - 1))
+        lng = random.random() * 360.0 - 180.0
+        depth_in_m = random.random() * 300000
+        src = Source(latitude=lat, longitude=lng, depth_in_m=depth_in_m)
+
+        self.db.get_seismograms(source=src, receiver=rec)
+
+    @property
+    def description(self):
+        return "Buffered, random src and receiver"
+
+
+class UnbufferedFullyRandom(InstaSeisBenchmark):
+    def setup(self):
+        self.db = InstaSeisDB(self.path, read_on_demand=False,
+                              buffer_size_in_mb=0)
+
+    def iterate(self):
+        # Random points on a sphere.
+        lat = np.rad2deg(np.arcsin(2 * random.random() - 1))
+        lng = random.random() * 360.0 - 180.0
+        rec = Receiver(latitude=lat, longitude=lng)
+
+        lat = np.rad2deg(np.arcsin(2 * random.random() - 1))
+        lng = random.random() * 360.0 - 180.0
+        depth_in_m = random.random() * 300000
+        src = Source(latitude=lat, longitude=lng, depth_in_m=depth_in_m)
+
+        self.db.get_seismograms(source=src, receiver=rec)
+
+    @property
+    def description(self):
+        return "Unbuffered, random src and receiver"
+
+
+class UnbufferedFullyRandomReadOnDemandTrue(InstaSeisBenchmark):
+    def setup(self):
+        self.db = InstaSeisDB(self.path, read_on_demand=True,
+                              buffer_size_in_mb=0)
+
+    def iterate(self):
+        # Random points on a sphere.
+        lat = np.rad2deg(np.arcsin(2 * random.random() - 1))
+        lng = random.random() * 360.0 - 180.0
+        rec = Receiver(latitude=lat, longitude=lng)
+
+        lat = np.rad2deg(np.arcsin(2 * random.random() - 1))
+        lng = random.random() * 360.0 - 180.0
+        depth_in_m = random.random() * 300000
+        src = Source(latitude=lat, longitude=lng, depth_in_m=depth_in_m)
+
+        self.db.get_seismograms(source=src, receiver=rec)
+
+    @property
+    def description(self):
+        return "Unbuffered, random src and receiver, read_on_demand=True, " \
+            "worst case!"
+
 parser = argparse.ArgumentParser(
     prog="python -m instaseis.benchmark",
     description='Benchmark InstaSeis.')
