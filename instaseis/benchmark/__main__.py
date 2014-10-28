@@ -36,7 +36,7 @@ def plot_gnuplot(times):
         gnuplot.stdin.write("set xlabel 'Seismogram Number'\n")
         gnuplot.stdin.write("plot '-' using 1:2 title 'time per sm' with "
                             "linespoints \n")
-        for i, j in zip(np.arange(len(times)) ,times):
+        for i, j in zip(np.arange(len(times)), times):
            gnuplot.stdin.write("%f %f\n" % (i, j))
         gnuplot.stdin.write("e\n")
         gnuplot.stdin.flush()
@@ -144,6 +144,23 @@ class BufferedFixedSrcRecRoDOffSeismogramGenerationNoObsPy(InstaSeisBenchmark):
     def description(self):
         return "Buffered, fixed source and receiver, " \
                "read_on_demand=False, no ObsPy output"
+
+
+class UnbufferedFixedSrcRecRoDOffSeismogramGenerationNoObsPy(
+        InstaSeisBenchmark):
+    def setup(self):
+        self.db = InstaSeisDB(self.path, read_on_demand=False,
+                              buffer_size_in_mb=0)
+
+    def iterate(self):
+        src = Source(latitude=10, longitude=10)
+        rec = Receiver(latitude=20, longitude=20)
+        self.db.get_seismograms(source=src, receiver=rec)
+
+    @property
+    def description(self):
+        return "Unbuffered, fixed source and receiver, " \
+               "read_on_demand=False"
 
 
 class BufferedFixedSrcRecRoDOnSeismogramGeneration(InstaSeisBenchmark):
@@ -281,6 +298,12 @@ parser.add_argument('--time', type=float, default=10.0,
 args = parser.parse_args()
 path = os.path.abspath(args.folder)
 
+print(colorama.Fore.GREEN + 79 * "=" + "\nInstaSeis Benchmark Suite\n")
+print("It enables to gauge the speed of InstaSeis for a certain DB.")
+print(79 * "=" + colorama.Fore.RESET)
+print(colorama.Fore.RED + "\nIt does not deal with OS level caches! So "
+      "interpret the results accordingly!\n" + colorama.Fore.RESET)
+
 db = InstaSeisDB(path, read_on_demand=True, buffer_size_in_mb=0)
 if not db.reciprocal:
     print("Benchmark currently only works with a reciprocal database.")
@@ -304,8 +327,8 @@ benchmarks = [i(path, args.time) for i in get_subclasses(InstaSeisBenchmark)]
 benchmarks.sort(key=lambda x: x.description)
 
 print(79 * "=")
+print("Discovered %i benchmark(s)" % len(benchmarks))
 print(79 * "=")
-print("\nFound %i benchmark(s)" % len(benchmarks))
 
 for benchmark in benchmarks:
     print("\n")
