@@ -16,13 +16,32 @@ import argparse
 import numpy as np
 import os
 import random
+import subprocess
 import sys
+import time
 import timeit
 
 from instaseis import InstaSeisDB, Source, Receiver
 
 # Write interval.
 WRITE_INTERVAL = 0.05
+
+
+def plot_gnuplot(times):
+    try:
+        gnuplot = subprocess.Popen(["gnuplot"],
+                                   stdin=subprocess.PIPE)
+        gnuplot.stdin.write("set term dumb 79 15\n")
+        gnuplot.stdin.write("set xlabel 'Seismogram Number'\n")
+        gnuplot.stdin.write("plot '-' using 1:2 title 'time per sm' with "
+                            "linespoints \n")
+        for i, j in zip(np.arange(len(times)) ,times):
+           gnuplot.stdin.write("%f %f\n" % (i, j))
+        gnuplot.stdin.write("e\n")
+        gnuplot.stdin.flush()
+        sys.stdout.flush()
+    except OSError:
+        print("Could not plot graph. No gnuplot installed?")
 
 
 class InstaSeisBenchmark(object):
@@ -77,7 +96,7 @@ class InstaSeisBenchmark(object):
                 sys.stdout.flush()
                 latest_times = []
                 last_write_time = t
-        print(80 * " ", end="\r")
+        print(79 * " ", end="\r")
 
         all_times = np.array(all_times, dtype="float64")
         cumtime = sum(all_times)
@@ -88,6 +107,9 @@ class InstaSeisBenchmark(object):
         for p in [0, 10, 25, 50, 75, 90, 100]:
             print("\t {0:>3}th percentile: {1} sec".format(
                 p, np.percentile(all_times, p)))
+        sys.stdout.flush()
+        plot_gnuplot(all_times)
+        time.sleep(0.1)
 
 
 class BufferedFixedSrcRecRoDOffSeismogramGeneration(InstaSeisBenchmark):
@@ -280,11 +302,14 @@ def get_subclasses(cls):
 benchmarks = [i(path, args.time) for i in get_subclasses(InstaSeisBenchmark)]
 benchmarks.sort(key=lambda x: x.description)
 
-print(80 * "=")
-print(80 * "=")
-print("\nFound %i benchmark(s)\n" % len(benchmarks))
+print(79 * "=")
+print(79 * "=")
+print("\nFound %i benchmark(s)" % len(benchmarks))
 
 for benchmark in benchmarks:
-    print(80 * "=")
-    print(benchmark.description)
+    print("\n")
+    print(79 * "=")
+    print(79 * "=")
+    print("\n")
+    print(benchmark.description, end="\n\n")
     benchmark.run()
