@@ -248,7 +248,6 @@ if not db.reciprocal:
 print(db)
 
 
-
 # Recursively get all subclasses of the benchmark class.
 def get_subclasses(cls):
     subclasses = []
