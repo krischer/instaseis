@@ -13,6 +13,7 @@ from __future__ import print_function
 
 from abc import ABCMeta, abstractmethod, abstractproperty
 import argparse
+import colorama
 import numpy as np
 import os
 import random
@@ -308,8 +309,9 @@ print("\nFound %i benchmark(s)" % len(benchmarks))
 
 for benchmark in benchmarks:
     print("\n")
-    print(79 * "=")
-    print(79 * "=")
+    print(colorama.Fore.YELLOW + 79 * "=")
+    print(79 * "=" + colorama.Fore.RESET)
     print("\n")
-    print(benchmark.description, end="\n\n")
+    print(colorama.Fore.BLUE + benchmark.description + colorama.Fore.RESET,
+          end="\n\n")
     benchmark.run()
