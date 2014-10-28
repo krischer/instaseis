@@ -21,9 +21,6 @@ import timeit
 
 from instaseis import InstaSeisDB, Source, Receiver
 
-# Time spent per benchmark in seconds.
-TIME_PER_BENCHMARK = 5.0
-
 # Write interval.
 WRITE_INTERVAL = 0.05
 
@@ -31,8 +28,9 @@ WRITE_INTERVAL = 0.05
 class InstaSeisBenchmark(object):
     __metaclass__ = ABCMeta
 
-    def __init__(self, path):
+    def __init__(self, path, time_per_benchmark):
         self.path = path
+        self.time_per_benchmark = time_per_benchmark
 
     @abstractmethod
     def setup(self):
@@ -53,7 +51,7 @@ class InstaSeisBenchmark(object):
         print("\tTime for initialization: %s sec" % (b - a))
 
         starttime = timeit.default_timer()
-        endtime = starttime + TIME_PER_BENCHMARK
+        endtime = starttime + self.time_per_benchmark
         all_times = []
 
         last_write_time = starttime
@@ -238,6 +236,8 @@ parser = argparse.ArgumentParser(
     description='Benchmark InstaSeis.')
 parser.add_argument('folder', type=str,
                     help="path to AxiSEM Green's function database")
+parser.add_argument('--time', type=float, default=10.0,
+                    help='time spent per benchmark in seconds')
 args = parser.parse_args()
 path = os.path.abspath(args.folder)
 
@@ -260,7 +260,7 @@ def get_subclasses(cls):
 
     return subclasses
 
-benchmarks = [i(path) for i in get_subclasses(InstaSeisBenchmark)]
+benchmarks = [i(path, args.time) for i in get_subclasses(InstaSeisBenchmark)]
 benchmarks.sort(key=lambda x: x.description)
 
 print(80 * "=")
