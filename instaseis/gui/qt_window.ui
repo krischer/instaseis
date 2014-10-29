@@ -36,15 +36,9 @@
        <layout class="QHBoxLayout" name="horizontalLayout_6">
         <item>
          <widget class="QPushButton" name="select_folder_button">
-          <property name="maximumSize">
-           <size>
-            <width>150</width>
-            <height>50</height>
-           </size>
-          </property>
           <property name="font">
            <font>
-            <pointsize>9</pointsize>
+            <pointsize>13</pointsize>
            </font>
           </property>
           <property name="text">
@@ -730,9 +724,6 @@
                       <string>Strike Dip Rake</string>
                      </attribute>
                      <layout class="QGridLayout" name="gridLayout_4">
-                      <property name="margin">
-                       <number>9</number>
-                      </property>
                       <item row="0" column="2">
                        <widget class="QLabel" name="strike_value">
                         <property name="minimumSize">

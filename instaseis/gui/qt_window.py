@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '/home/ex/local/src/instaseis/instaseis/gui/qt_window.ui'
+# Form implementation generated from reading ui file '/Users/lion/workspace/code/instaseis/instaseis/gui/qt_window.ui'
 #
-# Created: Wed Oct 29 15:36:11 2014
+# Created: Wed Oct 29 16:33:06 2014
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -43,9 +43,8 @@ class Ui_MainWindow(object):
         self.horizontalLayout_6 = QtGui.QHBoxLayout()
         self.horizontalLayout_6.setObjectName(_fromUtf8("horizontalLayout_6"))
         self.select_folder_button = QtGui.QPushButton(self.centralwidget)
-        self.select_folder_button.setMaximumSize(QtCore.QSize(150, 50))
         font = QtGui.QFont()
-        font.setPointSize(9)
+        font.setPointSize(13)
         self.select_folder_button.setFont(font)
         self.select_folder_button.setObjectName(_fromUtf8("select_folder_button"))
         self.horizontalLayout_6.addWidget(self.select_folder_button)
@@ -336,7 +335,6 @@ class Ui_MainWindow(object):
         self.tab_2 = QtGui.QWidget()
         self.tab_2.setObjectName(_fromUtf8("tab_2"))
         self.gridLayout_4 = QtGui.QGridLayout(self.tab_2)
-        self.gridLayout_4.setMargin(9)
         self.gridLayout_4.setObjectName(_fromUtf8("gridLayout_4"))
         self.strike_value = QtGui.QLabel(self.tab_2)
         self.strike_value.setMinimumSize(QtCore.QSize(30, 0))

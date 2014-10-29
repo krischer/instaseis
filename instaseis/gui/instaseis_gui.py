@@ -332,6 +332,7 @@ class Window(QtGui.QMainWindow):
                 prog_diag = QtGui.QProgressDialog(
                     "Calculating", "Cancel", 0, len(self.finite_source), self)
                 prog_diag.setWindowModality(QtCore.Qt.WindowModal)
+                prog_diag.setMinimumDuration(0)
 
                 def get_prog_fct():
                     def set_value(value, count):
