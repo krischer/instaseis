@@ -477,6 +477,21 @@ class Window(QtGui.QMainWindow):
             info_str += str(self.finite_source)
         self.ui.info_text.setText(info_str)
 
+    def on_load_source_button_released(self):
+        pwd = os.getcwd()
+        self.source_file = str(QtGui.QFileDialog.getOpenFileName(
+            self, "Choose Source File", pwd))
+        if not self.source_file:
+            return
+
+        s = Source.parse(self.source_file)
+        self.ui.m_rr.setValue(s.m_rr / SCALING_FACTOR)
+        self.ui.m_pp.setValue(s.m_pp / SCALING_FACTOR)
+        self.ui.m_rp.setValue(s.m_rp / SCALING_FACTOR)
+        self.ui.m_tt.setValue(s.m_tt / SCALING_FACTOR)
+        self.ui.m_rt.setValue(s.m_rt / SCALING_FACTOR)
+        self.ui.m_tp.setValue(s.m_tp / SCALING_FACTOR)
+
     def on_source_latitude_valueChanged(self, *args):
         self.update()
 

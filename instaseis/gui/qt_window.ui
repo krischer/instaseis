@@ -558,16 +558,39 @@
                   <item>
                    <widget class="QTabWidget" name="source_tab">
                     <property name="currentIndex">
-                     <number>1</number>
+                     <number>0</number>
                     </property>
                     <widget class="QWidget" name="tab">
                      <attribute name="title">
                       <string>Moment Tensor</string>
                      </attribute>
-                     <layout class="QGridLayout" name="gridLayout" columnstretch="0,10,10,10">
+                     <layout class="QGridLayout" name="gridLayout" columnstretch="0,10,10,10,0,0,0">
                       <property name="leftMargin">
                        <number>9</number>
                       </property>
+                      <item row="4" column="1">
+                       <widget class="QPushButton" name="load_source_button">
+                        <property name="text">
+                         <string>load</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="1" column="3">
+                       <widget class="QDoubleSpinBox" name="m_rp">
+                        <property name="prefix">
+                         <string/>
+                        </property>
+                        <property name="suffix">
+                         <string>e16</string>
+                        </property>
+                        <property name="minimum">
+                         <double>-99.000000000000000</double>
+                        </property>
+                        <property name="maximum">
+                         <double>99.000000000000000</double>
+                        </property>
+                       </widget>
+                      </item>
                       <item row="1" column="1">
                        <widget class="QDoubleSpinBox" name="m_rr">
                         <property name="prefix">
@@ -630,32 +653,6 @@
                         </property>
                        </widget>
                       </item>
-                      <item row="1" column="3">
-                       <widget class="QDoubleSpinBox" name="m_rp">
-                        <property name="prefix">
-                         <string/>
-                        </property>
-                        <property name="suffix">
-                         <string>e16</string>
-                        </property>
-                        <property name="minimum">
-                         <double>-99.000000000000000</double>
-                        </property>
-                        <property name="maximum">
-                         <double>99.000000000000000</double>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="3" column="0">
-                       <widget class="QLabel" name="label_7">
-                        <property name="text">
-                         <string>t</string>
-                        </property>
-                        <property name="alignment">
-                         <set>Qt::AlignCenter</set>
-                        </property>
-                       </widget>
-                      </item>
                       <item row="3" column="2">
                        <widget class="QDoubleSpinBox" name="m_tt">
                         <property name="prefix">
@@ -688,16 +685,6 @@
                         </property>
                        </widget>
                       </item>
-                      <item row="4" column="0">
-                       <widget class="QLabel" name="label_8">
-                        <property name="text">
-                         <string>p</string>
-                        </property>
-                        <property name="alignment">
-                         <set>Qt::AlignCenter</set>
-                        </property>
-                       </widget>
-                      </item>
                       <item row="4" column="3">
                        <widget class="QDoubleSpinBox" name="m_pp">
                         <property name="prefix">
@@ -714,7 +701,27 @@
                         </property>
                        </widget>
                       </item>
-                      <item row="1" column="0">
+                      <item row="3" column="4">
+                       <widget class="QLabel" name="label_7">
+                        <property name="text">
+                         <string>t</string>
+                        </property>
+                        <property name="alignment">
+                         <set>Qt::AlignCenter</set>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="4" column="4">
+                       <widget class="QLabel" name="label_8">
+                        <property name="text">
+                         <string>p</string>
+                        </property>
+                        <property name="alignment">
+                         <set>Qt::AlignCenter</set>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="1" column="4">
                        <widget class="QLabel" name="label_4">
                         <property name="enabled">
                          <bool>true</bool>
