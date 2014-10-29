@@ -927,6 +927,16 @@
         <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointsources</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">latitude</span><span class="p">)</span><span class="o">.</span><span class="n">latitude</span>
 
     <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">rupture_duration</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">ts_min</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointsources</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">time_shift</span><span class="p">)</span><span class="o">.</span><span class="n">time_shift</span>
+        <span class="n">ts_max</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointsources</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">time_shift</span><span class="p">)</span><span class="o">.</span><span class="n">time_shift</span>
+        <span class="k">return</span> <span class="n">ts_max</span> <span class="o">-</span> <span class="n">ts_min</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">time_shift</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointsources</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">time_shift</span><span class="p">)</span><span class="o">.</span><span class="n">time_shift</span>
+
+    <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">epicenter_latitude</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">hypocenter_latitude</span>
 
@@ -950,6 +960,10 @@
                       <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">M0</span><span class="p">)</span>
         <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">#point sources       : </span><span class="si">%d</span><span class="se">\n</span><span class="s">&#39;</span> \
                       <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">npointsources</span><span class="p">)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">rupture duration     : </span><span class="si">%6.1f</span><span class="s"> s</span><span class="se">\n</span><span class="s">&#39;</span> \
+                      <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rupture_duration</span><span class="p">)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">time shift           : </span><span class="si">%6.1f</span><span class="s"> s</span><span class="se">\n</span><span class="s">&#39;</span> \
+                      <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time_shift</span><span class="p">)</span>
 
         <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">min depth            : </span><span class="si">%6.1f</span><span class="s"> m</span><span class="se">\n</span><span class="s">&#39;</span> \
                       <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">min_depth_in_m</span><span class="p">)</span>
