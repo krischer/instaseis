@@ -150,6 +150,32 @@ class Window(QtGui.QMainWindow):
         self.mpl_mt_ax.set_ylim(-105, 105)
         self.mpl_mt_figure.canvas.draw()
 
+    def plot_mt_finite(self):
+        self.mpl_mt_finite_figure = self.ui.mt_fig_finite.fig
+        self.mpl_mt_finite_ax = self.mpl_mt_finite_figure.add_axes(
+            [0.0, 0.0, 1.0, 1.0])
+        self.mpl_mt_finite_ax.set_axis_off()
+        self.mpl_mt_finite_figure.patch.set_alpha(0.0)
+        self.mpl_mt_finite_figure.set_facecolor('None')
+
+        self._draw_mt_finite()
+
+    def _draw_mt_finite(self):
+        if not hasattr(self, "mpl_mt_finite_ax"):
+            return
+
+        try:
+            self.bb_finite.remove()
+        except:
+            pass
+
+        self.bb_finite = Beach(self.finite_source.CMT.tensor / SCALING_FACTOR,
+                        xy=(0, 0), width=200, linewidth=1, facecolor="red")
+        self.mpl_mt_finite_ax.add_collection(self.bb_finite)
+        self.mpl_mt_finite_ax.set_xlim(-105, 105)
+        self.mpl_mt_finite_ax.set_ylim(-105, 105)
+        self.mpl_mt_finite_figure.canvas.draw()
+
     def plot_map(self):
         self.mpl_map_figure = self.ui.map_fig.fig
         self.mpl_map_ax = self.mpl_map_figure.add_axes([0.01, 0.01, .98, .98])
@@ -390,6 +416,8 @@ class Window(QtGui.QMainWindow):
                 dt=self.instaseis_db.dt, nsamp=self.instaseis_db.ndumps,
                 freq=1.0/self.instaseis_db.parsed_mesh.dominant_period)
 
+        self.finite_source.compute_centroid()
+        self.plot_mt_finite()
         self.update()
         self.set_info()
 

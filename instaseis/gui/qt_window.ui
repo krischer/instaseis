@@ -878,31 +878,51 @@
              </attribute>
              <layout class="QHBoxLayout" name="horizontalLayout_2">
               <item>
-               <widget class="QPushButton" name="open_srf_file_button">
-                <property name="text">
-                 <string>Open *.srf</string>
+               <widget class="Qt4MplCanvas" name="mt_fig_finite">
+                <property name="minimumSize">
+                 <size>
+                  <width>60</width>
+                  <height>60</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>60</width>
+                  <height>60</height>
+                 </size>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="update_button">
-                <property name="text">
-                 <string>update seismograms (U)</string>
-                </property>
-                <property name="shortcut">
-                 <string>U</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="auto_update_check_box">
-                <property name="enabled">
-                 <bool>true</bool>
-                </property>
-                <property name="text">
-                 <string>auto update</string>
-                </property>
-               </widget>
+               <layout class="QVBoxLayout" name="verticalLayout_4">
+                <item>
+                 <widget class="QPushButton" name="open_srf_file_button">
+                  <property name="text">
+                   <string>Open *.srf</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="update_button">
+                  <property name="text">
+                   <string>update seismograms (U)</string>
+                  </property>
+                  <property name="shortcut">
+                   <string>U</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="auto_update_check_box">
+                  <property name="enabled">
+                   <bool>true</bool>
+                  </property>
+                  <property name="text">
+                   <string>auto update</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
               </item>
              </layout>
             </widget>

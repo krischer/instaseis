@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file '/home/ex/local/src/instaseis/instaseis/gui/qt_window.ui'
 #
-# Created: Tue Oct 28 17:21:52 2014
+# Created: Wed Oct 29 13:26:17 2014
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -397,16 +397,24 @@ class Ui_MainWindow(object):
         self.tab_10.setObjectName(_fromUtf8("tab_10"))
         self.horizontalLayout_2 = QtGui.QHBoxLayout(self.tab_10)
         self.horizontalLayout_2.setObjectName(_fromUtf8("horizontalLayout_2"))
+        self.mt_fig_finite = Qt4MplCanvas(self.tab_10)
+        self.mt_fig_finite.setMinimumSize(QtCore.QSize(60, 60))
+        self.mt_fig_finite.setMaximumSize(QtCore.QSize(60, 60))
+        self.mt_fig_finite.setObjectName(_fromUtf8("mt_fig_finite"))
+        self.horizontalLayout_2.addWidget(self.mt_fig_finite)
+        self.verticalLayout_4 = QtGui.QVBoxLayout()
+        self.verticalLayout_4.setObjectName(_fromUtf8("verticalLayout_4"))
         self.open_srf_file_button = QtGui.QPushButton(self.tab_10)
         self.open_srf_file_button.setObjectName(_fromUtf8("open_srf_file_button"))
-        self.horizontalLayout_2.addWidget(self.open_srf_file_button)
+        self.verticalLayout_4.addWidget(self.open_srf_file_button)
         self.update_button = QtGui.QPushButton(self.tab_10)
         self.update_button.setObjectName(_fromUtf8("update_button"))
-        self.horizontalLayout_2.addWidget(self.update_button)
+        self.verticalLayout_4.addWidget(self.update_button)
         self.auto_update_check_box = QtGui.QCheckBox(self.tab_10)
         self.auto_update_check_box.setEnabled(True)
         self.auto_update_check_box.setObjectName(_fromUtf8("auto_update_check_box"))
-        self.horizontalLayout_2.addWidget(self.auto_update_check_box)
+        self.verticalLayout_4.addWidget(self.auto_update_check_box)
+        self.horizontalLayout_2.addLayout(self.verticalLayout_4)
         self.finsource_tab.addTab(self.tab_10, _fromUtf8(""))
         self.verticalLayout_3.addWidget(self.finsource_tab)
         self.map_fig = Qt4MplCanvas(self.centralwidget)
