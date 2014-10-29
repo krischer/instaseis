@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file '/home/ex/local/src/instaseis/instaseis/gui/qt_window.ui'
 #
-# Created: Wed Oct 29 15:31:41 2014
+# Created: Wed Oct 29 15:36:11 2014
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -209,7 +209,7 @@ class Ui_MainWindow(object):
         self.info_text.setMaximumSize(QtCore.QSize(470, 600))
         font = QtGui.QFont()
         font.setFamily(_fromUtf8("Courier New"))
-        font.setPointSize(9)
+        font.setPointSize(10)
         self.info_text.setFont(font)
         self.info_text.setLineWrapMode(QtGui.QTextEdit.NoWrap)
         self.info_text.setTabStopWidth(20)

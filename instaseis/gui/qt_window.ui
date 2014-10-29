@@ -434,7 +434,7 @@
             <property name="font">
              <font>
               <family>Courier New</family>
-              <pointsize>9</pointsize>
+              <pointsize>10</pointsize>
              </font>
             </property>
             <property name="lineWrapMode">
