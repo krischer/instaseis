@@ -755,6 +755,7 @@ class FiniteSource(object):
         longitude = np.rad2deg(np.arctan2(y, x))
         colatitude = np.rad2deg(
             np.arccos(z / np.sqrt(x ** 2 + y ** 2 + z ** 2)))
+        latitude = 90.0 - colatitude
 
         depth_in_m = planet_radius - (x ** 2 + y ** 2 + z ** 2) ** 0.5
 
