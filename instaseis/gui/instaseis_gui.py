@@ -276,7 +276,7 @@ class Window(QtGui.QMainWindow):
             latitude=float(self.ui.receiver_latitude.value()),
             longitude=float(self.ui.receiver_longitude.value()))
 
-    def update(self, autorange=False, force=False):
+    def update(self, force=False):
 
         try:
             self._plot_receiver()
@@ -387,6 +387,7 @@ class Window(QtGui.QMainWindow):
             tr = st.select(component=components_map[components_choice][ic])[0]
             times = tr.times()
             plot_widget.plot(times, tr.data, pen="k")
+            plot_widget.ptp = tr.data.ptp()
             if st_cmt is not None:
                 tr = st_cmt.select(component=components_map[components_choice][ic])[0]
                 times = tr.times()
@@ -402,9 +403,6 @@ class Window(QtGui.QMainWindow):
                     else:
                         pen = "#95000066"
                     plot_widget.addLine(x=tt["time"], pen=pen, z=-10)
-
-            if autorange:
-                plot_widget.autoRange()
 
     def on_select_folder_button_released(self):
         pwd = os.getcwd()
@@ -422,6 +420,9 @@ class Window(QtGui.QMainWindow):
 
         self._setup_finite_source()
 
+        self.update()
+        self.set_info()
+
     def on_open_srf_file_button_released(self):
         pwd = os.getcwd()
         self.srf_file = str(QtGui.QFileDialog.getOpenFileName(
@@ -432,8 +433,12 @@ class Window(QtGui.QMainWindow):
         self.finite_source.compute_centroid()
 
         self._setup_finite_source()
+        self.update()
+        self.set_info()
 
     def _setup_finite_source(self):
+        if self.finite_source is None:
+            return
         if self.instaseis_db is not None:
             self.finite_source.set_sliprate_lp(
                 dt=self.instaseis_db.dt, nsamp=self.instaseis_db.ndumps,
@@ -444,8 +449,6 @@ class Window(QtGui.QMainWindow):
                 freq=1.0/self.instaseis_db.parsed_mesh.dominant_period)
 
         self.plot_mt_finite()
-        self.update()
-        self.set_info()
 
     def set_info(self):
         info_str = ''
@@ -516,7 +519,10 @@ class Window(QtGui.QMainWindow):
         self.update()
 
     def on_reset_view_button_released(self, *args):
-        self.ui.z_graph.autoRange()
+        widgets = [getattr(self.ui, "%s_graph" % _i)
+                   for _i in ("z", "n", "e")]
+        widgets.sort(key=lambda x: x.ptp)
+        widgets[-1].autoRange()
 
     def on_resample_check_box_stateChanged(self, state):
         resample = bool(state)
