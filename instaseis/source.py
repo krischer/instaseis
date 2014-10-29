@@ -281,6 +281,13 @@ class Source(SourceOrReceiver):
                 + 2 * self.m_tp ** 2) ** 0.5 * 0.5 ** 0.5
 
     @property
+    def moment_magnitude(self):
+        """
+        Moment magnitude M_w
+        """
+        return 2.0 / 3.0 * np.log10(self.M0) - 6.0
+
+    @property
     def tensor(self):
         """
         List of moment tensor components in r, theta, phi coordinates:
@@ -351,15 +358,16 @@ class Source(SourceOrReceiver):
 
     def __str__(self):
         return_str = 'AxiSEM Database Source:\n'
-        return_str += 'longitude     : %6.1f deg\n' % (self.longitude)
-        return_str += 'latitude      : %6.1f deg\n' % (self.latitude)
-        return_str += 'scalar Moment : %10.2e Nm\n' % (self.M0)
-        return_str += 'Mrr           : %10.2e Nm\n' % (self.m_rr)
-        return_str += 'Mtt           : %10.2e Nm\n' % (self.m_tt)
-        return_str += 'Mpp           : %10.2e Nm\n' % (self.m_pp)
-        return_str += 'Mrt           : %10.2e Nm\n' % (self.m_rt)
-        return_str += 'Mrp           : %10.2e Nm\n' % (self.m_rp)
-        return_str += 'Mtp           : %10.2e Nm\n' % (self.m_tp)
+        return_str += 'longitude        : %6.1f deg\n' % (self.longitude)
+        return_str += 'latitude         : %6.1f deg\n' % (self.latitude)
+        return_str += 'Moment Magnitude : %4.2f\n' % (self.moment_magnitude)
+        return_str += 'scalar Moment    : %10.2e Nm\n' % (self.M0)
+        return_str += 'Mrr              : %10.2e Nm\n' % (self.m_rr)
+        return_str += 'Mtt              : %10.2e Nm\n' % (self.m_tt)
+        return_str += 'Mpp              : %10.2e Nm\n' % (self.m_pp)
+        return_str += 'Mrt              : %10.2e Nm\n' % (self.m_rt)
+        return_str += 'Mrp              : %10.2e Nm\n' % (self.m_rp)
+        return_str += 'Mtp              : %10.2e Nm\n' % (self.m_tp)
 
         return return_str
 
@@ -778,6 +786,13 @@ class FiniteSource(object):
         return sum(ps.M0 for ps in self.pointsources)
 
     @property
+    def moment_magnitude(self):
+        """
+        Moment magnitude M_w
+        """
+        return 2.0 / 3.0 * np.log10(self.M0) - 6.0
+
+    @property
     def min_depth_in_m(self):
         return min(self.pointsources, key=lambda x: x.depth_in_m).depth_in_m
 
@@ -819,6 +834,8 @@ class FiniteSource(object):
             self.find_hypocenter()
 
         return_str = 'AxiSEM Database Finite Source:\n'
+        return_str += '\tMoment Magnitude     : %4.2f\n' \
+                      % (self.moment_magnitude)
         return_str += '\tscalar Moment        : %10.2e Nm\n' \
                       % (self.M0)
         return_str += '\t#point sources       : %d\n' \
