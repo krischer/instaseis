@@ -171,3 +171,24 @@ def test_M0_finite_source():
     finitesource.find_hypocenter()
 
     np.testing.assert_allclose(np.array([finitesource.M0]), np.array([3.2e20]))
+
+
+def test_CMT_finite_source():
+    """
+    Tests computation of CMT solution
+    """
+    finitesource = FiniteSource.from_srf_file(SRF_FILE, True)
+    finitesource.compute_centroid()
+
+    np.testing.assert_allclose(np.array([finitesource.CMT.time_shift]),
+                               np.array([111.111111]))
+
+    np.testing.assert_allclose(
+        np.array([-3.91949923e+04, 3.91030482e+04, 9.19441162e+01,
+                  1.94162699e+04, -5.14006869e+16, 3.19598656e+20]),
+        finitesource.CMT.tensor_voigt)
+
+    np.testing.assert_allclose(np.array([finitesource.CMT.latitude]),
+                               np.array([0.0]))
+    np.testing.assert_allclose(np.array([finitesource.CMT.longitude]),
+                               np.array([4.48739318376]))

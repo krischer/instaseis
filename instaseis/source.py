@@ -22,6 +22,7 @@ import os
 from scipy import interp
 
 from . import ReceiverParseError, SourceParseError
+from . import rotations
 
 DEFAULT_MU = 32e9
 
@@ -726,6 +727,44 @@ class FiniteSource(object):
         self.hypocenter_longitude = ps_hypo.longitude
         self.hypocenter_latitude = ps_hypo.latitude
         self.hypocenter_depth_in_m = ps_hypo.depth_in_m
+
+    def compute_centroid(self, planet_radius=6371e3):
+        """
+        computes the centroid moment tensor by summing over all pointsource
+        weihted by their scalar moment
+        """
+        x = 0.0
+        y = 0.0
+        z = 0.0
+        finite_M0 = self.M0
+        finite_mij = np.zeros(6)
+        finite_time_shift = 0.0
+
+        for ps in self.pointsources:
+            x += ps.x(planet_radius) * ps.M0 / finite_M0
+            y += ps.y(planet_radius) * ps.M0 / finite_M0
+            z += ps.z(planet_radius) * ps.M0 / finite_M0
+
+            finite_time_shift += ps.time_shift * ps.M0 / finite_M0
+
+            mij = rotations.rotate_symm_tensor_voigt_xyz_src_to_xyz_earth(
+                ps.tensor_voigt, np.deg2rad(ps.longitude),
+                np.deg2rad(ps.colatitude))
+            finite_mij += mij
+
+        longitude = np.rad2deg(np.sin(y / (x ** 2 + y ** 2) ** 0.5))
+        latitude = np.rad2deg(np.sin(z / (x ** 2 + y ** 2 + z ** 2) ** 0.5))
+        colatitude = 90.0 - latitude
+
+        depth_in_m = planet_radius - (x ** 2 + y ** 2 + z ** 2) ** 0.5
+
+        finite_mij = rotations.rotate_symm_tensor_voigt_xyz_earth_to_xyz_src(
+            finite_mij, np.deg2rad(longitude), np.deg2rad(colatitude))
+
+        self.CMT = Source(latitude, longitude, depth_in_m, m_rr=finite_mij[2],
+                          m_tt=finite_mij[0], m_pp=finite_mij[1],
+                          m_rt=finite_mij[4], m_rp=finite_mij[3],
+                          m_tp=finite_mij[5], time_shift=finite_time_shift)
 
     @property
     def M0(self):
