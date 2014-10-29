@@ -368,12 +368,13 @@ class Window(QtGui.QMainWindow):
                 st_cmt = None
 
             # check filter values from the UI
+            zp = bool(self.ui.zero_phase_check_box.checkState())
             if bool(self.ui.lowpass_check_box.checkState()):
                 try:
                     freq = 1.0 / float(self.ui.lowpass_period.value())
-                    st.filter('lowpass', freq=freq, zerophase=True)
+                    st.filter('lowpass', freq=freq, zerophase=zp)
                     if st_cmt is not None:
-                        st_cmt.filter('lowpass', freq=freq, zerophase=True)
+                        st_cmt.filter('lowpass', freq=freq, zerophase=zp)
                 except ZeroDivisionError:
                     # this happens when typing in the lowpass_period box
                     pass
@@ -381,9 +382,9 @@ class Window(QtGui.QMainWindow):
             if bool(self.ui.highpass_check_box.checkState()):
                 try:
                     freq = 1.0 / float(self.ui.highpass_period.value())
-                    st.filter('highpass', freq=freq, zerophase=True)
+                    st.filter('highpass', freq=freq, zerophase=zp)
                     if st_cmt is not None:
-                        st_cmt.filter('highpass', freq=freq, zerophase=True)
+                        st_cmt.filter('highpass', freq=freq, zerophase=zp)
                 except ZeroDivisionError:
                     # this happens when typing in the highpass_period box
                     pass
@@ -570,6 +571,9 @@ class Window(QtGui.QMainWindow):
         self.update()
 
     def on_highpass_period_valueChanged(self, *args):
+        self.update()
+
+    def on_zero_phase_check_box_stateChanged(self, state):
         self.update()
 
     def on_components_combo_currentIndexChanged(self):

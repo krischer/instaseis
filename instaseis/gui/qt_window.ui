@@ -38,7 +38,7 @@
          <widget class="QPushButton" name="select_folder_button">
           <property name="font">
            <font>
-            <pointsize>13</pointsize>
+            <pointsize>9</pointsize>
            </font>
           </property>
           <property name="text">
@@ -133,6 +133,13 @@
            </size>
           </property>
          </spacer>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="zero_phase_check_box">
+          <property name="text">
+           <string>Zero Phase</string>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QCheckBox" name="lowpass_check_box">
@@ -329,7 +336,7 @@
            <double>1.000000000000000</double>
           </property>
           <property name="value">
-           <double>10.000000000000000</double>
+           <double>5.000000000000000</double>
           </property>
          </widget>
         </item>

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '/Users/lion/workspace/code/instaseis/instaseis/gui/qt_window.ui'
+# Form implementation generated from reading ui file '/home/ex/local/src/instaseis/instaseis/gui/qt_window.ui'
 #
-# Created: Wed Oct 29 16:33:06 2014
+# Created: Wed Oct 29 17:49:27 2014
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -44,7 +44,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_6.setObjectName(_fromUtf8("horizontalLayout_6"))
         self.select_folder_button = QtGui.QPushButton(self.centralwidget)
         font = QtGui.QFont()
-        font.setPointSize(13)
+        font.setPointSize(9)
         self.select_folder_button.setFont(font)
         self.select_folder_button.setObjectName(_fromUtf8("select_folder_button"))
         self.horizontalLayout_6.addWidget(self.select_folder_button)
@@ -75,6 +75,9 @@ class Ui_MainWindow(object):
         self.horizontalLayout_6.addWidget(self.line_6)
         spacerItem3 = QtGui.QSpacerItem(20, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.horizontalLayout_6.addItem(spacerItem3)
+        self.zero_phase_check_box = QtGui.QCheckBox(self.centralwidget)
+        self.zero_phase_check_box.setObjectName(_fromUtf8("zero_phase_check_box"))
+        self.horizontalLayout_6.addWidget(self.zero_phase_check_box)
         self.lowpass_check_box = QtGui.QCheckBox(self.centralwidget)
         self.lowpass_check_box.setEnabled(True)
         font = QtGui.QFont()
@@ -148,7 +151,7 @@ class Ui_MainWindow(object):
         self.resample_factor.setEnabled(False)
         self.resample_factor.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.resample_factor.setMinimum(1.0)
-        self.resample_factor.setProperty("value", 10.0)
+        self.resample_factor.setProperty("value", 5.0)
         self.resample_factor.setObjectName(_fromUtf8("resample_factor"))
         self.horizontalLayout_6.addWidget(self.resample_factor)
         self.sr_ref_label = QtGui.QLabel(self.centralwidget)
@@ -473,6 +476,7 @@ class Ui_MainWindow(object):
         self.reset_view_button.setText(_translate("MainWindow", "Reset View (R)", None))
         self.reset_view_button.setShortcut(_translate("MainWindow", "R", None))
         self.tt_times.setText(_translate("MainWindow", "Plot TauP Times (AK135)", None))
+        self.zero_phase_check_box.setText(_translate("MainWindow", "Zero Phase", None))
         self.lowpass_check_box.setText(_translate("MainWindow", "Lowpass", None))
         self.lowpass_label.setText(_translate("MainWindow", "s", None))
         self.highpass_check_box.setText(_translate("MainWindow", "Highpass", None))
