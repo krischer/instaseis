@@ -717,6 +717,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">hypocenter_depth_in_m</span> <span class="o">=</span> <span class="n">hypocenter_depth_in_m</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">current</span> <span class="o">=</span> <span class="mi">0</span>
 
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointsources</span><span class="p">)</span>
+
     <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span>
 
@@ -826,7 +829,7 @@
 <span class="sd">        :param nsamp: desired number of samples</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">ps</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pointsources</span><span class="p">:</span>
-            <span class="n">ps</span><span class="o">.</span><span class="n">set_sliprate_dirac</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">nsamp</span><span class="p">)</span>
+            <span class="n">ps</span><span class="o">.</span><span class="n">set_sliprate_lp</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">nsamp</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">corners</span><span class="p">,</span> <span class="n">zerophase</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="FiniteSource.find_hypocenter"><a class="viewcode-back" href="../../source.html#instaseis.source.FiniteSource.find_hypocenter">[docs]</a>    <span class="k">def</span> <span class="nf">find_hypocenter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -862,9 +865,10 @@
                 <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">ps</span><span class="o">.</span><span class="n">colatitude</span><span class="p">))</span>
             <span class="n">finite_mij</span> <span class="o">+=</span> <span class="n">mij</span>
 
-        <span class="n">longitude</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">y</span> <span class="o">/</span> <span class="p">(</span><span class="n">x</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">y</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">))</span>
-        <span class="n">latitude</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">z</span> <span class="o">/</span> <span class="p">(</span><span class="n">x</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">y</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">z</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">))</span>
-        <span class="n">colatitude</span> <span class="o">=</span> <span class="mf">90.0</span> <span class="o">-</span> <span class="n">latitude</span>
+        <span class="n">longitude</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">))</span>
+        <span class="n">colatitude</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">z</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">x</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">y</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">z</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)))</span>
+        <span class="n">latitude</span> <span class="o">=</span> <span class="mf">90.0</span> <span class="o">-</span> <span class="n">colatitude</span>
 
         <span class="n">depth_in_m</span> <span class="o">=</span> <span class="n">planet_radius</span> <span class="o">-</span> <span class="p">(</span><span class="n">x</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">y</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">z</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span>
 
