@@ -752,9 +752,9 @@ class FiniteSource(object):
                 np.deg2rad(ps.colatitude))
             finite_mij += mij
 
-        longitude = np.rad2deg(np.sin(y / (x ** 2 + y ** 2) ** 0.5))
-        latitude = np.rad2deg(np.sin(z / (x ** 2 + y ** 2 + z ** 2) ** 0.5))
-        colatitude = 90.0 - latitude
+        longitude = np.rad2deg(np.arctan2(y, x))
+        colatitude = np.rad2deg(
+            np.arccos(z / np.sqrt(x ** 2 + y ** 2 + z ** 2)))
 
         depth_in_m = planet_radius - (x ** 2 + y ** 2 + z ** 2) ** 0.5
 
