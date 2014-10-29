@@ -329,9 +329,25 @@ class Window(QtGui.QMainWindow):
                     and not force):
                 st = self.st_copy.copy()
             else:
+                prog_diag = QtGui.QProgressDialog(
+                    "Calculating", "Cancel", 0, len(self.finite_source), self)
+                prog_diag.setWindowModality(QtCore.Qt.WindowModal)
+
+                def get_prog_fct():
+                    def set_value(value, count):
+                        prog_diag.setValue(value)
+                        if prog_diag.wasCanceled():
+                            return True
+                    return set_value
+
+                prog_diag.setValue(0)
                 st = self.instaseis_db.get_seismograms_finite_source(
                     sources=self.finite_source, receiver=self.receiver, dt=dt,
-                    components=('Z', 'N', 'E'))
+                    components=('Z', 'N', 'E'),
+                    progress_callback=get_prog_fct())
+                prog_diag.setValue(len(self.finite_source))
+                if not st:
+                    return
 
                 baz = gps2DistAzimuth(self.finite_source.CMT.latitude,
                                       self.finite_source.CMT.longitude,

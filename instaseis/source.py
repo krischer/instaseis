@@ -607,6 +607,9 @@ class FiniteSource(object):
         self.hypocenter_depth_in_m = hypocenter_depth_in_m
         self.current = 0
 
+    def __len__(self):
+        return len(self.pointsources)
+
     def __iter__(self):
         return self
 

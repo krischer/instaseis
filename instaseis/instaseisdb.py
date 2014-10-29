@@ -588,7 +588,8 @@ class InstaSeisDB(object):
 
     def get_seismograms_finite_source(self, sources, receiver,
                                       components=("Z", "N", "E"), dt=None,
-                                      a_lanczos=5, correct_mu=False):
+                                      a_lanczos=5, correct_mu=False,
+                                      progress_callback=None):
         """
         Extract seismograms for a finite source from the AxiSEM database
         provided as a list of point sources attached with source time functions
@@ -610,7 +611,8 @@ class InstaSeisDB(object):
             raise NotImplementedError
 
         data_summed = {}
-        for source in sources:
+        count = len(sources)
+        for _i, source in enumerate(sources):
             data, mu = self.get_seismograms(
                 source, receiver, components, reconvolve_stf=True,
                 return_obspy_stream=False)
@@ -625,6 +627,10 @@ class InstaSeisDB(object):
                     data_summed[comp] += data[comp] * corr_fac
                 else:
                     data_summed[comp] = data[comp] * corr_fac
+            if progress_callback:
+                cancel = progress_callback(_i + 1, count)
+                if cancel:
+                    return None
 
         if dt is not None:
             for comp in components:
