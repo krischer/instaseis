@@ -132,6 +132,7 @@
 <span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">interp</span>
 
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">ReceiverParseError</span><span class="p">,</span> <span class="n">SourceParseError</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">rotations</span>
 
 <span class="n">DEFAULT_MU</span> <span class="o">=</span> <span class="mf">32e9</span>
 
@@ -836,6 +837,44 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">hypocenter_longitude</span> <span class="o">=</span> <span class="n">ps_hypo</span><span class="o">.</span><span class="n">longitude</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hypocenter_latitude</span> <span class="o">=</span> <span class="n">ps_hypo</span><span class="o">.</span><span class="n">latitude</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hypocenter_depth_in_m</span> <span class="o">=</span> <span class="n">ps_hypo</span><span class="o">.</span><span class="n">depth_in_m</span>
+</div>
+<div class="viewcode-block" id="FiniteSource.compute_centroid"><a class="viewcode-back" href="../../source.html#instaseis.source.FiniteSource.compute_centroid">[docs]</a>    <span class="k">def</span> <span class="nf">compute_centroid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">planet_radius</span><span class="o">=</span><span class="mf">6371e3</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        computes the centroid moment tensor by summing over all pointsource</span>
+<span class="sd">        weihted by their scalar moment</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">finite_M0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">M0</span>
+        <span class="n">finite_mij</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+        <span class="n">finite_time_shift</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+        <span class="k">for</span> <span class="n">ps</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pointsources</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">+=</span> <span class="n">ps</span><span class="o">.</span><span class="n">x</span><span class="p">(</span><span class="n">planet_radius</span><span class="p">)</span> <span class="o">*</span> <span class="n">ps</span><span class="o">.</span><span class="n">M0</span> <span class="o">/</span> <span class="n">finite_M0</span>
+            <span class="n">y</span> <span class="o">+=</span> <span class="n">ps</span><span class="o">.</span><span class="n">y</span><span class="p">(</span><span class="n">planet_radius</span><span class="p">)</span> <span class="o">*</span> <span class="n">ps</span><span class="o">.</span><span class="n">M0</span> <span class="o">/</span> <span class="n">finite_M0</span>
+            <span class="n">z</span> <span class="o">+=</span> <span class="n">ps</span><span class="o">.</span><span class="n">z</span><span class="p">(</span><span class="n">planet_radius</span><span class="p">)</span> <span class="o">*</span> <span class="n">ps</span><span class="o">.</span><span class="n">M0</span> <span class="o">/</span> <span class="n">finite_M0</span>
+
+            <span class="n">finite_time_shift</span> <span class="o">+=</span> <span class="n">ps</span><span class="o">.</span><span class="n">time_shift</span> <span class="o">*</span> <span class="n">ps</span><span class="o">.</span><span class="n">M0</span> <span class="o">/</span> <span class="n">finite_M0</span>
+
+            <span class="n">mij</span> <span class="o">=</span> <span class="n">rotations</span><span class="o">.</span><span class="n">rotate_symm_tensor_voigt_xyz_src_to_xyz_earth</span><span class="p">(</span>
+                <span class="n">ps</span><span class="o">.</span><span class="n">tensor_voigt</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">ps</span><span class="o">.</span><span class="n">longitude</span><span class="p">),</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">ps</span><span class="o">.</span><span class="n">colatitude</span><span class="p">))</span>
+            <span class="n">finite_mij</span> <span class="o">+=</span> <span class="n">mij</span>
+
+        <span class="n">longitude</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">y</span> <span class="o">/</span> <span class="p">(</span><span class="n">x</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">y</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">))</span>
+        <span class="n">latitude</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">z</span> <span class="o">/</span> <span class="p">(</span><span class="n">x</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">y</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">z</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">))</span>
+        <span class="n">colatitude</span> <span class="o">=</span> <span class="mf">90.0</span> <span class="o">-</span> <span class="n">latitude</span>
+
+        <span class="n">depth_in_m</span> <span class="o">=</span> <span class="n">planet_radius</span> <span class="o">-</span> <span class="p">(</span><span class="n">x</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">y</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">z</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span>
+
+        <span class="n">finite_mij</span> <span class="o">=</span> <span class="n">rotations</span><span class="o">.</span><span class="n">rotate_symm_tensor_voigt_xyz_earth_to_xyz_src</span><span class="p">(</span>
+            <span class="n">finite_mij</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">longitude</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">colatitude</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">CMT</span> <span class="o">=</span> <span class="n">Source</span><span class="p">(</span><span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="p">,</span> <span class="n">depth_in_m</span><span class="p">,</span> <span class="n">m_rr</span><span class="o">=</span><span class="n">finite_mij</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+                          <span class="n">m_tt</span><span class="o">=</span><span class="n">finite_mij</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">m_pp</span><span class="o">=</span><span class="n">finite_mij</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                          <span class="n">m_rt</span><span class="o">=</span><span class="n">finite_mij</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">m_rp</span><span class="o">=</span><span class="n">finite_mij</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
+                          <span class="n">m_tp</span><span class="o">=</span><span class="n">finite_mij</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">time_shift</span><span class="o">=</span><span class="n">finite_time_shift</span><span class="p">)</span>
 </div>
     <span class="nd">@property</span>
 <div class="viewcode-block" id="FiniteSource.M0"><a class="viewcode-back" href="../../source.html#instaseis.source.FiniteSource.M0">[docs]</a>    <span class="k">def</span> <span class="nf">M0</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
