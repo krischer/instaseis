@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file '/home/ex/local/src/instaseis/instaseis/gui/qt_window.ui'
 #
-# Created: Wed Oct 29 17:49:27 2014
+# Created: Wed Oct 29 22:47:05 2014
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -132,6 +132,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_6.addItem(spacerItem4)
         self.components_combo = QtGui.QComboBox(self.centralwidget)
         self.components_combo.setEditable(False)
+        self.components_combo.setDuplicatesEnabled(True)
         self.components_combo.setObjectName(_fromUtf8("components_combo"))
         self.components_combo.addItem(_fromUtf8(""))
         self.components_combo.addItem(_fromUtf8(""))
@@ -452,8 +453,12 @@ class Ui_MainWindow(object):
         self.receiver_longitude.setProperty("value", 45.0)
         self.receiver_longitude.setObjectName(_fromUtf8("receiver_longitude"))
         self.horizontalLayout_7.addWidget(self.receiver_longitude)
-        spacerItem6 = QtGui.QSpacerItem(163, 24, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
-        self.horizontalLayout_7.addItem(spacerItem6)
+        self.stations_combo = QtGui.QComboBox(self.groupBox_2)
+        self.stations_combo.setObjectName(_fromUtf8("stations_combo"))
+        self.horizontalLayout_7.addWidget(self.stations_combo)
+        self.load_stations_button = QtGui.QPushButton(self.groupBox_2)
+        self.load_stations_button.setObjectName(_fromUtf8("load_stations_button"))
+        self.horizontalLayout_7.addWidget(self.load_stations_button)
         self.verticalLayout_3.addWidget(self.groupBox_2)
         self.horizontalLayout_8.addLayout(self.verticalLayout_3)
         self.horizontalLayout_8.setStretch(0, 10)
@@ -518,6 +523,7 @@ class Ui_MainWindow(object):
         self.groupBox_2.setTitle(_translate("MainWindow", "Receiver", None))
         self.label_11.setText(_translate("MainWindow", "Latitude", None))
         self.label_12.setText(_translate("MainWindow", "Longitude", None))
+        self.load_stations_button.setText(_translate("MainWindow", "load", None))
 
 from instaseis.gui.qt4mplcanvas import Qt4MplCanvas
 from pyqtgraph import PlotWidget

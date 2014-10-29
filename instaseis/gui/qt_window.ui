@@ -278,6 +278,9 @@
           <property name="currentIndex">
            <number>1</number>
           </property>
+          <property name="duplicatesEnabled">
+           <bool>true</bool>
+          </property>
           <item>
            <property name="text">
             <string>ZNE</string>
@@ -1003,17 +1006,14 @@
               </widget>
              </item>
              <item>
-              <spacer name="horizontalSpacer_5">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
+              <widget class="QComboBox" name="stations_combo"/>
+             </item>
+             <item>
+              <widget class="QPushButton" name="load_stations_button">
+               <property name="text">
+                <string>load</string>
                </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>163</width>
-                 <height>24</height>
-                </size>
-               </property>
-              </spacer>
+              </widget>
              </item>
             </layout>
            </widget>

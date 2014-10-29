@@ -585,6 +585,26 @@ class Window(QtGui.QMainWindow):
     def on_update_button_released(self):
         self.update(force=True)
 
+    def on_load_stations_button_released(self):
+        pwd = os.getcwd()
+        self.stations_file = str(QtGui.QFileDialog.getOpenFileName(
+            self, "Choose Stations File", pwd))
+        if not self.stations_file:
+            return
+
+        self.receivers = Receiver.parse(self.stations_file)
+        recnames = []
+        for _r in self.receivers:
+            recnames.append(_r.station)
+
+        self.ui.stations_combo.clear()
+        self.ui.stations_combo.addItems(recnames)
+
+    def on_stations_combo_currentIndexChanged(self):
+        idx = self.ui.stations_combo.currentIndex()
+        self.ui.receiver_longitude.setValue(self.receivers[idx].longitude)
+        self.ui.receiver_latitude.setValue(self.receivers[idx].latitude)
+
     def eventFilter(self, source, event):
         if event.type() == QtCore.QEvent.MouseMove:
             if source.parent() in [self.ui.z_graph, self.ui.n_graph,
