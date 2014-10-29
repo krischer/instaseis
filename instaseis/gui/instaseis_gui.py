@@ -100,6 +100,7 @@ class Window(QtGui.QMainWindow):
 
         self.instaseis_db = None
         self.finite_source = None
+        self.st_copy = None
 
         self.plot_map()
         self.plot_mt()
@@ -257,7 +258,8 @@ class Window(QtGui.QMainWindow):
             return
 
         if (not bool(self.ui.auto_update_check_box.checkState())
-                and self.ui.finsource_tab.currentIndex() == 1 and not force):
+                and self.ui.finsource_tab.currentIndex() == 1 and not force
+                and self.st_copy is None):
             return
 
         components = ["z", "n", "e"]
@@ -295,10 +297,15 @@ class Window(QtGui.QMainWindow):
                 st = self.instaseis_db.get_seismograms(
                     source=self.source, receiver=self.receiver, dt=dt,
                     components=components_map[components_choice])
-            elif self.ui.finsource_tab.currentIndex() == 1:
+            elif (not bool(self.ui.auto_update_check_box.checkState())
+                    and self.ui.finsource_tab.currentIndex() == 1
+                    and not force):
+                st = self.st_copy.copy()
+            else:
                 st = self.instaseis_db.get_seismograms_finite_source(
                     sources=self.finite_source, receiver=self.receiver, dt=dt,
-                    components=components_map[components_choice])
+                    components=('Z', 'N', 'E', 'R', 'T'))
+                self.st_copy = st.copy()
 
             # check filter values from the UI
             if bool(self.ui.lowpass_check_box.checkState()):
@@ -349,9 +356,9 @@ class Window(QtGui.QMainWindow):
                 plot_widget.autoRange()
 
     def on_select_folder_button_released(self):
+        pwd = os.getcwd()
         self.folder = str(QtGui.QFileDialog.getExistingDirectory(
-            self, "Choose Directory",
-            os.path.expanduser("~")))
+            self, "Choose Directory", pwd))
         if not self.folder:
             return
         self.instaseis_db = InstaSeisDB(self.folder)
@@ -363,23 +370,25 @@ class Window(QtGui.QMainWindow):
         self.ui.depth_slider.setMaximum(0)
 
         if self.finite_source is not None:
-            self.finite_source.resample_sliprate(
-                dt=self.instaseis_db.dt, nsamp=self.instaseis_db.ndumps)
+            self.finite_source.set_sliprate_lp(
+                dt=self.instaseis_db.dt, nsamp=self.instaseis_db.ndumps,
+                freq=1.0/self.instaseis_db.parsed_mesh.dominant_period)
 
         self.update(autorange=True)
         self.set_info()
 
     def on_open_srf_file_button_released(self):
+        pwd = os.getcwd()
         self.srf_file = str(QtGui.QFileDialog.getOpenFileName(
-            self, "Choose *.srf File",
-            os.path.expanduser("~")))
+            self, "Choose *.srf File", pwd))
         if not self.srf_file:
             return
         self.finite_source = FiniteSource.from_srf_file(self.srf_file)
 
         if self.instaseis_db is not None:
-            self.finite_source.resample_sliprate(
-                dt=self.instaseis_db.dt, nsamp=self.instaseis_db.ndumps)
+            self.finite_source.set_sliprate_lp(
+                dt=self.instaseis_db.dt, nsamp=self.instaseis_db.ndumps,
+                freq=1.0/self.instaseis_db.parsed_mesh.dominant_period)
 
         self.update()
         self.set_info()
