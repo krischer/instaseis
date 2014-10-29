@@ -16,6 +16,7 @@ import collections
 import functools
 import numpy as np
 import obspy
+from obspy.signal.filter import lowpass
 import obspy.xseed
 import os
 from scipy import interp
@@ -326,6 +327,25 @@ class Source(SourceOrReceiver):
                             len(self.sliprate), endpoint=False)
 
         self.sliprate = interp(t_new, t_old, self.sliprate)
+        self.dt = dt
+
+    def set_sliprate_dirac(self, dt, nsamp):
+        """
+        :param dt: desired sampling
+        :param nsamp: desired number of samples
+        """
+        self.sliprate = np.zeros(nsamp)
+        self.sliprate[0] = 1.0 / dt
+        self.dt = dt
+
+    def set_sliprate_lp(self, dt, nsamp, freq, corners=4, zerophase=False):
+        """
+        :param dt: desired sampling
+        :param nsamp: desired number of samples
+        """
+        self.sliprate = np.zeros(nsamp)
+        self.sliprate[0] = 1.0 / dt
+        self.sliprate = lowpass(self.sliprate, freq, 1./dt, corners, zerophase)
         self.dt = dt
 
     def __str__(self):
@@ -680,6 +700,22 @@ class FiniteSource(object):
         """
         for ps in self.pointsources:
             ps.resample_sliprate(dt, nsamp)
+
+    def set_sliprate_dirac(self, dt, nsamp):
+        """
+        :param dt: desired sampling
+        :param nsamp: desired number of samples
+        """
+        for ps in self.pointsources:
+            ps.set_sliprate_dirac(dt, nsamp)
+
+    def set_sliprate_lp(self, dt, nsamp, freq, corners=4, zerophase=False):
+        """
+        :param dt: desired sampling
+        :param nsamp: desired number of samples
+        """
+        for ps in self.pointsources:
+            ps.set_sliprate_dirac(dt, nsamp)
 
     def find_hypocenter(self):
         """
