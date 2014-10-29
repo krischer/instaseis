@@ -361,8 +361,8 @@ class Window(QtGui.QMainWindow):
             if self.ui.finsource_tab.currentIndex() == 1 \
                     and bool(self.ui.plot_CMT_check_box.checkState()):
                 st_cmt = self.instaseis_db.get_seismograms(
-                    source=self.finite_source.CMT, receiver=self.receiver, dt=dt,
-                    components=components_map[components_choice],
+                    source=self.finite_source.CMT, receiver=self.receiver,
+                    dt=dt, components=components_map[components_choice],
                     reconvolve_stf=True)
             else:
                 st_cmt = None
@@ -406,7 +406,8 @@ class Window(QtGui.QMainWindow):
             plot_widget.plot(times, tr.data, pen="k")
             plot_widget.ptp = tr.data.ptp()
             if st_cmt is not None:
-                tr = st_cmt.select(component=components_map[components_choice][ic])[0]
+                tr = st_cmt.select(
+                    component=components_map[components_choice][ic])[0]
                 times = tr.times()
                 plot_widget.plot(times, tr.data, pen="r")
 

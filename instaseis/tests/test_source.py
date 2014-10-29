@@ -184,11 +184,11 @@ def test_CMT_finite_source():
                                np.array([111.111111]))
 
     np.testing.assert_allclose(
-        np.array([-3.91949923e+04, 3.91030482e+04, 9.19441162e+01,
-                  1.94162699e+04, -5.14006869e+16, 3.19598656e+20]),
+        np.array([-3.91886976e+04, 3.90905071e+04, 9.81905182e+01,
+                  1.94225428e+04, -4.09600000e+03, 3.19598660e+20]),
         finitesource.CMT.tensor_voigt)
 
     np.testing.assert_allclose(np.array([finitesource.CMT.latitude]),
                                np.array([0.0]))
     np.testing.assert_allclose(np.array([finitesource.CMT.longitude]),
-                               np.array([4.48739318376]))
+                               np.array([4.496608]))
