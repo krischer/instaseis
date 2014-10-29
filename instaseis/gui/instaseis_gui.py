@@ -22,7 +22,7 @@ import imp
 import inspect
 from mpl_toolkits.basemap import Basemap
 from obspy.imaging.mopad_wrapper import Beach
-from obspy.core.util.geodetics import locations2degrees
+from obspy.core.util.geodetics import locations2degrees, gps2DistAzimuth
 from obspy.taup.taup import getTravelTimes
 import os
 import sys
@@ -170,7 +170,8 @@ class Window(QtGui.QMainWindow):
             pass
 
         self.bb_finite = Beach(self.finite_source.CMT.tensor / SCALING_FACTOR,
-                        xy=(0, 0), width=200, linewidth=1, facecolor="red")
+                               xy=(0, 0), width=200, linewidth=1,
+                               facecolor="red")
         self.mpl_mt_finite_ax.add_collection(self.bb_finite)
         self.mpl_mt_finite_ax.set_xlim(-105, 105)
         self.mpl_mt_finite_ax.set_ylim(-105, 105)
@@ -330,8 +331,16 @@ class Window(QtGui.QMainWindow):
             else:
                 st = self.instaseis_db.get_seismograms_finite_source(
                     sources=self.finite_source, receiver=self.receiver, dt=dt,
-                    components=('Z', 'N', 'E', 'R', 'T'))
+                    components=('Z', 'N', 'E'))
+
+                baz = gps2DistAzimuth(self.finite_source.CMT.latitude,
+                                      self.finite_source.CMT.longitude,
+                                      rec.latitude, rec.longitude)[1]
                 self.st_copy = st.copy()
+                st.rotate('NE->RT', baz)
+                st += self.st_copy
+                self.st_copy = st.copy()
+
 
             # check filter values from the UI
             if bool(self.ui.lowpass_check_box.checkState()):
