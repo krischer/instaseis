@@ -817,6 +817,16 @@ class FiniteSource(object):
         return max(self.pointsources, key=lambda x: x.latitude).latitude
 
     @property
+    def rupture_duration(self):
+        ts_min = min(self.pointsources, key=lambda x: x.time_shift).time_shift
+        ts_max = max(self.pointsources, key=lambda x: x.time_shift).time_shift
+        return ts_max - ts_min
+
+    @property
+    def time_shift(self):
+        return min(self.pointsources, key=lambda x: x.time_shift).time_shift
+
+    @property
     def epicenter_latitude(self):
         return self.hypocenter_latitude
 
@@ -840,6 +850,10 @@ class FiniteSource(object):
                       % (self.M0)
         return_str += '\t#point sources       : %d\n' \
                       % (self.npointsources)
+        return_str += '\trupture duration     : %6.1f s\n' \
+                      % (self.rupture_duration)
+        return_str += '\ttime shift           : %6.1f s\n' \
+                      % (self.time_shift)
 
         return_str += '\tmin depth            : %6.1f m\n' \
                       % (self.min_depth_in_m)
