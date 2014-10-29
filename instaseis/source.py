@@ -716,7 +716,7 @@ class FiniteSource(object):
         :param nsamp: desired number of samples
         """
         for ps in self.pointsources:
-            ps.set_sliprate_dirac(dt, nsamp)
+            ps.set_sliprate_lp(dt, nsamp, freq, corners, zerophase)
 
     def find_hypocenter(self):
         """
