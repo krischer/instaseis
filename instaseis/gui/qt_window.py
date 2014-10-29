@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file '/home/ex/local/src/instaseis/instaseis/gui/qt_window.ui'
 #
-# Created: Wed Oct 29 13:26:17 2014
+# Created: Wed Oct 29 14:22:32 2014
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -395,13 +395,13 @@ class Ui_MainWindow(object):
         self.finsource_tab.addTab(self.tab_9, _fromUtf8(""))
         self.tab_10 = QtGui.QWidget()
         self.tab_10.setObjectName(_fromUtf8("tab_10"))
-        self.horizontalLayout_2 = QtGui.QHBoxLayout(self.tab_10)
-        self.horizontalLayout_2.setObjectName(_fromUtf8("horizontalLayout_2"))
+        self.horizontalLayout_4 = QtGui.QHBoxLayout(self.tab_10)
+        self.horizontalLayout_4.setObjectName(_fromUtf8("horizontalLayout_4"))
         self.mt_fig_finite = Qt4MplCanvas(self.tab_10)
         self.mt_fig_finite.setMinimumSize(QtCore.QSize(60, 60))
         self.mt_fig_finite.setMaximumSize(QtCore.QSize(60, 60))
         self.mt_fig_finite.setObjectName(_fromUtf8("mt_fig_finite"))
-        self.horizontalLayout_2.addWidget(self.mt_fig_finite)
+        self.horizontalLayout_4.addWidget(self.mt_fig_finite)
         self.verticalLayout_4 = QtGui.QVBoxLayout()
         self.verticalLayout_4.setObjectName(_fromUtf8("verticalLayout_4"))
         self.open_srf_file_button = QtGui.QPushButton(self.tab_10)
@@ -410,11 +410,18 @@ class Ui_MainWindow(object):
         self.update_button = QtGui.QPushButton(self.tab_10)
         self.update_button.setObjectName(_fromUtf8("update_button"))
         self.verticalLayout_4.addWidget(self.update_button)
+        self.horizontalLayout_2 = QtGui.QHBoxLayout()
+        self.horizontalLayout_2.setObjectName(_fromUtf8("horizontalLayout_2"))
         self.auto_update_check_box = QtGui.QCheckBox(self.tab_10)
         self.auto_update_check_box.setEnabled(True)
         self.auto_update_check_box.setObjectName(_fromUtf8("auto_update_check_box"))
-        self.verticalLayout_4.addWidget(self.auto_update_check_box)
-        self.horizontalLayout_2.addLayout(self.verticalLayout_4)
+        self.horizontalLayout_2.addWidget(self.auto_update_check_box)
+        self.plot_CMT_check_box = QtGui.QCheckBox(self.tab_10)
+        self.plot_CMT_check_box.setEnabled(True)
+        self.plot_CMT_check_box.setObjectName(_fromUtf8("plot_CMT_check_box"))
+        self.horizontalLayout_2.addWidget(self.plot_CMT_check_box)
+        self.verticalLayout_4.addLayout(self.horizontalLayout_2)
+        self.horizontalLayout_4.addLayout(self.verticalLayout_4)
         self.finsource_tab.addTab(self.tab_10, _fromUtf8(""))
         self.verticalLayout_3.addWidget(self.finsource_tab)
         self.map_fig = Qt4MplCanvas(self.centralwidget)
@@ -504,6 +511,7 @@ class Ui_MainWindow(object):
         self.update_button.setText(_translate("MainWindow", "update seismograms (U)", None))
         self.update_button.setShortcut(_translate("MainWindow", "U", None))
         self.auto_update_check_box.setText(_translate("MainWindow", "auto update", None))
+        self.plot_CMT_check_box.setText(_translate("MainWindow", "plot CMT seismograms", None))
         self.finsource_tab.setTabText(self.finsource_tab.indexOf(self.tab_10), _translate("MainWindow", "Finite Source", None))
         self.groupBox_2.setTitle(_translate("MainWindow", "Receiver", None))
         self.label_11.setText(_translate("MainWindow", "Latitude", None))

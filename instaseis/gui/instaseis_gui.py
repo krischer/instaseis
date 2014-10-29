@@ -335,18 +335,28 @@ class Window(QtGui.QMainWindow):
 
                 baz = gps2DistAzimuth(self.finite_source.CMT.latitude,
                                       self.finite_source.CMT.longitude,
-                                      rec.latitude, rec.longitude)[1]
+                                      rec.latitude, rec.longitude)[2]
                 self.st_copy = st.copy()
                 st.rotate('NE->RT', baz)
                 st += self.st_copy
                 self.st_copy = st.copy()
 
+            if self.ui.finsource_tab.currentIndex() == 1 \
+                    and bool(self.ui.plot_CMT_check_box.checkState()):
+                st_cmt = self.instaseis_db.get_seismograms(
+                    source=self.finite_source.CMT, receiver=self.receiver, dt=dt,
+                    components=components_map[components_choice],
+                    reconvolve_stf=True)
+            else:
+                st_cmt = None
 
             # check filter values from the UI
             if bool(self.ui.lowpass_check_box.checkState()):
                 try:
                     freq = 1.0 / float(self.ui.lowpass_period.value())
                     st.filter('lowpass', freq=freq, zerophase=True)
+                    if st_cmt is not None:
+                        st_cmt.filter('lowpass', freq=freq, zerophase=True)
                 except ZeroDivisionError:
                     # this happens when typing in the lowpass_period box
                     pass
@@ -355,6 +365,8 @@ class Window(QtGui.QMainWindow):
                 try:
                     freq = 1.0 / float(self.ui.highpass_period.value())
                     st.filter('highpass', freq=freq, zerophase=True)
+                    if st_cmt is not None:
+                        st_cmt.filter('highpass', freq=freq, zerophase=True)
                 except ZeroDivisionError:
                     # this happens when typing in the highpass_period box
                     pass
@@ -375,6 +387,10 @@ class Window(QtGui.QMainWindow):
             tr = st.select(component=components_map[components_choice][ic])[0]
             times = tr.times()
             plot_widget.plot(times, tr.data, pen="k")
+            if st_cmt is not None:
+                tr = st_cmt.select(component=components_map[components_choice][ic])[0]
+                times = tr.times()
+                plot_widget.plot(times, tr.data, pen="r")
 
             if bool(self.ui.tt_times.checkState()):
                 for tt in self.tts:
@@ -404,13 +420,7 @@ class Window(QtGui.QMainWindow):
         self.ui.depth_slider.setMinimum(min_rad - max_rad)
         self.ui.depth_slider.setMaximum(0)
 
-        if self.finite_source is not None:
-            self.finite_source.set_sliprate_lp(
-                dt=self.instaseis_db.dt, nsamp=self.instaseis_db.ndumps,
-                freq=1.0/self.instaseis_db.parsed_mesh.dominant_period)
-
-        self.update(autorange=True)
-        self.set_info()
+        self._setup_finite_source()
 
     def on_open_srf_file_button_released(self):
         pwd = os.getcwd()
@@ -419,13 +429,20 @@ class Window(QtGui.QMainWindow):
         if not self.srf_file:
             return
         self.finite_source = FiniteSource.from_srf_file(self.srf_file)
+        self.finite_source.compute_centroid()
 
+        self._setup_finite_source()
+
+    def _setup_finite_source(self):
         if self.instaseis_db is not None:
             self.finite_source.set_sliprate_lp(
                 dt=self.instaseis_db.dt, nsamp=self.instaseis_db.ndumps,
                 freq=1.0/self.instaseis_db.parsed_mesh.dominant_period)
 
-        self.finite_source.compute_centroid()
+            self.finite_source.CMT.set_sliprate_lp(
+                dt=self.instaseis_db.dt, nsamp=self.instaseis_db.ndumps,
+                freq=1.0/self.instaseis_db.parsed_mesh.dominant_period)
+
         self.plot_mt_finite()
         self.update()
         self.set_info()

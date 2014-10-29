@@ -876,7 +876,7 @@
              <attribute name="title">
               <string>Finite Source</string>
              </attribute>
-             <layout class="QHBoxLayout" name="horizontalLayout_2">
+             <layout class="QHBoxLayout" name="horizontalLayout_4">
               <item>
                <widget class="Qt4MplCanvas" name="mt_fig_finite">
                 <property name="minimumSize">
@@ -913,14 +913,28 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QCheckBox" name="auto_update_check_box">
-                  <property name="enabled">
-                   <bool>true</bool>
-                  </property>
-                  <property name="text">
-                   <string>auto update</string>
-                  </property>
-                 </widget>
+                 <layout class="QHBoxLayout" name="horizontalLayout_2">
+                  <item>
+                   <widget class="QCheckBox" name="auto_update_check_box">
+                    <property name="enabled">
+                     <bool>true</bool>
+                    </property>
+                    <property name="text">
+                     <string>auto update</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QCheckBox" name="plot_CMT_check_box">
+                    <property name="enabled">
+                     <bool>true</bool>
+                    </property>
+                    <property name="text">
+                     <string>plot CMT seismograms</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
                 </item>
                </layout>
               </item>
