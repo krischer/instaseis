@@ -1,5 +1,5 @@
 [run]
-omit = */gui/*,*/scripts/*
+omit = */gui/*,*/scripts/*,*/benchmark/*
 
 [report]
 # Regexes for lines to exclude from consideration
