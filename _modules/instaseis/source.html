@@ -126,6 +126,7 @@
 <span class="kn">import</span> <span class="nn">functools</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">obspy</span>
+<span class="kn">from</span> <span class="nn">obspy.signal.filter</span> <span class="kn">import</span> <span class="n">lowpass</span>
 <span class="kn">import</span> <span class="nn">obspy.xseed</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">interp</span>
@@ -369,8 +370,15 @@
                 <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mf">2.</span> <span class="o">*</span> <span class="n">delta</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mf">2.</span> <span class="o">*</span> <span class="n">phi</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">lambd</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">)</span> \
             <span class="o">*</span> <span class="n">M0</span>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="p">(</span><span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="p">,</span> <span class="n">depth_in_m</span><span class="p">,</span> <span class="n">m_rr</span><span class="p">,</span> <span class="n">m_tt</span><span class="p">,</span> <span class="n">m_pp</span><span class="p">,</span> <span class="n">m_rt</span><span class="p">,</span>
-                    <span class="n">m_rp</span><span class="p">,</span> <span class="n">m_tp</span><span class="p">,</span> <span class="n">time_shift</span><span class="p">,</span> <span class="n">sliprate</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+        <span class="n">source</span> <span class="o">=</span> <span class="bp">self</span><span class="p">(</span><span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="p">,</span> <span class="n">depth_in_m</span><span class="p">,</span> <span class="n">m_rr</span><span class="p">,</span> <span class="n">m_tt</span><span class="p">,</span> <span class="n">m_pp</span><span class="p">,</span> <span class="n">m_rt</span><span class="p">,</span>
+                      <span class="n">m_rp</span><span class="p">,</span> <span class="n">m_tp</span><span class="p">,</span> <span class="n">time_shift</span><span class="p">,</span> <span class="n">sliprate</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+
+        <span class="c"># storing strike, dip and rake for plotting purposes</span>
+        <span class="n">source</span><span class="o">.</span><span class="n">phi</span> <span class="o">=</span> <span class="n">phi</span>
+        <span class="n">source</span><span class="o">.</span><span class="n">delta</span> <span class="o">=</span> <span class="n">delta</span>
+        <span class="n">source</span><span class="o">.</span><span class="n">lambd</span> <span class="o">=</span> <span class="n">lambd</span>
+
+        <span class="k">return</span> <span class="n">source</span>
 </div>
     <span class="nd">@property</span>
 <div class="viewcode-block" id="Source.M0"><a class="viewcode-back" href="../../source.html#instaseis.source.Source.M0">[docs]</a>    <span class="k">def</span> <span class="nf">M0</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -429,6 +437,25 @@
                             <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span><span class="p">),</span> <span class="n">endpoint</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span> <span class="o">=</span> <span class="n">interp</span><span class="p">(</span><span class="n">t_new</span><span class="p">,</span> <span class="n">t_old</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="n">dt</span>
+</div>
+<div class="viewcode-block" id="Source.set_sliprate_dirac"><a class="viewcode-back" href="../../source.html#instaseis.source.Source.set_sliprate_dirac">[docs]</a>    <span class="k">def</span> <span class="nf">set_sliprate_dirac</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">nsamp</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param dt: desired sampling</span>
+<span class="sd">        :param nsamp: desired number of samples</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nsamp</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">dt</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="n">dt</span>
+</div>
+<div class="viewcode-block" id="Source.set_sliprate_lp"><a class="viewcode-back" href="../../source.html#instaseis.source.Source.set_sliprate_lp">[docs]</a>    <span class="k">def</span> <span class="nf">set_sliprate_lp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">nsamp</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">corners</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">zerophase</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param dt: desired sampling</span>
+<span class="sd">        :param nsamp: desired number of samples</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nsamp</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">dt</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span> <span class="o">=</span> <span class="n">lowpass</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="mf">1.</span><span class="o">/</span><span class="n">dt</span><span class="p">,</span> <span class="n">corners</span><span class="p">,</span> <span class="n">zerophase</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="n">dt</span>
 </div>
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -783,6 +810,22 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">ps</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pointsources</span><span class="p">:</span>
             <span class="n">ps</span><span class="o">.</span><span class="n">resample_sliprate</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">nsamp</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="FiniteSource.set_sliprate_dirac"><a class="viewcode-back" href="../../source.html#instaseis.source.FiniteSource.set_sliprate_dirac">[docs]</a>    <span class="k">def</span> <span class="nf">set_sliprate_dirac</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">nsamp</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param dt: desired sampling</span>
+<span class="sd">        :param nsamp: desired number of samples</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">ps</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pointsources</span><span class="p">:</span>
+            <span class="n">ps</span><span class="o">.</span><span class="n">set_sliprate_dirac</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">nsamp</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="FiniteSource.set_sliprate_lp"><a class="viewcode-back" href="../../source.html#instaseis.source.FiniteSource.set_sliprate_lp">[docs]</a>    <span class="k">def</span> <span class="nf">set_sliprate_lp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">nsamp</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">corners</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">zerophase</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param dt: desired sampling</span>
+<span class="sd">        :param nsamp: desired number of samples</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">ps</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pointsources</span><span class="p">:</span>
+            <span class="n">ps</span><span class="o">.</span><span class="n">set_sliprate_dirac</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">nsamp</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="FiniteSource.find_hypocenter"><a class="viewcode-back" href="../../source.html#instaseis.source.FiniteSource.find_hypocenter">[docs]</a>    <span class="k">def</span> <span class="nf">find_hypocenter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>

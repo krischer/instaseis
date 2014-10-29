@@ -187,6 +187,40 @@ interpolation for all pointsources in the finite source.</p>
 </table>
 </dd></dl>
 
+<dl class="method">
+<dt id="instaseis.source.FiniteSource.set_sliprate_dirac">
+<tt class="descname">set_sliprate_dirac</tt><big>(</big><em>dt</em>, <em>nsamp</em><big>)</big><a class="reference internal" href="_modules/instaseis/source.html#FiniteSource.set_sliprate_dirac"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.FiniteSource.set_sliprate_dirac" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>dt</strong> &#8211; desired sampling</li>
+<li><strong>nsamp</strong> &#8211; desired number of samples</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="instaseis.source.FiniteSource.set_sliprate_lp">
+<tt class="descname">set_sliprate_lp</tt><big>(</big><em>dt</em>, <em>nsamp</em>, <em>freq</em>, <em>corners=4</em>, <em>zerophase=False</em><big>)</big><a class="reference internal" href="_modules/instaseis/source.html#FiniteSource.set_sliprate_lp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.FiniteSource.set_sliprate_lp" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>dt</strong> &#8211; desired sampling</li>
+<li><strong>nsamp</strong> &#8211; desired number of samples</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="class">
@@ -400,6 +434,40 @@ interpolation.</p>
 <li><strong>dt</strong> &#8211; sampling of the sliprate</li>
 <li><strong>normalize</strong> &#8211; if sliprate is not normalized, set this to true to
 normalize it using trapezoidal rule style integration</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="instaseis.source.Source.set_sliprate_dirac">
+<tt class="descname">set_sliprate_dirac</tt><big>(</big><em>dt</em>, <em>nsamp</em><big>)</big><a class="reference internal" href="_modules/instaseis/source.html#Source.set_sliprate_dirac"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.Source.set_sliprate_dirac" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>dt</strong> &#8211; desired sampling</li>
+<li><strong>nsamp</strong> &#8211; desired number of samples</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="instaseis.source.Source.set_sliprate_lp">
+<tt class="descname">set_sliprate_lp</tt><big>(</big><em>dt</em>, <em>nsamp</em>, <em>freq</em>, <em>corners=4</em>, <em>zerophase=False</em><big>)</big><a class="reference internal" href="_modules/instaseis/source.html#Source.set_sliprate_lp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.Source.set_sliprate_lp" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>dt</strong> &#8211; desired sampling</li>
+<li><strong>nsamp</strong> &#8211; desired number of samples</li>
 </ul>
 </td>
 </tr>
