@@ -30,6 +30,9 @@
     </sizepolicy>
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout_13">
+    <property name="margin">
+     <number>2</number>
+    </property>
     <item>
      <layout class="QVBoxLayout" name="verticalLayout_5">
       <item>
@@ -38,7 +41,7 @@
          <widget class="QPushButton" name="select_folder_button">
           <property name="font">
            <font>
-            <pointsize>9</pointsize>
+            <pointsize>13</pointsize>
            </font>
           </property>
           <property name="text">
@@ -136,6 +139,11 @@
         </item>
         <item>
          <widget class="QCheckBox" name="zero_phase_check_box">
+          <property name="font">
+           <font>
+            <pointsize>9</pointsize>
+           </font>
+          </property>
           <property name="text">
            <string>Zero Phase</string>
           </property>
@@ -471,6 +479,9 @@
               <string>Point Source</string>
              </attribute>
              <layout class="QHBoxLayout" name="horizontalLayout_5">
+              <property name="margin">
+               <number>2</number>
+              </property>
               <item>
                <layout class="QVBoxLayout" name="verticalLayout">
                 <item>
@@ -576,16 +587,13 @@
                        </widget>
                       </item>
                       <item row="1" column="3">
-                       <widget class="ScientificDoubleSpinBox" name="m_rp">
-                       </widget>
+                       <widget class="ScientificDoubleSpinBox" name="m_rp"/>
                       </item>
                       <item row="1" column="1">
-                       <widget class="ScientificDoubleSpinBox" name="m_rr">
-                       </widget>
+                       <widget class="ScientificDoubleSpinBox" name="m_rr"/>
                       </item>
                       <item row="1" column="2">
-                       <widget class="ScientificDoubleSpinBox" name="m_rt">
-                       </widget>
+                       <widget class="ScientificDoubleSpinBox" name="m_rt"/>
                       </item>
                       <item row="0" column="3">
                        <widget class="QLabel" name="label_9">
@@ -618,16 +626,13 @@
                        </widget>
                       </item>
                       <item row="3" column="2">
-                       <widget class="ScientificDoubleSpinBox" name="m_tt">
-                       </widget>
+                       <widget class="ScientificDoubleSpinBox" name="m_tt"/>
                       </item>
                       <item row="3" column="3">
-                       <widget class="ScientificDoubleSpinBox" name="m_tp">
-                       </widget>
+                       <widget class="ScientificDoubleSpinBox" name="m_tp"/>
                       </item>
                       <item row="4" column="3">
-                       <widget class="ScientificDoubleSpinBox" name="m_pp">
-                       </widget>
+                       <widget class="ScientificDoubleSpinBox" name="m_pp"/>
                       </item>
                       <item row="3" column="4">
                        <widget class="QLabel" name="label_7">
@@ -813,6 +818,9 @@
               <string>Finite Source</string>
              </attribute>
              <layout class="QHBoxLayout" name="horizontalLayout_4">
+              <property name="margin">
+               <number>2</number>
+              </property>
               <item>
                <widget class="Qt4MplCanvas" name="mt_fig_finite">
                 <property name="minimumSize">
@@ -882,8 +890,8 @@
            <widget class="Qt4MplCanvas" name="map_fig">
             <property name="minimumSize">
              <size>
-              <width>470</width>
-              <height>280</height>
+              <width>150</width>
+              <height>100</height>
              </size>
             </property>
             <property name="maximumSize">
@@ -900,6 +908,9 @@
              <string>Receiver</string>
             </property>
             <layout class="QHBoxLayout" name="horizontalLayout_7">
+             <property name="margin">
+              <number>2</number>
+             </property>
              <item>
               <widget class="QLabel" name="label_11">
                <property name="text">
@@ -961,7 +972,6 @@
     </item>
    </layout>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <customwidgets>
   <customwidget>
