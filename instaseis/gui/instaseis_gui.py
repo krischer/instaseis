@@ -490,6 +490,10 @@ class Window(QtGui.QMainWindow):
         self.ui.m_rt.setValue(s.m_rt)
         self.ui.m_tp.setValue(s.m_tp)
 
+        self.ui.source_longitude.setValue(s.longitude)
+        self.ui.source_latitude.setValue(s.latitude)
+        self.ui.depth_slider.setValue(- s.depth_in_m / 1e3)
+
     def on_source_latitude_valueChanged(self, *args):
         self.update()
 
