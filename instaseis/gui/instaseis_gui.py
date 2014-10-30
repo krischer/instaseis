@@ -118,7 +118,7 @@ class Window(QtGui.QMainWindow):
                 strike=float(self.ui.strike_slider.value()),
                 dip=float(self.ui.dip_slider.value()),
                 rake=float(self.ui.rake_slider.value()),
-                M0=1)
+                M0=1E16)
             return [source.m_rr, source.m_tt,
                     source.m_pp, source.m_rt,
                     source.m_rp, source.m_tp]
