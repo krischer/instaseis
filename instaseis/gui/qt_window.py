@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '/home/ex/local/src/instaseis/instaseis/gui/qt_window.ui'
+# Form implementation generated from reading ui file '/Users/lion/workspace/code/instaseis/instaseis/gui/qt_window.ui'
 #
-# Created: Wed Oct 29 23:19:20 2014
+# Created: Thu Oct 30 09:18:59 2014
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -274,19 +274,19 @@ class Ui_MainWindow(object):
         self.load_source_button = QtGui.QPushButton(self.tab)
         self.load_source_button.setObjectName(_fromUtf8("load_source_button"))
         self.gridLayout.addWidget(self.load_source_button, 4, 1, 1, 1)
-        self.m_rp = QtGui.QDoubleSpinBox(self.tab)
+        self.m_rp = ScientificDoubleSpinBox(self.tab)
         self.m_rp.setPrefix(_fromUtf8(""))
         self.m_rp.setMinimum(-99.0)
         self.m_rp.setMaximum(99.0)
         self.m_rp.setObjectName(_fromUtf8("m_rp"))
         self.gridLayout.addWidget(self.m_rp, 1, 3, 1, 1)
-        self.m_rr = QtGui.QDoubleSpinBox(self.tab)
+        self.m_rr = ScientificDoubleSpinBox(self.tab)
         self.m_rr.setPrefix(_fromUtf8(""))
         self.m_rr.setMinimum(-99.0)
         self.m_rr.setMaximum(99.0)
         self.m_rr.setObjectName(_fromUtf8("m_rr"))
         self.gridLayout.addWidget(self.m_rr, 1, 1, 1, 1)
-        self.m_rt = QtGui.QDoubleSpinBox(self.tab)
+        self.m_rt = ScientificDoubleSpinBox(self.tab)
         self.m_rt.setPrefix(_fromUtf8(""))
         self.m_rt.setMinimum(-99.0)
         self.m_rt.setMaximum(99.0)
@@ -304,19 +304,19 @@ class Ui_MainWindow(object):
         self.label_5.setAlignment(QtCore.Qt.AlignCenter)
         self.label_5.setObjectName(_fromUtf8("label_5"))
         self.gridLayout.addWidget(self.label_5, 0, 1, 1, 1)
-        self.m_tt = QtGui.QDoubleSpinBox(self.tab)
+        self.m_tt = ScientificDoubleSpinBox(self.tab)
         self.m_tt.setPrefix(_fromUtf8(""))
         self.m_tt.setMinimum(-99.0)
         self.m_tt.setMaximum(99.0)
         self.m_tt.setObjectName(_fromUtf8("m_tt"))
         self.gridLayout.addWidget(self.m_tt, 3, 2, 1, 1)
-        self.m_tp = QtGui.QDoubleSpinBox(self.tab)
+        self.m_tp = ScientificDoubleSpinBox(self.tab)
         self.m_tp.setPrefix(_fromUtf8(""))
         self.m_tp.setMinimum(-99.0)
         self.m_tp.setMaximum(99.0)
         self.m_tp.setObjectName(_fromUtf8("m_tp"))
         self.gridLayout.addWidget(self.m_tp, 3, 3, 1, 1)
-        self.m_pp = QtGui.QDoubleSpinBox(self.tab)
+        self.m_pp = ScientificDoubleSpinBox(self.tab)
         self.m_pp.setPrefix(_fromUtf8(""))
         self.m_pp.setMinimum(-99.0)
         self.m_pp.setMaximum(99.0)
@@ -530,4 +530,5 @@ class Ui_MainWindow(object):
         self.load_stations_button.setText(_translate("MainWindow", "load", None))
 
 from instaseis.gui.qt4mplcanvas import Qt4MplCanvas
+from scientific_double_spin_box import ScientificDoubleSpinBox
 from pyqtgraph import PlotWidget
