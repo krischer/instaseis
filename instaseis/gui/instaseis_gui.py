@@ -259,6 +259,25 @@ class Window(QtGui.QMainWindow):
         self.__receiver_map_obj.latitude = lat
         self.mpl_map_figure.canvas.draw()
 
+    def _plot_bg_receivers(self):
+        try:
+            self.__bg_receivers_map_obj.remove()
+        except AttributeError:
+            pass
+
+        xl = []
+        yl = []
+        for r in self.receivers:
+            lng, lat = r.longitude, r.latitude
+            x1, y1 = self.map(lng, lat)
+            xl.append(x1)
+            yl.append(y1)
+
+        self.__bg_receivers_map_obj = self.map.scatter(
+            xl, yl, s=100, zorder=5, color="k", marker="v",
+            edgecolor="gray", alpha=0.3)
+        self.mpl_map_figure.canvas.draw()
+
     @property
     def source(self):
         fm = self.focmec
@@ -629,6 +648,8 @@ class Window(QtGui.QMainWindow):
 
         self.ui.stations_combo.clear()
         self.ui.stations_combo.addItems(recnames)
+
+        self._plot_bg_receivers()
 
     def on_stations_combo_currentIndexChanged(self):
         idx = self.ui.stations_combo.currentIndex()
