@@ -595,6 +595,10 @@ class Window(QtGui.QMainWindow):
     def on_finsource_tab_currentChanged(self):
         self.update()
 
+    def on_source_tab_currentChanged(self):
+        self._draw_mt()
+        self.update()
+
     def on_update_button_released(self):
         self.update(force=True)
 
