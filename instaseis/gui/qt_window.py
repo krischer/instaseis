@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file '/home/ex/local/src/instaseis/instaseis/gui/qt_window.ui'
 #
-# Created: Thu Oct 30 10:26:43 2014
+# Created: Thu Oct 30 10:28:20 2014
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -48,7 +48,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_6.setObjectName(_fromUtf8("horizontalLayout_6"))
         self.select_folder_button = QtGui.QPushButton(self.centralwidget)
         font = QtGui.QFont()
-        font.setPointSize(13)
+        font.setPointSize(9)
         self.select_folder_button.setFont(font)
         self.select_folder_button.setObjectName(_fromUtf8("select_folder_button"))
         self.horizontalLayout_6.addWidget(self.select_folder_button)
@@ -137,6 +137,13 @@ class Ui_MainWindow(object):
         self.horizontalLayout_6.addWidget(self.highpass_label)
         spacerItem4 = QtGui.QSpacerItem(20, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.horizontalLayout_6.addItem(spacerItem4)
+        self.line_4 = QtGui.QFrame(self.centralwidget)
+        self.line_4.setFrameShape(QtGui.QFrame.VLine)
+        self.line_4.setFrameShadow(QtGui.QFrame.Sunken)
+        self.line_4.setObjectName(_fromUtf8("line_4"))
+        self.horizontalLayout_6.addWidget(self.line_4)
+        spacerItem5 = QtGui.QSpacerItem(20, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.horizontalLayout_6.addItem(spacerItem5)
         self.components_combo = QtGui.QComboBox(self.centralwidget)
         self.components_combo.setEditable(False)
         self.components_combo.setDuplicatesEnabled(True)
@@ -144,8 +151,15 @@ class Ui_MainWindow(object):
         self.components_combo.addItem(_fromUtf8(""))
         self.components_combo.addItem(_fromUtf8(""))
         self.horizontalLayout_6.addWidget(self.components_combo)
-        spacerItem5 = QtGui.QSpacerItem(20, 24, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
-        self.horizontalLayout_6.addItem(spacerItem5)
+        spacerItem6 = QtGui.QSpacerItem(20, 24, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.horizontalLayout_6.addItem(spacerItem6)
+        self.line_5 = QtGui.QFrame(self.centralwidget)
+        self.line_5.setFrameShape(QtGui.QFrame.VLine)
+        self.line_5.setFrameShadow(QtGui.QFrame.Sunken)
+        self.line_5.setObjectName(_fromUtf8("line_5"))
+        self.horizontalLayout_6.addWidget(self.line_5)
+        spacerItem7 = QtGui.QSpacerItem(20, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.horizontalLayout_6.addItem(spacerItem7)
         self.resample_check_box = QtGui.QCheckBox(self.centralwidget)
         self.resample_check_box.setEnabled(True)
         font = QtGui.QFont()
