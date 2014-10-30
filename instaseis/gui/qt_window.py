@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file '/home/ex/local/src/instaseis/instaseis/gui/qt_window.ui'
 #
-# Created: Thu Oct 30 10:28:20 2014
+# Created: Thu Oct 30 16:53:36 2014
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -165,7 +165,7 @@ class Ui_MainWindow(object):
         font = QtGui.QFont()
         font.setPointSize(9)
         self.resample_check_box.setFont(font)
-        self.resample_check_box.setChecked(False)
+        self.resample_check_box.setChecked(True)
         self.resample_check_box.setTristate(False)
         self.resample_check_box.setObjectName(_fromUtf8("resample_check_box"))
         self.horizontalLayout_6.addWidget(self.resample_check_box)
@@ -432,6 +432,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_2.addWidget(self.auto_update_check_box)
         self.plot_CMT_check_box = QtGui.QCheckBox(self.tab_10)
         self.plot_CMT_check_box.setEnabled(True)
+        self.plot_CMT_check_box.setChecked(True)
         self.plot_CMT_check_box.setObjectName(_fromUtf8("plot_CMT_check_box"))
         self.horizontalLayout_2.addWidget(self.plot_CMT_check_box)
         self.verticalLayout_4.addLayout(self.horizontalLayout_2)

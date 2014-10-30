@@ -380,7 +380,7 @@
            <string>Resample</string>
           </property>
           <property name="checked">
-           <bool>false</bool>
+           <bool>true</bool>
           </property>
           <property name="tristate">
            <bool>false</bool>
@@ -939,6 +939,9 @@
                     </property>
                     <property name="text">
                      <string>plot CMT seismograms</string>
+                    </property>
+                    <property name="checked">
+                     <bool>true</bool>
                     </property>
                    </widget>
                   </item>
