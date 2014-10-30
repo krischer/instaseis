@@ -473,6 +473,8 @@ class Window(QtGui.QMainWindow):
             info_str += str(self.instaseis_db) + '\n'
         if self.finite_source is not None:
             info_str += str(self.finite_source)
+        else:
+            info_str += str(self.source)
         self.ui.info_text.setText(info_str)
 
     def on_load_source_button_released(self):
@@ -493,6 +495,7 @@ class Window(QtGui.QMainWindow):
         self.ui.source_longitude.setValue(s.longitude)
         self.ui.source_latitude.setValue(s.latitude)
         self.ui.depth_slider.setValue(- s.depth_in_m / 1e3)
+        self.set_info()
 
     def on_source_latitude_valueChanged(self, *args):
         self.update()
