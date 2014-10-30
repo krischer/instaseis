@@ -19,6 +19,7 @@ def valid_float_string(string):
 
 class FloatValidator(QtGui.QValidator):
     def validate(self, string, position):
+        string = str(string)
         if valid_float_string(string):
             return (self.Acceptable, position)
         if string == "" or string[position-1] in 'e.-+':
