@@ -18,13 +18,12 @@ def valid_float_string(string):
 
 
 class FloatValidator(QtGui.QValidator):
-
     def validate(self, string, position):
         if valid_float_string(string):
-            return self.State.Acceptable
+            return (self.Acceptable, position)
         if string == "" or string[position-1] in 'e.-+':
-            return self.State.Intermediate
-        return self.State.Invalid
+            return (self.Intermediate, position)
+        return (self.Invalid, position)
 
     def fixup(self, text):
         match = _float_re.search(text)
