@@ -34,9 +34,21 @@
      <number>2</number>
     </property>
     <item>
-     <layout class="QVBoxLayout" name="verticalLayout_5">
+     <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,0,100">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_6">
+        <property name="bottomMargin">
+         <number>1</number>
+        </property>
         <item>
          <widget class="QPushButton" name="select_folder_button">
           <property name="font">
@@ -377,8 +389,17 @@
       </item>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="10,0,0">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>1</number>
+        </property>
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_2">
+          <property name="rightMargin">
+           <number>10</number>
+          </property>
           <item>
            <widget class="PlotWidget" name="z_graph">
             <property name="sizePolicy">
@@ -429,6 +450,9 @@
         </item>
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_3">
+          <property name="leftMargin">
+           <number>1</number>
+          </property>
           <item>
            <widget class="QTextBrowser" name="info_text">
             <property name="minimumSize">
@@ -576,8 +600,8 @@
                       <string>Moment Tensor</string>
                      </attribute>
                      <layout class="QGridLayout" name="gridLayout" columnstretch="0,10,10,10,0">
-                      <property name="leftMargin">
-                       <number>9</number>
+                      <property name="margin">
+                       <number>2</number>
                       </property>
                       <item row="4" column="1">
                        <widget class="QPushButton" name="load_source_button">
