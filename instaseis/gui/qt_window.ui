@@ -580,9 +580,6 @@
                         <property name="prefix">
                          <string/>
                         </property>
-                        <property name="suffix">
-                         <string>e16</string>
-                        </property>
                         <property name="minimum">
                          <double>-99.000000000000000</double>
                         </property>
@@ -596,9 +593,6 @@
                         <property name="prefix">
                          <string/>
                         </property>
-                        <property name="suffix">
-                         <string>e16</string>
-                        </property>
                         <property name="minimum">
                          <double>-99.000000000000000</double>
                         </property>
@@ -611,9 +605,6 @@
                        <widget class="ScientificDoubleSpinBox" name="m_rt">
                         <property name="prefix">
                          <string/>
-                        </property>
-                        <property name="suffix">
-                         <string>e16</string>
                         </property>
                         <property name="minimum">
                          <double>-99.000000000000000</double>
@@ -658,9 +649,6 @@
                         <property name="prefix">
                          <string/>
                         </property>
-                        <property name="suffix">
-                         <string>e16</string>
-                        </property>
                         <property name="minimum">
                          <double>-99.000000000000000</double>
                         </property>
@@ -674,9 +662,6 @@
                         <property name="prefix">
                          <string/>
                         </property>
-                        <property name="suffix">
-                         <string>e16</string>
-                        </property>
                         <property name="minimum">
                          <double>-99.000000000000000</double>
                         </property>
@@ -689,9 +674,6 @@
                        <widget class="ScientificDoubleSpinBox" name="m_pp">
                         <property name="prefix">
                          <string/>
-                        </property>
-                        <property name="suffix">
-                         <string>e16</string>
                         </property>
                         <property name="minimum">
                          <double>-99.000000000000000</double>

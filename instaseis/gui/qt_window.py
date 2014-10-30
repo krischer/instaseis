@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file '/Users/lion/workspace/code/instaseis/instaseis/gui/qt_window.ui'
 #
-# Created: Thu Oct 30 09:25:16 2014
+# Created: Thu Oct 30 09:34:34 2014
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -497,15 +497,9 @@ class Ui_MainWindow(object):
         self.label_2.setText(_translate("MainWindow", "Longitude", None))
         self.depth_label.setText(_translate("MainWindow", "Depth: 10 km", None))
         self.load_source_button.setText(_translate("MainWindow", "load", None))
-        self.m_rp.setSuffix(_translate("MainWindow", "e16", None))
-        self.m_rr.setSuffix(_translate("MainWindow", "e16", None))
-        self.m_rt.setSuffix(_translate("MainWindow", "e16", None))
         self.label_9.setText(_translate("MainWindow", "p", None))
         self.label_6.setText(_translate("MainWindow", "t", None))
         self.label_5.setText(_translate("MainWindow", "r", None))
-        self.m_tt.setSuffix(_translate("MainWindow", "e16", None))
-        self.m_tp.setSuffix(_translate("MainWindow", "e16", None))
-        self.m_pp.setSuffix(_translate("MainWindow", "e16", None))
         self.label_7.setText(_translate("MainWindow", "t", None))
         self.label_8.setText(_translate("MainWindow", "p", None))
         self.label_4.setText(_translate("MainWindow", "r", None))
