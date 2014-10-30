@@ -4,4 +4,4 @@
 
 [Documentation](http://krischer.github.io/instaseis/)
 
-[![Instaseis](http://lionkrischer.de/scratch/instaseis_logo.png)](http://krischer.github.io/instaseis/)
+[![Instaseis](http://lionkrischer.de/scratch/instaseis_logo_small.png)](http://krischer.github.io/instaseis/)
