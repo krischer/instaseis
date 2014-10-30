@@ -564,7 +564,7 @@
                      <attribute name="title">
                       <string>Moment Tensor</string>
                      </attribute>
-                     <layout class="QGridLayout" name="gridLayout" columnstretch="0,10,10,10,0,0,0">
+                     <layout class="QGridLayout" name="gridLayout" columnstretch="0,10,10,10,0">
                       <property name="leftMargin">
                        <number>9</number>
                       </property>
@@ -576,7 +576,7 @@
                        </widget>
                       </item>
                       <item row="1" column="3">
-                       <widget class="QDoubleSpinBox" name="m_rp">
+                       <widget class="ScientificDoubleSpinBox" name="m_rp">
                         <property name="prefix">
                          <string/>
                         </property>
@@ -592,7 +592,7 @@
                        </widget>
                       </item>
                       <item row="1" column="1">
-                       <widget class="QDoubleSpinBox" name="m_rr">
+                       <widget class="ScientificDoubleSpinBox" name="m_rr">
                         <property name="prefix">
                          <string/>
                         </property>
@@ -608,7 +608,7 @@
                        </widget>
                       </item>
                       <item row="1" column="2">
-                       <widget class="QDoubleSpinBox" name="m_rt">
+                       <widget class="ScientificDoubleSpinBox" name="m_rt">
                         <property name="prefix">
                          <string/>
                         </property>
@@ -654,7 +654,7 @@
                        </widget>
                       </item>
                       <item row="3" column="2">
-                       <widget class="QDoubleSpinBox" name="m_tt">
+                       <widget class="ScientificDoubleSpinBox" name="m_tt">
                         <property name="prefix">
                          <string/>
                         </property>
@@ -670,7 +670,7 @@
                        </widget>
                       </item>
                       <item row="3" column="3">
-                       <widget class="QDoubleSpinBox" name="m_tp">
+                       <widget class="ScientificDoubleSpinBox" name="m_tp">
                         <property name="prefix">
                          <string/>
                         </property>
@@ -686,7 +686,7 @@
                        </widget>
                       </item>
                       <item row="4" column="3">
-                       <widget class="QDoubleSpinBox" name="m_pp">
+                       <widget class="ScientificDoubleSpinBox" name="m_pp">
                         <property name="prefix">
                          <string/>
                         </property>
@@ -1045,6 +1045,11 @@
    <class>Qt4MplCanvas</class>
    <extends>QGraphicsView</extends>
    <header>instaseis.gui.qt4mplcanvas.h</header>
+  </customwidget>
+  <customwidget>
+   <class>ScientificDoubleSpinBox</class>
+   <extends>QDoubleSpinBox</extends>
+   <header>instaseis.gui.scientific_double_spin_box.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

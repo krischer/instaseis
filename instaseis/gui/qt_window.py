@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file '/Users/lion/workspace/code/instaseis/instaseis/gui/qt_window.ui'
 #
-# Created: Thu Oct 30 09:18:59 2014
+# Created: Thu Oct 30 09:25:16 2014
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -530,5 +530,5 @@ class Ui_MainWindow(object):
         self.load_stations_button.setText(_translate("MainWindow", "load", None))
 
 from instaseis.gui.qt4mplcanvas import Qt4MplCanvas
-from scientific_double_spin_box import ScientificDoubleSpinBox
 from pyqtgraph import PlotWidget
+from instaseis.gui.scientific_double_spin_box import ScientificDoubleSpinBox
