@@ -141,7 +141,9 @@ class Window(QtGui.QMainWindow):
         except:
             pass
 
-        self.bb = Beach(self.focmec, xy=(0, 0), width=200, linewidth=1,
+        fm = self.focmec
+        fm = [_i / 1e16 for _i in fm]
+        self.bb = Beach(fm, xy=(0, 0), width=200, linewidth=1,
                         facecolor="red")
         self.mpl_mt_ax.add_collection(self.bb)
         self.mpl_mt_ax.set_xlim(-105, 105)
@@ -167,7 +169,7 @@ class Window(QtGui.QMainWindow):
         except:
             pass
 
-        self.bb_finite = Beach(self.finite_source.CMT.tensor,
+        self.bb_finite = Beach(self.finite_source.CMT.tensor / 1e16,
                                xy=(0, 0), width=200, linewidth=1,
                                facecolor="red")
         self.mpl_mt_finite_ax.add_collection(self.bb_finite)
@@ -260,7 +262,6 @@ class Window(QtGui.QMainWindow):
     @property
     def source(self):
         fm = self.focmec
-        fm = [_i for _i in fm]
         return Source(
             latitude=float(self.ui.source_latitude.value()),
             longitude=float(self.ui.source_longitude.value()),
@@ -470,12 +471,12 @@ class Window(QtGui.QMainWindow):
 
     def set_info(self):
         info_str = ''
+        if self.finite_source is not None:
+            info_str += str(self.finite_source) + '\n'
+        else:
+            info_str += str(self.source) + '\n'
         if self.instaseis_db is not None:
             info_str += str(self.instaseis_db) + '\n'
-        if self.finite_source is not None:
-            info_str += str(self.finite_source)
-        else:
-            info_str += str(self.source)
         self.ui.info_text.setText(info_str)
 
     def on_load_source_button_released(self):
