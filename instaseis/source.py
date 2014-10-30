@@ -360,7 +360,8 @@ class Source(SourceOrReceiver):
         return_str = 'AxiSEM Database Source:\n'
         return_str += '\tlongitude        : %6.1f deg\n' % (self.longitude)
         return_str += '\tlatitude         : %6.1f deg\n' % (self.latitude)
-        return_str += '\tMoment Magnitude :   %4.2f\n' % (self.moment_magnitude)
+        return_str += '\tMoment Magnitude :   %4.2f\n' \
+                      % (self.moment_magnitude)
         return_str += '\tscalar Moment    : %10.2e Nm\n' % (self.M0)
         return_str += '\tMrr              : %10.2e Nm\n' % (self.m_rr)
         return_str += '\tMtt              : %10.2e Nm\n' % (self.m_tt)
