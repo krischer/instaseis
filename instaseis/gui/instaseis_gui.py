@@ -29,8 +29,6 @@ import sys
 
 from instaseis import InstaSeisDB, Source, Receiver, FiniteSource
 
-SCALING_FACTOR = 1E16
-
 
 def compile_and_import_ui_files():
     """
@@ -85,12 +83,12 @@ class Window(QtGui.QMainWindow):
         self.ui.e_graph.setYLink(self.ui.z_graph)
 
         # Set some random mt at startup.
-        m_rr = 4.71E17 / SCALING_FACTOR
-        m_tt = 3.81E15 / SCALING_FACTOR
-        m_pp = -4.74E17 / SCALING_FACTOR
-        m_rt = 3.99E16 / SCALING_FACTOR
-        m_rp = -8.05E16 / SCALING_FACTOR
-        m_tp = -1.23E17 / SCALING_FACTOR
+        m_rr = 4.71E17
+        m_tt = 3.81E15
+        m_pp = -4.74E17
+        m_rt = 3.99E16
+        m_rp = -8.05E16
+        m_tp = -1.23E17
         self.ui.m_rr.setValue(m_rr)
         self.ui.m_tt.setValue(m_tt)
         self.ui.m_pp.setValue(m_pp)
@@ -169,7 +167,7 @@ class Window(QtGui.QMainWindow):
         except:
             pass
 
-        self.bb_finite = Beach(self.finite_source.CMT.tensor / SCALING_FACTOR,
+        self.bb_finite = Beach(self.finite_source.CMT.tensor,
                                xy=(0, 0), width=200, linewidth=1,
                                facecolor="red")
         self.mpl_mt_finite_ax.add_collection(self.bb_finite)
@@ -262,7 +260,7 @@ class Window(QtGui.QMainWindow):
     @property
     def source(self):
         fm = self.focmec
-        fm = [_i * SCALING_FACTOR for _i in fm]
+        fm = [_i for _i in fm]
         return Source(
             latitude=float(self.ui.source_latitude.value()),
             longitude=float(self.ui.source_longitude.value()),
@@ -485,12 +483,12 @@ class Window(QtGui.QMainWindow):
             return
 
         s = Source.parse(self.source_file)
-        self.ui.m_rr.setValue(s.m_rr / SCALING_FACTOR)
-        self.ui.m_pp.setValue(s.m_pp / SCALING_FACTOR)
-        self.ui.m_rp.setValue(s.m_rp / SCALING_FACTOR)
-        self.ui.m_tt.setValue(s.m_tt / SCALING_FACTOR)
-        self.ui.m_rt.setValue(s.m_rt / SCALING_FACTOR)
-        self.ui.m_tp.setValue(s.m_tp / SCALING_FACTOR)
+        self.ui.m_rr.setValue(s.m_rr)
+        self.ui.m_pp.setValue(s.m_pp)
+        self.ui.m_rp.setValue(s.m_rp)
+        self.ui.m_tt.setValue(s.m_tt)
+        self.ui.m_rt.setValue(s.m_rt)
+        self.ui.m_tp.setValue(s.m_tp)
 
     def on_source_latitude_valueChanged(self, *args):
         self.update()
