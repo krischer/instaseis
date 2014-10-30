@@ -12,6 +12,7 @@ import re
 # part.
 _float_re = re.compile(r'(([+-]?\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?)')
 
+
 def valid_float_string(string):
     match = _float_re.search(string)
     return match.groups()[0] == string if match else False
