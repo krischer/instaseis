@@ -420,6 +420,7 @@ class Window(QtGui.QMainWindow):
                     else:
                         pen = "#95000066"
                     plot_widget.addLine(x=tt["time"], pen=pen, z=-10)
+        self.set_info()
 
     def on_select_folder_button_released(self):
         pwd = os.getcwd()
@@ -557,11 +558,14 @@ class Window(QtGui.QMainWindow):
         self._draw_mt()
         self.update()
 
-    def on_reset_view_button_released(self, *args):
+    def autoRange(self):
         widgets = [getattr(self.ui, "%s_graph" % _i)
                    for _i in ("z", "n", "e")]
         widgets.sort(key=lambda x: x.ptp)
         widgets[-1].autoRange()
+
+    def on_reset_view_button_released(self, *args):
+        self.autoRange()
 
     def on_resample_check_box_stateChanged(self, state):
         resample = bool(state)
@@ -605,6 +609,7 @@ class Window(QtGui.QMainWindow):
     def on_source_tab_currentChanged(self):
         self._draw_mt()
         self.update()
+        self.autoRange()
 
     def on_update_button_released(self):
         self.update(force=True)
