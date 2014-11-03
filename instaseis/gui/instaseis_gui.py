@@ -21,7 +21,6 @@ from glob import iglob
 import imp
 import inspect
 from mpl_toolkits.basemap import Basemap
-from matplotlib.lines import Line2D
 import numpy as np
 from obspy.imaging.mopad_wrapper import Beach
 from obspy.core.util.geodetics import locations2degrees, gps2DistAzimuth
