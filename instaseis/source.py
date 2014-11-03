@@ -17,6 +17,7 @@ import functools
 import numpy as np
 import obspy
 from obspy.signal.filter import lowpass
+from obspy.signal.util import nextpow2
 import obspy.xseed
 import os
 from scipy import interp
@@ -355,6 +356,16 @@ class Source(SourceOrReceiver):
         self.sliprate[0] = 1.0 / dt
         self.sliprate = lowpass(self.sliprate, freq, 1./dt, corners, zerophase)
         self.dt = dt
+
+    def normalize_sliprate(self):
+        """
+        normalize the sliprate using trapezoidal rule
+        """
+        self.sliprate /= np.trapz(self.sliprate, dx=self.dt)
+
+    def lp_sliprate(self, freq, corners=4, zerophase=False):
+        self.sliprate = lowpass(self.sliprate, freq, 1./self.dt, corners,
+                                zerophase)
 
     def __str__(self):
         return_str = 'AxiSEM Database Source:\n'
@@ -730,6 +741,17 @@ class FiniteSource(object):
         for ps in self.pointsources:
             ps.set_sliprate_lp(dt, nsamp, freq, corners, zerophase)
 
+    def normalize_sliprate(self):
+        """
+        normalize the sliprate using trapezoidal rule
+        """
+        for ps in self.pointsources:
+            ps.normalize_sliprate()
+
+    def lp_sliprate(self, freq, corners=4, zerophase=False):
+        for ps in self.pointsources:
+            ps.lp_sliprate(freq, corners, zerophase)
+
     def find_hypocenter(self):
         """
         Finds the hypo- and epicenter based on the point source that has the
@@ -740,7 +762,7 @@ class FiniteSource(object):
         self.hypocenter_latitude = ps_hypo.latitude
         self.hypocenter_depth_in_m = ps_hypo.depth_in_m
 
-    def compute_centroid(self, planet_radius=6371e3):
+    def compute_centroid(self, planet_radius=6371e3, dt=None, nsamp=None):
         """
         computes the centroid moment tensor by summing over all pointsource
         weihted by their scalar moment
@@ -750,19 +772,39 @@ class FiniteSource(object):
         z = 0.0
         finite_M0 = self.M0
         finite_mij = np.zeros(6)
-        finite_time_shift = 0.0
+        finite_time_shift = 0.0  # time shift is now included in the sliprate
+
+        if dt is None:
+            dt = self[0].dt
+
+        # estimate the number of samples needed from the pointsource with
+        # longest time_shift
+        if nsamp is None:
+            ps_ts_max = max(self.pointsources, key=lambda x: x.time_shift)
+            nsamp = int(ps_ts_max.time_shift / dt + len(ps_ts_max.sliprate))
+
+        finite_sliprate = np.zeros(nsamp)
+        nfft = nextpow2(nsamp) * 2
+        self.resample_sliprate(dt, nsamp)
 
         for ps in self.pointsources:
             x += ps.x(planet_radius) * ps.M0 / finite_M0
             y += ps.y(planet_radius) * ps.M0 / finite_M0
             z += ps.z(planet_radius) * ps.M0 / finite_M0
 
-            finite_time_shift += ps.time_shift * ps.M0 / finite_M0
+            #finite_time_shift += ps.time_shift * ps.M0 / finite_M0
 
             mij = rotations.rotate_symm_tensor_voigt_xyz_src_to_xyz_earth(
                 ps.tensor_voigt, np.deg2rad(ps.longitude),
                 np.deg2rad(ps.colatitude))
             finite_mij += mij
+
+            # sum sliprates with time shift applied
+            sliprate_f = np.fft.rfft(ps.sliprate, n=nfft)
+            sliprate_f *= np.exp(- 1j * np.fft.rfftfreq(nfft)
+                                 * 2. * np.pi * ps.time_shift / dt)
+            finite_sliprate += np.fft.irfft(sliprate_f)[:nsamp] \
+                * ps.M0 / finite_M0
 
         longitude = np.rad2deg(np.arctan2(y, x))
         colatitude = np.rad2deg(
@@ -777,7 +819,11 @@ class FiniteSource(object):
         self.CMT = Source(latitude, longitude, depth_in_m, m_rr=finite_mij[2],
                           m_tt=finite_mij[0], m_pp=finite_mij[1],
                           m_rt=finite_mij[4], m_rp=finite_mij[3],
-                          m_tp=finite_mij[5], time_shift=finite_time_shift)
+                          m_tp=finite_mij[5], time_shift=finite_time_shift,
+                          sliprate=finite_sliprate, dt=dt)
+
+        # should not be necessary, but cancels numerical effects
+        self.CMT.normalize_sliprate()
 
     @property
     def M0(self):
