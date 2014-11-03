@@ -792,7 +792,7 @@ class FiniteSource(object):
             y += ps.y(planet_radius) * ps.M0 / finite_M0
             z += ps.z(planet_radius) * ps.M0 / finite_M0
 
-            #finite_time_shift += ps.time_shift * ps.M0 / finite_M0
+            # finite_time_shift += ps.time_shift * ps.M0 / finite_M0
 
             mij = rotations.rotate_symm_tensor_voigt_xyz_src_to_xyz_earth(
                 ps.tensor_voigt, np.deg2rad(ps.longitude),
@@ -821,9 +821,6 @@ class FiniteSource(object):
                           m_rt=finite_mij[4], m_rp=finite_mij[3],
                           m_tp=finite_mij[5], time_shift=finite_time_shift,
                           sliprate=finite_sliprate, dt=dt)
-
-        # should not be necessary, but cancels numerical effects
-        self.CMT.normalize_sliprate()
 
     @property
     def M0(self):

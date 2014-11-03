@@ -21,6 +21,8 @@ from glob import iglob
 import imp
 import inspect
 from mpl_toolkits.basemap import Basemap
+from matplotlib.lines import Line2D
+import numpy as np
 from obspy.imaging.mopad_wrapper import Beach
 from obspy.core.util.geodetics import locations2degrees, gps2DistAzimuth
 from obspy.taup.taup import getTravelTimes
@@ -176,6 +178,21 @@ class Window(QtGui.QMainWindow):
         self.mpl_mt_finite_ax.set_xlim(-105, 105)
         self.mpl_mt_finite_ax.set_ylim(-105, 105)
         self.mpl_mt_finite_figure.canvas.draw()
+
+    def plot_cmt_sliprate(self):
+        fig = self.ui.cmt_sliprate.fig
+        fig.clf()
+        fig.set_facecolor('white')
+        ax = fig.add_axes([0.05, 0.2, 0.9, 0.8], frameon=False)
+        ax.get_xaxis().tick_bottom()
+        ax.axes.get_yaxis().set_visible(False)
+
+        nsamp = len(self.finite_source.CMT.sliprate)
+        time = np.linspace(0, self.finite_source.CMT.dt * nsamp, nsamp,
+                           endpoint=False)
+
+        ax.plot(time, self.finite_source.CMT.sliprate)
+        fig.canvas.draw()
 
     def plot_map(self):
         self.mpl_map_figure = self.ui.map_fig.fig
@@ -467,8 +484,8 @@ class Window(QtGui.QMainWindow):
             self, "Choose *.srf File", pwd))
         if not self.srf_file:
             return
-        self.finite_source = FiniteSource.from_srf_file(self.srf_file)
-        self.finite_source.compute_centroid()
+        self.finite_source = FiniteSource.from_srf_file(
+            self.srf_file, normalize=True)
 
         self._setup_finite_source()
         self.update()
@@ -478,15 +495,22 @@ class Window(QtGui.QMainWindow):
         if self.finite_source is None:
             return
         if self.instaseis_db is not None:
-            self.finite_source.set_sliprate_lp(
-                dt=self.instaseis_db.dt, nsamp=self.instaseis_db.ndumps,
-                freq=1.0/self.instaseis_db.parsed_mesh.dominant_period)
+            #self.finite_source.set_sliprate_lp(
+            #    dt=self.instaseis_db.dt, nsamp=self.instaseis_db.ndumps,
+            #    freq=1.0/self.instaseis_db.parsed_mesh.dominant_period)
 
-            self.finite_source.CMT.set_sliprate_lp(
-                dt=self.instaseis_db.dt, nsamp=self.instaseis_db.ndumps,
+            nsamp = int(self.instaseis_db.parsed_mesh.dominant_period
+                        / self.finite_source[0].dt) * 5
+            self.finite_source.resample_sliprate(
+                dt=self.finite_source[0].dt, nsamp=nsamp)
+            self.finite_source.lp_sliprate(
                 freq=1.0/self.instaseis_db.parsed_mesh.dominant_period)
+            self.finite_source.resample_sliprate(
+                dt=self.instaseis_db.dt, nsamp=self.instaseis_db.ndumps)
 
+        self.finite_source.compute_centroid()
         self.plot_mt_finite()
+        self.plot_cmt_sliprate()
 
     def set_info(self):
         info_str = ''
