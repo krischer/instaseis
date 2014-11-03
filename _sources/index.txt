@@ -194,4 +194,3 @@ Detailed Documentation
    instaseis
    mesh
    source
-   srf

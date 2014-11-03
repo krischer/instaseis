@@ -30,7 +30,6 @@
     <script type="text/javascript" src="_static/bootstrap-3.2.0/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
     <link rel="top" title="instaseis 0.0.1a documentation" href="index.html" />
-    <link rel="next" title="Standard Rupture Format" href="srf.html" />
     <link rel="prev" title="Meshes" href="mesh.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
@@ -74,7 +73,6 @@
 <li class="toctree-l1"><a class="reference internal" href="instaseis.html">InstaSeisDB</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mesh.html">Meshes</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="">Sources and Receivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="srf.html">Standard Rupture Format</a></li>
 </ul>
 </ul>
 </li>
@@ -85,10 +83,6 @@
                 
   <li>
     <a href="mesh.html" title="Previous Chapter: Meshes"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm">&laquo; Meshes</span>
-    </a>
-  </li>
-  <li>
-    <a href="srf.html" title="Next Chapter: Standard Rupture Format"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm">Standard Rupture... &raquo;</span>
     </a>
   </li>
               
@@ -143,7 +137,7 @@ Martin van Driel (<a class="reference external" href="mailto:Martin&#37;&#52;&#4
 
 <dl class="method">
 <dt id="instaseis.source.FiniteSource.compute_centroid">
-<tt class="descname">compute_centroid</tt><big>(</big><em>planet_radius=6371000.0</em><big>)</big><a class="reference internal" href="_modules/instaseis/source.html#FiniteSource.compute_centroid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.FiniteSource.compute_centroid" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">compute_centroid</tt><big>(</big><em>planet_radius=6371000.0</em>, <em>dt=None</em>, <em>nsamp=None</em><big>)</big><a class="reference internal" href="_modules/instaseis/source.html#FiniteSource.compute_centroid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.FiniteSource.compute_centroid" title="Permalink to this definition">¶</a></dt>
 <dd><p>computes the centroid moment tensor by summing over all pointsource
 weihted by their scalar moment</p>
 </dd></dl>
@@ -178,6 +172,12 @@ smallest timeshift</p>
 <dt id="instaseis.source.FiniteSource.moment_magnitude">
 <tt class="descname">moment_magnitude</tt><a class="reference internal" href="_modules/instaseis/source.html#FiniteSource.moment_magnitude"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.FiniteSource.moment_magnitude" title="Permalink to this definition">¶</a></dt>
 <dd><p>Moment magnitude M_w</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="instaseis.source.FiniteSource.normalize_sliprate">
+<tt class="descname">normalize_sliprate</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/instaseis/source.html#FiniteSource.normalize_sliprate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.FiniteSource.normalize_sliprate" title="Permalink to this definition">¶</a></dt>
+<dd><p>normalize the sliprate using trapezoidal rule</p>
 </dd></dl>
 
 <dl class="method">
@@ -400,6 +400,12 @@ useful in the context of finite sources</li>
 <dt id="instaseis.source.Source.moment_magnitude">
 <tt class="descname">moment_magnitude</tt><a class="reference internal" href="_modules/instaseis/source.html#Source.moment_magnitude"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.Source.moment_magnitude" title="Permalink to this definition">¶</a></dt>
 <dd><p>Moment magnitude M_w</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="instaseis.source.Source.normalize_sliprate">
+<tt class="descname">normalize_sliprate</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/instaseis/source.html#Source.normalize_sliprate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.Source.normalize_sliprate" title="Permalink to this definition">¶</a></dt>
+<dd><p>normalize the sliprate using trapezoidal rule</p>
 </dd></dl>
 
 <dl class="staticmethod">
