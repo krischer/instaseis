@@ -180,9 +180,6 @@ def test_CMT_finite_source():
     finitesource = FiniteSource.from_srf_file(SRF_FILE, True)
     finitesource.compute_centroid()
 
-    np.testing.assert_allclose(np.array([finitesource.CMT.time_shift]),
-                               np.array([111.111111]))
-
     np.testing.assert_allclose(
         np.array([-3.91886976e+04, 3.90905071e+04, 9.81905182e+01,
                   1.94225428e+04, -4.09600000e+03, 3.19598660e+20]),
