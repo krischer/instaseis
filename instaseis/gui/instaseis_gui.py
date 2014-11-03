@@ -494,9 +494,9 @@ class Window(QtGui.QMainWindow):
         if self.finite_source is None:
             return
         if self.instaseis_db is not None:
-            #self.finite_source.set_sliprate_lp(
-            #    dt=self.instaseis_db.dt, nsamp=self.instaseis_db.ndumps,
-            #    freq=1.0/self.instaseis_db.parsed_mesh.dominant_period)
+            # self.finite_source.set_sliprate_lp(
+            #     dt=self.instaseis_db.dt, nsamp=self.instaseis_db.ndumps,
+            #     freq=1.0/self.instaseis_db.parsed_mesh.dominant_period)
 
             nsamp = int(self.instaseis_db.parsed_mesh.dominant_period
                         / self.finite_source[0].dt) * 5
