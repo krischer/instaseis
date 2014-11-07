@@ -272,6 +272,28 @@ class Source(SourceOrReceiver):
 
         return source
 
+    def write_CMTSOLUTION_file(self, filename):
+        """
+        Initialize a source object from a CMTSOLUTION file.
+
+        :param filename: path to the CMTSOLUTION file
+        """
+        with open(filename, "w") as f:
+            f.write('\n')
+            f.write('event name:  nn\n')
+            f.write('time shift:     %5.2f\n' % (self.time_shift,))
+            f.write('half duration:  0.0\n')
+            f.write('latitude:       %7.4f\n' % (self.latitude,))
+            f.write('longitude:      %7.4f\n' % (self.longitude,))
+            f.write('depth:          %7.4f\n' % (self.depth_in_m / 1e3,))
+
+            f.write('Mrr:            %7.4f\n' % (self.m_rr * 1e7,))
+            f.write('Mtt:            %7.4f\n' % (self.m_tt * 1e7,))
+            f.write('Mpp:            %7.4f\n' % (self.m_pp * 1e7,))
+            f.write('Mrt:            %7.4f\n' % (self.m_rt * 1e7,))
+            f.write('Mrp:            %7.4f\n' % (self.m_rp * 1e7,))
+            f.write('Mtp:            %7.4f\n' % (self.m_tp * 1e7,))
+
     @property
     def M0(self):
         """

@@ -52,6 +52,17 @@ def test_parse_CMTSOLUTIONS_file(tmpdir):
         (37.91, -77.93, 12000, 4.71E17, 3.81E15, -4.74E17, 3.99E16, -8.05E16,
          -1.23E17), dtype="float64"))
 
+    filename = os.path.join(str(tmpdir), "CMTSOLUTIONS2")
+    src.write_CMTSOLUTION_file(filename)
+
+    src = Source.parse(filename)
+    src_params = np.array([src.latitude, src.longitude, src.depth_in_m,
+                           src.m_rr, src.m_tt, src.m_pp, src.m_rt, src.m_rp,
+                           src.m_tp], dtype="float64")
+    np.testing.assert_allclose(src_params, np.array(
+        (37.91, -77.93, 12000, 4.71E17, 3.81E15, -4.74E17, 3.99E16, -8.05E16,
+         -1.23E17), dtype="float64"))
+
 
 def _assert_src(src):
     """
