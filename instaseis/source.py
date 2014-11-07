@@ -391,17 +391,19 @@ class Source(SourceOrReceiver):
 
     def __str__(self):
         return_str = 'AxiSEM Database Source:\n'
-        return_str += '\tlongitude        : %6.1f deg\n' % (self.longitude)
-        return_str += '\tlatitude         : %6.1f deg\n' % (self.latitude)
+        return_str += '\tlongitude        : %6.1f deg\n' % (self.longitude,)
+        return_str += '\tlatitude         : %6.1f deg\n' % (self.latitude,)
+        return_str += '\tdepth            : %6.1e km\n' \
+                      % (self.depth_in_m / 1e3,)
         return_str += '\tMoment Magnitude :   %4.2f\n' \
-                      % (self.moment_magnitude)
-        return_str += '\tscalar Moment    : %10.2e Nm\n' % (self.M0)
-        return_str += '\tMrr              : %10.2e Nm\n' % (self.m_rr)
-        return_str += '\tMtt              : %10.2e Nm\n' % (self.m_tt)
-        return_str += '\tMpp              : %10.2e Nm\n' % (self.m_pp)
-        return_str += '\tMrt              : %10.2e Nm\n' % (self.m_rt)
-        return_str += '\tMrp              : %10.2e Nm\n' % (self.m_rp)
-        return_str += '\tMtp              : %10.2e Nm\n' % (self.m_tp)
+                      % (self.moment_magnitude,)
+        return_str += '\tscalar Moment    : %10.2e Nm\n' % (self.M0,)
+        return_str += '\tMrr              : %10.2e Nm\n' % (self.m_rr,)
+        return_str += '\tMtt              : %10.2e Nm\n' % (self.m_tt,)
+        return_str += '\tMpp              : %10.2e Nm\n' % (self.m_pp,)
+        return_str += '\tMrt              : %10.2e Nm\n' % (self.m_rt,)
+        return_str += '\tMrp              : %10.2e Nm\n' % (self.m_rp,)
+        return_str += '\tMtp              : %10.2e Nm\n' % (self.m_tp,)
 
         return return_str
 
