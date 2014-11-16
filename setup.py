@@ -60,7 +60,7 @@ def _compile(self, obj, src, ext, cc_args, extra_postargs, pp_opts):
     try:
         self.spawn(compiler_so + cc_args + [src, '-o', obj] +
                    extra_postargs)
-    except DistutilsExecError, msg:
+    except DistutilsExecError as msg:
         raise CompileError(msg)
 UnixCCompiler._compile = _compile
 
