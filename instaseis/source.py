@@ -48,9 +48,9 @@ def _purge_duplicates(f):
 
 class SourceOrReceiver(object):
     def __init__(self, latitude, longitude, depth_in_m):
-        self.latitude = latitude
-        self.longitude = longitude
-        self.depth_in_m = depth_in_m
+        self.latitude = float(latitude)
+        self.longitude = float(longitude)
+        self.depth_in_m = float(depth_in_m) if depth_in_m is not None else None
 
     def __eq__(self, other):
         if type(self) != type(other):
