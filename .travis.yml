@@ -1,7 +1,10 @@
 language: python
 
 python:
+  - "2.6"
   - "2.7"
+  - "3.3"
+  - "3.4"
 
 env:
   global:
@@ -21,9 +24,13 @@ before_install:
   - sudo rm -rf /dev/shm
   - sudo ln -s /run/shm /dev/shm
   - conda install --yes python=$TRAVIS_PYTHON_VERSION atlas numpy scipy matplotlib nose pytest flake8 sphinx lxml sqlalchemy mock netcdf4
-  - pip install --use-mirrors suds
-  - pip install --use-mirrors sphinx-bootstrap-theme
-  - pip install obspy
+  # Only install the theme for Python 2.7 as it builds the docs.
+  - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then pip install --use-mirros sphinx-bootstrap-theme ; fi
+  # Currently only the ObsPy master supports Python 3.
+  - if [[ $TRAVIS_PYTHON_VERSION == '2.6' ]]; then pip install --use-mirrors obspy ; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then pip install --use-mirrors obspy ; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == '3.3' ]]; then pip install https://github.com/obspy/obspy/archive/master.zip ; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == '3.4' ]]; then pip install https://github.com/obspy/obspy/archive/master.zip ; fi
   - pip install coveralls
 
 install:
@@ -31,8 +38,9 @@ install:
 
 script:
   - coverage run --source=instaseis -m instaseis.tests
-  - cd $TRAVIS_BUILD_DIR/doc; make html
+  # Docs only need to be built once.
+  - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then cd $TRAVIS_BUILD_DIR/doc; make html ; fi
 
 after_success:
   - cd $TRAVIS_BUILD_DIR; coveralls
-  - bash $TRAVIS_BUILD_DIR/.travis-update-gh-pages.sh
+  - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then bash $TRAVIS_BUILD_DIR/.travis-update-gh-pages.sh ; fi
