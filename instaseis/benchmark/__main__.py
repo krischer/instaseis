@@ -15,6 +15,7 @@ from __future__ import (absolute_import, division, print_function,
 from abc import ABCMeta, abstractmethod, abstractproperty
 import argparse
 import colorama
+import fnmatch
 import numpy as np
 import os
 import random
@@ -307,7 +308,6 @@ class FiniteSourceEmulation(InstaSeisBenchmark):
         if self.current_depth_counter >= self.depth_count:
             self.counter += 1
             self.current_depth_counter = 0
-        self.current_depth_counter += 1
 
         # Fix latitude.
         lat = 0.0
@@ -318,6 +318,7 @@ class FiniteSourceEmulation(InstaSeisBenchmark):
 
         self.db.get_seismograms(source=src, receiver=self.rec)
         self.counter += 1
+        self.current_depth_counter += 1
 
     @property
     def description(self):
@@ -331,6 +332,8 @@ parser.add_argument('folder', type=str,
                     help="path to AxiSEM Green's function database")
 parser.add_argument('--time', type=float, default=10.0,
                     help='time spent per benchmark in seconds')
+parser.add_argument('--pattern', type=str,
+                    help='UNIX style patterns to only run certain benchmarks')
 args = parser.parse_args()
 path = os.path.abspath(args.folder)
 
@@ -364,6 +367,13 @@ benchmarks.sort(key=lambda x: x.description)
 
 print(79 * "=")
 print("Discovered %i benchmark(s)" % len(benchmarks))
+
+if args.pattern is not None:
+    pattern = "*%s*" % args.pattern
+    benchmarks = [_i for _i in benchmarks if
+                  fnmatch.fnmatch(_i.description.lower(), pattern)]
+    print("Pattern matching retained %i benchmark(s)" % len(benchmarks))
+
 print(79 * "=")
 
 for benchmark in benchmarks:
