@@ -25,7 +25,7 @@ before_install:
   - sudo ln -s /run/shm /dev/shm
   - conda install --yes python=$TRAVIS_PYTHON_VERSION atlas numpy scipy matplotlib nose pytest flake8 sphinx lxml sqlalchemy mock netcdf4
   # Only install the theme for Python 2.7 as it builds the docs.
-  - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then pip install --use-mirros sphinx-bootstrap-theme ; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then pip install --use-mirrors sphinx-bootstrap-theme ; fi
   # Currently only the ObsPy master supports Python 3.
   - if [[ $TRAVIS_PYTHON_VERSION == '2.6' ]]; then pip install --use-mirrors obspy ; fi
   - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then pip install --use-mirrors obspy ; fi
