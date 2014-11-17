@@ -49,16 +49,16 @@ def compile_and_import_ui_files():
         if not os.path.exists(py_ui_file) or \
                 (os.path.getmtime(ui_file) >= os.path.getmtime(py_ui_file)):
             from PyQt4 import uic
-            print "Compiling ui file: %s" % ui_file
+            print("Compiling ui file: %s" % ui_file)
             with open(py_ui_file, 'w') as open_file:
                 uic.compileUi(ui_file, open_file)
         # Import the (compiled) file.
         try:
             import_name = os.path.splitext(os.path.basename(py_ui_file))[0]
             globals()[import_name] = imp.load_source(import_name, py_ui_file)
-        except ImportError, e:
-            print "Error importing %s" % py_ui_file
-            print e.message
+        except ImportError as e:
+            print("Error importing %s" % py_ui_file)
+            print(e.message)
 
 
 class Window(QtGui.QMainWindow):

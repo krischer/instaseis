@@ -142,7 +142,7 @@ class Source(SourceOrReceiver):
 
         :param filename_or_obj: The object or filename to parse.
         """
-        if isinstance(filename_or_obj, basestring):
+        if isinstance(filename_or_obj, (str, bytes)):
             # Anything ObsPy can read.
             try:
                 src = obspy.readEvents(filename_or_obj)
@@ -501,7 +501,7 @@ class Receiver(SourceOrReceiver):
         receivers = []
 
         # STATIONS file.
-        if isinstance(filename_or_obj, basestring) and \
+        if isinstance(filename_or_obj, (str, bytes)) and \
                 os.path.exists(filename_or_obj):
             try:
                 return Receiver._parse_stations_file(filename_or_obj)

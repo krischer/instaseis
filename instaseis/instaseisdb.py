@@ -360,7 +360,7 @@ class InstaSeisDB(object):
 
                 if "Z" in components:
                     final = np.zeros(strain_z.shape[0], dtype="float64")
-                    for i in xrange(3):
+                    for i in range(3):
                         final += mij[i] * strain_z[:, i]
                     final += 2.0 * mij[4] * strain_z[:, 4]
                     data["Z"] = final
@@ -688,8 +688,8 @@ class InstaSeisDB(object):
                 if var not in mesh_dict:
                     continue
                 temp = mesh_dict[var][:, gll_point_ids.flatten()]
-                for ipol in xrange(mesh.npol + 1):
-                    for jpol in xrange(mesh.npol + 1):
+                for ipol in range(mesh.npol + 1):
+                    for jpol in range(mesh.npol + 1):
                         utemp[:, jpol, ipol, i] = temp[:, ipol * 5 + jpol]
 
             strain_fct_map = {
@@ -707,7 +707,7 @@ class InstaSeisDB(object):
 
         final_strain = np.empty((strain.shape[0], 6), order="F")
 
-        for i in xrange(6):
+        for i in range(6):
             final_strain[:, i] = spectral_basis.lagrange_interpol_2D_td(
                 col_points_xi, col_points_eta, strain[:, :, :, i], xi, eta)
 
@@ -759,8 +759,8 @@ class InstaSeisDB(object):
                 if var not in mesh_dict:
                     continue
                 temp = mesh_dict[var][:, gll_point_ids.flatten()]
-                for ipol in xrange(mesh.npol + 1):
-                    for jpol in xrange(mesh.npol + 1):
+                for ipol in range(mesh.npol + 1):
+                    for jpol in range(mesh.npol + 1):
                         utemp[:, jpol, ipol, i] = temp[:, ipol * 5 + jpol]
 
             mesh.displ_buffer.add(id_elem, utemp)
@@ -769,7 +769,7 @@ class InstaSeisDB(object):
 
         final_displacement = np.empty((utemp.shape[0], 3), order="F")
 
-        for i in xrange(3):
+        for i in range(3):
             final_displacement[:, i] = spectral_basis.lagrange_interpol_2D_td(
                 col_points_xi, col_points_eta, utemp[:, :, :, i], xi, eta)
 
