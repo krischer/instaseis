@@ -111,6 +111,13 @@ lib = MyExtension('instaseis',
                       os.path.join(src, "lanczos.f90"),
                   ])
 
+INSTALL_REQUIRES = ["netCDF4", "numpy", "obspy"]
+
+# Add argparse and ordereddict for Python 2.6. Both are standard library
+# packages for Python >= 2.7.
+if sys.version_info[:2] == (2, 6):
+    INSTALL_REQUIRES.extend(["argparse", "ordereddict"])
+
 setup_config = dict(
     name="instaseis",
     version="0.0.1",
@@ -126,7 +133,7 @@ setup_config = dict(
             get_package_data()},
     license="GNU General Public License, version 3 (GPLv3)",
     platforms="OS Independent",
-    install_requires=["netCDF4", "numpy", "obspy"],
+    install_requires=INSTALL_REQUIRES,
     extras_require={
         'tests': ['flake8>=2', 'pytest']},
     ext_package='instaseis.lib',

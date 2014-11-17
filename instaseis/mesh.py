@@ -17,7 +17,12 @@ import netCDF4
 import numpy as np
 from obspy import UTCDateTime
 from scipy.spatial import cKDTree
-from collections import OrderedDict
+
+# Python 2.6 compat.
+try:
+    from collections import OrderedDict
+except ImportError:
+    from ordereddict import OrderedDict
 
 
 class Buffer(object):
