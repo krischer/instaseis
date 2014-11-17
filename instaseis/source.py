@@ -659,6 +659,12 @@ class FiniteSource(object):
         return self
 
     def next(self):
+        """
+        For Py2K compat.
+        """
+        return self.__next__()
+
+    def __next__(self):
         if self.pointsources is None:
             raise ValueError('FiniteSource not Initialized')
         if self.current > len(self.pointsources) - 1:
