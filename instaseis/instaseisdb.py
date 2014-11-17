@@ -582,9 +582,11 @@ class InstaSeisDB(object):
         else:
             npol = self.parsed_mesh.npol
             if not self.read_on_demand:
-                mu = self.parsed_mesh.mesh_mu[gll_point_ids[npol/2, npol/2]]
+                mu = self.parsed_mesh.mesh_mu[gll_point_ids[npol // 2,
+                                                            npol // 2]]
             else:
-                mu = mesh.variables["mesh_mu"][gll_point_ids[npol/2, npol/2]]
+                mu = mesh.variables["mesh_mu"][gll_point_ids[npol // 2,
+                                                             npol // 2]]
             return data, mu
 
     def get_seismograms_finite_source(self, sources, receiver,
