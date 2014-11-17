@@ -17,6 +17,7 @@ import argparse
 import colorama
 import fnmatch
 import numpy as np
+import obspy
 import os
 import random
 import subprocess
@@ -50,9 +51,10 @@ def plot_gnuplot(times):
 class InstaSeisBenchmark(object):
     __metaclass__ = ABCMeta
 
-    def __init__(self, path, time_per_benchmark):
+    def __init__(self, path, time_per_benchmark, save_output=False):
         self.path = path
         self.time_per_benchmark = time_per_benchmark
+        self.save_output = save_output
 
     @abstractmethod
     def setup(self):
@@ -113,6 +115,20 @@ class InstaSeisBenchmark(object):
         sys.stdout.flush()
         plot_gnuplot(all_times)
         time.sleep(0.1)
+        if self.save_output:
+            folder = "benchmark_results"
+            if not os.path.exists(folder):
+                os.makedirs(folder)
+            _i = 0
+            while True:
+                _i += 1
+                filename = os.path.join(folder, "%s_%04i.txt" % (
+                    self.__class__.__name__, _i))
+                if not os.path.exists(filename):
+                    break
+            np.savetxt(filename, all_times,
+                       header="time per seismogram [run at %s]" % (
+                       obspy.UTCDateTime()))
 
 
 class BufferedFixedSrcRecRoDOffSeismogramGeneration(InstaSeisBenchmark):
@@ -317,12 +333,11 @@ class FiniteSourceEmulation(InstaSeisBenchmark):
                      depth_in_m=self.depths[self.current_depth_counter])
 
         self.db.get_seismograms(source=src, receiver=self.rec)
-        self.counter += 1
         self.current_depth_counter += 1
 
     @property
     def description(self):
-        return "Finite source emulation"
+        return "Finite source emulation."
 
 
 parser = argparse.ArgumentParser(
@@ -334,6 +349,8 @@ parser.add_argument('--time', type=float, default=10.0,
                     help='time spent per benchmark in seconds')
 parser.add_argument('--pattern', type=str,
                     help='UNIX style patterns to only run certain benchmarks')
+parser.add_argument('--save', action="store_true",
+                    help='save output to txt file')
 args = parser.parse_args()
 path = os.path.abspath(args.folder)
 
@@ -362,7 +379,8 @@ def get_subclasses(cls):
 
     return subclasses
 
-benchmarks = [i(path, args.time) for i in get_subclasses(InstaSeisBenchmark)]
+benchmarks = [i(path, args.time, args.save) for i in get_subclasses(
+              InstaSeisBenchmark)]
 benchmarks.sort(key=lambda x: x.description)
 
 print(79 * "=")
