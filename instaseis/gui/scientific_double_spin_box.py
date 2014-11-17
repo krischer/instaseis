@@ -5,12 +5,15 @@ Originally from https://gist.github.com/jdreaver/0be2e44981159d0854f5
 """
 from PyQt4 import QtGui
 import numpy as np
+import platform
 import re
 
 # Regular expression to find floats. Match groups are the whole string, the
 # whole coefficient, the decimal part of the coefficient, and the exponent
 # part.
 _float_re = re.compile(r'(([+-]?\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?)')
+
+PY3K = platform.python_version_tuple()[0] == "3"
 
 
 def valid_float_string(string):
@@ -22,9 +25,15 @@ class FloatValidator(QtGui.QValidator):
     def validate(self, string, position):
         string = str(string)
         if valid_float_string(string):
+            if PY3K:
+                return (self.Acceptable, string, position)
             return (self.Acceptable, position)
         if string == "" or string[position-1] in 'e.-+':
+            if PY3K:
+                return (self.Intermediate, string, position)
             return (self.Intermediate, position)
+        if PY3K:
+            return (self.Invalid, string, position)
         return (self.Invalid, position)
 
     def fixup(self, text):
