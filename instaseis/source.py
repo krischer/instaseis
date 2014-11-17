@@ -10,7 +10,8 @@ Source and Receiver classes used for the AxiSEM DB Python interface.
     GNU General Public License, Version 3
     (http://www.gnu.org/copyleft/gpl.html)
 """
-from __future__ import absolute_import
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
 
 import collections
 import functools

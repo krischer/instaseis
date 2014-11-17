@@ -9,6 +9,9 @@ Hacky code to generate some finite source in a .srf file
     GNU General Public License, Version 3
     (http://www.gnu.org/copyleft/gpl.html)
 """
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
+
 import matplotlib.pyplot as plt
 import numpy as np
 from obspy.signal.filter import lowpass

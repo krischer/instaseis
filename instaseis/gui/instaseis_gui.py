@@ -9,7 +9,8 @@ Graphical user interface for Instaseis.
     GNU General Public License, Version 3
     (http://www.gnu.org/copyleft/gpl.html)
 """
-from __future__ import absolute_import
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
 
 from PyQt4 import QtGui, QtCore
 import pyqtgraph as pg
