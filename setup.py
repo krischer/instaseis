@@ -131,6 +131,21 @@ setup_config = dict(
         'tests': ['flake8>=2', 'pytest']},
     ext_package='instaseis.lib',
     ext_modules=[lib],
+    classifiers=[
+        # complete classifier list:
+        # http://pypi.python.org/pypi?%3Aaction=list_classifiers
+        "Development Status :: 3 - Alpha",
+        "Intended Audience :: Developers",
+        "Operating System :: Unix",
+        "Operating System :: POSIX",
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 2.6",
+        "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.3",
+        "Programming Language :: Python :: 3.4",
+        "Programming Language :: Python :: Implementation :: CPython",
+        ],
 )
 
 if __name__ == "__main__":
