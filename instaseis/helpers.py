@@ -13,6 +13,7 @@ from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 
 import ctypes as C
+import glob
 import inspect
 import os
 
@@ -27,7 +28,12 @@ def load_lib():
     if cache:
         return cache[0]
     else:
-        filename = os.path.join(LIB_DIR, "instaseis.so")
+        # Enable a couple of different library naming schemes.
+        possible_files = glob.glob(os.path.join(LIB_DIR, "instaseis*.so"))
+        if not possible_files:
+            raise ValueError("Could not find suitable instaseis shared "
+                             "library.")
+        filename = possible_files[0]
         lib = C.CDLL(filename)
         cache.append(lib)
         return lib
