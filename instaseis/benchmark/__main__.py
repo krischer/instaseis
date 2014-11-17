@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Benchmarks for instaseis.
+Benchmarks for Instaseis.
 
 :copyright:
     Lion Krischer (krischer@geophysik.uni-muenchen.de), 2014
@@ -144,7 +144,7 @@ class BufferedFixedSrcRecRoDOffSeismogramGenerationNoObsPy(InstaSeisBenchmark):
     @property
     def description(self):
         return "Buffered, fixed source and receiver, " \
-               "read_on_demand=False, no ObsPy output"
+               "read_on_demand=False, no ObsPy output, best case!"
 
 
 class UnbufferedFixedSrcRecRoDOffSeismogramGenerationNoObsPy(
@@ -211,13 +211,13 @@ class BufferedHalfDegreeLatLngDepthScatter(InstaSeisBenchmark):
         lat += 44
         lng = random.random() * 0.5
         lng += 44
-        depth_in_m = random.random() * 100000
+        depth_in_m = random.random() * 50000
         src = Source(latitude=lat, longitude=lng, depth_in_m=depth_in_m)
         self.db.get_seismograms(source=src, receiver=rec)
 
     @property
     def description(self):
-        return "Buffered, 0.5 Degree/100 km (depth) source position scatter"
+        return "Buffered, 0.5 Degree/50 km (depth) source position scatter"
 
 
 class BufferedFullyRandom(InstaSeisBenchmark):
@@ -288,6 +288,41 @@ class UnbufferedFullyRandomReadOnDemandTrue(InstaSeisBenchmark):
     def description(self):
         return "Unbuffered, random src and receiver, read_on_demand=True, " \
                "worst case!"
+
+
+class FiniteSourceEmulation(InstaSeisBenchmark):
+    def setup(self):
+        self.db = InstaSeisDB(self.path, read_on_demand=False,
+                              buffer_size_in_mb=250)
+        self.counter = 0
+        self.current_depth_counter = 0
+        # Depth increases in 1 km steps up to a depth of 25 km.
+        self.depths = range(0, 25001, 1000)
+        self.depth_count = len(self.depths)
+
+        # Fix Receiver
+        self.rec = Receiver(latitude=45.0, longitude=45.0)
+
+    def iterate(self):
+        if self.current_depth_counter >= self.depth_count:
+            self.counter += 1
+            self.current_depth_counter = 0
+        self.current_depth_counter += 1
+
+        # Fix latitude.
+        lat = 0.0
+        # Longitude values increase in 1 km steps.
+        lng = self.counter * 0.01
+        src = Source(latitude=lat, longitude=lng,
+                     depth_in_m=self.depths[self.current_depth_counter])
+
+        self.db.get_seismograms(source=src, receiver=self.rec)
+        self.counter += 1
+
+    @property
+    def description(self):
+        return "Finite source emulation"
+
 
 parser = argparse.ArgumentParser(
     prog="python -m instaseis.benchmark",
