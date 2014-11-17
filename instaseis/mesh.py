@@ -123,8 +123,9 @@ class Mesh(object):
             raise ValueError("Database file too old.")
 
         self.ndumps = getattr(self.f, "number of strain dumps")
-        self.chunks = \
-            self.f.groups["Snapshots"].variables.values()[0].chunking()
+        snapshot_vars = self.f.groups["Snapshots"].variables
+        contents = sorted(list(snapshot_vars.keys()))
+        self.chunks = snapshot_vars[contents[0]].chunking()
         self.excitation_type = getattr(self.f, "excitation type")
 
         # The rest is not needed for every mesh.
