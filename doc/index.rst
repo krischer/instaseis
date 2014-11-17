@@ -21,9 +21,9 @@ on Linux and Mac OS X. Adding support for Windows is mainly a question of
 compiling the shared Fortran library. Pull requests are welcome.
 
 * ``gfortran >= 4.7``
-* ``Python 2.7``
+* ``Python 2.6, 2.7, 3.3, or 3.4``
 * ``NumPy >= 1.7``
-* ``ObsPy >= 0.9.2``
+* ``ObsPy >= 0.9.2`` *(only the ObsPy master currently supports Python 3)*
 * ``netCDF4 >= 4.3`` including Python bindings (``>= 1.1``)
 
 The graphical user interface (which is optional and not needed to run
@@ -62,10 +62,10 @@ If you know what you are doing, just make sure the aforementioned
 dependencies are installed. Otherwise do yourself a favor and download the
 `Anaconda <https://store.continuum.io/cshop/anaconda/>`_ Python distribution.
 It is a free scientific Python distribution bundling almost all necessary
-modules with a convenient installer (does not require root access!). Make sure
-to use the distribution for Python 2.7. Once installed assert that ``pip`` and
-``conda`` point to the Anaconda installation folder (you need to open a new
-terminal after installing Anaconda) and install the missing dependencies with
+modules with a convenient installer (does not require root access!).
+Once installed assert that ``pip`` and ``conda`` point to the Anaconda
+installation folder (you need to open a new terminal after installing Anaconda)
+and install the missing dependencies with
 
 .. code-block:: bash
 
