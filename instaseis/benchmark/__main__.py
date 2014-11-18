@@ -72,6 +72,7 @@ class InstaSeisBenchmark(object):
     def run(self):
         # Set seeds to be able to reproduce results.
         if self.seed is not None:
+            print("\tSetting random seed to %i" % self.seed)
             np.random.seed(self.seed)
             random.seed(self.seed)
         a = timeit.default_timer()
@@ -288,7 +289,7 @@ class UnbufferedFullyRandom(InstaSeisBenchmark):
         return "Unbuffered, random src and receiver"
 
 
-class UnbufferedFullyRandomReadOnDemandTrue(InstaSeisBenchmark):
+class UnbufferedAndRandomReadOnDemandTrue(InstaSeisBenchmark):
     def setup(self):
         self.db = InstaSeisDB(self.path, read_on_demand=True,
                               buffer_size_in_mb=0)
@@ -394,9 +395,9 @@ print(79 * "=")
 print("Discovered %i benchmark(s)" % len(benchmarks))
 
 if args.pattern is not None:
-    pattern = "*%s*" % args.pattern
+    pattern = "*%s*" % args.pattern.lower()
     benchmarks = [_i for _i in benchmarks if
-                  fnmatch.fnmatch(_i.description.lower(), pattern)]
+                  fnmatch.fnmatch(_i.__class__.__name__.lower(), pattern)]
     print("Pattern matching retained %i benchmark(s)" % len(benchmarks))
 
 print(79 * "=")
