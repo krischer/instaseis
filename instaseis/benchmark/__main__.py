@@ -51,10 +51,11 @@ def plot_gnuplot(times):
 class InstaSeisBenchmark(object):
     __metaclass__ = ABCMeta
 
-    def __init__(self, path, time_per_benchmark, save_output=False):
+    def __init__(self, path, time_per_benchmark, save_output=False, seed=None):
         self.path = path
         self.time_per_benchmark = time_per_benchmark
         self.save_output = save_output
+        self.seed = seed
 
     @abstractmethod
     def setup(self):
@@ -69,6 +70,10 @@ class InstaSeisBenchmark(object):
         pass
 
     def run(self):
+        # Set seeds to be able to reproduce results.
+        if self.seed is not None:
+            np.random.seed(self.seed)
+            random.seed(self.seed)
         a = timeit.default_timer()
         self.setup()
         b = timeit.default_timer()
@@ -349,6 +354,8 @@ parser.add_argument('--time', type=float, default=10.0,
                     help='time spent per benchmark in seconds')
 parser.add_argument('--pattern', type=str,
                     help='UNIX style patterns to only run certain benchmarks')
+parser.add_argument('--seed', type=int,
+                    help='Seed used for the random number generation')
 parser.add_argument('--save', action="store_true",
                     help='save output to txt file')
 args = parser.parse_args()
@@ -379,7 +386,7 @@ def get_subclasses(cls):
 
     return subclasses
 
-benchmarks = [i(path, args.time, args.save) for i in get_subclasses(
+benchmarks = [i(path, args.time, args.save, args.seed) for i in get_subclasses(
               InstaSeisBenchmark)]
 benchmarks.sort(key=lambda x: x.description)
 
@@ -399,6 +406,7 @@ for benchmark in benchmarks:
     print(colorama.Fore.YELLOW + 79 * "=")
     print(79 * "=" + colorama.Fore.RESET)
     print("\n")
-    print(colorama.Fore.BLUE + benchmark.description + colorama.Fore.RESET,
-          end="\n\n")
+    print(colorama.Fore.BLUE +
+          benchmark.__class__.__name__ + ": " + benchmark.description +
+          colorama.Fore.RESET, end="\n\n")
     benchmark.run()
