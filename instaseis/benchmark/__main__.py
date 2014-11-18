@@ -112,7 +112,7 @@ class InstaSeisBenchmark(object):
                           end="\r")
                 else:
                     print("\tseismograms/sec: {0:>8.2f}, remaining runs: "
-                          "{1:>6d} sec".format(speed, self.count - count),
+                          "{1:>6d}".format(speed, self.count - count),
                           end="\r")
                 sys.stdout.flush()
                 latest_times = []
