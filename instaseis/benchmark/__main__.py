@@ -51,11 +51,13 @@ def plot_gnuplot(times):
 class InstaSeisBenchmark(object):
     __metaclass__ = ABCMeta
 
-    def __init__(self, path, time_per_benchmark, save_output=False, seed=None):
+    def __init__(self, path, time_per_benchmark, save_output=False,
+                 seed=None, count=None):
         self.path = path
         self.time_per_benchmark = time_per_benchmark
         self.save_output = save_output
         self.seed = seed
+        self.count = count
 
     @abstractmethod
     def setup(self):
@@ -86,10 +88,13 @@ class InstaSeisBenchmark(object):
 
         last_write_time = starttime
         latest_times = []
+        count = 0
 
         print("\tStarting...", end="\r")
         t = starttime
-        while (t < endtime):
+        while ((self.count is not None and count < self.count)
+               or (self.count is None and t < endtime)):
+            count += 1
             s = timeit.default_timer()
             self.iterate()
             t = timeit.default_timer()
@@ -101,9 +106,14 @@ class InstaSeisBenchmark(object):
             if t >= (last_write_time + WRITE_INTERVAL):
                 cumtime = sum(latest_times)
                 speed = len(latest_times) / cumtime
-                print("\tseismograms/sec: {0:>8.2f}, remaining time: "
-                      "{1:>2.1f} sec".format(speed, endtime - t),
-                      end="\r")
+                if self.count is None:
+                    print("\tseismograms/sec: {0:>8.2f}, remaining time: "
+                          "{1:>2.1f} sec".format(speed, endtime - t),
+                          end="\r")
+                else:
+                    print("\tseismograms/sec: {0:>8.2f}, remaining runs: "
+                          "{1:>6d} sec".format(speed, self.count - count),
+                          end="\r")
                 sys.stdout.flush()
                 latest_times = []
                 last_write_time = t
@@ -134,7 +144,7 @@ class InstaSeisBenchmark(object):
                     break
             np.savetxt(filename, all_times,
                        header="time per seismogram [run at %s]" % (
-                       obspy.UTCDateTime()))
+                           obspy.UTCDateTime()))
 
 
 class BufferedFixedSrcRecRoDOffSeismogramGeneration(InstaSeisBenchmark):
@@ -357,6 +367,10 @@ parser.add_argument('--pattern', type=str,
                     help='UNIX style patterns to only run certain benchmarks')
 parser.add_argument('--seed', type=int,
                     help='Seed used for the random number generation')
+parser.add_argument('--count', type=int,
+                    help='Number of seismograms to be calculated for each '
+                         'benchmark. Overwrites any time limitations if '
+                         'given.')
 parser.add_argument('--save', action="store_true",
                     help='save output to txt file')
 args = parser.parse_args()
@@ -387,8 +401,8 @@ def get_subclasses(cls):
 
     return subclasses
 
-benchmarks = [i(path, args.time, args.save, args.seed) for i in get_subclasses(
-              InstaSeisBenchmark)]
+benchmarks = [i(path, args.time, args.save, args.seed, args.count) for i in
+              get_subclasses(InstaSeisBenchmark)]
 benchmarks.sort(key=lambda x: x.description)
 
 print(79 * "=")
