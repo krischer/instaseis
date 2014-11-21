@@ -77,6 +77,9 @@ def _assert_src(src):
            (36.97, -3.54, 609800.0, -2.16E18, 5.36E17, 1.62E18, 1.3E16,
             3.23E18, 1.75E18)
 
+    # Also check the time!
+    assert src.origin_time == obspy.UTCDateTime("2010-04-11T22:08:12.800000Z")
+
 
 def test_parse_QuakeML():
     """
