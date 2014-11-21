@@ -28,7 +28,7 @@ from . import rotations
 from . import sem_derivatives
 from . import spectral_basis
 from . import lanczos
-from instaseis.source import Source, ForceSource
+from instaseis.source import Source, ForceSource, Receiver
 
 
 MeshCollection_bwd = collections.namedtuple("MeshCollection_bwd", ["px", "pz"])
@@ -223,6 +223,21 @@ class InstaSeisDB(object):
             using a lanczos kernel
         :param a_lanczos: width of the kernel used in resampling
         """
+        # Attempt to parse them if the types are not correct.
+        if not isinstance(source, Source) and \
+                not isinstance(source, ForceSource):
+            source = Source.parse(source)
+        if not isinstance(receiver, Receiver):
+            # This only works in the special case of one station, otherwise
+            # it has to be called more then once.
+            rec = Receiver.parse(receiver)
+            if len(rec) != 1:
+                raise ValueError("Receiver object/file contains multiple "
+                                 "stations. Please parse outside the "
+                                 "get_seismograms() function and call in a "
+                                 "loop.")
+            receiver = rec[0]
+
         if self.reciprocal:
             if any(comp in components for comp in ['N', 'E', 'R', 'T']) and \
                     self.meshes.px is None:
