@@ -16,7 +16,7 @@ from __future__ import (absolute_import, division, print_function,
 
 import collections
 import numpy as np
-from obspy.core import Stream, Trace
+from obspy.core import Stream, Trace, UTCDateTime
 from obspy.signal.util import nextpow2
 import os
 import warnings
@@ -566,6 +566,10 @@ class InstaSeisDB(object):
                     data[comp], self.parsed_mesh.dt, dt, a_lanczos)
 
         if return_obspy_stream:
+            if hasattr(source, "origin_time"):
+                origin_time = source.origin_time
+            else:
+                origin_time = UTCDateTime(0)
             # Convert to an ObsPy Stream object.
             st = Stream()
             if dt is None:
@@ -574,6 +578,7 @@ class InstaSeisDB(object):
             for comp in components:
                 tr = Trace(data=data[comp],
                            header={"delta": dt,
+                                   "starttime": origin_time,
                                    "station": receiver.station,
                                    "network": receiver.network,
                                    "channel": "%sX%s" % (band_code, comp)})
