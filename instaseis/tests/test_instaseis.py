@@ -568,3 +568,50 @@ def test_origin_time_of_resulting_seismograms():
 
     # Default time is it timestamp 0.
     assert st[0].stats.starttime == org_time
+
+
+def test_higher_level_event_and_receiver_parsing():
+    """
+    Tests that events and receivers can be parsed from different supported
+    formats.
+    """
+    # Create an event and modify it to match the settings of the test data.
+    event = obspy.readEvents(os.path.join(
+        DATA, "GCMT_event_STRAIT_OF_GIBRALTAR.xml"))[0]
+    event.origins = event.origins[:1]
+    event.magnitudes = event.magnitudes[:1]
+    event.focal_mechanisms = event.focal_mechanisms[:1]
+
+    org = event.origins[0]
+    mt = event.focal_mechanisms[0].moment_tensor.tensor
+
+    org.latitude = 89.91
+    org.longitude = 0.0
+    org.depth = 12000
+    org.time = obspy.UTCDateTime(2014, 1, 5)
+    mt.m_rr = 4.710000e+24 / 1E7
+    mt.m_tt = 3.810000e+22 / 1E7
+    mt.m_pp = -4.740000e+24 / 1E7
+    mt.m_rt = 3.990000e+23 / 1E7
+    mt.m_rp = -8.050000e+23 / 1E7
+    mt.m_tp = -1.230000e+24 / 1E7
+
+    # Same with the receiver objects.
+    inv = obspy.read_inventory(os.path.join(DATA, "TA.Q56A..BH.xml"))
+    inv[0][0].latitude = 42.6390
+    inv[0][0].longitude = 74.4940
+    inv[0][0].elevation = 0.0
+    inv[0][0].channels = []
+
+    # receiver = Receiver(latitude=42.6390, longitude=74.4940)
+    instaseis_bwd = InstaSeisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
+
+    st = instaseis_bwd.get_seismograms(source=event, receiver=inv,
+                                       components=('Z'))
+    np.testing.assert_allclose(st.select(component='Z')[0].data,
+                               BWD_TEST_DATA["Z"], rtol=1E-7, atol=1E-12)
+
+    # Make sure the attributes are correct.
+    assert st[0].stats.starttime == org.time
+    assert st[0].stats.network == "TA"
+    assert st[0].stats.station == "Q56A"
