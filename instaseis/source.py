@@ -104,8 +104,8 @@ class Source(SourceOrReceiver):
     """
     def __init__(self, latitude, longitude, depth_in_m=None, m_rr=0.0,
                  m_tt=0.0, m_pp=0.0, m_rt=0.0, m_rp=0.0, m_tp=0.0,
-                 origin_time=obspy.UTCDateTime(0),time_shift=None,
-                 sliprate=None, dt=None):
+                 time_shift=None, sliprate=None, dt=None,
+                 origin_time=obspy.UTCDateTime(0)):
         """
         :param latitude: latitude of the source in degree
         :param longitude: longitude of the source in degree
@@ -116,13 +116,13 @@ class Source(SourceOrReceiver):
         :param m_rt: moment tensor components in r, theta, phi in Nm
         :param m_rp: moment tensor components in r, theta, phi in Nm
         :param m_tp: moment tensor components in r, theta, phi in Nm
-        :param origin_time: The origin time of the source. This will be the
-            time of the first sample in the final seismogram. Be careful to
-            adjust it for any time shift or STF (de)convolution effects.
         :param time_shift: correction of the origin time in seconds. only
             useful in the context of finite sources
         :param sliprate: normalized source time function (sliprate)
         :param dt: sampling of the source time function
+        :param origin_time: The origin time of the source. This will be the
+            time of the first sample in the final seismogram. Be careful to
+            adjust it for any time shift or STF (de)convolution effects.
         """
         super(Source, self).__init__(latitude, longitude, depth_in_m)
         self.m_rr = m_rr
