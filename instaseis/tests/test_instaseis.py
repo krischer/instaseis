@@ -14,6 +14,7 @@ from __future__ import absolute_import
 
 import inspect
 import numpy as np
+import obspy
 import os
 import pytest
 import shutil
@@ -527,3 +528,43 @@ def test_get_band_code_method():
     }
     for sr, letter in codes.items():
         assert InstaSeisDB._get_band_code(1.0 / sr) == letter
+
+
+def test_origin_time_of_resulting_seismograms():
+    """
+    Makes sure that the origin time is passed to the seismograms.
+    """
+    instaseis_bwd = InstaSeisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
+
+    receiver = Receiver(latitude=42.6390, longitude=74.4940)
+    source = Source(
+        latitude=89.91, longitude=0.0, depth_in_m=12000,
+        m_rr=4.710000e+24 / 1E7,
+        m_tt=3.810000e+22 / 1E7,
+        m_pp=-4.740000e+24 / 1E7,
+        m_rt=3.990000e+23 / 1E7,
+        m_rp=-8.050000e+23 / 1E7,
+        m_tp=-1.230000e+24 / 1E7)
+
+    st = instaseis_bwd.get_seismograms(
+        source=source, receiver=receiver, components=('Z'))
+
+    # Default time is it timestamp 0.
+    assert st[0].stats.starttime == obspy.UTCDateTime(0)
+
+    # Set some custom time.
+    org_time = obspy.UTCDateTime(2014, 1, 1)
+    source = Source(
+        latitude=89.91, longitude=0.0, depth_in_m=12000,
+        m_rr=4.710000e+24 / 1E7,
+        m_tt=3.810000e+22 / 1E7,
+        m_pp=-4.740000e+24 / 1E7,
+        m_rt=3.990000e+23 / 1E7,
+        m_rp=-8.050000e+23 / 1E7,
+        m_tp=-1.230000e+24 / 1E7,
+        origin_time=org_time)
+    st = instaseis_bwd.get_seismograms(
+        source=source, receiver=receiver, components=('Z'))
+
+    # Default time is it timestamp 0.
+    assert st[0].stats.starttime == org_time
