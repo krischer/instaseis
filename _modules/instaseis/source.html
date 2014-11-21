@@ -125,11 +125,13 @@
 <span class="kn">import</span> <span class="nn">functools</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">obspy</span>
+<span class="kn">from</span> <span class="nn">obspy.core.util.geodetics</span> <span class="kn">import</span> <span class="n">FlinnEngdahl</span>
 <span class="kn">from</span> <span class="nn">obspy.signal.filter</span> <span class="kn">import</span> <span class="n">lowpass</span>
 <span class="kn">from</span> <span class="nn">obspy.signal.util</span> <span class="kn">import</span> <span class="n">nextpow2</span>
 <span class="kn">import</span> <span class="nn">obspy.xseed</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">interp</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
 
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">ReceiverParseError</span><span class="p">,</span> <span class="n">SourceParseError</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">rotations</span>
@@ -212,7 +214,8 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="p">,</span> <span class="n">depth_in_m</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">m_rr</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
                  <span class="n">m_tt</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">m_pp</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">m_rt</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">m_rp</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">m_tp</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
-                 <span class="n">time_shift</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">sliprate</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+                 <span class="n">time_shift</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">sliprate</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">origin_time</span><span class="o">=</span><span class="n">obspy</span><span class="o">.</span><span class="n">UTCDateTime</span><span class="p">(</span><span class="mi">0</span><span class="p">)):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param latitude: latitude of the source in degree</span>
 <span class="sd">        :param longitude: longitude of the source in degree</span>
@@ -227,6 +230,9 @@
 <span class="sd">            useful in the context of finite sources</span>
 <span class="sd">        :param sliprate: normalized source time function (sliprate)</span>
 <span class="sd">        :param dt: sampling of the source time function</span>
+<span class="sd">        :param origin_time: The origin time of the source. This will be the</span>
+<span class="sd">            time of the first sample in the final seismogram. Be careful to</span>
+<span class="sd">            adjust it for any time shift or STF (de)convolution effects.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">Source</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="p">,</span> <span class="n">depth_in_m</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">m_rr</span> <span class="o">=</span> <span class="n">m_rr</span>
@@ -235,6 +241,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">m_rt</span> <span class="o">=</span> <span class="n">m_rt</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">m_rp</span> <span class="o">=</span> <span class="n">m_rp</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">m_tp</span> <span class="o">=</span> <span class="n">m_tp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">origin_time</span> <span class="o">=</span> <span class="n">origin_time</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">time_shift</span> <span class="o">=</span> <span class="n">time_shift</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sliprate</span><span class="p">)</span> <span class="k">if</span> <span class="n">sliprate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="k">else</span> <span class="bp">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="n">dt</span>
@@ -288,6 +295,7 @@
                 <span class="n">latitude</span><span class="o">=</span><span class="n">org</span><span class="o">.</span><span class="n">latitude</span><span class="p">,</span>
                 <span class="n">longitude</span><span class="o">=</span><span class="n">org</span><span class="o">.</span><span class="n">longitude</span><span class="p">,</span>
                 <span class="n">depth_in_m</span><span class="o">=</span><span class="n">org</span><span class="o">.</span><span class="n">depth</span><span class="p">,</span>
+                <span class="n">origin_time</span><span class="o">=</span><span class="n">org</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
                 <span class="n">m_rr</span><span class="o">=</span><span class="n">t</span><span class="o">.</span><span class="n">m_rr</span><span class="p">,</span>
                 <span class="n">m_tt</span><span class="o">=</span><span class="n">t</span><span class="o">.</span><span class="n">m_tt</span><span class="p">,</span>
                 <span class="n">m_pp</span><span class="o">=</span><span class="n">t</span><span class="o">.</span><span class="n">m_pp</span><span class="p">,</span>
@@ -305,7 +313,16 @@
 <span class="sd">        :param filename: path to the CMTSOLUTION file</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&quot;rt&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+            <span class="n">origin_time</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">4</span><span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()[:</span><span class="mi">6</span><span class="p">]</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">origin_time</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span> <span class="o">+</span> \
+                <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">origin_time</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])]</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">origin_time</span> <span class="o">=</span> <span class="n">obspy</span><span class="o">.</span><span class="n">UTCDateTime</span><span class="p">(</span><span class="o">*</span><span class="n">values</span><span class="p">)</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&quot;Could not determine origin time from line: </span><span class="si">%s</span><span class="s">&quot;</span>
+                              <span class="o">%</span> <span class="n">line</span><span class="p">)</span>
+                <span class="n">origin_time</span> <span class="o">=</span> <span class="n">obspy</span><span class="o">.</span><span class="n">UTCDateTime</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
             <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
             <span class="n">time_shift</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
             <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
@@ -321,7 +338,7 @@
             <span class="n">m_tp</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="mf">1e7</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="p">(</span><span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="p">,</span> <span class="n">depth_in_m</span><span class="p">,</span> <span class="n">m_rr</span><span class="p">,</span> <span class="n">m_tt</span><span class="p">,</span> <span class="n">m_pp</span><span class="p">,</span> <span class="n">m_rt</span><span class="p">,</span>
-                    <span class="n">m_rp</span><span class="p">,</span> <span class="n">m_tp</span><span class="p">,</span> <span class="n">time_shift</span><span class="p">)</span>
+                    <span class="n">m_rp</span><span class="p">,</span> <span class="n">m_tp</span><span class="p">,</span> <span class="n">time_shift</span><span class="p">,</span> <span class="n">origin_time</span><span class="o">=</span><span class="n">origin_time</span><span class="p">)</span>
 </div>
     <span class="nd">@classmethod</span>
 <div class="viewcode-block" id="Source.from_strike_dip_rake"><a class="viewcode-back" href="../../source.html#instaseis.source.Source.from_strike_dip_rake">[docs]</a>    <span class="k">def</span> <span class="nf">from_strike_dip_rake</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="p">,</span> <span class="n">depth_in_m</span><span class="p">,</span> <span class="n">strike</span><span class="p">,</span>
@@ -388,7 +405,26 @@
 <span class="sd">        :param filename: path to the CMTSOLUTION file</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+            <span class="c"># Reconstruct the first line as well as possible. All</span>
+            <span class="c"># hypocentral information is missing.</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;    </span><span class="si">%4i</span><span class="s"> </span><span class="si">%2i</span><span class="s"> </span><span class="si">%2i</span><span class="s"> </span><span class="si">%2i</span><span class="s"> </span><span class="si">%2i</span><span class="s"> </span><span class="si">%5.2f</span><span class="s"> </span><span class="si">%8.4f</span><span class="s"> </span><span class="si">%9.4f</span><span class="s"> </span><span class="si">%5.1f</span><span class="s"> </span><span class="si">%.1f</span><span class="s"> </span><span class="si">%.1f</span><span class="s">&#39;</span>
+                    <span class="s">&#39; </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">origin_time</span><span class="o">.</span><span class="n">year</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">origin_time</span><span class="o">.</span><span class="n">month</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">origin_time</span><span class="o">.</span><span class="n">day</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">origin_time</span><span class="o">.</span><span class="n">hour</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">origin_time</span><span class="o">.</span><span class="n">minute</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">origin_time</span><span class="o">.</span><span class="n">second</span> <span class="o">+</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">origin_time</span><span class="o">.</span><span class="n">microsecond</span> <span class="o">/</span> <span class="mf">1E6</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">latitude</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">longitude</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">depth_in_m</span> <span class="o">/</span> <span class="mf">1e3</span><span class="p">,</span>
+                        <span class="c"># Just write the moment magnitude twice...we don&#39;t</span>
+                        <span class="c"># have any other.</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">moment_magnitude</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">moment_magnitude</span><span class="p">,</span>
+                        <span class="n">FlinnEngdahl</span><span class="p">()</span><span class="o">.</span><span class="n">get_region</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">longitude</span><span class="p">,</span>
+                                                  <span class="bp">self</span><span class="o">.</span><span class="n">latitude</span><span class="p">)))</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;event name:  nn</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;time shift:     </span><span class="si">%5.2f</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time_shift</span><span class="p">,))</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;half duration:  0.0</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>

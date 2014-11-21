@@ -327,7 +327,7 @@ objects. Likely only needed for the recursive part of this method.</li>
 
 <dl class="class">
 <dt id="instaseis.source.Source">
-<em class="property">class </em><tt class="descclassname">instaseis.source.</tt><tt class="descname">Source</tt><big>(</big><em>latitude</em>, <em>longitude</em>, <em>depth_in_m=None</em>, <em>m_rr=0.0</em>, <em>m_tt=0.0</em>, <em>m_pp=0.0</em>, <em>m_rt=0.0</em>, <em>m_rp=0.0</em>, <em>m_tp=0.0</em>, <em>time_shift=None</em>, <em>sliprate=None</em>, <em>dt=None</em><big>)</big><a class="reference internal" href="_modules/instaseis/source.html#Source"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.Source" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">instaseis.source.</tt><tt class="descname">Source</tt><big>(</big><em>latitude</em>, <em>longitude</em>, <em>depth_in_m=None</em>, <em>m_rr=0.0</em>, <em>m_tt=0.0</em>, <em>m_pp=0.0</em>, <em>m_rt=0.0</em>, <em>m_rp=0.0</em>, <em>m_tp=0.0</em>, <em>time_shift=None</em>, <em>sliprate=None</em>, <em>dt=None</em>, <em>origin_time=UTCDateTime(1970</em>, <em>1</em>, <em>1</em>, <em>0</em>, <em>0)</em><big>)</big><a class="reference internal" href="_modules/instaseis/source.html#Source"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.Source" title="Permalink to this definition">¶</a></dt>
 <dd><p>A class to handle a seimic moment tensor source including a source time
 function.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -348,6 +348,9 @@ function.</p>
 useful in the context of finite sources</li>
 <li><strong>sliprate</strong> &#8211; normalized source time function (sliprate)</li>
 <li><strong>dt</strong> &#8211; sampling of the source time function</li>
+<li><strong>origin_time</strong> &#8211; The origin time of the source. This will be the
+time of the first sample in the final seismogram. Be careful to
+adjust it for any time shift or STF (de)convolution effects.</li>
 </ul>
 </td>
 </tr>
