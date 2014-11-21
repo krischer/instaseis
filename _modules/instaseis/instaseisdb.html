@@ -136,7 +136,7 @@
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">sem_derivatives</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">spectral_basis</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">lanczos</span>
-<span class="kn">from</span> <span class="nn">instaseis.source</span> <span class="kn">import</span> <span class="n">Source</span><span class="p">,</span> <span class="n">ForceSource</span>
+<span class="kn">from</span> <span class="nn">instaseis.source</span> <span class="kn">import</span> <span class="n">Source</span><span class="p">,</span> <span class="n">ForceSource</span><span class="p">,</span> <span class="n">Receiver</span>
 
 
 <span class="n">MeshCollection_bwd</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">namedtuple</span><span class="p">(</span><span class="s">&quot;MeshCollection_bwd&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s">&quot;px&quot;</span><span class="p">,</span> <span class="s">&quot;pz&quot;</span><span class="p">])</span>
@@ -331,6 +331,21 @@
 <span class="sd">            using a lanczos kernel</span>
 <span class="sd">        :param a_lanczos: width of the kernel used in resampling</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># Attempt to parse them if the types are not correct.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">Source</span><span class="p">)</span> <span class="ow">and</span> \
+                <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">ForceSource</span><span class="p">):</span>
+            <span class="n">source</span> <span class="o">=</span> <span class="n">Source</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">receiver</span><span class="p">,</span> <span class="n">Receiver</span><span class="p">):</span>
+            <span class="c"># This only works in the special case of one station, otherwise</span>
+            <span class="c"># it has to be called more then once.</span>
+            <span class="n">rec</span> <span class="o">=</span> <span class="n">Receiver</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">receiver</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rec</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Receiver object/file contains multiple &quot;</span>
+                                 <span class="s">&quot;stations. Please parse outside the &quot;</span>
+                                 <span class="s">&quot;get_seismograms() function and call in a &quot;</span>
+                                 <span class="s">&quot;loop.&quot;</span><span class="p">)</span>
+            <span class="n">receiver</span> <span class="o">=</span> <span class="n">rec</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reciprocal</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">comp</span> <span class="ow">in</span> <span class="n">components</span> <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">,</span> <span class="s">&#39;E&#39;</span><span class="p">,</span> <span class="s">&#39;R&#39;</span><span class="p">,</span> <span class="s">&#39;T&#39;</span><span class="p">])</span> <span class="ow">and</span> \
                     <span class="bp">self</span><span class="o">.</span><span class="n">meshes</span><span class="o">.</span><span class="n">px</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
