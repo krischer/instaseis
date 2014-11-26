@@ -19,7 +19,7 @@ import os
 import pytest
 import shutil
 
-from instaseis import InstaSeisDB
+from instaseis import InstaseisDB
 from instaseis import Source, Receiver, ForceSource
 
 from .testdata import BWD_TEST_DATA, FWD_TEST_DATA
@@ -35,9 +35,9 @@ def test_fwd_vs_bwd():
     """
     Test fwd against bwd mode
     """
-    instaseis_fwd = InstaSeisDB(os.path.join(DATA, "100s_db_fwd"))
+    instaseis_fwd = InstaseisDB(os.path.join(DATA, "100s_db_fwd"))
 
-    instaseis_bwd = InstaSeisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
+    instaseis_bwd = InstaseisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
 
     source_fwd = Source(latitude=4., longitude=3.0, depth_in_m=None,
                         m_rr=4.71e+17, m_tt=3.81e+17, m_pp=-4.74e+17,
@@ -86,9 +86,9 @@ def test_fwd_vs_bwd_axial():
     in non axial case, presumably because the close source, which is not
     exactly a point source in the SEM representation.
     """
-    instaseis_fwd = InstaSeisDB(os.path.join(DATA, "100s_db_fwd_deep"))
+    instaseis_fwd = InstaseisDB(os.path.join(DATA, "100s_db_fwd_deep"))
 
-    instaseis_bwd = InstaSeisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
+    instaseis_bwd = InstaseisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
 
     source_fwd = Source(latitude=0., longitude=0., depth_in_m=None,
                         m_rr=4.71e+17, m_tt=3.81e+17, m_pp=-4.74e+17,
@@ -139,7 +139,7 @@ def test_incremental_bwd():
     """
     incremental tests of bwd mode with displ_only db
     """
-    instaseis_bwd = InstaSeisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
+    instaseis_bwd = InstaseisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
 
     receiver = Receiver(latitude=42.6390, longitude=74.4940)
     source = Source(
@@ -168,7 +168,7 @@ def test_incremental_bwd():
     assert instaseis_bwd.meshes.pz.strain_buffer.efficiency == 0.0
 
     # read on init
-    instaseis_bwd = InstaSeisDB(os.path.join(DATA, "100s_db_bwd_displ_only"),
+    instaseis_bwd = InstaseisDB(os.path.join(DATA, "100s_db_bwd_displ_only"),
                                 read_on_demand=False)
 
     st_bwd = instaseis_bwd.get_seismograms(
@@ -234,7 +234,7 @@ def test_vertical_only_db(tmpdir):
         m_tp=-1.230000e+24 / 1E7)
 
     # vertical only DB
-    instaseis_bwd = InstaSeisDB(tmpdir)
+    instaseis_bwd = InstaseisDB(tmpdir)
 
     st_bwd = instaseis_bwd.get_seismograms(
         source=source, receiver=receiver, components=('Z'))
@@ -267,7 +267,7 @@ def test_horizontal_only_db(tmpdir):
         m_tp=-1.230000e+24 / 1E7)
 
     # vertical only DB
-    instaseis_bwd = InstaSeisDB(tmpdir)
+    instaseis_bwd = InstaseisDB(tmpdir)
 
     st_bwd = instaseis_bwd.get_seismograms(
         source=source, receiver=receiver, components=('N'))
@@ -297,7 +297,7 @@ def test_requesting_wrong_component_horizontal(tmpdir):
         m_tp=-1.230000e+24 / 1E7)
 
     # vertical only DB
-    instaseis_bwd = InstaSeisDB(tmpdir)
+    instaseis_bwd = InstaseisDB(tmpdir)
 
     with pytest.raises(ValueError):
         instaseis_bwd.get_seismograms(
@@ -325,7 +325,7 @@ def test_requesting_wrong_component_vertical(tmpdir):
         m_tp=-1.230000e+24 / 1E7)
 
     # vertical only DB
-    instaseis_bwd = InstaSeisDB(tmpdir)
+    instaseis_bwd = InstaseisDB(tmpdir)
 
     with pytest.raises(ValueError):
         instaseis_bwd.get_seismograms(
@@ -345,7 +345,7 @@ def test_incremental_fwd():
     """
     incremental tests of fwd mode
     """
-    instaseis_fwd = InstaSeisDB(os.path.join(DATA, "100s_db_fwd"))
+    instaseis_fwd = InstaseisDB(os.path.join(DATA, "100s_db_fwd"))
 
     receiver = Receiver(latitude=42.6390, longitude=74.4940)
     source = Source(
@@ -398,7 +398,7 @@ def test_incremental_bwd_strain_only():
     """
     incremental tests of bwd mode with strain_only DB
     """
-    instaseis_bwd = InstaSeisDB(os.path.join(DATA, "100s_db_bwd_strain_only"))
+    instaseis_bwd = InstaseisDB(os.path.join(DATA, "100s_db_bwd_strain_only"))
 
     receiver = Receiver(latitude=42.6390, longitude=74.4940)
     source = Source(
@@ -434,7 +434,7 @@ def test_incremental_bwd_force_source():
     """
     incremental tests of bwd mode with source force
     """
-    instaseis_bwd = InstaSeisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
+    instaseis_bwd = InstaseisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
 
     receiver = Receiver(latitude=42.6390, longitude=74.4940)
     source = ForceSource(
@@ -463,7 +463,7 @@ def test_finite_source():
     incremental tests of bwd mode with source force
     """
     from obspy.signal.filter import lowpass
-    instaseis_bwd = InstaSeisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
+    instaseis_bwd = InstaseisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
 
     receiver = Receiver(latitude=42.6390, longitude=74.4940)
 
@@ -527,14 +527,14 @@ def test_get_band_code_method():
         33.0: "L"
     }
     for sr, letter in codes.items():
-        assert InstaSeisDB._get_band_code(1.0 / sr) == letter
+        assert InstaseisDB._get_band_code(1.0 / sr) == letter
 
 
 def test_origin_time_of_resulting_seismograms():
     """
     Makes sure that the origin time is passed to the seismograms.
     """
-    instaseis_bwd = InstaSeisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
+    instaseis_bwd = InstaseisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
 
     receiver = Receiver(latitude=42.6390, longitude=74.4940)
     source = Source(
@@ -604,7 +604,7 @@ def test_higher_level_event_and_receiver_parsing():
     inv[0][0].channels = []
 
     # receiver = Receiver(latitude=42.6390, longitude=74.4940)
-    instaseis_bwd = InstaSeisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
+    instaseis_bwd = InstaseisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
 
     st = instaseis_bwd.get_seismograms(source=event, receiver=inv,
                                        components=('Z'))

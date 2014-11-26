@@ -25,7 +25,7 @@ import sys
 import time
 import timeit
 
-from instaseis import InstaSeisDB, Source, Receiver
+from instaseis import InstaseisDB, Source, Receiver
 
 # Write interval.
 WRITE_INTERVAL = 0.05
@@ -48,7 +48,7 @@ def plot_gnuplot(times):
         print("Could not plot graph. No gnuplot installed?")
 
 
-class InstaSeisBenchmark(object):
+class InstaseisBenchmark(object):
     __metaclass__ = ABCMeta
 
     def __init__(self, path, time_per_benchmark, save_output=False,
@@ -147,9 +147,9 @@ class InstaSeisBenchmark(object):
                            obspy.UTCDateTime()))
 
 
-class BufferedFixedSrcRecRoDOffSeismogramGeneration(InstaSeisBenchmark):
+class BufferedFixedSrcRecRoDOffSeismogramGeneration(InstaseisBenchmark):
     def setup(self):
-        self.db = InstaSeisDB(self.path, read_on_demand=False,
+        self.db = InstaseisDB(self.path, read_on_demand=False,
                               buffer_size_in_mb=250)
 
     def iterate(self):
@@ -163,9 +163,9 @@ class BufferedFixedSrcRecRoDOffSeismogramGeneration(InstaSeisBenchmark):
                "read_on_demand=False"
 
 
-class BufferedFixedSrcRecRoDOffSeismogramGenerationNoObsPy(InstaSeisBenchmark):
+class BufferedFixedSrcRecRoDOffSeismogramGenerationNoObsPy(InstaseisBenchmark):
     def setup(self):
-        self.db = InstaSeisDB(self.path, read_on_demand=False,
+        self.db = InstaseisDB(self.path, read_on_demand=False,
                               buffer_size_in_mb=250)
 
     def iterate(self):
@@ -181,9 +181,9 @@ class BufferedFixedSrcRecRoDOffSeismogramGenerationNoObsPy(InstaSeisBenchmark):
 
 
 class UnbufferedFixedSrcRecRoDOffSeismogramGenerationNoObsPy(
-        InstaSeisBenchmark):
+        InstaseisBenchmark):
     def setup(self):
-        self.db = InstaSeisDB(self.path, read_on_demand=False,
+        self.db = InstaseisDB(self.path, read_on_demand=False,
                               buffer_size_in_mb=0)
 
     def iterate(self):
@@ -197,9 +197,9 @@ class UnbufferedFixedSrcRecRoDOffSeismogramGenerationNoObsPy(
                "read_on_demand=False"
 
 
-class BufferedFixedSrcRecRoDOnSeismogramGeneration(InstaSeisBenchmark):
+class BufferedFixedSrcRecRoDOnSeismogramGeneration(InstaseisBenchmark):
     def setup(self):
-        self.db = InstaSeisDB(self.path, read_on_demand=True,
+        self.db = InstaseisDB(self.path, read_on_demand=True,
                               buffer_size_in_mb=250)
 
     def iterate(self):
@@ -213,9 +213,9 @@ class BufferedFixedSrcRecRoDOnSeismogramGeneration(InstaSeisBenchmark):
                "read_on_demand=True"
 
 
-class Buffered2DegreeLatLngDepthScatter(InstaSeisBenchmark):
+class Buffered2DegreeLatLngDepthScatter(InstaseisBenchmark):
     def setup(self):
-        self.db = InstaSeisDB(self.path, read_on_demand=False,
+        self.db = InstaseisDB(self.path, read_on_demand=False,
                               buffer_size_in_mb=250)
 
     def iterate(self):
@@ -233,9 +233,9 @@ class Buffered2DegreeLatLngDepthScatter(InstaSeisBenchmark):
         return "Buffered, 2 Degree/200 km source position scatter"
 
 
-class BufferedHalfDegreeLatLngDepthScatter(InstaSeisBenchmark):
+class BufferedHalfDegreeLatLngDepthScatter(InstaseisBenchmark):
     def setup(self):
-        self.db = InstaSeisDB(self.path, read_on_demand=False,
+        self.db = InstaseisDB(self.path, read_on_demand=False,
                               buffer_size_in_mb=250)
 
     def iterate(self):
@@ -253,9 +253,9 @@ class BufferedHalfDegreeLatLngDepthScatter(InstaSeisBenchmark):
         return "Buffered, 0.5 Degree/50 km (depth) source position scatter"
 
 
-class BufferedFullyRandom(InstaSeisBenchmark):
+class BufferedFullyRandom(InstaseisBenchmark):
     def setup(self):
-        self.db = InstaSeisDB(self.path, read_on_demand=False,
+        self.db = InstaseisDB(self.path, read_on_demand=False,
                               buffer_size_in_mb=250)
 
     def iterate(self):
@@ -276,9 +276,9 @@ class BufferedFullyRandom(InstaSeisBenchmark):
         return "Buffered, random src and receiver"
 
 
-class UnbufferedFullyRandom(InstaSeisBenchmark):
+class UnbufferedFullyRandom(InstaseisBenchmark):
     def setup(self):
-        self.db = InstaSeisDB(self.path, read_on_demand=False,
+        self.db = InstaseisDB(self.path, read_on_demand=False,
                               buffer_size_in_mb=0)
 
     def iterate(self):
@@ -299,9 +299,9 @@ class UnbufferedFullyRandom(InstaSeisBenchmark):
         return "Unbuffered, random src and receiver"
 
 
-class UnbufferedAndRandomReadOnDemandTrue(InstaSeisBenchmark):
+class UnbufferedAndRandomReadOnDemandTrue(InstaseisBenchmark):
     def setup(self):
-        self.db = InstaSeisDB(self.path, read_on_demand=True,
+        self.db = InstaseisDB(self.path, read_on_demand=True,
                               buffer_size_in_mb=0)
 
     def iterate(self):
@@ -323,9 +323,9 @@ class UnbufferedAndRandomReadOnDemandTrue(InstaSeisBenchmark):
                "worst case!"
 
 
-class FiniteSourceEmulation(InstaSeisBenchmark):
+class FiniteSourceEmulation(InstaseisBenchmark):
     def setup(self):
-        self.db = InstaSeisDB(self.path, read_on_demand=False,
+        self.db = InstaseisDB(self.path, read_on_demand=False,
                               buffer_size_in_mb=250)
         self.counter = 0
         self.current_depth_counter = 0
@@ -358,7 +358,7 @@ class FiniteSourceEmulation(InstaSeisBenchmark):
 
 parser = argparse.ArgumentParser(
     prog="python -m instaseis.benchmark",
-    description='Benchmark InstaSeis.')
+    description='Benchmark Instaseis.')
 parser.add_argument('folder', type=str,
                     help="path to AxiSEM Green's function database")
 parser.add_argument('--time', type=float, default=10.0,
@@ -376,13 +376,13 @@ parser.add_argument('--save', action="store_true",
 args = parser.parse_args()
 path = os.path.abspath(args.folder)
 
-print(colorama.Fore.GREEN + 79 * "=" + "\nInstaSeis Benchmark Suite\n")
-print("It enables to gauge the speed of InstaSeis for a certain DB.")
+print(colorama.Fore.GREEN + 79 * "=" + "\nInstaseis Benchmark Suite\n")
+print("It enables to gauge the speed of Instaseis for a certain DB.")
 print(79 * "=" + colorama.Fore.RESET)
 print(colorama.Fore.RED + "\nIt does not deal with OS level caches! So "
       "interpret the results accordingly!\n" + colorama.Fore.RESET)
 
-db = InstaSeisDB(path, read_on_demand=True, buffer_size_in_mb=0)
+db = InstaseisDB(path, read_on_demand=True, buffer_size_in_mb=0)
 if not db.reciprocal:
     print("Benchmark currently only works with a reciprocal database.")
     sys.exit(1)
@@ -402,7 +402,7 @@ def get_subclasses(cls):
     return subclasses
 
 benchmarks = [i(path, args.time, args.save, args.seed, args.count) for i in
-              get_subclasses(InstaSeisBenchmark)]
+              get_subclasses(InstaseisBenchmark)]
 benchmarks.sort(key=lambda x: x.description)
 
 print(79 * "=")
