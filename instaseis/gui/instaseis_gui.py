@@ -668,7 +668,7 @@ class Window(QtGui.QMainWindow):
         self.receivers = Receiver.parse(self.stations_file)
         recnames = []
         for _r in self.receivers:
-            recnames.append(_r.station)
+            recnames.append('%s.%s' % (_r.network, _r.station))
 
         self.ui.stations_combo.clear()
         self.ui.stations_combo.addItems(recnames)
