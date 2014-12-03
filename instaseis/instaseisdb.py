@@ -806,7 +806,8 @@ class InstaSeisDB(object):
         # Get the size of all netCDF files.
         filesize = 0
         for m in self.meshes:
-            filesize += os.path.getsize(m.filename)
+            if m:
+                filesize += os.path.getsize(m.filename)
         filesize = sizeof_fmt(filesize)
 
         if self.reciprocal:
