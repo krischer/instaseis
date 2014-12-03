@@ -17,11 +17,13 @@ import collections
 import functools
 import numpy as np
 import obspy
+from obspy.core.util.geodetics import FlinnEngdahl
 from obspy.signal.filter import lowpass
 from obspy.signal.util import nextpow2
 import obspy.xseed
 import os
 from scipy import interp
+import warnings
 
 from . import ReceiverParseError, SourceParseError
 from . import rotations
@@ -104,7 +106,8 @@ class Source(SourceOrReceiver):
     """
     def __init__(self, latitude, longitude, depth_in_m=None, m_rr=0.0,
                  m_tt=0.0, m_pp=0.0, m_rt=0.0, m_rp=0.0, m_tp=0.0,
-                 time_shift=None, sliprate=None, dt=None):
+                 time_shift=None, sliprate=None, dt=None,
+                 origin_time=obspy.UTCDateTime(0)):
         """
         :param latitude: latitude of the source in degree
         :param longitude: longitude of the source in degree
@@ -119,6 +122,9 @@ class Source(SourceOrReceiver):
             useful in the context of finite sources
         :param sliprate: normalized source time function (sliprate)
         :param dt: sampling of the source time function
+        :param origin_time: The origin time of the source. This will be the
+            time of the first sample in the final seismogram. Be careful to
+            adjust it for any time shift or STF (de)convolution effects.
         """
         super(Source, self).__init__(latitude, longitude, depth_in_m)
         self.m_rr = m_rr
@@ -127,6 +133,7 @@ class Source(SourceOrReceiver):
         self.m_rt = m_rt
         self.m_rp = m_rp
         self.m_tp = m_tp
+        self.origin_time = origin_time
         self.time_shift = time_shift
         self.sliprate = np.array(sliprate) if sliprate is not None else None
         self.dt = dt
@@ -180,6 +187,7 @@ class Source(SourceOrReceiver):
                 latitude=org.latitude,
                 longitude=org.longitude,
                 depth_in_m=org.depth,
+                origin_time=org.time,
                 m_rr=t.m_rr,
                 m_tt=t.m_tt,
                 m_pp=t.m_pp,
@@ -197,7 +205,16 @@ class Source(SourceOrReceiver):
         :param filename: path to the CMTSOLUTION file
         """
         with open(filename, "rt") as f:
-            f.readline()
+            line = f.readline()
+            origin_time = line[4:].strip().split()[:6]
+            values = list(map(int, origin_time[:-1])) + \
+                [float(origin_time[-1])]
+            try:
+                origin_time = obspy.UTCDateTime(*values)
+            except (TypeError, ValueError):
+                warnings.warn("Could not determine origin time from line: %s"
+                              % line)
+                origin_time = obspy.UTCDateTime(0)
             f.readline()
             time_shift = float(f.readline().strip().split()[-1])
             f.readline()
@@ -213,7 +230,7 @@ class Source(SourceOrReceiver):
             m_tp = float(f.readline().strip().split()[-1]) / 1e7
 
         return self(latitude, longitude, depth_in_m, m_rr, m_tt, m_pp, m_rt,
-                    m_rp, m_tp, time_shift)
+                    m_rp, m_tp, time_shift, origin_time=origin_time)
 
     @classmethod
     def from_strike_dip_rake(self, latitude, longitude, depth_in_m, strike,
@@ -280,7 +297,26 @@ class Source(SourceOrReceiver):
         :param filename: path to the CMTSOLUTION file
         """
         with open(filename, "w") as f:
-            f.write('\n')
+            # Reconstruct the first line as well as possible. All
+            # hypocentral information is missing.
+            f.write('    %4i %2i %2i %2i %2i %5.2f %8.4f %9.4f %5.1f %.1f %.1f'
+                    ' %s\n' % (
+                        self.origin_time.year,
+                        self.origin_time.month,
+                        self.origin_time.day,
+                        self.origin_time.hour,
+                        self.origin_time.minute,
+                        self.origin_time.second +
+                        self.origin_time.microsecond / 1E6,
+                        self.latitude,
+                        self.longitude,
+                        self.depth_in_m / 1e3,
+                        # Just write the moment magnitude twice...we don't
+                        # have any other.
+                        self.moment_magnitude,
+                        self.moment_magnitude,
+                        FlinnEngdahl().get_region(self.longitude,
+                                                  self.latitude)))
             f.write('event name:  nn\n')
             f.write('time shift:     %5.2f\n' % (self.time_shift,))
             f.write('half duration:  0.0\n')

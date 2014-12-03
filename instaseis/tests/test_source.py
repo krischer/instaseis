@@ -44,6 +44,8 @@ def test_parse_CMTSOLUTIONS_file(tmpdir):
     with open(filename, "wt") as fh:
         fh.write("\n".join(lines))
 
+    origin_time = obspy.UTCDateTime(2011, 8, 23, 17, 51, 4.6)
+
     src = Source.parse(filename)
     src_params = np.array([src.latitude, src.longitude, src.depth_in_m,
                            src.m_rr, src.m_tt, src.m_pp, src.m_rt, src.m_rp,
@@ -51,6 +53,7 @@ def test_parse_CMTSOLUTIONS_file(tmpdir):
     np.testing.assert_allclose(src_params, np.array(
         (37.91, -77.93, 12000, 4.71E17, 3.81E15, -4.74E17, 3.99E16, -8.05E16,
          -1.23E17), dtype="float64"))
+    assert src.origin_time == origin_time
 
     filename = os.path.join(str(tmpdir), "CMTSOLUTIONS2")
     src.write_CMTSOLUTION_file(filename)
@@ -62,6 +65,7 @@ def test_parse_CMTSOLUTIONS_file(tmpdir):
     np.testing.assert_allclose(src_params, np.array(
         (37.91, -77.93, 12000, 4.71E17, 3.81E15, -4.74E17, 3.99E16, -8.05E16,
          -1.23E17), dtype="float64"))
+    assert src.origin_time == origin_time
 
 
 def _assert_src(src):
@@ -72,6 +76,9 @@ def _assert_src(src):
             src.m_pp, src.m_rt, src.m_rp, src.m_tp) == \
            (36.97, -3.54, 609800.0, -2.16E18, 5.36E17, 1.62E18, 1.3E16,
             3.23E18, 1.75E18)
+
+    # Also check the time!
+    assert src.origin_time == obspy.UTCDateTime("2010-04-11T22:08:12.800000Z")
 
 
 def test_parse_QuakeML():

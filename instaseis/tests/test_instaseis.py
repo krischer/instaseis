@@ -14,11 +14,12 @@ from __future__ import absolute_import
 
 import inspect
 import numpy as np
+import obspy
 import os
 import pytest
 import shutil
 
-from instaseis import InstaSeisDB
+from instaseis import InstaseisDB
 from instaseis import Source, Receiver, ForceSource
 
 from .testdata import BWD_TEST_DATA, FWD_TEST_DATA
@@ -34,9 +35,9 @@ def test_fwd_vs_bwd():
     """
     Test fwd against bwd mode
     """
-    instaseis_fwd = InstaSeisDB(os.path.join(DATA, "100s_db_fwd"))
+    instaseis_fwd = InstaseisDB(os.path.join(DATA, "100s_db_fwd"))
 
-    instaseis_bwd = InstaSeisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
+    instaseis_bwd = InstaseisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
 
     source_fwd = Source(latitude=4., longitude=3.0, depth_in_m=None,
                         m_rr=4.71e+17, m_tt=3.81e+17, m_pp=-4.74e+17,
@@ -85,9 +86,9 @@ def test_fwd_vs_bwd_axial():
     in non axial case, presumably because the close source, which is not
     exactly a point source in the SEM representation.
     """
-    instaseis_fwd = InstaSeisDB(os.path.join(DATA, "100s_db_fwd_deep"))
+    instaseis_fwd = InstaseisDB(os.path.join(DATA, "100s_db_fwd_deep"))
 
-    instaseis_bwd = InstaSeisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
+    instaseis_bwd = InstaseisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
 
     source_fwd = Source(latitude=0., longitude=0., depth_in_m=None,
                         m_rr=4.71e+17, m_tt=3.81e+17, m_pp=-4.74e+17,
@@ -138,7 +139,7 @@ def test_incremental_bwd():
     """
     incremental tests of bwd mode with displ_only db
     """
-    instaseis_bwd = InstaSeisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
+    instaseis_bwd = InstaseisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
 
     receiver = Receiver(latitude=42.6390, longitude=74.4940)
     source = Source(
@@ -167,7 +168,7 @@ def test_incremental_bwd():
     assert instaseis_bwd.meshes.pz.strain_buffer.efficiency == 0.0
 
     # read on init
-    instaseis_bwd = InstaSeisDB(os.path.join(DATA, "100s_db_bwd_displ_only"),
+    instaseis_bwd = InstaseisDB(os.path.join(DATA, "100s_db_bwd_displ_only"),
                                 read_on_demand=False)
 
     st_bwd = instaseis_bwd.get_seismograms(
@@ -233,7 +234,7 @@ def test_vertical_only_db(tmpdir):
         m_tp=-1.230000e+24 / 1E7)
 
     # vertical only DB
-    instaseis_bwd = InstaSeisDB(tmpdir)
+    instaseis_bwd = InstaseisDB(tmpdir)
 
     st_bwd = instaseis_bwd.get_seismograms(
         source=source, receiver=receiver, components=('Z'))
@@ -266,7 +267,7 @@ def test_horizontal_only_db(tmpdir):
         m_tp=-1.230000e+24 / 1E7)
 
     # vertical only DB
-    instaseis_bwd = InstaSeisDB(tmpdir)
+    instaseis_bwd = InstaseisDB(tmpdir)
 
     st_bwd = instaseis_bwd.get_seismograms(
         source=source, receiver=receiver, components=('N'))
@@ -296,7 +297,7 @@ def test_requesting_wrong_component_horizontal(tmpdir):
         m_tp=-1.230000e+24 / 1E7)
 
     # vertical only DB
-    instaseis_bwd = InstaSeisDB(tmpdir)
+    instaseis_bwd = InstaseisDB(tmpdir)
 
     with pytest.raises(ValueError):
         instaseis_bwd.get_seismograms(
@@ -324,7 +325,7 @@ def test_requesting_wrong_component_vertical(tmpdir):
         m_tp=-1.230000e+24 / 1E7)
 
     # vertical only DB
-    instaseis_bwd = InstaSeisDB(tmpdir)
+    instaseis_bwd = InstaseisDB(tmpdir)
 
     with pytest.raises(ValueError):
         instaseis_bwd.get_seismograms(
@@ -344,7 +345,7 @@ def test_incremental_fwd():
     """
     incremental tests of fwd mode
     """
-    instaseis_fwd = InstaSeisDB(os.path.join(DATA, "100s_db_fwd"))
+    instaseis_fwd = InstaseisDB(os.path.join(DATA, "100s_db_fwd"))
 
     receiver = Receiver(latitude=42.6390, longitude=74.4940)
     source = Source(
@@ -397,7 +398,7 @@ def test_incremental_bwd_strain_only():
     """
     incremental tests of bwd mode with strain_only DB
     """
-    instaseis_bwd = InstaSeisDB(os.path.join(DATA, "100s_db_bwd_strain_only"))
+    instaseis_bwd = InstaseisDB(os.path.join(DATA, "100s_db_bwd_strain_only"))
 
     receiver = Receiver(latitude=42.6390, longitude=74.4940)
     source = Source(
@@ -433,7 +434,7 @@ def test_incremental_bwd_force_source():
     """
     incremental tests of bwd mode with source force
     """
-    instaseis_bwd = InstaSeisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
+    instaseis_bwd = InstaseisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
 
     receiver = Receiver(latitude=42.6390, longitude=74.4940)
     source = ForceSource(
@@ -462,7 +463,7 @@ def test_finite_source():
     incremental tests of bwd mode with source force
     """
     from obspy.signal.filter import lowpass
-    instaseis_bwd = InstaSeisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
+    instaseis_bwd = InstaseisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
 
     receiver = Receiver(latitude=42.6390, longitude=74.4940)
 
@@ -526,4 +527,91 @@ def test_get_band_code_method():
         33.0: "L"
     }
     for sr, letter in codes.items():
-        assert InstaSeisDB._get_band_code(1.0 / sr) == letter
+        assert InstaseisDB._get_band_code(1.0 / sr) == letter
+
+
+def test_origin_time_of_resulting_seismograms():
+    """
+    Makes sure that the origin time is passed to the seismograms.
+    """
+    instaseis_bwd = InstaseisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
+
+    receiver = Receiver(latitude=42.6390, longitude=74.4940)
+    source = Source(
+        latitude=89.91, longitude=0.0, depth_in_m=12000,
+        m_rr=4.710000e+24 / 1E7,
+        m_tt=3.810000e+22 / 1E7,
+        m_pp=-4.740000e+24 / 1E7,
+        m_rt=3.990000e+23 / 1E7,
+        m_rp=-8.050000e+23 / 1E7,
+        m_tp=-1.230000e+24 / 1E7)
+
+    st = instaseis_bwd.get_seismograms(
+        source=source, receiver=receiver, components=('Z'))
+
+    # Default time is it timestamp 0.
+    assert st[0].stats.starttime == obspy.UTCDateTime(0)
+
+    # Set some custom time.
+    org_time = obspy.UTCDateTime(2014, 1, 1)
+    source = Source(
+        latitude=89.91, longitude=0.0, depth_in_m=12000,
+        m_rr=4.710000e+24 / 1E7,
+        m_tt=3.810000e+22 / 1E7,
+        m_pp=-4.740000e+24 / 1E7,
+        m_rt=3.990000e+23 / 1E7,
+        m_rp=-8.050000e+23 / 1E7,
+        m_tp=-1.230000e+24 / 1E7,
+        origin_time=org_time)
+    st = instaseis_bwd.get_seismograms(
+        source=source, receiver=receiver, components=('Z'))
+
+    # Default time is it timestamp 0.
+    assert st[0].stats.starttime == org_time
+
+
+def test_higher_level_event_and_receiver_parsing():
+    """
+    Tests that events and receivers can be parsed from different supported
+    formats.
+    """
+    # Create an event and modify it to match the settings of the test data.
+    event = obspy.readEvents(os.path.join(
+        DATA, "GCMT_event_STRAIT_OF_GIBRALTAR.xml"))[0]
+    event.origins = event.origins[:1]
+    event.magnitudes = event.magnitudes[:1]
+    event.focal_mechanisms = event.focal_mechanisms[:1]
+
+    org = event.origins[0]
+    mt = event.focal_mechanisms[0].moment_tensor.tensor
+
+    org.latitude = 89.91
+    org.longitude = 0.0
+    org.depth = 12000
+    org.time = obspy.UTCDateTime(2014, 1, 5)
+    mt.m_rr = 4.710000e+24 / 1E7
+    mt.m_tt = 3.810000e+22 / 1E7
+    mt.m_pp = -4.740000e+24 / 1E7
+    mt.m_rt = 3.990000e+23 / 1E7
+    mt.m_rp = -8.050000e+23 / 1E7
+    mt.m_tp = -1.230000e+24 / 1E7
+
+    # Same with the receiver objects.
+    inv = obspy.read_inventory(os.path.join(DATA, "TA.Q56A..BH.xml"))
+    inv[0][0].latitude = 42.6390
+    inv[0][0].longitude = 74.4940
+    inv[0][0].elevation = 0.0
+    inv[0][0].channels = []
+
+    # receiver = Receiver(latitude=42.6390, longitude=74.4940)
+    instaseis_bwd = InstaseisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
+
+    st = instaseis_bwd.get_seismograms(source=event, receiver=inv,
+                                       components=('Z'))
+    np.testing.assert_allclose(st.select(component='Z')[0].data,
+                               BWD_TEST_DATA["Z"], rtol=1E-7, atol=1E-12)
+
+    # Make sure the attributes are correct.
+    assert st[0].stats.starttime == org.time
+    assert st[0].stats.network == "TA"
+    assert st[0].stats.station == "Q56A"
