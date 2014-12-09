@@ -19,6 +19,7 @@ import numpy as np
 from obspy.core import Stream, Trace, UTCDateTime
 from obspy.signal.util import nextpow2
 import os
+from scipy.integrate import cumtrapz
 import warnings
 
 from . import InstaseisError, InstaseisNotFoundError
@@ -198,8 +199,9 @@ class InstaseisDB(object):
         self.reciprocal = False
 
     def get_seismograms(self, source, receiver, components=("Z", "N", "E"),
-                        remove_source_shift=True, reconvolve_stf=False,
-                        return_obspy_stream=True, dt=None, a_lanczos=5):
+                        kind='displacement', remove_source_shift=True,
+                        reconvolve_stf=False, return_obspy_stream=True,
+                        dt=None, a_lanczos=5):
         """
         Extract seismograms for a moment tensor point source from the AxiSEM
         database.
@@ -211,6 +213,7 @@ class InstaseisDB(object):
         :type receiver: :class:`instaseis.source.Receiver`
         :param components: a tuple containing any combination of the
             strings ``"Z"``, ``"N"``, ``"E"``, ``"R"``, and ``"T"``
+        :param kind: 'displacement', 'velocity' or 'acceleration'
         :param remove_source_shift: move the starttime to the peak of the
             sliprate from the source time function used to generate the
             database
@@ -237,6 +240,9 @@ class InstaseisDB(object):
                                  "get_seismograms() function and call in a "
                                  "loop.")
             receiver = rec[0]
+
+        if kind not in ['displacement', 'velocity', 'acceleration']:
+            raise ValueError('unknown kind %s' % (kind,))
 
         if self.reciprocal:
             if any(comp in components for comp in ['N', 'E', 'R', 'T']) and \
@@ -548,6 +554,26 @@ class InstaseisDB(object):
                 if "Z" in components:
                     data["Z"] = final[:, 2]
 
+        if dt is None:
+            dt_out = self.parsed_mesh.dt
+        else:
+            dt_out = dt
+
+        kind_map = {
+            'displacement': 0,
+            'velocity': 1,
+            'acceleration': 2}
+
+        stf_map = {
+            'errorf': 0,
+            'quheavi': 0,
+            'dirac_0': 1,
+            'gauss_0': 1,
+            'gauss_1': 2,
+            'gauss_2': 3}
+
+        n_derivative = kind_map[kind] - stf_map[self.parsed_mesh.stf]
+
         for comp in components:
             if remove_source_shift and not reconvolve_stf:
                 data[comp] = data[comp][self.parsed_mesh.source_shift_samp:]
@@ -578,7 +604,16 @@ class InstaseisDB(object):
 
             if dt is not None:
                 data[comp] = lanczos.lanczos_resamp(
-                    data[comp], self.parsed_mesh.dt, dt, a_lanczos)
+                    data[comp], self.parsed_mesh.dt, dt_out, a_lanczos)
+
+            # taking derivative or integral to get the desired kind of
+            # seismogram
+            for _n in np.arange(n_derivative):
+                data[comp] = np.gradient(data[comp], [dt_out])
+
+            for _n in np.arange(-n_derivative):
+                # adding a zero at the beginning to avoid phase shift
+                data[comp] = np.c_[0., cumtrapz(data[comp], dx=dt_out)]
 
         if return_obspy_stream:
             if hasattr(source, "origin_time"):
@@ -587,12 +622,10 @@ class InstaseisDB(object):
                 origin_time = UTCDateTime(0)
             # Convert to an ObsPy Stream object.
             st = Stream()
-            if dt is None:
-                dt = self.parsed_mesh.dt
-            band_code = self._get_band_code(dt)
+            band_code = self._get_band_code(dt_out)
             for comp in components:
                 tr = Trace(data=data[comp],
-                           header={"delta": dt,
+                           header={"delta": dt_out,
                                    "starttime": origin_time,
                                    "station": receiver.station,
                                    "network": receiver.network,
@@ -610,7 +643,8 @@ class InstaseisDB(object):
             return data, mu
 
     def get_seismograms_finite_source(self, sources, receiver,
-                                      components=("Z", "N", "E"), dt=None,
+                                      components=("Z", "N", "E"),
+                                      kind='displacement', dt=None,
                                       a_lanczos=5, correct_mu=False,
                                       progress_callback=None):
         """
@@ -624,6 +658,7 @@ class InstaseisDB(object):
         :type receiver: :class:`instaseis.source.Receiver`
         :param components: a tuple containing any combination of the strings
             ``"Z"``, ``"N"``, and ``"E"``
+        :param kind: 'displacement', 'velocity' or 'acceleration'
         :param dt: desired sampling of the seismograms.resampling is done
             using a lanczos kernel
         :param a_lanczos: width of the kernel used in resampling
