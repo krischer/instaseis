@@ -127,6 +127,7 @@
 <span class="kn">from</span> <span class="nn">obspy.core</span> <span class="kn">import</span> <span class="n">Stream</span><span class="p">,</span> <span class="n">Trace</span><span class="p">,</span> <span class="n">UTCDateTime</span>
 <span class="kn">from</span> <span class="nn">obspy.signal.util</span> <span class="kn">import</span> <span class="n">nextpow2</span>
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">scipy.integrate</span> <span class="kn">import</span> <span class="n">cumtrapz</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">InstaseisError</span><span class="p">,</span> <span class="n">InstaseisNotFoundError</span>
@@ -306,8 +307,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">reciprocal</span> <span class="o">=</span> <span class="bp">False</span>
 
 <div class="viewcode-block" id="InstaseisDB.get_seismograms"><a class="viewcode-back" href="../../instaseis.html#instaseis.instaseisdb.InstaseisDB.get_seismograms">[docs]</a>    <span class="k">def</span> <span class="nf">get_seismograms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">receiver</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="p">(</span><span class="s">&quot;Z&quot;</span><span class="p">,</span> <span class="s">&quot;N&quot;</span><span class="p">,</span> <span class="s">&quot;E&quot;</span><span class="p">),</span>
-                        <span class="n">remove_source_shift</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">reconvolve_stf</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
-                        <span class="n">return_obspy_stream</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">a_lanczos</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+                        <span class="n">kind</span><span class="o">=</span><span class="s">&#39;displacement&#39;</span><span class="p">,</span> <span class="n">remove_source_shift</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                        <span class="n">reconvolve_stf</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">return_obspy_stream</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                        <span class="n">dt</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">a_lanczos</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Extract seismograms for a moment tensor point source from the AxiSEM</span>
 <span class="sd">        database.</span>
@@ -319,6 +321,7 @@
 <span class="sd">        :type receiver: :class:`instaseis.source.Receiver`</span>
 <span class="sd">        :param components: a tuple containing any combination of the</span>
 <span class="sd">            strings ``&quot;Z&quot;``, ``&quot;N&quot;``, ``&quot;E&quot;``, ``&quot;R&quot;``, and ``&quot;T&quot;``</span>
+<span class="sd">        :param kind: &#39;displacement&#39;, &#39;velocity&#39; or &#39;acceleration&#39;</span>
 <span class="sd">        :param remove_source_shift: move the starttime to the peak of the</span>
 <span class="sd">            sliprate from the source time function used to generate the</span>
 <span class="sd">            database</span>
@@ -345,6 +348,9 @@
                                  <span class="s">&quot;get_seismograms() function and call in a &quot;</span>
                                  <span class="s">&quot;loop.&quot;</span><span class="p">)</span>
             <span class="n">receiver</span> <span class="o">=</span> <span class="n">rec</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">kind</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;displacement&#39;</span><span class="p">,</span> <span class="s">&#39;velocity&#39;</span><span class="p">,</span> <span class="s">&#39;acceleration&#39;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;unknown kind </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">kind</span><span class="p">,))</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reciprocal</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">comp</span> <span class="ow">in</span> <span class="n">components</span> <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">,</span> <span class="s">&#39;E&#39;</span><span class="p">,</span> <span class="s">&#39;R&#39;</span><span class="p">,</span> <span class="s">&#39;T&#39;</span><span class="p">])</span> <span class="ow">and</span> \
@@ -656,6 +662,26 @@
                 <span class="k">if</span> <span class="s">&quot;Z&quot;</span> <span class="ow">in</span> <span class="n">components</span><span class="p">:</span>
                     <span class="n">data</span><span class="p">[</span><span class="s">&quot;Z&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">final</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span>
 
+        <span class="k">if</span> <span class="n">dt</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">dt_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">dt</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dt_out</span> <span class="o">=</span> <span class="n">dt</span>
+
+        <span class="n">kind_map</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s">&#39;displacement&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s">&#39;velocity&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s">&#39;acceleration&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}</span>
+
+        <span class="n">stf_map</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s">&#39;errorf&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s">&#39;quheavi&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s">&#39;dirac_0&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s">&#39;gauss_0&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s">&#39;gauss_1&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="s">&#39;gauss_2&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">}</span>
+
+        <span class="n">n_derivative</span> <span class="o">=</span> <span class="n">kind_map</span><span class="p">[</span><span class="n">kind</span><span class="p">]</span> <span class="o">-</span> <span class="n">stf_map</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">stf</span><span class="p">]</span>
+
         <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">components</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">remove_source_shift</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">reconvolve_stf</span><span class="p">:</span>
                 <span class="n">data</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">comp</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">source_shift_samp</span><span class="p">:]</span>
@@ -686,7 +712,16 @@
 
             <span class="k">if</span> <span class="n">dt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
                 <span class="n">data</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">=</span> <span class="n">lanczos</span><span class="o">.</span><span class="n">lanczos_resamp</span><span class="p">(</span>
-                    <span class="n">data</span><span class="p">[</span><span class="n">comp</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">a_lanczos</span><span class="p">)</span>
+                    <span class="n">data</span><span class="p">[</span><span class="n">comp</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span> <span class="n">dt_out</span><span class="p">,</span> <span class="n">a_lanczos</span><span class="p">)</span>
+
+            <span class="c"># taking derivative or integral to get the desired kind of</span>
+            <span class="c"># seismogram</span>
+            <span class="k">for</span> <span class="n">_n</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_derivative</span><span class="p">):</span>
+                <span class="n">data</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">comp</span><span class="p">],</span> <span class="p">[</span><span class="n">dt_out</span><span class="p">])</span>
+
+            <span class="k">for</span> <span class="n">_n</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="n">n_derivative</span><span class="p">):</span>
+                <span class="c"># adding a zero at the beginning to avoid phase shift</span>
+                <span class="n">data</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="n">cumtrapz</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">comp</span><span class="p">],</span> <span class="n">dx</span><span class="o">=</span><span class="n">dt_out</span><span class="p">)]</span>
 
         <span class="k">if</span> <span class="n">return_obspy_stream</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="s">&quot;origin_time&quot;</span><span class="p">):</span>
@@ -695,12 +730,10 @@
                 <span class="n">origin_time</span> <span class="o">=</span> <span class="n">UTCDateTime</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
             <span class="c"># Convert to an ObsPy Stream object.</span>
             <span class="n">st</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
-            <span class="k">if</span> <span class="n">dt</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-                <span class="n">dt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">dt</span>
-            <span class="n">band_code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_band_code</span><span class="p">(</span><span class="n">dt</span><span class="p">)</span>
+            <span class="n">band_code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_band_code</span><span class="p">(</span><span class="n">dt_out</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">components</span><span class="p">:</span>
                 <span class="n">tr</span> <span class="o">=</span> <span class="n">Trace</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="n">comp</span><span class="p">],</span>
-                           <span class="n">header</span><span class="o">=</span><span class="p">{</span><span class="s">&quot;delta&quot;</span><span class="p">:</span> <span class="n">dt</span><span class="p">,</span>
+                           <span class="n">header</span><span class="o">=</span><span class="p">{</span><span class="s">&quot;delta&quot;</span><span class="p">:</span> <span class="n">dt_out</span><span class="p">,</span>
                                    <span class="s">&quot;starttime&quot;</span><span class="p">:</span> <span class="n">origin_time</span><span class="p">,</span>
                                    <span class="s">&quot;station&quot;</span><span class="p">:</span> <span class="n">receiver</span><span class="o">.</span><span class="n">station</span><span class="p">,</span>
                                    <span class="s">&quot;network&quot;</span><span class="p">:</span> <span class="n">receiver</span><span class="o">.</span><span class="n">network</span><span class="p">,</span>
@@ -718,7 +751,8 @@
             <span class="k">return</span> <span class="n">data</span><span class="p">,</span> <span class="n">mu</span>
 </div>
 <div class="viewcode-block" id="InstaseisDB.get_seismograms_finite_source"><a class="viewcode-back" href="../../instaseis.html#instaseis.instaseisdb.InstaseisDB.get_seismograms_finite_source">[docs]</a>    <span class="k">def</span> <span class="nf">get_seismograms_finite_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sources</span><span class="p">,</span> <span class="n">receiver</span><span class="p">,</span>
-                                      <span class="n">components</span><span class="o">=</span><span class="p">(</span><span class="s">&quot;Z&quot;</span><span class="p">,</span> <span class="s">&quot;N&quot;</span><span class="p">,</span> <span class="s">&quot;E&quot;</span><span class="p">),</span> <span class="n">dt</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                                      <span class="n">components</span><span class="o">=</span><span class="p">(</span><span class="s">&quot;Z&quot;</span><span class="p">,</span> <span class="s">&quot;N&quot;</span><span class="p">,</span> <span class="s">&quot;E&quot;</span><span class="p">),</span>
+                                      <span class="n">kind</span><span class="o">=</span><span class="s">&#39;displacement&#39;</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                                       <span class="n">a_lanczos</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">correct_mu</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
                                       <span class="n">progress_callback</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -732,6 +766,7 @@
 <span class="sd">        :type receiver: :class:`instaseis.source.Receiver`</span>
 <span class="sd">        :param components: a tuple containing any combination of the strings</span>
 <span class="sd">            ``&quot;Z&quot;``, ``&quot;N&quot;``, and ``&quot;E&quot;``</span>
+<span class="sd">        :param kind: &#39;displacement&#39;, &#39;velocity&#39; or &#39;acceleration&#39;</span>
 <span class="sd">        :param dt: desired sampling of the seismograms.resampling is done</span>
 <span class="sd">            using a lanczos kernel</span>
 <span class="sd">        :param a_lanczos: width of the kernel used in resampling</span>

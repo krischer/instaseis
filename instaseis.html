@@ -145,7 +145,7 @@ useful e.g. for finite sources)</li>
 </table>
 <dl class="method">
 <dt id="instaseis.instaseisdb.InstaseisDB.get_seismograms">
-<tt class="descname">get_seismograms</tt><big>(</big><em>source</em>, <em>receiver</em>, <em>components=(u'Z'</em>, <em>u'N'</em>, <em>u'E')</em>, <em>remove_source_shift=True</em>, <em>reconvolve_stf=False</em>, <em>return_obspy_stream=True</em>, <em>dt=None</em>, <em>a_lanczos=5</em><big>)</big><a class="reference internal" href="_modules/instaseis/instaseisdb.html#InstaseisDB.get_seismograms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.instaseisdb.InstaseisDB.get_seismograms" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">get_seismograms</tt><big>(</big><em>source</em>, <em>receiver</em>, <em>components=(u'Z'</em>, <em>u'N'</em>, <em>u'E')</em>, <em>kind=u'displacement'</em>, <em>remove_source_shift=True</em>, <em>reconvolve_stf=False</em>, <em>return_obspy_stream=True</em>, <em>dt=None</em>, <em>a_lanczos=5</em><big>)</big><a class="reference internal" href="_modules/instaseis/instaseisdb.html#InstaseisDB.get_seismograms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.instaseisdb.InstaseisDB.get_seismograms" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extract seismograms for a moment tensor point source from the AxiSEM
 database.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -158,6 +158,7 @@ database.</p>
 <li><strong>receiver</strong> (<a class="reference internal" href="source.html#instaseis.source.Receiver" title="instaseis.source.Receiver"><tt class="xref py py-class docutils literal"><span class="pre">instaseis.source.Receiver</span></tt></a>) &#8211; instaseis.Receiver object</li>
 <li><strong>components</strong> &#8211; a tuple containing any combination of the
 strings <tt class="docutils literal"><span class="pre">&quot;Z&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;N&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;E&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;R&quot;</span></tt>, and <tt class="docutils literal"><span class="pre">&quot;T&quot;</span></tt></li>
+<li><strong>kind</strong> &#8211; &#8216;displacement&#8217;, &#8216;velocity&#8217; or &#8216;acceleration&#8217;</li>
 <li><strong>remove_source_shift</strong> &#8211; move the starttime to the peak of the
 sliprate from the source time function used to generate the
 database</li>
@@ -178,7 +179,7 @@ using a lanczos kernel</li>
 
 <dl class="method">
 <dt id="instaseis.instaseisdb.InstaseisDB.get_seismograms_finite_source">
-<tt class="descname">get_seismograms_finite_source</tt><big>(</big><em>sources</em>, <em>receiver</em>, <em>components=(u'Z'</em>, <em>u'N'</em>, <em>u'E')</em>, <em>dt=None</em>, <em>a_lanczos=5</em>, <em>correct_mu=False</em>, <em>progress_callback=None</em><big>)</big><a class="reference internal" href="_modules/instaseis/instaseisdb.html#InstaseisDB.get_seismograms_finite_source"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.instaseisdb.InstaseisDB.get_seismograms_finite_source" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">get_seismograms_finite_source</tt><big>(</big><em>sources</em>, <em>receiver</em>, <em>components=(u'Z'</em>, <em>u'N'</em>, <em>u'E')</em>, <em>kind=u'displacement'</em>, <em>dt=None</em>, <em>a_lanczos=5</em>, <em>correct_mu=False</em>, <em>progress_callback=None</em><big>)</big><a class="reference internal" href="_modules/instaseis/instaseisdb.html#InstaseisDB.get_seismograms_finite_source"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.instaseisdb.InstaseisDB.get_seismograms_finite_source" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extract seismograms for a finite source from the AxiSEM database
 provided as a list of point sources attached with source time functions
 and time shifts.</p>
@@ -191,6 +192,7 @@ and time shifts.</p>
 <li><strong>receiver</strong> (<a class="reference internal" href="source.html#instaseis.source.Receiver" title="instaseis.source.Receiver"><tt class="xref py py-class docutils literal"><span class="pre">instaseis.source.Receiver</span></tt></a>) &#8211; The receiver location.</li>
 <li><strong>components</strong> &#8211; a tuple containing any combination of the strings
 <tt class="docutils literal"><span class="pre">&quot;Z&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;N&quot;</span></tt>, and <tt class="docutils literal"><span class="pre">&quot;E&quot;</span></tt></li>
+<li><strong>kind</strong> &#8211; &#8216;displacement&#8217;, &#8216;velocity&#8217; or &#8216;acceleration&#8217;</li>
 <li><strong>dt</strong> &#8211; desired sampling of the seismograms.resampling is done
 using a lanczos kernel</li>
 <li><strong>a_lanczos</strong> &#8211; width of the kernel used in resampling</li>
