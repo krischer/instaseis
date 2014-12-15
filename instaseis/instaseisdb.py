@@ -572,7 +572,7 @@ class InstaseisDB(object):
             'gauss_1': 2,
             'gauss_2': 3}
 
-        n_derivative = kind_map[kind] - stf_map[self.parsed_mesh.stf]
+        n_derivative = kind_map[kind] - stf_map[self.parsed_mesh.stf_kind]
 
         for comp in components:
             if remove_source_shift and not reconvolve_stf:
@@ -613,7 +613,7 @@ class InstaseisDB(object):
 
             for _n in np.arange(-n_derivative):
                 # adding a zero at the beginning to avoid phase shift
-                data[comp] = np.c_[0., cumtrapz(data[comp], dx=dt_out)]
+                data[comp] = cumtrapz(data[comp], dx=dt_out, initial=0.)
 
         if return_obspy_stream:
             if hasattr(source, "origin_time"):
@@ -857,6 +857,10 @@ class InstaseisDB(object):
     def slip(self):
         return self.parsed_mesh.stf
 
+    @property
+    def stf(self):
+        return self.parsed_mesh.stf_kind
+
     def __str__(self):
         # Get the size of all netCDF files.
         filesize = 0
@@ -916,7 +920,7 @@ class InstaseisDB(object):
             sampling_rate=1.0 / self.dt,
             npts=self.ndumps,
             length=self.dt * (self.ndumps - 1),
-            stf=self.parsed_mesh.stf,
+            stf=self.parsed_mesh.stf_kind,
             src_shift=self.parsed_mesh.source_shift,
             spatial_order=self.parsed_mesh.npol,
             min_rad=self.parsed_mesh.kwf_rmin,

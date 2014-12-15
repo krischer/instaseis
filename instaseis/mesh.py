@@ -181,7 +181,7 @@ class Mesh(object):
         self.kwf_colatmax = getattr(self.f, "kernel wavefield colatmax")
         self.time_scheme = getattr(self.f, "time scheme")
         self.source_depth = getattr(self.f, "source depth in km")
-        self.stf = getattr(self.f, "source time function")
+        self.stf_kind = getattr(self.f, "source time function")
 
         if self.dump_type == "displ_only":
             self.gll_points = self.f.groups["Mesh"].variables["gll"][:]
