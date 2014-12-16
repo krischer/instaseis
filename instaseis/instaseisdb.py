@@ -572,6 +572,10 @@ class InstaseisDB(object):
             'gauss_1': 2,
             'gauss_2': 3}
 
+        stf_deconv_map = {
+            0: self.sliprate,
+            1: self.slip}
+
         n_derivative = kind_map[kind] - stf_map[self.parsed_mesh.stf_kind]
 
         for comp in components:
@@ -581,8 +585,14 @@ class InstaseisDB(object):
                 if source.dt is None or source.sliprate is None:
                     raise RuntimeError("source has no source time function")
 
+                if stf_map[self.parsed_mesh.stf_kind] not in [0,1]:
+                    raise NotImplementedError(
+                        'deconvolution not implemented for stf %s'
+                        % (self.parsed_mesh.stf_kind))
+
                 stf_deconv_f = np.fft.rfft(
-                    self.sliprate, n=self.nfft)
+                    stf_deconv_map[stf_map[self.parsed_mesh.stf_kind]],
+                    n=self.nfft)
 
                 if abs((source.dt - self.dt) / self.dt) > 1e-7:
                     raise ValueError("dt of the source not compatible")
