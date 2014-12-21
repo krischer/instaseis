@@ -871,6 +871,65 @@ class InstaseisDB(object):
     def stf(self):
         return self.parsed_mesh.stf_kind
 
+
+    @property
+    def info(self):
+        """
+        Returns a dictionary with information about the currently loaded
+        database.
+        """
+        # Get the size of all netCDF files.
+        filesize = 0
+        for m in self.meshes:
+            if m:
+                filesize += os.path.getsize(m.filename)
+        filesize = sizeof_fmt(filesize)
+
+        if self.reciprocal:
+            if self.meshes.pz is not None and self.meshes.px is not None:
+                components = 'vertical and horizontal'
+            elif self.meshes.pz is None and self.meshes.px is not None:
+                components = 'horizontal only'
+            elif self.meshes.pz is not None and self.meshes.px is None:
+                components = 'vertical only'
+        else:
+            components = '4 elemental moment tensors'
+
+        return dict(
+            reciprocal=self.reciprocal,
+            components=components,
+            source_depth=(
+                "\tsource depth         : %.2f km\n" %
+                self.parsed_mesh.source_depth) if self.reciprocal is False
+            else "",
+            velocity_model=self.background_model,
+            attenuation=self.attenuation,
+            period=float(self.parsed_mesh.dominant_period),
+            dump_type=self.dump_type,
+            excitation_type=self.parsed_mesh.excitation_type,
+            dt=float(self.dt),
+            sampling_rate=float(1.0 / self.dt),
+            npts=int(self.ndumps),
+            length=float(self.dt * (self.ndumps - 1)),
+            stf=self.parsed_mesh.stf_kind,
+            src_shift=float(self.parsed_mesh.source_shift),
+            spatial_order=int(self.parsed_mesh.npol),
+            min_rad=float(self.parsed_mesh.kwf_rmin),
+            max_rad=float(self.parsed_mesh.kwf_rmax),
+            planet_rad=float(self.parsed_mesh.planet_radius / 1E3),
+            min_d=float(self.parsed_mesh.kwf_colatmin),
+            max_d=float(self.parsed_mesh.kwf_colatmax),
+            time_scheme=self.parsed_mesh.time_scheme,
+            directory=os.path.relpath(self.db_path),
+            filesize=filesize,
+            compiler=self.parsed_mesh.axisem_compiler,
+            user=self.parsed_mesh.axisem_user,
+            format_v=int(self.parsed_mesh.file_version),
+            axisem_v=self.parsed_mesh.axisem_version,
+            datetime=self.parsed_mesh.creation_time
+        )
+
+
     def __str__(self):
         # Get the size of all netCDF files.
         filesize = 0
