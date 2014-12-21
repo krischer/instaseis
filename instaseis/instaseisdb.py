@@ -585,7 +585,7 @@ class InstaseisDB(object):
                 if source.dt is None or source.sliprate is None:
                     raise RuntimeError("source has no source time function")
 
-                if stf_map[self.parsed_mesh.stf_kind] not in [0,1]:
+                if stf_map[self.parsed_mesh.stf_kind] not in [0, 1]:
                     raise NotImplementedError(
                         'deconvolution not implemented for stf %s'
                         % (self.parsed_mesh.stf_kind))
