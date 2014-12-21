@@ -680,6 +680,10 @@
             <span class="s">&#39;gauss_1&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
             <span class="s">&#39;gauss_2&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">}</span>
 
+        <span class="n">stf_deconv_map</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="mi">0</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span><span class="p">,</span>
+            <span class="mi">1</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">slip</span><span class="p">}</span>
+
         <span class="n">n_derivative</span> <span class="o">=</span> <span class="n">kind_map</span><span class="p">[</span><span class="n">kind</span><span class="p">]</span> <span class="o">-</span> <span class="n">stf_map</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">stf_kind</span><span class="p">]</span>
 
         <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">components</span><span class="p">:</span>
@@ -689,8 +693,14 @@
                 <span class="k">if</span> <span class="n">source</span><span class="o">.</span><span class="n">dt</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">source</span><span class="o">.</span><span class="n">sliprate</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&quot;source has no source time function&quot;</span><span class="p">)</span>
 
+                <span class="k">if</span> <span class="n">stf_map</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">stf_kind</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]:</span>
+                    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                        <span class="s">&#39;deconvolution not implemented for stf </span><span class="si">%s</span><span class="s">&#39;</span>
+                        <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">stf_kind</span><span class="p">))</span>
+
                 <span class="n">stf_deconv_f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfft</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nfft</span><span class="p">)</span>
+                    <span class="n">stf_deconv_map</span><span class="p">[</span><span class="n">stf_map</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">stf_kind</span><span class="p">]],</span>
+                    <span class="n">n</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nfft</span><span class="p">)</span>
 
                 <span class="k">if</span> <span class="nb">abs</span><span class="p">((</span><span class="n">source</span><span class="o">.</span><span class="n">dt</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1e-7</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;dt of the source not compatible&quot;</span><span class="p">)</span>
