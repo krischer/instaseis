@@ -12,6 +12,7 @@ Server offering a REST API for Instaseis.
 import flask
 from flask import Flask, request
 from flask.ext import restful
+from flask.ext.restful import reqparse
 
 import obspy
 
@@ -30,72 +31,47 @@ def index():
 
 
 # Define the seismogram parser.
-seismogram_parser = restful.reqparse.RequestParser()
+seismogram_parser = reqparse.RequestParser()
 # Source parameters.
 seismogram_parser.add_argument("source_latitude", type=float, required=True,
-                               help="The latitude of the source.")
+                               help="source_latitude is required")
 seismogram_parser.add_argument("source_longitude", type=float, required=True,
-                               help="The longitude of the source.")
-seismogram_parser.add_argument("source_depth_in_m", type=float,
-                               help="The source depth in meter.")
-seismogram_parser.add_argument("source_depth_in_m", type=float,
-                               help="The source depth in meter.")
+                               help="source_longitude is required")
+seismogram_parser.add_argument("source_depth_in_m", type=float)
 # Source can either be given as the moment tensor components in Nm.
-seismogram_parser.add_argument("m_rr", type=float,
-                               help="rr component of the moment tensor.")
-seismogram_parser.add_argument("m_tt", type=float,
-                               help="tt component of the moment tensor.")
-seismogram_parser.add_argument("m_pp", type=float,
-                               help="pp component of the moment tensor.")
-seismogram_parser.add_argument("m_rt", type=float,
-                               help="rt component of the moment tensor.")
-seismogram_parser.add_argument("m_rp", type=float,
-                               help="rp component of the moment tensor.")
-seismogram_parser.add_argument("m_tp", type=float,
-                               help="tp component of the moment tensor.")
+seismogram_parser.add_argument("m_rr", type=float)
+seismogram_parser.add_argument("m_tt", type=float)
+seismogram_parser.add_argument("m_pp", type=float)
+seismogram_parser.add_argument("m_rt", type=float)
+seismogram_parser.add_argument("m_rp", type=float)
+seismogram_parser.add_argument("m_tp", type=float)
 # Or as strike, dip, rake and M0.
-seismogram_parser.add_argument("strike", type=float,
-                               help="strike of the fault in degree")
-seismogram_parser.add_argument("dip", type=float,
-                               help="dip of the fault in degree")
-seismogram_parser.add_argument("rake", type=float,
-                               help="rake of the fault in degree")
-seismogram_parser.add_argument("M0", type=float,
-                               help="scalar seismic moment")
+seismogram_parser.add_argument("strike", type=float)
+seismogram_parser.add_argument("dip", type=float)
+seismogram_parser.add_argument("rake", type=float)
+seismogram_parser.add_argument("M0", type=float)
 # Or as a force source.
-seismogram_parser.add_argument("f_r", type=float,
-                               help="r force component in N")
-seismogram_parser.add_argument("f_t", type=float,
-                               help="t force component in N")
-seismogram_parser.add_argument("f_p", type=float,
-                               help="p force component in N")
+seismogram_parser.add_argument("f_r", type=float)
+seismogram_parser.add_argument("f_t", type=float)
+seismogram_parser.add_argument("f_p", type=float)
 # More optional source parameters.
-seismogram_parser.add_argument("source_sliprate", type=float,
-                               help="Normalized source time function ("
-                                    "sliprate)")
-seismogram_parser.add_argument("stf_dt", type=float,
-                               help="sampling of the source time function.")
-seismogram_parser.add_argument("origin_time", type=str,
-                               default=obspy.UTCDateTime(0),
-                               help="The origin time of the source. This will "
-                               "be the time of the first sample in the final "
-                               "seismogram. Be careful to adjust it for any "
-                               "time shift or STF (de)convolution effects.")
+seismogram_parser.add_argument("source_sliprate", type=float)
+seismogram_parser.add_argument("stf_dt", type=float)
+seismogram_parser.add_argument("origin_time", type=str)
 # Receiver parameters.
 seismogram_parser.add_argument("receiver_latitude", type=float, required=True,
-                               help="The latitude of the receiver.")
+                               help="receiver_latitude is required")
 seismogram_parser.add_argument("receiver_longitude", type=float, required=True,
-                               help="The longitude of the receiver.")
-seismogram_parser.add_argument("receiver_depth_in_m", type=float,
-                               help="The receiver depth in meter.")
-seismogram_parser.add_argument("network_code", type=str,
-                               help="The network code of the receiver.")
-seismogram_parser.add_argument("station_code", type=str,
-                               help="The station code of the receiver.")
+                               help="receiver_longitude is required")
+seismogram_parser.add_argument("receiver_depth_in_m", type=float)
+seismogram_parser.add_argument("network_code", type=str)
+seismogram_parser.add_argument("station_code", type=str)
 
 
 class Seismogram(restful.Resource):
     def get(self):
+        args = seismogram_parser.parse_args()
+        print(args)
         return {'hello': 'world'}
 
 
