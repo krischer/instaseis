@@ -81,6 +81,17 @@ seismogram_parser.add_argument("origin_time", type=str,
                                "be the time of the first sample in the final "
                                "seismogram. Be careful to adjust it for any "
                                "time shift or STF (de)convolution effects.")
+# Receiver parameters.
+seismogram_parser.add_argument("receiver_latitude", type=float, required=True,
+                               help="The latitude of the receiver.")
+seismogram_parser.add_argument("receiver_longitude", type=float, required=True,
+                               help="The longitude of the receiver.")
+seismogram_parser.add_argument("receiver_depth_in_m", type=float,
+                               help="The receiver depth in meter.")
+seismogram_parser.add_argument("network_code", type=str,
+                               help="The network code of the receiver.")
+seismogram_parser.add_argument("station_code", type=str,
+                               help="The station code of the receiver.")
 
 
 class Seismogram(restful.Resource):
