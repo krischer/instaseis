@@ -13,13 +13,30 @@ import flask
 from flask import Flask, request
 from flask.ext import restful
 from flask.ext.restful import reqparse
+import io
 
 import obspy
 
 from ..instaseisdb import InstaseisDB
+from .. import Source, ForceSource, Receiver
+
+
+class InvalidSourceError(Exception):
+    pass
+
+
+# Dictionary responsible for pretty error messages with various HTTP codes.
+errors = {
+    "InvalidSourceError": {
+        "message": "The source definition is invalid.",
+        "status": 404,
+        }
+}
+
 
 app = Flask(__name__)
-api = restful.Api(app)
+
+api = restful.Api(app, errors=errors)
 
 
 @app.route("/")
@@ -57,7 +74,8 @@ seismogram_parser.add_argument("f_p", type=float)
 # More optional source parameters.
 seismogram_parser.add_argument("source_sliprate", type=float)
 seismogram_parser.add_argument("stf_dt", type=float)
-seismogram_parser.add_argument("origin_time", type=str)
+seismogram_parser.add_argument("origin_time", type=obspy.UTCDateTime,
+                               default=obspy.UTCDateTime(0))
 # Receiver parameters.
 seismogram_parser.add_argument("receiver_latitude", type=float, required=True,
                                help="receiver_latitude is required")
@@ -72,6 +90,57 @@ class Seismogram(restful.Resource):
     def get(self):
         args = seismogram_parser.parse_args()
         print(args)
+
+        # Figure out the type of source and construct the source object.
+        src_params = {
+            "moment_tensor": set(["m_rr", "m_tt", "m_pp", "m_rt", "m_rp",
+                                  "m_tp"]),
+            "strike_dip_rake": set(["strike", "dip", "rake", "M0"]),
+            "force_source": set(["f_r", "f_t", "f_p"])
+        }
+        for src_type, params in src_params.items():
+            src_params = [getattr(args, _i) for _i in params]
+            if None in src_params:
+                continue
+            elif src_type == "moment_tensor":
+                source = Source(latitude=args.source_latitude,
+                                longitude=args.source_longitude,
+                                depth_in_m=args.source_depth_in_m,
+                                m_rr=args.m_rr, m_tt=args.m_tt, m_pp=args.m_pp,
+                                m_rt=args.m_rt, m_rp=args.m_rp, m_tp=args.m_tp,
+                                sliprate=args.source_sliprate,
+                                dt=args.stf_dt, origin_time=args.origin_time)
+                break
+            elif src_type == "strike_dip_rake":
+                source = Source.from_strike_dip_rake(
+                    latitude=args.source_latitude,
+                    longitude=args.source_longitude,
+                    depth_in_m=args.source_depth_in_m,
+                    strike=args.strike, dip=args.dip, rake=args.rake,
+                    M0=args.M0, sliprate=args.source_sliprate,
+                    dt=args.stf_dt, origin_time=args.origin_time)
+                break
+            elif src_type == "force_source":
+                source = ForceSource(latitude=args.source_latitude,
+                                     longitude=args.source_longitude,
+                                     depth_in_m=args.source_depth_in_m,
+                                     f_r=args.f_r, f_t=args.f_t, f_p=args.f_p)
+                break
+            else:
+                raise InvalidSourceError
+        else:
+            raise InvalidSourceError
+
+        # Construct the receiver object.
+        receiver = Receiver(latitude=args.receiver_latitude,
+                            longitude=args.receiver_longitude,
+                            network=args.network_code,
+                            station=args.station_code,
+                            depth_in_m=args.receiver_depth_in_m)
+
+        st = app.db.get_seismograms(source=source, receiver=receiver)
+
+        print(st)
         return {'hello': 'world'}
 
 
@@ -81,4 +150,4 @@ api.add_resource(Seismogram, "/seismogram")
 def serve(db_path, port, buffer_size_in_mb):
     app.db = InstaseisDB(db_path=db_path, buffer_size_in_mb=buffer_size_in_mb)
     print(app.db.info)
-    app.run(host="0.0.0.0", port=port, debug=True)
+    app.run(host="0.0.0.0", port=port, debug=False)
