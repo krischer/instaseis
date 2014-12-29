@@ -383,7 +383,7 @@ print(colorama.Fore.RED + "\nIt does not deal with OS level caches! So "
       "interpret the results accordingly!\n" + colorama.Fore.RESET)
 
 db = InstaseisDB(path, read_on_demand=True, buffer_size_in_mb=0)
-if not db.reciprocal:
+if not db.is_reciprocal:
     print("Benchmark currently only works with a reciprocal database.")
     sys.exit(1)
 print(db)
