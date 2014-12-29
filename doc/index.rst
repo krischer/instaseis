@@ -148,9 +148,9 @@ most expensive part so make sure to do it only once if possible.
 
 .. code-block:: python
 
-    In [1]: from instaseis import InstaseisDB, Source, Receiver
+    In [1]: from instaseis import open_db, Source, Receiver
 
-    In [2]: db = InstaseisDB("./prem50s_forces")
+    In [2]: db = open_db("./prem50s_forces")
 
     In [3]: receiver = Receiver(latitude=42.6390, longitude=74.4940)
 
