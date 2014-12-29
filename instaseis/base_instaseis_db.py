@@ -156,6 +156,7 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
         )
         return return_str
 
+
 def sizeof_fmt(num):
     """
     Handy formatting for human readable filesizes.

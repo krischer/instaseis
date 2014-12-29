@@ -871,7 +871,6 @@ class InstaseisDB(object):
     def stf(self):
         return self.parsed_mesh.stf_kind
 
-
     @property
     def info(self):
         """
@@ -926,7 +925,6 @@ class InstaseisDB(object):
             axisem_version=self.parsed_mesh.axisem_version,
             datetime=self.parsed_mesh.creation_time
         )
-
 
     def __str__(self):
         # Get the size of all netCDF files.

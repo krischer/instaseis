@@ -24,7 +24,7 @@ if __name__ == "__main__":
     parser.add_argument('--port', type=int, required=True,
                         help='Server port.')
     parser.add_argument('--buffer_size_in_mb', type=int,
-                       default=100, help='Size of the buffer in MB')
+                        default=100, help='Size of the buffer in MB')
     parser.add_argument('db_path', type=str,
                         help='Database path')
 
