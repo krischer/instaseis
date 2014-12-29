@@ -352,7 +352,7 @@ class Window(QtGui.QMainWindow):
             # Grab resampling settings from the UI.
             if bool(self.ui.resample_check_box.checkState()):
                 dt = float(self.ui.resample_factor.value())
-                dt = self.instaseis_db.dt / dt
+                dt = self.instaseis_db.info.dt / dt
             else:
                 dt = None
             if self.ui.finsource_tab.currentIndex() == 0:
@@ -424,7 +424,7 @@ class Window(QtGui.QMainWindow):
                     # this happens when typing in the highpass_period box
                     pass
 
-        except AttributeError:
+        except AttributeError as e:
             return
 
         if bool(self.ui.tt_times.checkState()):
@@ -496,7 +496,8 @@ class Window(QtGui.QMainWindow):
             return
         if self.instaseis_db is not None:
             # self.finite_source.set_sliprate_lp(
-            #     dt=self.instaseis_db.dt, nsamp=self.instaseis_db.ndumps,
+            #     dt=self.instaseis_db.info.dt,
+            # nsamp=self.instaseis_db.info.npts,
             #     freq=1.0/self.instaseis_db.parsed_mesh.dominant_period)
 
             nsamp = int(self.instaseis_db.parsed_mesh.dominant_period
@@ -506,7 +507,7 @@ class Window(QtGui.QMainWindow):
             self.finite_source.lp_sliprate(
                 freq=1.0/self.instaseis_db.parsed_mesh.dominant_period)
             self.finite_source.resample_sliprate(
-                dt=self.instaseis_db.dt, nsamp=self.instaseis_db.ndumps)
+                dt=self.instaseis_db.info.dt, nsamp=self.instaseis_db.ndumps)
 
         self.finite_source.compute_centroid()
         self.plot_mt_finite()
