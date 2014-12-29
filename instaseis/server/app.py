@@ -10,11 +10,10 @@ Server offering a REST API for Instaseis.
     (http://www.gnu.org/copyleft/gpl.html)
 """
 import flask
-from flask import Flask, request
-from flask.ext import restful
+from flask import Flask, send_file
 from flask.ext.restful import reqparse
 import io
-
+import numpy as np
 import obspy
 
 from ..instaseisdb import InstaseisDB
@@ -35,8 +34,6 @@ errors = {
 
 
 app = Flask(__name__)
-
-api = restful.Api(app, errors=errors)
 
 
 @app.route("/")
@@ -86,68 +83,75 @@ seismogram_parser.add_argument("network_code", type=str)
 seismogram_parser.add_argument("station_code", type=str)
 
 
-class Seismogram(restful.Resource):
-    def get(self):
-        args = seismogram_parser.parse_args()
-        print(args)
+@app.route("/seismograms", methods=["GET", "POST"])
+def get_seismograms():
+    args = seismogram_parser.parse_args()
+    print(args)
 
-        # Figure out the type of source and construct the source object.
-        src_params = {
-            "moment_tensor": set(["m_rr", "m_tt", "m_pp", "m_rt", "m_rp",
-                                  "m_tp"]),
-            "strike_dip_rake": set(["strike", "dip", "rake", "M0"]),
-            "force_source": set(["f_r", "f_t", "f_p"])
-        }
-        for src_type, params in src_params.items():
-            src_params = [getattr(args, _i) for _i in params]
-            if None in src_params:
-                continue
-            elif src_type == "moment_tensor":
-                source = Source(latitude=args.source_latitude,
-                                longitude=args.source_longitude,
-                                depth_in_m=args.source_depth_in_m,
-                                m_rr=args.m_rr, m_tt=args.m_tt, m_pp=args.m_pp,
-                                m_rt=args.m_rt, m_rp=args.m_rp, m_tp=args.m_tp,
-                                sliprate=args.source_sliprate,
-                                dt=args.stf_dt, origin_time=args.origin_time)
-                break
-            elif src_type == "strike_dip_rake":
-                source = Source.from_strike_dip_rake(
-                    latitude=args.source_latitude,
-                    longitude=args.source_longitude,
-                    depth_in_m=args.source_depth_in_m,
-                    strike=args.strike, dip=args.dip, rake=args.rake,
-                    M0=args.M0, sliprate=args.source_sliprate,
-                    dt=args.stf_dt, origin_time=args.origin_time)
-                break
-            elif src_type == "force_source":
-                source = ForceSource(latitude=args.source_latitude,
-                                     longitude=args.source_longitude,
-                                     depth_in_m=args.source_depth_in_m,
-                                     f_r=args.f_r, f_t=args.f_t, f_p=args.f_p)
-                break
-            else:
-                raise InvalidSourceError
+    # Figure out the type of source and construct the source object.
+    src_params = {
+        "moment_tensor": set(["m_rr", "m_tt", "m_pp", "m_rt", "m_rp",
+                              "m_tp"]),
+        "strike_dip_rake": set(["strike", "dip", "rake", "M0"]),
+        "force_source": set(["f_r", "f_t", "f_p"])
+    }
+    for src_type, params in src_params.items():
+        src_params = [getattr(args, _i) for _i in params]
+        if None in src_params:
+            continue
+        elif src_type == "moment_tensor":
+            source = Source(latitude=args.source_latitude,
+                            longitude=args.source_longitude,
+                            depth_in_m=args.source_depth_in_m,
+                            m_rr=args.m_rr, m_tt=args.m_tt, m_pp=args.m_pp,
+                            m_rt=args.m_rt, m_rp=args.m_rp, m_tp=args.m_tp,
+                            sliprate=args.source_sliprate,
+                            dt=args.stf_dt, origin_time=args.origin_time)
+            break
+        elif src_type == "strike_dip_rake":
+            source = Source.from_strike_dip_rake(
+                latitude=args.source_latitude,
+                longitude=args.source_longitude,
+                depth_in_m=args.source_depth_in_m,
+                strike=args.strike, dip=args.dip, rake=args.rake,
+                M0=args.M0, sliprate=args.source_sliprate,
+                dt=args.stf_dt, origin_time=args.origin_time)
+            break
+        elif src_type == "force_source":
+            source = ForceSource(latitude=args.source_latitude,
+                                 longitude=args.source_longitude,
+                                 depth_in_m=args.source_depth_in_m,
+                                 f_r=args.f_r, f_t=args.f_t, f_p=args.f_p)
+            break
         else:
             raise InvalidSourceError
+    else:
+        raise InvalidSourceError
 
-        # Construct the receiver object.
-        receiver = Receiver(latitude=args.receiver_latitude,
-                            longitude=args.receiver_longitude,
-                            network=args.network_code,
-                            station=args.station_code,
-                            depth_in_m=args.receiver_depth_in_m)
+    # Construct the receiver object.
+    receiver = Receiver(latitude=args.receiver_latitude,
+                        longitude=args.receiver_longitude,
+                        network=args.network_code,
+                        station=args.station_code,
+                        depth_in_m=args.receiver_depth_in_m)
 
-        st = app.db.get_seismograms(source=source, receiver=receiver)
+    st = app.db.get_seismograms(source=source, receiver=receiver)
+    # Half the filesize but definitely sufficiently accurate.
+    for tr in st:
+        tr.data = np.require(tr.data, dtype=np.float32)
 
-        print(st)
-        return {'hello': 'world'}
+    fh = io.BytesIO()
 
-
-api.add_resource(Seismogram, "/seismogram")
+    st.write(fh, format="mseed")
+    fh.seek(0, 0)
+    return send_file(fh, mimetype="application/octet-stream",
+                     add_etags=False,
+                     as_attachment=True,
+                     attachment_filename="instaseis_seismogram_%s.mseed" %
+                     str(obspy.UTCDateTime()).replace(":", "_"))
 
 
 def serve(db_path, port, buffer_size_in_mb):
     app.db = InstaseisDB(db_path=db_path, buffer_size_in_mb=buffer_size_in_mb)
     print(app.db.info)
-    app.run(host="0.0.0.0", port=port, debug=False)
+    app.run(host="0.0.0.0", port=port, debug=True)
