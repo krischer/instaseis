@@ -16,7 +16,7 @@ import io
 import numpy as np
 import obspy
 
-from ..instaseisdb import InstaseisDB
+from ..instaseis_db import InstaseisDB
 from .. import Source, ForceSource, Receiver
 
 

@@ -132,19 +132,20 @@ choice or host it somewhere.
 Usage
 -----
 
-Use it by creating an :class:`~instaseis.instaseis.InstaseisDB` object which needs
-to know the path to the output folder containing the netCDF files from an
+Use it by creating an :class:`~instaseis.instaseis_db.InstaseisDB` object
+which needs to know the path to the output folder containing the netCDF files from an
 AxiSEM run. All information is determined from the netCDF files so no other
 files have to be present.
 
 Then a source and receiver pair is defined. The moment tensor components are in
-``N m``. Lastly the :meth:`~instaseis.instaseis.InstaseisDB.get_seismograms()`
+``N m``. Lastly the
+:meth:`~instaseis.instaseis_db.InstaseisDB.get_seismograms()`
 method is called which by default returns a three component ObsPy
 :class:`~obspy.core.stream.Stream` object with the waveform data. This can then
 be used process and save the data in any format supported by ObsPy.
 
-The initialization of an :class:`~instaseis.instaseis.InstaseisDB` object is the
-most expensive part so make sure to do it only once if possible.
+The initialization of an :class:`~instaseis.instaseis_db.InstaseisDB` object
+is the most expensive part so make sure to do it only once if possible.
 
 .. code-block:: python
 

@@ -28,7 +28,7 @@ def open_db(path, *args, **kwargs):
     if "://" in path:
         raise NotImplementedError
     else:
-        from .instaseisdb import InstaseisDB
+        from .instaseis_db import InstaseisDB
         return InstaseisDB(path, *args, **kwargs)
 
 
