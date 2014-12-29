@@ -107,4 +107,6 @@ class RemoteInstaseisDB(BaseInstaseisDB):
         Returns a dictionary with information about the currently loaded
         database.
         """
-        return self._download_url(self._get_url(path="info"), unpack_json=True)
+        info = self._download_url(self._get_url(path="info"), unpack_json=True)
+        info["directory"] = self.url
+        return info
