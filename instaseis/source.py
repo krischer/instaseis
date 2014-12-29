@@ -235,7 +235,7 @@ class Source(SourceOrReceiver):
     @classmethod
     def from_strike_dip_rake(self, latitude, longitude, depth_in_m, strike,
                              dip, rake, M0, time_shift=None, sliprate=None,
-                             dt=None):
+                             dt=None, origin_time=obspy.UTCDateTime(0)):
         """
         Initialize a source object from a shear source parameterized by strike,
         dip and rake.
@@ -251,13 +251,15 @@ class Source(SourceOrReceiver):
             useful in the context of finite sources
         :param sliprate: normalized source time function (sliprate)
         :param dt: sampling of the source time function
+        :param origin_time: The origin time of the source. This will be the
+            time of the first sample in the final seismogram. Be careful to
+            adjust it for any time shift or STF (de)convolution effects.
         """
         # formulas in Udias (17.24) are in geographic system North, East,
         # Down, which # transforms to the geocentric as:
         # Mtt =  Mxx, Mpp = Myy, Mrr =  Mzz
         # Mrp = -Myz, Mrt = Mxz, Mtp = -Mxy
         # voigt in tpr: Mtt Mpp Mrr Mrp Mrt Mtp
-
         phi = np.deg2rad(strike)
         delta = np.deg2rad(dip)
         lambd = np.deg2rad(rake)
@@ -281,7 +283,8 @@ class Source(SourceOrReceiver):
             * M0
 
         source = self(latitude, longitude, depth_in_m, m_rr, m_tt, m_pp, m_rt,
-                      m_rp, m_tp, time_shift, sliprate, dt)
+                      m_rp, m_tp, time_shift, sliprate, dt,
+                      origin_time=origin_time)
 
         # storing strike, dip and rake for plotting purposes
         source.phi = phi
