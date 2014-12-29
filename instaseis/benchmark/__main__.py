@@ -25,7 +25,7 @@ import sys
 import time
 import timeit
 
-from instaseis import InstaseisDB, Source, Receiver
+from instaseis import open_db, Source, Receiver
 
 # Write interval.
 WRITE_INTERVAL = 0.05
@@ -149,8 +149,8 @@ class InstaseisBenchmark(object):
 
 class BufferedFixedSrcRecRoDOffSeismogramGeneration(InstaseisBenchmark):
     def setup(self):
-        self.db = InstaseisDB(self.path, read_on_demand=False,
-                              buffer_size_in_mb=250)
+        self.db = open_db(self.path, read_on_demand=False,
+                          buffer_size_in_mb=250)
 
     def iterate(self):
         src = Source(latitude=10, longitude=10)
@@ -165,8 +165,8 @@ class BufferedFixedSrcRecRoDOffSeismogramGeneration(InstaseisBenchmark):
 
 class BufferedFixedSrcRecRoDOffSeismogramGenerationNoObsPy(InstaseisBenchmark):
     def setup(self):
-        self.db = InstaseisDB(self.path, read_on_demand=False,
-                              buffer_size_in_mb=250)
+        self.db = open_db(self.path, read_on_demand=False,
+                          buffer_size_in_mb=250)
 
     def iterate(self):
         src = Source(latitude=10, longitude=10)
@@ -183,8 +183,8 @@ class BufferedFixedSrcRecRoDOffSeismogramGenerationNoObsPy(InstaseisBenchmark):
 class UnbufferedFixedSrcRecRoDOffSeismogramGenerationNoObsPy(
         InstaseisBenchmark):
     def setup(self):
-        self.db = InstaseisDB(self.path, read_on_demand=False,
-                              buffer_size_in_mb=0)
+        self.db = open_db(self.path, read_on_demand=False,
+                          buffer_size_in_mb=0)
 
     def iterate(self):
         src = Source(latitude=10, longitude=10)
@@ -199,8 +199,8 @@ class UnbufferedFixedSrcRecRoDOffSeismogramGenerationNoObsPy(
 
 class BufferedFixedSrcRecRoDOnSeismogramGeneration(InstaseisBenchmark):
     def setup(self):
-        self.db = InstaseisDB(self.path, read_on_demand=True,
-                              buffer_size_in_mb=250)
+        self.db = open_db(self.path, read_on_demand=True,
+                          buffer_size_in_mb=250)
 
     def iterate(self):
         src = Source(latitude=10, longitude=10)
@@ -215,8 +215,8 @@ class BufferedFixedSrcRecRoDOnSeismogramGeneration(InstaseisBenchmark):
 
 class Buffered2DegreeLatLngDepthScatter(InstaseisBenchmark):
     def setup(self):
-        self.db = InstaseisDB(self.path, read_on_demand=False,
-                              buffer_size_in_mb=250)
+        self.db = open_db(self.path, read_on_demand=False,
+                          buffer_size_in_mb=250)
 
     def iterate(self):
         rec = Receiver(latitude=20, longitude=20)
@@ -235,8 +235,8 @@ class Buffered2DegreeLatLngDepthScatter(InstaseisBenchmark):
 
 class BufferedHalfDegreeLatLngDepthScatter(InstaseisBenchmark):
     def setup(self):
-        self.db = InstaseisDB(self.path, read_on_demand=False,
-                              buffer_size_in_mb=250)
+        self.db = open_db(self.path, read_on_demand=False,
+                          buffer_size_in_mb=250)
 
     def iterate(self):
         rec = Receiver(latitude=20, longitude=20)
@@ -255,8 +255,8 @@ class BufferedHalfDegreeLatLngDepthScatter(InstaseisBenchmark):
 
 class BufferedFullyRandom(InstaseisBenchmark):
     def setup(self):
-        self.db = InstaseisDB(self.path, read_on_demand=False,
-                              buffer_size_in_mb=250)
+        self.db = open_db(self.path, read_on_demand=False,
+                          buffer_size_in_mb=250)
 
     def iterate(self):
         # Random points on a sphere.
@@ -278,8 +278,8 @@ class BufferedFullyRandom(InstaseisBenchmark):
 
 class UnbufferedFullyRandom(InstaseisBenchmark):
     def setup(self):
-        self.db = InstaseisDB(self.path, read_on_demand=False,
-                              buffer_size_in_mb=0)
+        self.db = open_db(self.path, read_on_demand=False,
+                          buffer_size_in_mb=0)
 
     def iterate(self):
         # Random points on a sphere.
@@ -301,8 +301,8 @@ class UnbufferedFullyRandom(InstaseisBenchmark):
 
 class UnbufferedAndRandomReadOnDemandTrue(InstaseisBenchmark):
     def setup(self):
-        self.db = InstaseisDB(self.path, read_on_demand=True,
-                              buffer_size_in_mb=0)
+        self.db = open_db(self.path, read_on_demand=True,
+                          buffer_size_in_mb=0)
 
     def iterate(self):
         # Random points on a sphere.
@@ -325,8 +325,8 @@ class UnbufferedAndRandomReadOnDemandTrue(InstaseisBenchmark):
 
 class FiniteSourceEmulation(InstaseisBenchmark):
     def setup(self):
-        self.db = InstaseisDB(self.path, read_on_demand=False,
-                              buffer_size_in_mb=250)
+        self.db = open_db(self.path, read_on_demand=False,
+                          buffer_size_in_mb=250)
         self.counter = 0
         self.current_depth_counter = 0
         # Depth increases in 1 km steps up to a depth of 25 km.
@@ -382,7 +382,7 @@ print(79 * "=" + colorama.Fore.RESET)
 print(colorama.Fore.RED + "\nIt does not deal with OS level caches! So "
       "interpret the results accordingly!\n" + colorama.Fore.RESET)
 
-db = InstaseisDB(path, read_on_demand=True, buffer_size_in_mb=0)
+db = open_db(path, read_on_demand=True, buffer_size_in_mb=0)
 if not db.is_reciprocal:
     print("Benchmark currently only works with a reciprocal database.")
     sys.exit(1)

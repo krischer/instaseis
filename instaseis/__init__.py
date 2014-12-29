@@ -19,12 +19,17 @@ class SourceParseError(InstaseisError):
     pass
 
 
-def open(path, *args, **kwargs):
+def open_db(path, *args, **kwargs):
+    """
+    Open a local or remote Instaseis database.
+
+    :param path: Filepath or URL.
+    """
     if "://" in path:
-        pass
+        raise NotImplementedError
     else:
-        pass
+        from .instaseisdb import InstaseisDB
+        return InstaseisDB(path, *args, **kwargs)
 
 
-from .instaseisdb import InstaseisDB  # NoQa
 from .source import Source, Receiver, ForceSource, FiniteSource  # NoQa

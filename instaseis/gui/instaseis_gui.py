@@ -29,7 +29,7 @@ from obspy.taup.taup import getTravelTimes
 import os
 import sys
 
-from instaseis import InstaseisDB, Source, Receiver, FiniteSource
+from instaseis import open_db, Source, Receiver, FiniteSource
 
 
 def compile_and_import_ui_files():
@@ -424,7 +424,7 @@ class Window(QtGui.QMainWindow):
                     # this happens when typing in the highpass_period box
                     pass
 
-        except AttributeError as e:
+        except AttributeError:
             return
 
         if bool(self.ui.tt_times.checkState()):
@@ -465,7 +465,7 @@ class Window(QtGui.QMainWindow):
             self, "Choose Directory", pwd))
         if not self.folder:
             return
-        self.instaseis_db = InstaseisDB(self.folder)
+        self.instaseis_db = open_db(self.folder)
 
         # Adjust depth slider to the DB.
         max_rad = self.instaseis_db.parsed_mesh.kwf_rmax

@@ -19,7 +19,7 @@ import os
 import pytest
 import shutil
 
-from instaseis import InstaseisDB
+from instaseis.instaseisdb import InstaseisDB
 from instaseis import Source, Receiver, ForceSource
 
 from .testdata import BWD_TEST_DATA, FWD_TEST_DATA
