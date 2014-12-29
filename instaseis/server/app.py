@@ -49,6 +49,8 @@ def info():
     info = app.db.info
     # No need to write a custom encoder...
     info["datetime"] = str(info["datetime"])
+    info["slip"] = list([float(_i) for _i in info["slip"]])
+    info["sliprate"] = list([float(_i) for _i in info["sliprate"]])
     return flask.jsonify(**info)
 
 
