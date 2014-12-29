@@ -38,6 +38,14 @@ app = Flask(__name__)
 
 @app.route("/")
 def index():
+    desc = {
+        "type": "Instaseis Remote Server"
+    }
+    return flask.jsonify(**desc)
+
+
+@app.route("/info")
+def info():
     info = app.db.info
     # No need to write a custom encoder...
     info["datetime"] = str(info["datetime"])
@@ -153,5 +161,5 @@ def get_seismograms():
 
 def serve(db_path, port, buffer_size_in_mb):
     app.db = InstaseisDB(db_path=db_path, buffer_size_in_mb=buffer_size_in_mb)
-    print(app.db.info)
+    print(app.db)
     app.run(host="0.0.0.0", port=port, debug=True)
