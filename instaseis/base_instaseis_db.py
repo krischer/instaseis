@@ -47,11 +47,11 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
         ``"velocity_model"``, ``"attenuation"``, ``"period"``,
         ``"dump_type"``, ``"excitation_type"``, ``"dt"``,
         ``"sampling_rate"``, ``"npts"``, ``"length"``, ``"stf"``,
-        ``"sliprate"``, ``"slip"``,
-        ``"src_shift"``, ``"spatial_order"``, ``"min_radius"``,
-        ``"max_radius"``, ``"planet_radius"``, ``"min_d"``, ``"max_d"``,
-        ``"time_scheme"``, ``"directory"``, ``"filesize"``, ``"compiler"``,
-        ``"user"``, ``"format_version"``, ``"axisem_version"``, ``"datetime"``
+        ``"slip"``, ``"sliprate"``, ``"src_shift"``, ``"spatial_order"``,
+        ``"min_radius"``, ``"max_radius"``, ``"planet_radius"``,
+        ``"min_d"``, ``"max_d"``, ``"time_scheme"``, ``"directory"``,
+        ``"filesize"``, ``"compiler"``, ``"user"``, ``"format_version"``,
+        ``"axisem_version"``, ``"datetime"``
         """
         pass
 
@@ -113,6 +113,8 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
             "\tseismogram length    : {length:.1f} s\n"
             "\tsource time function : {stf}\n"
             "\tsource shift         : {src_shift:.3f} s\n"
+            "\tslip                 : {slip}\n"
+            "\tslip rate            : {slip_rate}\n"
             "\tspatial order        : {spatial_order}\n"
             "\tmin/max radius       : {min_radius:.1f} - {max_radius:.1f} km\n"
             "\tPlanet radius        : {planet_radius:.1f} km\n"
@@ -139,6 +141,8 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
             length=info.length,
             stf=info.stf,
             src_shift=info.src_shift,
+            slip=info.slip,
+            slip_rate=info.slip_rate,
             spatial_order=info.spatial_order,
             min_radius=info.min_radius,
             max_radius=info.max_radius,

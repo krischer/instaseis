@@ -204,7 +204,7 @@ def test_incremental_bwd():
     assert instaseis_bwd.meshes.pz.strain_buffer.efficiency == 1.0 / 2.0
 
     # test resampling
-    dt = instaseis_bwd.dt
+    dt = instaseis_bwd.info.dt
     st_bwd = instaseis_bwd.get_seismograms(
         source=source, receiver=receiver, components=('Z'), dt=dt)
     np.testing.assert_allclose(st_bwd.select(component='Z')[0].data,
@@ -476,7 +476,7 @@ def test_finite_source():
         m_rp=-8.050000e+23 / 1E7,
         m_tp=-1.230000e+24 / 1E7)
 
-    dt = instaseis_bwd.dt
+    dt = instaseis_bwd.info.dt
     sliprate = np.zeros(1000)
     sliprate[0] = 1.
     sliprate = lowpass(sliprate, 1./100., 1./dt, corners=4)
