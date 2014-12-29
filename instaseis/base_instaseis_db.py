@@ -16,6 +16,9 @@ from future.utils import with_metaclass
 
 from abc import ABCMeta, abstractmethod
 from obspy.core import AttribDict
+import warnings
+
+from .source import Source, ForceSource, Receiver
 
 
 class BaseInstaseisDB(with_metaclass(ABCMeta)):
@@ -63,6 +66,47 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
         """
         """
         raise NotImplementedError
+
+    def _get_seismograms_sanity_checks(self, source, receiver, kind):
+        """
+        Common sanity checks for the get_seismograms method. Also parses
+        source and receiver objects if necessary.
+
+        :param source: instaseis.Source or instaseis.ForceSource object
+        :type source: :class:`instaseis.source.Source` or
+            :class:`instaseis.source.ForceSource`
+        :param receiver: instaseis.Receiver object
+        :type receiver: :class:`instaseis.source.Receiver`
+        :param kind: 'displacement', 'velocity' or 'acceleration'
+        """
+        # Attempt to parse them if the types are not correct.
+        if not isinstance(source, Source) and \
+                not isinstance(source, ForceSource):
+            source = Source.parse(source)
+        if not isinstance(receiver, Receiver):
+            # This only works in the special case of one station, otherwise
+            # it has to be called more then once.
+            rec = Receiver.parse(receiver)
+            if len(rec) != 1:
+                raise ValueError("Receiver object/file contains multiple "
+                                 "stations. Please parse outside the "
+                                 "get_seismograms() function and call in a "
+                                 "loop.")
+            receiver = rec[0]
+
+        if kind not in ['displacement', 'velocity', 'acceleration']:
+            raise ValueError('unknown kind %s' % (kind,))
+
+        if self.is_reciprocal:
+            if receiver.depth_in_m is not None:
+                warnings.warn('Receiver depth cannot be changed when reading '
+                              'from reciprocal DB. Using depth from the DB.')
+        else:
+            if source.depth_in_m is not None:
+                warnings.warn('Source depth cannot be changed when reading '
+                              'from forward DB. Using depth from the DB.')
+
+        return source, receiver
 
     @staticmethod
     def _get_band_code(dt):

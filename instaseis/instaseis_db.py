@@ -20,7 +20,6 @@ from obspy.core import Stream, Trace, UTCDateTime
 from obspy.signal.util import nextpow2
 import os
 from scipy.integrate import cumtrapz
-import warnings
 
 from . import InstaseisError, InstaseisNotFoundError
 from .base_instaseis_db import BaseInstaseisDB
@@ -30,7 +29,7 @@ from . import rotations
 from . import sem_derivatives
 from . import spectral_basis
 from . import lanczos
-from instaseis.source import Source, ForceSource, Receiver
+from .source import Source, ForceSource
 
 
 MeshCollection_bwd = collections.namedtuple("MeshCollection_bwd", ["px", "pz"])
@@ -227,23 +226,8 @@ class InstaseisDB(BaseInstaseisDB):
             using a lanczos kernel
         :param a_lanczos: width of the kernel used in resampling
         """
-        # Attempt to parse them if the types are not correct.
-        if not isinstance(source, Source) and \
-                not isinstance(source, ForceSource):
-            source = Source.parse(source)
-        if not isinstance(receiver, Receiver):
-            # This only works in the special case of one station, otherwise
-            # it has to be called more then once.
-            rec = Receiver.parse(receiver)
-            if len(rec) != 1:
-                raise ValueError("Receiver object/file contains multiple "
-                                 "stations. Please parse outside the "
-                                 "get_seismograms() function and call in a "
-                                 "loop.")
-            receiver = rec[0]
-
-        if kind not in ['displacement', 'velocity', 'acceleration']:
-            raise ValueError('unknown kind %s' % (kind,))
+        source, receiver = self._get_seismograms_sanity_checks(
+            source=source, receiver=receiver, kind=kind)
 
         if self.is_reciprocal:
             if any(comp in components for comp in ['N', 'E', 'R', 'T']) and \
@@ -253,10 +237,6 @@ class InstaseisDB(BaseInstaseisDB):
             if 'Z' in components and self.meshes.pz is None:
                 raise ValueError("horizontal component only DB")
 
-            if receiver.depth_in_m is not None:
-                warnings.warn('Receiver depth cannot be changed when reading '
-                              'from reciprocal DB. Using depth from the DB.')
-
             rotmesh_s, rotmesh_phi, rotmesh_z = rotations.rotate_frame_rd(
                 source.x(planet_radius=self.planet_radius),
                 source.y(planet_radius=self.planet_radius),
@@ -264,10 +244,6 @@ class InstaseisDB(BaseInstaseisDB):
                 receiver.longitude, receiver.colatitude)
 
         else:
-            if source.depth_in_m is not None:
-                warnings.warn('Source depth cannot be changed when reading '
-                              'from forward DB. Using depth from the DB.')
-
             rotmesh_s, rotmesh_phi, rotmesh_z = rotations.rotate_frame_rd(
                 receiver.x(planet_radius=self.planet_radius),
                 receiver.y(planet_radius=self.planet_radius),
