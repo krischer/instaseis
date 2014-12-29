@@ -19,5 +19,12 @@ class SourceParseError(InstaseisError):
     pass
 
 
+def open(path, *args, **kwargs):
+    if "://" in path:
+        pass
+    else:
+        pass
+
+
 from .instaseisdb import InstaseisDB  # NoQa
 from .source import Source, Receiver, ForceSource, FiniteSource  # NoQa

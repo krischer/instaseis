@@ -898,10 +898,8 @@ class InstaseisDB(object):
         return dict(
             is_reciprocal=self.is_reciprocal,
             components=components,
-            source_depth=(
-                "\tsource depth         : %.2f km\n" %
-                self.parsed_mesh.source_depth) if self.is_reciprocal is False
-            else "",
+            source_depth=float(self.parsed_mesh.source_depth)
+            if self.is_reciprocal is False else None,
             velocity_model=self.background_model,
             attenuation=self.attenuation,
             period=float(self.parsed_mesh.dominant_period),
