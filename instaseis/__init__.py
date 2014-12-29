@@ -26,10 +26,11 @@ def open_db(path, *args, **kwargs):
     :param path: Filepath or URL.
     """
     if "://" in path:
-        raise NotImplementedError
+        from . import remote_instaseis_db
+        return remote_instaseis_db.RemoteInstaseisDB(path, *args, **kwargs)
     else:
-        from .instaseis_db import InstaseisDB
-        return InstaseisDB(path, *args, **kwargs)
+        from . import instaseis_db
+        return instaseis_db.InstaseisDB(path, *args, **kwargs)
 
 
 from .source import Source, Receiver, ForceSource, FiniteSource  # NoQa
