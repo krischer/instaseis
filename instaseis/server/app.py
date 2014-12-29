@@ -9,6 +9,7 @@ Server offering a REST API for Instaseis.
     GNU General Public License, Version 3
     (http://www.gnu.org/copyleft/gpl.html)
 """
+import copy
 import flask
 from flask import Flask, send_file
 from flask.ext.restful import reqparse
@@ -46,11 +47,14 @@ def index():
 
 @app.route("/info")
 def info():
-    info = app.db.info
+    info = copy.deepcopy(app.db.info)
     # No need to write a custom encoder...
     info["datetime"] = str(info["datetime"])
     info["slip"] = list([float(_i) for _i in info["slip"]])
     info["sliprate"] = list([float(_i) for _i in info["sliprate"]])
+    # Clear the directory to avoid leaking any more system information then
+    # necessary.
+    info["directory"] = ""
     return flask.jsonify(**info)
 
 
