@@ -148,13 +148,15 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
             # Convert to an ObsPy Stream object.
             st = Stream()
             band_code = self._get_band_code(dt_out)
+            instaseis_header = AttribDict(mu=data["mu"])
             for comp in components:
                 tr = Trace(data=data[comp],
                            header={"delta": dt_out,
                                    "starttime": origin_time,
                                    "station": receiver.station,
                                    "network": receiver.network,
-                                   "channel": "%sX%s" % (band_code, comp)})
+                                   "channel": "%sX%s" % (band_code, comp),
+                                   "instaseis": instaseis_header})
                 st += tr
             return st
         else:
