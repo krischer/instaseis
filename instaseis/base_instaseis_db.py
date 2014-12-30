@@ -15,8 +15,10 @@ from __future__ import (absolute_import, division, print_function,
 from future.utils import with_metaclass
 
 from abc import ABCMeta, abstractmethod
-from obspy.core import AttribDict, Stream, Trace
+import numpy as np
+from obspy.core import AttribDict, Stream, Trace, UTCDateTime
 import warnings
+from scipy.integrate import cumtrapz
 
 from . import lanczos
 from .source import Source, ForceSource, Receiver
@@ -32,15 +34,134 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
     Each subclass must provide at least a ``get_seismograms()`` and a
     ``get_info()`` method.
     """
-    @abstractmethod
     def get_seismograms(self, source, receiver, components=("Z", "N", "E"),
                         kind='displacement', remove_source_shift=True,
                         reconvolve_stf=False, return_obspy_stream=True,
                         dt=None, a_lanczos=5):
         """
-        Must return either an ObsPy Stream object or a raw numpy array
-        depending on the ``return_obspy_stream`` argument.
+        Extract seismograms for a moment tensor point source from the AxiSEM
+        database.
+
+        :param source: instaseis.Source or instaseis.ForceSource object
+        :type source: :class:`instaseis.source.Source` or
+            :class:`instaseis.source.ForceSource`
+        :param receiver: instaseis.Receiver object
+        :type receiver: :class:`instaseis.source.Receiver`
+        :param components: a tuple containing any combination of the
+            strings ``"Z"``, ``"N"``, ``"E"``, ``"R"``, and ``"T"``
+        :param kind: 'displacement', 'velocity' or 'acceleration'
+        :param remove_source_shift: move the starttime to the peak of the
+            sliprate from the source time function used to generate the
+            database
+        :param reconvolve_stf: deconvolve the source time function used in
+            the AxiSEM run and convolve with the stf attached to the source.
+            For this to be stable, the new stf needs to bandlimited.
+        :param return_obspy_stream: return format is either an obspy.Stream
+            object or a plain array containing the data
+        :param dt: desired sampling of the seismograms. resampling is done
+            using a lanczos kernel
+        :param a_lanczos: width of the kernel used in resampling
         """
+        source, receiver = self._get_seismograms_sanity_checks(
+            source=source, receiver=receiver, components=components, kind=kind)
+
+        # Call the _get_seismograms() method of the respective implementation.
+        data = self._get_seismograms(source=source, receiver=receiver,
+                                     components=components)
+
+        if dt is None:
+            dt_out = self.info.dt
+        else:
+            dt_out = dt
+
+        kind_map = {
+            'displacement': 0,
+            'velocity': 1,
+            'acceleration': 2}
+
+        stf_map = {
+            'errorf': 0,
+            'quheavi': 0,
+            'dirac_0': 1,
+            'gauss_0': 1,
+            'gauss_1': 2,
+            'gauss_2': 3}
+
+        stf_deconv_map = {
+            0: self.info.sliprate,
+            1: self.info.slip}
+
+        n_derivative = kind_map[kind] - stf_map[self.info.stf]
+
+        for comp in components:
+            if remove_source_shift and not reconvolve_stf:
+                data[comp] = data[comp][self.info.src_shift_samples:]
+            elif reconvolve_stf:
+                if source.dt is None or source.sliprate is None:
+                    raise RuntimeError("source has no source time function")
+
+                if stf_map[self.info.stf] not in [0, 1]:
+                    raise NotImplementedError(
+                        'deconvolution not implemented for stf %s'
+                        % (self.info.stf))
+
+                stf_deconv_f = np.fft.rfft(
+                    stf_deconv_map[stf_map[self.info.stf]],
+                    n=self.info.nfft)
+
+                if abs((source.dt - self.info.dt) / self.info.dt) > 1e-7:
+                    raise ValueError("dt of the source not compatible")
+
+                stf_conv_f = np.fft.rfft(source.sliprate,
+                                         n=self.info.nfft)
+
+                if source.time_shift is not None:
+                    stf_conv_f *= \
+                        np.exp(- 1j * np.fft.rfftfreq(self.info.nfft)
+                               * 2. * np.pi * source.time_shift / self.info.dt)
+
+                # XXX: double check whether a taper is needed at the end of the
+                # trace
+                dataf = np.fft.rfft(data[comp], n=self.info.nfft)
+
+                data[comp] = np.fft.irfft(
+                    dataf * stf_conv_f / stf_deconv_f)[:self.info.npts]
+
+            if dt is not None:
+                data[comp] = lanczos.lanczos_resamp(
+                    data[comp], self.info.dt, dt_out, a_lanczos)
+
+            # taking derivative or integral to get the desired kind of
+            # seismogram
+            for _ in np.arange(n_derivative):
+                data[comp] = np.gradient(data[comp], [dt_out])
+
+            for _ in np.arange(-n_derivative):
+                # adding a zero at the beginning to avoid phase shift
+                data[comp] = cumtrapz(data[comp], dx=dt_out, initial=0.)
+
+        if return_obspy_stream:
+            if hasattr(source, "origin_time"):
+                origin_time = source.origin_time
+            else:
+                origin_time = UTCDateTime(0)
+            # Convert to an ObsPy Stream object.
+            st = Stream()
+            band_code = self._get_band_code(dt_out)
+            for comp in components:
+                tr = Trace(data=data[comp],
+                           header={"delta": dt_out,
+                                   "starttime": origin_time,
+                                   "station": receiver.station,
+                                   "network": receiver.network,
+                                   "channel": "%sX%s" % (band_code, comp)})
+                st += tr
+            return st
+        else:
+            return data
+
+    @abstractmethod
+    def _get_seismograms(self, source, receiver, components=("Z", "N", "E")):
         pass
 
     @abstractmethod
@@ -89,12 +210,12 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
         data_summed = {}
         count = len(sources)
         for _i, source in enumerate(sources):
-            data, mu = self.get_seismograms(
+            data = self.get_seismograms(
                 source, receiver, components, reconvolve_stf=True,
                 return_obspy_stream=False)
 
             if correct_mu:
-                corr_fac = mu / DEFAULT_MU,
+                corr_fac = data["mu"] / DEFAULT_MU,
             else:
                 corr_fac = 1
 
