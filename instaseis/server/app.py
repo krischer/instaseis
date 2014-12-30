@@ -83,8 +83,6 @@ seismogram_parser.add_argument("f_r", type=float)
 seismogram_parser.add_argument("f_t", type=float)
 seismogram_parser.add_argument("f_p", type=float)
 # More optional source parameters.
-seismogram_parser.add_argument("source_sliprate", type=float)
-seismogram_parser.add_argument("stf_dt", type=float)
 seismogram_parser.add_argument("origin_time", type=obspy.UTCDateTime,
                                default=obspy.UTCDateTime(0))
 # Receiver parameters.
@@ -119,8 +117,7 @@ def get_seismograms():
                             depth_in_m=args.source_depth_in_m,
                             m_rr=args.m_rr, m_tt=args.m_tt, m_pp=args.m_pp,
                             m_rt=args.m_rt, m_rp=args.m_rp, m_tp=args.m_tp,
-                            sliprate=args.source_sliprate,
-                            dt=args.stf_dt, origin_time=args.origin_time)
+                            origin_time=args.origin_time)
             break
         elif src_type == "strike_dip_rake":
             source = Source.from_strike_dip_rake(
@@ -128,8 +125,7 @@ def get_seismograms():
                 longitude=args.source_longitude,
                 depth_in_m=args.source_depth_in_m,
                 strike=args.strike, dip=args.dip, rake=args.rake,
-                M0=args.M0, sliprate=args.source_sliprate,
-                dt=args.stf_dt, origin_time=args.origin_time)
+                M0=args.M0, origin_time=args.origin_time)
             break
         elif src_type == "force_source":
             source = ForceSource(latitude=args.source_latitude,
