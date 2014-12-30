@@ -65,7 +65,7 @@ class RemoteInstaseisDB(BaseInstaseisDB):
             strings ``"Z"``, ``"N"``, ``"E"``, ``"R"``, and ``"T"``
         """
         # Collect parameters.
-        params = {}
+        params = {"components": "".join(components).upper()}
 
         # Start with the receiver.
         params["receiver_latitude"] = receiver.latitude

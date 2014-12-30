@@ -65,6 +65,7 @@ seismogram_parser.add_argument("source_latitude", type=float, required=True,
                                help="source_latitude is required")
 seismogram_parser.add_argument("source_longitude", type=float, required=True,
                                help="source_longitude is required")
+seismogram_parser.add_argument("components", type=str, default="ZNE")
 seismogram_parser.add_argument("source_depth_in_m", type=float)
 # Source can either be given as the moment tensor components in Nm.
 seismogram_parser.add_argument("m_rr", type=float)
@@ -98,7 +99,6 @@ seismogram_parser.add_argument("station_code", type=str)
 @app.route("/seismograms", methods=["GET", "POST"])
 def get_seismograms():
     args = seismogram_parser.parse_args()
-    print(args)
 
     # Figure out the type of source and construct the source object.
     src_params = {
@@ -107,6 +107,8 @@ def get_seismograms():
         "strike_dip_rake": set(["strike", "dip", "rake", "M0"]),
         "force_source": set(["f_r", "f_t", "f_p"])
     }
+
+    components = list(args.components)
     for src_type, params in src_params.items():
         src_params = [getattr(args, _i) for _i in params]
         if None in src_params:
@@ -145,7 +147,8 @@ def get_seismograms():
                         station=args.station_code,
                         depth_in_m=args.receiver_depth_in_m)
 
-    st = app.db.get_seismograms(source=source, receiver=receiver)
+    st = app.db.get_seismograms(source=source, receiver=receiver,
+                                components=components)
     # Half the filesize but definitely sufficiently accurate.
     for tr in st:
         tr.data = np.require(tr.data, dtype=np.float32)
