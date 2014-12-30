@@ -36,8 +36,6 @@ MeshCollection_bwd = collections.namedtuple("MeshCollection_bwd", ["px", "pz"])
 MeshCollection_fwd = collections.namedtuple("MeshCollection_fwd", ["m1", "m2",
                                                                    "m3", "m4"])
 
-DEFAULT_MU = 32e9
-
 
 class InstaseisDB(BaseInstaseisDB):
     """
@@ -566,7 +564,7 @@ class InstaseisDB(BaseInstaseisDB):
                         np.exp(- 1j * np.fft.rfftfreq(self.info.nfft)
                                * 2. * np.pi * source.time_shift / self.info.dt)
 
-                # XXX: double check wether a taper is needed at the end of the
+                # XXX: double check whether a taper is needed at the end of the
                 # trace
                 dataf = np.fft.rfft(data[comp], n=self.info.nfft)
 
@@ -612,73 +610,6 @@ class InstaseisDB(BaseInstaseisDB):
                 mu = mesh.variables["mesh_mu"][gll_point_ids[npol // 2,
                                                              npol // 2]]
             return data, mu
-
-    def get_seismograms_finite_source(self, sources, receiver,
-                                      components=("Z", "N", "E"),
-                                      kind='displacement', dt=None,
-                                      a_lanczos=5, correct_mu=False,
-                                      progress_callback=None):
-        """
-        Extract seismograms for a finite source from the AxiSEM database
-        provided as a list of point sources attached with source time functions
-        and time shifts.
-
-        :param sources: A collection of point sources.
-        :type sources: list of :class:`instaseis.source.Source` objects
-        :param receiver: The receiver location.
-        :type receiver: :class:`instaseis.source.Receiver`
-        :param components: a tuple containing any combination of the strings
-            ``"Z"``, ``"N"``, and ``"E"``
-        :param kind: 'displacement', 'velocity' or 'acceleration'
-        :param dt: desired sampling of the seismograms.resampling is done
-            using a lanczos kernel
-        :param a_lanczos: width of the kernel used in resampling
-        :param correct_mu: correct the source magnitude for the actual shear
-            modulus from the model
-        """
-        if not self.info.is_reciprocal:
-            raise NotImplementedError
-
-        data_summed = {}
-        count = len(sources)
-        for _i, source in enumerate(sources):
-            data, mu = self.get_seismograms(
-                source, receiver, components, reconvolve_stf=True,
-                return_obspy_stream=False)
-
-            if correct_mu:
-                corr_fac = mu / DEFAULT_MU,
-            else:
-                corr_fac = 1
-
-            for comp in components:
-                if comp in data_summed:
-                    data_summed[comp] += data[comp] * corr_fac
-                else:
-                    data_summed[comp] = data[comp] * corr_fac
-            if progress_callback:
-                cancel = progress_callback(_i + 1, count)
-                if cancel:
-                    return None
-
-        if dt is not None:
-            for comp in components:
-                data_summed[comp] = lanczos.lanczos_resamp(
-                    data_summed[comp], self.info.dt, dt, a_lanczos)
-
-        # Convert to an ObsPy Stream object.
-        st = Stream()
-        if dt is None:
-            dt = self.info.dt
-        band_code = self._get_band_code(dt)
-        for comp in components:
-            tr = Trace(data=data_summed[comp],
-                       header={"delta": dt,
-                               "station": receiver.station,
-                               "network": receiver.network,
-                               "channel": "%sX%s" % (band_code, comp)})
-            st += tr
-        return st
 
     def __get_strain_interp(self, mesh, id_elem, gll_point_ids, G, GT,
                             col_points_xi, col_points_eta, corner_points,

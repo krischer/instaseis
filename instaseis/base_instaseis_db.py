@@ -15,10 +15,14 @@ from __future__ import (absolute_import, division, print_function,
 from future.utils import with_metaclass
 
 from abc import ABCMeta, abstractmethod
-from obspy.core import AttribDict
+from obspy.core import AttribDict, Stream, Trace
 import warnings
 
+from . import lanczos
 from .source import Source, ForceSource, Receiver
+
+
+DEFAULT_MU = 32e9
 
 
 class BaseInstaseisDB(with_metaclass(ABCMeta)):
@@ -26,9 +30,7 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
     Abstract base class for all Instaseis database classes.
 
     Each subclass must provide at least a ``get_seismograms()`` and a
-    ``get_info()`` method. The ``get_seismograms_finite_source()`` method must
-    not be implemented by all subclasses as it may not be practical for some
-    of them.
+    ``get_info()`` method.
     """
     @abstractmethod
     def get_seismograms(self, source, receiver, components=("Z", "N", "E"),
@@ -64,8 +66,66 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
                                       a_lanczos=5, correct_mu=False,
                                       progress_callback=None):
         """
+        Extract seismograms for a finite source from the AxiSEM database
+        provided as a list of point sources attached with source time functions
+        and time shifts.
+
+        :param sources: A collection of point sources.
+        :type sources: list of :class:`instaseis.source.Source` objects
+        :param receiver: The receiver location.
+        :type receiver: :class:`instaseis.source.Receiver`
+        :param components: a tuple containing any combination of the strings
+            ``"Z"``, ``"N"``, and ``"E"``
+        :param kind: 'displacement', 'velocity' or 'acceleration'
+        :param dt: desired sampling of the seismograms.resampling is done
+            using a lanczos kernel
+        :param a_lanczos: width of the kernel used in resampling
+        :param correct_mu: correct the source magnitude for the actual shear
+            modulus from the model
         """
-        raise NotImplementedError
+        if not self.info.is_reciprocal:
+            raise NotImplementedError
+
+        data_summed = {}
+        count = len(sources)
+        for _i, source in enumerate(sources):
+            data, mu = self.get_seismograms(
+                source, receiver, components, reconvolve_stf=True,
+                return_obspy_stream=False)
+
+            if correct_mu:
+                corr_fac = mu / DEFAULT_MU,
+            else:
+                corr_fac = 1
+
+            for comp in components:
+                if comp in data_summed:
+                    data_summed[comp] += data[comp] * corr_fac
+                else:
+                    data_summed[comp] = data[comp] * corr_fac
+            if progress_callback:
+                cancel = progress_callback(_i + 1, count)
+                if cancel:
+                    return None
+
+        if dt is not None:
+            for comp in components:
+                data_summed[comp] = lanczos.lanczos_resamp(
+                    data_summed[comp], self.info.dt, dt, a_lanczos)
+
+        # Convert to an ObsPy Stream object.
+        st = Stream()
+        if dt is None:
+            dt = self.info.dt
+        band_code = self._get_band_code(dt)
+        for comp in components:
+            tr = Trace(data=data_summed[comp],
+                       header={"delta": dt,
+                               "station": receiver.station,
+                               "network": receiver.network,
+                               "channel": "%sX%s" % (band_code, comp)})
+            st += tr
+        return st
 
     def _get_seismograms_sanity_checks(self, source, receiver, components,
                                        kind):
