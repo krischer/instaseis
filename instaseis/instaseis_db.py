@@ -680,12 +680,12 @@ class InstaseisDB(BaseInstaseisDB):
         if dt is not None:
             for comp in components:
                 data_summed[comp] = lanczos.lanczos_resamp(
-                    data_summed[comp], self.parsed_mesh.dt, dt, a_lanczos)
+                    data_summed[comp], self.info.dt, dt, a_lanczos)
 
         # Convert to an ObsPy Stream object.
         st = Stream()
         if dt is None:
-            dt = self.parsed_mesh.dt
+            dt = self.info.dt
         band_code = self._get_band_code(dt)
         for comp in components:
             tr = Trace(data=data_summed[comp],
