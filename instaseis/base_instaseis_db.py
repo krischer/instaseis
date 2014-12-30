@@ -327,8 +327,11 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
         """
         Returns the info dictionary about the class.
         """
-        if not hasattr(self, "__cached_info"):
-            self.__cached_info = AttribDict(self.get_info())
+        try:
+            return self.__cached_info
+        except:
+            pass
+        self.__cached_info = AttribDict(self.get_info())
         return self.__cached_info
 
     def __str__(self):
