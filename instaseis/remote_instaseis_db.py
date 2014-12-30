@@ -16,9 +16,10 @@ from future import standard_library
 with standard_library.hooks():
     from urllib.parse import urlunparse, urlencode, urlparse
 
+import obspy
 import requests
 
-from . import InstaseisError
+from . import InstaseisError, Source, ForceSource
 from .base_instaseis_db import BaseInstaseisDB
 
 
@@ -80,12 +81,44 @@ class RemoteInstaseisDB(BaseInstaseisDB):
         source, receiver = self._get_seismograms_sanity_checks(
             source=source, receiver=receiver, kind=kind)
 
-        if return_obspy_stream:
-            return st
-        else:
-            return data, mu
+        # Collect parameters.
+        params = {}
 
-    def _get_url(self, path, *kwargs):
+        # Start with the receiver.
+        params["receiver_latitude"] = receiver.latitude
+        params["receiver_longitude"] = receiver.longitude
+        if receiver.depth_in_m is not None:
+            params["receiver_depth_in_m"] = receiver.depth_in_m
+        if receiver.network:
+            params["network_code"] = receiver.network
+        if receiver.station:
+            params["station_code"] = receiver.station
+
+        # Do the source.
+        params["source_latitude"] = source.latitude
+        params["source_longitude"] = source.longitude
+        if source.depth_in_m is not None:
+            params["source_depth_in_m"] = source.depth_in_m
+        if isinstance(source, ForceSource):
+            params["f_r"] = source.f_r
+            params["f_t"] = source.f_t
+            params["f_p"] = source.f_p
+        elif isinstance(source, Source):
+            params["m_rr"] = source.m_rr
+            params["m_tt"] = source.m_tt
+            params["m_pp"] = source.m_pp
+            params["m_rt"] = source.m_rt
+            params["m_rp"] = source.m_rp
+            params["m_tp"] = source.m_tp
+        else:
+            raise NotImplementedError
+
+        url = self._get_url(path="seismograms", **params)
+        # Just utilize ObsPy to download and unpack the data!
+        st = obspy.read(url)
+        return st
+
+    def _get_url(self, path, **kwargs):
         return urlunparse((self._scheme, self._netloc, path, None,
                            urlencode(kwargs), None))
 
