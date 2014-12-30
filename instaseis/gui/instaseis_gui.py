@@ -478,6 +478,25 @@ class Window(QtGui.QMainWindow):
         self.update()
         self.set_info()
 
+    def on_select_remote_connection_button_released(self):
+        text, ok = QtGui.QInputDialog.getText(
+            self, "Remote Instaseis Connection",
+            "Enter URL to remote Instaseis Server:")
+        if not ok:
+            return
+        text = str(text)
+
+        self.instaseis_db = open_db(text)
+
+        # Adjust depth slider to the DB.
+        max_rad = self.instaseis_db.info.max_radius
+        min_rad = self.instaseis_db.info.min_radius
+        self.ui.depth_slider.setMinimum(min_rad - max_rad)
+        self.ui.depth_slider.setMaximum(0)
+
+        self.update()
+        self.set_info()
+
     def on_open_srf_file_button_released(self):
         pwd = os.getcwd()
         self.srf_file = str(QtGui.QFileDialog.getOpenFileName(

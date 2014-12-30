@@ -49,7 +49,6 @@ class RemoteInstaseisDB(BaseInstaseisDB):
                                  "response: %s" % (str(root)))
         self.get_info()
 
-
     def get_seismograms(self, source, receiver, components=("Z", "N", "E"),
                         kind='displacement', remove_source_shift=True,
                         reconvolve_stf=False, return_obspy_stream=True,
