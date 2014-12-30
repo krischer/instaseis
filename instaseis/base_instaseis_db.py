@@ -97,7 +97,7 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
         if kind not in ['displacement', 'velocity', 'acceleration']:
             raise ValueError('unknown kind %s' % (kind,))
 
-        if self.is_reciprocal:
+        if self.info.is_reciprocal:
             if receiver.depth_in_m is not None:
                 warnings.warn('Receiver depth cannot be changed when reading '
                               'from reciprocal DB. Using depth from the DB.')

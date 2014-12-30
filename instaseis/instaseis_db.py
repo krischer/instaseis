@@ -173,7 +173,7 @@ class InstaseisDB(BaseInstaseisDB):
             # Should not happen.
             raise NotImplementedError
         self.meshes = MeshCollection_bwd(px=px_m, pz=pz_m)
-        self.is_reciprocal = True
+        self._is_reciprocal = True
 
     def _parse_mt_meshes(self, files):
         m1_m = mesh.Mesh(
@@ -196,7 +196,7 @@ class InstaseisDB(BaseInstaseisDB):
         self.parsed_mesh = m1_m
 
         self.meshes = MeshCollection_fwd(m1_m, m2_m, m3_m, m4_m)
-        self.is_reciprocal = False
+        self._is_reciprocal = False
 
     def get_seismograms(self, source, receiver, components=("Z", "N", "E"),
                         kind='displacement', remove_source_shift=True,
@@ -229,7 +229,7 @@ class InstaseisDB(BaseInstaseisDB):
         source, receiver = self._get_seismograms_sanity_checks(
             source=source, receiver=receiver, kind=kind)
 
-        if self.is_reciprocal:
+        if self.info.is_reciprocal:
             if any(comp in components for comp in ['N', 'E', 'R', 'T']) and \
                     self.meshes.px is None:
                 raise ValueError("vertical component only DB")
@@ -305,7 +305,7 @@ class InstaseisDB(BaseInstaseisDB):
 
         data = {}
 
-        if self.is_reciprocal:
+        if self.info.is_reciprocal:
 
             fac_1_map = {"N": np.cos,
                          "E": np.sin}
@@ -652,7 +652,7 @@ class InstaseisDB(BaseInstaseisDB):
         :param correct_mu: correct the source magnitude for the actual shear
             modulus from the model
         """
-        if not self.is_reciprocal:
+        if not self.info.is_reciprocal:
             raise NotImplementedError
 
         data_summed = {}
@@ -811,7 +811,7 @@ class InstaseisDB(BaseInstaseisDB):
             if m:
                 filesize += os.path.getsize(m.filename)
 
-        if self.is_reciprocal:
+        if self._is_reciprocal:
             if self.meshes.pz is not None and self.meshes.px is not None:
                 components = 'vertical and horizontal'
             elif self.meshes.pz is None and self.meshes.px is not None:
@@ -822,10 +822,10 @@ class InstaseisDB(BaseInstaseisDB):
             components = '4 elemental moment tensors'
 
         return dict(
-            is_reciprocal=self.is_reciprocal,
+            is_reciprocal=self._is_reciprocal,
             components=components,
             source_depth=float(self.parsed_mesh.source_depth)
-            if self.is_reciprocal is False else None,
+            if self._is_reciprocal is False else None,
             velocity_model=self.parsed_mesh.background_model,
             attenuation=self.parsed_mesh.attenuation,
             period=float(self.parsed_mesh.dominant_period),
