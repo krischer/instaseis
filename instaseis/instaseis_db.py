@@ -582,8 +582,8 @@ class InstaseisDB(BaseInstaseisDB):
                         np.exp(- 1j * np.fft.rfftfreq(self.nfft)
                                * 2. * np.pi * source.time_shift / self.info.dt)
 
-                # TODO: double check wether a taper is needed at the end of the
-                #       trace
+                # XXX: double check wether a taper is needed at the end of the
+                # trace
                 dataf = np.fft.rfft(data[comp], n=self.nfft)
 
                 data[comp] = np.fft.irfft(
@@ -595,10 +595,10 @@ class InstaseisDB(BaseInstaseisDB):
 
             # taking derivative or integral to get the desired kind of
             # seismogram
-            for _n in np.arange(n_derivative):
+            for _ in np.arange(n_derivative):
                 data[comp] = np.gradient(data[comp], [dt_out])
 
-            for _n in np.arange(-n_derivative):
+            for _ in np.arange(-n_derivative):
                 # adding a zero at the beginning to avoid phase shift
                 data[comp] = cumtrapz(data[comp], dx=dt_out, initial=0.)
 
@@ -837,6 +837,7 @@ class InstaseisDB(BaseInstaseisDB):
             length=float(self.parsed_mesh.dt * (self.parsed_mesh.ndumps - 1)),
             stf=self.parsed_mesh.stf_kind,
             src_shift=float(self.parsed_mesh.source_shift),
+            src_shift_samples=int(self.parsed_mesh.source_shift_samp),
             slip=self.parsed_mesh.stf,
             sliprate=self.parsed_mesh.stf_d_norm,
             spatial_order=int(self.parsed_mesh.npol),

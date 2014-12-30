@@ -50,11 +50,11 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
         ``"velocity_model"``, ``"attenuation"``, ``"period"``,
         ``"dump_type"``, ``"excitation_type"``, ``"dt"``,
         ``"sampling_rate"``, ``"npts"``, ``"length"``, ``"stf"``,
-        ``"slip"``, ``"sliprate"``, ``"src_shift"``, ``"spatial_order"``,
-        ``"min_radius"``, ``"max_radius"``, ``"planet_radius"``,
-        ``"min_d"``, ``"max_d"``, ``"time_scheme"``, ``"directory"``,
-        ``"filesize"``, ``"compiler"``, ``"user"``, ``"format_version"``,
-        ``"axisem_version"``, ``"datetime"``
+        ``"slip"``, ``"sliprate"``, ``"src_shift"``, ``"src_shift_samples"``,
+        ``"spatial_order"``, ``"min_radius"``, ``"max_radius"``,
+        ``"planet_radius"``, ``"min_d"``, ``"max_d"``, ``"time_scheme"``,
+        ``"directory"``, ``"filesize"``, ``"compiler"``, ``"user"``,
+        ``"format_version"``, ``"axisem_version"``, ``"datetime"``
         """
         pass
 
