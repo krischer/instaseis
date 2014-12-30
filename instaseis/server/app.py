@@ -147,8 +147,12 @@ def get_seismograms():
                         station=args.station_code,
                         depth_in_m=args.receiver_depth_in_m)
 
+    # Get the most barebones seismograms possible.
     st = app.db.get_seismograms(source=source, receiver=receiver,
-                                components=components)
+                                components=components, kind="displacement",
+                                remove_source_shift=False,
+                                reconvolve_stf=False,
+                                return_obspy_stream=True, dt=None)
     # Half the filesize but definitely sufficiently accurate.
     for tr in st:
         tr.data = np.require(tr.data, dtype=np.float32)

@@ -469,7 +469,7 @@ class Window(QtGui.QMainWindow):
 
         # Adjust depth slider to the DB.
         max_rad = self.instaseis_db.info.max_radius
-        min_rad = self.instaseis_db.info.max_radius
+        min_rad = self.instaseis_db.info.min_radius
         self.ui.depth_slider.setMinimum(min_rad - max_rad)
         self.ui.depth_slider.setMaximum(0)
 
