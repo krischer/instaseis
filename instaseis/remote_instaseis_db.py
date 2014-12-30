@@ -78,7 +78,7 @@ class RemoteInstaseisDB(BaseInstaseisDB):
         :param a_lanczos: width of the kernel used in resampling
         """
         source, receiver = self._get_seismograms_sanity_checks(
-            source=source, receiver=receiver, kind=kind)
+            source=source, receiver=receiver, components=components, kind=kind)
 
         # Collect parameters.
         params = {}

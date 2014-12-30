@@ -67,7 +67,8 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
         """
         raise NotImplementedError
 
-    def _get_seismograms_sanity_checks(self, source, receiver, kind):
+    def _get_seismograms_sanity_checks(self, source, receiver, components,
+                                       kind):
         """
         Common sanity checks for the get_seismograms method. Also parses
         source and receiver objects if necessary.
@@ -77,6 +78,8 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
             :class:`instaseis.source.ForceSource`
         :param receiver: instaseis.Receiver object
         :type receiver: :class:`instaseis.source.Receiver`
+        :param components: a tuple containing any combination of the
+            strings ``"Z"``, ``"N"``, ``"E"``, ``"R"``, and ``"T"``
         :param kind: 'displacement', 'velocity' or 'acceleration'
         """
         # Attempt to parse them if the types are not correct.
@@ -101,6 +104,14 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
             if receiver.depth_in_m is not None:
                 warnings.warn('Receiver depth cannot be changed when reading '
                               'from reciprocal DB. Using depth from the DB.')
+
+            if any(comp in components for comp in ['N', 'E', 'R', 'T']) and \
+                    "horizontal" not in self.info.components:
+                raise ValueError("vertical component only DB")
+
+            if 'Z' in components and "vertical" not in self.info.components:
+                raise ValueError("horizontal component only DB")
+
         else:
             if source.depth_in_m is not None:
                 warnings.warn('Source depth cannot be changed when reading '

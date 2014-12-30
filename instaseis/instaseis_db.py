@@ -222,28 +222,17 @@ class InstaseisDB(BaseInstaseisDB):
         :param a_lanczos: width of the kernel used in resampling
         """
         source, receiver = self._get_seismograms_sanity_checks(
-            source=source, receiver=receiver, kind=kind)
+            source=source, receiver=receiver, components=components, kind=kind)
 
         if self.info.is_reciprocal:
-            if any(comp in components for comp in ['N', 'E', 'R', 'T']) and \
-                    self.meshes.px is None:
-                raise ValueError("vertical component only DB")
-
-            if 'Z' in components and self.meshes.pz is None:
-                raise ValueError("horizontal component only DB")
-
-            rotmesh_s, rotmesh_phi, rotmesh_z = rotations.rotate_frame_rd(
-                source.x(planet_radius=self.info.planet_radius),
-                source.y(planet_radius=self.info.planet_radius),
-                source.z(planet_radius=self.info.planet_radius),
-                receiver.longitude, receiver.colatitude)
-
+            a, b = source, receiver
         else:
-            rotmesh_s, rotmesh_phi, rotmesh_z = rotations.rotate_frame_rd(
-                receiver.x(planet_radius=self.info.planet_radius),
-                receiver.y(planet_radius=self.info.planet_radius),
-                receiver.z(planet_radius=self.info.planet_radius),
-                source.longitude, source.colatitude)
+            a, b = receiver, source
+        rotmesh_s, rotmesh_phi, rotmesh_z = rotations.rotate_frame_rd(
+            a.x(planet_radius=self.info.planet_radius),
+            a.y(planet_radius=self.info.planet_radius),
+            a.z(planet_radius=self.info.planet_radius),
+            b.longitude, b.colatitude)
 
         k_map = {"displ_only": 6,
                  "strain_only": 1,
