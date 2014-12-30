@@ -7,6 +7,10 @@ class InstaseisError(Exception):
     pass
 
 
+class InstaseisWarning(UserWarning):
+    pass
+
+
 class InstaseisNotFoundError(InstaseisError):
     pass
 

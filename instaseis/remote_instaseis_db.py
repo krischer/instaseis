@@ -16,11 +16,13 @@ from future import standard_library
 with standard_library.hooks():
     from urllib.parse import urlunparse, urlencode, urlparse
 
+import io
 import obspy
 import requests
+import warnings
 
-from . import InstaseisError, Source, ForceSource
-from .base_instaseis_db import BaseInstaseisDB
+from . import InstaseisError, InstaseisWarning, Source, ForceSource
+from .base_instaseis_db import BaseInstaseisDB, DEFAULT_MU
 
 
 class RemoteInstaseisDB(BaseInstaseisDB):
@@ -49,10 +51,7 @@ class RemoteInstaseisDB(BaseInstaseisDB):
                                  "response: %s" % (str(root)))
         self.get_info()
 
-    def get_seismograms(self, source, receiver, components=("Z", "N", "E"),
-                        kind='displacement', remove_source_shift=True,
-                        reconvolve_stf=False, return_obspy_stream=True,
-                        dt=None, a_lanczos=5):
+    def _get_seismograms(self, source, receiver, components=("Z", "N", "E")):
         """
         Extract seismograms for a moment tensor point source from the AxiSEM
         database.
@@ -64,22 +63,7 @@ class RemoteInstaseisDB(BaseInstaseisDB):
         :type receiver: :class:`instaseis.source.Receiver`
         :param components: a tuple containing any combination of the
             strings ``"Z"``, ``"N"``, ``"E"``, ``"R"``, and ``"T"``
-        :param kind: 'displacement', 'velocity' or 'acceleration'
-        :param remove_source_shift: move the starttime to the peak of the
-            sliprate from the source time function used to generate the
-            database
-        :param reconvolve_stf: deconvolve the source time function used in
-            the AxiSEM run and convolve with the stf attached to the source.
-            For this to be stable, the new stf needs to bandlimited.
-        :param return_obspy_stream: return format is either an obspy.Stream
-            object or a plain array containing the data
-        :param dt: desired sampling of the seismograms. resampling is done
-            using a lanczos kernel
-        :param a_lanczos: width of the kernel used in resampling
         """
-        source, receiver = self._get_seismograms_sanity_checks(
-            source=source, receiver=receiver, components=components, kind=kind)
-
         # Collect parameters.
         params = {}
 
@@ -113,9 +97,31 @@ class RemoteInstaseisDB(BaseInstaseisDB):
             raise NotImplementedError
 
         url = self._get_url(path="seismograms", **params)
-        # Just utilize ObsPy to download and unpack the data!
-        st = obspy.read(url)
-        return st
+
+        r = requests.get(url)
+        if "Instaseis-Mu" not in r.headers:
+            warnings.warn("Mu is not passed via the HTTP headers. Maybe some "
+                          "proxy removed it? Mu is now always the default me.",
+                          InstaseisWarning)
+            mu = DEFAULT_MU
+        else:
+            mu = float(r.headers["Instaseis-Mu"])
+
+        with io.BytesIO(r.content) as fh:
+            fh.seek(0, 0)
+            st = obspy.read(fh)
+
+        # Convert back to dictionary of numpy arrays...this is a bit
+        # redundant but plays nice with the rest of Instaseis and still
+        # enables a REST API that serves MiniSEED files.
+        data = {
+            "mu": mu
+        }
+
+        for tr in st:
+            data[tr.stats.channel[-1].upper()] = tr.data
+
+        return data
 
     def _get_url(self, path, **kwargs):
         return urlunparse((self._scheme, self._netloc, path, None,

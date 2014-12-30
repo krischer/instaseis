@@ -11,7 +11,7 @@ Server offering a REST API for Instaseis.
 """
 import copy
 import flask
-from flask import Flask, send_file
+from flask import Flask, make_response
 from flask.ext.restful import reqparse
 import io
 import numpy as np
@@ -154,15 +154,23 @@ def get_seismograms():
     for tr in st:
         tr.data = np.require(tr.data, dtype=np.float32)
 
-    fh = io.BytesIO()
+    with io.BytesIO() as fh:
+        st.write(fh, format="mseed")
+        fh.seek(0, 0)
+        binary_data = fh.read()
 
-    st.write(fh, format="mseed")
-    fh.seek(0, 0)
-    return send_file(fh, mimetype="application/octet-stream",
-                     add_etags=False,
-                     as_attachment=True,
-                     attachment_filename="instaseis_seismogram_%s.mseed" %
-                     str(obspy.UTCDateTime()).replace(":", "_"))
+    filename = "instaseis_seismogram_%s.mseed" % \
+        str(obspy.UTCDateTime()).replace(":", "_")
+
+    response = make_response(binary_data)
+    response.headers["Content-Type"] = "application/octet-stream"
+    response.headers["Content-Disposition"] = \
+        "attachment; filename=%s" % filename
+    # Passing mu in the HTTP header...not sure how well this plays with
+    # proxies...
+    response.headers["Instaseis-Mu"] = st[0].stats.instaseis.mu
+
+    return response
 
 
 def serve(db_path, port, buffer_size_in_mb):
