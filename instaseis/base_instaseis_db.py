@@ -49,7 +49,7 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
         ``"is_reciprocal"``, ``"components"``, ``"source_depth"``,
         ``"velocity_model"``, ``"attenuation"``, ``"period"``,
         ``"dump_type"``, ``"excitation_type"``, ``"dt"``,
-        ``"sampling_rate"``, ``"npts"``, ``"length"``, ``"stf"``,
+        ``"sampling_rate"``, ``"npts"``, ``"nnft"``, ``"length"``, ``"stf"``,
         ``"slip"``, ``"sliprate"``, ``"src_shift"``, ``"src_shift_samples"``,
         ``"spatial_order"``, ``"min_radius"``, ``"max_radius"``,
         ``"planet_radius"``, ``"min_d"``, ``"max_d"``, ``"time_scheme"``,

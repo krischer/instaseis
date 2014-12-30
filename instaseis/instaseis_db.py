@@ -123,11 +123,6 @@ class InstaseisDB(BaseInstaseisDB):
         else:
             raise InstaseisError("Could not find any suitable netCDF files.")
 
-        # Set some common variables.
-        self.nfft = nextpow2(self.info.npts) * 2
-        self.planet_radius = self.parsed_mesh.planet_radius
-        self.dump_type = self.parsed_mesh.dump_type
-
     def _parse_fs_meshes(self, files):
         if "PX" in files:
             px_file = files["PX"]
@@ -238,28 +233,28 @@ class InstaseisDB(BaseInstaseisDB):
                 raise ValueError("horizontal component only DB")
 
             rotmesh_s, rotmesh_phi, rotmesh_z = rotations.rotate_frame_rd(
-                source.x(planet_radius=self.planet_radius),
-                source.y(planet_radius=self.planet_radius),
-                source.z(planet_radius=self.planet_radius),
+                source.x(planet_radius=self.info.planet_radius),
+                source.y(planet_radius=self.info.planet_radius),
+                source.z(planet_radius=self.info.planet_radius),
                 receiver.longitude, receiver.colatitude)
 
         else:
             rotmesh_s, rotmesh_phi, rotmesh_z = rotations.rotate_frame_rd(
-                receiver.x(planet_radius=self.planet_radius),
-                receiver.y(planet_radius=self.planet_radius),
-                receiver.z(planet_radius=self.planet_radius),
+                receiver.x(planet_radius=self.info.planet_radius),
+                receiver.y(planet_radius=self.info.planet_radius),
+                receiver.z(planet_radius=self.info.planet_radius),
                 source.longitude, source.colatitude)
 
         k_map = {"displ_only": 6,
                  "strain_only": 1,
                  "fullfields": 1}
 
-        nextpoints = self.parsed_mesh.kdtree.query([rotmesh_s, rotmesh_z],
-                                                   k=k_map[self.dump_type])
+        nextpoints = self.parsed_mesh.kdtree.query(
+            [rotmesh_s, rotmesh_z], k=k_map[self.info.dump_type])
 
         # Find the element containing the point of interest.
         mesh = self.parsed_mesh.f.groups["Mesh"]
-        if self.dump_type == 'displ_only':
+        if self.info.dump_type == 'displ_only':
             for idx in nextpoints[1]:
                 corner_points = np.empty((4, 2), dtype="float64")
 
@@ -313,7 +308,7 @@ class InstaseisDB(BaseInstaseisDB):
                          "E": np.cos}
 
             if isinstance(source, Source):
-                if self.dump_type == 'displ_only':
+                if self.info.dump_type == 'displ_only':
                     if axis:
                         G = self.parsed_mesh.G2
                         GT = self.parsed_mesh.G1T
@@ -326,23 +321,23 @@ class InstaseisDB(BaseInstaseisDB):
 
                 # Minor optimization: Only read if actually requested.
                 if "Z" in components:
-                    if self.dump_type == 'displ_only':
+                    if self.info.dump_type == 'displ_only':
                         strain_z = self.__get_strain_interp(
                             self.meshes.pz, id_elem, gll_point_ids, G, GT,
                             col_points_xi, col_points_eta, corner_points,
                             eltype, axis, xi, eta)
-                    elif (self.dump_type == 'fullfields'
-                            or self.dump_type == 'strain_only'):
+                    elif (self.info.dump_type == 'fullfields'
+                            or self.info.dump_type == 'strain_only'):
                         strain_z = self.__get_strain(self.meshes.pz, id_elem)
 
                 if any(comp in components for comp in ['N', 'E', 'R', 'T']):
-                    if self.dump_type == 'displ_only':
+                    if self.info.dump_type == 'displ_only':
                         strain_x = self.__get_strain_interp(
                             self.meshes.px, id_elem, gll_point_ids, G, GT,
                             col_points_xi, col_points_eta, corner_points,
                             eltype, axis, xi, eta)
-                    elif (self.dump_type == 'fullfields'
-                            or self.dump_type == 'strain_only'):
+                    elif (self.info.dump_type == 'fullfields' or
+                          self.info.dump_type == 'strain_only'):
                         strain_x = self.__get_strain(self.meshes.px, id_elem)
 
                 mij = rotations\
@@ -397,7 +392,7 @@ class InstaseisDB(BaseInstaseisDB):
                     data[comp] = final
 
             elif isinstance(source, ForceSource):
-                if self.dump_type != 'displ_only':
+                if self.info.dump_type != 'displ_only':
                     raise ValueError("Force sources only in displ_only mode")
 
                 if "Z" in components:
@@ -460,7 +455,7 @@ class InstaseisDB(BaseInstaseisDB):
         else:
             if not isinstance(source, Source):
                 raise NotImplementedError
-            if self.dump_type != 'displ_only':
+            if self.info.dump_type != 'displ_only':
                 raise NotImplementedError
 
             displ_1 = self.__get_displacement(self.meshes.m1, id_elem,
@@ -569,22 +564,22 @@ class InstaseisDB(BaseInstaseisDB):
 
                 stf_deconv_f = np.fft.rfft(
                     stf_deconv_map[stf_map[self.info.stf]],
-                    n=self.nfft)
+                    n=self.info.nfft)
 
                 if abs((source.dt - self.info.dt) / self.info.dt) > 1e-7:
                     raise ValueError("dt of the source not compatible")
 
                 stf_conv_f = np.fft.rfft(source.sliprate,
-                                         n=self.nfft)
+                                         n=self.info.nfft)
 
                 if source.time_shift is not None:
                     stf_conv_f *= \
-                        np.exp(- 1j * np.fft.rfftfreq(self.nfft)
+                        np.exp(- 1j * np.fft.rfftfreq(self.info.nfft)
                                * 2. * np.pi * source.time_shift / self.info.dt)
 
                 # XXX: double check wether a taper is needed at the end of the
                 # trace
-                dataf = np.fft.rfft(data[comp], n=self.nfft)
+                dataf = np.fft.rfft(data[comp], n=self.info.nfft)
 
                 data[comp] = np.fft.irfft(
                     dataf * stf_conv_f / stf_deconv_f)[:self.info.npts]
@@ -834,6 +829,7 @@ class InstaseisDB(BaseInstaseisDB):
             dt=float(self.parsed_mesh.dt),
             sampling_rate=float(1.0 / self.parsed_mesh.dt),
             npts=int(self.parsed_mesh.ndumps),
+            nfft=int(nextpow2(self.parsed_mesh.ndumps) * 2),
             length=float(self.parsed_mesh.dt * (self.parsed_mesh.ndumps - 1)),
             stf=self.parsed_mesh.stf_kind,
             src_shift=float(self.parsed_mesh.source_shift),
