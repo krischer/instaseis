@@ -532,7 +532,7 @@ class InstaseisDB(BaseInstaseisDB):
                     data["Z"] = final[:, 2]
 
         if dt is None:
-            dt_out = self.parsed_mesh.dt
+            dt_out = self.info.dt
         else:
             dt_out = dt
 
@@ -553,22 +553,22 @@ class InstaseisDB(BaseInstaseisDB):
             0: self.info.sliprate,
             1: self.info.slip}
 
-        n_derivative = kind_map[kind] - stf_map[self.parsed_mesh.stf_kind]
+        n_derivative = kind_map[kind] - stf_map[self.info.stf]
 
         for comp in components:
             if remove_source_shift and not reconvolve_stf:
-                data[comp] = data[comp][self.parsed_mesh.source_shift_samp:]
+                data[comp] = data[comp][self.info.src_shift_samples:]
             elif reconvolve_stf:
                 if source.dt is None or source.sliprate is None:
                     raise RuntimeError("source has no source time function")
 
-                if stf_map[self.parsed_mesh.stf_kind] not in [0, 1]:
+                if stf_map[self.info.stf] not in [0, 1]:
                     raise NotImplementedError(
                         'deconvolution not implemented for stf %s'
-                        % (self.parsed_mesh.stf_kind))
+                        % (self.info.stf))
 
                 stf_deconv_f = np.fft.rfft(
-                    stf_deconv_map[stf_map[self.parsed_mesh.stf_kind]],
+                    stf_deconv_map[stf_map[self.info.stf]],
                     n=self.nfft)
 
                 if abs((source.dt - self.info.dt) / self.info.dt) > 1e-7:
@@ -591,7 +591,7 @@ class InstaseisDB(BaseInstaseisDB):
 
             if dt is not None:
                 data[comp] = lanczos.lanczos_resamp(
-                    data[comp], self.parsed_mesh.dt, dt_out, a_lanczos)
+                    data[comp], self.info.dt, dt_out, a_lanczos)
 
             # taking derivative or integral to get the desired kind of
             # seismogram
@@ -620,7 +620,7 @@ class InstaseisDB(BaseInstaseisDB):
                 st += tr
             return st
         else:
-            npol = self.parsed_mesh.npol
+            npol = self.info.spatial_order
             if not self.read_on_demand:
                 mu = self.parsed_mesh.mesh_mu[gll_point_ids[npol // 2,
                                                             npol // 2]]
