@@ -839,7 +839,7 @@ class InstaseisDB(BaseInstaseisDB):
             spatial_order=int(self.parsed_mesh.npol),
             min_radius=float(self.parsed_mesh.kwf_rmin),
             max_radius=float(self.parsed_mesh.kwf_rmax),
-            planet_radius=float(self.parsed_mesh.planet_radius / 1E3),
+            planet_radius=float(self.parsed_mesh.planet_radius),
             min_d=float(self.parsed_mesh.kwf_colatmin),
             max_d=float(self.parsed_mesh.kwf_colatmax),
             time_scheme=self.parsed_mesh.time_scheme,

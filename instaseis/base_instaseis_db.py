@@ -187,7 +187,7 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
             spatial_order=info.spatial_order,
             min_radius=info.min_radius,
             max_radius=info.max_radius,
-            planet_radius=info.planet_radius,
+            planet_radius=info.planet_radius / 1.0E3,
             min_d=info.min_d,
             max_d=info.max_d,
             time_scheme=info.time_scheme,
