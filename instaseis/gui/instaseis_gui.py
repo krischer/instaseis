@@ -494,6 +494,8 @@ class Window(QtGui.QMainWindow):
         self.ui.depth_slider.setMinimum(min_rad - max_rad)
         self.ui.depth_slider.setMaximum(0)
 
+        self._setup_finite_source()
+
         self.update()
         self.set_info()
 
@@ -517,16 +519,17 @@ class Window(QtGui.QMainWindow):
             # self.finite_source.set_sliprate_lp(
             #     dt=self.instaseis_db.info.dt,
             # nsamp=self.instaseis_db.info.npts,
-            #     freq=1.0/self.instaseis_db.parsed_mesh.dominant_period)
+            #     freq=1.0/self.instaseis_db.info.period)
 
-            nsamp = int(self.instaseis_db.parsed_mesh.dominant_period
+            nsamp = int(self.instaseis_db.info.period
                         / self.finite_source[0].dt) * 5
             self.finite_source.resample_sliprate(
                 dt=self.finite_source[0].dt, nsamp=nsamp)
             self.finite_source.lp_sliprate(
-                freq=1.0/self.instaseis_db.parsed_mesh.dominant_period)
+                freq=1.0/self.instaseis_db.info.period)
             self.finite_source.resample_sliprate(
-                dt=self.instaseis_db.info.dt, nsamp=self.instaseis_db.ndumps)
+                dt=self.instaseis_db.info.dt,
+                nsamp=self.instaseis_db.info.npts)
 
         self.finite_source.compute_centroid()
         self.plot_mt_finite()
