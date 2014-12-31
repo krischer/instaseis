@@ -111,8 +111,8 @@ lib = MyExtension('instaseis',
                       os.path.join(src, "lanczos.f90"),
                   ])
 
-INSTALL_REQUIRES = ["netCDF4", "numpy", "obspy", "future", "tornado",
-                    "flake8>=2", "pytest"]
+INSTALL_REQUIRES = ["netCDF4", "numpy", "obspy", "future", "requests",
+                    "tornado", "flake8>=2", "pytest"]
 
 # Add argparse and ordereddict for Python 2.6. Both are standard library
 # packages for Python >= 2.7.
