@@ -14,7 +14,7 @@ from __future__ import (absolute_import, division, print_function,
 import argparse
 import os
 
-from instaseis.server.app import serve
+from instaseis.server.app import launch_io_loop
 
 
 if __name__ == "__main__":
@@ -31,5 +31,5 @@ if __name__ == "__main__":
     args = parser.parse_args()
     db_path = os.path.abspath(args.db_path)
 
-    serve(db_path=db_path, port=args.port,
-          buffer_size_in_mb=args.buffer_size_in_mb)
+    launch_io_loop(db_path=db_path, port=args.port,
+                   buffer_size_in_mb=args.buffer_size_in_mb)
