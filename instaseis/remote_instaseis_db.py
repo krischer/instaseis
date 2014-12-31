@@ -35,7 +35,8 @@ class RemoteInstaseisDB(BaseInstaseisDB):
         :type db_path: str
         """
         self.url = url
-        self._scheme, self._netloc = urlparse(url)[:2]
+        self._scheme, self._netloc, self._path = urlparse(url)[:3]
+        self._path = self._path.strip("/")
 
         # Parse the root message of the server.
         try:
@@ -124,6 +125,8 @@ class RemoteInstaseisDB(BaseInstaseisDB):
         return data
 
     def _get_url(self, path, **kwargs):
+        if self._path:
+            path = "/" + self._path + "/" + path
         return urlunparse((self._scheme, self._netloc, path, None,
                            urlencode(kwargs), None))
 
