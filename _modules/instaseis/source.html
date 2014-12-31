@@ -343,7 +343,7 @@
     <span class="nd">@classmethod</span>
 <div class="viewcode-block" id="Source.from_strike_dip_rake"><a class="viewcode-back" href="../../source.html#instaseis.source.Source.from_strike_dip_rake">[docs]</a>    <span class="k">def</span> <span class="nf">from_strike_dip_rake</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="p">,</span> <span class="n">depth_in_m</span><span class="p">,</span> <span class="n">strike</span><span class="p">,</span>
                              <span class="n">dip</span><span class="p">,</span> <span class="n">rake</span><span class="p">,</span> <span class="n">M0</span><span class="p">,</span> <span class="n">time_shift</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">sliprate</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                             <span class="n">dt</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+                             <span class="n">dt</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">origin_time</span><span class="o">=</span><span class="n">obspy</span><span class="o">.</span><span class="n">UTCDateTime</span><span class="p">(</span><span class="mi">0</span><span class="p">)):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize a source object from a shear source parameterized by strike,</span>
 <span class="sd">        dip and rake.</span>
@@ -359,13 +359,15 @@
 <span class="sd">            useful in the context of finite sources</span>
 <span class="sd">        :param sliprate: normalized source time function (sliprate)</span>
 <span class="sd">        :param dt: sampling of the source time function</span>
+<span class="sd">        :param origin_time: The origin time of the source. This will be the</span>
+<span class="sd">            time of the first sample in the final seismogram. Be careful to</span>
+<span class="sd">            adjust it for any time shift or STF (de)convolution effects.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c"># formulas in Udias (17.24) are in geographic system North, East,</span>
         <span class="c"># Down, which # transforms to the geocentric as:</span>
         <span class="c"># Mtt =  Mxx, Mpp = Myy, Mrr =  Mzz</span>
         <span class="c"># Mrp = -Myz, Mrt = Mxz, Mtp = -Mxy</span>
         <span class="c"># voigt in tpr: Mtt Mpp Mrr Mrp Mrt Mtp</span>
-
         <span class="n">phi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">strike</span><span class="p">)</span>
         <span class="n">delta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">dip</span><span class="p">)</span>
         <span class="n">lambd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">rake</span><span class="p">)</span>
@@ -389,7 +391,8 @@
             <span class="o">*</span> <span class="n">M0</span>
 
         <span class="n">source</span> <span class="o">=</span> <span class="bp">self</span><span class="p">(</span><span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="p">,</span> <span class="n">depth_in_m</span><span class="p">,</span> <span class="n">m_rr</span><span class="p">,</span> <span class="n">m_tt</span><span class="p">,</span> <span class="n">m_pp</span><span class="p">,</span> <span class="n">m_rt</span><span class="p">,</span>
-                      <span class="n">m_rp</span><span class="p">,</span> <span class="n">m_tp</span><span class="p">,</span> <span class="n">time_shift</span><span class="p">,</span> <span class="n">sliprate</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+                      <span class="n">m_rp</span><span class="p">,</span> <span class="n">m_tp</span><span class="p">,</span> <span class="n">time_shift</span><span class="p">,</span> <span class="n">sliprate</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span>
+                      <span class="n">origin_time</span><span class="o">=</span><span class="n">origin_time</span><span class="p">)</span>
 
         <span class="c"># storing strike, dip and rake for plotting purposes</span>
         <span class="n">source</span><span class="o">.</span><span class="n">phi</span> <span class="o">=</span> <span class="n">phi</span>

@@ -378,7 +378,7 @@ adjust it for any time shift or STF (de)convolution effects.</li>
 
 <dl class="classmethod">
 <dt id="instaseis.source.Source.from_strike_dip_rake">
-<em class="property">classmethod </em><tt class="descname">from_strike_dip_rake</tt><big>(</big><em>latitude</em>, <em>longitude</em>, <em>depth_in_m</em>, <em>strike</em>, <em>dip</em>, <em>rake</em>, <em>M0</em>, <em>time_shift=None</em>, <em>sliprate=None</em>, <em>dt=None</em><big>)</big><a class="reference internal" href="_modules/instaseis/source.html#Source.from_strike_dip_rake"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.Source.from_strike_dip_rake" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><tt class="descname">from_strike_dip_rake</tt><big>(</big><em>latitude</em>, <em>longitude</em>, <em>depth_in_m</em>, <em>strike</em>, <em>dip</em>, <em>rake</em>, <em>M0</em>, <em>time_shift=None</em>, <em>sliprate=None</em>, <em>dt=None</em>, <em>origin_time=UTCDateTime(1970</em>, <em>1</em>, <em>1</em>, <em>0</em>, <em>0)</em><big>)</big><a class="reference internal" href="_modules/instaseis/source.html#Source.from_strike_dip_rake"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.Source.from_strike_dip_rake" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize a source object from a shear source parameterized by strike,
 dip and rake.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -397,6 +397,9 @@ dip and rake.</p>
 useful in the context of finite sources</li>
 <li><strong>sliprate</strong> &#8211; normalized source time function (sliprate)</li>
 <li><strong>dt</strong> &#8211; sampling of the source time function</li>
+<li><strong>origin_time</strong> &#8211; The origin time of the source. This will be the
+time of the first sample in the final seismogram. Be careful to
+adjust it for any time shift or STF (de)convolution effects.</li>
 </ul>
 </td>
 </tr>

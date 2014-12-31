@@ -216,20 +216,21 @@ choice or host it somewhere.</p>
 </div>
 <div class="section" id="usage">
 <h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
-<p>Use it by creating an <tt class="xref py py-class docutils literal"><span class="pre">InstaseisDB</span></tt> object which needs
-to know the path to the output folder containing the netCDF files from an
+<p>Use it by creating an <tt class="xref py py-class docutils literal"><span class="pre">InstaseisDB</span></tt> object
+which needs to know the path to the output folder containing the netCDF files from an
 AxiSEM run. All information is determined from the netCDF files so no other
 files have to be present.</p>
 <p>Then a source and receiver pair is defined. The moment tensor components are in
-<tt class="docutils literal"><span class="pre">N</span> <span class="pre">m</span></tt>. Lastly the <tt class="xref py py-meth docutils literal"><span class="pre">get_seismograms()</span></tt>
+<tt class="docutils literal"><span class="pre">N</span> <span class="pre">m</span></tt>. Lastly the
+<tt class="xref py py-meth docutils literal"><span class="pre">get_seismograms()</span></tt>
 method is called which by default returns a three component ObsPy
 <a class="reference external" href="http://docs.obspy.org/packages/autogen/obspy.core.stream.Stream.html#obspy.core.stream.Stream" title="(in ObsPy Documentation (0.9.2) v0.9)"><tt class="xref py py-class docutils literal"><span class="pre">Stream</span></tt></a> object with the waveform data. This can then
 be used process and save the data in any format supported by ObsPy.</p>
-<p>The initialization of an <tt class="xref py py-class docutils literal"><span class="pre">InstaseisDB</span></tt> object is the
-most expensive part so make sure to do it only once if possible.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="kn">from</span> <span class="nn">instaseis</span> <span class="kn">import</span> <span class="n">InstaseisDB</span><span class="p">,</span> <span class="n">Source</span><span class="p">,</span> <span class="n">Receiver</span>
+<p>The initialization of an <tt class="xref py py-class docutils literal"><span class="pre">InstaseisDB</span></tt> object
+is the most expensive part so make sure to do it only once if possible.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="kn">from</span> <span class="nn">instaseis</span> <span class="kn">import</span> <span class="n">open_db</span><span class="p">,</span> <span class="n">Source</span><span class="p">,</span> <span class="n">Receiver</span>
 
-<span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="n">db</span> <span class="o">=</span> <span class="n">InstaseisDB</span><span class="p">(</span><span class="s">&quot;./prem50s_forces&quot;</span><span class="p">)</span>
+<span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="n">db</span> <span class="o">=</span> <span class="n">open_db</span><span class="p">(</span><span class="s">&quot;./prem50s_forces&quot;</span><span class="p">)</span>
 
 <span class="n">In</span> <span class="p">[</span><span class="mi">3</span><span class="p">]:</span> <span class="n">receiver</span> <span class="o">=</span> <span class="n">Receiver</span><span class="p">(</span><span class="n">latitude</span><span class="o">=</span><span class="mf">42.6390</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="mf">74.4940</span><span class="p">)</span>
 
