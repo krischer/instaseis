@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file '/Users/lion/workspace/code/instaseis/instaseis/gui/qt_window.ui'
 #
-# Created: Tue Dec 30 01:42:38 2014
+# Created: Wed Dec 31 02:18:56 2014
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -37,6 +37,8 @@ class Ui_MainWindow(object):
         self.centralwidget.setSizePolicy(sizePolicy)
         self.centralwidget.setObjectName(_fromUtf8("centralwidget"))
         self.verticalLayout_5 = QtGui.QVBoxLayout(self.centralwidget)
+        self.verticalLayout_5.setSpacing(0)
+        self.verticalLayout_5.setMargin(2)
         self.verticalLayout_5.setObjectName(_fromUtf8("verticalLayout_5"))
         self.horizontalLayout_4 = QtGui.QHBoxLayout()
         self.horizontalLayout_4.setObjectName(_fromUtf8("horizontalLayout_4"))
@@ -485,6 +487,9 @@ class Ui_MainWindow(object):
         self.horizontalLayout_8.addLayout(self.verticalLayout_3)
         self.horizontalLayout_8.setStretch(0, 10)
         self.verticalLayout_5.addLayout(self.horizontalLayout_8)
+        self.verticalLayout_5.setStretch(0, 1)
+        self.verticalLayout_5.setStretch(1, 1)
+        self.verticalLayout_5.setStretch(2, 100)
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
