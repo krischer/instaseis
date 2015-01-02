@@ -12,6 +12,8 @@ Benchmarks for Instaseis.
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 
+from future.utils import with_metaclass
+
 from abc import ABCMeta, abstractmethod, abstractproperty
 import argparse
 import colorama
@@ -48,8 +50,7 @@ def plot_gnuplot(times):
         print("Could not plot graph. No gnuplot installed?")
 
 
-class InstaseisBenchmark(object):
-    __metaclass__ = ABCMeta
+class InstaseisBenchmark(with_metaclass(ABCMeta)):
 
     def __init__(self, path, time_per_benchmark, save_output=False,
                  seed=None, count=None):
