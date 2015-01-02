@@ -16,6 +16,7 @@ import obspy
 import tornado.ioloop
 import tornado.web
 
+from ..import __version__
 from ..instaseis_db import InstaseisDB
 from .. import Source, ForceSource, Receiver
 
@@ -27,7 +28,8 @@ class InvalidSourceError(Exception):
 class IndexHandler(tornado.web.RequestHandler):
     def get(self):
         response = {
-            "type": "Instaseis Remote Server"
+            "type": "Instaseis Remote Server",
+            "version": __version__
         }
         self.write(response)
 
