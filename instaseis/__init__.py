@@ -36,5 +36,7 @@ def open_db(path, *args, **kwargs):
         from . import instaseis_db
         return instaseis_db.InstaseisDB(path, *args, **kwargs)
 
+from .version import get_git_version
+__version__ = get_git_version()
 
 from .source import Source, Receiver, ForceSource, FiniteSource  # NoQa

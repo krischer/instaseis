@@ -23,6 +23,13 @@ from subprocess import Popen, PIPE
 import sys
 
 
+# Import the version string.
+path = os.path.join(os.path.abspath(os.path.dirname(inspect.getfile(
+    inspect.currentframe()))), "instaseis")
+sys.path.insert(0, path)
+from version import get_git_version
+
+
 # Monkey patch the compilers to treat Fortran files like C files.
 CCompiler.language_map['.f90'] = "c"
 UnixCCompiler.src_extensions.append(".f90")
@@ -121,7 +128,7 @@ if sys.version_info[:2] == (2, 6):
 
 setup_config = dict(
     name="instaseis",
-    version="0.0.1",
+    version=get_git_version(),
     description="Python Interface to AxiSEM's DB mode",
     author=u"Lion Krischer, Martin van Driel, and Simon Stähler",
     author_email="krischer@geophysik.uni-muenchen.de",
