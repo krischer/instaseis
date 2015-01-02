@@ -48,7 +48,7 @@ class AsyncClient(object):
 
     @property
     def io_loop(self):
-        ## We're using a singleton ioloop throughout
+        # We're using a singleton ioloop throughout
         return IOLoop.instance()
 
     def stop(self, _arg=None, **kwargs):
@@ -116,7 +116,7 @@ def bind_unused_port():
 def client_db_bwd_displ_only(request):
     application.db = InstaseisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
 
-    ## Build server as in testing:311
+    # Build server as in testing:311
     sock, port = bind_unused_port()
     server = HTTPServer(application, io_loop=IOLoop.instance())
     server.add_sockets([sock])
