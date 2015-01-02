@@ -21,10 +21,6 @@ from ..instaseis_db import InstaseisDB
 from .. import Source, ForceSource, Receiver
 
 
-class InvalidSourceError(Exception):
-    pass
-
-
 class IndexHandler(tornado.web.RequestHandler):
     def get(self):
         response = {
@@ -86,7 +82,11 @@ class SeismogramsHandler(tornado.web.RequestHandler):
         args = obspy.core.AttribDict()
         for name, properties in self.seismogram_arguments.items():
             if "required" in properties:
-                value = self.get_argument(name)
+                try:
+                    value = self.get_argument(name)
+                except:
+                    raise tornado.web.HTTPError(
+                        400, "Required parameter '%s' not given." % name)
             else:
                 if "default" in properties:
                     default = properties["default"]
@@ -94,7 +94,12 @@ class SeismogramsHandler(tornado.web.RequestHandler):
                     default = None
                 value = self.get_argument(name, default=default)
             if value is not None:
-                value = properties["type"](value)
+                try:
+                    value = properties["type"](value)
+                except:
+                    raise tornado.web.HTTPError(
+                        400, "Parameter '%s' could not be converted to '%s'." %
+                        (name, str(properties["type"])))
             setattr(args, name, value)
         return args
 
@@ -115,44 +120,75 @@ class SeismogramsHandler(tornado.web.RequestHandler):
             if None in src_params:
                 continue
             elif src_type == "moment_tensor":
-                source = Source(latitude=args.source_latitude,
-                                longitude=args.source_longitude,
-                                depth_in_m=args.source_depth_in_m,
-                                m_rr=args.m_rr, m_tt=args.m_tt, m_pp=args.m_pp,
-                                m_rt=args.m_rt, m_rp=args.m_rp, m_tp=args.m_tp,
-                                origin_time=args.origin_time)
+                try:
+                    source = Source(latitude=args.source_latitude,
+                                    longitude=args.source_longitude,
+                                    depth_in_m=args.source_depth_in_m,
+                                    m_rr=args.m_rr, m_tt=args.m_tt,
+                                    m_pp=args.m_pp, m_rt=args.m_rt,
+                                    m_rp=args.m_rp, m_tp=args.m_tp,
+                                    origin_time=args.origin_time)
+                except:
+                    raise tornado.web.HTTPError(
+                        400, "Could not construct moment tensor source with "
+                             "passed parameters. Check parameters for sanity.")
                 break
             elif src_type == "strike_dip_rake":
-                source = Source.from_strike_dip_rake(
-                    latitude=args.source_latitude,
-                    longitude=args.source_longitude,
-                    depth_in_m=args.source_depth_in_m,
-                    strike=args.strike, dip=args.dip, rake=args.rake,
-                    M0=args.M0, origin_time=args.origin_time)
+                try:
+                    source = Source.from_strike_dip_rake(
+                        latitude=args.source_latitude,
+                        longitude=args.source_longitude,
+                        depth_in_m=args.source_depth_in_m,
+                        strike=args.strike, dip=args.dip, rake=args.rake,
+                        M0=args.M0, origin_time=args.origin_time)
+                except:
+                    raise tornado.web.HTTPError(
+                        400, "Could not construct the source from the passed "
+                             "strike/dip/rake parameters. Check parameter for "
+                             "sanity.")
                 break
             elif src_type == "force_source":
-                source = ForceSource(latitude=args.source_latitude,
-                                     longitude=args.source_longitude,
-                                     depth_in_m=args.source_depth_in_m,
-                                     f_r=args.f_r, f_t=args.f_t, f_p=args.f_p)
+                try:
+                    source = ForceSource(latitude=args.source_latitude,
+                                         longitude=args.source_longitude,
+                                         depth_in_m=args.source_depth_in_m,
+                                         f_r=args.f_r, f_t=args.f_t,
+                                         f_p=args.f_p)
+                except:
+                    raise tornado.web.HTTPError(
+                        400, "Could not construct force source with passed "
+                             "parameters. Check parameters for sanity.")
                 break
             else:
-                raise InvalidSourceError
+                raise tornado.web.HTTPError(
+                    400, "Unsufficient source parameters.")
         else:
-            raise InvalidSourceError
+            raise tornado.web.HTTPError(400, "No source parameters specified")
 
         # Construct the receiver object.
-        receiver = Receiver(latitude=args.receiver_latitude,
-                            longitude=args.receiver_longitude,
-                            network=args.network_code,
-                            station=args.station_code,
-                            depth_in_m=args.receiver_depth_in_m)
+        try:
+            receiver = Receiver(latitude=args.receiver_latitude,
+                                longitude=args.receiver_longitude,
+                                network=args.network_code,
+                                station=args.station_code,
+                                depth_in_m=args.receiver_depth_in_m)
+        except:
+            raise tornado.web.HTTPError(
+                400, "Could not construct receiver with passed "
+                     "parameters. Check parameters for sanity.")
 
         # Get the most barebones seismograms possible.
-        st = application.db.get_seismograms(
-            source=source, receiver=receiver, components=components,
-            kind="displacement", remove_source_shift=False,
-            reconvolve_stf=False, return_obspy_stream=True, dt=None)
+        try:
+            st = application.db.get_seismograms(
+                source=source, receiver=receiver, components=components,
+                kind="displacement", remove_source_shift=False,
+                reconvolve_stf=False, return_obspy_stream=True, dt=None)
+        except:
+            tornado.web.HTTPError(
+                400, "Could not extract seismogram. Make sure, "
+                     "the components are valid, and the depth settings are "
+                     "correct.")
+
         # Half the filesize but definitely sufficiently accurate.
         for tr in st:
             tr.data = np.require(tr.data, dtype=np.float32)
