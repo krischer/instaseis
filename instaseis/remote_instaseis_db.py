@@ -29,7 +29,7 @@ class RemoteInstaseisDB(BaseInstaseisDB):
     """
     Remote instaseis database interface.
     """
-    def __init__(self, url):
+    def __init__(self, url, *args, **kwargs):
         """
         :param url: URL to the remote instaseis server.
         :type db_path: str

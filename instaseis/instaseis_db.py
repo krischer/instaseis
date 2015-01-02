@@ -43,7 +43,8 @@ class InstaseisDB(BaseInstaseisDB):
     discretization equals the SEM basis functions of AxiSEM, resulting in high
     order spatial accuracy and short access times.
     """
-    def __init__(self, db_path, buffer_size_in_mb=100, read_on_demand=True):
+    def __init__(self, db_path, buffer_size_in_mb=100, read_on_demand=True,
+                 *args, **kwargs):
         """
         :param db_path: Path to the AxiSEM Database containing subdirectories
             PZ and/or PX each containing a order_output.nc4 file
