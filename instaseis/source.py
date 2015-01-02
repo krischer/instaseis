@@ -54,6 +54,9 @@ class SourceOrReceiver(object):
         self.longitude = float(longitude)
         self.depth_in_m = float(depth_in_m) if depth_in_m is not None else None
 
+        if -90 <= self.latitude <= 90:
+            raise ValueError("Invalid Latitude Value")
+
     def __eq__(self, other):
         if type(self) != type(other):
             return False
