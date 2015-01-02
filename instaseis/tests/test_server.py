@@ -11,10 +11,20 @@ Test for the Instaseis server.
 """
 from __future__ import absolute_import
 
+import copy
 import json
 import numpy as np
 import instaseis
 from .tornado_testing_fixtures import *  # NOQA
+
+
+def _assemble_url(**kwargs):
+    """
+    Helper function.
+    """
+    url = "/seismograms_raw?"
+    url += "&".join("%s=%s" % (key, value) for key, value in kwargs.items())
+    return url
 
 
 def test_root_route(all_clients):
@@ -67,3 +77,86 @@ def test_info_route(all_clients):
     # Same for slip and sliprate.
     np.testing.assert_allclose(client_slip, db_slip)
     np.testing.assert_allclose(client_sliprate, db_sliprate)
+
+
+def test_raw_seismograms_error_handling(all_clients):
+    """
+    Tests error handling of the /seismograms_raw route. Potentially outwards
+    facing thus tested rather well.
+    """
+    client = all_clients
+
+    basic_parameters = {
+        "source_latitude": 10,
+        "source_longitude": 10,
+        "receiver_latitude": -10,
+        "receiver_longitude": -10}
+
+    # Remove the source latitude, a required parameter.
+    params = copy.deepcopy(basic_parameters)
+    del params["source_latitude"]
+    request = client.fetch(_assemble_url(**params))
+    assert request.code == 400
+    assert request.reason == \
+        "Required parameter 'source_latitude' not given."
+
+    # Invalid type.
+    params = copy.deepcopy(basic_parameters)
+    params["source_latitude"] = "A"
+    request = client.fetch(_assemble_url(**params))
+    assert request.code == 400
+    assert "could not be converted" in request.reason
+    assert "source_latitude" in request.reason
+
+    # No source.
+    request = client.fetch(_assemble_url(**basic_parameters))
+    assert request.code == 400
+    assert request.reason == "No/insufficient source parameters specified"
+
+    # Invalid MT source.
+    params = copy.deepcopy(basic_parameters)
+    params["m_tt"] = "100000"
+    params["m_pp"] = "100000"
+    params["m_rr"] = "100000"
+    params["m_rt"] = "100000"
+    params["m_rp"] = "100000"
+    params["m_tp"] = "100000"
+    params["source_latitude"] = "100"
+    request = client.fetch(_assemble_url(**params))
+    assert request.code == 400
+    assert "could not construct moment tensor source" in request.reason.lower()
+
+    # Invalid strike/dip/rake
+    params = copy.deepcopy(basic_parameters)
+    params["strike"] = "45"
+    params["dip"] = "45"
+    params["rake"] = "45"
+    params["M0"] = "450000"
+    params["source_latitude"] = "100"
+    request = client.fetch(_assemble_url(**params))
+    assert request.code == 400
+    assert "could not construct the source" in request.reason.lower()
+    assert "strike/dip/rake" in request.reason.lower()
+
+    # Invalid force source.
+    params = copy.deepcopy(basic_parameters)
+    params["f_r"] = "100000"
+    params["f_t"] = "100000"
+    params["f_p"] = "100000"
+    params["source_latitude"] = "100"
+    request = client.fetch(_assemble_url(**params))
+    assert request.code == 400
+    assert "could not construct force source" in request.reason.lower()
+
+    # Could not extract seismogram.
+    params = copy.deepcopy(basic_parameters)
+    params["m_tt"] = "100000"
+    params["m_pp"] = "100000"
+    params["m_rr"] = "100000"
+    params["m_rt"] = "100000"
+    params["m_rp"] = "100000"
+    params["m_tp"] = "100000"
+    params["components"] = "ABC"
+    request = client.fetch(_assemble_url(**params))
+    assert request.code == 400
+    assert "could not extract seismogram" in request.reason.lower()

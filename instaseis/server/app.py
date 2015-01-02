@@ -86,7 +86,8 @@ class SeismogramsHandler(tornado.web.RequestHandler):
                     value = self.get_argument(name)
                 except:
                     raise tornado.web.HTTPError(
-                        400, "Required parameter '%s' not given." % name)
+                        400,
+                        reason="Required parameter '%s' not given." % name)
             else:
                 if "default" in properties:
                     default = properties["default"]
@@ -98,8 +99,8 @@ class SeismogramsHandler(tornado.web.RequestHandler):
                     value = properties["type"](value)
                 except:
                     raise tornado.web.HTTPError(
-                        400, "Parameter '%s' could not be converted to '%s'." %
-                        (name, str(properties["type"])))
+                        400, reason="Parameter '%s' could not be converted "
+                        "to '%s'." % (name, str(properties["type"])))
             setattr(args, name, value)
         return args
 
@@ -130,8 +131,8 @@ class SeismogramsHandler(tornado.web.RequestHandler):
                                     origin_time=args.origin_time)
                 except:
                     raise tornado.web.HTTPError(
-                        400, "Could not construct moment tensor source with "
-                             "passed parameters. Check parameters for sanity.")
+                        400, reason="Could not construct moment tensor source "
+                        "with passed parameters. Check parameters for sanity.")
                 break
             elif src_type == "strike_dip_rake":
                 try:
@@ -143,9 +144,9 @@ class SeismogramsHandler(tornado.web.RequestHandler):
                         M0=args.M0, origin_time=args.origin_time)
                 except:
                     raise tornado.web.HTTPError(
-                        400, "Could not construct the source from the passed "
-                             "strike/dip/rake parameters. Check parameter for "
-                             "sanity.")
+                        400, reason="Could not construct the source from the "
+                        "passed strike/dip/rake parameters. Check parameter "
+                        "for sanity.")
                 break
             elif src_type == "force_source":
                 try:
@@ -156,14 +157,15 @@ class SeismogramsHandler(tornado.web.RequestHandler):
                                          f_p=args.f_p)
                 except:
                     raise tornado.web.HTTPError(
-                        400, "Could not construct force source with passed "
-                             "parameters. Check parameters for sanity.")
+                        400, reason="Could not construct force source with "
+                        "passed parameters. Check parameters for sanity.")
                 break
             else:
-                raise tornado.web.HTTPError(
-                    400, "Unsufficient source parameters.")
+                # Cannot really happen.
+                raise NotImplementedError
         else:
-            raise tornado.web.HTTPError(400, "No source parameters specified")
+            raise tornado.web.HTTPError(
+                400, reason="No/insufficient source parameters specified")
 
         # Construct the receiver object.
         try:
@@ -174,8 +176,8 @@ class SeismogramsHandler(tornado.web.RequestHandler):
                                 depth_in_m=args.receiver_depth_in_m)
         except:
             raise tornado.web.HTTPError(
-                400, "Could not construct receiver with passed "
-                     "parameters. Check parameters for sanity.")
+                400, reason="Could not construct receiver with passed "
+                "parameters. Check parameters for sanity.")
 
         # Get the most barebones seismograms possible.
         try:
@@ -183,11 +185,11 @@ class SeismogramsHandler(tornado.web.RequestHandler):
                 source=source, receiver=receiver, components=components,
                 kind="displacement", remove_source_shift=False,
                 reconvolve_stf=False, return_obspy_stream=True, dt=None)
-        except:
-            tornado.web.HTTPError(
-                400, "Could not extract seismogram. Make sure, "
-                     "the components are valid, and the depth settings are "
-                     "correct.")
+        except Exception:
+            raise tornado.web.HTTPError(
+                400, reason="Could not extract seismogram. Make sure, "
+                "the components are valid, and the depth settings are "
+                "correct.")
 
         # Half the filesize but definitely sufficiently accurate.
         for tr in st:
