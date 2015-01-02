@@ -97,7 +97,7 @@ class RemoteInstaseisDB(BaseInstaseisDB):
         else:
             raise NotImplementedError
 
-        url = self._get_url(path="seismograms", **params)
+        url = self._get_url(path="seismograms_raw", **params)
 
         r = requests.get(url)
         if "Instaseis-Mu" not in r.headers:

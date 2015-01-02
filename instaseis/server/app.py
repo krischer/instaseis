@@ -212,7 +212,7 @@ class SeismogramsHandler(tornado.web.RequestHandler):
 
 
 application = tornado.web.Application([
-    (r"/seismograms", SeismogramsHandler),
+    (r"/seismograms_raw", SeismogramsHandler),
     (r"/info", InfoHandler),
     (r"/", IndexHandler)
 ])
