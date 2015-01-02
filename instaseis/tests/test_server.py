@@ -14,14 +14,15 @@ from __future__ import absolute_import
 import json
 
 import instaseis
-from .tornado_testing_fixtures import client_db_bwd_displ_only  # NOQA
+from .tornado_testing_fixtures import *  # NOQA
 
 
-def test_root_route(client_db_bwd_displ_only):  # NOQA
+def test_root_route(all_clients):
     """
-    Shows very basic information and the version of the client.
+    Shows very basic information and the version of the client. Test is run
+    for all clients.
     """
-    client = client_db_bwd_displ_only
+    client = all_clients
     request = client.fetch("/")
     assert request.code == 200
     result = json.loads(str(request.body.decode("utf8")))

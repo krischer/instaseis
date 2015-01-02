@@ -112,13 +112,29 @@ def bind_unused_port():
     return sock, port
 
 
-@pytest.fixture()
-def client_db_bwd_displ_only(request):
-    application.db = InstaseisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
+# All test databases.
+DBS = {
+    "db_bwd_displ_only": os.path.join(DATA, "100s_db_bwd_displ_only"),
+    "db_bwd_strain_only": os.path.join(DATA, "100s_db_bwd_strain_only"),
+    "db_fwd": os.path.join(DATA, "100s_db_fwd"),
+    "db_fwd_deep": os.path.join(DATA, "100s_db_fwd_deep")
+}
 
+
+def create_async_client(path):
+    application.db = InstaseisDB(path)
     # Build server as in testing:311
     sock, port = bind_unused_port()
     server = HTTPServer(application, io_loop=IOLoop.instance())
     server.add_sockets([sock])
+    client = AsyncClient(server, AsyncHTTPClient())
+    client.filepath = path
+    return client
 
-    return AsyncClient(server, AsyncHTTPClient())
+
+@pytest.fixture(params=list(DBS.values()))
+def all_clients(request):
+    """
+    Fixture returning all clients!
+    """
+    return create_async_client(request.param)
