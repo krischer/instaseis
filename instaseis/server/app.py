@@ -52,10 +52,8 @@ class SeismogramsHandler(tornado.web.RequestHandler):
     seismogram_arguments = {
         "components": {"type": str, "default": "ZNE"},
         # Source parameters.
-        "source_latitude": {"type": float, "required": True,
-                            "help": "source_latitude is required"},
-        "source_longitude": {"type": float, "required": True,
-                             "help": "source_longitude is required"},
+        "source_latitude": {"type": float, "required": True},
+        "source_longitude": {"type": float, "required": True},
         "source_depth_in_m": {"type": float},
         # Source can either be given as the moment tensor components in Nm.
         "m_rr": {"type": float},
@@ -77,10 +75,8 @@ class SeismogramsHandler(tornado.web.RequestHandler):
         "origin_time": {"type": obspy.UTCDateTime,
                         "default": obspy.UTCDateTime(0)},
         # Receiver parameters.
-        "receiver_latitude": {"type": float, "required": True,
-                              "help": "receiver_latitude is required"},
-        "receiver_longitude": {"type": float, "required": True,
-                               "help": "receiver_longitude is required"},
+        "receiver_latitude": {"type": float, "required": True},
+        "receiver_longitude": {"type": float, "required": True},
         "receiver_depth_in_m": {"type": float},
         "network_code": {"type": str},
         "station_code": {"type": str}
