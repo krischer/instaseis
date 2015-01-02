@@ -5,3 +5,4 @@ instaseis.egg-info
 instaseis/experimental_gui/qt_window.py
 doc/_build
 build/
+RELEASE-VERSION
