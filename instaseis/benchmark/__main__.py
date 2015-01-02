@@ -374,7 +374,8 @@ parser.add_argument('--count', type=int,
 parser.add_argument('--save', action="store_true",
                     help='save output to txt file')
 args = parser.parse_args()
-path = os.path.abspath(args.folder)
+path = os.path.abspath(args.folder) if "://" not in args.folder \
+    else args.folder
 
 print(colorama.Fore.GREEN + 79 * "=" + "\nInstaseis Benchmark Suite\n")
 print("It enables to gauge the speed of Instaseis for a certain DB.")
@@ -383,7 +384,7 @@ print(colorama.Fore.RED + "\nIt does not deal with OS level caches! So "
       "interpret the results accordingly!\n" + colorama.Fore.RESET)
 
 db = open_db(path, read_on_demand=True, buffer_size_in_mb=0)
-if not db.is_reciprocal:
+if not db.info.is_reciprocal:
     print("Benchmark currently only works with a reciprocal database.")
     sys.exit(1)
 print(db)
