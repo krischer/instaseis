@@ -17,6 +17,7 @@ with standard_library.hooks():
     from urllib.parse import urlunparse, urlencode, urlparse
 
 import io
+import numpy as np
 import obspy
 import requests
 import warnings
@@ -150,4 +151,9 @@ class RemoteInstaseisDB(BaseInstaseisDB):
         """
         info = self._download_url(self._get_url(path="info"), unpack_json=True)
         info["directory"] = self.url
+        # Convert types lost in the translation to JSON.
+        info["datetime"] = obspy.UTCDateTime(info["datetime"])
+        info["slip"] = np.array(info["slip"], dtype=np.float64)
+        info["sliprate"] = np.array(info["sliprate"], dtype=np.float64)
+
         return info

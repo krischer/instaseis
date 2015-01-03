@@ -71,8 +71,8 @@ def test_info_route(all_clients):
     # Make sure it is identical to one from a local client.
     db = instaseis.open_db(client.filepath, read_on_demand=True)
 
-    db_slip = list(db.info.slip)
-    db_sliprate = list(db.info.sliprate)
+    db_slip = db.info.slip
+    db_sliprate = db.info.sliprate
     del db.info["slip"]
     del db.info["sliprate"]
 

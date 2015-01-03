@@ -9,6 +9,8 @@ instaseis server.
 import inspect
 import os
 import pytest
+import re
+import responses
 import socket
 import sys
 
@@ -18,6 +20,7 @@ from tornado.ioloop import IOLoop
 from tornado.testing import AsyncHTTPClient
 from tornado.util import raise_exc_info
 
+import instaseis
 from instaseis.server.app import application
 from instaseis.instaseis_db import InstaseisDB
 
@@ -129,6 +132,7 @@ def create_async_client(path):
     server.add_sockets([sock])
     client = AsyncClient(server, AsyncHTTPClient())
     client.filepath = path
+    client.port = port
     return client
 
 
@@ -138,3 +142,28 @@ def all_clients(request):
     Fixture returning all clients!
     """
     return create_async_client(request.param)
+
+
+def _add_callback(client):
+    def request_callback(request):
+        req = client.fetch(request.path_url)
+        return (req.code, req.headers, req.body)
+
+    pattern = re.compile(r"http://localhost.*")
+    responses.add_callback(
+        responses.GET, pattern,
+        callback=request_callback,
+        content_type="application/octet_stream"
+    )
+
+
+@pytest.fixture(params=list(DBS.values()))
+@responses.activate
+def all_remote_dbs(request):
+    client = create_async_client(request.param)
+
+    _add_callback(client)
+
+    db = instaseis.open_db("http://localhost:%i" % client.port)
+    db._client = client
+    return db
