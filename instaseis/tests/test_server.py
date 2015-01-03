@@ -123,6 +123,19 @@ def test_raw_seismograms_error_handling(all_clients):
     assert request.code == 400
     assert request.reason == "No/insufficient source parameters specified"
 
+    # Invalid receiver.
+    params = copy.deepcopy(basic_parameters)
+    params["receiver_latitude"] = "100"
+    params["m_tt"] = "100000"
+    params["m_pp"] = "100000"
+    params["m_rr"] = "100000"
+    params["m_rt"] = "100000"
+    params["m_rp"] = "100000"
+    params["m_tp"] = "100000"
+    request = client.fetch(_assemble_url(**params))
+    assert request.code == 400
+    assert "could not construct receiver with " in request.reason.lower()
+
     # Invalid MT source.
     params = copy.deepcopy(basic_parameters)
     params["m_tt"] = "100000"
