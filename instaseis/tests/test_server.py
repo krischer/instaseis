@@ -257,7 +257,6 @@ def test_seismograms_raw_route(all_clients):
 
     # Test passing network and station codes.
     params = copy.deepcopy(basic_parameters)
-    time = obspy.UTCDateTime(2013, 1, 2, 3, 4, 5)
     params.update(mt)
     params["network_code"] = "BW"
     params["station_code"] = "ALTM"
@@ -269,3 +268,28 @@ def test_seismograms_raw_route(all_clients):
     for tr in st:
         assert tr.stats.network == "BW"
         assert tr.stats.station == "ALTM"
+
+
+def test_mu_is_passed_as_header_value(all_clients):
+    """
+    Makes sure mu is passed as a header value.
+
+    Also tests the other headers.
+    """
+    client = all_clients
+    parameters = {"source_latitude": 10, "source_longitude": 10,
+                  "receiver_latitude": -10, "receiver_longitude": -10,
+                  "m_tt": "100000", "m_pp": "100000", "m_rr": "100000",
+                  "m_rt": "100000", "m_rp": "100000", "m_tp": "100000"}
+
+    # Moment tensor source.
+    request = client.fetch(_assemble_url(**parameters))
+    assert request.code == 200
+    # Make sure the mu header exists and the value can be converted to a float.
+    assert "Instaseis-Mu" in request.headers
+    assert isinstance(float(request.headers["Instaseis-Mu"]), float)
+
+    assert request.headers["Content-Type"] == "application/octet-stream"
+    cd = request.headers["Content-Disposition"]
+    assert "attachment; filename=" in cd
+    assert "instaseis_seismogram" in cd
