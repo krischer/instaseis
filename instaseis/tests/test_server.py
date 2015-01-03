@@ -351,7 +351,7 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
             latitude=basic_parameters["source_latitude"],
             longitude=basic_parameters["source_longitude"],
             depth_in_m=0.0,
-            **{key: float(value) for key, value in mt.items()})
+            **dict((key, float(value)) for (key, value) in mt.items()))
         assert p.call_args[1]["receiver"] == instaseis.Receiver(
             latitude=basic_parameters["receiver_latitude"],
             longitude=basic_parameters["receiver_longitude"],
@@ -380,7 +380,7 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
             latitude=basic_parameters["source_latitude"],
             longitude=basic_parameters["source_longitude"],
             depth_in_m=5.0, origin_time=time,
-            **{key: float(value) for key, value in mt.items()})
+            **dict((key, float(value)) for (key, value) in mt.items()))
         assert p.call_args[1]["receiver"] == instaseis.Receiver(
             latitude=basic_parameters["receiver_latitude"],
             longitude=basic_parameters["receiver_longitude"],
@@ -406,7 +406,7 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
                 latitude=basic_parameters["source_latitude"],
                 longitude=basic_parameters["source_longitude"],
                 depth_in_m=0.0,
-                **{key: float(value) for key, value in sdr.items()})
+                **dict((key, float(value)) for (key, value) in sdr.items()))
         assert p.call_args[1]["receiver"] == instaseis.Receiver(
             latitude=basic_parameters["receiver_latitude"],
             longitude=basic_parameters["receiver_longitude"],
@@ -436,7 +436,7 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
                 latitude=basic_parameters["source_latitude"],
                 longitude=basic_parameters["source_longitude"],
                 depth_in_m=5.0, origin_time=time,
-                **{key: float(value) for key, value in sdr.items()})
+                **dict((key, float(value)) for (key, value) in sdr.items()))
         assert p.call_args[1]["receiver"] == instaseis.Receiver(
             latitude=basic_parameters["receiver_latitude"],
             longitude=basic_parameters["receiver_longitude"],
@@ -462,7 +462,7 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
                 latitude=basic_parameters["source_latitude"],
                 longitude=basic_parameters["source_longitude"],
                 depth_in_m=0.0,
-                **{key: float(value) for key, value in fs.items()})
+                **dict((key, float(value)) for (key, value) in fs.items()))
             assert p.call_args[1]["receiver"] == instaseis.Receiver(
                 latitude=basic_parameters["receiver_latitude"],
                 longitude=basic_parameters["receiver_longitude"],
@@ -491,7 +491,7 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
                 latitude=basic_parameters["source_latitude"],
                 longitude=basic_parameters["source_longitude"],
                 depth_in_m=5.0, origin_time=time,
-                **{key: float(value) for key, value in fs.items()})
+                **dict((key, float(value)) for (key, value) in fs.items()))
             assert p.call_args[1]["receiver"] == instaseis.Receiver(
                 latitude=basic_parameters["receiver_latitude"],
                 longitude=basic_parameters["receiver_longitude"],
