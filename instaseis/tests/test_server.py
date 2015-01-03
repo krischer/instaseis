@@ -39,6 +39,7 @@ def test_root_route(all_clients):
     result = json.loads(str(request.body.decode("utf8")))
     assert result == {
         "type": "Instaseis Remote Server", "version": instaseis.__version__}
+    assert request.headers["Content-Type"] == "application/json; charset=UTF-8"
 
 
 def test_info_route(all_clients):
@@ -52,6 +53,7 @@ def test_info_route(all_clients):
     # Load the result via the webclient.
     request = client.fetch("/info")
     assert request.code == 200
+    assert request.headers["Content-Type"] == "application/json; charset=UTF-8"
     result = json.loads(str(request.body.decode("utf8")))
     # Convert list to arrays.
     client_slip = np.array(result["slip"])
