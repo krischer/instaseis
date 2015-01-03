@@ -119,7 +119,7 @@ lib = MyExtension('instaseis',
                   ])
 
 INSTALL_REQUIRES = ["netCDF4", "numpy", "obspy", "future", "requests",
-                    "tornado", "flake8>=2", "pytest"]
+                    "tornado", "flake8>=2", "pytest", "responses"]
 
 # Add argparse and ordereddict for Python 2.6. Both are standard library
 # packages for Python >= 2.7.
