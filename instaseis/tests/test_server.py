@@ -14,6 +14,7 @@ from __future__ import absolute_import
 import copy
 import json
 import obspy
+import mock
 import numpy as np
 import instaseis
 from .tornado_testing_fixtures import *  # NOQA
@@ -219,6 +220,8 @@ def test_seismograms_raw_route(all_clients):
     if "displ_only" in client.filepath:
         params = copy.deepcopy(basic_parameters)
         params.update(fs)
+        time = obspy.UTCDateTime(2008, 7, 6, 5, 4, 3)
+        params["origin_time"] = str(time)
         request = client.fetch(_assemble_url(**params))
         assert request.code == 200
 
@@ -229,6 +232,7 @@ def test_seismograms_raw_route(all_clients):
         for tr in st:
             assert hasattr(tr.stats, "mseed")
             assert tr.data.dtype.char == "f"
+            assert tr.stats.starttime == time
 
     # Test different components.
     components = ["NRE", "ZRT", "RT", "Z", "ZNE"]
@@ -295,3 +299,194 @@ def test_mu_is_passed_as_header_value(all_clients):
     cd = request.headers["Content-Disposition"]
     assert "attachment; filename=" in cd
     assert "instaseis_seismogram" in cd
+
+
+def test_object_creation_for_raw_seismogram_route(all_clients):
+    """
+    Tests that the correct objects are created for the raw seismogram route.
+    """
+    client = all_clients
+
+    basic_parameters = {
+        "source_latitude": 10,
+        "source_longitude": 10,
+        "receiver_latitude": -10,
+        "receiver_longitude": -10}
+
+    # Various sources.
+    mt = {"m_tt": "100000", "m_pp": "100000", "m_rr": "100000",
+          "m_rt": "100000", "m_rp": "100000", "m_tp": "100000"}
+    sdr = {"strike": "10", "dip": "10", "rake": "10", "M0": "1000000"}
+    fs = {"f_r": "100000", "f_t": "100000", "f_p": "100000"}
+
+    time = obspy.UTCDateTime(2010, 1, 2, 3, 4, 5)
+
+    with mock.patch("instaseis.instaseis_db.InstaseisDB.get_seismograms") as p:
+        _st = obspy.read()
+        for tr in _st:
+            tr.stats.instaseis = obspy.core.AttribDict()
+            tr.stats.instaseis.mu = 1.0
+        p.return_value = _st
+
+        # Moment tensor source.
+        params = copy.deepcopy(basic_parameters)
+        params.update(mt)
+        request = client.fetch(_assemble_url(**params))
+        assert request.code == 200
+
+        assert p.call_count == 1
+        assert p.call_args[1]["kind"] == "displacement"
+        assert p.call_args[1]["components"] == ["Z", "N", "E"]
+        assert p.call_args[1]["remove_source_shift"] is False
+        assert p.call_args[1]["reconvolve_stf"] is False
+        assert p.call_args[1]["return_obspy_stream"] is True
+        assert p.call_args[1]["dt"] is None
+        assert p.call_args[1]["source"] == instaseis.Source(
+            latitude=basic_parameters["source_latitude"],
+            longitude=basic_parameters["source_longitude"],
+            depth_in_m=0.0,
+            **{key: float(value) for key, value in mt.items()})
+        assert p.call_args[1]["receiver"] == instaseis.Receiver(
+            latitude=basic_parameters["receiver_latitude"],
+            longitude=basic_parameters["receiver_longitude"],
+            depth_in_m=0.0)
+
+        # Moment tensor source with a couple more parameters.
+        p.reset_mock()
+
+        params["source_depth_in_m"] = "5.0"
+        params["origin_time"] = str(time)
+        params["receiver_depth_in_m"] = "55.0"
+        params["network_code"] = "BW"
+        params["station_code"] = "ALTM"
+
+        request = client.fetch(_assemble_url(**params))
+        assert request.code == 200
+
+        assert p.call_count == 1
+        assert p.call_args[1]["kind"] == "displacement"
+        assert p.call_args[1]["components"] == ["Z", "N", "E"]
+        assert p.call_args[1]["remove_source_shift"] is False
+        assert p.call_args[1]["reconvolve_stf"] is False
+        assert p.call_args[1]["return_obspy_stream"] is True
+        assert p.call_args[1]["dt"] is None
+        assert p.call_args[1]["source"] == instaseis.Source(
+            latitude=basic_parameters["source_latitude"],
+            longitude=basic_parameters["source_longitude"],
+            depth_in_m=5.0, origin_time=time,
+            **{key: float(value) for key, value in mt.items()})
+        assert p.call_args[1]["receiver"] == instaseis.Receiver(
+            latitude=basic_parameters["receiver_latitude"],
+            longitude=basic_parameters["receiver_longitude"],
+            depth_in_m=55.0, network="BW", station="ALTM")
+
+        # From strike, dip, rake
+        p.reset_mock()
+
+        params = copy.deepcopy(basic_parameters)
+        params.update(sdr)
+        request = client.fetch(_assemble_url(**params))
+        assert request.code == 200
+
+        assert p.call_count == 1
+        assert p.call_args[1]["kind"] == "displacement"
+        assert p.call_args[1]["components"] == ["Z", "N", "E"]
+        assert p.call_args[1]["remove_source_shift"] is False
+        assert p.call_args[1]["reconvolve_stf"] is False
+        assert p.call_args[1]["return_obspy_stream"] is True
+        assert p.call_args[1]["dt"] is None
+        assert p.call_args[1]["source"] == \
+            instaseis.Source.from_strike_dip_rake(
+                latitude=basic_parameters["source_latitude"],
+                longitude=basic_parameters["source_longitude"],
+                depth_in_m=0.0,
+                **{key: float(value) for key, value in sdr.items()})
+        assert p.call_args[1]["receiver"] == instaseis.Receiver(
+            latitude=basic_parameters["receiver_latitude"],
+            longitude=basic_parameters["receiver_longitude"],
+            depth_in_m=0.0)
+
+        # Moment tensor source with a couple more parameters.
+        p.reset_mock()
+
+        params["source_depth_in_m"] = "5.0"
+        params["origin_time"] = str(time)
+        params["receiver_depth_in_m"] = "55.0"
+        params["network_code"] = "BW"
+        params["station_code"] = "ALTM"
+
+        request = client.fetch(_assemble_url(**params))
+        assert request.code == 200
+
+        assert p.call_count == 1
+        assert p.call_args[1]["kind"] == "displacement"
+        assert p.call_args[1]["components"] == ["Z", "N", "E"]
+        assert p.call_args[1]["remove_source_shift"] is False
+        assert p.call_args[1]["reconvolve_stf"] is False
+        assert p.call_args[1]["return_obspy_stream"] is True
+        assert p.call_args[1]["dt"] is None
+        assert p.call_args[1]["source"] == \
+            instaseis.Source.from_strike_dip_rake(
+                latitude=basic_parameters["source_latitude"],
+                longitude=basic_parameters["source_longitude"],
+                depth_in_m=5.0, origin_time=time,
+                **{key: float(value) for key, value in sdr.items()})
+        assert p.call_args[1]["receiver"] == instaseis.Receiver(
+            latitude=basic_parameters["receiver_latitude"],
+            longitude=basic_parameters["receiver_longitude"],
+            depth_in_m=55.0, network="BW", station="ALTM")
+
+        # Force source only works for displ_only databases.
+        if "displ_only" in client.filepath:
+            p.reset_mock()
+
+            params = copy.deepcopy(basic_parameters)
+            params.update(fs)
+            request = client.fetch(_assemble_url(**params))
+            assert request.code == 200
+
+            assert p.call_count == 1
+            assert p.call_args[1]["kind"] == "displacement"
+            assert p.call_args[1]["components"] == ["Z", "N", "E"]
+            assert p.call_args[1]["remove_source_shift"] is False
+            assert p.call_args[1]["reconvolve_stf"] is False
+            assert p.call_args[1]["return_obspy_stream"] is True
+            assert p.call_args[1]["dt"] is None
+            assert p.call_args[1]["source"] == instaseis.ForceSource(
+                latitude=basic_parameters["source_latitude"],
+                longitude=basic_parameters["source_longitude"],
+                depth_in_m=0.0,
+                **{key: float(value) for key, value in fs.items()})
+            assert p.call_args[1]["receiver"] == instaseis.Receiver(
+                latitude=basic_parameters["receiver_latitude"],
+                longitude=basic_parameters["receiver_longitude"],
+                depth_in_m=0.0)
+
+            # Moment tensor source with a couple more parameters.
+            p.reset_mock()
+
+            params["source_depth_in_m"] = "5.0"
+            params["origin_time"] = str(time)
+            params["receiver_depth_in_m"] = "55.0"
+            params["network_code"] = "BW"
+            params["station_code"] = "ALTM"
+
+            request = client.fetch(_assemble_url(**params))
+            assert request.code == 200
+
+            assert p.call_count == 1
+            assert p.call_args[1]["kind"] == "displacement"
+            assert p.call_args[1]["components"] == ["Z", "N", "E"]
+            assert p.call_args[1]["remove_source_shift"] is False
+            assert p.call_args[1]["reconvolve_stf"] is False
+            assert p.call_args[1]["return_obspy_stream"] is True
+            assert p.call_args[1]["dt"] is None
+            assert p.call_args[1]["source"] == instaseis.ForceSource(
+                latitude=basic_parameters["source_latitude"],
+                longitude=basic_parameters["source_longitude"],
+                depth_in_m=5.0, origin_time=time,
+                **{key: float(value) for key, value in fs.items()})
+            assert p.call_args[1]["receiver"] == instaseis.Receiver(
+                latitude=basic_parameters["receiver_latitude"],
+                longitude=basic_parameters["receiver_longitude"],
+                depth_in_m=55.0, network="BW", station="ALTM")

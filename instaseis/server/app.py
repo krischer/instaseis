@@ -50,7 +50,7 @@ class SeismogramsHandler(tornado.web.RequestHandler):
         # Source parameters.
         "source_latitude": {"type": float, "required": True},
         "source_longitude": {"type": float, "required": True},
-        "source_depth_in_m": {"type": float},
+        "source_depth_in_m": {"type": float, "default": 0.0},
         # Source can either be given as the moment tensor components in Nm.
         "m_rr": {"type": float},
         "m_tt": {"type": float},
@@ -73,7 +73,7 @@ class SeismogramsHandler(tornado.web.RequestHandler):
         # Receiver parameters.
         "receiver_latitude": {"type": float, "required": True},
         "receiver_longitude": {"type": float, "required": True},
-        "receiver_depth_in_m": {"type": float},
+        "receiver_depth_in_m": {"type": float, "default": 0.0},
         "network_code": {"type": str},
         "station_code": {"type": str}
     }
@@ -157,7 +157,8 @@ class SeismogramsHandler(tornado.web.RequestHandler):
                                          longitude=args.source_longitude,
                                          depth_in_m=args.source_depth_in_m,
                                          f_r=args.f_r, f_t=args.f_t,
-                                         f_p=args.f_p)
+                                         f_p=args.f_p,
+                                         origin_time=args.origin_time)
                 except:
                     msg = ("Could not construct force source with passed "
                            "parameters. Check parameters for sanity.")

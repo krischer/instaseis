@@ -433,7 +433,7 @@ class Source(SourceOrReceiver):
                                 zerophase)
 
     def __str__(self):
-        return_str = 'AxiSEM Database Source:\n'
+        return_str = 'Instaseis Source:\n'
         return_str += '\tlongitude        : %6.1f deg\n' % (self.longitude,)
         return_str += '\tlatitude         : %6.1f deg\n' % (self.latitude,)
         return_str += '\tdepth            : %6.1e km\n' \
@@ -456,7 +456,7 @@ class ForceSource(SourceOrReceiver):
     A class to handle a seimic force source.
     """
     def __init__(self, latitude, longitude, depth_in_m=None, f_r=0., f_t=0.,
-                 f_p=0.):
+                 f_p=0., origin_time=obspy.UTCDateTime(0)):
         """
         :param latitude: latitude of the source in degree
         :param longitude: longitude of the source in degree
@@ -464,11 +464,15 @@ class ForceSource(SourceOrReceiver):
         :param f_r: force components in r, theta, phi in N
         :param f_t: force components in r, theta, phi in N
         :param f_p: force components in r, theta, phi in N
+        :param origin_time: The origin time of the source. This will be the
+            time of the first sample in the final seismogram. Be careful to
+            adjust it for any time shift or STF (de)convolution effects.
         """
         super(ForceSource, self).__init__(latitude, longitude, depth_in_m)
         self.f_r = f_r
         self.f_t = f_t
         self.f_p = f_p
+        self.origin_time = origin_time
 
     @property
     def force_tpr(self):
