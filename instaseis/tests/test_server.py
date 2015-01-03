@@ -14,10 +14,16 @@ from __future__ import absolute_import
 import copy
 import json
 import obspy
-import mock
 import numpy as np
 import instaseis
 from .tornado_testing_fixtures import *  # NOQA
+
+# Conditionally import mock either from the stdlib or as a separate library.
+import sys
+if sys.version_info[0] == 2:
+    import mock
+else:
+    import unittest.mock as mock
 
 
 def _assemble_url(**kwargs):

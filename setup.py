@@ -125,11 +125,15 @@ INSTALL_REQUIRES = ["netCDF4", "numpy", "obspy", "future", "requests",
 # packages for Python >= 2.7.
 if sys.version_info[:2] == (2, 6):
     INSTALL_REQUIRES.extend(["argparse", "ordereddict"])
+# Add mock for Python 2.x. Starting with Python 3 it is part of the standard
+# library.
+if sys.version_info[0] == 2:
+    INSTALL_REQUIRES.append("mock")
 
 setup_config = dict(
     name="instaseis",
     version=get_git_version(),
-    description="Python Interface to AxiSEM's DB mode",
+    description="Instant seismograms from an AxiSEM Green's functions' DB.",
     author=u"Lion Krischer, Martin van Driel, and Simon Stähler",
     author_email="krischer@geophysik.uni-muenchen.de",
     url="",
