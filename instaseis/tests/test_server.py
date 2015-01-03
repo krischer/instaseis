@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Test for the Instaseis server.
+Tests for the Instaseis server.
 
 :copyright:
     Lion Krischer (krischer@geophysik.uni-muenchen.de), 2014
@@ -13,6 +13,7 @@ from __future__ import absolute_import
 
 import copy
 import json
+import obspy
 import numpy as np
 import instaseis
 from .tornado_testing_fixtures import *  # NOQA
@@ -138,7 +139,8 @@ def test_raw_seismograms_error_handling(all_clients):
     assert "could not construct the source" in request.reason.lower()
     assert "strike/dip/rake" in request.reason.lower()
 
-    # Invalid force source.
+    # Invalid force source. It only works in displ_only mode but here it
+    # fails earlier.
     params = copy.deepcopy(basic_parameters)
     params["f_r"] = "100000"
     params["f_t"] = "100000"
@@ -160,3 +162,110 @@ def test_raw_seismograms_error_handling(all_clients):
     request = client.fetch(_assemble_url(**params))
     assert request.code == 400
     assert "could not extract seismogram" in request.reason.lower()
+
+
+def test_seismograms_raw_route(all_clients):
+    """
+    Test the raw routes. Make sure the response is a MiniSEED file with the
+    correct channels.
+
+    Once again executed for each known test database.
+    """
+    client = all_clients
+
+    basic_parameters = {
+        "source_latitude": 10,
+        "source_longitude": 10,
+        "receiver_latitude": -10,
+        "receiver_longitude": -10}
+
+    # Various sources.
+    mt = {"m_tt": "100000", "m_pp": "100000", "m_rr": "100000",
+          "m_rt": "100000", "m_rp": "100000", "m_tp": "100000"}
+    sdr = {"strike": "10", "dip": "10", "rake": "10", "M0": "1000000"}
+    fs = {"f_r": "100000", "f_t": "100000", "f_p": "100000"}
+
+    # Moment tensor source.
+    params = copy.deepcopy(basic_parameters)
+    params.update(mt)
+    request = client.fetch(_assemble_url(**params))
+    assert request.code == 200
+
+    st = obspy.read(request.buffer)
+    assert len(st) == 3
+
+    # Assert the MiniSEED file and some basic properties.
+    for tr in st:
+        assert hasattr(tr.stats, "mseed")
+        assert tr.data.dtype.char == "f"
+
+    # Strike/dip/rake
+    params = copy.deepcopy(basic_parameters)
+    params.update(sdr)
+    request = client.fetch(_assemble_url(**params))
+    assert request.code == 200
+
+    st = obspy.read(request.buffer)
+    assert len(st) == 3
+
+    # Assert the MiniSEED file and some basic properties.
+    for tr in st:
+        assert hasattr(tr.stats, "mseed")
+        assert tr.data.dtype.char == "f"
+
+    # Force source only works for displ_only databases.
+    if "displ_only" in client.filepath:
+        params = copy.deepcopy(basic_parameters)
+        params.update(fs)
+        request = client.fetch(_assemble_url(**params))
+        assert request.code == 200
+
+        st = obspy.read(request.buffer)
+        assert len(st) == 3
+
+        # Assert the MiniSEED file and some basic properties.
+        for tr in st:
+            assert hasattr(tr.stats, "mseed")
+            assert tr.data.dtype.char == "f"
+
+    # Test different components.
+    components = ["NRE", "ZRT", "RT", "Z", "ZNE"]
+    for comp in components:
+        params = copy.deepcopy(basic_parameters)
+        params.update(mt)
+        params["components"] = comp
+        request = client.fetch(_assemble_url(**params))
+        assert request.code == 200
+
+        st = obspy.read(request.buffer)
+        assert len(st) == len(comp)
+        assert "".join(sorted(comp)) == "".join(sorted(
+            [tr.stats.channel[-1] for tr in st]))
+
+    # Test passing the origin time.
+    params = copy.deepcopy(basic_parameters)
+    time = obspy.UTCDateTime(2013, 1, 2, 3, 4, 5)
+    params.update(mt)
+    params["origin_time"] = str(time)
+    request = client.fetch(_assemble_url(**params))
+    assert request.code == 200
+
+    st = obspy.read(request.buffer)
+    assert len(st) == 3
+    for tr in st:
+        assert tr.stats.starttime == time
+
+    # Test passing network and station codes.
+    params = copy.deepcopy(basic_parameters)
+    time = obspy.UTCDateTime(2013, 1, 2, 3, 4, 5)
+    params.update(mt)
+    params["network_code"] = "BW"
+    params["station_code"] = "ALTM"
+    request = client.fetch(_assemble_url(**params))
+    assert request.code == 200
+
+    st = obspy.read(request.buffer)
+    assert len(st) == 3
+    for tr in st:
+        assert tr.stats.network == "BW"
+        assert tr.stats.station == "ALTM"
