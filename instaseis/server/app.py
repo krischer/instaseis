@@ -214,7 +214,7 @@ class SeismogramsHandler(tornado.web.RequestHandler):
                         "attachment; filename=%s" % filename)
         # Passing mu in the HTTP header...not sure how well this plays with
         # proxies...
-        self.set_header("Instaseis-Mu", str(st[0].stats.instaseis.mu))
+        self.set_header("Instaseis-Mu", "%f" % st[0].stats.instaseis.mu)
 
 
 application = tornado.web.Application([
