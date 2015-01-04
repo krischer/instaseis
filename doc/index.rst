@@ -1,5 +1,5 @@
-.. image:: http://lionkrischer.de/scratch/instaseis_logo.png
-     :scale: 40%
+.. image:: http://i.imgur.com/6LNoJD6.png
+     :width: 60%
      :align: right
 
 Instaseis - Instant high frequency seismograms
@@ -25,6 +25,13 @@ compiling the shared Fortran library. Pull requests are welcome.
 * ``NumPy >= 1.7``
 * ``ObsPy >= 0.9.2`` *(only the ObsPy master currently supports Python 3)*
 * ``netCDF4 >= 4.3`` including Python bindings (``>= 1.1``)
+* ``future``
+* ``requests``
+* ``responses``
+* ``tornado``
+* ``flake8``
+* ``pytest``
+* ``mock`` *(only for Python 2.x, otherwise part of the standard library)*
 
 The graphical user interface (which is optional and not needed to run
 Instaseis) furthermore requires
@@ -34,10 +41,6 @@ Instaseis) furthermore requires
 * ``matplolitb``
 * ``basemap``
 
-Additionally the tests need
-
-* ``pytest``
-* ``flake8``
 
 Fortran Compiler
 ~~~~~~~~~~~~~~~~
@@ -64,14 +67,22 @@ dependencies are installed. Otherwise do yourself a favor and download the
 It is a free scientific Python distribution bundling almost all necessary
 modules with a convenient installer (does not require root access!).
 Once installed assert that ``pip`` and ``conda`` point to the Anaconda
-installation folder (you need to open a new terminal after installing Anaconda)
-and install the missing dependencies with
+installation folder (you may need to open a new terminal after installing
+Anaconda).
 
 .. code-block:: bash
 
-    $ pip install obspy
-    $ pip install pyqtgraph pytest flake8
-    $ conda install basemap
+    $ conda install netcdf4 future requests tornado flake8 pytest mock basemap pyqt pip
+    $ pip install obspy responses pyqtgraph
+
+A possible complication arises if you are running on a server without a
+display. In that case please edit (on Linux)
+``~/.config/matplotlib/matplotlibrc`` (create if it does not exist) and make
+sure the following line is part of it:
+
+.. code-block:: bash
+
+    backend: agg
 
 
 Installing Instaseis
@@ -101,12 +112,13 @@ Clone the git repository and install in an editable fashion.
 Testing
 ^^^^^^^
 
-Tests are executed with
+To assert that your installation is running as intended, execute
 
 .. code-block:: bash
 
     $ python -m instaseis.tests
 
+and make sure all tests pass. Otherwise please contact the developers.
 
 Build the Documentation
 ^^^^^^^^^^^^^^^^^^^^^^^
