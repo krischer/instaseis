@@ -22,7 +22,8 @@ import obspy
 import requests
 import warnings
 
-from . import InstaseisError, InstaseisWarning, Source, ForceSource
+from . import InstaseisError, InstaseisWarning, Source, ForceSource, \
+    __version__
 from .base_instaseis_db import BaseInstaseisDB, DEFAULT_MU
 
 
@@ -51,6 +52,12 @@ class RemoteInstaseisDB(BaseInstaseisDB):
         if "type" not in root or root["type"] != "Instaseis Remote Server":
             raise InstaseisError("Instaseis server responded with invalid "
                                  "response: %s" % (str(root)))
+
+        if root["version"] != __version__:
+            msg = ("Instaseis versions on server (%s) and on your local "
+                   "client (%s) differ and thus things might not work as "
+                   "expected." % (root["version"], __version__))
+            warnings.warn(msg, InstaseisWarning)
         self.get_info()
 
     def _get_seismograms(self, source, receiver, components=("Z", "N", "E")):
