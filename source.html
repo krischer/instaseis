@@ -243,7 +243,7 @@ interpolation for all pointsources in the finite source.</p>
 
 <dl class="class">
 <dt id="instaseis.source.ForceSource">
-<em class="property">class </em><tt class="descclassname">instaseis.source.</tt><tt class="descname">ForceSource</tt><big>(</big><em>latitude</em>, <em>longitude</em>, <em>depth_in_m=None</em>, <em>f_r=0.0</em>, <em>f_t=0.0</em>, <em>f_p=0.0</em>, <em>origin_time=UTCDateTime(1970</em>, <em>1</em>, <em>1</em>, <em>0</em>, <em>0)</em><big>)</big><a class="reference internal" href="_modules/instaseis/source.html#ForceSource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.ForceSource" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">instaseis.source.</tt><tt class="descname">ForceSource</tt><big>(</big><em>latitude</em>, <em>longitude</em>, <em>depth_in_m=None</em>, <em>f_r=0.0</em>, <em>f_t=0.0</em>, <em>f_p=0.0</em><big>)</big><a class="reference internal" href="_modules/instaseis/source.html#ForceSource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.ForceSource" title="Permalink to this definition">¶</a></dt>
 <dd><p>A class to handle a seimic force source.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -256,9 +256,6 @@ interpolation for all pointsources in the finite source.</p>
 <li><strong>f_r</strong> &#8211; force components in r, theta, phi in N</li>
 <li><strong>f_t</strong> &#8211; force components in r, theta, phi in N</li>
 <li><strong>f_p</strong> &#8211; force components in r, theta, phi in N</li>
-<li><strong>origin_time</strong> &#8211; The origin time of the source. This will be the
-time of the first sample in the final seismogram. Be careful to
-adjust it for any time shift or STF (de)convolution effects.</li>
 </ul>
 </td>
 </tr>

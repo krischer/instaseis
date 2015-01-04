@@ -162,9 +162,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">longitude</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">longitude</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">depth_in_m</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">depth_in_m</span><span class="p">)</span> <span class="k">if</span> <span class="n">depth_in_m</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="k">else</span> <span class="bp">None</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="o">-</span><span class="mi">90</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latitude</span> <span class="o">&lt;=</span> <span class="mi">90</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Invalid Latitude Value&quot;</span><span class="p">)</span>
-
     <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">False</span>
@@ -541,7 +538,7 @@
                                 <span class="n">zerophase</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">return_str</span> <span class="o">=</span> <span class="s">&#39;Instaseis Source:</span><span class="se">\n</span><span class="s">&#39;</span>
+        <span class="n">return_str</span> <span class="o">=</span> <span class="s">&#39;AxiSEM Database Source:</span><span class="se">\n</span><span class="s">&#39;</span>
         <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">longitude        : </span><span class="si">%6.1f</span><span class="s"> deg</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">longitude</span><span class="p">,)</span>
         <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">latitude         : </span><span class="si">%6.1f</span><span class="s"> deg</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">latitude</span><span class="p">,)</span>
         <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">depth            : </span><span class="si">%6.1e</span><span class="s"> km</span><span class="se">\n</span><span class="s">&#39;</span> \
@@ -564,7 +561,7 @@
 <span class="sd">    A class to handle a seimic force source.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="p">,</span> <span class="n">depth_in_m</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">f_r</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">f_t</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span>
-                 <span class="n">f_p</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">origin_time</span><span class="o">=</span><span class="n">obspy</span><span class="o">.</span><span class="n">UTCDateTime</span><span class="p">(</span><span class="mi">0</span><span class="p">)):</span>
+                 <span class="n">f_p</span><span class="o">=</span><span class="mf">0.</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param latitude: latitude of the source in degree</span>
 <span class="sd">        :param longitude: longitude of the source in degree</span>
@@ -572,15 +569,11 @@
 <span class="sd">        :param f_r: force components in r, theta, phi in N</span>
 <span class="sd">        :param f_t: force components in r, theta, phi in N</span>
 <span class="sd">        :param f_p: force components in r, theta, phi in N</span>
-<span class="sd">        :param origin_time: The origin time of the source. This will be the</span>
-<span class="sd">            time of the first sample in the final seismogram. Be careful to</span>
-<span class="sd">            adjust it for any time shift or STF (de)convolution effects.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ForceSource</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="p">,</span> <span class="n">depth_in_m</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">f_r</span> <span class="o">=</span> <span class="n">f_r</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">f_t</span> <span class="o">=</span> <span class="n">f_t</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">f_p</span> <span class="o">=</span> <span class="n">f_p</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">origin_time</span> <span class="o">=</span> <span class="n">origin_time</span>
 
     <span class="nd">@property</span>
 <div class="viewcode-block" id="ForceSource.force_tpr"><a class="viewcode-back" href="../../source.html#instaseis.source.ForceSource.force_tpr">[docs]</a>    <span class="k">def</span> <span class="nf">force_tpr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
