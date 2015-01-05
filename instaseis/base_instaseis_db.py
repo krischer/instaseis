@@ -32,7 +32,7 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
     Abstract base class for all Instaseis database classes.
 
     Each subclass must provide at least a ``get_seismograms()`` and a
-    ``get_info()`` method.
+    ``_get_info()`` method.
     """
     def get_seismograms(self, source, receiver, components=("Z", "N", "E"),
                         kind='displacement', remove_source_shift=True,
@@ -167,7 +167,7 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
         pass
 
     @abstractmethod
-    def get_info(self):
+    def _get_info(self):
         """
         Must return a dictionary with the following keys:
 
@@ -324,14 +324,11 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
 
     @property
     def info(self):
-        """
-        Returns the info dictionary about the class.
-        """
         try:
             return self.__cached_info
         except:
             pass
-        self.__cached_info = AttribDict(self.get_info())
+        self.__cached_info = AttribDict(self._get_info())
         return self.__cached_info
 
     def __str__(self):

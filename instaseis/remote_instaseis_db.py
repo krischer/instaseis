@@ -58,7 +58,7 @@ class RemoteInstaseisDB(BaseInstaseisDB):
                    "client (%s) differ and thus things might not work as "
                    "expected." % (root["version"], __version__))
             warnings.warn(msg, InstaseisWarning)
-        self.get_info()
+        self._get_info()
 
     def _get_seismograms(self, source, receiver, components=("Z", "N", "E")):
         """
@@ -151,7 +151,7 @@ class RemoteInstaseisDB(BaseInstaseisDB):
         else:
             return r.text
 
-    def get_info(self):
+    def _get_info(self):
         """
         Returns a dictionary with information about the currently loaded
         database.

@@ -613,7 +613,7 @@ class InstaseisDB(BaseInstaseisDB):
 
         return final_displacement
 
-    def get_info(self):
+    def _get_info(self):
         """
         Returns a dictionary with information about the currently loaded
         database.
