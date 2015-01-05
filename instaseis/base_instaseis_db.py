@@ -29,10 +29,8 @@ DEFAULT_MU = 32e9
 
 class BaseInstaseisDB(with_metaclass(ABCMeta)):
     """
-    Abstract base class for all Instaseis database classes.
-
-    Each subclass must provide at least a ``get_seismograms()`` and a
-    ``_get_info()`` method.
+    Base class for all Instaseis database classes defining the interface for
+    the users.
     """
     def get_seismograms(self, source, receiver, components=("Z", "N", "E"),
                         kind='displacement', remove_source_shift=True,
