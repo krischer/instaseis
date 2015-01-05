@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>instaseis.remote_instaseis_db &mdash; instaseis 0.0.1a-35-gfd48 documentation</title>
+    <title>instaseis.remote_instaseis_db &mdash; instaseis 0.0.1a-37-g70ae documentation</title>
     
     <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.0.1a-35-gfd48',
+        VERSION:     '0.0.1a-37-g70ae',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -29,7 +29,7 @@
     <script type="text/javascript" src="../../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../../_static/bootstrap-3.2.0/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../../_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.0.1a-35-gfd48 documentation" href="../../index.html" />
+    <link rel="top" title="instaseis 0.0.1a-37-g70ae documentation" href="../../index.html" />
     <link rel="up" title="instaseis" href="../instaseis.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
@@ -50,7 +50,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-35-gfd48</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-37-g70ae</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -167,7 +167,7 @@
                    <span class="s">&quot;client (</span><span class="si">%s</span><span class="s">) differ and thus things might not work as &quot;</span>
                    <span class="s">&quot;expected.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">root</span><span class="p">[</span><span class="s">&quot;version&quot;</span><span class="p">],</span> <span class="n">__version__</span><span class="p">))</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">InstaseisWarning</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">get_info</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_get_info</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">_get_seismograms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">receiver</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="p">(</span><span class="s">&quot;Z&quot;</span><span class="p">,</span> <span class="s">&quot;N&quot;</span><span class="p">,</span> <span class="s">&quot;E&quot;</span><span class="p">)):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -260,7 +260,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">text</span>
 
-<div class="viewcode-block" id="RemoteInstaseisDB.get_info"><a class="viewcode-back" href="../../instaseis.html#instaseis.remote_instaseis_db.RemoteInstaseisDB.get_info">[docs]</a>    <span class="k">def</span> <span class="nf">get_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_get_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a dictionary with information about the currently loaded</span>
 <span class="sd">        database.</span>
@@ -272,7 +272,7 @@
         <span class="n">info</span><span class="p">[</span><span class="s">&quot;slip&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s">&quot;slip&quot;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
         <span class="n">info</span><span class="p">[</span><span class="s">&quot;sliprate&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s">&quot;sliprate&quot;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">info</span></div></div>
+        <span class="k">return</span> <span class="n">info</span></div>
 </pre></div>
 
     </div>

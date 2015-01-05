@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>instaseis.base_instaseis_db &mdash; instaseis 0.0.1a-35-gfd48 documentation</title>
+    <title>instaseis.base_instaseis_db &mdash; instaseis 0.0.1a-37-g70ae documentation</title>
     
     <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.0.1a-35-gfd48',
+        VERSION:     '0.0.1a-37-g70ae',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -29,7 +29,7 @@
     <script type="text/javascript" src="../../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../../_static/bootstrap-3.2.0/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../../_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.0.1a-35-gfd48 documentation" href="../../index.html" />
+    <link rel="top" title="instaseis 0.0.1a-37-g70ae documentation" href="../../index.html" />
     <link rel="up" title="instaseis" href="../instaseis.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
@@ -50,7 +50,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-35-gfd48</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-37-g70ae</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -138,10 +138,8 @@
 
 <div class="viewcode-block" id="BaseInstaseisDB"><a class="viewcode-back" href="../../instaseis.html#instaseis.base_instaseis_db.BaseInstaseisDB">[docs]</a><span class="k">class</span> <span class="nc">BaseInstaseisDB</span><span class="p">(</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">ABCMeta</span><span class="p">)):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Abstract base class for all Instaseis database classes.</span>
-
-<span class="sd">    Each subclass must provide at least a ``get_seismograms()`` and a</span>
-<span class="sd">    ``get_info()`` method.</span>
+<span class="sd">    Base class for all Instaseis database classes defining the interface for</span>
+<span class="sd">    the users.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 <div class="viewcode-block" id="BaseInstaseisDB.get_seismograms"><a class="viewcode-back" href="../../instaseis.html#instaseis.base_instaseis_db.BaseInstaseisDB.get_seismograms">[docs]</a>    <span class="k">def</span> <span class="nf">get_seismograms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">receiver</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="p">(</span><span class="s">&quot;Z&quot;</span><span class="p">,</span> <span class="s">&quot;N&quot;</span><span class="p">,</span> <span class="s">&quot;E&quot;</span><span class="p">),</span>
                         <span class="n">kind</span><span class="o">=</span><span class="s">&#39;displacement&#39;</span><span class="p">,</span> <span class="n">remove_source_shift</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
@@ -276,7 +274,7 @@
         <span class="k">pass</span>
 
     <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="BaseInstaseisDB.get_info"><a class="viewcode-back" href="../../instaseis.html#instaseis.base_instaseis_db.BaseInstaseisDB.get_info">[docs]</a>    <span class="k">def</span> <span class="nf">get_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_get_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Must return a dictionary with the following keys:</span>
 
@@ -291,7 +289,7 @@
 <span class="sd">        ``&quot;format_version&quot;``, ``&quot;axisem_version&quot;``, ``&quot;datetime&quot;``</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
-</div>
+
 <div class="viewcode-block" id="BaseInstaseisDB.get_seismograms_finite_source"><a class="viewcode-back" href="../../instaseis.html#instaseis.base_instaseis_db.BaseInstaseisDB.get_seismograms_finite_source">[docs]</a>    <span class="k">def</span> <span class="nf">get_seismograms_finite_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sources</span><span class="p">,</span> <span class="n">receiver</span><span class="p">,</span>
                                       <span class="n">components</span><span class="o">=</span><span class="p">(</span><span class="s">&quot;Z&quot;</span><span class="p">,</span> <span class="s">&quot;N&quot;</span><span class="p">,</span> <span class="s">&quot;E&quot;</span><span class="p">),</span>
                                       <span class="n">kind</span><span class="o">=</span><span class="s">&#39;displacement&#39;</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
@@ -432,17 +430,14 @@
         <span class="k">return</span> <span class="n">band_code</span>
 
     <span class="nd">@property</span>
-<div class="viewcode-block" id="BaseInstaseisDB.info"><a class="viewcode-back" href="../../instaseis.html#instaseis.base_instaseis_db.BaseInstaseisDB.info">[docs]</a>    <span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns the info dictionary about the class.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_info</span>
         <span class="k">except</span><span class="p">:</span>
             <span class="k">pass</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__cached_info</span> <span class="o">=</span> <span class="n">AttribDict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_info</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cached_info</span> <span class="o">=</span> <span class="n">AttribDict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_info</span><span class="p">())</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_info</span>
-</div>
+
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span>
 

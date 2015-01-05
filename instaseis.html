@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Instaseis Database Objects &mdash; instaseis 0.0.1a-35-gfd48 documentation</title>
+    <title>Instaseis Database Objects &mdash; instaseis 0.0.1a-37-g70ae documentation</title>
     
     <link rel="stylesheet" href="_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.0.1a-35-gfd48',
+        VERSION:     '0.0.1a-37-g70ae',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -29,7 +29,7 @@
     <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="_static/bootstrap-3.2.0/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.0.1a-35-gfd48 documentation" href="index.html" />
+    <link rel="top" title="instaseis 0.0.1a-37-g70ae documentation" href="index.html" />
     <link rel="next" title="Meshes" href="mesh.html" />
     <link rel="prev" title="Instaseis - Instant high frequency seismograms" href="index.html" />
 <meta charset='utf-8'>
@@ -51,7 +51,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-35-gfd48</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-37-g70ae</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -134,24 +134,8 @@
 <dl class="class">
 <dt id="instaseis.base_instaseis_db.BaseInstaseisDB">
 <em class="property">class </em><tt class="descclassname">instaseis.base_instaseis_db.</tt><tt class="descname">BaseInstaseisDB</tt><a class="reference internal" href="_modules/instaseis/base_instaseis_db.html#BaseInstaseisDB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.base_instaseis_db.BaseInstaseisDB" title="Permalink to this definition">¶</a></dt>
-<dd><p>Abstract base class for all Instaseis database classes.</p>
-<p>Each subclass must provide at least a <tt class="docutils literal"><span class="pre">get_seismograms()</span></tt> and a
-<tt class="docutils literal"><span class="pre">get_info()</span></tt> method.</p>
-<dl class="method">
-<dt id="instaseis.base_instaseis_db.BaseInstaseisDB.get_info">
-<tt class="descname">get_info</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/instaseis/base_instaseis_db.html#BaseInstaseisDB.get_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.base_instaseis_db.BaseInstaseisDB.get_info" title="Permalink to this definition">¶</a></dt>
-<dd><p>Must return a dictionary with the following keys:</p>
-<p><tt class="docutils literal"><span class="pre">&quot;is_reciprocal&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;components&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;source_depth&quot;</span></tt>,
-<tt class="docutils literal"><span class="pre">&quot;velocity_model&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;attenuation&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;period&quot;</span></tt>,
-<tt class="docutils literal"><span class="pre">&quot;dump_type&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;excitation_type&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;dt&quot;</span></tt>,
-<tt class="docutils literal"><span class="pre">&quot;sampling_rate&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;npts&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;nnft&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;length&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;stf&quot;</span></tt>,
-<tt class="docutils literal"><span class="pre">&quot;slip&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;sliprate&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;src_shift&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;src_shift_samples&quot;</span></tt>,
-<tt class="docutils literal"><span class="pre">&quot;spatial_order&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;min_radius&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;max_radius&quot;</span></tt>,
-<tt class="docutils literal"><span class="pre">&quot;planet_radius&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;min_d&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;max_d&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;time_scheme&quot;</span></tt>,
-<tt class="docutils literal"><span class="pre">&quot;directory&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;filesize&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;compiler&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;user&quot;</span></tt>,
-<tt class="docutils literal"><span class="pre">&quot;format_version&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;axisem_version&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;datetime&quot;</span></tt></p>
-</dd></dl>
-
+<dd><p>Base class for all Instaseis database classes defining the interface for
+the users.</p>
 <dl class="method">
 <dt id="instaseis.base_instaseis_db.BaseInstaseisDB.get_seismograms">
 <tt class="descname">get_seismograms</tt><big>(</big><em>source</em>, <em>receiver</em>, <em>components=(u'Z'</em>, <em>u'N'</em>, <em>u'E')</em>, <em>kind=u'displacement'</em>, <em>remove_source_shift=True</em>, <em>reconvolve_stf=False</em>, <em>return_obspy_stream=True</em>, <em>dt=None</em>, <em>a_lanczos=5</em><big>)</big><a class="reference internal" href="_modules/instaseis/base_instaseis_db.html#BaseInstaseisDB.get_seismograms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.base_instaseis_db.BaseInstaseisDB.get_seismograms" title="Permalink to this definition">¶</a></dt>
@@ -214,12 +198,6 @@ modulus from the model</li>
 </table>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="instaseis.base_instaseis_db.BaseInstaseisDB.info">
-<tt class="descname">info</tt><a class="reference internal" href="_modules/instaseis/base_instaseis_db.html#BaseInstaseisDB.info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.base_instaseis_db.BaseInstaseisDB.info" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the info dictionary about the class.</p>
-</dd></dl>
-
 </dd></dl>
 
 <dl class="class">
@@ -249,13 +227,6 @@ useful e.g. for finite sources)</li>
 </tr>
 </tbody>
 </table>
-<dl class="method">
-<dt id="instaseis.instaseis_db.InstaseisDB.get_info">
-<tt class="descname">get_info</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/instaseis/instaseis_db.html#InstaseisDB.get_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.instaseis_db.InstaseisDB.get_info" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a dictionary with information about the currently loaded
-database.</p>
-</dd></dl>
-
 </dd></dl>
 
 <dl class="class">
@@ -270,13 +241,6 @@ database.</p>
 </tr>
 </tbody>
 </table>
-<dl class="method">
-<dt id="instaseis.remote_instaseis_db.RemoteInstaseisDB.get_info">
-<tt class="descname">get_info</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/instaseis/remote_instaseis_db.html#RemoteInstaseisDB.get_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.remote_instaseis_db.RemoteInstaseisDB.get_info" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a dictionary with information about the currently loaded
-database.</p>
-</dd></dl>
-
 </dd></dl>
 
 </div>
