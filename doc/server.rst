@@ -141,3 +141,156 @@ Load balancing can also be achieved by a combination of supervisor and nginx.
 It might not be worth it as Instaseis itself is oftentimes I/O bound
 but it will depend on your specific system and if you face performance
 issues it is a potential solution.
+
+
+Rest-like API Documentation
+===========================
+
+If you wish to use the Instaseis Server without the Python client this
+documentation might be helpful. The Instaseis server offers a REST-like API
+with currently three endpoints only supporting GET.
+
+.. contents:: Endpoints
+    :local:
+
+
+GET /
+^^^^^
+
+Content-Type
+    application/json; charset=UTF-8
+
+Description
+    Very basic information about the Instaseis server.
+
+Example Response
+    .. code-block:: json
+
+        {
+            "type": "Instaseis Remote Server"
+            "version": "0.0.1a",
+        }
+
+
+GET /info
+^^^^^^^^^
+
+Content-Type
+    application/json; charset=UTF-8
+
+Description
+    Detailed information about the Instaseis database offered from this
+    particular server.
+
+Example Response
+    .. code-block:: json
+
+        {
+            "attenuation": true,
+            "axisem_version": "615a180",
+            "compiler": "ifort 1400",
+            "components": "vertical and horizontal",
+            "datetime": "2014-11-07T18:48:29.000000Z",
+            "directory": "",
+            "dt": 0.4874457469080638,
+            "dump_type": "displ_only",
+            "excitation_type": "dipole",
+            "filesize": 948145144202,
+            "format_version": 7,
+            "is_reciprocal": true,
+            "length": 3699.713219032204,
+            "max_d": 180,
+            "max_radius": 6371,
+            "min_d": 0,
+            "min_radius": 5671,
+            "nfft": 16384,
+            "npts": 7591
+            "period": 2,
+            "planet_radius": 6371000,
+            "slip": [ "..." ],
+            "sliprate": [ "..." ],
+            "sampling_rate": 2.05151036057477,
+            "source_depth": null,
+            "spatial_order": 4,
+            "src_shift": 3.4121203422546387,
+            "src_shift_samples": 7,
+            "stf": "errorf",
+            "time_scheme": "symplec4",
+            "user": "di29kub on login05",
+            "velocity_model": "ak135f",
+        }
+
+GET /seismograms_raw
+^^^^^^^^^^^^^^^^^^^^
+
+Content-Type
+    application/octet-stream
+
+Description
+    Returns the raw, correctly rotated seismograms from an Instaseis database.
+    No further post-processing like STF reconvolution or resampling is
+    performed.
+
+Filetype
+    Returns MiniSEED files encoded with encoding format 4 (IEEE floating
+    point).
+
++-------------------------+----------+----------+-----------------------------+----------------------------------------------------------------------+
+| Parameter               | Type     | Required | Default Value               | Description                                                          |
++=========================+==========+==========+=============================+======================================================================+
+| ``components``          | String   | False    | ZNE                         | The desired seismogram components. Any combination of Z, N, E, R, T. |
++-------------------------+----------+----------+-----------------------------+----------------------------------------------------------------------+
+| ``origin_time``         | Datetime | False    | 1970-01-01T00:00:00.000000Z | Time of the first sample.                                            |
++-------------------------+----------+----------+-----------------------------+----------------------------------------------------------------------+
+| Receiver Parameters                                                                                                                                |
++-------------------------+----------+----------+-----------------------------+----------------------------------------------------------------------+
+| ``receiver_latitude``   | Float    | True     |                             | The latitude of the receiver.                                        |
++-------------------------+----------+----------+-----------------------------+----------------------------------------------------------------------+
+| ``receiver_longitude``  | Float    | True     |                             | The longitude of the receiver.                                       |
++-------------------------+----------+----------+-----------------------------+----------------------------------------------------------------------+
+| ``receiver_depth_in_m`` | Float    | False    | 0.0                         | The depth of the receiver in meter.                                  |
++-------------------------+----------+----------+-----------------------------+----------------------------------------------------------------------+
+| ``network_code``        | String   | False    |                             | The network code of the final seismogram.                            |
++-------------------------+----------+----------+-----------------------------+----------------------------------------------------------------------+
+| ``station_code``        | String   | False    |                             | The station code of the final seismogram.                            |
++-------------------------+----------+----------+-----------------------------+----------------------------------------------------------------------+
+| Source Parameters                                                                                                                                  |
++-------------------------+----------+----------+-----------------------------+----------------------------------------------------------------------+
+| ``source_latitude``     | Float    | True     |                             | The latitude of the source.                                          |
++-------------------------+----------+----------+-----------------------------+----------------------------------------------------------------------+
+| ``source_longitude``    | Float    | True     |                             | The longitude of the source.                                         |
++-------------------------+----------+----------+-----------------------------+----------------------------------------------------------------------+
+| ``source_depth_in_m``   | Float    | False    | 0.0                         | The depth of the source in meter.                                    |
++-------------------------+----------+----------+-----------------------------+----------------------------------------------------------------------+
+| Source can be given as the moment tensor components...                                                                                             |
++-------------------------+----------+----------+-----------------------------+----------------------------------------------------------------------+
+| ``m_rr``                | Float    | False    |                             | A moment tensor component in Nm.                                     |
++-------------------------+----------+----------+-----------------------------+----------------------------------------------------------------------+
+| ``m_tt``                | Float    | False    |                             | A moment tensor componentin Nm.                                      |
++-------------------------+----------+----------+-----------------------------+----------------------------------------------------------------------+
+| ``m_pp``                | Float    | False    |                             | A moment tensor componentin Nm.                                      |
++-------------------------+----------+----------+-----------------------------+----------------------------------------------------------------------+
+| ``m_rt``                | Float    | False    |                             | A moment tensor componentin Nm.                                      |
++-------------------------+----------+----------+-----------------------------+----------------------------------------------------------------------+
+| ``m_rp``                | Float    | False    |                             | A moment tensor componentin Nm.                                      |
++-------------------------+----------+----------+-----------------------------+----------------------------------------------------------------------+
+| ``m_tp``                | Float    | False    |                             | A moment tensor componentin Nm.                                      |
++-------------------------+----------+----------+-----------------------------+----------------------------------------------------------------------+
+| ...as a double couple...                                                                                                                           |
++-------------------------+----------+----------+-----------------------------+----------------------------------------------------------------------+
+| ``strike``              | Float    | False    |                             | Strike of a double couple source in degree.                          |
++-------------------------+----------+----------+-----------------------------+----------------------------------------------------------------------+
+| ``dip``                 | Float    | False    |                             | Dip of a double couple source in degree.                             |
++-------------------------+----------+----------+-----------------------------+----------------------------------------------------------------------+
+| ``rake``                | Float    | False    |                             | Rake of a double couple source in degree.                            |
++-------------------------+----------+----------+-----------------------------+----------------------------------------------------------------------+
+| ``M0``                  | Float    | False    |                             | Scalar seismic moment in Nm.                                         |
++-------------------------+----------+----------+-----------------------------+----------------------------------------------------------------------+
+| ...or as a force source.                                                                                                                           |
++-------------------------+----------+----------+-----------------------------+----------------------------------------------------------------------+
+| ``f_r``                 | Float    | False    |                             | A force source component in N.                                       |
++-------------------------+----------+----------+-----------------------------+----------------------------------------------------------------------+
+| ``f_t``                 | Float    | False    |                             | A force source component in N.                                       |
++-------------------------+----------+----------+-----------------------------+----------------------------------------------------------------------+
+| ``f_p``                 | Float    | False    |                             | A force source component in N.                                       |
++-------------------------+----------+----------+-----------------------------+----------------------------------------------------------------------+
