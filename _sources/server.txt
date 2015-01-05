@@ -13,7 +13,7 @@ local connection to an Instaseis database and shares data over HTTP.
 Instaseis clients can connect to that server with the same interface as to a
 local database.
 
-Starting a server
+Starting a Server
 =================
 
 To launch a server, just execute
@@ -143,7 +143,7 @@ but it will depend on your specific system and if you face performance
 issues it is a potential solution.
 
 
-Rest-like API Documentation
+REST-like API Documentation
 ===========================
 
 If you wish to use the Instaseis Server without the Python client this
