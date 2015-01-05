@@ -120,6 +120,7 @@ html_theme_options = {
     "navbar_links": [
         ("AxiSEM", "http://axisem.info", True),
         ("ObsPy", "http://obspy.org", True),
+        ("Instaseis on GitHub", "http://github.com/krischer/instaseis", True),
     ],
     "navbar_pagenav": False,
     'source_link_position': False
