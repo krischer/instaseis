@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Instaseis - Instant high frequency seismograms &mdash; instaseis 0.0.1a documentation</title>
+    <title>Instaseis - Instant high frequency seismograms &mdash; instaseis 0.0.1a-34-g406f documentation</title>
     
     <link rel="stylesheet" href="_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.0.1a',
+        VERSION:     '0.0.1a-34-g406f',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -29,8 +29,8 @@
     <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="_static/bootstrap-3.2.0/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.0.1a documentation" href="#" />
-    <link rel="next" title="InstaseisDB" href="instaseis.html" />
+    <link rel="top" title="instaseis 0.0.1a-34-g406f documentation" href="#" />
+    <link rel="next" title="Instaseis Database Objects" href="instaseis.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
@@ -50,7 +50,7 @@
         </button>
         <a class="navbar-brand" href="#">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0.1a</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-34-g406f</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -69,8 +69,9 @@
   <ul class="dropdown-menu globaltoc"
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul>
-<li class="toctree-l1"><a class="reference internal" href="instaseis.html">InstaseisDB</a></li>
+<li class="toctree-l1"><a class="reference internal" href="instaseis.html">Instaseis Database Objects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mesh.html">Meshes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="server.html">Instaseis Server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="source.html">Sources and Receivers</a></li>
 </ul>
 </ul>
@@ -81,7 +82,7 @@
               
                 
   <li>
-    <a href="instaseis.html" title="Next Chapter: InstaseisDB"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">InstaseisDB &raquo;</span>
+    <a href="instaseis.html" title="Next Chapter: Instaseis Database Objects"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">Instaseis Databa... &raquo;</span>
     </a>
   </li>
               
@@ -109,7 +110,7 @@
   <div class="row">
     <div class="col-md-12">
       
-  <a class="reference internal image-reference" href="http://lionkrischer.de/scratch/instaseis_logo.png"><img alt="http://lionkrischer.de/scratch/instaseis_logo.png" class="align-right" src="http://lionkrischer.de/scratch/instaseis_logo.png" /></a>
+  <a class="reference internal image-reference" href="http://i.imgur.com/6LNoJD6.png"><img alt="http://i.imgur.com/6LNoJD6.png" class="align-right" src="http://i.imgur.com/6LNoJD6.png" style="width: 60%;" /></a>
 <div class="section" id="instaseis-instant-high-frequency-seismograms">
 <h1>Instaseis - Instant high frequency seismograms<a class="headerlink" href="#instaseis-instant-high-frequency-seismograms" title="Permalink to this headline">¶</a></h1>
 <p>Instaseis calculates high frequency seismograms from Green&#8217;s function databases
@@ -129,6 +130,13 @@ compiling the shared Fortran library. Pull requests are welcome.</p>
 <li><tt class="docutils literal"><span class="pre">NumPy</span> <span class="pre">&gt;=</span> <span class="pre">1.7</span></tt></li>
 <li><tt class="docutils literal"><span class="pre">ObsPy</span> <span class="pre">&gt;=</span> <span class="pre">0.9.2</span></tt> <em>(only the ObsPy master currently supports Python 3)</em></li>
 <li><tt class="docutils literal"><span class="pre">netCDF4</span> <span class="pre">&gt;=</span> <span class="pre">4.3</span></tt> including Python bindings (<tt class="docutils literal"><span class="pre">&gt;=</span> <span class="pre">1.1</span></tt>)</li>
+<li><tt class="docutils literal"><span class="pre">future</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">requests</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">responses</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">tornado</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">flake8</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">pytest</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">mock</span></tt> <em>(only for Python 2.x, otherwise part of the standard library)</em></li>
 </ul>
 <p>The graphical user interface (which is optional and not needed to run
 Instaseis) furthermore requires</p>
@@ -137,11 +145,6 @@ Instaseis) furthermore requires</p>
 <li><tt class="docutils literal"><span class="pre">pyqtgraph</span></tt></li>
 <li><tt class="docutils literal"><span class="pre">matplolitb</span></tt></li>
 <li><tt class="docutils literal"><span class="pre">basemap</span></tt></li>
-</ul>
-<p>Additionally the tests need</p>
-<ul class="simple">
-<li><tt class="docutils literal"><span class="pre">pytest</span></tt></li>
-<li><tt class="docutils literal"><span class="pre">flake8</span></tt></li>
 </ul>
 <div class="section" id="fortran-compiler">
 <h4>Fortran Compiler<a class="headerlink" href="#fortran-compiler" title="Permalink to this headline">¶</a></h4>
@@ -163,11 +166,17 @@ dependencies are installed. Otherwise do yourself a favor and download the
 It is a free scientific Python distribution bundling almost all necessary
 modules with a convenient installer (does not require root access!).
 Once installed assert that <tt class="docutils literal"><span class="pre">pip</span></tt> and <tt class="docutils literal"><span class="pre">conda</span></tt> point to the Anaconda
-installation folder (you need to open a new terminal after installing Anaconda)
-and install the missing dependencies with</p>
-<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>pip install obspy
-<span class="nv">$ </span>pip install pyqtgraph pytest flake8
-<span class="nv">$ </span>conda install basemap
+installation folder (you may need to open a new terminal after installing
+Anaconda).</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>conda install netcdf4 future requests tornado flake8 pytest mock basemap pyqt pip
+<span class="nv">$ </span>pip install obspy responses pyqtgraph
+</pre></div>
+</div>
+<p>A possible complication arises if you are running on a server without a
+display. In that case please edit (on Linux)
+<tt class="docutils literal"><span class="pre">~/.config/matplotlib/matplotlibrc</span></tt> (create if it does not exist) and make
+sure the following line is part of it:</p>
+<div class="highlight-bash"><div class="highlight"><pre>backend: agg
 </pre></div>
 </div>
 </div>
@@ -193,10 +202,11 @@ and install the missing dependencies with</p>
 </div>
 <div class="section" id="testing">
 <h3>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h3>
-<p>Tests are executed with</p>
+<p>To assert that your installation is working properly, execute</p>
 <div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>python -m instaseis.tests
 </pre></div>
 </div>
+<p>and make sure all tests pass. Otherwise please contact the developers.</p>
 </div>
 <div class="section" id="build-the-documentation">
 <h3>Build the Documentation<a class="headerlink" href="#build-the-documentation" title="Permalink to this headline">¶</a></h3>
@@ -214,49 +224,139 @@ with</p>
 choice or host it somewhere.</p>
 </div>
 </div>
-<div class="section" id="usage">
-<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
-<p>Use it by creating an <tt class="xref py py-class docutils literal"><span class="pre">InstaseisDB</span></tt> object
-which needs to know the path to the output folder containing the netCDF files from an
-AxiSEM run. All information is determined from the netCDF files so no other
-files have to be present.</p>
-<p>Then a source and receiver pair is defined. The moment tensor components are in
-<tt class="docutils literal"><span class="pre">N</span> <span class="pre">m</span></tt>. Lastly the
-<tt class="xref py py-meth docutils literal"><span class="pre">get_seismograms()</span></tt>
-method is called which by default returns a three component ObsPy
-<a class="reference external" href="http://docs.obspy.org/packages/autogen/obspy.core.stream.Stream.html#obspy.core.stream.Stream" title="(in ObsPy Documentation (0.9.2) v0.9)"><tt class="xref py py-class docutils literal"><span class="pre">Stream</span></tt></a> object with the waveform data. This can then
-be used process and save the data in any format supported by ObsPy.</p>
-<p>The initialization of an <tt class="xref py py-class docutils literal"><span class="pre">InstaseisDB</span></tt> object
-is the most expensive part so make sure to do it only once if possible.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="kn">from</span> <span class="nn">instaseis</span> <span class="kn">import</span> <span class="n">open_db</span><span class="p">,</span> <span class="n">Source</span><span class="p">,</span> <span class="n">Receiver</span>
+<div class="section" id="tutorial">
+<h2>Tutorial<a class="headerlink" href="#tutorial" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="learning-python-and-obspy">
+<h3>Learning Python and ObsPy<a class="headerlink" href="#learning-python-and-obspy" title="Permalink to this headline">¶</a></h3>
+<p>Instaseis is written in <a class="reference external" href="http://www.python.org">Python</a> and utilizes the
+data structures of <a class="reference external" href="http://obspy.org">ObsPy</a> to allow the construction of
+modern and efficient workflows. Python is an easy to learn and powerful
+interactive programming language with an exhaustive scientific ecosystem. The
+following resources are useful if you are starting out with Python and ObsPy:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://learnpythonthehardway.org/book/">Good, general Python tutorial</a></li>
+<li><a class="reference external" href="http://www.nature.com/news/interactive-notebooks-sharing-the-code-1.16261">IPython Notebook in Nature</a></li>
+<li><a class="reference external" href="https://scipy-lectures.github.io/">Introduction to the scientific Python ecosystem</a></li>
+<li><a class="reference external" href="http://docs.obspy.org/master">The ObsPy Documentation</a></li>
+<li><a class="reference external" href="http://docs.obspy.org/master/tutorial/index.html">The ObsPy Tutorial</a></li>
+</ul>
+</div>
+<div class="section" id="using-instaseis">
+<h3>Using Instaseis<a class="headerlink" href="#using-instaseis" title="Permalink to this headline">¶</a></h3>
+<p>To use Instaseis you first have to ope a connection to an Instaseis
+database. Instaseis supports connections to local and remote Green&#8217;s
+functions&#8217; databases; a local database are a couple of NetCDF files on the
+filesystem whereas a remote database requires an Instaseis server answering
+queries. The usage and capabilities of both are completely equivalent. This
+section deals with using Instaseis to generate seismograms; if you wish to
+run an Instaseis server, please see the documentation of the <a class="reference internal" href="server.html"><em>Instaseis Server</em></a>.</p>
+<p>Connecting to either a local or a remote Instaseis database happens with the
+<a class="reference internal" href="instaseis.html#instaseis.open_db" title="instaseis.open_db"><tt class="xref py py-func docutils literal"><span class="pre">open_db()</span></tt></a> function. It will return either an
+<a class="reference internal" href="instaseis.html#instaseis.instaseis_db.InstaseisDB" title="instaseis.instaseis_db.InstaseisDB"><tt class="xref py py-class docutils literal"><span class="pre">InstaseisDB</span></tt></a> or a
+<a class="reference internal" href="instaseis.html#instaseis.remote_instaseis_db.RemoteInstaseisDB" title="instaseis.remote_instaseis_db.RemoteInstaseisDB"><tt class="xref py py-class docutils literal"><span class="pre">RemoteInstaseisDB</span></tt></a> object. Additional
+arguments and keyword arguments are passed to the the initialization
+function of these objects. Once the database objects are created, usage of
+both is identical. Be aware that the initialization of the database objects
+is potentially a fairly expensive operation so make sure to do it as little
+as possible (usually once per model).</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">instaseis</span>
 
-<span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="n">db</span> <span class="o">=</span> <span class="n">open_db</span><span class="p">(</span><span class="s">&quot;./prem50s_forces&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># Open connection to a local database by giving the path on disc where</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># the `ordered_output.nc4` files of AxiSEM are stored.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">instaseis</span><span class="o">.</span><span class="n">open_db</span><span class="p">(</span><span class="s">&quot;/path/to/10s_PREM&quot;</span><span class="p">)</span>
 
-<span class="n">In</span> <span class="p">[</span><span class="mi">3</span><span class="p">]:</span> <span class="n">receiver</span> <span class="o">=</span> <span class="n">Receiver</span><span class="p">(</span><span class="n">latitude</span><span class="o">=</span><span class="mf">42.6390</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="mf">74.4940</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># Or open connection to a remote database by giving an HTTP URL.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">instaseis</span><span class="o">.</span><span class="n">open_db</span><span class="p">(</span><span class="s">&quot;http://123.456.789.123:1234&quot;</span><span class="p">)</span>
 
-<span class="n">In</span> <span class="p">[</span><span class="mi">4</span><span class="p">]:</span> <span class="n">source</span> <span class="o">=</span> <span class="n">Source</span><span class="p">(</span>
-   <span class="o">...</span><span class="p">:</span>     <span class="n">latitude</span><span class="o">=</span><span class="mf">89.91</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">depth_in_m</span><span class="o">=</span><span class="mi">12000</span><span class="p">,</span>
-   <span class="o">...</span><span class="p">:</span>     <span class="n">m_rr</span> <span class="o">=</span> <span class="mf">4.710000e+24</span> <span class="o">/</span> <span class="mf">1E7</span><span class="p">,</span>
-   <span class="o">...</span><span class="p">:</span>     <span class="n">m_tt</span> <span class="o">=</span> <span class="mf">3.810000e+22</span> <span class="o">/</span> <span class="mf">1E7</span><span class="p">,</span>
-   <span class="o">...</span><span class="p">:</span>     <span class="n">m_pp</span> <span class="o">=-</span><span class="mf">4.740000e+24</span> <span class="o">/</span> <span class="mf">1E7</span><span class="p">,</span>
-   <span class="o">...</span><span class="p">:</span>     <span class="n">m_rt</span> <span class="o">=</span> <span class="mf">3.990000e+23</span> <span class="o">/</span> <span class="mf">1E7</span><span class="p">,</span>
-   <span class="o">...</span><span class="p">:</span>     <span class="n">m_rp</span> <span class="o">=-</span><span class="mf">8.050000e+23</span> <span class="o">/</span> <span class="mf">1E7</span><span class="p">,</span>
-   <span class="o">...</span><span class="p">:</span>     <span class="n">m_tp</span> <span class="o">=-</span><span class="mf">1.230000e+24</span> <span class="o">/</span> <span class="mf">1E7</span><span class="p">)</span>
-
-<span class="n">In</span> <span class="p">[</span><span class="mi">5</span><span class="p">]:</span> <span class="n">st</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_seismograms</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">receiver</span><span class="o">=</span><span class="n">receiver</span><span class="p">)</span>
-
-<span class="n">In</span> <span class="p">[</span><span class="mi">6</span><span class="p">]:</span> <span class="k">print</span> <span class="n">st</span>
-<span class="mi">3</span> <span class="n">Trace</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="ow">in</span> <span class="n">Stream</span><span class="p">:</span>
-<span class="o">...</span><span class="n">BXZ</span> <span class="o">|</span> <span class="mi">1970</span><span class="o">-</span><span class="mo">01</span><span class="o">-</span><span class="mo">01</span><span class="n">T00</span><span class="p">:</span><span class="mo">00</span><span class="p">:</span><span class="mf">00.000000</span><span class="n">Z</span> <span class="o">-</span> <span class="o">...</span> <span class="o">|</span> <span class="mf">12.5</span> <span class="n">s</span><span class="p">,</span> <span class="mi">144</span> <span class="n">samples</span>
-<span class="o">...</span><span class="n">BXN</span> <span class="o">|</span> <span class="mi">1970</span><span class="o">-</span><span class="mo">01</span><span class="o">-</span><span class="mo">01</span><span class="n">T00</span><span class="p">:</span><span class="mo">00</span><span class="p">:</span><span class="mf">00.000000</span><span class="n">Z</span> <span class="o">-</span> <span class="o">...</span> <span class="o">|</span> <span class="mf">12.5</span> <span class="n">s</span><span class="p">,</span> <span class="mi">144</span> <span class="n">samples</span>
-<span class="o">...</span><span class="n">BXE</span> <span class="o">|</span> <span class="mi">1970</span><span class="o">-</span><span class="mo">01</span><span class="o">-</span><span class="mo">01</span><span class="n">T00</span><span class="p">:</span><span class="mo">00</span><span class="p">:</span><span class="mf">00.000000</span><span class="n">Z</span> <span class="o">-</span> <span class="o">...</span> <span class="o">|</span> <span class="mf">12.5</span> <span class="n">s</span><span class="p">,</span> <span class="mi">144</span> <span class="n">samples</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># Get some basic information by printing the database object.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
+<span class="go">RemoteInstaseisDB reciprocal Green&#39;s function Database (v7) generated with these parameters:</span>
+<span class="go">components           : vertical and horizontal</span>
+<span class="go">velocity model       : prem_ani</span>
+<span class="go">attenuation          : True</span>
+<span class="go">dominant period      : 10.000 s</span>
+<span class="go">dump type            : displ_only</span>
+<span class="go">excitation type      : dipole</span>
+<span class="go">time step            : 2.436 s</span>
+<span class="go">sampling rate        : 0.411 Hz</span>
+<span class="go">number of samples    : 739</span>
+<span class="go">seismogram length    : 1797.7 s</span>
+<span class="go">source time function : errorf</span>
+<span class="go">source shift         : 17.051 s</span>
+<span class="go">spatial order        : 4</span>
+<span class="go">min/max radius       : 5700.0 - 6371.0 km</span>
+<span class="go">Planet radius        : 6371.0 km</span>
+<span class="go">min/max distance     : 0.0 - 180.0 deg</span>
+<span class="go">time stepping scheme : newmark2</span>
+<span class="go">compiler/user        : gfortran 4.9.1 by lion on Laptop</span>
+<span class="go">directory/url        : http://123.456.789.123:1234</span>
+<span class="go">size of netCDF files : 3.4 GB</span>
+<span class="go">generated by AxiSEM version 60945ec at 2014-10-23T21:32:58.000000Z</span>
 </pre></div>
+</div>
+<p>The <a class="reference internal" href="instaseis.html#instaseis.base_instaseis_db.BaseInstaseisDB.get_seismograms" title="instaseis.base_instaseis_db.BaseInstaseisDB.get_seismograms"><tt class="xref py py-meth docutils literal"><span class="pre">get_seismograms()</span></tt></a>
+method is called to generate seismograms as <a class="reference external" href="http://docs.obspy.org/packages/autogen/obspy.core.stream.Stream.html#obspy.core.stream.Stream" title="(in ObsPy Documentation (0.9.2) v0.9)"><tt class="xref py py-class docutils literal"><span class="pre">Stream</span></tt></a>
+objects with the waveform data. This enables easy serialization in a large
+selection of formats and facilitates post processing by utilizing ObsPy.</p>
+<p>To generate seismograms source information must be given either as a
+<a class="reference internal" href="source.html#instaseis.source.Source" title="instaseis.source.Source"><tt class="xref py py-class docutils literal"><span class="pre">Source</span></tt></a> object, a
+<a class="reference internal" href="source.html#instaseis.source.ForceSource" title="instaseis.source.ForceSource"><tt class="xref py py-class docutils literal"><span class="pre">ForceSource</span></tt></a> object, or as a
+<a class="reference internal" href="source.html#instaseis.source.FiniteSource" title="instaseis.source.FiniteSource"><tt class="xref py py-class docutils literal"><span class="pre">FiniteSource</span></tt></a> object. Receiver information must be
+passed in form of a <a class="reference internal" href="source.html#instaseis.source.Receiver" title="instaseis.source.Receiver"><tt class="xref py py-class docutils literal"><span class="pre">Receiver</span></tt></a> object. Please refer
+to the documentation of these classes for more details.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">obspy</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">receiver</span> <span class="o">=</span> <span class="n">instaseis</span><span class="o">.</span><span class="n">Receiver</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">latitude</span><span class="o">=</span><span class="mf">42.6390</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="mf">74.4940</span><span class="p">,</span> <span class="n">network</span><span class="o">=</span><span class="s">&quot;AB&quot;</span><span class="p">,</span> <span class="n">station</span><span class="o">=</span><span class="s">&quot;CED&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span> <span class="o">=</span> <span class="n">instaseis</span><span class="o">.</span><span class="n">Source</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">latitude</span><span class="o">=</span><span class="mf">89.91</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">depth_in_m</span><span class="o">=</span><span class="mi">12000</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">m_rr</span> <span class="o">=</span> <span class="mf">4.710000e+24</span> <span class="o">/</span> <span class="mf">1E7</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">m_tt</span> <span class="o">=</span> <span class="mf">3.810000e+22</span> <span class="o">/</span> <span class="mf">1E7</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">m_pp</span> <span class="o">=-</span><span class="mf">4.740000e+24</span> <span class="o">/</span> <span class="mf">1E7</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">m_rt</span> <span class="o">=</span> <span class="mf">3.990000e+23</span> <span class="o">/</span> <span class="mf">1E7</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">m_rp</span> <span class="o">=-</span><span class="mf">8.050000e+23</span> <span class="o">/</span> <span class="mf">1E7</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">m_tp</span> <span class="o">=-</span><span class="mf">1.230000e+24</span> <span class="o">/</span> <span class="mf">1E7</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">origin_time</span><span class="o">=</span><span class="n">obspy</span><span class="o">.</span><span class="n">UTCDateTime</span><span class="p">(</span><span class="mi">2011</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">st</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_seismograms</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">receiver</span><span class="o">=</span><span class="n">receiver</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">st</span><span class="p">)</span>
+<span class="go">3 Trace(s) in Stream:</span>
+<span class="go">AB.CED..MXZ | 2011-01-02T03:04:05Z - ... | 0.4 Hz, 732 samples</span>
+<span class="go">AB.CED..MXN | 2011-01-02T03:04:05Z - ... | 0.4 Hz, 732 samples</span>
+<span class="go">AB.CED..MXE | 2011-01-02T03:04:05Z - ... | 0.4 Hz, 732 samples</span>
+</pre></div>
+</div>
+<p>Source and receiver can also be replaced by ObsPy objects. This can be used
+to calculate synthetics based on standard file formats and web services.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="c"># Read event information from a local QuakeML file.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cat</span> <span class="o">=</span> <span class="n">obspy</span><span class="o">.</span><span class="n">readEvents</span><span class="p">(</span><span class="s">&quot;quake.xml&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">cat</span><span class="p">)</span>
+<span class="go">1 Event(s) in Catalog:</span>
+<span class="go">2010-03-11T06:22:20.100000Z | -57.460,  -27.580 | 5.6 Mwc</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># Query a web service for station information.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">obspy.fdsn</span> <span class="kn">import</span> <span class="n">Client</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">Client</span><span class="p">(</span><span class="s">&quot;IRIS&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">inv</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">get_stations</span><span class="p">(</span><span class="n">network</span><span class="o">=</span><span class="s">&quot;IU&quot;</span><span class="p">,</span> <span class="n">station</span><span class="o">=</span><span class="s">&quot;ANMO&quot;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="s">&quot;station&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                     <span class="n">starttime</span><span class="o">=</span><span class="n">cat</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">origins</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">time</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">inv</span><span class="p">)</span>
+<span class="go">Created by: IRIS WEB SERVICE: fdsnws-station | ...</span>
+<span class="go">Contains:</span>
+<span class="go">    Networks (1): IU</span>
+<span class="go">    Stations (1): IU.ANMO (Albuquerque, New Mexico, USA)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">st</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_seismograms</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">cat</span><span class="p">,</span> <span class="n">receiver</span><span class="o">=</span><span class="n">inv</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">st</span><span class="p">)</span>
+<span class="go">3 Trace(s) in Stream:</span>
+<span class="go">IU.ANMO..MXZ | 2010-03-11T06:22:20Z - ... | 0.4 Hz, 732 samples</span>
+<span class="go">IU.ANMO..MXN | 2010-03-11T06:22:20Z - ... | 0.4 Hz, 732 samples</span>
+<span class="go">IU.ANMO..MXE | 2010-03-11T06:22:20Z - ... | 0.4 Hz, 732 samples</span>
+</pre></div>
+</div>
 </div>
 </div>
 <div class="section" id="gui">
 <h2>GUI<a class="headerlink" href="#gui" title="Permalink to this headline">¶</a></h2>
-<p>Instaseis contains an optional graphical user interface which might be
-useful for some purposes. To execute it just type</p>
+<p>Instaseis contains an optional graphical user interface which is useful to
+explore a database and for educational purposes. To launch it just type</p>
 <div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>python -m instaseis.gui
 </pre></div>
 </div>
@@ -266,8 +366,15 @@ useful for some purposes. To execute it just type</p>
 <h2>Detailed Documentation<a class="headerlink" href="#detailed-documentation" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="instaseis.html">InstaseisDB</a></li>
+<li class="toctree-l1"><a class="reference internal" href="instaseis.html">Instaseis Database Objects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mesh.html">Meshes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="server.html">Instaseis Server</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="server.html#starting-a-server">Starting a server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server.html#connecting-to-a-server">Connecting to a Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server.html#deployment-and-performance-considerations">Deployment and Performance Considerations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server.html#rest-like-api-documentation">Rest-like API Documentation</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="source.html">Sources and Receivers</a></li>
 </ul>
 </div>

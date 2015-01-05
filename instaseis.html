@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>InstaseisDB &mdash; instaseis 0.0.1a documentation</title>
+    <title>Instaseis Database Objects &mdash; instaseis 0.0.1a-34-g406f documentation</title>
     
     <link rel="stylesheet" href="_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.0.1a',
+        VERSION:     '0.0.1a-34-g406f',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -29,7 +29,7 @@
     <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="_static/bootstrap-3.2.0/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.0.1a documentation" href="index.html" />
+    <link rel="top" title="instaseis 0.0.1a-34-g406f documentation" href="index.html" />
     <link rel="next" title="Meshes" href="mesh.html" />
     <link rel="prev" title="Instaseis - Instant high frequency seismograms" href="index.html" />
 <meta charset='utf-8'>
@@ -51,7 +51,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0.1a</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-34-g406f</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -70,8 +70,9 @@
   <ul class="dropdown-menu globaltoc"
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="">InstaseisDB</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Instaseis Database Objects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mesh.html">Meshes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="server.html">Instaseis Server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="source.html">Sources and Receivers</a></li>
 </ul>
 </ul>
@@ -114,8 +115,170 @@
   <div class="row">
     <div class="col-md-12">
       
-  <div class="section" id="instaseisdb">
-<h1>InstaseisDB<a class="headerlink" href="#instaseisdb" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="instaseis-database-objects">
+<h1>Instaseis Database Objects<a class="headerlink" href="#instaseis-database-objects" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="instaseis.open_db">
+<tt class="descclassname">instaseis.</tt><tt class="descname">open_db</tt><big>(</big><em>path</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/instaseis.html#open_db"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.open_db" title="Permalink to this definition">¶</a></dt>
+<dd><p>Open a local or remote Instaseis database.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> &#8211; Filepath or URL.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="instaseis.base_instaseis_db.BaseInstaseisDB">
+<em class="property">class </em><tt class="descclassname">instaseis.base_instaseis_db.</tt><tt class="descname">BaseInstaseisDB</tt><a class="reference internal" href="_modules/instaseis/base_instaseis_db.html#BaseInstaseisDB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.base_instaseis_db.BaseInstaseisDB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Abstract base class for all Instaseis database classes.</p>
+<p>Each subclass must provide at least a <tt class="docutils literal"><span class="pre">get_seismograms()</span></tt> and a
+<tt class="docutils literal"><span class="pre">get_info()</span></tt> method.</p>
+<dl class="method">
+<dt id="instaseis.base_instaseis_db.BaseInstaseisDB.get_info">
+<tt class="descname">get_info</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/instaseis/base_instaseis_db.html#BaseInstaseisDB.get_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.base_instaseis_db.BaseInstaseisDB.get_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Must return a dictionary with the following keys:</p>
+<p><tt class="docutils literal"><span class="pre">&quot;is_reciprocal&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;components&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;source_depth&quot;</span></tt>,
+<tt class="docutils literal"><span class="pre">&quot;velocity_model&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;attenuation&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;period&quot;</span></tt>,
+<tt class="docutils literal"><span class="pre">&quot;dump_type&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;excitation_type&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;dt&quot;</span></tt>,
+<tt class="docutils literal"><span class="pre">&quot;sampling_rate&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;npts&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;nnft&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;length&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;stf&quot;</span></tt>,
+<tt class="docutils literal"><span class="pre">&quot;slip&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;sliprate&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;src_shift&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;src_shift_samples&quot;</span></tt>,
+<tt class="docutils literal"><span class="pre">&quot;spatial_order&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;min_radius&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;max_radius&quot;</span></tt>,
+<tt class="docutils literal"><span class="pre">&quot;planet_radius&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;min_d&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;max_d&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;time_scheme&quot;</span></tt>,
+<tt class="docutils literal"><span class="pre">&quot;directory&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;filesize&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;compiler&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;user&quot;</span></tt>,
+<tt class="docutils literal"><span class="pre">&quot;format_version&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;axisem_version&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;datetime&quot;</span></tt></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="instaseis.base_instaseis_db.BaseInstaseisDB.get_seismograms">
+<tt class="descname">get_seismograms</tt><big>(</big><em>source</em>, <em>receiver</em>, <em>components=(u'Z'</em>, <em>u'N'</em>, <em>u'E')</em>, <em>kind=u'displacement'</em>, <em>remove_source_shift=True</em>, <em>reconvolve_stf=False</em>, <em>return_obspy_stream=True</em>, <em>dt=None</em>, <em>a_lanczos=5</em><big>)</big><a class="reference internal" href="_modules/instaseis/base_instaseis_db.html#BaseInstaseisDB.get_seismograms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.base_instaseis_db.BaseInstaseisDB.get_seismograms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract seismograms for a moment tensor point source from the AxiSEM
+database.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>source</strong> (<a class="reference internal" href="source.html#instaseis.source.Source" title="instaseis.source.Source"><tt class="xref py py-class docutils literal"><span class="pre">instaseis.source.Source</span></tt></a> or
+<a class="reference internal" href="source.html#instaseis.source.ForceSource" title="instaseis.source.ForceSource"><tt class="xref py py-class docutils literal"><span class="pre">instaseis.source.ForceSource</span></tt></a>) &#8211; instaseis.Source or instaseis.ForceSource object</li>
+<li><strong>receiver</strong> (<a class="reference internal" href="source.html#instaseis.source.Receiver" title="instaseis.source.Receiver"><tt class="xref py py-class docutils literal"><span class="pre">instaseis.source.Receiver</span></tt></a>) &#8211; instaseis.Receiver object</li>
+<li><strong>components</strong> &#8211; a tuple containing any combination of the
+strings <tt class="docutils literal"><span class="pre">&quot;Z&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;N&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;E&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;R&quot;</span></tt>, and <tt class="docutils literal"><span class="pre">&quot;T&quot;</span></tt></li>
+<li><strong>kind</strong> &#8211; &#8216;displacement&#8217;, &#8216;velocity&#8217; or &#8216;acceleration&#8217;</li>
+<li><strong>remove_source_shift</strong> &#8211; move the starttime to the peak of the
+sliprate from the source time function used to generate the
+database</li>
+<li><strong>reconvolve_stf</strong> &#8211; deconvolve the source time function used in
+the AxiSEM run and convolve with the stf attached to the source.
+For this to be stable, the new stf needs to bandlimited.</li>
+<li><strong>return_obspy_stream</strong> &#8211; return format is either an obspy.Stream
+object or a plain array containing the data</li>
+<li><strong>dt</strong> &#8211; desired sampling of the seismograms. resampling is done
+using a lanczos kernel</li>
+<li><strong>a_lanczos</strong> &#8211; width of the kernel used in resampling</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="instaseis.base_instaseis_db.BaseInstaseisDB.get_seismograms_finite_source">
+<tt class="descname">get_seismograms_finite_source</tt><big>(</big><em>sources</em>, <em>receiver</em>, <em>components=(u'Z'</em>, <em>u'N'</em>, <em>u'E')</em>, <em>kind=u'displacement'</em>, <em>dt=None</em>, <em>a_lanczos=5</em>, <em>correct_mu=False</em>, <em>progress_callback=None</em><big>)</big><a class="reference internal" href="_modules/instaseis/base_instaseis_db.html#BaseInstaseisDB.get_seismograms_finite_source"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.base_instaseis_db.BaseInstaseisDB.get_seismograms_finite_source" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract seismograms for a finite source from the AxiSEM database
+provided as a list of point sources attached with source time functions
+and time shifts.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>sources</strong> (list of <a class="reference internal" href="source.html#instaseis.source.Source" title="instaseis.source.Source"><tt class="xref py py-class docutils literal"><span class="pre">instaseis.source.Source</span></tt></a> objects) &#8211; A collection of point sources.</li>
+<li><strong>receiver</strong> (<a class="reference internal" href="source.html#instaseis.source.Receiver" title="instaseis.source.Receiver"><tt class="xref py py-class docutils literal"><span class="pre">instaseis.source.Receiver</span></tt></a>) &#8211; The receiver location.</li>
+<li><strong>components</strong> &#8211; a tuple containing any combination of the strings
+<tt class="docutils literal"><span class="pre">&quot;Z&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;N&quot;</span></tt>, and <tt class="docutils literal"><span class="pre">&quot;E&quot;</span></tt></li>
+<li><strong>kind</strong> &#8211; &#8216;displacement&#8217;, &#8216;velocity&#8217; or &#8216;acceleration&#8217;</li>
+<li><strong>dt</strong> &#8211; desired sampling of the seismograms.resampling is done
+using a lanczos kernel</li>
+<li><strong>a_lanczos</strong> &#8211; width of the kernel used in resampling</li>
+<li><strong>correct_mu</strong> &#8211; correct the source magnitude for the actual shear
+modulus from the model</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="instaseis.base_instaseis_db.BaseInstaseisDB.info">
+<tt class="descname">info</tt><a class="reference internal" href="_modules/instaseis/base_instaseis_db.html#BaseInstaseisDB.info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.base_instaseis_db.BaseInstaseisDB.info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the info dictionary about the class.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="instaseis.instaseis_db.InstaseisDB">
+<em class="property">class </em><tt class="descclassname">instaseis.instaseis_db.</tt><tt class="descname">InstaseisDB</tt><big>(</big><em>db_path</em>, <em>buffer_size_in_mb=100</em>, <em>read_on_demand=True</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/instaseis/instaseis_db.html#InstaseisDB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.instaseis_db.InstaseisDB" title="Permalink to this definition">¶</a></dt>
+<dd><p>A class to extract Seismograms from a set of wavefields generated by
+AxiSEM. Taking advantage of reciprocity of the Green&#8217;s function, two
+simulations with single force sources (vertical and horizontal) to build a
+complete Database of Green&#8217;s function in global 1D models. The spatial
+discretization equals the SEM basis functions of AxiSEM, resulting in high
+order spatial accuracy and short access times.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>db_path</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Path to the AxiSEM Database containing subdirectories
+PZ and/or PX each containing a order_output.nc4 file</li>
+<li><strong>buffer_size_in_mb</strong> (<em>int, optional</em>) &#8211; Strain is buffered to avoid unnecessary
+file access when sources are located in the same SEM element</li>
+<li><strong>read_on_demand</strong> (<em>bool, optional</em>) &#8211; read several global fields on demand (faster
+initialization, default) or on initialization (slower
+initialization, faster in individual seismogram extraction,
+useful e.g. for finite sources)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="instaseis.instaseis_db.InstaseisDB.get_info">
+<tt class="descname">get_info</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/instaseis/instaseis_db.html#InstaseisDB.get_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.instaseis_db.InstaseisDB.get_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a dictionary with information about the currently loaded
+database.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="instaseis.remote_instaseis_db.RemoteInstaseisDB">
+<em class="property">class </em><tt class="descclassname">instaseis.remote_instaseis_db.</tt><tt class="descname">RemoteInstaseisDB</tt><big>(</big><em>url</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/instaseis/remote_instaseis_db.html#RemoteInstaseisDB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.remote_instaseis_db.RemoteInstaseisDB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remote instaseis database interface.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>url</strong> &#8211; URL to the remote instaseis server.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="instaseis.remote_instaseis_db.RemoteInstaseisDB.get_info">
+<tt class="descname">get_info</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/instaseis/remote_instaseis_db.html#RemoteInstaseisDB.get_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.remote_instaseis_db.RemoteInstaseisDB.get_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a dictionary with information about the currently loaded
+database.</p>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 
 

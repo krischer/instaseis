@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Overview: module code &mdash; instaseis 0.0.1a-34-g406f documentation</title>
+    <title>instaseis &mdash; instaseis 0.0.1a-34-g406f documentation</title>
     
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -30,6 +30,7 @@
     <script type="text/javascript" src="../_static/bootstrap-3.2.0/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
     <link rel="top" title="instaseis 0.0.1a-34-g406f documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
@@ -105,14 +106,50 @@
   <div class="row">
     <div class="col-md-12">
       
-  <h1>All modules for which code is available</h1>
-<ul><li><a href="instaseis.html">instaseis</a></li>
-<ul><li><a href="instaseis/base_instaseis_db.html">instaseis.base_instaseis_db</a></li>
-<li><a href="instaseis/instaseis_db.html">instaseis.instaseis_db</a></li>
-<li><a href="instaseis/mesh.html">instaseis.mesh</a></li>
-<li><a href="instaseis/remote_instaseis_db.html">instaseis.remote_instaseis_db</a></li>
-<li><a href="instaseis/source.html">instaseis.source</a></li>
-</ul></ul>
+  <h1>Source code for instaseis</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/env python</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="p">(</span><span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span>
+                        <span class="n">unicode_literals</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">InstaseisError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+
+<span class="k">class</span> <span class="nc">InstaseisWarning</span><span class="p">(</span><span class="ne">UserWarning</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+
+<span class="k">class</span> <span class="nc">InstaseisNotFoundError</span><span class="p">(</span><span class="n">InstaseisError</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+
+<span class="k">class</span> <span class="nc">ReceiverParseError</span><span class="p">(</span><span class="n">InstaseisError</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+
+<span class="k">class</span> <span class="nc">SourceParseError</span><span class="p">(</span><span class="n">InstaseisError</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+
+<div class="viewcode-block" id="open_db"><a class="viewcode-back" href="../instaseis.html#instaseis.open_db">[docs]</a><span class="k">def</span> <span class="nf">open_db</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Open a local or remote Instaseis database.</span>
+
+<span class="sd">    :param path: Filepath or URL.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="s">&quot;://&quot;</span> <span class="ow">in</span> <span class="n">path</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">remote_instaseis_db</span>
+        <span class="k">return</span> <span class="n">remote_instaseis_db</span><span class="o">.</span><span class="n">RemoteInstaseisDB</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">instaseis_db</span>
+        <span class="k">return</span> <span class="n">instaseis_db</span><span class="o">.</span><span class="n">InstaseisDB</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</div>
+<span class="kn">from</span> <span class="nn">.version</span> <span class="kn">import</span> <span class="n">get_git_version</span>
+<span class="n">__version__</span> <span class="o">=</span> <span class="n">get_git_version</span><span class="p">()</span>
+
+<span class="kn">from</span> <span class="nn">.source</span> <span class="kn">import</span> <span class="n">Source</span><span class="p">,</span> <span class="n">Receiver</span><span class="p">,</span> <span class="n">ForceSource</span><span class="p">,</span> <span class="n">FiniteSource</span>  <span class="c"># NoQa</span>
+</pre></div>
 
     </div>
       

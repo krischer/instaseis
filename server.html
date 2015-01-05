@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Instaseis Server &mdash; instaseis 0.0.1a-34-g406f documentation</title>
+    
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootswatch-3.2.0/simplex/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.0.1a-34-g406f',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.2.0/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="instaseis 0.0.1a-34-g406f documentation" href="index.html" />
+    <link rel="next" title="Sources and Receivers" href="source.html" />
+    <link rel="prev" title="Meshes" href="mesh.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">
+          Instaseis</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-34-g406f</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="http://axisem.info">AxiSEM</a></li>
+                <li><a href="http://obspy.org">ObsPy</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="instaseis.html">Instaseis Database Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mesh.html">Meshes</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Instaseis Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="source.html">Sources and Receivers</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+  <li>
+    <a href="mesh.html" title="Previous Chapter: Meshes"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; Meshes</span>
+    </a>
+  </li>
+  <li>
+    <a href="source.html" title="Next Chapter: Sources and Receivers"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">Sources and Rece... &raquo;</span>
+    </a>
+  </li>
+              
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      
+  <div class="section" id="instaseis-server">
+<h1>Instaseis Server<a class="headerlink" href="#instaseis-server" title="Permalink to this headline">¶</a></h1>
+<p>The biggest hurdle to using Instaseis are the generation and storage of the
+potentially huge databases. Even if that is possible, concurrent access to a
+database on a network storage by multiple users might thrash that storage
+system and result in abysmal performance and other problems.</p>
+<p>Both issues are potentially resolvable by the Instaseis server. Someone (be
+it locally at the institutes network or globally over the internet) opens a
+local connection to an Instaseis database and shares data over HTTP.
+Instaseis clients can connect to that server with the same interface as to a
+local database.</p>
+<div class="section" id="starting-a-server">
+<h2>Starting a server<a class="headerlink" href="#starting-a-server" title="Permalink to this headline">¶</a></h2>
+<p>To launch a server, just execute</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>python -m instaseis.server --port 8765 --buffer_size_in_mb 100 /path/to/db
+</pre></div>
+</div>
+<p>which will launch a webserver and start serving at the specified port. The
+<tt class="docutils literal"><span class="pre">buffer_size_in_mb</span></tt> argument is passed to the
+<a class="reference internal" href="instaseis.html#instaseis.instaseis_db.InstaseisDB" title="instaseis.instaseis_db.InstaseisDB"><tt class="xref py py-class docutils literal"><span class="pre">InstaseisDB</span></tt></a> initialization routine. It is
+probably a good idea to choose it as big as your machine allows.</p>
+</div>
+<div class="section" id="connecting-to-a-server">
+<h2>Connecting to a Server<a class="headerlink" href="#connecting-to-a-server" title="Permalink to this headline">¶</a></h2>
+<p>Connecting works by simply opening a connection to said machine, e.g. if
+the server is running on the same machine:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">instaseis</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">instaseis</span><span class="o">.</span><span class="n">open_db</span><span class="p">(</span><span class="s">&quot;http://127.0.0.1:8765&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
+<span class="go">RemoteInstaseisDB reciprocal Green&#39;s function Database (v7) generated with these parameters:</span>
+<span class="go">components           : vertical and horizontal</span>
+<span class="go">velocity model       : ak135f</span>
+<span class="go">attenuation          : True</span>
+<span class="go">dominant period      : 2.000 s</span>
+<span class="go">dump type            : displ_only</span>
+<span class="go">excitation type      : dipole</span>
+<span class="go">time step            : 0.487 s</span>
+<span class="go">sampling rate        : 2.052 Hz</span>
+<span class="go">number of samples    : 7591</span>
+<span class="go">seismogram length    : 3699.7 s</span>
+<span class="go">source time function : errorf</span>
+<span class="go">source shift         : 3.412 s</span>
+<span class="go">spatial order        : 4</span>
+<span class="go">min/max radius       : 5671.0 - 6371.0 km</span>
+<span class="go">Planet radius        : 6371.0 km</span>
+<span class="go">min/max distance     : 0.0 - 180.0 deg</span>
+<span class="go">time stepping scheme : symplec4</span>
+<span class="go">compiler/user        : ifort         1400 by di29kub on login05</span>
+<span class="go">directory/url        : http://127.0.0.1:8765</span>
+<span class="go">size of netCDF files : 883.0 GB</span>
+<span class="go">generated by AxiSEM version 615a180 at 2014-11-07T18:48:29.000000Z</span>
+</pre></div>
+</div>
+<p>Usage is then the same as with a local Instaseis database.</p>
+</div>
+<div class="section" id="deployment-and-performance-considerations">
+<h2>Deployment and Performance Considerations<a class="headerlink" href="#deployment-and-performance-considerations" title="Permalink to this headline">¶</a></h2>
+<p>Network latency and throughput are the limiting factors of the achievable speed
+when using the Instaseis server. The server is based on
+<a class="reference external" href="http://www.tornadoweb.org/en/stable/">Tornado</a> resulting in asynchronous
+network I/O. The database access and file I/O on the other hand is, by design,
+synchronous. Thus each Instaseis server should easily be able to serve
+dozens or more concurrent users with acceptable speed.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If you plan to run this on a machine with outwards facing ports please
+either know what are you doing or ask your network admin to have a look
+to not compromise security of the whole network. Running this on an
+institute&#8217;s network or some managed server on the other hand should be a
+less of a security issue.</p>
+</div>
+<p>To get a stable server you will have to properly deploy it. A common option
+to deploy Tornado apps is to use <a class="reference external" href="http://supervisord.org/">supervisor</a> for
+process management and <a class="reference external" href="http://nginx.org/">ngnix</a> as a server and reverse
+proxy. There are a ton of tutorials online as the configuration differs from
+system to system but it should not be hard to find.</p>
+<p>Supervisor takes care to start, monitor, and restart the Instaseis server
+making sure it runs all the time. A very minimal supervisor configuration
+that launches two Instaseis server instances serving two different databases:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[program:instaseis_20s]</span>
+<span class="na">command</span><span class="o">=</span><span class="s">/path/to/python -m instaseis.server --port=8765 --buffer_size_in_mb=50 /path/to/20s_PREM_ANI_FORCES</span>
+<span class="na">autostart</span><span class="o">=</span><span class="s">true</span>
+<span class="na">autorestart</span><span class="o">=</span><span class="s">true</span>
+<span class="na">redirect_stderr</span><span class="o">=</span><span class="s">true</span>
+<span class="na">stdout_logfile</span><span class="o">=</span><span class="s">/tmp/instaseis_20s.log</span>
+
+<span class="k">[program:instaseis_10s]</span>
+<span class="na">command</span><span class="o">=</span><span class="s">/path/to/python -m instaseis.server --port=8766 --buffer_size_in_mb=100 /path/to/10s_PREM_ANI_FORCES</span>
+<span class="na">autostart</span><span class="o">=</span><span class="s">true</span>
+<span class="na">autorestart</span><span class="o">=</span><span class="s">true</span>
+<span class="na">redirect_stderr</span><span class="o">=</span><span class="s">true</span>
+<span class="na">stdout_logfile</span><span class="o">=</span><span class="s">/tmp/instaseis_10s.log</span>
+</pre></div>
+</div>
+<p>Now nginx can be used as a reverse proxy to map the internal routes to nice
+URLs. Also make sure to block all ports that you don&#8217;t need with your
+system&#8217;s firewall. The following example configuration will map both
+Instaseis server instances started with supervisor to
+<tt class="docutils literal"><span class="pre">http://site-name.org:8080/20s_PREM_ANI_FORCES</span></tt> and
+<tt class="docutils literal"><span class="pre">http://site-name.org:8080/10s_PREM_ANI_FORCES</span></tt>. One can easily imaging
+this being done for a number of models at various frequencies.</p>
+<div class="highlight-ini"><div class="highlight"><pre>server {
+    listen 8080;
+    server_name localhost;
+    location /20s_PREM_ANI_FORCES/ {
+        rewrite ^/20s_PREM_ANI_FORCES/?(.*)$ /$1 break;
+        proxy_pass  http://127.0.0.1:8765;
+    }
+    location /10s_PREM_ANI_FORCES/ {
+        rewrite ^/10s_PREM_ANI_FORCES/?(.*)$ /$1 break;
+        proxy_pass  http://127.0.0.1:8766;
+    }
+}
+</pre></div>
+</div>
+<p>Load balancing can also be achieved by a combination of supervisor and nginx.
+It might not be worth it as Instaseis itself is oftentimes I/O bound
+but it will depend on your specific system and if you face performance
+issues it is a potential solution.</p>
+</div>
+<div class="section" id="rest-like-api-documentation">
+<h2>Rest-like API Documentation<a class="headerlink" href="#rest-like-api-documentation" title="Permalink to this headline">¶</a></h2>
+<p>If you wish to use the Instaseis Server without the Python client this
+documentation might be helpful. The Instaseis server offers a REST-like API
+with currently three endpoints only supporting GET.</p>
+<div class="contents local topic" id="endpoints">
+<p class="topic-title first">Endpoints</p>
+<ul class="simple">
+<li><a class="reference internal" href="#get" id="id1">GET /</a></li>
+<li><a class="reference internal" href="#get-info" id="id2">GET /info</a></li>
+<li><a class="reference internal" href="#get-seismograms-raw" id="id3">GET /seismograms_raw</a></li>
+</ul>
+</div>
+<div class="section" id="get">
+<h3><a class="toc-backref" href="#id1">GET /</a><a class="headerlink" href="#get" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt>Content-Type</dt>
+<dd>application/json; charset=UTF-8</dd>
+<dt>Description</dt>
+<dd>Very basic information about the Instaseis server.</dd>
+<dt>Example Response</dt>
+<dd><div class="first last highlight-json"><div class="highlight"><pre><span class="p">{</span>
+    <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;Instaseis Remote Server&quot;</span>
+    <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;0.0.1a&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</div>
+<div class="section" id="get-info">
+<h3><a class="toc-backref" href="#id2">GET /info</a><a class="headerlink" href="#get-info" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt>Content-Type</dt>
+<dd>application/json; charset=UTF-8</dd>
+<dt>Description</dt>
+<dd>Detailed information about the Instaseis database offered from this
+particular server.</dd>
+<dt>Example Response</dt>
+<dd><div class="first last highlight-json"><div class="highlight"><pre><span class="p">{</span>
+    <span class="nt">&quot;attenuation&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+    <span class="nt">&quot;axisem_version&quot;</span><span class="p">:</span> <span class="s2">&quot;615a180&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;compiler&quot;</span><span class="p">:</span> <span class="s2">&quot;ifort 1400&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;components&quot;</span><span class="p">:</span> <span class="s2">&quot;vertical and horizontal&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;datetime&quot;</span><span class="p">:</span> <span class="s2">&quot;2014-11-07T18:48:29.000000Z&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;directory&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;dt&quot;</span><span class="p">:</span> <span class="mf">0.4874457469080638</span><span class="p">,</span>
+    <span class="nt">&quot;dump_type&quot;</span><span class="p">:</span> <span class="s2">&quot;displ_only&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;excitation_type&quot;</span><span class="p">:</span> <span class="s2">&quot;dipole&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;filesize&quot;</span><span class="p">:</span> <span class="mi">948145144202</span><span class="p">,</span>
+    <span class="nt">&quot;format_version&quot;</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span>
+    <span class="nt">&quot;is_reciprocal&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+    <span class="nt">&quot;length&quot;</span><span class="p">:</span> <span class="mf">3699.713219032204</span><span class="p">,</span>
+    <span class="nt">&quot;max_d&quot;</span><span class="p">:</span> <span class="mi">180</span><span class="p">,</span>
+    <span class="nt">&quot;max_radius&quot;</span><span class="p">:</span> <span class="mi">6371</span><span class="p">,</span>
+    <span class="nt">&quot;min_d&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="nt">&quot;min_radius&quot;</span><span class="p">:</span> <span class="mi">5671</span><span class="p">,</span>
+    <span class="nt">&quot;nfft&quot;</span><span class="p">:</span> <span class="mi">16384</span><span class="p">,</span>
+    <span class="nt">&quot;npts&quot;</span><span class="p">:</span> <span class="mi">7591</span>
+    <span class="s2">&quot;period&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="nt">&quot;planet_radius&quot;</span><span class="p">:</span> <span class="mi">6371000</span><span class="p">,</span>
+    <span class="nt">&quot;slip&quot;</span><span class="p">:</span> <span class="p">[</span> <span class="s2">&quot;...&quot;</span> <span class="p">],</span>
+    <span class="nt">&quot;sliprate&quot;</span><span class="p">:</span> <span class="p">[</span> <span class="s2">&quot;...&quot;</span> <span class="p">],</span>
+    <span class="nt">&quot;sampling_rate&quot;</span><span class="p">:</span> <span class="mf">2.05151036057477</span><span class="p">,</span>
+    <span class="nt">&quot;source_depth&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+    <span class="nt">&quot;spatial_order&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+    <span class="nt">&quot;src_shift&quot;</span><span class="p">:</span> <span class="mf">3.4121203422546387</span><span class="p">,</span>
+    <span class="nt">&quot;src_shift_samples&quot;</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span>
+    <span class="nt">&quot;stf&quot;</span><span class="p">:</span> <span class="s2">&quot;errorf&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;time_scheme&quot;</span><span class="p">:</span> <span class="s2">&quot;symplec4&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;user&quot;</span><span class="p">:</span> <span class="s2">&quot;di29kub on login05&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;velocity_model&quot;</span><span class="p">:</span> <span class="s2">&quot;ak135f&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</div>
+<div class="section" id="get-seismograms-raw">
+<h3><a class="toc-backref" href="#id3">GET /seismograms_raw</a><a class="headerlink" href="#get-seismograms-raw" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt>Content-Type</dt>
+<dd>application/octet-stream</dd>
+<dt>Description</dt>
+<dd>Returns the raw, correctly rotated seismograms from an Instaseis database.
+No further post-processing like STF reconvolution or resampling is
+performed.</dd>
+<dt>Filetype</dt>
+<dd>Returns MiniSEED files encoded with encoding format 4 (IEEE floating
+point).</dd>
+</dl>
+<table border="1" class="docutils">
+<colgroup>
+<col width="17%" />
+<col width="7%" />
+<col width="7%" />
+<col width="20%" />
+<col width="49%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Parameter</th>
+<th class="head">Type</th>
+<th class="head">Required</th>
+<th class="head">Default Value</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">components</span></tt></td>
+<td>String</td>
+<td>False</td>
+<td>ZNE</td>
+<td>The desired seismogram components. Any combination of Z, N, E, R, T.</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">origin_time</span></tt></td>
+<td>Datetime</td>
+<td>False</td>
+<td>1970-01-01T00:00:00.000000Z</td>
+<td>Time of the first sample.</td>
+</tr>
+<tr class="row-even"><td colspan="5">Receiver Parameters</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">receiver_latitude</span></tt></td>
+<td>Float</td>
+<td>True</td>
+<td>&nbsp;</td>
+<td>The latitude of the receiver.</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">receiver_longitude</span></tt></td>
+<td>Float</td>
+<td>True</td>
+<td>&nbsp;</td>
+<td>The longitude of the receiver.</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">receiver_depth_in_m</span></tt></td>
+<td>Float</td>
+<td>False</td>
+<td>0.0</td>
+<td>The depth of the receiver in meter.</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">network_code</span></tt></td>
+<td>String</td>
+<td>False</td>
+<td>&nbsp;</td>
+<td>The network code of the final seismogram.</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">station_code</span></tt></td>
+<td>String</td>
+<td>False</td>
+<td>&nbsp;</td>
+<td>The station code of the final seismogram.</td>
+</tr>
+<tr class="row-even"><td colspan="5">Source Parameters</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">source_latitude</span></tt></td>
+<td>Float</td>
+<td>True</td>
+<td>&nbsp;</td>
+<td>The latitude of the source.</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">source_longitude</span></tt></td>
+<td>Float</td>
+<td>True</td>
+<td>&nbsp;</td>
+<td>The longitude of the source.</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">source_depth_in_m</span></tt></td>
+<td>Float</td>
+<td>False</td>
+<td>0.0</td>
+<td>The depth of the source in meter.</td>
+</tr>
+<tr class="row-even"><td colspan="5">Source can be given as the moment tensor components...</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">m_rr</span></tt></td>
+<td>Float</td>
+<td>False</td>
+<td>&nbsp;</td>
+<td>A moment tensor component in Nm.</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">m_tt</span></tt></td>
+<td>Float</td>
+<td>False</td>
+<td>&nbsp;</td>
+<td>A moment tensor componentin Nm.</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">m_pp</span></tt></td>
+<td>Float</td>
+<td>False</td>
+<td>&nbsp;</td>
+<td>A moment tensor componentin Nm.</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">m_rt</span></tt></td>
+<td>Float</td>
+<td>False</td>
+<td>&nbsp;</td>
+<td>A moment tensor componentin Nm.</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">m_rp</span></tt></td>
+<td>Float</td>
+<td>False</td>
+<td>&nbsp;</td>
+<td>A moment tensor componentin Nm.</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">m_tp</span></tt></td>
+<td>Float</td>
+<td>False</td>
+<td>&nbsp;</td>
+<td>A moment tensor componentin Nm.</td>
+</tr>
+<tr class="row-odd"><td colspan="5">...as a double couple...</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">strike</span></tt></td>
+<td>Float</td>
+<td>False</td>
+<td>&nbsp;</td>
+<td>Strike of a double couple source in degree.</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">dip</span></tt></td>
+<td>Float</td>
+<td>False</td>
+<td>&nbsp;</td>
+<td>Dip of a double couple source in degree.</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">rake</span></tt></td>
+<td>Float</td>
+<td>False</td>
+<td>&nbsp;</td>
+<td>Rake of a double couple source in degree.</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">M0</span></tt></td>
+<td>Float</td>
+<td>False</td>
+<td>&nbsp;</td>
+<td>Scalar seismic moment in Nm.</td>
+</tr>
+<tr class="row-even"><td colspan="5">...or as a force source.</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">f_r</span></tt></td>
+<td>Float</td>
+<td>False</td>
+<td>&nbsp;</td>
+<td>A force source component in N.</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">f_t</span></tt></td>
+<td>Float</td>
+<td>False</td>
+<td>&nbsp;</td>
+<td>A force source component in N.</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">f_p</span></tt></td>
+<td>Float</td>
+<td>False</td>
+<td>&nbsp;</td>
+<td>A force source component in N.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2014, Lion Krischer and Martin van Driel.<br/>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2.3.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>
