@@ -292,6 +292,12 @@ class RawSeismogramsHandler(tornado.web.RequestHandler):
     def get(self):
         args = self.parse_arguments()
 
+        args.kind = args.kind.lower()
+        if args.kind not in ["displacement", "velocity", "acceleration"]:
+            msg = ("Kind must be one of 'displacement', 'velocity', "
+                   "or 'acceleration'")
+            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+
         # Figure out the type of source and construct the source object.
         src_params = {
             "moment_tensor": set(["m_rr", "m_tt", "m_pp", "m_rt", "m_rp",
