@@ -337,7 +337,7 @@ explore a database and for educational purposes. To launch it just type
 
     $ python -m instaseis.gui
 
-.. image:: http://http://i.imgur.com/FfEtlCU.png
+.. image:: http://i.imgur.com/FfEtlCU.png
 
 Screenshot of the Instaseis graphical user interface (GUI). Aside from quickly
 exploring the characteristics of a given Green’s function database it is a
