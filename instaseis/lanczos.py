@@ -36,6 +36,9 @@ def lanczos_resamp(si, dt_old, dt_new, a):
     dt_new  -- desired sampling
     a       -- width of the kernel
     """
+    if a < 2:
+        raise ValueError("Width of Lanzcos kernel must be at least 2.")
+
     si = np.require(si, dtype=np.float64, requirements=["F_CONTIGUOUS"])
     n_old = len(si)
     n_new = int(n_old * dt_old / dt_new)
