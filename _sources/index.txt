@@ -1,12 +1,37 @@
-.. image:: http://i.imgur.com/6LNoJD6.png
-     :width: 60%
-     :align: right
+.. only:: not html
+
+    .. image:: http://i.imgur.com/6LNoJD6.png
+         :width: 60%
+
+.. only:: html
+
+    .. raw:: html
+
+        <div class="col-lg-4 col-md-5 col-sm-12">
+        <img src="http://i.imgur.com/6LNoJD6.png">
+        </div>
+
+
 
 Instaseis - Instant Global Broadband Seismograms Based on a Waveform Database
 =============================================================================
 
+.. only:: html
+
+    .. raw:: html
+
+        <div class="col-md-12">
+
+
 Instaseis calculates high frequency seismograms from Green's function databases
 generated with `AxiSEM <http://axisem.info>`_.
+
+
+.. only:: html
+
+    .. raw:: html
+
+        </div>
 
 Installation
 ------------
