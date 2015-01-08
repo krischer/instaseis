@@ -109,7 +109,7 @@ class InstaseisDB(BaseInstaseisDB):
         if "PX" in netcdf_files or "PZ" in netcdf_files:
             self._parse_fs_meshes(netcdf_files)
         elif "MZZ" in netcdf_files or "MXX_P_MYY" in netcdf_files or \
-                "MXZ_MYZ" in netcdf_files or "MXY_MXX_M_MYY" or netcdf_files:
+                "MXZ_MYZ" in netcdf_files or "MXY_MXX_M_MYY" in netcdf_files:
             if sorted(netcdf_files.keys()) != sorted([
                     "MZZ", "MXX_P_MYY", "MXZ_MYZ", "MXY_MXX_M_MYY"]):
                 raise InstaseisError(
@@ -117,7 +117,11 @@ class InstaseisDB(BaseInstaseisDB):
                     "to be present.")
             self._parse_mt_meshes(netcdf_files)
         else:
-            raise InstaseisError("Could not find any suitable netCDF files.")
+            raise InstaseisError(
+                "Could not find any suitable netCDF files. Did you pass the "
+                "correct directory? E.g. if the 'ordered_output.nc4' files "
+                "are located in '/path/to/PZ/Data', please pass '/path/to/' "
+                "to Instaseis.")
 
     def _parse_fs_meshes(self, files):
         if "PX" in files:
