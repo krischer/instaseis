@@ -180,6 +180,16 @@ both is identical. Be aware that the initialization of the database objects
 is potentially a fairly expensive operation so make sure to do it as little
 as possible (usually once per model).
 
+
+.. note::
+
+    If opening a local database and the ``ordered_output.nc4`` files are
+    located for example in ``/path/to/DB/PZ/Data`` and ``/path/to/DB/PX/Data``,
+    please pass ``/path/to/DB`` to the :func:`~instaseis.open_db` function.
+    Instaseis will recursively search the child directories for the necessary
+    files and open them.
+
+
 .. code-block:: python
 
     >>> import instaseis
