@@ -121,11 +121,14 @@ class Mesh(object):
         try:
             self.file_version = getattr(self.f, "file version")
         except AttributeError:
-            # very old files don't even have this attribute
-            raise ValueError("Database file too old.")
+            raise ValueError("Database file so old that it does not even have "
+                             "a version number. Please update AxiSEM or get "
+                             "new databases.")
 
         if self.file_version < self.MIN_FILE_VERSION:
-            raise ValueError("Database file too old.")
+            raise ValueError("Database file too old. Minimum file version "
+                             "expected: %d, found: %d." %
+                             (self.MIN_FILE_VERSION, self.file_version))
 
         self.ndumps = getattr(self.f, "number of strain dumps")
         snapshot_vars = self.f.groups["Snapshots"].variables
