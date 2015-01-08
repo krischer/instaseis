@@ -35,7 +35,7 @@ compute databases at the highest frequencies globally observed. By storing the
 basis coefficients of the numerical scheme (Lagrange polynomials), the Green’s
 functions are 4th order accurate in space and the spatial discretization
 respects discontinuities in the velocity model exactly. On top, AxiSEM allows to
-include 2D struc- ture in the source receiver plane and readily includes other
+include 2D structure in the source receiver plane and readily includes other
 planetes such as Mars
 
 
