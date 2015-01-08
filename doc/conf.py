@@ -120,7 +120,7 @@ html_theme_options = {
     "navbar_links": [
         ("AxiSEM", "http://axisem.info", True),
         ("ObsPy", "http://obspy.org", True),
-        ("Instaseis on GitHub", "http://github.com/krischer/instaseis", True),
+        ("GitHub", "http://github.com/krischer/instaseis", True),
     ],
     "navbar_pagenav": False,
     'source_link_position': False
@@ -197,7 +197,7 @@ html_static_path = ['_static']
 #html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'axisem_dbdoc'
+htmlhelp_basename = 'instaseis_doc'
 
 
 # -- Options for LaTeX output ---------------------------------------------
@@ -217,7 +217,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  ('index', 'instaseis.tex', u'axisem\\_db Documentation',
+  ('index', 'instaseis.tex', u'Instaseis Documentation',
    u'Lion Krischer and Martin van Driel', 'manual'),
 ]
 
