@@ -139,26 +139,32 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
                 data[comp] = cumtrapz(data[comp], dx=dt_out, initial=0.)
 
         if return_obspy_stream:
-            if hasattr(source, "origin_time"):
-                origin_time = source.origin_time
-            else:
-                origin_time = UTCDateTime(0)
-            # Convert to an ObsPy Stream object.
-            st = Stream()
-            band_code = self._get_band_code(dt_out)
-            instaseis_header = AttribDict(mu=data["mu"])
-            for comp in components:
-                tr = Trace(data=data[comp],
-                           header={"delta": dt_out,
-                                   "starttime": origin_time,
-                                   "station": receiver.station,
-                                   "network": receiver.network,
-                                   "channel": "%sX%s" % (band_code, comp),
-                                   "instaseis": instaseis_header})
-                st += tr
-            return st
+            return self._convert_to_stream(source=source, receiver=receiver,
+                                           components=components,
+                                           data=data, dt_out=dt_out)
         else:
             return data
+
+    @staticmethod
+    def _convert_to_stream(source, receiver, components, data, dt_out):
+        if hasattr(source, "origin_time"):
+            origin_time = source.origin_time
+        else:
+            origin_time = UTCDateTime(0)
+        # Convert to an ObsPy Stream object.
+        st = Stream()
+        band_code = BaseInstaseisDB._get_band_code(dt_out)
+        instaseis_header = AttribDict(mu=data["mu"])
+        for comp in components:
+            tr = Trace(data=data[comp],
+                       header={"delta": dt_out,
+                               "starttime": origin_time,
+                               "station": receiver.station,
+                               "network": receiver.network,
+                               "channel": "%sX%s" % (band_code, comp),
+                               "instaseis": instaseis_header})
+            st += tr
+        return st
 
     @abstractmethod
     def _get_seismograms(self, source, receiver, components=("Z", "N", "E")):
@@ -280,6 +286,10 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
 
         if kind not in ['displacement', 'velocity', 'acceleration']:
             raise ValueError('unknown kind %s' % (kind,))
+
+        for comp in components:
+            if comp not in ["N", "E", "Z", "R", "T"]:
+                raise ValueError("Invalid component: %s" % comp)
 
         if self.info.is_reciprocal:
             if receiver.depth_in_m is not None:

@@ -71,8 +71,8 @@ def test_info_route(all_clients):
     # Make sure it is identical to one from a local client.
     db = instaseis.open_db(client.filepath, read_on_demand=True)
 
-    db_slip = db.info.slip
-    db_sliprate = db.info.sliprate
+    db_slip = list(db.info.slip)
+    db_sliprate = list(db.info.sliprate)
     del db.info["slip"]
     del db.info["sliprate"]
 
@@ -340,12 +340,14 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
 
     time = obspy.UTCDateTime(2010, 1, 2, 3, 4, 5)
 
-    with mock.patch("instaseis.instaseis_db.InstaseisDB.get_seismograms") as p:
+    with mock.patch("instaseis.instaseis_db.InstaseisDB._get_seismograms") \
+            as p:
         _st = obspy.read()
+        data = {}
+        data["mu"] = 1.0
         for tr in _st:
-            tr.stats.instaseis = obspy.core.AttribDict()
-            tr.stats.instaseis.mu = 1.0
-        p.return_value = _st
+            data[tr.stats.channel[-1]] = tr.data
+        p.return_value = data
 
         # Moment tensor source.
         params = copy.deepcopy(basic_parameters)
@@ -354,12 +356,7 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
         assert request.code == 200
 
         assert p.call_count == 1
-        assert p.call_args[1]["kind"] == "displacement"
         assert p.call_args[1]["components"] == ["Z", "N", "E"]
-        assert p.call_args[1]["remove_source_shift"] is False
-        assert p.call_args[1]["reconvolve_stf"] is False
-        assert p.call_args[1]["return_obspy_stream"] is True
-        assert p.call_args[1]["dt"] is None
         assert p.call_args[1]["source"] == instaseis.Source(
             latitude=basic_parameters["source_latitude"],
             longitude=basic_parameters["source_longitude"],
@@ -383,12 +380,7 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
         assert request.code == 200
 
         assert p.call_count == 1
-        assert p.call_args[1]["kind"] == "displacement"
         assert p.call_args[1]["components"] == ["Z", "N", "E"]
-        assert p.call_args[1]["remove_source_shift"] is False
-        assert p.call_args[1]["reconvolve_stf"] is False
-        assert p.call_args[1]["return_obspy_stream"] is True
-        assert p.call_args[1]["dt"] is None
         assert p.call_args[1]["source"] == instaseis.Source(
             latitude=basic_parameters["source_latitude"],
             longitude=basic_parameters["source_longitude"],
@@ -408,12 +400,7 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
         assert request.code == 200
 
         assert p.call_count == 1
-        assert p.call_args[1]["kind"] == "displacement"
         assert p.call_args[1]["components"] == ["Z", "N", "E"]
-        assert p.call_args[1]["remove_source_shift"] is False
-        assert p.call_args[1]["reconvolve_stf"] is False
-        assert p.call_args[1]["return_obspy_stream"] is True
-        assert p.call_args[1]["dt"] is None
         assert p.call_args[1]["source"] == \
             instaseis.Source.from_strike_dip_rake(
                 latitude=basic_parameters["source_latitude"],
@@ -438,12 +425,7 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
         assert request.code == 200
 
         assert p.call_count == 1
-        assert p.call_args[1]["kind"] == "displacement"
         assert p.call_args[1]["components"] == ["Z", "N", "E"]
-        assert p.call_args[1]["remove_source_shift"] is False
-        assert p.call_args[1]["reconvolve_stf"] is False
-        assert p.call_args[1]["return_obspy_stream"] is True
-        assert p.call_args[1]["dt"] is None
         assert p.call_args[1]["source"] == \
             instaseis.Source.from_strike_dip_rake(
                 latitude=basic_parameters["source_latitude"],
@@ -465,12 +447,7 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
             assert request.code == 200
 
             assert p.call_count == 1
-            assert p.call_args[1]["kind"] == "displacement"
             assert p.call_args[1]["components"] == ["Z", "N", "E"]
-            assert p.call_args[1]["remove_source_shift"] is False
-            assert p.call_args[1]["reconvolve_stf"] is False
-            assert p.call_args[1]["return_obspy_stream"] is True
-            assert p.call_args[1]["dt"] is None
             assert p.call_args[1]["source"] == instaseis.ForceSource(
                 latitude=basic_parameters["source_latitude"],
                 longitude=basic_parameters["source_longitude"],
@@ -494,12 +471,7 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
             assert request.code == 200
 
             assert p.call_count == 1
-            assert p.call_args[1]["kind"] == "displacement"
             assert p.call_args[1]["components"] == ["Z", "N", "E"]
-            assert p.call_args[1]["remove_source_shift"] is False
-            assert p.call_args[1]["reconvolve_stf"] is False
-            assert p.call_args[1]["return_obspy_stream"] is True
-            assert p.call_args[1]["dt"] is None
             assert p.call_args[1]["source"] == instaseis.ForceSource(
                 latitude=basic_parameters["source_latitude"],
                 longitude=basic_parameters["source_longitude"],

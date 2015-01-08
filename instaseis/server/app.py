@@ -376,14 +376,23 @@ class RawSeismogramsHandler(tornado.web.RequestHandler):
 
         # Get the most barebones seismograms possible.
         try:
-            st = application.db.get_seismograms(
+            application.db._get_seismograms_sanity_checks(
                 source=source, receiver=receiver, components=components,
-                kind="displacement", remove_source_shift=False,
-                reconvolve_stf=False, return_obspy_stream=True, dt=None)
+                kind="displacement")
+            data = application.db._get_seismograms(
+                source=source, receiver=receiver, components=components)
         except Exception:
             msg = ("Could not extract seismogram. Make sure, the components "
                    "are valid, and the depth settings are correct.")
             raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+
+        try:
+            st = application.db._convert_to_stream(
+                source=source, receiver=receiver, components=components,
+                data=data, dt_out=application.db.info.dt)
+        except Exception:
+            msg = ("Could not convert seismogram to a Stream object.")
+            raise tornado.web.HTTPError(500, log_message=msg, reason=msg)
 
         # Half the filesize but definitely sufficiently accurate.
         for tr in st:
