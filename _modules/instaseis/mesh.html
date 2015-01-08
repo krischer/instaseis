@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>instaseis.mesh &mdash; instaseis 0.0.1a-55-g8bed documentation</title>
+    <title>instaseis.mesh &mdash; instaseis 0.0.1a-56-gdc3b9 documentation</title>
     
     <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.0.1a-55-g8bed',
+        VERSION:     '0.0.1a-56-gdc3b9',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -29,7 +29,7 @@
     <script type="text/javascript" src="../../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../../_static/bootstrap-3.2.0/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../../_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.0.1a-55-g8bed documentation" href="../../index.html" />
+    <link rel="top" title="instaseis 0.0.1a-56-gdc3b9 documentation" href="../../index.html" />
     <link rel="up" title="instaseis" href="../instaseis.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
@@ -50,7 +50,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-55-g8bed</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-56-gdc3b9</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -231,11 +231,14 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">file_version</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">,</span> <span class="s">&quot;file version&quot;</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-            <span class="c"># very old files don&#39;t even have this attribute</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Database file too old.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Database file so old that it does not even have &quot;</span>
+                             <span class="s">&quot;a version number. Please update AxiSEM or get &quot;</span>
+                             <span class="s">&quot;new databases.&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_version</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">MIN_FILE_VERSION</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Database file too old.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Database file too old. Minimum file version &quot;</span>
+                             <span class="s">&quot;expected: </span><span class="si">%d</span><span class="s">, found: </span><span class="si">%d</span><span class="s">.&quot;</span> <span class="o">%</span>
+                             <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">MIN_FILE_VERSION</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_version</span><span class="p">))</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">ndumps</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">,</span> <span class="s">&quot;number of strain dumps&quot;</span><span class="p">)</span>
         <span class="n">snapshot_vars</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">groups</span><span class="p">[</span><span class="s">&quot;Snapshots&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">variables</span>
