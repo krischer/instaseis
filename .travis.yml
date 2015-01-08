@@ -36,7 +36,13 @@ before_install:
   - pip install requests responses
 
 install:
+  - git version
+  - git fetch origin --tags --unshallow
+  - git remote add instaseis git://github.com/krischer/instaseis.git
+  - git fetch instaseis --tags
+  - git status
   - pip install --no-deps -v -e .
+  - git status
 
 script:
   - coverage run --source=instaseis -m instaseis.tests
