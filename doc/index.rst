@@ -337,7 +337,16 @@ explore a database and for educational purposes. To launch it just type
 
     $ python -m instaseis.gui
 
-.. image:: http://i.imgur.com/FVmua2X.png
+.. image:: http://http://i.imgur.com/FfEtlCU.png
+
+Screenshot of the Instaseis graphical user interface (GUI). Aside from quickly
+exploring the characteristics of a given Green’s function database it is a
+great tool for understanding and teaching many aspect of seismograms. The speed
+of Instaseis enables an immediate visual response to changing source and
+receiver parameters. The left hand side shows three component seismograms where
+theoretical arrival times of various seismic phases are overlaid as vertical
+lines. The bar at the top is used to change filter and resampling settings and
+the section on the right side is used to modify source and receiver parameters.
 
 
 Detailed Documentation
