@@ -2,8 +2,8 @@
      :width: 60%
      :align: right
 
-Instaseis - Instant high frequency seismograms
-==============================================
+Instaseis - Instant Global Broadband Seismograms Based on a Waveform Database
+=============================================================================
 
 Instaseis calculates high frequency seismograms from Green's function databases
 generated with `AxiSEM <http://axisem.info>`_.
