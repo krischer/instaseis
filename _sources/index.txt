@@ -23,8 +23,20 @@ Instaseis - Instant Global Broadband Seismograms Based on a Waveform Database
         <div class="col-md-12">
 
 
-Instaseis calculates high frequency seismograms from Green's function databases
-generated with `AxiSEM <http://axisem.info>`_.
+Instaseis calculates broadband seismograms from Green's function databases
+generated with `AxiSEM <http://axisem.info>`_  and allows for near
+instantaneous (on the order of milliseconds) extraction of seismograms. Using
+the 2.5D axisymmetric spectral element method, the generation of these
+databases, based on reciprocity of the Green’s functions, is very efficient and
+is approximately half as expensive as a single AxiSEM forward run. Thus this
+enables the computation of full databases at half the cost of the computation of
+seismograms for a single source in the previous scheme and hence allows to
+compute databases at the highest frequencies globally observed. By storing the
+basis coefficients of the numerical scheme (Lagrange polynomials), the Green’s
+functions are 4th order accurate in space and the spatial discretization
+respects discontinuities in the velocity model exactly. On top, AxiSEM allows to
+include 2D struc- ture in the source receiver plane and readily includes other
+planetes such as Mars
 
 
 .. only:: html
@@ -39,11 +51,11 @@ Installation
 Requirements
 ^^^^^^^^^^^^
 
-Instaseis is implemented as a Python library and has a number of
-dependencies which are listed here. It might well work with other versions but
-that has not been tested and we do not officially support it. It currently runs
-on Linux and Mac OS X. Adding support for Windows is mainly a question of
-compiling the shared Fortran library. Pull requests are welcome.
+Instaseis is implemented as a Python library and has a number of dependencies
+listed here. It might well work with other versions but only the versions listed
+here are continuously tested and supported. Instaseis currently runs on Linux
+and Mac OS X. Adding support for Windows is mainly a question of compiling the
+shared Fortran librarys - pull requests are welcome.
 
 * ``gfortran >= 4.7``
 * ``Python 2.6, 2.7, 3.3, or 3.4``
@@ -58,8 +70,7 @@ compiling the shared Fortran library. Pull requests are welcome.
 * ``pytest``
 * ``mock`` *(only for Python 2.x, otherwise part of the standard library)*
 
-The graphical user interface (which is optional and not needed to run
-Instaseis) furthermore requires
+The optional graphical user interface furthermore requires
 
 * ``PyQt4``
 * ``pyqtgraph``
@@ -163,7 +174,7 @@ Build the doc with
     $ make html
 
 Finally open the ``doc/_build/html/index.html`` file with the browser of your
-choice or host it somewhere.
+choice.
 
 
 Tutorial
@@ -187,13 +198,13 @@ following resources are useful if you are starting out with Python and ObsPy:
 Using Instaseis
 ^^^^^^^^^^^^^^^
 
-To use Instaseis you first have to ope a connection to an Instaseis
-database. Instaseis supports connections to local and remote Green's
-functions' databases; a local database are a couple of NetCDF files on the
-filesystem whereas a remote database requires an Instaseis server answering
-queries. The usage and capabilities of both are completely equivalent. This
-section deals with using Instaseis to generate seismograms; if you wish to
-run an Instaseis server, please see the documentation of the :doc:`server`.
+To use Instaseis you first have to open a connection to an Instaseis database.
+Instaseis supports connections to local and remote Green's function databases; a
+local database consists of up to four NetCDF files on the filesystem whereas a
+remote database requires an Instaseis server answering queries. The usage and
+capabilities of both are completely equivalent. This section deals with using
+Instaseis to generate seismograms; if you wish to run an Instaseis server,
+please see the documentation of the :doc:`server`.
 
 Connecting to either a local or a remote Instaseis database happens with the
 :func:`~instaseis.open_db` function. It will return either an
@@ -202,8 +213,8 @@ Connecting to either a local or a remote Instaseis database happens with the
 arguments and keyword arguments are passed to the the initialization
 function of these objects. Once the database objects are created, usage of
 both is identical. Be aware that the initialization of the database objects
-is potentially a fairly expensive operation so make sure to do it as little
-as possible (usually once per model).
+is potentially a fairly expensive operation so make sure to do it more often
+than necessary (usually once per database).
 
 
 .. note::
