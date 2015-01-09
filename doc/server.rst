@@ -226,6 +226,11 @@ GET /seismograms_raw
 Content-Type
     application/octet-stream
 
+Special Response Headers
+    ``Instaseis-Mu``: This transports the mu of the model for the given
+    seismogram which is needed for some finite source calculations. Please make
+    sure your proxy does not filter it.
+
 Description
     Returns the raw, correctly rotated seismograms from an Instaseis database.
     No further post-processing like STF reconvolution or resampling is
