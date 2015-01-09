@@ -49,7 +49,7 @@ class SeismogramsHandler(tornado.web.RequestHandler):
         "components": {"type": str, "default": "ZNE"},
         "kind": {"type": str, "default": "displacement"},
         "remove_source_shift": {"type": bool, "default": True},
-        "dt": {"type": int},
+        "dt": {"type": float},
         "a_lanczos": {"type": int, "default": 5},
         # Source parameters.
         "source_latitude": {"type": float, "required": True},
@@ -121,10 +121,25 @@ class SeismogramsHandler(tornado.web.RequestHandler):
     def get(self):
         args = self.parse_arguments()
 
+        # Make sure the kinds arguments is valid.
         args.kind = args.kind.lower()
         if args.kind not in ["displacement", "velocity", "acceleration"]:
             msg = ("Kind must be one of 'displacement', 'velocity', "
                    "or 'acceleration'")
+            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+
+        # Make sure that dt, if given is larger then 0.01. This should still
+        # be plenty for any use case but prevents the server from having to
+        # send massive amounts of data in the case of user errors.
+        if args.kind < 0.01:
+            msg = ("The smallest possible dt is 0.01. Please choose a "
+                   "smaller value and resample locally if needed.")
+            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+
+        # Make sure the lanczos window width is sensible. Don't allow values
+        # smaller than 2 or larger than 20.
+        if not (2 <= args.a_lanczos <= 20):
+            msg = ("`a_lanczos` must not be smaller than 2 or larger than 20.")
             raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
         # Figure out the type of source and construct the source object.
