@@ -112,7 +112,7 @@ class SeismogramsHandler(tornado.web.RequestHandler):
                         value = properties["type"](value)
                 except:
                     msg = "Parameter '%s' could not be converted to '%s'." % (
-                        name, str(properties["type"]))
+                        name, str(properties["type"].__name__))
                     raise tornado.web.HTTPError(400, log_message=msg,
                                                 reason=msg)
             setattr(args, name, value)

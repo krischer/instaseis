@@ -654,3 +654,60 @@ def test_seismograms_error_handling(all_clients):
     request = client.fetch(_assemble_url(**params))
     assert request.code == 400
     assert "`a_lanczos` must not be smaller" in request.reason.lower()
+
+
+def test_conversion_to_boolean_parameters(all_clients):
+    """
+    Boolean values can be specified in a number of ways. Test that these are
+    working as expected.
+    """
+    client = all_clients
+
+    basic_parameters = {
+        "source_latitude": 10,
+        "source_longitude": 10,
+        "receiver_latitude": -10,
+        "receiver_longitude": -10,
+        "m_tt": "100000",
+        "m_pp": "100000",
+        "m_rr": "100000",
+        "m_rt": "100000",
+        "m_rp": "100000",
+        "m_tp": "100000"}
+
+    truth_values = ["1", "true", "TRUE", "True", "T", "t", "y", "Y"]
+    false_values = ["0", "false", "FALSE", "False", "F", "f", "n", "N"]
+    invalid_values = ["A", "HMMMM", "234"]
+
+    for value in truth_values:
+        params = copy.deepcopy(basic_parameters)
+        params["remove_source_shift"] = value
+        _st = obspy.read()
+
+        with mock.patch("instaseis.base_instaseis_db.BaseInstaseisDB"
+                        ".get_seismograms") as p:
+            p.return_value = _st
+            client.fetch(_assemble_url(**params))
+            assert p.call_count == 1
+            assert p.call_args[1]["remove_source_shift"] is True
+
+    for value in false_values:
+        params = copy.deepcopy(basic_parameters)
+        params["remove_source_shift"] = value
+        _st = obspy.read()
+
+        with mock.patch("instaseis.base_instaseis_db.BaseInstaseisDB"
+                        ".get_seismograms") as p:
+            p.return_value = _st
+            client.fetch(_assemble_url(**params))
+            assert p.call_count == 1
+            assert p.call_args[1]["remove_source_shift"] is False
+
+    # Test invalid values.
+    for value in invalid_values:
+        params = copy.deepcopy(basic_parameters)
+        params["remove_source_shift"] = value
+        request = client.fetch(_assemble_url(**params))
+        assert request.code == 400
+        assert ("parameter 'remove_source_shift' could not be converted to "
+                "'bool'" in request.reason.lower())
