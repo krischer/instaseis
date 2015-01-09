@@ -755,6 +755,12 @@ def test_object_creation_for_seismogram_route(all_clients):
             latitude=basic_parameters["receiver_latitude"],
             longitude=basic_parameters["receiver_longitude"],
             depth_in_m=0.0)
+        assert p.call_args[1]["kind"] == "displacement"
+        assert p.call_args[1]["remove_source_shift"] == True
+        assert p.call_args[1]["reconvolve_stf"] == False
+        assert p.call_args[1]["return_obspy_stream"] == True
+        assert p.call_args[1]["dt"] == None
+        assert p.call_args[1]["a_lanczos"] == 5
 
         # Moment tensor source with a couple more parameters.
         p.reset_mock()
@@ -779,6 +785,12 @@ def test_object_creation_for_seismogram_route(all_clients):
             latitude=basic_parameters["receiver_latitude"],
             longitude=basic_parameters["receiver_longitude"],
             depth_in_m=55.0, network="BW", station="ALTM")
+        assert p.call_args[1]["kind"] == "displacement"
+        assert p.call_args[1]["remove_source_shift"] == True
+        assert p.call_args[1]["reconvolve_stf"] == False
+        assert p.call_args[1]["return_obspy_stream"] == True
+        assert p.call_args[1]["dt"] == None
+        assert p.call_args[1]["a_lanczos"] == 5
 
         # From strike, dip, rake
         p.reset_mock()
@@ -800,6 +812,12 @@ def test_object_creation_for_seismogram_route(all_clients):
             latitude=basic_parameters["receiver_latitude"],
             longitude=basic_parameters["receiver_longitude"],
             depth_in_m=0.0)
+        assert p.call_args[1]["kind"] == "displacement"
+        assert p.call_args[1]["remove_source_shift"] == True
+        assert p.call_args[1]["reconvolve_stf"] == False
+        assert p.call_args[1]["return_obspy_stream"] == True
+        assert p.call_args[1]["dt"] == None
+        assert p.call_args[1]["a_lanczos"] == 5
 
         # Moment tensor source with a couple more parameters.
         p.reset_mock()
@@ -825,6 +843,12 @@ def test_object_creation_for_seismogram_route(all_clients):
             latitude=basic_parameters["receiver_latitude"],
             longitude=basic_parameters["receiver_longitude"],
             depth_in_m=55.0, network="BW", station="ALTM")
+        assert p.call_args[1]["kind"] == "displacement"
+        assert p.call_args[1]["remove_source_shift"] == True
+        assert p.call_args[1]["reconvolve_stf"] == False
+        assert p.call_args[1]["return_obspy_stream"] == True
+        assert p.call_args[1]["dt"] == None
+        assert p.call_args[1]["a_lanczos"] == 5
 
         # Force source only works for displ_only databases.
         if "displ_only" in client.filepath:
@@ -846,6 +870,12 @@ def test_object_creation_for_seismogram_route(all_clients):
                 latitude=basic_parameters["receiver_latitude"],
                 longitude=basic_parameters["receiver_longitude"],
                 depth_in_m=0.0)
+            assert p.call_args[1]["kind"] == "displacement"
+            assert p.call_args[1]["remove_source_shift"] == True
+            assert p.call_args[1]["reconvolve_stf"] == False
+            assert p.call_args[1]["return_obspy_stream"] == True
+            assert p.call_args[1]["dt"] == None
+            assert p.call_args[1]["a_lanczos"] == 5
 
             # Moment tensor source with a couple more parameters.
             p.reset_mock()
@@ -870,3 +900,9 @@ def test_object_creation_for_seismogram_route(all_clients):
                 latitude=basic_parameters["receiver_latitude"],
                 longitude=basic_parameters["receiver_longitude"],
                 depth_in_m=55.0, network="BW", station="ALTM")
+            assert p.call_args[1]["kind"] == "displacement"
+            assert p.call_args[1]["remove_source_shift"] == True
+            assert p.call_args[1]["reconvolve_stf"] == False
+            assert p.call_args[1]["return_obspy_stream"] == True
+            assert p.call_args[1]["dt"] == None
+            assert p.call_args[1]["a_lanczos"] == 5
