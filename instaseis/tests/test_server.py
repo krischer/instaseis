@@ -26,7 +26,7 @@ else:
     import unittest.mock as mock
 
 
-def _assemble_url(**kwargs):
+def _assemble_url_raw(**kwargs):
     """
     Helper function.
     """
@@ -105,7 +105,7 @@ def test_raw_seismograms_error_handling(all_clients):
     # Remove the source latitude, a required parameter.
     params = copy.deepcopy(basic_parameters)
     del params["source_latitude"]
-    request = client.fetch(_assemble_url(**params))
+    request = client.fetch(_assemble_url_raw(**params))
     assert request.code == 400
     assert request.reason == \
         "Required parameter 'source_latitude' not given."
@@ -113,13 +113,13 @@ def test_raw_seismograms_error_handling(all_clients):
     # Invalid type.
     params = copy.deepcopy(basic_parameters)
     params["source_latitude"] = "A"
-    request = client.fetch(_assemble_url(**params))
+    request = client.fetch(_assemble_url_raw(**params))
     assert request.code == 400
     assert "could not be converted" in request.reason
     assert "source_latitude" in request.reason
 
     # No source.
-    request = client.fetch(_assemble_url(**basic_parameters))
+    request = client.fetch(_assemble_url_raw(**basic_parameters))
     assert request.code == 400
     assert request.reason == "No/insufficient source parameters specified"
 
@@ -132,7 +132,7 @@ def test_raw_seismograms_error_handling(all_clients):
     params["m_rt"] = "100000"
     params["m_rp"] = "100000"
     params["m_tp"] = "100000"
-    request = client.fetch(_assemble_url(**params))
+    request = client.fetch(_assemble_url_raw(**params))
     assert request.code == 400
     assert "could not construct receiver with " in request.reason.lower()
 
@@ -145,7 +145,7 @@ def test_raw_seismograms_error_handling(all_clients):
     params["m_rp"] = "100000"
     params["m_tp"] = "100000"
     params["source_latitude"] = "100"
-    request = client.fetch(_assemble_url(**params))
+    request = client.fetch(_assemble_url_raw(**params))
     assert request.code == 400
     assert "could not construct moment tensor source" in request.reason.lower()
 
@@ -156,7 +156,7 @@ def test_raw_seismograms_error_handling(all_clients):
     params["rake"] = "45"
     params["M0"] = "450000"
     params["source_latitude"] = "100"
-    request = client.fetch(_assemble_url(**params))
+    request = client.fetch(_assemble_url_raw(**params))
     assert request.code == 400
     assert "could not construct the source" in request.reason.lower()
     assert "strike/dip/rake" in request.reason.lower()
@@ -168,7 +168,7 @@ def test_raw_seismograms_error_handling(all_clients):
     params["f_t"] = "100000"
     params["f_p"] = "100000"
     params["source_latitude"] = "100"
-    request = client.fetch(_assemble_url(**params))
+    request = client.fetch(_assemble_url_raw(**params))
     assert request.code == 400
     assert "could not construct force source" in request.reason.lower()
 
@@ -181,7 +181,7 @@ def test_raw_seismograms_error_handling(all_clients):
     params["m_rp"] = "100000"
     params["m_tp"] = "100000"
     params["components"] = "ABC"
-    request = client.fetch(_assemble_url(**params))
+    request = client.fetch(_assemble_url_raw(**params))
     assert request.code == 400
     assert "could not extract seismogram" in request.reason.lower()
 
@@ -210,7 +210,7 @@ def test_seismograms_raw_route(all_clients):
     # Moment tensor source.
     params = copy.deepcopy(basic_parameters)
     params.update(mt)
-    request = client.fetch(_assemble_url(**params))
+    request = client.fetch(_assemble_url_raw(**params))
     assert request.code == 200
 
     st = obspy.read(request.buffer)
@@ -224,7 +224,7 @@ def test_seismograms_raw_route(all_clients):
     # Strike/dip/rake
     params = copy.deepcopy(basic_parameters)
     params.update(sdr)
-    request = client.fetch(_assemble_url(**params))
+    request = client.fetch(_assemble_url_raw(**params))
     assert request.code == 200
 
     st = obspy.read(request.buffer)
@@ -241,7 +241,7 @@ def test_seismograms_raw_route(all_clients):
         params.update(fs)
         time = obspy.UTCDateTime(2008, 7, 6, 5, 4, 3)
         params["origin_time"] = str(time)
-        request = client.fetch(_assemble_url(**params))
+        request = client.fetch(_assemble_url_raw(**params))
         assert request.code == 200
 
         st = obspy.read(request.buffer)
@@ -259,7 +259,7 @@ def test_seismograms_raw_route(all_clients):
         params = copy.deepcopy(basic_parameters)
         params.update(mt)
         params["components"] = comp
-        request = client.fetch(_assemble_url(**params))
+        request = client.fetch(_assemble_url_raw(**params))
         assert request.code == 200
 
         st = obspy.read(request.buffer)
@@ -272,7 +272,7 @@ def test_seismograms_raw_route(all_clients):
     time = obspy.UTCDateTime(2013, 1, 2, 3, 4, 5)
     params.update(mt)
     params["origin_time"] = str(time)
-    request = client.fetch(_assemble_url(**params))
+    request = client.fetch(_assemble_url_raw(**params))
     assert request.code == 200
 
     st = obspy.read(request.buffer)
@@ -285,7 +285,7 @@ def test_seismograms_raw_route(all_clients):
     params.update(mt)
     params["network_code"] = "BW"
     params["station_code"] = "ALTM"
-    request = client.fetch(_assemble_url(**params))
+    request = client.fetch(_assemble_url_raw(**params))
     assert request.code == 200
 
     st = obspy.read(request.buffer)
@@ -308,7 +308,7 @@ def test_mu_is_passed_as_header_value(all_clients):
                   "m_rt": "100000", "m_rp": "100000", "m_tp": "100000"}
 
     # Moment tensor source.
-    request = client.fetch(_assemble_url(**parameters))
+    request = client.fetch(_assemble_url_raw(**parameters))
     assert request.code == 200
     # Make sure the mu header exists and the value can be converted to a float.
     assert "Instaseis-Mu" in request.headers
@@ -352,7 +352,7 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
         # Moment tensor source.
         params = copy.deepcopy(basic_parameters)
         params.update(mt)
-        request = client.fetch(_assemble_url(**params))
+        request = client.fetch(_assemble_url_raw(**params))
         assert request.code == 200
 
         assert p.call_count == 1
@@ -376,7 +376,7 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
         params["network_code"] = "BW"
         params["station_code"] = "ALTM"
 
-        request = client.fetch(_assemble_url(**params))
+        request = client.fetch(_assemble_url_raw(**params))
         assert request.code == 200
 
         assert p.call_count == 1
@@ -396,7 +396,7 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
 
         params = copy.deepcopy(basic_parameters)
         params.update(sdr)
-        request = client.fetch(_assemble_url(**params))
+        request = client.fetch(_assemble_url_raw(**params))
         assert request.code == 200
 
         assert p.call_count == 1
@@ -421,7 +421,7 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
         params["network_code"] = "BW"
         params["station_code"] = "ALTM"
 
-        request = client.fetch(_assemble_url(**params))
+        request = client.fetch(_assemble_url_raw(**params))
         assert request.code == 200
 
         assert p.call_count == 1
@@ -443,7 +443,7 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
 
             params = copy.deepcopy(basic_parameters)
             params.update(fs)
-            request = client.fetch(_assemble_url(**params))
+            request = client.fetch(_assemble_url_raw(**params))
             assert request.code == 200
 
             assert p.call_count == 1
@@ -467,7 +467,7 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
             params["network_code"] = "BW"
             params["station_code"] = "ALTM"
 
-            request = client.fetch(_assemble_url(**params))
+            request = client.fetch(_assemble_url_raw(**params))
             assert request.code == 200
 
             assert p.call_count == 1
