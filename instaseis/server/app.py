@@ -329,6 +329,14 @@ class RawSeismogramsHandler(tornado.web.RequestHandler):
             "force_source": set(["f_r", "f_t", "f_p"])
         }
 
+        if len(args.components) > 5:
+            msg = "A maximum of 5 components can be requested."
+            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+
+        if not args.components:
+            msg = "A request with no components will not return anything..."
+            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+
         components = list(args.components)
         for src_type, params in src_params.items():
             src_params = [getattr(args, _i) for _i in params]
