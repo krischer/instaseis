@@ -148,7 +148,7 @@ REST-like API Documentation
 
 If you wish to use the Instaseis Server without the Python client this
 documentation might be helpful. The Instaseis server offers a REST-like API
-with currently three endpoints only supporting GET.
+with currently four endpoints only supporting GET.
 
 .. contents:: Endpoints
     :local:
@@ -157,11 +157,11 @@ with currently three endpoints only supporting GET.
 GET /
 ^^^^^
 
-Content-Type
-    application/json; charset=UTF-8
-
 Description
     Very basic information about the Instaseis server.
+
+Content-Type
+    application/json; charset=UTF-8
 
 Example Response
     .. code-block:: json
@@ -175,12 +175,12 @@ Example Response
 GET /info
 ^^^^^^^^^
 
-Content-Type
-    application/json; charset=UTF-8
-
 Description
     Detailed information about the Instaseis database offered from this
     particular server.
+
+Content-Type
+    application/json; charset=UTF-8
 
 Example Response
     .. code-block:: json
@@ -223,6 +223,13 @@ Example Response
 GET /seismograms_raw
 ^^^^^^^^^^^^^^^^^^^^
 
+Description
+    Returns the raw, correctly rotated seismograms from an Instaseis database.
+    No further post-processing like STF reconvolution or resampling is
+    performed. This is mostly useful for using the Instaseis client in
+    remote mode. If you only want to get seismograms and continue your work
+    with other programs, please use the ``/seismograms`` route.
+
 Content-Type
     application/octet-stream
 
@@ -230,11 +237,6 @@ Special Response Headers
     ``Instaseis-Mu``: This transports the mu of the model for the given
     seismogram which is needed for some finite source calculations. Please make
     sure your proxy does not filter it.
-
-Description
-    Returns the raw, correctly rotated seismograms from an Instaseis database.
-    No further post-processing like STF reconvolution or resampling is
-    performed.
 
 Filetype
     Returns MiniSEED files encoded with encoding format 4 (IEEE floating
@@ -299,3 +301,91 @@ Filetype
 +-------------------------+----------+----------+-----------------------------+----------------------------------------------------------------------+
 | ``f_p``                 | Float    | False    |                             | A force source component in N.                                       |
 +-------------------------+----------+----------+-----------------------------+----------------------------------------------------------------------+
+
+
+GET /seismograms
+^^^^^^^^^^^^^^^^
+
+Description
+    Returns Instaseis seismograms. In addition to the functionality of the
+    ``/seismograms_raw`` route this one also offers the possibility to convert
+    every seismogram to displacement, velocity, or acceleration. It furthermore
+    can shift the start time of the data to the peak of the source time
+    function's sliprate and resample the data to an arbitrary (up to 100 Hz)
+    sampling rate. This route is suitable to be queried by any program able
+    to use HTTP.
+
+Content-Type
+    application/octet-stream
+Filetype
+    Returns MiniSEED files encoded with encoding format 4 (IEEE floating
+    point).
+
++-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
+| Parameter               | Type     | Required | Default Value               | Description                                                                          |
++-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
+| ``components``          | String   | False    | ZNE                         | The desired seismogram components. Any combination of Z, N, E, R, T.                 |
++-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
+| ``kind``                | String   | False    | displacement                | The type of seismogram. One of ``displacement``, ``velocity``, o  ``acceleration``.  |
++-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
+| ``remove_source_shift`` | Bool     | False    | True                        | Move the start time to the peak of the sliprate of the source time function.         |
++-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
+| ``dt``                  | Float    | False    |                             | If given, seismograms will be resampled to the desired sample spacing.               |
++-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
+| ``a_lanczos``           | Integer  | False    | 5                           | Width of the Lanczos kernel used for resampling.                                     |
++-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
+| ``origin_time``         | Datetime | False    | 1970-01-01T00:00:00.000000Z | Time of the first sample.                                                            |
++-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
+| Receiver Parameters                                                                                                                                                |
++-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
+| ``receiver_latitude``   | Float    | True     |                             | The latitude of the receiver.                                                        |
++-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
+| ``receiver_longitude``  | Float    | True     |                             | The longitude of the receiver.                                                       |
++-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
+| ``receiver_depth_in_m`` | Float    | False    | 0.0                         | The depth of the receiver in meter.                                                  |
++-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
+| ``network_code``        | String   | False    |                             | The network code of the final seismogram.                                            |
++-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
+| ``station_code``        | String   | False    |                             | The station code of the final seismogram.                                            |
++-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
+| Source Parameters                                                                                                                                                  |
++-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
+| ``source_latitude``     | Float    | True     |                             | The latitude of the source.                                                          |
++-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
+| ``source_longitude``    | Float    | True     |                             | The longitude of the source.                                                         |
++-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
+| ``source_depth_in_m``   | Float    | False    | 0.0                         | The depth of the source in meter.                                                    |
++-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
+| Source can be given as the moment tensor components...                                                                                                             |
++-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
+| ``m_rr``                | Float    | False    |                             | A moment tensor component in Nm.                                                     |
++-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
+| ``m_tt``                | Float    | False    |                             | A moment tensor componentin Nm.                                                      |
++-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
+| ``m_pp``                | Float    | False    |                             | A moment tensor componentin Nm.                                                      |
++-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
+| ``m_rt``                | Float    | False    |                             | A moment tensor componentin Nm.                                                      |
++-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
+| ``m_rp``                | Float    | False    |                             | A moment tensor componentin Nm.                                                      |
++-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
+| ``m_tp``                | Float    | False    |                             | A moment tensor componentin Nm.                                                      |
++-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
+| ...as a double couple...                                                                                                                                           |
++-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
+| ``strike``              | Float    | False    |                             | Strike of a double couple source in degree.                                          |
++-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
+| ``dip``                 | Float    | False    |                             | Dip of a double couple source in degree.                                             |
++-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
+| ``rake``                | Float    | False    |                             | Rake of a double couple source in degree.                                            |
++-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
+| ``M0``                  | Float    | False    |                             | Scalar seismic moment in Nm.                                                         |
++-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
+| ...or as a force source.                                                                                                                                           |
++-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
+| ``f_r``                 | Float    | False    |                             | A force source component in N.                                                       |
++-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
+| ``f_t``                 | Float    | False    |                             | A force source component in N.                                                       |
++-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
+| ``f_p``                 | Float    | False    |                             | A force source component in N.                                                       |
++-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
+
