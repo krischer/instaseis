@@ -655,6 +655,32 @@ def test_seismograms_error_handling(all_clients):
     assert request.code == 400
     assert "`a_lanczos` must not be smaller" in request.reason.lower()
 
+    # too many components raise to avoid abuse.
+    params = copy.deepcopy(basic_parameters)
+    params["m_tt"] = "100000"
+    params["m_pp"] = "100000"
+    params["m_rr"] = "100000"
+    params["m_rt"] = "100000"
+    params["m_rp"] = "100000"
+    params["m_tp"] = "100000"
+    params["components"] = "NNEERRTTZZ"
+    request = client.fetch(_assemble_url(**params))
+    assert request.code == 400
+    assert "a maximum of 5 components can be request" in request.reason.lower()
+
+    # At least one components must be requested.
+    params = copy.deepcopy(basic_parameters)
+    params["m_tt"] = "100000"
+    params["m_pp"] = "100000"
+    params["m_rr"] = "100000"
+    params["m_rt"] = "100000"
+    params["m_rp"] = "100000"
+    params["m_tp"] = "100000"
+    params["components"] = ""
+    request = client.fetch(_assemble_url(**params))
+    assert request.code == 400
+    assert "a request with no components will not re" in request.reason.lower()
+
 
 def test_conversion_to_boolean_parameters(all_clients):
     """
