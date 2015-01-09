@@ -1016,3 +1016,384 @@ def test_object_creation_for_seismogram_route(all_clients):
         assert p.call_args[1]["return_obspy_stream"] is True
         assert p.call_args[1]["dt"] == 0.1
         assert p.call_args[1]["a_lanczos"] == 2
+
+
+def test_seismograms_retrieval(all_clients):
+    """
+    Tests if the seismograms requested from the server are identical to the
+    on requested with the local instaseis client.
+    """
+    client = all_clients
+    db = instaseis.open_db(client.filepath)
+
+    basic_parameters = {
+        "source_latitude": 10,
+        "source_longitude": 10,
+        "receiver_latitude": -10,
+        "receiver_longitude": -10}
+
+    # Various sources.
+    mt = {"m_tt": "100000", "m_pp": "100000", "m_rr": "100000",
+          "m_rt": "100000", "m_rp": "100000", "m_tp": "100000"}
+    sdr = {"strike": "10", "dip": "10", "rake": "10", "M0": "1000000"}
+    fs = {"f_r": "100000", "f_t": "100000", "f_p": "100000"}
+
+    time = obspy.UTCDateTime(2010, 1, 2, 3, 4, 5)
+
+    # Moment tensor source.
+    params = copy.deepcopy(basic_parameters)
+    params.update(mt)
+    request = client.fetch(_assemble_url(**params))
+    st_server = obspy.read(request.buffer)
+
+    components = ["Z", "N", "E"]
+    source = instaseis.Source(
+        latitude=basic_parameters["source_latitude"],
+        longitude=basic_parameters["source_longitude"],
+        depth_in_m=0.0,
+        **dict((key, float(value)) for (key, value) in mt.items()))
+    receiver = instaseis.Receiver(
+        latitude=basic_parameters["receiver_latitude"],
+        longitude=basic_parameters["receiver_longitude"],
+        depth_in_m=0.0)
+    st_db = db.get_seismograms(source=source, receiver=receiver,
+                               components=components)
+    for tr_server, tr_db in zip(st_server, st_db):
+        # Remove the additional stats from both.
+        del tr_server.stats.mseed
+        del tr_server.stats._format
+        del tr_db.stats.instaseis
+        # Sample spacing is very similar but not equal due to floating point
+        # accuracy.
+        np.testing.assert_allclose(tr_server.stats.delta, tr_db.stats.delta)
+        tr_server.stats.delta = tr_db.stats.delta
+        assert tr_server.stats == tr_db.stats
+        # Relative tolerance not particularly useful when testing super
+        # small values.
+        np.testing.assert_allclose(tr_server.data, tr_db.data,
+                                   atol=1E-10 * tr_server.data.ptp())
+
+    params["source_depth_in_m"] = "5.0"
+    params["origin_time"] = str(time)
+    params["receiver_depth_in_m"] = "55.0"
+    params["network_code"] = "BW"
+    params["station_code"] = "ALTM"
+    request = client.fetch(_assemble_url(**params))
+    st_server = obspy.read(request.buffer)
+
+    source = instaseis.Source(
+        latitude=basic_parameters["source_latitude"],
+        longitude=basic_parameters["source_longitude"],
+        depth_in_m=5.0, origin_time=time,
+        **dict((key, float(value)) for (key, value) in mt.items()))
+    receiver = instaseis.Receiver(
+        latitude=basic_parameters["receiver_latitude"],
+        longitude=basic_parameters["receiver_longitude"],
+        depth_in_m=55.0, network="BW", station="ALTM")
+    st_db = db.get_seismograms(source=source, receiver=receiver,
+                               components=components)
+    for tr_server, tr_db in zip(st_server, st_db):
+        # Remove the additional stats from both.
+        del tr_server.stats.mseed
+        del tr_server.stats._format
+        del tr_db.stats.instaseis
+        # Sample spacing is very similar but not equal due to floating point
+        # accuracy.
+        np.testing.assert_allclose(tr_server.stats.delta, tr_db.stats.delta)
+        tr_server.stats.delta = tr_db.stats.delta
+        assert tr_server.stats == tr_db.stats
+        # Relative tolerance not particularly useful when testing super
+        # small values.
+        np.testing.assert_allclose(tr_server.data, tr_db.data,
+                                   atol=1E-10 * tr_server.data.ptp())
+
+    # From strike, dip, rake
+    params = copy.deepcopy(basic_parameters)
+    params.update(sdr)
+    request = client.fetch(_assemble_url(**params))
+    st_server = obspy.read(request.buffer)
+
+    source = instaseis.Source.from_strike_dip_rake(
+        latitude=basic_parameters["source_latitude"],
+        longitude=basic_parameters["source_longitude"],
+        depth_in_m=0.0,
+        **dict((key, float(value)) for (key, value) in sdr.items()))
+    receiver = instaseis.Receiver(
+        latitude=basic_parameters["receiver_latitude"],
+        longitude=basic_parameters["receiver_longitude"], depth_in_m=0.0)
+    st_db = db.get_seismograms(source=source, receiver=receiver,
+                               components=components)
+    for tr_server, tr_db in zip(st_server, st_db):
+        # Remove the additional stats from both.
+        del tr_server.stats.mseed
+        del tr_server.stats._format
+        del tr_db.stats.instaseis
+        # Sample spacing is very similar but not equal due to floating point
+        # accuracy.
+        np.testing.assert_allclose(tr_server.stats.delta, tr_db.stats.delta)
+        tr_server.stats.delta = tr_db.stats.delta
+        assert tr_server.stats == tr_db.stats
+        # Relative tolerance not particularly useful when testing super
+        # small values.
+        np.testing.assert_allclose(tr_server.data, tr_db.data,
+                                   atol=1E-10 * tr_server.data.ptp())
+
+    # Moment tensor source with a couple more parameters.
+    params["source_depth_in_m"] = "5.0"
+    params["origin_time"] = str(time)
+    params["receiver_depth_in_m"] = "55.0"
+    params["network_code"] = "BW"
+    params["station_code"] = "ALTM"
+
+    request = client.fetch(_assemble_url(**params))
+    st_server = obspy.read(request.buffer)
+
+    source = instaseis.Source.from_strike_dip_rake(
+        latitude=basic_parameters["source_latitude"],
+        longitude=basic_parameters["source_longitude"],
+        depth_in_m=5.0, origin_time=time,
+        **dict((key, float(value)) for (key, value) in sdr.items()))
+    receiver = instaseis.Receiver(
+        latitude=basic_parameters["receiver_latitude"],
+        longitude=basic_parameters["receiver_longitude"],
+        depth_in_m=55.0, network="BW", station="ALTM")
+    st_db = db.get_seismograms(source=source, receiver=receiver,
+                               components=components)
+    for tr_server, tr_db in zip(st_server, st_db):
+        # Remove the additional stats from both.
+        del tr_server.stats.mseed
+        del tr_server.stats._format
+        del tr_db.stats.instaseis
+        # Sample spacing is very similar but not equal due to floating point
+        # accuracy.
+        np.testing.assert_allclose(tr_server.stats.delta, tr_db.stats.delta)
+        tr_server.stats.delta = tr_db.stats.delta
+        assert tr_server.stats == tr_db.stats
+        # Relative tolerance not particularly useful when testing super
+        # small values.
+        np.testing.assert_allclose(tr_server.data, tr_db.data,
+                                   atol=1E-10 * tr_server.data.ptp())
+
+    # Force source only works for displ_only databases.
+    if "displ_only" in client.filepath:
+        params = copy.deepcopy(basic_parameters)
+        params.update(fs)
+        request = client.fetch(_assemble_url(**params))
+        st_server = obspy.read(request.buffer)
+
+        source = instaseis.ForceSource(
+            latitude=basic_parameters["source_latitude"],
+            longitude=basic_parameters["source_longitude"],
+            depth_in_m=0.0,
+            **dict((key, float(value)) for (key, value) in fs.items()))
+        receiver = instaseis.Receiver(
+            latitude=basic_parameters["receiver_latitude"],
+            longitude=basic_parameters["receiver_longitude"],
+            depth_in_m=0.0)
+        st_db = db.get_seismograms(source=source, receiver=receiver,
+                                   components=components)
+        for tr_server, tr_db in zip(st_server, st_db):
+            # Remove the additional stats from both.
+            del tr_server.stats.mseed
+            del tr_server.stats._format
+            del tr_db.stats.instaseis
+            # Sample spacing is very similar but not equal due to floating
+            # point accuracy.
+            np.testing.assert_allclose(tr_server.stats.delta,
+                                       tr_db.stats.delta)
+            tr_server.stats.delta = tr_db.stats.delta
+            assert tr_server.stats == tr_db.stats
+            # Relative tolerance not particularly useful when testing super
+            # small values.
+            np.testing.assert_allclose(tr_server.data, tr_db.data,
+                                       atol=1E-10 * tr_server.data.ptp())
+
+        params["source_depth_in_m"] = "5.0"
+        params["origin_time"] = str(time)
+        params["receiver_depth_in_m"] = "55.0"
+        params["network_code"] = "BW"
+        params["station_code"] = "ALTM"
+
+        request = client.fetch(_assemble_url(**params))
+        st_server = obspy.read(request.buffer)
+
+        source = instaseis.ForceSource(
+            latitude=basic_parameters["source_latitude"],
+            longitude=basic_parameters["source_longitude"],
+            depth_in_m=5.0, origin_time=time,
+            **dict((key, float(value)) for (key, value) in fs.items()))
+        receiver = instaseis.Receiver(
+            latitude=basic_parameters["receiver_latitude"],
+            longitude=basic_parameters["receiver_longitude"],
+            depth_in_m=55.0, network="BW", station="ALTM")
+        st_db = db.get_seismograms(source=source, receiver=receiver,
+                                   components=components)
+        for tr_server, tr_db in zip(st_server, st_db):
+            # Remove the additional stats from both.
+            del tr_server.stats.mseed
+            del tr_server.stats._format
+            del tr_db.stats.instaseis
+            # Sample spacing is very similar but not equal due to floating
+            # point accuracy.
+            np.testing.assert_allclose(tr_server.stats.delta,
+                                       tr_db.stats.delta)
+            tr_server.stats.delta = tr_db.stats.delta
+            assert tr_server.stats == tr_db.stats
+            # Relative tolerance not particularly useful when testing super
+            # small values.
+            np.testing.assert_allclose(tr_server.data, tr_db.data,
+                                       atol=1E-10 * tr_server.data.ptp())
+
+    source = instaseis.Source(
+        latitude=basic_parameters["source_latitude"],
+        longitude=basic_parameters["source_longitude"],
+        depth_in_m=0.0,
+        **dict((key, float(value)) for (key, value) in mt.items()))
+    receiver = instaseis.Receiver(
+        latitude=basic_parameters["receiver_latitude"],
+        longitude=basic_parameters["receiver_longitude"],
+        depth_in_m=0.0)
+
+    # Now test other the other parameters.
+    params = copy.deepcopy(basic_parameters)
+    params.update(mt)
+    params["components"] = "RTE"
+    request = client.fetch(_assemble_url(**params))
+    st_server = obspy.read(request.buffer)
+    st_db = db.get_seismograms(source=source, receiver=receiver,
+                               components=["R", "T", "E"])
+    for tr_server, tr_db in zip(st_server, st_db):
+        # Remove the additional stats from both.
+        del tr_server.stats.mseed
+        del tr_server.stats._format
+        del tr_db.stats.instaseis
+        # Sample spacing is very similar but not equal due to floating
+        # point accuracy.
+        np.testing.assert_allclose(tr_server.stats.delta,
+                                   tr_db.stats.delta)
+        tr_server.stats.delta = tr_db.stats.delta
+        assert tr_server.stats == tr_db.stats
+        # Relative tolerance not particularly useful when testing super
+        # small values.
+        np.testing.assert_allclose(tr_server.data, tr_db.data,
+                                   atol=1E-10 * tr_server.data.ptp())
+
+    params = copy.deepcopy(basic_parameters)
+    params.update(mt)
+    params["kind"] = "acceleration"
+    request = client.fetch(_assemble_url(**params))
+    st_server = obspy.read(request.buffer)
+    st_db = db.get_seismograms(source=source, receiver=receiver,
+                               kind="acceleration")
+    for tr_server, tr_db in zip(st_server, st_db):
+        # Remove the additional stats from both.
+        del tr_server.stats.mseed
+        del tr_server.stats._format
+        del tr_db.stats.instaseis
+        # Sample spacing is very similar but not equal due to floating
+        # point accuracy.
+        np.testing.assert_allclose(tr_server.stats.delta,
+                                   tr_db.stats.delta)
+        tr_server.stats.delta = tr_db.stats.delta
+        assert tr_server.stats == tr_db.stats
+        # Relative tolerance not particularly useful when testing super
+        # small values.
+        np.testing.assert_allclose(tr_server.data, tr_db.data,
+                                   atol=1E-10 * tr_server.data.ptp())
+
+    params = copy.deepcopy(basic_parameters)
+    params.update(mt)
+    params["kind"] = "velocity"
+    request = client.fetch(_assemble_url(**params))
+    st_server = obspy.read(request.buffer)
+    st_db = db.get_seismograms(source=source, receiver=receiver,
+                               kind="velocity")
+    for tr_server, tr_db in zip(st_server, st_db):
+        # Remove the additional stats from both.
+        del tr_server.stats.mseed
+        del tr_server.stats._format
+        del tr_db.stats.instaseis
+        # Sample spacing is very similar but not equal due to floating
+        # point accuracy.
+        np.testing.assert_allclose(tr_server.stats.delta,
+                                   tr_db.stats.delta)
+        tr_server.stats.delta = tr_db.stats.delta
+        assert tr_server.stats == tr_db.stats
+        # Relative tolerance not particularly useful when testing super
+        # small values.
+        np.testing.assert_allclose(tr_server.data, tr_db.data,
+                                   atol=1E-10 * tr_server.data.ptp())
+
+    params = copy.deepcopy(basic_parameters)
+    params.update(mt)
+    params["remove_source_shift"] = "False"
+    request = client.fetch(_assemble_url(**params))
+    st_server = obspy.read(request.buffer)
+    st_db = db.get_seismograms(source=source, receiver=receiver,
+                               remove_source_shift=False)
+    for tr_server, tr_db in zip(st_server, st_db):
+        # Remove the additional stats from both.
+        del tr_server.stats.mseed
+        del tr_server.stats._format
+        del tr_db.stats.instaseis
+        # Sample spacing is very similar but not equal due to floating
+        # point accuracy.
+        np.testing.assert_allclose(tr_server.stats.delta,
+                                   tr_db.stats.delta)
+        tr_server.stats.delta = tr_db.stats.delta
+        assert tr_server.stats == tr_db.stats
+        # Relative tolerance not particularly useful when testing super
+        # small values.
+        np.testing.assert_allclose(tr_server.data, tr_db.data,
+                                   atol=1E-10 * tr_server.data.ptp())
+
+    params = copy.deepcopy(basic_parameters)
+    params.update(mt)
+    params["dt"] = "0.1"
+    params["a_lanczos"] = "20"
+    request = client.fetch(_assemble_url(**params))
+    st_server = obspy.read(request.buffer)
+    st_db = db.get_seismograms(source=source, receiver=receiver,
+                               dt=0.1, a_lanczos=20)
+    for tr_server, tr_db in zip(st_server, st_db):
+        # Remove the additional stats from both.
+        del tr_server.stats.mseed
+        del tr_server.stats._format
+        del tr_db.stats.instaseis
+        # Sample spacing is very similar but not equal due to floating
+        # point accuracy.
+        np.testing.assert_allclose(tr_server.stats.delta,
+                                   tr_db.stats.delta)
+        tr_server.stats.delta = tr_db.stats.delta
+        assert tr_server.stats == tr_db.stats
+        # Relative tolerance not particularly useful when testing super
+        # small values.
+        np.testing.assert_allclose(tr_server.data, tr_db.data,
+                                   atol=1E-10 * tr_server.data.ptp())
+
+    params = copy.deepcopy(basic_parameters)
+    params.update(mt)
+    params["dt"] = "0.1"
+    params["a_lanczos"] = "2"
+    params["kind"] = "ACCELERATION"
+    params["remove_source_shift"] = "False"
+    request = client.fetch(_assemble_url(**params))
+    st_server = obspy.read(request.buffer)
+    st_db = db.get_seismograms(source=source, receiver=receiver,
+                               dt=0.1, a_lanczos=2, kind="acceleration",
+                               remove_source_shift=False)
+    for tr_server, tr_db in zip(st_server, st_db):
+        # Remove the additional stats from both.
+        del tr_server.stats.mseed
+        del tr_server.stats._format
+        del tr_db.stats.instaseis
+        # Sample spacing is very similar but not equal due to floating
+        # point accuracy.
+        np.testing.assert_allclose(tr_server.stats.delta,
+                                   tr_db.stats.delta)
+        tr_server.stats.delta = tr_db.stats.delta
+        assert tr_server.stats == tr_db.stats
+        # Relative tolerance not particularly useful when testing super
+        # small values.
+        np.testing.assert_allclose(tr_server.data, tr_db.data,
+                                   atol=1E-10 * tr_server.data.ptp())
