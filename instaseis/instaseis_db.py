@@ -140,19 +140,19 @@ class InstaseisDB(BaseInstaseisDB):
             px_m = mesh.Mesh(
                 px_file, full_parse=True,
                 strain_buffer_size_in_mb=self.buffer_size_in_mb,
-                displ_buffer_size_in_mb=0,
+                displ_buffer_size_in_mb=self.buffer_size_in_mb,
                 read_on_demand=self.read_on_demand)
             pz_m = mesh.Mesh(
                 pz_file, full_parse=False,
                 strain_buffer_size_in_mb=self.buffer_size_in_mb,
-                displ_buffer_size_in_mb=0,
+                displ_buffer_size_in_mb=self.buffer_size_in_mb,
                 read_on_demand=self.read_on_demand)
             self.parsed_mesh = px_m
         elif x_exists:
             px_m = mesh.Mesh(
                 px_file, full_parse=True,
                 strain_buffer_size_in_mb=self.buffer_size_in_mb,
-                displ_buffer_size_in_mb=0,
+                displ_buffer_size_in_mb=self.buffer_size_in_mb,
                 read_on_demand=self.read_on_demand)
             pz_m = None
             self.parsed_mesh = px_m
@@ -161,7 +161,7 @@ class InstaseisDB(BaseInstaseisDB):
             pz_m = mesh.Mesh(
                 pz_file, full_parse=True,
                 strain_buffer_size_in_mb=self.buffer_size_in_mb,
-                displ_buffer_size_in_mb=0,
+                displ_buffer_size_in_mb=self.buffer_size_in_mb,
                 read_on_demand=self.read_on_demand)
             self.parsed_mesh = pz_m
         else:
