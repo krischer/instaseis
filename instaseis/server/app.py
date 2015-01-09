@@ -131,7 +131,7 @@ class SeismogramsHandler(tornado.web.RequestHandler):
         # Make sure that dt, if given is larger then 0.01. This should still
         # be plenty for any use case but prevents the server from having to
         # send massive amounts of data in the case of user errors.
-        if args.kind < 0.01:
+        if args.dt is not None and args.dt < 0.01:
             msg = ("The smallest possible dt is 0.01. Please choose a "
                    "smaller value and resample locally if needed.")
             raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
