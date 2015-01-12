@@ -26,6 +26,8 @@ which will launch a webserver and start serving at the specified port. The
 ``buffer_size_in_mb`` argument is passed to the
 :class:`~instaseis.instaseis_db.InstaseisDB` initialization routine. It is
 probably a good idea to choose it as big as your machine allows.
+For a reciprocal database with horizontal and vertical components Instaseis
+will create 4 buffers, each ``buffer_size_in_mb`` in size.
 
 Connecting to a Server
 ======================
