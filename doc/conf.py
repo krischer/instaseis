@@ -130,6 +130,7 @@ html_theme_options = {
     "navbar_pagenav": False,
     "navbar_sidebarrel": False,
     "source_link_position": False,
+    "navbar_class": "navbar navbar-inverse"
     }
 
 # Add any paths that contain custom themes here, relative to this directory.
