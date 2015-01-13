@@ -50,6 +50,19 @@ planetes such as Mars.
     :local:
     :depth: 2
 
+
+.. admonition:: Contact Us
+
+    If you encounter a bug or another error, please open a new
+    `issue <https://github.com/krischer/instaseis/issues>`_ on Github. For
+    generic questions and to stay up to date with Instaseis, please use our
+    `mailing list <https://groups.google.com/forum/#!forum/instaseis>`_.
+    Send an email to it via
+    `instaseis@googlegroups.com <instaseis@googlegroups.com>`_
+    and subscribe by sending an email to
+    `instaseis+subscribe@googlegroups.com <instaseis+subscribe@googlegroups.com>`_.
+
+
 Installation
 ------------
 

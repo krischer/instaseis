@@ -34,3 +34,9 @@ dl > dt {
     padding: 5px;
     color: #222222;
 }
+
+.admonition {
+    background-color: #FFE3E3;
+    border-color: #FFC4C4;
+    color: #555555;
+}
