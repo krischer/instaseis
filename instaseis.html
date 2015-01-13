@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 
 
@@ -5,17 +6,18 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Instaseis Database Objects &mdash; instaseis 0.0.1a-73-ga50a documentation</title>
+    <title>Instaseis Database Objects &mdash; instaseis 0.0.1a-74-gbf26 documentation</title>
     
     <link rel="stylesheet" href="_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="_static/bootswatch-3.2.0/simplex/bootstrap.min.css" type="text/css" />
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/my-styles.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.0.1a-73-ga50a',
+        VERSION:     '0.0.1a-74-gbf26',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -29,7 +31,7 @@
     <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="_static/bootstrap-3.2.0/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.0.1a-73-ga50a documentation" href="index.html" />
+    <link rel="top" title="instaseis 0.0.1a-74-gbf26 documentation" href="index.html" />
     <link rel="next" title="Meshes" href="mesh.html" />
     <link rel="prev" title="Instaseis - Instant Global Broadband Seismograms Based on a Waveform Database" href="index.html" />
 <meta charset='utf-8'>
@@ -51,7 +53,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-73-ga50a</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-74-gbf26</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -80,18 +82,6 @@
 </li>
               
             
-            
-              
-                
-  <li>
-    <a href="index.html" title="Previous Chapter: Instaseis - Instant Global Broadband Seismograms Based on a Waveform Database"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; Instaseis - Inst...</span>
-    </a>
-  </li>
-  <li>
-    <a href="mesh.html" title="Next Chapter: Meshes"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">Meshes &raquo;</span>
-    </a>
-  </li>
-              
             
             
             
@@ -130,6 +120,24 @@
 </tr>
 </tbody>
 </table>
+<p>If a directory is passed, it will return a local Instaseis database.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">instaseis</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">instaseis</span><span class="o">.</span><span class="n">open_db</span><span class="p">(</span><span class="s">&quot;/path/to/DB&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
+<span class="go">InstaseisDB reciprocal Green&#39;s function Database (v7) generated ...</span>
+<span class="go">    components           : vertical and horizontal</span>
+<span class="go">    velocity model       : ak135f</span>
+<span class="go">    ...</span>
+</pre></div>
+</div>
+<p>For an HTTP URL it will return a remote Instaseis database.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">instaseis</span><span class="o">.</span><span class="n">open_db</span><span class="p">(</span><span class="s">&quot;http://webadress.com:8765&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
+<span class="go">RemoteInstaseisDB reciprocal Green&#39;s function Database (v7) generated ...</span>
+<span class="go">    components           : vertical and horizontal</span>
+<span class="go">    velocity model       : ak135f</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="class">

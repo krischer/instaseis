@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 
 
@@ -5,17 +6,18 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>instaseis.source &mdash; instaseis 0.0.1a-73-ga50a documentation</title>
+    <title>instaseis.source &mdash; instaseis 0.0.1a-74-gbf26 documentation</title>
     
     <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/bootswatch-3.2.0/simplex/bootstrap.min.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/my-styles.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.0.1a-73-ga50a',
+        VERSION:     '0.0.1a-74-gbf26',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -29,7 +31,7 @@
     <script type="text/javascript" src="../../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../../_static/bootstrap-3.2.0/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../../_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.0.1a-73-ga50a documentation" href="../../index.html" />
+    <link rel="top" title="instaseis 0.0.1a-74-gbf26 documentation" href="../../index.html" />
     <link rel="up" title="instaseis" href="../instaseis.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
@@ -50,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-73-ga50a</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-74-gbf26</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -80,10 +82,6 @@
               
             
             
-              
-                
-              
-            
             
             
             
@@ -111,7 +109,7 @@
 <span class="c">#!/usr/bin/env python</span>
 <span class="c"># -*- coding: utf-8 -*-</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Source and Receiver classes used for the AxiSEM DB Python interface.</span>
+<span class="sd">Source and Receiver classes of Instaseis.</span>
 
 <span class="sd">:copyright:</span>
 <span class="sd">    Lion Krischer (krischer@geophysik.uni-muenchen.de), 2014</span>
@@ -601,12 +599,12 @@
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">f_t</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_r</span><span class="p">])</span>
 </div>
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">return_str</span> <span class="o">=</span> <span class="s">&#39;AxiSEM Database Force Source:</span><span class="se">\n</span><span class="s">&#39;</span>
-        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;longitude : </span><span class="si">%6.1f</span><span class="s"> deg</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">longitude</span><span class="p">)</span>
-        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;latitude  : </span><span class="si">%6.1f</span><span class="s"> deg</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">latitude</span><span class="p">)</span>
-        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;Fr        : </span><span class="si">%10.2e</span><span class="s"> N</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f_r</span><span class="p">)</span>
-        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;Ft        : </span><span class="si">%10.2e</span><span class="s"> N</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f_t</span><span class="p">)</span>
-        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;Fp        : </span><span class="si">%10.2e</span><span class="s"> N</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f_p</span><span class="p">)</span>
+        <span class="n">return_str</span> <span class="o">=</span> <span class="s">&#39;Instaseis Force Source:</span><span class="se">\n</span><span class="s">&#39;</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">longitude : </span><span class="si">%6.1f</span><span class="s"> deg</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">longitude</span><span class="p">)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">latitude  : </span><span class="si">%6.1f</span><span class="s"> deg</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">latitude</span><span class="p">)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">Fr        : </span><span class="si">%10.2e</span><span class="s"> N</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f_r</span><span class="p">)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">Ft        : </span><span class="si">%10.2e</span><span class="s"> N</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f_t</span><span class="p">)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">Fp        : </span><span class="si">%10.2e</span><span class="s"> N</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f_p</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">return_str</span>
 
@@ -614,26 +612,35 @@
 <div class="viewcode-block" id="Receiver"><a class="viewcode-back" href="../../source.html#instaseis.source.Receiver">[docs]</a><span class="k">class</span> <span class="nc">Receiver</span><span class="p">(</span><span class="n">SourceOrReceiver</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class dealing with seismic receivers.</span>
+
+<span class="sd">    :param latitude: latitude of the source in degree</span>
+<span class="sd">    :param longitude: longitude of the source in degree</span>
+<span class="sd">    :param network: network id</span>
+<span class="sd">    :param station: station id</span>
+
+<span class="sd">    &gt;&gt;&gt; from instaseis import Receiver</span>
+<span class="sd">    &gt;&gt;&gt; rec = Receiver(latitude=12.34, longitude=56.78, network=&quot;AB&quot;,</span>
+<span class="sd">    ...                station=&quot;CDE&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; print(rec)</span>
+<span class="sd">    Instaseis Receiver:</span>
+<span class="sd">    longitude :   56.8 deg</span>
+<span class="sd">    latitude  :   12.3 deg</span>
+<span class="sd">    network   : AB</span>
+<span class="sd">    station   : CDE</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="p">,</span> <span class="n">network</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">station</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                  <span class="n">depth_in_m</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param latitude: latitude of the source in degree</span>
-<span class="sd">        :param longitude: longitude of the source in degree</span>
-<span class="sd">        :param network: network id</span>
-<span class="sd">        :param station: station id</span>
-<span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">Receiver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="p">,</span>
                                        <span class="n">depth_in_m</span><span class="o">=</span><span class="n">depth_in_m</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">network</span> <span class="o">=</span> <span class="n">network</span> <span class="ow">or</span> <span class="s">&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">station</span> <span class="o">=</span> <span class="n">station</span> <span class="ow">or</span> <span class="s">&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">return_str</span> <span class="o">=</span> <span class="s">&#39;AxiSEM Database Receiver:</span><span class="se">\n</span><span class="s">&#39;</span>
-        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;longitude : </span><span class="si">%6.1f</span><span class="s"> deg</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">longitude</span><span class="p">)</span>
-        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;latitude  : </span><span class="si">%6.1f</span><span class="s"> deg</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">latitude</span><span class="p">)</span>
-        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;name      : </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">station</span><span class="p">)</span>
-        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;network   : </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="p">)</span>
+        <span class="n">return_str</span> <span class="o">=</span> <span class="s">&#39;Instaseis Receiver:</span><span class="se">\n</span><span class="s">&#39;</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">longitude : </span><span class="si">%6.1f</span><span class="s"> deg</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">longitude</span><span class="p">)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">latitude  : </span><span class="si">%6.1f</span><span class="s"> deg</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">latitude</span><span class="p">)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">network   : </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="p">)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">station   : </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">station</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">return_str</span>
 
@@ -1074,7 +1081,7 @@
                 <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">hypocenter_longitude</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">find_hypocenter</span><span class="p">()</span>
 
-        <span class="n">return_str</span> <span class="o">=</span> <span class="s">&#39;AxiSEM Database Finite Source:</span><span class="se">\n</span><span class="s">&#39;</span>
+        <span class="n">return_str</span> <span class="o">=</span> <span class="s">&#39;Instaseis Finite Source:</span><span class="se">\n</span><span class="s">&#39;</span>
         <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">Moment Magnitude     : </span><span class="si">%4.2f</span><span class="se">\n</span><span class="s">&#39;</span> \
                       <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">moment_magnitude</span><span class="p">)</span>
         <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">scalar Moment        : </span><span class="si">%10.2e</span><span class="s"> Nm</span><span class="se">\n</span><span class="s">&#39;</span> \
