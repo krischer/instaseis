@@ -128,6 +128,26 @@ class Source(SourceOrReceiver):
         :param origin_time: The origin time of the source. This will be the
             time of the first sample in the final seismogram. Be careful to
             adjust it for any time shift or STF (de)convolution effects.
+
+
+        >>> import instaseis
+        >>> source = instaseis.Source(
+        ...     latitude=89.91, longitude=0.0, depth_in_m=12000,
+        ...     m_rr = 4.71e+17, m_tt = 3.81e+15, m_pp =-4.74e+17,
+        ...     m_rt = 3.99e+16, m_rp =-8.05e+16, m_tp =-1.23e+17)
+        >>> print(source)
+        Instaseis Source:
+            Longitude        :    0.0 deg
+            Latitude         :   89.9 deg
+            Depth            : 1.2e+01 km
+            Moment Magnitude :   5.80
+            Scalar Moment    :   4.96e+17 Nm
+            Mrr              :   4.71e+17 Nm
+            Mtt              :   3.81e+15 Nm
+            Mpp              :  -4.74e+17 Nm
+            Mrt              :   3.99e+16 Nm
+            Mrp              :  -8.05e+16 Nm
+            Mtp              :  -1.23e+17 Nm
         """
         super(Source, self).__init__(latitude, longitude, depth_in_m)
         self.m_rr = m_rr
@@ -152,6 +172,26 @@ class Source(SourceOrReceiver):
         otherwise it will raise an error.
 
         :param filename_or_obj: The object or filename to parse.
+
+
+        The following example will read a local QuakeML file and return a
+        :class:`~instaseis.source.Source` object.
+
+        >>> import instaseis
+        >>> source = instaseis.Source.parse("quake.xml")
+        >>> print(source)
+        Instaseis Source:
+            Longitude        :   -3.5 deg
+            Latitude         :   37.0 deg
+            Depth            : 6.1e+02 km
+            Moment Magnitude :   6.41
+            Scalar Moment    :   4.16e+18 Nm
+            Mrr              :  -2.16e+18 Nm
+            Mtt              :   5.36e+17 Nm
+            Mpp              :   1.62e+18 Nm
+            Mrt              :   1.30e+16 Nm
+            Mrp              :   3.23e+18 Nm
+            Mtp              :   1.75e+18 Nm
         """
         if isinstance(filename_or_obj, (str, bytes)):
             # Anything ObsPy can read.
@@ -206,6 +246,22 @@ class Source(SourceOrReceiver):
         Initialize a source object from a CMTSOLUTION file.
 
         :param filename: path to the CMTSOLUTION file
+
+        >>> import instaseis
+        >>> source = instaseis.Source.from_CMTSOLUTION_file('file.cmt')
+        >>> print(source)
+        Instaseis Source:
+            Longitude        : -177.0 deg
+            Latitude         :  -29.2 deg
+            Depth            : 4.8e+01 km
+            Moment Magnitude :   7.32
+            Scalar Moment    :   9.63e+19 Nm
+            Mrr              :   7.68e+19 Nm
+            Mtt              :   9.00e+17 Nm
+            Mpp              :  -7.77e+19 Nm
+            Mrt              :   1.39e+19 Nm
+            Mrp              :   4.52e+19 Nm
+            Mtp              :  -3.26e+19 Nm
         """
         with open(filename, "rt") as f:
             line = f.readline()
@@ -257,6 +313,24 @@ class Source(SourceOrReceiver):
         :param origin_time: The origin time of the source. This will be the
             time of the first sample in the final seismogram. Be careful to
             adjust it for any time shift or STF (de)convolution effects.
+
+        >>> import instaseis
+        >>> source = instaseis.Source.from_strike_dip_rake(
+        ...     latitude=10.0, longitude=12.0, depth_in_m=1000, strike=79,
+        ...     dip=10, rake=20, M0=1E17)
+        >>> print(source)
+        Instaseis Source:
+            Longitude        :   12.0 deg
+            Latitude         :   10.0 deg
+            Depth            : 1.0e+00 km
+            Moment Magnitude :   5.33
+            Scalar Moment    :   1.00e+17 Nm
+            Mrr              :   1.17e+16 Nm
+            Mtt              :  -1.74e+16 Nm
+            Mpp              :   5.69e+15 Nm
+            Mrt              :  -4.92e+16 Nm
+            Mrp              :   8.47e+16 Nm
+            Mtp              :   1.29e+16 Nm
         """
         # formulas in Udias (17.24) are in geographic system North, East,
         # Down, which # transforms to the geocentric as:
@@ -434,13 +508,13 @@ class Source(SourceOrReceiver):
 
     def __str__(self):
         return_str = 'Instaseis Source:\n'
-        return_str += '\tlongitude        : %6.1f deg\n' % (self.longitude,)
-        return_str += '\tlatitude         : %6.1f deg\n' % (self.latitude,)
-        return_str += '\tdepth            : %6.1e km\n' \
+        return_str += '\tLongitude        : %6.1f deg\n' % (self.longitude,)
+        return_str += '\tLatitude         : %6.1f deg\n' % (self.latitude,)
+        return_str += '\tDepth            : %6.1e km\n' \
                       % (self.depth_in_m / 1e3,)
         return_str += '\tMoment Magnitude :   %4.2f\n' \
                       % (self.moment_magnitude,)
-        return_str += '\tscalar Moment    : %10.2e Nm\n' % (self.M0,)
+        return_str += '\tScalar Moment    : %10.2e Nm\n' % (self.M0,)
         return_str += '\tMrr              : %10.2e Nm\n' % (self.m_rr,)
         return_str += '\tMtt              : %10.2e Nm\n' % (self.m_tt,)
         return_str += '\tMpp              : %10.2e Nm\n' % (self.m_pp,)
@@ -454,20 +528,31 @@ class Source(SourceOrReceiver):
 class ForceSource(SourceOrReceiver):
     """
     A class to handle a seimic force source.
+
+    :param latitude: latitude of the source in degree
+    :param longitude: longitude of the source in degree
+    :param depth_in_m: source depth in m
+    :param f_r: force components in r, theta, phi in N
+    :param f_t: force components in r, theta, phi in N
+    :param f_p: force components in r, theta, phi in N
+    :param origin_time: The origin time of the source. This will be the
+        time of the first sample in the final seismogram. Be careful to
+        adjust it for any time shift or STF (de)convolution effects.
+
+
+    >>> import instaseis
+    >>> source = instaseis.ForceSource(latitude=12.34, longitude=12.34,
+    ...                                f_r=1E10)
+    >>> print(source)
+    Instaseis Force Source:
+        longitude :   12.3 deg
+        latitude  :   12.3 deg
+        Fr        :   1.00e+10 N
+        Ft        :   0.00e+00 N
+        Fp        :   0.00e+00 N
     """
     def __init__(self, latitude, longitude, depth_in_m=None, f_r=0., f_t=0.,
                  f_p=0., origin_time=obspy.UTCDateTime(0)):
-        """
-        :param latitude: latitude of the source in degree
-        :param longitude: longitude of the source in degree
-        :param depth_in_m: source depth in m
-        :param f_r: force components in r, theta, phi in N
-        :param f_t: force components in r, theta, phi in N
-        :param f_p: force components in r, theta, phi in N
-        :param origin_time: The origin time of the source. This will be the
-            time of the first sample in the final seismogram. Be careful to
-            adjust it for any time shift or STF (de)convolution effects.
-        """
         super(ForceSource, self).__init__(latitude, longitude, depth_in_m)
         self.f_r = f_r
         self.f_t = f_t
@@ -505,10 +590,16 @@ class Receiver(SourceOrReceiver):
     """
     Class dealing with seismic receivers.
 
-    :param latitude: latitude of the source in degree
-    :param longitude: longitude of the source in degree
-    :param network: network id
-    :param station: station id
+    :type latitude: float
+    :param latitude: The latitude of the receiver in degree.
+    :type longitude: float
+    :param longitude: The longitude of the receiver in degree.
+    :type depth_in_m: float
+    :param depth_in_m: The depth of the receiver in meters. Only
+    :type network: str, optional
+    :param network: The network id of the receiver.
+    :type station: str, optional
+    :param station: The station id of the receiver.
 
     >>> from instaseis import Receiver
     >>> rec = Receiver(latitude=12.34, longitude=56.78, network="AB",
@@ -540,7 +631,8 @@ class Receiver(SourceOrReceiver):
     @_purge_duplicates
     def parse(filename_or_obj, network_code=None):
         """
-        Attempts to parse anything to a list of Receiver objects. Always
+        Attempts to parse anything to a list of
+        :class:`~instaseis.source.Receiver` objects. Always
         returns a list, even if it only contains a single element. It is
         meant as a single entry point for receiver information from any source.
 
@@ -553,6 +645,13 @@ class Receiver(SourceOrReceiver):
         :param network_code: Network code needed to parse ObsPy station
             objects. Likely only needed for the recursive part of this method.
         :return: List of :class:`~instaseis.source.Receiver` objects.
+
+        The following example parses a StationXML file to a list of
+        :class:`~instaseis.source.Receiver` objects.
+
+        >>> import instaseis
+        >>> print(instaseis.Receiver.parse("TA.Q56A..BH.xml"))
+        [<instaseis.source.Receiver object at 0x...>]
         """
         receivers = []
 
@@ -693,7 +792,22 @@ class Receiver(SourceOrReceiver):
 
 class FiniteSource(object):
     """
-    A class to handle finite sources represented my a number of point sources.
+    A class to handle finite sources represented by a number of point sources.
+
+    :param pointsources: The points sources making up the finite source.
+    :type pointsources: list of :class:`~instaseis.source.Source` objects
+    :param CMT: The centroid of the finite source.
+    :type CMT: :class:`~instaseis.source.Source`, optional
+    :param magnitude: The total moment magnitude of the source.
+    :type magnitude: float, optional
+    :param event_duration: The event duration in seconds.
+    :type event_duration: float, optional
+    :param hypocenter_longitude: The hypocentral longitude.
+    :type hypocenter_longitude: float, optional
+    :param hypocenter_latitude: The hypocentral latitude.
+    :type hypocenter_latitude: float, optional
+    :param hypocenter_depth_in_m: The hypocentral depth in m.
+    :type hypocenter_depth_in_m: float, optional
     """
     def __init__(self, pointsources=None, CMT=None, magnitude=None,
                  event_duration=None, hypocenter_longitude=None,
@@ -740,6 +854,25 @@ class FiniteSource(object):
 
         :param filename: path to the .srf file
         :param normalize: normalize the sliprate to 1
+
+        >>> import instaseis
+        >>> source = instaseis.FiniteSource.from_srf_file("filename.srf")
+        >>> print(source)
+        Instaseis Finite Source:
+            Moment Magnitude     : 7.09
+            scalar Moment        : 6.67e+20 Nm
+            #point sources       : 117414
+            rupture duration     :  131.5 s
+            time shift           :    0.7 s
+            min depth            :   24.3 m
+            max depth            : 18170.8 m
+            hypocenter depth     : 18170.8 m
+            min latitude         :   23.3 deg
+            max latitude         :   24.7 deg
+            hypocenter latitude  :   23.3 deg
+            min longitude        : -148.5 deg
+            max longitude        : -145.7 deg
+            hypocenter longitude : -145.7 deg
         """
         with open(filename, "rt") as f:
             # go to POINTS block
