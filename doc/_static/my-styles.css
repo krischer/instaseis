@@ -1,0 +1,25 @@
+dl .attribute {
+    margin-left: 50px;
+}
+
+dl .method {
+    margin-left: 50px;
+}
+
+dl .classmethod {
+    margin-left: 50px;
+}
+
+dl .staticmethod {
+    margin-left: 50px;
+}
+
+dd > p {
+    padding-left: 20px;
+}
+
+.property {
+    font-weight: 100;
+    padding-right: 2px;
+}
+

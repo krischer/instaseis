@@ -28,6 +28,24 @@ def open_db(path, *args, **kwargs):
     Open a local or remote Instaseis database.
 
     :param path: Filepath or URL.
+
+    If a directory is passed, it will return a local Instaseis database.
+
+    >>> import instaseis
+    >>> db = instaseis.open_db("/path/to/DB")
+    >>> print(db)
+    InstaseisDB reciprocal Green's function Database (v7) generated ...
+        components           : vertical and horizontal
+        velocity model       : ak135f
+        ...
+
+    For an HTTP URL it will return a remote Instaseis database.
+
+    >>> db = instaseis.open_db("http://webadress.com:8765")
+    >>> print(db)
+    RemoteInstaseisDB reciprocal Green's function Database (v7) generated ...
+        components           : vertical and horizontal
+        velocity model       : ak135f
     """
     if "://" in path:
         from . import remote_instaseis_db

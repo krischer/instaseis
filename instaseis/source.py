@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Source and Receiver classes used for the AxiSEM DB Python interface.
+Source and Receiver classes of Instaseis.
 
 :copyright:
     Lion Krischer (krischer@geophysik.uni-muenchen.de), 2014
@@ -491,12 +491,12 @@ class ForceSource(SourceOrReceiver):
         return np.array([self.f_t, self.f_p, self.f_r])
 
     def __str__(self):
-        return_str = 'AxiSEM Database Force Source:\n'
-        return_str += 'longitude : %6.1f deg\n' % (self.longitude)
-        return_str += 'latitude  : %6.1f deg\n' % (self.latitude)
-        return_str += 'Fr        : %10.2e N\n' % (self.f_r)
-        return_str += 'Ft        : %10.2e N\n' % (self.f_t)
-        return_str += 'Fp        : %10.2e N\n' % (self.f_p)
+        return_str = 'Instaseis Force Source:\n'
+        return_str += '\tlongitude : %6.1f deg\n' % (self.longitude)
+        return_str += '\tlatitude  : %6.1f deg\n' % (self.latitude)
+        return_str += '\tFr        : %10.2e N\n' % (self.f_r)
+        return_str += '\tFt        : %10.2e N\n' % (self.f_t)
+        return_str += '\tFp        : %10.2e N\n' % (self.f_p)
 
         return return_str
 
@@ -504,26 +504,35 @@ class ForceSource(SourceOrReceiver):
 class Receiver(SourceOrReceiver):
     """
     Class dealing with seismic receivers.
+
+    :param latitude: latitude of the source in degree
+    :param longitude: longitude of the source in degree
+    :param network: network id
+    :param station: station id
+
+    >>> from instaseis import Receiver
+    >>> rec = Receiver(latitude=12.34, longitude=56.78, network="AB",
+    ...                station="CDE")
+    >>> print(rec)
+    Instaseis Receiver:
+    longitude :   56.8 deg
+    latitude  :   12.3 deg
+    network   : AB
+    station   : CDE
     """
     def __init__(self, latitude, longitude, network=None, station=None,
                  depth_in_m=None):
-        """
-        :param latitude: latitude of the source in degree
-        :param longitude: longitude of the source in degree
-        :param network: network id
-        :param station: station id
-        """
         super(Receiver, self).__init__(latitude, longitude,
                                        depth_in_m=depth_in_m)
         self.network = network or ""
         self.station = station or ""
 
     def __str__(self):
-        return_str = 'AxiSEM Database Receiver:\n'
-        return_str += 'longitude : %6.1f deg\n' % (self.longitude)
-        return_str += 'latitude  : %6.1f deg\n' % (self.latitude)
-        return_str += 'name      : %s\n' % (self.station)
-        return_str += 'network   : %s\n' % (self.network)
+        return_str = 'Instaseis Receiver:\n'
+        return_str += '\tlongitude : %6.1f deg\n' % (self.longitude)
+        return_str += '\tlatitude  : %6.1f deg\n' % (self.latitude)
+        return_str += '\tnetwork   : %s\n' % (self.network)
+        return_str += '\tstation   : %s\n' % (self.station)
 
         return return_str
 
@@ -964,7 +973,7 @@ class FiniteSource(object):
                 and self.hypocenter_longitude) is None:
             self.find_hypocenter()
 
-        return_str = 'AxiSEM Database Finite Source:\n'
+        return_str = 'Instaseis Finite Source:\n'
         return_str += '\tMoment Magnitude     : %4.2f\n' \
                       % (self.moment_magnitude)
         return_str += '\tscalar Moment        : %10.2e Nm\n' \
