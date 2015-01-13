@@ -20,7 +20,8 @@ Instaseis - Instant Global Broadband Seismograms Based on a Waveform Database
 
     .. raw:: html
 
-        <div class="col-md-12">
+        <div class="clearfix"></div>
+        <div style="float: none; padding-top: 20px" class="col-md-12">
 
 
 Instaseis calculates broadband seismograms from Green's function databases
@@ -44,6 +45,10 @@ planetes such as Mars.
     .. raw:: html
 
         </div>
+
+.. contents:: Contents
+    :local:
+    :depth: 2
 
 Installation
 ------------
@@ -111,8 +116,8 @@ Anaconda).
     $ conda install netcdf4 future requests tornado flake8 pytest mock basemap pyqt pip
     $ pip install obspy responses pyqtgraph
 
-A possible complication arises if you are running on a server without a
-display. In that case please edit (on Linux)
+A possible complication arises **if you are running on a server without a
+display**. In that case please edit (on Linux)
 ``~/.config/matplotlib/matplotlibrc`` (create if it does not exist) and make
 sure the following line is part of it:
 
@@ -327,6 +332,8 @@ to calculate synthetics based on standard file formats and web services.
     IU.ANMO..MXN | 2010-03-11T06:22:20Z - ... | 0.4 Hz, 732 samples
     IU.ANMO..MXE | 2010-03-11T06:22:20Z - ... | 0.4 Hz, 732 samples
 
+
+
 GUI
 ---
 
@@ -356,6 +363,5 @@ Detailed Documentation
    :maxdepth: 2
 
    instaseis
-   mesh
    server
    source

@@ -1,6 +1,6 @@
-==========================
-Instaseis Database Objects
-==========================
+======================
+Main Instaseis Classes
+======================
 
 .. autofunction:: instaseis.open_db
 
