@@ -25,11 +25,19 @@ class SourceParseError(InstaseisError):
 
 def open_db(path, *args, **kwargs):
     """
-    Open a local or remote Instaseis database.
+    Central function to open a local or remote Instaseis database. Any
+    keyword arguments are passed to the underlying
+    :class:`~instaseis.instaseis_db.InstaseisDB` or
+    :class:`~instaseis.remote_instaseis_db.RemoteInstaseisDB` classes.
 
-    :param path: Filepath or URL.
+    :type path: str
+    :param path: Filepath or URL. Instaseis will determine if it is a local
+        file path or a HTTP URL and delegate to the corresponding class.
+    :returns: An initialized database object.
+    :rtype: :class:`~instaseis.instaseis_db.InstaseisDB` or
+        :class:`~instaseis.remote_instaseis_db.RemoteInstaseisDB`
 
-    If a directory is passed, it will return a local Instaseis database.
+    If a directory is passed, it will return a local Instaseis database:
 
     >>> import instaseis
     >>> db = instaseis.open_db("/path/to/DB")
@@ -39,13 +47,21 @@ def open_db(path, *args, **kwargs):
         velocity model       : ak135f
         ...
 
-    For an HTTP URL it will return a remote Instaseis database.
+    For an HTTP URL it will return a remote Instaseis database:
 
     >>> db = instaseis.open_db("http://webadress.com:8765")
     >>> print(db)
     RemoteInstaseisDB reciprocal Green's function Database (v7) generated ...
         components           : vertical and horizontal
         velocity model       : ak135f
+
+    .. note::
+
+        If opening a local database and the ``ordered_output.nc4`` files are
+        located for example in ``/path/to/DB/PZ/Data`` and
+        ``/path/to/DB/PX/Data``, please pass ``/path/to/DB`` to the
+        :func:`~instaseis.open_db` function. Instaseis will recursively
+        search the child directories for the  necessary files and open them.
     """
     if "://" in path:
         from . import remote_instaseis_db

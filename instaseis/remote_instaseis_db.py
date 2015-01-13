@@ -29,11 +29,11 @@ from .base_instaseis_db import BaseInstaseisDB, DEFAULT_MU
 
 class RemoteInstaseisDB(BaseInstaseisDB):
     """
-    Remote instaseis database interface.
+    Remote Instaseis database interface.
     """
     def __init__(self, url, *args, **kwargs):
         """
-        :param url: URL to the remote instaseis server.
+        :param url: URL to the remote Instaseis server.
         :type db_path: str
         """
         self.url = url

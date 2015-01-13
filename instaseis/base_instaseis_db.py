@@ -29,36 +29,48 @@ DEFAULT_MU = 32e9
 
 class BaseInstaseisDB(with_metaclass(ABCMeta)):
     """
-    Base class for all Instaseis database classes defining the interface for
-    the users.
+    Base class for all Instaseis database classes defining the user interface.
     """
     def get_seismograms(self, source, receiver, components=("Z", "N", "E"),
                         kind='displacement', remove_source_shift=True,
                         reconvolve_stf=False, return_obspy_stream=True,
                         dt=None, a_lanczos=5):
         """
-        Extract seismograms for a moment tensor point source from the AxiSEM
-        database.
+        Extract seismograms from the Green's function database.
 
-        :param source: instaseis.Source or instaseis.ForceSource object
+        :param source: The source definition.
         :type source: :class:`instaseis.source.Source` or
             :class:`instaseis.source.ForceSource`
-        :param receiver: instaseis.Receiver object
+        :param receiver: The seismic receiver.
         :type receiver: :class:`instaseis.source.Receiver`
-        :param components: a tuple containing any combination of the
-            strings ``"Z"``, ``"N"``, ``"E"``, ``"R"``, and ``"T"``
-        :param kind: 'displacement', 'velocity' or 'acceleration'
-        :param remove_source_shift: move the starttime to the peak of the
-            sliprate from the source time function used to generate the
-            database
-        :param reconvolve_stf: deconvolve the source time function used in
-            the AxiSEM run and convolve with the stf attached to the source.
-            For this to be stable, the new stf needs to bandlimited.
-        :param return_obspy_stream: return format is either an obspy.Stream
-            object or a plain array containing the data
-        :param dt: desired sampling of the seismograms. resampling is done
-            using a lanczos kernel
-        :param a_lanczos: width of the kernel used in resampling
+        :type components: tuple of str, optional
+        :param components: Which components to calculate. Must be a tuple
+            containing any combination of ``"Z"``, ``"N"``, ``"E"``,
+            ``"R"``, and ``"T"``.
+        :type kind: str, optional
+        :param kind: The desired units of the seismogram:
+            ``"displacement"``, ``"velocity"``, or ``"acceleration"``.
+        :type remove_source_shift: bool, optional
+        :param remove_source_shift: Move the starttime of the seismogram to
+            the peak of the sliprate from the source time function used to
+            generate the database.
+        :type reconvolve_stf: bool, optional
+        :param reconvolve_stf: Deconvolve the source time function used in
+            the AxiSEM run and convolve with the STF attached to the source.
+            For this to be stable, the new STF needs to bandlimited.
+        :type return_obspy_stream: bool, optional
+        :param return_obspy_stream: Return format is either an
+            :class:`obspy.core.stream.Stream` object or a dictionary
+            containing the raw NumPy arrays.
+        :type dt: float, optional
+        :param dt: Desired sampling rate of the seismograms. Resampling is done
+            using a Lanczos kernel.
+        :type a_lanczos: int, optional
+        :param a_lanczos: The width of the kernel used in the resampling.
+
+        :returns: Multi component seismograms.
+        :rtype: A :class:`obspy.core.stream.Stream` object or a dictionary
+            with NumPy arrays as values.
         """
         source, receiver = self._get_seismograms_sanity_checks(
             source=source, receiver=receiver, components=components, kind=kind)
@@ -193,22 +205,37 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
                                       a_lanczos=5, correct_mu=False,
                                       progress_callback=None):
         """
-        Extract seismograms for a finite source from the AxiSEM database
-        provided as a list of point sources attached with source time functions
-        and time shifts.
+        Extract seismograms for a finite source from an Instaseis database.
 
         :param sources: A collection of point sources.
-        :type sources: list of :class:`instaseis.source.Source` objects
-        :param receiver: The receiver location.
+        :type sources: :class:`~instaseis.source.FiniteSource` or list of
+            :class:`~instaseis.source.Source` objects.
+        :param receiver: The seismic receiver.
         :type receiver: :class:`instaseis.source.Receiver`
-        :param components: a tuple containing any combination of the strings
-            ``"Z"``, ``"N"``, and ``"E"``
-        :param kind: 'displacement', 'velocity' or 'acceleration'
-        :param dt: desired sampling of the seismograms.resampling is done
-            using a lanczos kernel
-        :param a_lanczos: width of the kernel used in resampling
-        :param correct_mu: correct the source magnitude for the actual shear
-            modulus from the model
+        :type components: tuple of str, optional
+        :param components: Which components to calculate. Must be a tuple
+            containing any combination of ``"Z"``, ``"N"``, ``"E"``,
+            ``"R"``, and ``"T"``.
+        :type kind: str, optional
+        :param kind: The desired units of the seismogram:
+            ``"displacement"``, ``"velocity"``, or ``"acceleration"``.
+        :type dt: float, optional
+        :param dt: Desired sampling rate of the seismograms. Resampling is done
+            using a Lanczos kernel.
+        :type a_lanczos: int, optional
+        :param a_lanczos: The width of the kernel used in the resampling.
+        :type correct_mu: bool, optional
+        :param correct_mu: Correct the source magnitude for the actual shear
+            modulus from the model.
+        :type progress_callback: function, optional
+        :param progress_callback: Optional callback function that will be
+            called with current source number and the number of total
+            sources for each calculated source. Useful for integration into
+            user interfaces to provide some kind of progress information. If
+            the callback returns ``True``, the calculation will be cancelled.
+
+        :returns: Multi component finite source seismogram.
+        :rtype: :class:`obspy.core.stream.Stream`
         """
         if not self.info.is_reciprocal:
             raise NotImplementedError
