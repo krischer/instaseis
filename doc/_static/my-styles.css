@@ -23,3 +23,10 @@ dd > p {
     padding-right: 2px;
 }
 
+dl > dt {
+    background-color: #DDDDDD;
+    border-radius: 5px;
+    padding: 5px;
+    color: #222222;
+}
+
