@@ -55,6 +55,7 @@ def get_package_data():
                 filenames.append(os.path.relpath(
                     os.path.join(directory, filename),
                     root_dir))
+    filenames.append("RELEASE-VERSION")
     return filenames
 
 

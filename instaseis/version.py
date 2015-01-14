@@ -44,7 +44,7 @@ from subprocess import Popen, PIPE
 script_dir = os.path.abspath(os.path.dirname(inspect.getfile(
                                              inspect.currentframe())))
 INSTASEIS_ROOT = os.path.abspath(os.path.join(script_dir, os.pardir))
-VERSION_FILE = os.path.join(INSTASEIS_ROOT, "RELEASE-VERSION")
+VERSION_FILE = os.path.join(script_dir, "RELEASE-VERSION")
 
 
 def call_git_describe(abbrev=4):

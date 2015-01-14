@@ -70,13 +70,16 @@ def open_db(path, *args, **kwargs):
         from . import instaseis_db
         return instaseis_db.InstaseisDB(path, *args, **kwargs)
 
-from .version import get_git_version
-__version__ = get_git_version()
-
-
 import netCDF4
 import re
 import warnings
+
+from .version import get_git_version
+__version__ = get_git_version()
+
+if __version__.startswith("0.0.0-tar/zipball"):
+    warnings.warn("Please don't install from a tarball. Use the proper pypi "
+                  "release or install from git.", UserWarning)
 
 
 def __version_cmp(required_version, version):
