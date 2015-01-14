@@ -3,8 +3,8 @@
 !     Martin van Driel (Martin@vanDriel.de), 2014
 !     Lion Krischer (krischer@geophysik.uni-muenchen.de), 2014
 ! license:
-!     GNU General Public License, Version 3
-!     (http://www.gnu.org/copyleft/gpl.html)
+!     GNU Lesser General Public License, Version 3
+!     (http://www.gnu.org/copyleft/lgpl.html)
 
 module sem_derivatives
   use global_parameters,      only : dp
