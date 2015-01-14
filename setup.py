@@ -1,12 +1,27 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""
-Python interface to AxiSEM's netCDF based database mode.
+u"""
+Instaseis: Instant Global Broadband Seismograms Based on a Waveform Database
+
+Instaseis calculates broadband seismograms from Green’s function databases
+generated with AxiSEM and allows for near instantaneous (on the order of
+milliseconds) extraction of seismograms. Using the 2.5D axisymmetric
+spectral element method, the generation of these databases, based on
+reciprocity of the Green’s functions, is very efficient and is approximately
+half as expensive as a single AxiSEM forward run. Thus this enables the
+computation of full databases at half the cost of the computation of
+seismograms for a single source in the previous scheme and hence allows to
+compute databases at the highest frequencies globally observed. By storing
+the basis coefficients of the numerical scheme (Lagrange polynomials),
+the Green’s functions are 4th order accurate in space and the spatial
+discretization respects discontinuities in the velocity model exactly. On
+top, AxiSEM allows to include 2D structure in the source receiver plane and
+readily includes other planets such as Mars.
+
+For more information visit http://www.instaseis.net.
 
 :copyright:
-    Lion Krischer (krischer@geophysik.uni-muenchen.de), 2014
-    Martin van Driel (vandriel@tomo.ig.erdw.ethz.ch), 2014
-    Simon Stähler (staehler@geophysik.uni-muenchen.de), 2014
+    The Instaseis Development Team (instaseis@googlegroups.com), 2014-2015
 :license:
     GNU Lesser General Public License, Version 3
     (http://www.gnu.org/copyleft/lgpl.html)
@@ -33,6 +48,8 @@ from version import get_git_version
 # Monkey patch the compilers to treat Fortran files like C files.
 CCompiler.language_map['.f90'] = "c"
 UnixCCompiler.src_extensions.append(".f90")
+
+DOCSTRING = __doc__.strip().split("\n")
 
 
 def get_package_data():
@@ -134,10 +151,11 @@ if sys.version_info[0] == 2:
 setup_config = dict(
     name="instaseis",
     version=get_git_version(),
-    description="Instant seismograms from an AxiSEM Green's functions' DB.",
+    description=DOCSTRING[0],
+    long_description="\n".join(DOCSTRING[2:]),
     author=u"Lion Krischer, Martin van Driel, and Simon Stähler",
     author_email="krischer@geophysik.uni-muenchen.de",
-    url="",
+    url="http://instaseis.net",
     packages=find_packages(),
     package_data={
         "instaseis":
@@ -149,13 +167,19 @@ setup_config = dict(
     install_requires=INSTALL_REQUIRES,
     ext_package='instaseis.lib',
     ext_modules=[lib],
+    # this is needed for "pip install instaseis==dev"
+    download_url=("https://github.com/krischer/instaseis/zipball/master"
+                  "#egg=instaseis=dev"),
     classifiers=[
         # complete classifier list:
         # http://pypi.python.org/pypi?%3Aaction=list_classifiers
-        "Development Status :: 3 - Alpha",
-        "Intended Audience :: Developers",
+        "Development Status :: 4 - Beta",
+        "Intended Audience :: Science/Research",
         "Operating System :: Unix",
         "Operating System :: POSIX",
+        "Operating System :: MacOS",
+        "License :: OSI Approved :: GNU Lesser General Public License v3 "
+        "(LGPLv3)",
         "Programming Language :: Python",
         "Programming Language :: Python :: 2.6",
         "Programming Language :: Python :: 2.7",
@@ -163,6 +187,8 @@ setup_config = dict(
         "Programming Language :: Python :: 3.3",
         "Programming Language :: Python :: 3.4",
         "Programming Language :: Python :: Implementation :: CPython",
+        "Topic :: Scientific/Engineering",
+        "Topic :: Scientific/Engineering :: Physics"
         ],
 )
 
