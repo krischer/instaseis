@@ -7,8 +7,8 @@ and some other sanity checks as well.
 :copyright:
     Lion Krischer (krischer@geophysik.uni-muenchen.de), 2013-2014
 :license:
-    GNU General Public License, Version 3
-    (http://www.gnu.org/copyleft/gpl.html)
+    GNU Lesser General Public License, Version 3
+    (http://www.gnu.org/copyleft/lgpl.html)
 """
 import flake8
 import flake8.engine

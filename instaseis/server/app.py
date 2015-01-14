@@ -6,8 +6,8 @@ Server offering a REST API for Instaseis.
 :copyright:
     Lion Krischer (krischer@geophysik.uni-muenchen.de), 2014
 :license:
-    GNU General Public License, Version 3
-    (http://www.gnu.org/copyleft/gpl.html)
+    GNU Lesser General Public License, Version 3
+    (http://www.gnu.org/copyleft/lgpl.html)
 """
 import copy
 import io

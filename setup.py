@@ -8,8 +8,8 @@ Python interface to AxiSEM's netCDF based database mode.
     Martin van Driel (vandriel@tomo.ig.erdw.ethz.ch), 2014
     Simon Stähler (staehler@geophysik.uni-muenchen.de), 2014
 :license:
-    GNU General Public License, Version 3
-    (http://www.gnu.org/copyleft/gpl.html)
+    GNU Lesser General Public License, Version 3
+    (http://www.gnu.org/copyleft/lgpl.html)
 """
 from distutils.ccompiler import CCompiler
 from distutils.errors import DistutilsExecError, CompileError
@@ -143,7 +143,7 @@ setup_config = dict(
             [os.path.join("lib", "instaseis.so")] +
             [os.path.join("gui", "qt_window.ui")] +
             get_package_data()},
-    license="GNU General Public License, version 3 (GPLv3)",
+    license="GNU Lesser General Public License, version 3 (LGPLv3)",
     platforms="OS Independent",
     install_requires=INSTALL_REQUIRES,
     ext_package='instaseis.lib',
