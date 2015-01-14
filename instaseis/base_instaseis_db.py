@@ -5,6 +5,7 @@ Abstract base class for all Instaseis database classes.
 
 :copyright:
     Lion Krischer (krischer@geophysik.uni-muenchen.de), 2014
+    Martin van Driel (Martin@vanDriel.de), 2014
 :license:
     GNU Lesser General Public License, Version 3
     (http://www.gnu.org/copyleft/lgpl.html)
