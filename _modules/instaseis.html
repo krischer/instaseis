@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>instaseis &mdash; instaseis 0.0.1a-87-ge90e documentation</title>
+    <title>instaseis &mdash; instaseis 0.0.1a-88-g78dd documentation</title>
     
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.0.1a-87-ge90e',
+        VERSION:     '0.0.1a-88-g78dd',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -31,7 +31,7 @@
     <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-3.2.0/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.0.1a-87-ge90e documentation" href="../index.html" />
+    <link rel="top" title="instaseis 0.0.1a-88-g78dd documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-87-ge90e</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-88-g78dd</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -194,6 +194,8 @@
 <span class="sd">    based on http://stackoverflow.com/a/1714190/1657047</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">normalize</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+        <span class="c"># Strip any additional version specifiers.</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;-&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s">&quot;-&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s">&quot;~&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s">r&#39;(\.0+)*$&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;.&quot;</span><span class="p">)]</span>
 
     <span class="k">if</span> <span class="n">normalize</span><span class="p">(</span><span class="n">version</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">normalize</span><span class="p">(</span><span class="n">required_version</span><span class="p">):</span>
