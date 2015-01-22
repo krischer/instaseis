@@ -87,6 +87,8 @@ def __version_cmp(required_version, version):
     based on http://stackoverflow.com/a/1714190/1657047
     """
     def normalize(v):
+        # Strip any additional version specifiers.
+        v = v.split("-")[0].strip("-").strip("~")
         return [int(x) for x in re.sub(r'(\.0+)*$', '', v).split(".")]
 
     if normalize(version) < normalize(required_version):
