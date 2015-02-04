@@ -104,7 +104,7 @@ class SourceOrReceiver(object):
 
 class Source(SourceOrReceiver):
     """
-    A class to handle a seimic moment tensor source including a source time
+    Class to handle a seismic moment tensor source including a source time
     function.
     """
     def __init__(self, latitude, longitude, depth_in_m=None, m_rr=0.0,
@@ -527,7 +527,7 @@ class Source(SourceOrReceiver):
 
 class ForceSource(SourceOrReceiver):
     """
-    A class to handle a seimic force source.
+    Class to handle a seismic force source.
 
     :param latitude: latitude of the source in degree
     :param longitude: longitude of the source in degree
