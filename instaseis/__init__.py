@@ -2,6 +2,12 @@
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 
+import netCDF4
+import re
+import warnings
+
+from .version import get_git_version
+
 
 class InstaseisError(Exception):
     pass
@@ -70,12 +76,9 @@ def open_db(path, *args, **kwargs):
         from . import instaseis_db
         return instaseis_db.InstaseisDB(path, *args, **kwargs)
 
-import netCDF4
-import re
-import warnings
 
-from .version import get_git_version
 __version__ = get_git_version()
+
 
 if __version__.startswith("0.0.0-tar/zipball"):
     warnings.warn("Please don't install from a tarball. Use the proper pypi "

@@ -12,10 +12,6 @@ Instaseis database class for remote access over HTTP.
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 
-from future import standard_library
-with standard_library.hooks():
-    from urllib.parse import urlunparse, urlencode, urlparse
-
 import io
 import numpy as np
 import obspy
@@ -25,6 +21,10 @@ import warnings
 from . import InstaseisError, InstaseisWarning, Source, ForceSource, \
     __version__
 from .base_instaseis_db import BaseInstaseisDB, DEFAULT_MU
+
+from future import standard_library
+with standard_library.hooks():
+    from urllib.parse import urlunparse, urlencode, urlparse
 
 
 class RemoteInstaseisDB(BaseInstaseisDB):

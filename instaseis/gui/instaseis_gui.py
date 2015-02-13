@@ -14,9 +14,6 @@ from __future__ import (absolute_import, division, print_function,
 
 from PyQt4 import QtGui, QtCore
 import pyqtgraph as pg
-# Default to antialiased drawing.
-pg.setConfigOptions(antialias=True, foreground=(50, 50, 50), background=None)
-
 
 from glob import iglob
 import imp
@@ -30,6 +27,9 @@ import os
 import sys
 
 from instaseis import open_db, Source, Receiver, FiniteSource
+
+# Default to antialiased drawing.
+pg.setConfigOptions(antialias=True, foreground=(50, 50, 50), background=None)
 
 
 def compile_and_import_ui_files():
