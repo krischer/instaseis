@@ -13,8 +13,8 @@
 
 
 
-Instaseis - Instant Global Broadband Seismograms Based on a Waveform Database
-=============================================================================
+Instaseis: Instant Global Seismograms Based on a Broadband Waveform Database
+============================================================================
 
 .. only:: html
 
