@@ -369,6 +369,14 @@ lines. The bar at the top is used to change filter and resampling settings and
 the section on the right side is used to modify source and receiver parameters.
 
 
+Acknowledgements
+----------------
+
+We gratefully acknowledge support from the European Commission (Marie Curie
+Actions, **ITN QUEST**, `www.quest-itn.org <http://www.quest-itn.org>`_)
+and the EU-FP7 725 690 **VERCE** project
+(number 283543, `www.verce.eu <http://www.verce.eu>`_).
+
 Detailed Documentation
 ----------------------
 
