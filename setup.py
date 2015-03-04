@@ -23,7 +23,7 @@ For more information visit http://www.instaseis.net.
 :copyright:
     The Instaseis Development Team (instaseis@googlegroups.com), 2014-2015
 :license:
-    GNU Lesser General Public License, Version 3
+    GNU Lesser General Public License, Version 3 [non-commercial/academic use]
     (http://www.gnu.org/copyleft/lgpl.html)
 """
 from distutils.ccompiler import CCompiler
@@ -162,7 +162,8 @@ setup_config = dict(
             [os.path.join("lib", "instaseis.so")] +
             [os.path.join("gui", "qt_window.ui")] +
             get_package_data()},
-    license="GNU Lesser General Public License, version 3 (LGPLv3)",
+    license="GNU Lesser General Public License, version 3 (LGPLv3) for "
+        "non-commercial/academic use",
     platforms="OS Independent",
     install_requires=INSTALL_REQUIRES,
     ext_package='instaseis.lib',
@@ -178,8 +179,6 @@ setup_config = dict(
         "Operating System :: Unix",
         "Operating System :: POSIX",
         "Operating System :: MacOS",
-        "License :: OSI Approved :: GNU Lesser General Public License v3 "
-        "(LGPLv3)",
         "Programming Language :: Python",
         "Programming Language :: Python :: 2.6",
         "Programming Language :: Python :: 2.7",

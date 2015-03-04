@@ -1,3 +1,6 @@
+License valid for non-commercial/academic use only. Please contact us for other
+uses.
+
 Instaseis is licensed under the LGPL v3.0, e.g. it is licensed with the
 GPL v3.0 and the additional set of permissions granted by the LGPL v3.0
 license. This file contains both licenses.

@@ -7,7 +7,7 @@ Mesh object also taking care of opening and closing the netCDF files.
     Lion Krischer (krischer@geophysik.uni-muenchen.de), 2014
     Martin van Driel (Martin@vanDriel.de), 2014
 :license:
-    GNU Lesser General Public License, Version 3
+    GNU Lesser General Public License, Version 3 [non-commercial/academic use]
     (http://www.gnu.org/copyleft/lgpl.html)
 """
 from __future__ import (absolute_import, division, print_function,

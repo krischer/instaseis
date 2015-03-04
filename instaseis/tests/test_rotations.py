@@ -6,7 +6,7 @@ Testing rotation module
 :copyright:
     Martin van Driel (Martin@vanDriel.de), 2014
 :license:
-    GNU Lesser General Public License, Version 3
+    GNU Lesser General Public License, Version 3 [non-commercial/academic use]
     (http://www.gnu.org/copyleft/lgpl.html)
 """
 from __future__ import absolute_import

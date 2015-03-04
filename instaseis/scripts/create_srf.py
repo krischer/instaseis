@@ -6,7 +6,7 @@ Hacky code to generate some finite source in a .srf file
 :copyright:
     Martin van Driel (Martin@vanDriel.de)
 :license:
-    GNU Lesser General Public License, Version 3
+    GNU Lesser General Public License, Version 3 [non-commercial/academic use]
     (http://www.gnu.org/copyleft/lgpl.html)
 """
 from __future__ import (absolute_import, division, print_function,
