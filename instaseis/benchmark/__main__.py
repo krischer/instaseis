@@ -93,8 +93,8 @@ class InstaseisBenchmark(with_metaclass(ABCMeta)):
 
         print("\tStarting...", end="\r")
         t = starttime
-        while ((self.count is not None and count < self.count)
-               or (self.count is None and t < endtime)):
+        while ((self.count is not None and count < self.count) or
+                (self.count is None and t < endtime)):
             count += 1
             s = timeit.default_timer()
             self.iterate()

@@ -112,8 +112,9 @@ class Mesh(object):
         # Cheap sanity check. No need to parse the rest.
         self.dump_type = \
             getattr(self.f, "dump type (displ_only, displ_velo, fullfields)")
-        if (self.dump_type != "displ_only" and self.dump_type != "fullfields"
-                and self.dump_type != "strain_only"):
+        if (self.dump_type != "displ_only" and
+                self.dump_type != "fullfields" and
+                self.dump_type != "strain_only"):
             raise NotImplementedError
 
         self.npol = self.f.npol

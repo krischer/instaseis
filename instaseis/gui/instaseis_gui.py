@@ -319,9 +319,9 @@ class Window(QtGui.QMainWindow):
         except AttributeError:
             return
 
-        if (not bool(self.ui.auto_update_check_box.checkState())
-                and self.ui.finsource_tab.currentIndex() == 1 and not force
-                and self.st_copy is None):
+        if (not bool(self.ui.auto_update_check_box.checkState()) and
+                self.ui.finsource_tab.currentIndex() == 1 and not force and
+                self.st_copy is None):
             return
 
         components = ["z", "n", "e"]
@@ -335,8 +335,8 @@ class Window(QtGui.QMainWindow):
 
         for component in components:
             p = getattr(self.ui, "%s_graph" % component)
-            p.setTitle(label_map[components_choice][component].capitalize()
-                       + " component")
+            p.setTitle(label_map[components_choice][component].capitalize() +
+                       " component")
 
         if self.ui.finsource_tab.currentIndex() == 0:
             src_latitude = self.source.latitude
@@ -359,9 +359,9 @@ class Window(QtGui.QMainWindow):
                 st = self.instaseis_db.get_seismograms(
                     source=self.source, receiver=self.receiver, dt=dt,
                     components=components_map[components_choice])
-            elif (not bool(self.ui.auto_update_check_box.checkState())
-                    and self.ui.finsource_tab.currentIndex() == 1
-                    and not force):
+            elif (not bool(self.ui.auto_update_check_box.checkState()) and
+                    self.ui.finsource_tab.currentIndex() == 1 and
+                    not force):
                 st = self.st_copy.copy()
             else:
                 prog_diag = QtGui.QProgressDialog(
@@ -521,8 +521,8 @@ class Window(QtGui.QMainWindow):
             # nsamp=self.instaseis_db.info.npts,
             #     freq=1.0/self.instaseis_db.info.period)
 
-            nsamp = int(self.instaseis_db.info.period
-                        / self.finite_source[0].dt) * 5
+            nsamp = int(self.instaseis_db.info.period /
+                        self.finite_source[0].dt) * 5
             self.finite_source.resample_sliprate(
                 dt=self.finite_source[0].dt, nsamp=nsamp)
             self.finite_source.lp_sliprate(

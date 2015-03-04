@@ -341,23 +341,23 @@ class Source(SourceOrReceiver):
         delta = np.deg2rad(dip)
         lambd = np.deg2rad(rake)
 
-        m_tt = (- np.sin(delta) * np.cos(lambd) * np.sin(2. * phi)
-                - np.sin(2. * delta) * np.sin(phi)**2. * np.sin(lambd)) * M0
+        m_tt = (- np.sin(delta) * np.cos(lambd) * np.sin(2. * phi) -
+                np.sin(2. * delta) * np.sin(phi)**2. * np.sin(lambd)) * M0
 
-        m_pp = (np.sin(delta) * np.cos(lambd) * np.sin(2. * phi)
-                - np.sin(2. * delta) * np.cos(phi)**2. * np.sin(lambd)) * M0
+        m_pp = (np.sin(delta) * np.cos(lambd) * np.sin(2. * phi) -
+                np.sin(2. * delta) * np.cos(phi)**2. * np.sin(lambd)) * M0
 
         m_rr = (np.sin(2. * delta) * np.sin(lambd)) * M0
 
-        m_rp = (- np.cos(phi) * np.sin(lambd) * np.cos(2. * delta)
-                + np.cos(delta) * np.cos(lambd) * np.sin(phi)) * M0
+        m_rp = (- np.cos(phi) * np.sin(lambd) * np.cos(2. * delta) +
+                np.cos(delta) * np.cos(lambd) * np.sin(phi)) * M0
 
-        m_rt = (- np.sin(lambd) * np.sin(phi) * np.cos(2. * delta)
-                - np.cos(delta) * np.cos(lambd) * np.cos(phi)) * M0
+        m_rt = (- np.sin(lambd) * np.sin(phi) * np.cos(2. * delta) -
+                np.cos(delta) * np.cos(lambd) * np.cos(phi)) * M0
 
-        m_tp = (- np.sin(delta) * np.cos(lambd) * np.cos(2. * phi)
-                - np.sin(2. * delta) * np.sin(2. * phi) * np.sin(lambd) / 2.) \
-            * M0
+        m_tp = (- np.sin(delta) * np.cos(lambd) * np.cos(2. * phi) -
+                np.sin(2. * delta) * np.sin(2. * phi) * np.sin(lambd) / 2.) * \
+            M0
 
         source = self(latitude, longitude, depth_in_m, m_rr, m_tt, m_pp, m_rt,
                       m_rp, m_tp, time_shift, sliprate, dt,
@@ -416,9 +416,9 @@ class Source(SourceOrReceiver):
         """
         Scalar Moment M0 in Nm
         """
-        return (self.m_rr ** 2 + self.m_tt ** 2 + self.m_pp ** 2
-                + 2 * self.m_rt ** 2 + 2 * self.m_rp ** 2
-                + 2 * self.m_tp ** 2) ** 0.5 * 0.5 ** 0.5
+        return (self.m_rr ** 2 + self.m_tt ** 2 + self.m_pp ** 2 +
+                2 * self.m_rt ** 2 + 2 * self.m_rp ** 2 +
+                2 * self.m_tp ** 2) ** 0.5 * 0.5 ** 0.5
 
     @property
     def moment_magnitude(self):
@@ -1020,8 +1020,8 @@ class FiniteSource(object):
 
             # sum sliprates with time shift applied
             sliprate_f = np.fft.rfft(ps.sliprate, n=nfft)
-            sliprate_f *= np.exp(- 1j * np.fft.rfftfreq(nfft)
-                                 * 2. * np.pi * ps.time_shift / dt)
+            sliprate_f *= np.exp(- 1j * np.fft.rfftfreq(nfft) *
+                                 2. * np.pi * ps.time_shift / dt)
             finite_sliprate += np.fft.irfft(sliprate_f)[:nsamp] \
                 * ps.M0 / finite_M0
 
@@ -1102,8 +1102,8 @@ class FiniteSource(object):
         return len(self.pointsources)
 
     def __str__(self):
-        if (self.hypocenter_latitude is None
-                and self.hypocenter_longitude) is None:
+        if (self.hypocenter_latitude is None and
+                self.hypocenter_longitude) is None:
             self.find_hypocenter()
 
         return_str = 'Instaseis Finite Source:\n'

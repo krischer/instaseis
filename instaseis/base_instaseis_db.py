@@ -128,8 +128,8 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
 
                 if source.time_shift is not None:
                     stf_conv_f *= \
-                        np.exp(- 1j * np.fft.rfftfreq(self.info.nfft)
-                               * 2. * np.pi * source.time_shift / self.info.dt)
+                        np.exp(- 1j * np.fft.rfftfreq(self.info.nfft) *
+                               2. * np.pi * source.time_shift / self.info.dt)
 
                 # XXX: double check whether a taper is needed at the end of the
                 # trace

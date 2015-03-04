@@ -310,8 +310,8 @@ class InstaseisDB(BaseInstaseisDB):
                             self.meshes.pz, id_elem, gll_point_ids, G, GT,
                             col_points_xi, col_points_eta, corner_points,
                             eltype, axis, xi, eta)
-                    elif (self.info.dump_type == 'fullfields'
-                            or self.info.dump_type == 'strain_only'):
+                    elif (self.info.dump_type == 'fullfields' or
+                            self.info.dump_type == 'strain_only'):
                         strain_z = self.__get_strain(self.meshes.pz, id_elem)
 
                 if any(comp in components for comp in ['N', 'E', 'R', 'T']):
@@ -576,8 +576,8 @@ class InstaseisDB(BaseInstaseisDB):
             final_strain = np.empty((self.info.npts, 6), order="F")
             final_strain[:, 0] = strain_temp[:, 0]
             final_strain[:, 1] = strain_temp[:, 2]
-            final_strain[:, 2] = (strain_temp[:, 5] - strain_temp[:, 0]
-                                  - strain_temp[:, 2])
+            final_strain[:, 2] = (strain_temp[:, 5] - strain_temp[:, 0] -
+                                  strain_temp[:, 2])
             final_strain[:, 3] = -strain_temp[:, 4]
             final_strain[:, 4] = strain_temp[:, 1]
             final_strain[:, 5] = -strain_temp[:, 3]
