@@ -528,10 +528,19 @@ class InstaseisDB(BaseInstaseisDB):
             for i, var in enumerate(["disp_s", "disp_p", "disp_z"]):
                 if var not in mesh_dict:
                     continue
-                temp = mesh_dict[var][:, gll_point_ids.flatten()]
+
+                # The netCDF Python wrappers starting with version 1.1.6
+                # disallow duplicate and unordered indices while slicing. So
+                # we need to do it manually.
+                # The list of ids we have is unique but not sorted.
+                ids = gll_point_ids.flatten()
+                s_ids = np.sort(ids)
+                temp = mesh_dict[var][:, s_ids]
                 for ipol in range(mesh.npol + 1):
                     for jpol in range(mesh.npol + 1):
-                        utemp[:, jpol, ipol, i] = temp[:, ipol * 5 + jpol]
+                        idx = ipol * 5 + jpol
+                        utemp[:, jpol, ipol, i] = \
+                            temp[:, np.argwhere(s_ids == ids[idx])[0][0]]
 
             strain_fct_map = {
                 "monopole": sem_derivatives.strain_monopole_td,
@@ -599,10 +608,18 @@ class InstaseisDB(BaseInstaseisDB):
             for i, var in enumerate(["disp_s", "disp_p", "disp_z"]):
                 if var not in mesh_dict:
                     continue
-                temp = mesh_dict[var][:, gll_point_ids.flatten()]
+                # The netCDF Python wrappers starting with version 1.1.6
+                # disallow duplicate and unordered indices while slicing. So
+                # we need to do it manually.
+                # The list of ids we have is unique but not sorted.
+                ids = gll_point_ids.flatten()
+                s_ids = np.sort(ids)
+                temp = mesh_dict[var][:, s_ids]
                 for ipol in range(mesh.npol + 1):
                     for jpol in range(mesh.npol + 1):
-                        utemp[:, jpol, ipol, i] = temp[:, ipol * 5 + jpol]
+                        idx = ipol * 5 + jpol
+                        utemp[:, jpol, ipol, i] = \
+                            temp[:, np.argwhere(s_ids == ids[idx])[0][0]]
 
             mesh.displ_buffer.add(id_elem, utemp)
         else:
