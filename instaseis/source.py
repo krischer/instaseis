@@ -222,7 +222,7 @@ class Source(SourceOrReceiver):
             if not ev.focal_mechanisms:
                 raise SourceParseError("Event must contain a focal mechanism.")
             org = ev.preferred_origin() or ev.origins[0]
-            fm = ev.preferred_focal_mechanism() or ev.focal_mechansisms[0]
+            fm = ev.preferred_focal_mechanism() or ev.focal_mechanisms[0]
             if not fm.moment_tensor:
                 raise SourceParseError("Event must contain a moment tensor.")
             t = fm.moment_tensor.tensor
