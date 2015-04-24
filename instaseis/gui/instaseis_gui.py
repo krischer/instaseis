@@ -22,7 +22,7 @@ from mpl_toolkits.basemap import Basemap
 import numpy as np
 from obspy.imaging.mopad_wrapper import Beach
 from obspy.core.util.geodetics import locations2degrees, gps2DistAzimuth
-from obspy.taup.taup import getTravelTimes
+from obspy.taup import TauPyModel
 import os
 import sys
 
@@ -30,6 +30,9 @@ from instaseis import open_db, Source, Receiver, FiniteSource
 
 # Default to antialiased drawing.
 pg.setConfigOptions(antialias=True, foreground=(50, 50, 50), background=None)
+
+# Initialize model once.
+tau_model = TauPyModel(model="ak135")
 
 
 def compile_and_import_ui_files():
@@ -431,8 +434,9 @@ class Window(QtGui.QMainWindow):
             great_circle_distance = locations2degrees(
                 src_latitude, src_longitude,
                 rec.latitude, rec.longitude)
-            self.tts = getTravelTimes(great_circle_distance,
-                                      src_depth_in_m / 1000.0, model="ak135")
+            self.tts = tau_model.get_travel_times(
+                source_depth_in_km=src_depth_in_m / 1000.0,
+                distance_in_degree=great_circle_distance)
 
         for ic, component in enumerate(components):
             plot_widget = getattr(self.ui, "%s_graph" % component.lower())
@@ -448,15 +452,17 @@ class Window(QtGui.QMainWindow):
                 plot_widget.plot(times, tr.data, pen="r")
 
             if bool(self.ui.tt_times.checkState()):
+                tts = []
                 for tt in self.tts:
-                    if tt["time"] >= times[-1]:
-                        self.tts.remove(tt)
+                    if tt.time >= times[-1]:
                         continue
-                    if tt["phase_name"][0].lower() == "p":
+                    tts.append(tt)
+                    if tt.name[0].lower() == "p":
                         pen = "#008c2866"
                     else:
                         pen = "#95000066"
-                    plot_widget.addLine(x=tt["time"], pen=pen, z=-10)
+                    plot_widget.addLine(x=tt.time, pen=pen, z=-10)
+                self.tts = tts
         self.set_info()
 
     def on_select_folder_button_released(self):
@@ -712,7 +718,7 @@ class Window(QtGui.QMainWindow):
                     tt = float(self.ui.z_graph.mapToView(
                         pg.Point(event.pos().x(), event.pos().y())).x())
                     closest_phase = \
-                        min(self.tts, key=lambda x: abs(x["time"] - tt))
+                        min(self.tts, key=lambda x: abs(x.time - tt))
                     tooltipstr = 'Mouse at %6.2f s, closest phase = %s, ' \
                         'arriving at %6.2f s' % \
                         (tt, closest_phase["phase_name"],
