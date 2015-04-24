@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>instaseis.source &mdash; instaseis 0.0.1a-97-g21c8 documentation</title>
+    <title>instaseis.source &mdash; instaseis 0.0.1a-99-g01b5 documentation</title>
     
     <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.0.1a-97-g21c8',
+        VERSION:     '0.0.1a-99-g01b5',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -26,12 +26,12 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../../_static/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="../../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../../_static/bootstrap-3.2.0/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../../_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.0.1a-97-g21c8 documentation" href="../../index.html" />
+    <link rel="top" title="instaseis 0.0.1a-99-g01b5 documentation" href="../../index.html" />
     <link rel="up" title="instaseis" href="../instaseis.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
@@ -39,7 +39,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 
   </head>
-  <body>
+  <body role="document">
 
   <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
     <div class="container">
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-97-g21c8</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-99-g01b5</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -329,7 +329,7 @@
             <span class="k">if</span> <span class="ow">not</span> <span class="n">ev</span><span class="o">.</span><span class="n">focal_mechanisms</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">SourceParseError</span><span class="p">(</span><span class="s">&quot;Event must contain a focal mechanism.&quot;</span><span class="p">)</span>
             <span class="n">org</span> <span class="o">=</span> <span class="n">ev</span><span class="o">.</span><span class="n">preferred_origin</span><span class="p">()</span> <span class="ow">or</span> <span class="n">ev</span><span class="o">.</span><span class="n">origins</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">fm</span> <span class="o">=</span> <span class="n">ev</span><span class="o">.</span><span class="n">preferred_focal_mechanism</span><span class="p">()</span> <span class="ow">or</span> <span class="n">ev</span><span class="o">.</span><span class="n">focal_mechansisms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">fm</span> <span class="o">=</span> <span class="n">ev</span><span class="o">.</span><span class="n">preferred_focal_mechanism</span><span class="p">()</span> <span class="ow">or</span> <span class="n">ev</span><span class="o">.</span><span class="n">focal_mechanisms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">fm</span><span class="o">.</span><span class="n">moment_tensor</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">SourceParseError</span><span class="p">(</span><span class="s">&quot;Event must contain a moment tensor.&quot;</span><span class="p">)</span>
             <span class="n">t</span> <span class="o">=</span> <span class="n">fm</span><span class="o">.</span><span class="n">moment_tensor</span><span class="o">.</span><span class="n">tensor</span>
@@ -519,32 +519,32 @@
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;Mtp:            </span><span class="si">%7.4f</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m_tp</span> <span class="o">*</span> <span class="mf">1e7</span><span class="p">,))</span>
 </div>
     <span class="nd">@property</span>
-<div class="viewcode-block" id="Source.M0"><a class="viewcode-back" href="../../source.html#instaseis.source.Source.M0">[docs]</a>    <span class="k">def</span> <span class="nf">M0</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">M0</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Scalar Moment M0 in Nm</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m_rr</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_tt</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_pp</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span>
                 <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_rt</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_rp</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span>
                 <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_tp</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="mf">0.5</span> <span class="o">**</span> <span class="mf">0.5</span>
-</div>
+
     <span class="nd">@property</span>
-<div class="viewcode-block" id="Source.moment_magnitude"><a class="viewcode-back" href="../../source.html#instaseis.source.Source.moment_magnitude">[docs]</a>    <span class="k">def</span> <span class="nf">moment_magnitude</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">moment_magnitude</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Moment magnitude M_w</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="mf">3.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">M0</span><span class="p">)</span> <span class="o">-</span> <span class="mf">6.0</span>
-</div>
+
     <span class="nd">@property</span>
-<div class="viewcode-block" id="Source.tensor"><a class="viewcode-back" href="../../source.html#instaseis.source.Source.tensor">[docs]</a>    <span class="k">def</span> <span class="nf">tensor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">tensor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        List of moment tensor components in r, theta, phi coordinates:</span>
 <span class="sd">        [m_rr, m_tt, m_pp, m_rt, m_rp, m_tp]</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">m_rr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_tt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_pp</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_rt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_rp</span><span class="p">,</span>
                          <span class="bp">self</span><span class="o">.</span><span class="n">m_tp</span><span class="p">])</span>
-</div>
+
     <span class="nd">@property</span>
-<div class="viewcode-block" id="Source.tensor_voigt"><a class="viewcode-back" href="../../source.html#instaseis.source.Source.tensor_voigt">[docs]</a>    <span class="k">def</span> <span class="nf">tensor_voigt</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">tensor_voigt</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        List of moment tensor components in theta, phi, r coordinates in Voigt</span>
 <span class="sd">        notation:</span>
@@ -552,7 +552,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">m_tt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_pp</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_rr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_rp</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_rt</span><span class="p">,</span>
                          <span class="bp">self</span><span class="o">.</span><span class="n">m_tp</span><span class="p">])</span>
-</div>
+
 <div class="viewcode-block" id="Source.set_sliprate"><a class="viewcode-back" href="../../source.html#instaseis.source.Source.set_sliprate">[docs]</a>    <span class="k">def</span> <span class="nf">set_sliprate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sliprate</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">time_shift</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add a source time function (sliprate) to a initialized source object.</span>
@@ -667,21 +667,21 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">origin_time</span> <span class="o">=</span> <span class="n">origin_time</span>
 
     <span class="nd">@property</span>
-<div class="viewcode-block" id="ForceSource.force_tpr"><a class="viewcode-back" href="../../source.html#instaseis.source.ForceSource.force_tpr">[docs]</a>    <span class="k">def</span> <span class="nf">force_tpr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">force_tpr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        List of force components in theta, phi, r coordinates:</span>
 <span class="sd">        [f_t, f_p, f_r]</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">f_t</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_r</span><span class="p">])</span>
-</div>
+
     <span class="nd">@property</span>
-<div class="viewcode-block" id="ForceSource.force_rtp"><a class="viewcode-back" href="../../source.html#instaseis.source.ForceSource.force_rtp">[docs]</a>    <span class="k">def</span> <span class="nf">force_rtp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">force_rtp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        List of force components in r, theta, phi, coordinates:</span>
 <span class="sd">        [f_r, f_t, f_p]</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">f_t</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_r</span><span class="p">])</span>
-</div>
+
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">return_str</span> <span class="o">=</span> <span class="s">&#39;Instaseis Force Source:</span><span class="se">\n</span><span class="s">&#39;</span>
         <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">longitude : </span><span class="si">%6.1f</span><span class="s"> deg</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">longitude</span><span class="p">)</span>
@@ -1149,19 +1149,19 @@
                           <span class="n">sliprate</span><span class="o">=</span><span class="n">finite_sliprate</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">)</span>
 </div>
     <span class="nd">@property</span>
-<div class="viewcode-block" id="FiniteSource.M0"><a class="viewcode-back" href="../../source.html#instaseis.source.FiniteSource.M0">[docs]</a>    <span class="k">def</span> <span class="nf">M0</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">M0</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Scalar Moment M0 in Nm</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">ps</span><span class="o">.</span><span class="n">M0</span> <span class="k">for</span> <span class="n">ps</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pointsources</span><span class="p">)</span>
-</div>
+
     <span class="nd">@property</span>
-<div class="viewcode-block" id="FiniteSource.moment_magnitude"><a class="viewcode-back" href="../../source.html#instaseis.source.FiniteSource.moment_magnitude">[docs]</a>    <span class="k">def</span> <span class="nf">moment_magnitude</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">moment_magnitude</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Moment magnitude M_w</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="mf">3.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">M0</span><span class="p">)</span> <span class="o">-</span> <span class="mf">6.0</span>
-</div>
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">min_depth_in_m</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointsources</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">depth_in_m</span><span class="p">)</span><span class="o">.</span><span class="n">depth_in_m</span>
@@ -1261,7 +1261,7 @@
     </p>
     <p>
         &copy; Copyright 2014, Lion Krischer and Martin van Driel.<br/>
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2.3.<br/>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.3.1.<br/>
     </p>
   </div>
 </footer>
