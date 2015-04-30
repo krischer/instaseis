@@ -343,16 +343,15 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
         """
         Figure out the channel band code. Done as in SPECFEM.
         """
-        sr = 1.0 / dt
-        if sr <= 0.001:
+        if dt <= 0.001:
             band_code = "F"
-        elif sr <= 0.004:
+        elif dt <= 0.004:
             band_code = "C"
-        elif sr <= 0.0125:
+        elif dt <= 0.0125:
             band_code = "H"
-        elif sr <= 0.1:
+        elif dt <= 0.1:
             band_code = "B"
-        elif sr < 1:
+        elif dt < 1:
             band_code = "M"
         else:
             band_code = "L"
