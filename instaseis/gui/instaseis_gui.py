@@ -34,6 +34,10 @@ pg.setConfigOptions(antialias=True, foreground=(50, 50, 50), background=None)
 # Initialize model once.
 tau_model = TauPyModel(model="ak135")
 
+# Most generic way to get the data folder path.
+DATA = os.path.join(os.path.dirname(os.path.abspath(
+    inspect.getfile(inspect.currentframe()))), "data")
+
 
 def compile_and_import_ui_files():
     """
@@ -206,7 +210,8 @@ class Window(QtGui.QMainWindow):
         self.map = Basemap(projection='moll', lon_0=0, resolution="c",
                            ax=self.mpl_map_ax)
         self.map.drawmapboundary(fill_color='#cccccc')
-        self.map.fillcontinents(color='white', lake_color='#cccccc', zorder=0)
+        #self.map.fillcontinents(color='white', lake_color='#cccccc', zorder=0)
+        self.map.warpimage(image=os.path.join(DATA, 'mola_texture_shifted_800.jpg'))
         self.mpl_map_figure.patch.set_alpha(0.0)
 
         self.mpl_map_figure.canvas.mpl_connect(
