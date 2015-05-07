@@ -34,6 +34,10 @@ pg.setConfigOptions(antialias=True, foreground=(50, 50, 50), background=None)
 # Initialize model once.
 tau_model = TauPyModel(model="ak135")
 
+# Most generic way to get the data folder path.
+DATA = os.path.join(os.path.dirname(os.path.abspath(
+    inspect.getfile(inspect.currentframe()))), "data")
+
 
 def compile_and_import_ui_files():
     """
@@ -199,14 +203,25 @@ class Window(QtGui.QMainWindow):
 
     def plot_map(self):
         self.mpl_map_figure = self.ui.map_fig.fig
+
+        # if hasattr(self, 'mpl_map_ax'):
+        #     self.mpl_map_ax.clear()
+
         self.mpl_map_ax = self.mpl_map_figure.add_axes([0.01, 0.01, .98, .98])
         self.mpl_map_ax.set_title("Left click: Set Receiver; Right click: Set "
                                   "Source")
 
         self.map = Basemap(projection='moll', lon_0=0, resolution="c",
                            ax=self.mpl_map_ax)
+
         self.map.drawmapboundary(fill_color='#cccccc')
-        self.map.fillcontinents(color='white', lake_color='#cccccc', zorder=0)
+        if self.instaseis_db and self.instaseis_db.info.planet_radius < 5e6:
+            imfile = os.path.join(DATA, 'mola_texture_shifted_800.jpg')
+            self.map.warpimage(image=imfile, zorder=0)
+        else:
+            self.map.fillcontinents(color='white', lake_color='#cccccc',
+                                    zorder=0)
+
         self.mpl_map_figure.patch.set_alpha(0.0)
 
         self.mpl_map_figure.canvas.mpl_connect(
@@ -481,6 +496,7 @@ class Window(QtGui.QMainWindow):
 
         self._setup_finite_source()
 
+        self.plot_map()
         self.update()
         self.set_info()
 
@@ -502,6 +518,7 @@ class Window(QtGui.QMainWindow):
 
         self._setup_finite_source()
 
+        self.plot_map()
         self.update()
         self.set_info()
 
