@@ -204,8 +204,8 @@ class Window(QtGui.QMainWindow):
     def plot_map(self):
         self.mpl_map_figure = self.ui.map_fig.fig
 
-        #if hasattr(self, 'mpl_map_ax'):
-        #    self.mpl_map_ax.clear()
+        # if hasattr(self, 'mpl_map_ax'):
+        #     self.mpl_map_ax.clear()
 
         self.mpl_map_ax = self.mpl_map_figure.add_axes([0.01, 0.01, .98, .98])
         self.mpl_map_ax.set_title("Left click: Set Receiver; Right click: Set "
@@ -219,7 +219,8 @@ class Window(QtGui.QMainWindow):
             imfile = os.path.join(DATA, 'mola_texture_shifted_800.jpg')
             self.map.warpimage(image=imfile, zorder=0)
         else:
-            self.map.fillcontinents(color='white', lake_color='#cccccc', zorder=0)
+            self.map.fillcontinents(color='white', lake_color='#cccccc',
+                                    zorder=0)
 
         self.mpl_map_figure.patch.set_alpha(0.0)
 

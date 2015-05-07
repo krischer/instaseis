@@ -526,8 +526,8 @@ def test_get_band_code_method():
         10.0: "L",
         33.0: "L"
     }
-    for sr, letter in codes.items():
-        assert InstaseisDB._get_band_code(1.0 / sr) == letter
+    for dt, letter in codes.items():
+        assert InstaseisDB._get_band_code(dt) == letter
 
 
 def test_origin_time_of_resulting_seismograms():
