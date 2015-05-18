@@ -4,10 +4,21 @@ from PyQt4.QtGui import *
 
 from PyQt4 import QtGui
 
+from db_list import DBList, DBItem
 from source_list import SourceList, SourceItem
+from receiver_list import ReceiverList, ReceiverItem
+from filter_list import FilterList, FilterItem, Filter
 
 import instaseis
 import random
+
+
+db_list = DBList()
+
+for i in range(2):
+    db = instaseis.open_db('/media/ex/instaseis/Martin/DWTh2Ref2_nocrust_50s')
+    item = DBItem(db, "db_%i" % i)
+    db_list.append(item)
 
 
 source_list = SourceList()
@@ -18,6 +29,23 @@ for i in range(5):
                            depth_in_m=10)
     item = SourceItem(src, "Event_%i" % i)
     source_list.append(item)
+
+
+receiver_list = ReceiverList()
+
+for i in range(2):
+    rec = instaseis.Receiver(latitude=random.random(),
+                             longitude=random.random())
+    item = ReceiverItem(rec, "rec_%i" % i)
+    receiver_list.append(item)
+
+
+filter_list = FilterList()
+
+for i in range(3):
+    filter = Filter()
+    item = FilterItem(filter, "filter_%i" % i)
+    filter_list.append(item)
 
 
 class MyWindow(QWidget):
@@ -56,17 +84,21 @@ class QCustomQWidget(QtGui.QWidget):
         self.name_vbox = QtGui.QVBoxLayout()
         self.dropdown_vbox = QtGui.QVBoxLayout()
 
-        items = [
-            ("DB:", ["DB_1", "DB_2"]),
-            ("Source:", ["asdf_1", "asdklfjadks"]),
-            ("Receiver:", ["DB_1", "asdklfjadks"]),
-            ("Filter:", ["asdklfjadks", "DB_2"]),
-        ]
+        labels = ["DB:", "Source:", "Receiver:", "Filter:"]
 
-        for label, content in items:
+        for label in labels:
             _name = QtGui.QLabel(label)
             dropdown = QtGui.QComboBox()
-            dropdown.setModel(source_list)
+            if label == "DB:":
+                dropdown.setModel(db_list)
+            elif label == "Receiver:":
+                dropdown.setModel(receiver_list)
+            elif label == "Source:":
+                dropdown.setModel(source_list)
+            elif label == "Filter:":
+                dropdown.setModel(filter_list)
+            else:
+                raise ValueError
 
             self.name_vbox.addWidget(_name)
             self.dropdown_vbox.addWidget(dropdown)
