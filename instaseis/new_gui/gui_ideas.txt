@@ -1,0 +1,24 @@
+ - generalize datamodel: pipeline of model, source, receiver and filters
+ - allow multiple of these pipelines
+
+ - fix finite sources
+ - 1D model from netcdf file (compare kerner)
+ - add noise (HNM, LNM, external?)
+ - magnitude slider
+ - impacts
+ - spectrogram, cwt
+ - recordsection
+ - global stack
+ - finite source vizualization
+ - travel times from a editable phase list
+ - ray paths plot
+ - particle motion
+ - misfits between multiple pipelines (TFM)
+ - save button for plots
+ - 'generate code' button
+ - show DB info only on load
+ - overlay real data?
+ - generic finite sources (line source?)
+
+ - generate info pdf for a DB including plots of the model, recordsec etc in a nicely
+   readable format
