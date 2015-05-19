@@ -104,6 +104,11 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
 
         n_derivative = kind_map[kind] - stf_map[self.info.stf]
 
+        # not 100% sure why, but this way we get correct seismograms for impacts when
+        # using ForceSource:
+        if isinstance(source, ForceSource):
+            n_derivative += 2
+
         for comp in components:
             if remove_source_shift and not reconvolve_stf:
                 data[comp] = data[comp][self.info.src_shift_samples:]
