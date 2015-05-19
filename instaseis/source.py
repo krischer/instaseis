@@ -508,6 +508,7 @@ class Source(SourceOrReceiver):
 
     def __str__(self):
         return_str = 'Instaseis Source:\n'
+        return_str += '\torigin time      : %s\n' % (self.origin_time,)
         return_str += '\tLongitude        : %6.1f deg\n' % (self.longitude,)
         return_str += '\tLatitude         : %6.1f deg\n' % (self.latitude,)
         return_str += '\tDepth            : %6.1e km\n' \
@@ -577,6 +578,7 @@ class ForceSource(SourceOrReceiver):
 
     def __str__(self):
         return_str = 'Instaseis Force Source:\n'
+        return_str += '\torigin time      : %s\n' % (self.origin_time,)
         return_str += '\tlongitude : %6.1f deg\n' % (self.longitude)
         return_str += '\tlatitude  : %6.1f deg\n' % (self.latitude)
         return_str += '\tFr        : %10.2e N\n' % (self.f_r)
