@@ -891,8 +891,8 @@ class FiniteSource(object):
                 rake, slip1, nt1, slip2, nt2, slip3, nt3 = \
                     map(float, f.readline().split())
 
-                dep *= 1e3  # km    > m
-                area *= 1e-4  # cm^2 > m^2
+                dep *= 1e3     # km   > m
+                area *= 1e-4   # cm^2 > m^2
                 slip1 *= 1e-2  # cm   > m
                 slip2 *= 1e-2  # cm   > m
                 # slip3 *= 1e-2  # cm   > m
@@ -931,6 +931,62 @@ class FiniteSource(object):
 
                 if nt3 > 0:
                     raise NotImplementedError('Slip along u3 axis')
+
+            return self(pointsources=sources)
+
+    @classmethod
+    def from_usgs_param_file(self, filename):
+        """
+        Initialize a finite source object from a (.param) file available from
+        the USGS website
+
+        :param filename: path to the .param file
+
+        >>> import instaseis
+        >>> source = instaseis.FiniteSource.from_srf_file("filename.param")
+        >>> print(source)
+        Instaseis Finite Source:
+            Moment Magnitude     : 7.09
+            scalar Moment        : 6.67e+20 Nm
+            #point sources       : 117414
+            rupture duration     :  131.5 s
+            time shift           :    0.7 s
+            min depth            :   24.3 m
+            max depth            : 18170.8 m
+            hypocenter depth     : 18170.8 m
+            min latitude         :   23.3 deg
+            max latitude         :   24.7 deg
+            hypocenter latitude  :   23.3 deg
+            min longitude        : -148.5 deg
+            max longitude        : -145.7 deg
+            hypocenter longitude : -145.7 deg
+        """
+        with open(filename, "rt") as f:
+            # number of segments
+            line = f.readline()
+            nseg = int(line.split()[-1])
+            if not nseg == 1:
+                raise ValueError("parsing for USGS .param files only "
+                                 "implemented for single fault segments")
+
+            # got to point source segment
+            while '#Lat. Lon. depth' not in line:
+                line = f.readline()
+
+            sources = []
+            # loop over remaining lines
+            for line in f:
+                # Lat. Lon. depth slip rake strike dip t_rup t_ris t_fal mo
+                lat, lon, dep, slip, rake, stk, dip, tinit, trise, tfal, M0 = \
+                    map(float, line.split())
+
+                dep *= 1e3    # km > m
+                slip *= 1e-2  # cm > m
+                M0 *= 1e-7    # dyn / cm > N * m
+
+                sources.append(
+                    Source.from_strike_dip_rake(lat, lon, dep, stk, dip, rake,
+                                                M0, time_shift=tinit))
 
             return self(pointsources=sources)
 

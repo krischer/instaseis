@@ -20,6 +20,7 @@ from instaseis import Source, FiniteSource
 DATA = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 EVENT_FILE = os.path.join(DATA, "GCMT_event_STRAIT_OF_GIBRALTAR.xml")
 SRF_FILE = os.path.join(DATA, "strike_slip_eq_10pts.srf")
+USGS_PARAM_FILE = os.path.join(DATA, "nepal.param")
 
 
 def test_parse_CMTSOLUTIONS_file(tmpdir):
@@ -119,6 +120,15 @@ def test_parse_srf_file():
             -3.91886976e+03, 3.91886976e+03, -1.19980783e-13, 1.95943488e+03,
             3.20000000e+19])
         np.testing.assert_allclose(src_params, src_params_ref)
+
+
+def test_parse_usgs_param_file():
+    """
+    Tests parsing from a .param file.
+    """
+    finitesource = FiniteSource.from_usgs_param_file(USGS_PARAM_FILE)
+    np.testing.assert_almost_equal(finitesource.moment_magnitude,
+                                   7.9374427577095901)
 
 
 def test_resample_stf():
