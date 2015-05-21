@@ -48,6 +48,39 @@ def _purge_duplicates(f):
     return wrapper
 
 
+def asymmetric_cosine(trise, tfall=None, npts=10000, dt=0.1):
+    """
+    Initialize a source time function with asymmetric cosine, normalized to 1
+
+    :param trise: rise time
+    :type trise: float
+    :param tfall: fall time, defaults to trise
+    :type trise: float, optional
+    :param npts: number of samples
+    :type npts: int, optional
+    :param dt: sample interval
+    :type dt: float, optional
+    """
+    # initialize
+    if not tfall:
+        tfall = trise
+    t = np.linspace(0, npts * dt, npts, endpoint=False)
+    asc = np.zeros(npts)
+
+    # build slices
+    slrise = (t <= trise)
+    slfall = np.logical_and(t > trise, t <= trise + tfall)
+
+    # compute stf
+    asc[slrise] = (1. - np.cos(np.pi * t[slrise] / trise))
+    asc[slfall] = (1. - np.cos(np.pi * (t[slfall] - trise + tfall) / tfall))
+
+    # normalize
+    asc /= trise + tfall
+
+    return asc
+
+
 class SourceOrReceiver(object):
     def __init__(self, latitude, longitude, depth_in_m):
         self.latitude = float(latitude)
@@ -855,7 +888,9 @@ class FiniteSource(object):
         (.srf) file
 
         :param filename: path to the .srf file
+        :type filename: str
         :param normalize: normalize the sliprate to 1
+        :type normalize: bool, optional
 
         >>> import instaseis
         >>> source = instaseis.FiniteSource.from_srf_file("filename.srf")
@@ -935,12 +970,21 @@ class FiniteSource(object):
             return self(pointsources=sources)
 
     @classmethod
-    def from_usgs_param_file(self, filename):
+    def from_usgs_param_file(self, filename, npts=10000, dt=0.1):
         """
         Initialize a finite source object from a (.param) file available from
         the USGS website
 
         :param filename: path to the .param file
+        :type filename: str
+        :param npts: number of samples for the source time functions. Should be
+                     enough to accomodate long rise times plus optional filter
+                     responses.
+        :type npts: int, optional
+        :param dt: sample interval for the source time functions. Needs to be
+                   small enough to sample short rise times and can then be low
+                   pass filtered and downsampled before extracting seismograms.
+        :type dt: float, optional
 
         >>> import instaseis
         >>> source = instaseis.FiniteSource.from_srf_file("filename.param")
@@ -981,17 +1025,18 @@ class FiniteSource(object):
                         break
 
                     # Lat. Lon. depth slip rake strike dip t_rup t_ris t_fal mo
-                    (lat, lon, dep, slip, rake, stk, dip, tinit, trise, tfal,
+                    (lat, lon, dep, slip, rake, stk, dip, tinit, trise, tfall,
                         M0) = map(float, line.split())
 
                     dep *= 1e3    # km > m
                     slip *= 1e-2  # cm > m
                     M0 *= 1e-7    # dyn / cm > N * m
 
+                    stf = asymmetric_cosine(trise, tfall, npts, dt)
                     sources.append(
-                        Source.from_strike_dip_rake(lat, lon, dep, stk, dip,
-                                                    rake, M0,
-                                                    time_shift=tinit))
+                        Source.from_strike_dip_rake(
+                            lat, lon, dep, stk, dip, rake, M0,
+                            time_shift=tinit, sliprate=stf, dt=dt))
 
             return self(pointsources=sources)
 
