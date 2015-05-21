@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>instaseis.source &mdash; instaseis 0.0.1a-112-g75f1 documentation</title>
+    <title>instaseis.source &mdash; instaseis 0.0.1a-113-gd907 documentation</title>
     
     <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.0.1a-112-g75f1',
+        VERSION:     '0.0.1a-113-gd907',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -31,7 +31,7 @@
     <script type="text/javascript" src="../../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../../_static/bootstrap-3.2.0/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../../_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.0.1a-112-g75f1 documentation" href="../../index.html" />
+    <link rel="top" title="instaseis 0.0.1a-113-gd907 documentation" href="../../index.html" />
     <link rel="up" title="instaseis" href="../instaseis.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-112-g75f1</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-113-gd907</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -1072,28 +1072,33 @@
             <span class="c"># number of segments</span>
             <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
             <span class="n">nseg</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">nseg</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;parsing for USGS .param files only &quot;</span>
-                                 <span class="s">&quot;implemented for single fault segments&quot;</span><span class="p">)</span>
-
-            <span class="c"># got to point source segment</span>
-            <span class="k">while</span> <span class="s">&#39;#Lat. Lon. depth&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
-                <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
-
             <span class="n">sources</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="c"># loop over remaining lines</span>
-            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
-                <span class="c"># Lat. Lon. depth slip rake strike dip t_rup t_ris t_fal mo</span>
-                <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">dep</span><span class="p">,</span> <span class="n">slip</span><span class="p">,</span> <span class="n">rake</span><span class="p">,</span> <span class="n">stk</span><span class="p">,</span> <span class="n">dip</span><span class="p">,</span> <span class="n">tinit</span><span class="p">,</span> <span class="n">trise</span><span class="p">,</span> <span class="n">tfal</span><span class="p">,</span> <span class="n">M0</span> <span class="o">=</span> \
-                    <span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
 
-                <span class="n">dep</span> <span class="o">*=</span> <span class="mf">1e3</span>    <span class="c"># km &gt; m</span>
-                <span class="n">slip</span> <span class="o">*=</span> <span class="mf">1e-2</span>  <span class="c"># cm &gt; m</span>
-                <span class="n">M0</span> <span class="o">*=</span> <span class="mf">1e-7</span>    <span class="c"># dyn / cm &gt; N * m</span>
+            <span class="c"># parse all segments</span>
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nseg</span><span class="p">):</span>
 
-                <span class="n">sources</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                    <span class="n">Source</span><span class="o">.</span><span class="n">from_strike_dip_rake</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">dep</span><span class="p">,</span> <span class="n">stk</span><span class="p">,</span> <span class="n">dip</span><span class="p">,</span> <span class="n">rake</span><span class="p">,</span>
-                                                <span class="n">M0</span><span class="p">,</span> <span class="n">time_shift</span><span class="o">=</span><span class="n">tinit</span><span class="p">))</span>
+                <span class="c"># got to point source segment</span>
+                <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="s">&#39;#Lat. Lon. depth&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                        <span class="k">break</span>
+
+                <span class="c"># read all point sources until reaching next segment</span>
+                <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="s">&#39;#Fault_segment&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                        <span class="k">break</span>
+
+                    <span class="c"># Lat. Lon. depth slip rake strike dip t_rup t_ris t_fal mo</span>
+                    <span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">dep</span><span class="p">,</span> <span class="n">slip</span><span class="p">,</span> <span class="n">rake</span><span class="p">,</span> <span class="n">stk</span><span class="p">,</span> <span class="n">dip</span><span class="p">,</span> <span class="n">tinit</span><span class="p">,</span> <span class="n">trise</span><span class="p">,</span> <span class="n">tfal</span><span class="p">,</span>
+                        <span class="n">M0</span><span class="p">)</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+
+                    <span class="n">dep</span> <span class="o">*=</span> <span class="mf">1e3</span>    <span class="c"># km &gt; m</span>
+                    <span class="n">slip</span> <span class="o">*=</span> <span class="mf">1e-2</span>  <span class="c"># cm &gt; m</span>
+                    <span class="n">M0</span> <span class="o">*=</span> <span class="mf">1e-7</span>    <span class="c"># dyn / cm &gt; N * m</span>
+
+                    <span class="n">sources</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="n">Source</span><span class="o">.</span><span class="n">from_strike_dip_rake</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">dep</span><span class="p">,</span> <span class="n">stk</span><span class="p">,</span> <span class="n">dip</span><span class="p">,</span>
+                                                    <span class="n">rake</span><span class="p">,</span> <span class="n">M0</span><span class="p">,</span>
+                                                    <span class="n">time_shift</span><span class="o">=</span><span class="n">tinit</span><span class="p">))</span>
 
             <span class="k">return</span> <span class="bp">self</span><span class="p">(</span><span class="n">pointsources</span><span class="o">=</span><span class="n">sources</span><span class="p">)</span>
 </div>
