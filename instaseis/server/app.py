@@ -11,6 +11,7 @@ Server offering a REST API for Instaseis.
 """
 import copy
 import io
+import logging
 import numpy as np
 import obspy
 import tornado.ioloop
@@ -456,8 +457,16 @@ application = tornado.web.Application([
 
 
 def launch_io_loop(db_path, port, buffer_size_in_mb):
+    # Get tornado application log.
+    app_log = logging.getLogger("tornado.application")
+
     application.db = InstaseisDB(db_path=db_path,
                                  buffer_size_in_mb=buffer_size_in_mb)
+
+    # Log the database information.
+    app_log.info("Successfully opened DB")
+    app_log.info(str(application.db))
+
     print(application.db)
     application.listen(port)
     tornado.ioloop.IOLoop.instance().start()
