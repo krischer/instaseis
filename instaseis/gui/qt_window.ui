@@ -888,7 +888,7 @@
               <item>
                <widget class="QPushButton" name="open_srf_file_button">
                 <property name="text">
-                 <string>Open *.srf</string>
+                 <string>open finite source from file (*.srf, *.param)</string>
                 </property>
                </widget>
               </item>

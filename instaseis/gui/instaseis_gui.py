@@ -524,12 +524,21 @@ class Window(QtGui.QMainWindow):
 
     def on_open_srf_file_button_released(self):
         pwd = os.getcwd()
-        self.srf_file = str(QtGui.QFileDialog.getOpenFileName(
-            self, "Choose *.srf File", pwd))
-        if not self.srf_file:
+        self.finite_src_file = str(QtGui.QFileDialog.getOpenFileName(
+            self, "Choose *.srf or *.param File", pwd,
+            "Standard Rupture Format (*.srf);;"
+            "USGS finite source files (*.param)"))
+        if not self.finite_src_file:
             return
-        self.finite_source = FiniteSource.from_srf_file(
-            self.srf_file, normalize=True)
+        if self.finite_src_file.endswith('.srf'):
+            self.finite_source = FiniteSource.from_srf_file(
+                self.finite_src_file, normalize=True)
+        elif self.finite_src_file.endswith('.param'):
+            self.finite_source = FiniteSource.from_usgs_param_file(
+                self.finite_src_file)
+        else:
+            raise IOError('unknown file type *.%s' %
+                          self.finite_src_file.split('.')[-1])
 
         self._setup_finite_source()
         self.update()
