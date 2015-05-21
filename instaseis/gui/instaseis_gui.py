@@ -199,6 +199,7 @@ class Window(QtGui.QMainWindow):
                            endpoint=False)
 
         ax.plot(time, self.finite_source.CMT.sliprate)
+        ax.set_xlim(0., self.finite_source.rupture_duration * 2.)
         fig.canvas.draw()
 
     def plot_map(self):
