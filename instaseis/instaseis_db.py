@@ -672,7 +672,7 @@ class InstaseisDB(BaseInstaseisDB):
             stf=self.parsed_mesh.stf_kind,
             src_shift=float(self.parsed_mesh.source_shift),
             src_shift_samples=int(self.parsed_mesh.source_shift_samp),
-            slip=self.parsed_mesh.stf,
+            slip=self.parsed_mesh.stf_norm,
             sliprate=self.parsed_mesh.stf_d_norm,
             spatial_order=int(self.parsed_mesh.npol),
             min_radius=float(self.parsed_mesh.kwf_rmin),

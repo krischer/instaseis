@@ -153,7 +153,8 @@ class Mesh(object):
         self.stf_d = self.f.groups["Surface"].variables["stf_d_dump"][:]
         self.stf = self.f.groups["Surface"].variables["stf_dump"][:]
 
-        self.stf_d_norm = self.stf_d / np.trapz(self.stf_d, dx=self.dt)
+        self.stf_d_norm = self.stf_d / self.amplitude
+        self.stf_norm = self.stf / self.amplitude
 
         self.npoints = self.f.npoints
 
