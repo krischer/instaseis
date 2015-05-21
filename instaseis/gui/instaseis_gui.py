@@ -549,13 +549,17 @@ class Window(QtGui.QMainWindow):
         if self.finite_source is None:
             return
         if self.instaseis_db is not None:
+            # this is a super uggly construction: if you open a different DB, it will not
+            # use the original finite source, but the one already messed up for the
+            # previously used DB. Not fixing it here, but in the new GUI we should.
+
             # self.finite_source.set_sliprate_lp(
             #     dt=self.instaseis_db.info.dt,
             # nsamp=self.instaseis_db.info.npts,
             #     freq=1.0/self.instaseis_db.info.period)
 
             nsamp = int(self.instaseis_db.info.period /
-                        self.finite_source[0].dt) * 5
+                        self.finite_source[0].dt) * 50
             self.finite_source.resample_sliprate(
                 dt=self.finite_source[0].dt, nsamp=nsamp)
             self.finite_source.lp_sliprate(
