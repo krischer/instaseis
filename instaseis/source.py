@@ -970,7 +970,7 @@ class FiniteSource(object):
             return self(pointsources=sources)
 
     @classmethod
-    def from_usgs_param_file(self, filename, npts=10000, dt=0.1):
+    def from_usgs_param_file(self, filename, npts=10000, dt=0.1, trise_min=1.):
         """
         Initialize a finite source object from a (.param) file available from
         the USGS website
@@ -985,6 +985,11 @@ class FiniteSource(object):
                    small enough to sample short rise times and can then be low
                    pass filtered and downsampled before extracting seismograms.
         :type dt: float, optional
+        :param trise_min: minimum rise time. If rise time or fall time is
+                          smaller than this value, it is replaced by the
+                          minimum value. Mostly meant to handle zero rise times
+                          in some USGS files.
+        :type trise_min: float, optional
 
         >>> import instaseis
         >>> source = instaseis.FiniteSource.from_srf_file("filename.param")
@@ -1031,6 +1036,12 @@ class FiniteSource(object):
                     dep *= 1e3    # km > m
                     slip *= 1e-2  # cm > m
                     M0 *= 1e-7    # dyn / cm > N * m
+
+                    if trise < trise_min:
+                        trise = trise_min
+
+                    if tfall < trise_min:
+                        tfall = trise_min
 
                     stf = asymmetric_cosine(trise, tfall, npts, dt)
                     sources.append(
