@@ -965,28 +965,33 @@ class FiniteSource(object):
             # number of segments
             line = f.readline()
             nseg = int(line.split()[-1])
-            if not nseg == 1:
-                raise ValueError("parsing for USGS .param files only "
-                                 "implemented for single fault segments")
-
-            # got to point source segment
-            while '#Lat. Lon. depth' not in line:
-                line = f.readline()
-
             sources = []
-            # loop over remaining lines
-            for line in f:
-                # Lat. Lon. depth slip rake strike dip t_rup t_ris t_fal mo
-                lat, lon, dep, slip, rake, stk, dip, tinit, trise, tfal, M0 = \
-                    map(float, line.split())
 
-                dep *= 1e3    # km > m
-                slip *= 1e-2  # cm > m
-                M0 *= 1e-7    # dyn / cm > N * m
+            # parse all segments
+            for _ in range(nseg):
 
-                sources.append(
-                    Source.from_strike_dip_rake(lat, lon, dep, stk, dip, rake,
-                                                M0, time_shift=tinit))
+                # got to point source segment
+                for line in f:
+                    if '#Lat. Lon. depth' in line:
+                        break
+
+                # read all point sources until reaching next segment
+                for line in f:
+                    if '#Fault_segment' in line:
+                        break
+
+                    # Lat. Lon. depth slip rake strike dip t_rup t_ris t_fal mo
+                    (lat, lon, dep, slip, rake, stk, dip, tinit, trise, tfal,
+                        M0) = map(float, line.split())
+
+                    dep *= 1e3    # km > m
+                    slip *= 1e-2  # cm > m
+                    M0 *= 1e-7    # dyn / cm > N * m
+
+                    sources.append(
+                        Source.from_strike_dip_rake(lat, lon, dep, stk, dip,
+                                                    rake, M0,
+                                                    time_shift=tinit))
 
             return self(pointsources=sources)
 
