@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Sources and Receivers &mdash; instaseis 0.0.1a-106-g3511 documentation</title>
+    <title>Sources and Receivers &mdash; instaseis 0.0.1a-112-g75f1 documentation</title>
     
     <link rel="stylesheet" href="_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.0.1a-106-g3511',
+        VERSION:     '0.0.1a-112-g75f1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -31,7 +31,7 @@
     <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="_static/bootstrap-3.2.0/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.0.1a-106-g3511 documentation" href="index.html" />
+    <link rel="top" title="instaseis 0.0.1a-112-g75f1 documentation" href="index.html" />
     <link rel="prev" title="Instaseis Server" href="server.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-106-g3511</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-112-g75f1</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -604,6 +604,41 @@ smallest timeshift</p>
 </table>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">instaseis</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">source</span> <span class="o">=</span> <span class="n">instaseis</span><span class="o">.</span><span class="n">FiniteSource</span><span class="o">.</span><span class="n">from_srf_file</span><span class="p">(</span><span class="s">&quot;filename.srf&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+<span class="go">Instaseis Finite Source:</span>
+<span class="go">    Moment Magnitude     : 7.09</span>
+<span class="go">    scalar Moment        : 6.67e+20 Nm</span>
+<span class="go">    #point sources       : 117414</span>
+<span class="go">    rupture duration     :  131.5 s</span>
+<span class="go">    time shift           :    0.7 s</span>
+<span class="go">    min depth            :   24.3 m</span>
+<span class="go">    max depth            : 18170.8 m</span>
+<span class="go">    hypocenter depth     : 18170.8 m</span>
+<span class="go">    min latitude         :   23.3 deg</span>
+<span class="go">    max latitude         :   24.7 deg</span>
+<span class="go">    hypocenter latitude  :   23.3 deg</span>
+<span class="go">    min longitude        : -148.5 deg</span>
+<span class="go">    max longitude        : -145.7 deg</span>
+<span class="go">    hypocenter longitude : -145.7 deg</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="instaseis.source.FiniteSource.from_usgs_param_file">
+<em class="property">classmethod </em><code class="descname">from_usgs_param_file</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/source.html#FiniteSource.from_usgs_param_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.FiniteSource.from_usgs_param_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize a finite source object from a (.param) file available from
+the USGS website</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filename</strong> &#8211; path to the .param file</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">instaseis</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span> <span class="o">=</span> <span class="n">instaseis</span><span class="o">.</span><span class="n">FiniteSource</span><span class="o">.</span><span class="n">from_srf_file</span><span class="p">(</span><span class="s">&quot;filename.param&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
 <span class="go">Instaseis Finite Source:</span>
 <span class="go">    Moment Magnitude     : 7.09</span>
