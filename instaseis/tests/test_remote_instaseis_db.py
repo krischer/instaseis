@@ -60,7 +60,7 @@ def _compare_streams(r_db, l_db, kwargs):
         # Very small values have issues with floating point accuracy. 7
         # orders of magnitude should be more than accurate enough.
         np.testing.assert_allclose(r_tr.data, l_tr.data,
-                                   atol=1E-7 * r_tr.data.ptp())
+                                   atol=1E-6 * r_tr.data.ptp())
 
 
 @responses.activate
