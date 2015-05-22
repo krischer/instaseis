@@ -145,6 +145,30 @@ but it will depend on your specific system and if you face performance
 issues it is a potential solution.
 
 
+Logging
+=======
+
+The Instaseis server starting script
+
+.. code-block:: bash
+
+    $ python -m instaseis.server
+
+offers basic functionality to log to standard out. By default it logs at the
+``INFO`` level. The ``--quiet`` flag can be given to deactivate all logging
+output and the ``--log-level`` argument modifies said level. Please read up on
+`Python logging <https://docs.python.org/3.4/library/logging.html>`_ for more
+details.
+
+The Instaseis server is based on the `Tornado <http://www.tornadoweb.org/>`_
+framework, an asynchronous Python web server. To customize logging, read `this
+<http://tornado.readthedocs.org/en/latest/log.html>`_ document, use
+`this source code file
+<https://github.com/krischer/instaseis/tree/master/instaseis/server/__main__.py>`_
+as a template for your custom server starting script, and modify however you
+see fit.
+
+
 REST-like API Documentation
 ===========================
 
