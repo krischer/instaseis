@@ -456,17 +456,33 @@ application = tornado.web.Application([
 ])
 
 
-def launch_io_loop(db_path, port, buffer_size_in_mb):
-    # Get tornado application log.
-    app_log = logging.getLogger("tornado.application")
-
+def launch_io_loop(db_path, port, buffer_size_in_mb, quiet, log_level):
     application.db = InstaseisDB(db_path=db_path,
                                  buffer_size_in_mb=buffer_size_in_mb)
 
-    # Log the database information.
-    app_log.info("Successfully opened DB")
-    app_log.info(str(application.db))
+    if not quiet:
+        # Get all tornado loggers.
+        access_log = logging.getLogger("tornado.access")
+        app_log = logging.getLogger("tornado.application")
+        gen_log = logging.getLogger("tornado.general")
+        loggers = (access_log, app_log, gen_log)
 
-    print(application.db)
+        # Console log handler.
+        ch = logging.StreamHandler()
+        # Add formatter
+        FORMAT = "[%(asctime)s] - %(name)s - %(levelname)s: %(message)s"
+        formatter = logging.Formatter(FORMAT)
+        ch.setFormatter(formatter)
+
+        log_level = getattr(logging, log_level)
+
+        for logger in loggers:
+            logger.addHandler(ch)
+            logger.setLevel(log_level)
+
+        # Log the database information.
+        app_log.info("Successfully opened DB")
+        app_log.info(str(application.db))
+
     application.listen(port)
     tornado.ioloop.IOLoop.instance().start()
