@@ -163,3 +163,26 @@ def test_rotate_vector_xyz_earth_to_xyz_src():
     w = rotations.rotate_vector_xyz_earth_to_xyz_src(v, phi, theta)
     wref = np.array([-3., -1., 2.])
     np.testing.assert_allclose(wref, w, atol=1e-10)
+
+
+def test_rotate_vector_xyz_src_to_xyz_earth():
+    # identity
+    v = np.array([1., 2., 3.])
+    phi1 = np.radians(20.)
+    theta1 = np.radians(30.)
+    phi2, theta2 = phi1, theta1
+    w = rotations.rotate_vector_xyz_src_to_xyz_rec(
+        v, phi1, theta1, phi2, theta2)
+    wref = v.copy()
+    np.testing.assert_allclose(wref, w, atol=1e-10)
+
+    # theta1 = 0, phi1 = 90, theta2 = 0, phi2 = -90
+    v = np.array([1., 2., 3.])
+    phi1 = np.radians(90.0)
+    theta1 = np.radians(0.0)
+    phi2 = np.radians(-90.0)
+    theta2 = np.radians(0.0)
+    w = rotations.rotate_vector_xyz_src_to_xyz_rec(
+        v, phi1, theta1, phi2, theta2)
+    wref = np.array([-1., -2., 3.])
+    np.testing.assert_allclose(wref, w, atol=1e-10)
