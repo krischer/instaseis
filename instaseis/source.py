@@ -1141,14 +1141,14 @@ class FiniteSource(object):
         """
         raise NotImplementedError
 
-        sources = []
-        nsources = nl * nw
+        # sources = []
+        # nsources = nl * nw
 
-        x0 = planet_radius * np.cos(latitude) * np.cos(longitude)
-        y0 = planet_radius * np.cos(latitude) * np.sin(longitude)
-        z0 = planet_radius * np.sin(latitude)
+        # x0 = planet_radius * np.cos(latitude) * np.cos(longitude)
+        # y0 = planet_radius * np.cos(latitude) * np.sin(longitude)
+        # z0 = planet_radius * np.sin(latitude)
 
-        pass
+        # pass
 
     def resample_sliprate(self, dt, nsamp):
         """

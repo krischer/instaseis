@@ -165,7 +165,7 @@ def test_rotate_vector_xyz_earth_to_xyz_src():
     np.testing.assert_allclose(wref, w, atol=1e-10)
 
 
-def test_rotate_vector_xyz_src_to_xyz_earth():
+def test_rotate_vector_xyz_src_to_xyz_rec():
     # identity
     v = np.array([1., 2., 3.])
     phi1 = np.radians(20.)
