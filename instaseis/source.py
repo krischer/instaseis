@@ -72,6 +72,47 @@ def magnitude2moment(Mw):
     return 10.0 ** ((Mw + 6.0) / 2.0 * 3.0)
 
 
+def fault_vectors_lmn(strike, dip, rake):
+    """
+    compute vectors l, m = n x l and n describing the fault according to Udias
+    Fig. 16.19
+
+    :param strike: strike of the fault measured from North
+    :type strike: float
+    :param dip: dip of the fault measured from horizontal
+    :type dip: float
+    :param rake: rake of the fault measured from horizontal
+    :type rake: float
+    :return (l, m, n): vectors l, m = n x l and n
+    :type (l, m, n): tuple of numpy arrays
+    """
+    phi = np.deg2rad(strike)
+    delta = np.deg2rad(dip)
+    lambd = np.deg2rad(rake)
+
+    l = np.empty(3)
+    m = np.empty(3)
+    n = np.empty(3)
+
+    l[0] = np.cos(lambd) * np.cos(phi) \
+        + np.cos(delta) * np.sin(lambd) * np.sin(phi)
+    l[1] = np.cos(lambd) * np.sin(phi) \
+        - np.cos(delta) * np.sin(lambd) * np.cos(phi)
+    l[2] = - np.sin(delta) * np.sin(lambd)
+
+    m[0] = - np.sin(lambd) * np.cos(phi) \
+        + np.cos(delta) * np.cos(lambd) * np.sin(phi)
+    m[1] = - np.sin(lambd) * np.sin(phi) \
+        - np.cos(delta) * np.cos(lambd) * np.cos(phi)
+    m[2] = - np.sin(delta) * np.cos(lambd)
+
+    n[0] = - np.sin(delta) * np.sin(phi)
+    n[1] = np.sin(delta) * np.cos(phi)
+    n[2] = - np.cos(delta)
+
+    return l, m, n
+
+
 def asymmetric_cosine(trise, tfall=None, npts=10000, dt=0.1):
     """
     Initialize a source time function with asymmetric cosine, normalized to 1
@@ -1077,8 +1118,36 @@ class FiniteSource(object):
 
     @classmethod
     def from_Haskell(self, latitude, longitude, depth_in_m, strike, dip, rake,
-                     M0, sliprate=None, dt=None,
+                     M0, fault_length, fault_width, rupture_velocity, nl=100,
+                     nw=1, trise=1., dt=None, planet_radius=6371e3,
                      origin_time=obspy.UTCDateTime(0)):
+        """
+        Initialize a source object from a shear source parameterized by strike,
+        dip and rake.
+
+        :param latitude: latitude of the source centroid in degree
+        :param longitude: longitude of the source centroid in degree
+        :param depth_in_m: source centroid depth in m
+        :param strike: strike of the fault in degree
+        :param dip: dip of the fault in degree
+        :param rake: rake of the fault in degree
+        :param M0: scalar moment
+        :param fault_length: fault length in m
+        :param fault_width: fault width in m
+        :param nl: number of point sources along strike direction
+        :param nw: number of point sources perpendicular strike direction
+        :param dt: sampling of the source time function
+        :param origin_time: The origin time of the first patch breaking.
+        """
+        raise NotImplementedError
+
+        sources = []
+        nsources = nl * nw
+
+        x0 = planet_radius * np.cos(latitude) * np.cos(longitude)
+        y0 = planet_radius * np.cos(latitude) * np.sin(longitude)
+        z0 = planet_radius * np.sin(latitude)
+
         pass
 
     def resample_sliprate(self, dt, nsamp):

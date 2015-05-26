@@ -17,6 +17,7 @@ import numpy as np
 
 from instaseis import Source, FiniteSource
 from instaseis.source import moment2magnitude, magnitude2moment
+from instaseis.source import fault_vectors_lmn
 
 DATA = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 EVENT_FILE = os.path.join(DATA, "GCMT_event_STRAIT_OF_GIBRALTAR.xml")
@@ -236,3 +237,26 @@ def test_CMT_finite_source():
                                np.array([0.0]))
     np.testing.assert_allclose(np.array([finitesource.CMT.longitude]),
                                np.array([4.496608]))
+
+
+def test_fault_vectors_lmn():
+    """
+    Tests computation of fault vectors l, m and n
+    """
+    strike, dip, rake = 35., 70., 17.
+    l, m, n = fault_vectors_lmn(strike, dip, rake)
+
+    # vectors should be perpendicular
+    np.testing.assert_allclose(np.array([np.dot(l, n)]),
+                               np.array([0.0]), atol=1e-15)
+    np.testing.assert_allclose(np.array([np.dot(l, m)]),
+                               np.array([0.0]), atol=1e-15)
+    np.testing.assert_allclose(np.array([np.dot(m, n)]),
+                               np.array([0.0]), atol=1e-15)
+
+    np.testing.assert_allclose(np.cross(n, l), m, atol=1e-15)
+
+    # vectors should be normalized
+    np.testing.assert_allclose(np.array([1.0]), (l**2).sum())
+    np.testing.assert_allclose(np.array([1.0]), (m**2).sum())
+    np.testing.assert_allclose(np.array([1.0]), (n**2).sum())
