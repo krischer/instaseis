@@ -48,6 +48,30 @@ def _purge_duplicates(f):
     return wrapper
 
 
+def moment2magnitude(M0):
+    """
+    Convert seismic moment M0 to moment magnitude Mw
+
+    :param M0: seismic moment in Nm
+    :type M0: float
+    :return Mw: moment magnitude
+    :type Mw: float
+    """
+    return 2.0 / 3.0 * np.log10(M0) - 6.0
+
+
+def magnitude2moment(Mw):
+    """
+    Convert moment magnitude Mw to seismic moment M0
+
+    :param Mw: moment magnitude
+    :type Mw: float
+    :return M0: seismic moment in Nm
+    :type M0: float
+    """
+    return 10.0 ** ((Mw + 6.0) / 2.0 * 3.0)
+
+
 def asymmetric_cosine(trise, tfall=None, npts=10000, dt=0.1):
     """
     Initialize a source time function with asymmetric cosine, normalized to 1
@@ -458,7 +482,7 @@ class Source(SourceOrReceiver):
         """
         Moment magnitude M_w
         """
-        return 2.0 / 3.0 * np.log10(self.M0) - 6.0
+        return moment2magnitude(self.M0)
 
     @property
     def tensor(self):
@@ -1051,6 +1075,12 @@ class FiniteSource(object):
 
             return self(pointsources=sources)
 
+    @classmethod
+    def from_Haskell(self, latitude, longitude, depth_in_m, strike, dip, rake,
+                     M0, sliprate=None, dt=None,
+                     origin_time=obspy.UTCDateTime(0)):
+        pass
+
     def resample_sliprate(self, dt, nsamp):
         """
         For convolution, the sliprate is needed at the sampling of the fields
@@ -1172,7 +1202,7 @@ class FiniteSource(object):
         """
         Moment magnitude M_w
         """
-        return 2.0 / 3.0 * np.log10(self.M0) - 6.0
+        return moment2magnitude(self.M0)
 
     @property
     def min_depth_in_m(self):

@@ -16,6 +16,7 @@ import os
 import numpy as np
 
 from instaseis import Source, FiniteSource
+from instaseis.source import moment2magnitude, magnitude2moment
 
 DATA = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 EVENT_FILE = os.path.join(DATA, "GCMT_event_STRAIT_OF_GIBRALTAR.xml")
@@ -196,6 +197,17 @@ def test_M0():
     source = Source.from_strike_dip_rake(0., 0., 0., strike, dip, rake, M0)
 
     assert source.M0 == M0
+
+
+def test_moment2magnitude():
+    """
+    Tests computation of magnitude
+    """
+    M0 = 1e22
+    Mw = moment2magnitude(M0)
+    M0_calc = magnitude2moment(Mw)
+
+    assert M0_calc == M0
 
 
 def test_M0_finite_source():
