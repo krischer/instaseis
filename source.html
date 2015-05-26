@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Sources and Receivers &mdash; instaseis 0.0.1a-124-ga882 documentation</title>
+    <title>Sources and Receivers &mdash; instaseis 0.0.1a-128-g5d4d documentation</title>
     
     <link rel="stylesheet" href="_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.0.1a-124-ga882',
+        VERSION:     '0.0.1a-128-g5d4d',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -31,7 +31,7 @@
     <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="_static/bootstrap-3.2.0/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.0.1a-124-ga882 documentation" href="index.html" />
+    <link rel="top" title="instaseis 0.0.1a-128-g5d4d documentation" href="index.html" />
     <link rel="prev" title="Instaseis Server" href="server.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-124-ga882</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-128-g5d4d</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -583,6 +583,36 @@ weihted by their scalar moment</p>
 <code class="descname">find_hypocenter</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/source.html#FiniteSource.find_hypocenter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.FiniteSource.find_hypocenter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Finds the hypo- and epicenter based on the point source that has the
 smallest timeshift</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="instaseis.source.FiniteSource.from_Haskell">
+<em class="property">classmethod </em><code class="descname">from_Haskell</code><span class="sig-paren">(</span><em>latitude</em>, <em>longitude</em>, <em>depth_in_m</em>, <em>strike</em>, <em>dip</em>, <em>rake</em>, <em>M0</em>, <em>fault_length</em>, <em>fault_width</em>, <em>rupture_velocity</em>, <em>nl=100</em>, <em>nw=1</em>, <em>trise=1.0</em>, <em>dt=None</em>, <em>planet_radius=6371000.0</em>, <em>origin_time=UTCDateTime(1970</em>, <em>1</em>, <em>1</em>, <em>0</em>, <em>0)</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/source.html#FiniteSource.from_Haskell"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.FiniteSource.from_Haskell" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize a source object from a shear source parameterized by strike,
+dip and rake.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>latitude</strong> &#8211; latitude of the source centroid in degree</li>
+<li><strong>longitude</strong> &#8211; longitude of the source centroid in degree</li>
+<li><strong>depth_in_m</strong> &#8211; source centroid depth in m</li>
+<li><strong>strike</strong> &#8211; strike of the fault in degree</li>
+<li><strong>dip</strong> &#8211; dip of the fault in degree</li>
+<li><strong>rake</strong> &#8211; rake of the fault in degree</li>
+<li><strong>M0</strong> &#8211; scalar moment</li>
+<li><strong>fault_length</strong> &#8211; fault length in m</li>
+<li><strong>fault_width</strong> &#8211; fault width in m</li>
+<li><strong>nl</strong> &#8211; number of point sources along strike direction</li>
+<li><strong>nw</strong> &#8211; number of point sources perpendicular strike direction</li>
+<li><strong>dt</strong> &#8211; sampling of the source time function</li>
+<li><strong>origin_time</strong> &#8211; The origin time of the first patch breaking.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="classmethod">
