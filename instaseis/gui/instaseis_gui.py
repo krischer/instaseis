@@ -753,8 +753,7 @@ class Window(QtGui.QMainWindow):
                         min(self.tts, key=lambda x: abs(x.time - tt))
                     tooltipstr = 'Mouse at %6.2f s, closest phase = %s, ' \
                         'arriving at %6.2f s' % \
-                        (tt, closest_phase.name,
-                         closest_phase.time)
+                        (tt, closest_phase.name, closest_phase.time)
                 except:
                     tooltipstr = ''
 
