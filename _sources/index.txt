@@ -78,7 +78,7 @@ shared Fortran librarys - pull requests are welcome.
 * ``gfortran >= 4.7``
 * ``Python 2.6, 2.7, 3.3, or 3.4``
 * ``NumPy >= 1.7``
-* ``ObsPy >= 0.9.2`` *(only the ObsPy master currently supports Python 3)*
+* ``ObsPy >= 0.10.2``
 * ``netCDF4 >= 4.3`` including Python bindings (``>= 1.1``)
 * ``future``
 * ``requests``
@@ -126,8 +126,8 @@ Anaconda).
 
 .. code-block:: bash
 
-    $ conda install netcdf4 future requests tornado flake8 pytest mock basemap pyqt pip
-    $ pip install obspy responses pyqtgraph
+    $ conda install -c obspy obspy netcdf4 future requests tornado flake8 pytest mock basemap pyqt pip
+    $ pip install responses pyqtgraph
 
 A possible complication arises **if you are running on a server without a
 display**. In that case please edit (on Linux)
