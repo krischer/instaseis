@@ -73,8 +73,8 @@ def rotate_symm_tensor_voigt_xyz_earth_to_xyz_src(mt, phi, theta):
 def rotate_symm_tensor_voigt_xyz_src_to_xyz_earth(mt, phi, theta):
     """
     rotates a tensor from a cartesian system xyz with z axis aligned with the
-    north pole to a cartesian system x,y,z where z is aligned with the source /
-    receiver
+    source / receiver to a cartesian system x,y,z where z is aligned with the
+    north pole
 
     input symmetric tensor in voigt notation:
     A = {{a1, a6, a5}, {a6, a2, a4}, {a5, a4, a3}};
@@ -186,3 +186,39 @@ def rotate_vector_xyz_src_to_xyz_rec(vec, srclon, srccolat, reclon, reccolat):
     rotmat = rotate_vector_xyz_earth_to_xyz_src(rotmat, reclon, reccolat)
 
     return np.dot(rotmat, vec)
+
+
+def coord_transform_lat_lon_depth_to_xyz(latitude, longitude, depth_in_m,
+                                         planet_radius=6371e3):
+    """
+    Tansform coordinates from latitude, longitude, depth to global cartesian
+    coordinates with z aligned with northpole
+    """
+    longitude_rad = np.radians(longitude)
+    latitude_rad = np.radians(latitude)
+
+    xyz = np.empty(3)
+    xyz[0] = (planet_radius - depth_in_m) \
+        * np.cos(latitude_rad) * np.cos(longitude_rad)
+    xyz[1] = (planet_radius - depth_in_m) \
+        * np.cos(latitude_rad) * np.sin(longitude_rad)
+    xyz[2] = (planet_radius - depth_in_m) * np.sin(latitude_rad)
+
+    return xyz
+
+
+def coord_transform_xyz_to_lat_lon_depth(x, y, z, planet_radius=6371e3):
+    """
+    Tansform coordinates from global cartesian coordinates with z aligned with
+    northpole to latitude, longitude, depth
+    """
+
+    r = (x ** 2 + y ** 2 + z ** 2) ** 0.5
+    theta = np.arccos(z / r)
+    phi = np.arctan2(y, x)
+
+    longitude = np.rad2deg(phi)
+    latitude = 90. - np.rad2deg(theta)
+    depth_in_m = planet_radius - r
+
+    return latitude, longitude, depth_in_m
