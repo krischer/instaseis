@@ -126,8 +126,8 @@ Anaconda).
 
 .. code-block:: bash
 
-    $ conda install netcdf4 future requests tornado flake8 pytest mock basemap pyqt pip
-    $ pip install obspy responses pyqtgraph
+    $ conda install -c obspy obspy netcdf4 future requests tornado flake8 pytest mock basemap pyqt pip
+    $ pip install responses pyqtgraph
 
 A possible complication arises **if you are running on a server without a
 display**. In that case please edit (on Linux)
