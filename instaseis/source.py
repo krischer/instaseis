@@ -110,7 +110,48 @@ def fault_vectors_lmn(strike, dip, rake):
     n[1] = np.sin(delta) * np.cos(phi)
     n[2] = - np.cos(delta)
 
+    # Udias 16.99 - 16.104 is in geographic coordinates (North, East, Down),
+    # here we use geocentric, i.e. t,p,r
+
+    transform = np.array([-1., 1., -1.])
+    l *= transform
+    m *= transform
+    n *= transform
+
     return l, m, n
+
+
+def strike_dip_rake_from_ln(l, n):
+    """
+    compute strike, dip and rake from the fault vectors l and n
+    describing the fault according to Udias Fig. 16.19
+
+    :return (strike, dip, rake): strike, dip and rake
+    :type (strike, dip, rake): tuple of floats
+    """
+    l_norm = l / (l ** 2).sum()
+    n_norm = n / (n ** 2).sum()
+
+    delta = np.arccos(n_norm[2])
+    phi = np.arctan2(n_norm[0], n_norm[1])
+
+    # needs two different formulas, beqause the first is unstable for sip = 0
+    # and the second for dip = 90
+    if delta > 0.1:
+        lambd = np.arctan2(
+            l_norm[2], np.sin(delta) * (-l_norm[0] * np.cos(phi) +
+                                        l_norm[1] * np.sin(phi)))
+    else:
+        lambd = np.arctan2(
+            (-l_norm[0] * np.sin(phi) - l_norm[1] * np.cos(phi)),
+            np.cos(delta) * (-l_norm[0] * np.cos(phi) +
+                             l_norm[1] * np.sin(phi)))
+
+    strike = np.rad2deg(phi)
+    dip = np.rad2deg(delta)
+    rake = np.rad2deg(lambd)
+
+    return strike, dip, rake
 
 
 def asymmetric_cosine(trise, tfall=None, npts=10000, dt=0.1):
@@ -1134,21 +1175,71 @@ class FiniteSource(object):
         :param M0: scalar moment
         :param fault_length: fault length in m
         :param fault_width: fault width in m
+        :param rupture_velocity: rupture velocity in m / s. Use negative value
+            to propagate the rupture in negative rake direction.
         :param nl: number of point sources along strike direction
         :param nw: number of point sources perpendicular strike direction
         :param dt: sampling of the source time function
+        :param planet_radius: radius of the planet, default to Earth.
         :param origin_time: The origin time of the first patch breaking.
         """
-        raise NotImplementedError
+        # raise NotImplementedError
 
-        # sources = []
-        # nsources = nl * nw
+        sources = []
+        nsources = nl * nw
 
-        # x0 = planet_radius * np.cos(latitude) * np.cos(longitude)
-        # y0 = planet_radius * np.cos(latitude) * np.sin(longitude)
-        # z0 = planet_radius * np.sin(latitude)
+        colatitude = 90. - latitude
+        longitude_rad = np.radians(longitude)
+        latitude_rad = np.radians(latitude)
+        colatitude_rad = np.radians(colatitude)
 
-        # pass
+        # centroid in global cartesian coordinates
+        centroid_xyz = np.empty(3)
+        centroid_xyz[0] = (planet_radius - depth_in_m) \
+            * np.cos(latitude_rad) * np.cos(longitude_rad)
+        centroid_xyz[1] = (planet_radius - depth_in_m) \
+            * np.cos(latitude_rad) * np.sin(longitude_rad)
+        centroid_xyz[2] = (planet_radius - depth_in_m) * np.sin(latitude_rad)
+
+        # compute fault vectors and transform to global cartesian system
+        l_src, m_src, n_src = fault_vectors_lmn(strike, dip, rake)
+        l_xyz = rotations.rotate_vector_xyz_src_to_xyz_earth(
+            l_src, longitude_rad, colatitude_rad)
+        m_xyz = rotations.rotate_vector_xyz_src_to_xyz_earth(
+            m_src, longitude_rad, colatitude_rad)
+
+        # make a mesh centered on patch centers, xi1 and xi2 as defined by Aki
+        # and Richards, Fig 10.2
+        xi1, step = np.linspace(-.5 * fault_length, .5 * fault_length, nl,
+                                endpoint=False, retstep=True)
+        xi1 = xi1 + step / 2.
+
+        xi2, step = np.linspace(-.5 * fault_width, .5 * fault_width, nw,
+                                endpoint=False, retstep=True)
+        xi2 = xi2 + step / 2.
+
+        xi1_mesh, xi2_mesh = np.meshgrid(xi1, xi2)
+        xi1_mesh = xi1_mesh.flatten()
+        xi2_mesh = xi2_mesh.flatten()
+
+        # create point sources in
+        src_xyz = centroid_xyz.repeat(nsources).reshape((3, nsources)) \
+            + np.outer(l_xyz, xi1_mesh) + np.outer(m_xyz, xi2_mesh)
+
+        # make sure all points are inside the planet
+        depth = planet_radius - (src_xyz ** 2).sum(axis=0) ** .5
+        if np.any(depth < 0):
+            raise ValueError('some source points outside planet, '
+                             'maximum height in m: %f' % (-depth.min(),))
+
+        # compute time shifts as distance along xi1
+        time_shift = xi1_mesh / rupture_velocity
+        time_shift -= time_shift.min()
+
+        for i in np.arange(nsources):
+            sources.append()
+
+        return src_xyz, time_shift
 
     def resample_sliprate(self, dt, nsamp):
         """

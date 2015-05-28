@@ -17,7 +17,7 @@ import numpy as np
 
 from instaseis import Source, FiniteSource
 from instaseis.source import moment2magnitude, magnitude2moment
-from instaseis.source import fault_vectors_lmn
+from instaseis.source import fault_vectors_lmn, strike_dip_rake_from_ln
 
 DATA = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 EVENT_FILE = os.path.join(DATA, "GCMT_event_STRAIT_OF_GIBRALTAR.xml")
@@ -140,6 +140,48 @@ def test_parse_usgs_param_file():
                                    8.26413197488)
 
 
+# def test_Haskell():
+#     """
+#     Tests Haskell source.
+#     """
+#     latitude, longitude, depth_in_m = 0., 0., 500.
+#     strike, dip, rake = 0., 90., 0.
+#     M0 = 1e20
+#     fault_length, fault_width = 1000., 200.
+#     rupture_velocity = 2500.
+#     nl, nw = 10, 5
+#     finitesource, dt = FiniteSource.from_Haskell(
+#         latitude, longitude, depth_in_m, strike, dip, rake, M0, fault_length,
+#         fault_width, rupture_velocity, nl=nl, nw=nw)
+#
+#     # Plotting to verify rotations
+#
+#     from mpl_toolkits.mplot3d import Axes3D
+#     import matplotlib.pyplot as plt
+#
+#     fig = plt.figure()
+#     ax = fig.add_subplot(111, projection='3d')
+#     p = ax.scatter(finitesource[0], finitesource[1], finitesource[2], c=dt)
+#     ax.set_xlabel('X')
+#     ax.set_ylabel('Y')
+#     ax.set_zlabel('Z')
+#     ax.set_aspect('equal')
+#
+#     # Create cubic bounding box to simulate equal aspect ratio
+#     X = finitesource[0]
+#     Y = finitesource[1]
+#     Z = finitesource[2]
+#     max_range = np.array([X.max()-X.min(), Y.max()-Y.min(), Z.max()-Z.min()]).max()
+#     Xb = 0.5*max_range*np.mgrid[-1:2:2,-1:2:2,-1:2:2][0].flatten() + 0.5*(X.max()+X.min())
+#     Yb = 0.5*max_range*np.mgrid[-1:2:2,-1:2:2,-1:2:2][1].flatten() + 0.5*(Y.max()+Y.min())
+#     Zb = 0.5*max_range*np.mgrid[-1:2:2,-1:2:2,-1:2:2][2].flatten() + 0.5*(Z.max()+Z.min())
+#     # Comment or uncomment following both lines to test the fake bounding box:
+#     for xb, yb, zb in zip(Xb, Yb, Zb):
+#        ax.plot([xb], [yb], [zb], 'w')
+#     fig.colorbar(p)
+#     plt.show()
+
+
 def test_resample_stf():
     """
     Tests resampling sliprates
@@ -260,3 +302,18 @@ def test_fault_vectors_lmn():
     np.testing.assert_allclose(np.array([1.0]), (l**2).sum())
     np.testing.assert_allclose(np.array([1.0]), (m**2).sum())
     np.testing.assert_allclose(np.array([1.0]), (n**2).sum())
+
+
+def test_strike_dip_rake_from_ln():
+    """
+    Tests computation of strike dip and rake from fault vectors l and n
+    """
+    for strike, dip, rake in zip((42., 180., -140.), (22., 0., 90.),
+                                 (17., 32., 120.)):
+        print(strike)
+        l, m, n = fault_vectors_lmn(strike, dip, rake)
+        s, d, r = strike_dip_rake_from_ln(l, n)
+
+        np.testing.assert_allclose(np.array([strike]), np.array([s]))
+        np.testing.assert_allclose(np.array([dip]), np.array([d]))
+        np.testing.assert_allclose(np.array([rake]), np.array([r]))
