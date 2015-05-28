@@ -78,7 +78,7 @@ shared Fortran librarys - pull requests are welcome.
 * ``gfortran >= 4.7``
 * ``Python 2.6, 2.7, 3.3, or 3.4``
 * ``NumPy >= 1.7``
-* ``ObsPy >= 0.10.2``
+* ``ObsPy >= 0.9.2`` *(only the ObsPy master currently supports Python 3)*
 * ``netCDF4 >= 4.3`` including Python bindings (``>= 1.1``)
 * ``future``
 * ``requests``
