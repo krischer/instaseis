@@ -349,7 +349,7 @@ class Window(QtGui.QMainWindow):
 
         components_choice = int(self.ui.components_combo.currentIndex())
 
-        label_map = {0: {"z": "vertical", "n": "east", "e": "north"},
+        label_map = {0: {"z": "vertical", "n": "north", "e": "east"},
                      1: {"z": "vertical", "n": "radial", "e": "transverse"}}
 
         for component in components:
