@@ -135,7 +135,7 @@ def strike_dip_rake_from_ln(l, n):
     delta = np.arccos(n_norm[2])
     phi = np.arctan2(n_norm[0], n_norm[1])
 
-    # needs two different formulas, beqause the first is unstable for sip = 0
+    # needs two different formulas, beqause the first is unstable for dip = 0
     # and the second for dip = 90
     if delta > 0.1:
         lambd = np.arctan2(
@@ -1160,7 +1160,7 @@ class FiniteSource(object):
     @classmethod
     def from_Haskell(self, latitude, longitude, depth_in_m, strike, dip, rake,
                      M0, fault_length, fault_width, rupture_velocity, nl=100,
-                     nw=1, trise=1., dt=None, planet_radius=6371e3,
+                     nw=1, trise=1., tfall=None, dt=0.1, planet_radius=6371e3,
                      origin_time=obspy.UTCDateTime(0)):
         """
         Initialize a source object from a shear source parameterized by strike,
@@ -1179,6 +1179,8 @@ class FiniteSource(object):
             to propagate the rupture in negative rake direction.
         :param nl: number of point sources along strike direction
         :param nw: number of point sources perpendicular strike direction
+        :param trise: rise time
+        :param tfall: fall time
         :param dt: sampling of the source time function
         :param planet_radius: radius of the planet, default to Earth.
         :param origin_time: The origin time of the first patch breaking.
@@ -1190,16 +1192,12 @@ class FiniteSource(object):
 
         colatitude = 90. - latitude
         longitude_rad = np.radians(longitude)
-        latitude_rad = np.radians(latitude)
+        # latitude_rad = np.radians(latitude)
         colatitude_rad = np.radians(colatitude)
 
         # centroid in global cartesian coordinates
-        centroid_xyz = np.empty(3)
-        centroid_xyz[0] = (planet_radius - depth_in_m) \
-            * np.cos(latitude_rad) * np.cos(longitude_rad)
-        centroid_xyz[1] = (planet_radius - depth_in_m) \
-            * np.cos(latitude_rad) * np.sin(longitude_rad)
-        centroid_xyz[2] = (planet_radius - depth_in_m) * np.sin(latitude_rad)
+        centroid_xyz = rotations.coord_transform_lat_lon_depth_to_xyz(
+            latitude, longitude, depth_in_m, planet_radius)
 
         # compute fault vectors and transform to global cartesian system
         l_src, m_src, n_src = fault_vectors_lmn(strike, dip, rake)
@@ -1207,6 +1205,8 @@ class FiniteSource(object):
             l_src, longitude_rad, colatitude_rad)
         m_xyz = rotations.rotate_vector_xyz_src_to_xyz_earth(
             m_src, longitude_rad, colatitude_rad)
+        n_xyz = rotations.rotate_vector_xyz_src_to_xyz_earth(
+            n_src, longitude_rad, colatitude_rad)
 
         # make a mesh centered on patch centers, xi1 and xi2 as defined by Aki
         # and Richards, Fig 10.2
@@ -1222,24 +1222,52 @@ class FiniteSource(object):
         xi1_mesh = xi1_mesh.flatten()
         xi2_mesh = xi2_mesh.flatten()
 
-        # create point sources in
+        # create point sources in cartesian coordinates
         src_xyz = centroid_xyz.repeat(nsources).reshape((3, nsources)) \
             + np.outer(l_xyz, xi1_mesh) + np.outer(m_xyz, xi2_mesh)
 
+        # transform to lat, lon, depth
+        src_lat, src_lon, src_depth = \
+            rotations.coord_transform_xyz_to_lat_lon_depth(
+                src_xyz[0, :], src_xyz[1, :], src_xyz[2, :],
+                planet_radius=planet_radius)
+        src_colat = 90. - src_lat
+
         # make sure all points are inside the planet
-        depth = planet_radius - (src_xyz ** 2).sum(axis=0) ** .5
-        if np.any(depth < 0):
-            raise ValueError('some source points outside planet, '
-                             'maximum height in m: %f' % (-depth.min(),))
+        if np.any(src_depth < 0):
+            raise ValueError('at least on source point outside planet, '
+                             'maximum height in m: %f' % (-src_depth.min(),))
 
         # compute time shifts as distance along xi1
         time_shift = xi1_mesh / rupture_velocity
+        # time shifts should be positive
         time_shift -= time_shift.min()
 
-        for i in np.arange(nsources):
-            sources.append()
+        # generate source time function (same for all point sources)
+        if tfall:
+            npts = int((trise + tfall) / dt) + 1
+        else:
+            npts = int((trise * 2) / dt) + 1
+        stf = asymmetric_cosine(trise, tfall, npts, dt)
 
-        return src_xyz, time_shift
+        for i in np.arange(nsources):
+            # compute strike dip and rake in the coordinate system of each
+            # source point
+            l_src = rotations.rotate_vector_xyz_earth_to_xyz_src(
+                l_xyz, np.deg2rad(src_lon[i]), np.deg2rad(src_colat[i]))
+            n_src = rotations.rotate_vector_xyz_earth_to_xyz_src(
+                n_xyz, np.deg2rad(src_lon[i]), np.deg2rad(src_colat[i]))
+            strik, dip, rake = strike_dip_rake_from_ln(l_src, n_src)
+
+            # initialize point source
+            src = Source.from_strike_dip_rake(
+                src_lat[i], src_lon[i], src_depth[i], strike, dip, rake,
+                M0 / nsources, time_shift=time_shift[i],
+                origin_time=origin_time, dt=dt, sliprate=stf)
+            sources.append(src)
+
+        # return as FiniteSource
+        return self(pointsources=sources)
 
     def resample_sliprate(self, dt, nsamp):
         """

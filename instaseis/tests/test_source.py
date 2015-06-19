@@ -140,46 +140,21 @@ def test_parse_usgs_param_file():
                                    8.26413197488)
 
 
-# def test_Haskell():
-#     """
-#     Tests Haskell source.
-#     """
-#     latitude, longitude, depth_in_m = 0., 0., 500.
-#     strike, dip, rake = 0., 90., 0.
-#     M0 = 1e20
-#     fault_length, fault_width = 1000., 200.
-#     rupture_velocity = 2500.
-#     nl, nw = 10, 5
-#     finitesource, dt = FiniteSource.from_Haskell(
-#         latitude, longitude, depth_in_m, strike, dip, rake, M0, fault_length,
-#         fault_width, rupture_velocity, nl=nl, nw=nw)
-#
-#     # Plotting to verify rotations
-#
-#     from mpl_toolkits.mplot3d import Axes3D
-#     import matplotlib.pyplot as plt
-#
-#     fig = plt.figure()
-#     ax = fig.add_subplot(111, projection='3d')
-#     p = ax.scatter(finitesource[0], finitesource[1], finitesource[2], c=dt)
-#     ax.set_xlabel('X')
-#     ax.set_ylabel('Y')
-#     ax.set_zlabel('Z')
-#     ax.set_aspect('equal')
-#
-#     # Create cubic bounding box to simulate equal aspect ratio
-#     X = finitesource[0]
-#     Y = finitesource[1]
-#     Z = finitesource[2]
-#     max_range = np.array([X.max()-X.min(), Y.max()-Y.min(), Z.max()-Z.min()]).max()
-#     Xb = 0.5*max_range*np.mgrid[-1:2:2,-1:2:2,-1:2:2][0].flatten() + 0.5*(X.max()+X.min())
-#     Yb = 0.5*max_range*np.mgrid[-1:2:2,-1:2:2,-1:2:2][1].flatten() + 0.5*(Y.max()+Y.min())
-#     Zb = 0.5*max_range*np.mgrid[-1:2:2,-1:2:2,-1:2:2][2].flatten() + 0.5*(Z.max()+Z.min())
-#     # Comment or uncomment following both lines to test the fake bounding box:
-#     for xb, yb, zb in zip(Xb, Yb, Zb):
-#        ax.plot([xb], [yb], [zb], 'w')
-#     fig.colorbar(p)
-#     plt.show()
+def test_Haskell():
+    """
+    Tests Haskell source.
+    """
+    latitude, longitude, depth_in_m = 89.9999, 0., 10000.
+    strike, dip, rake = 90., 90., 0.
+    M0 = 1e20
+    fault_length, fault_width = 1000e3, 200.
+    rupture_velocity = 1000.
+    nl, nw = 3, 3
+    finitesource = FiniteSource.from_Haskell(
+        latitude, longitude, depth_in_m, strike, dip, rake, M0, fault_length,
+        fault_width, rupture_velocity, nl=nl, nw=nw)
+    np.testing.assert_almost_equal(finitesource.moment_magnitude,
+                                   7.33333333333333)
 
 
 def test_resample_stf():
