@@ -187,6 +187,7 @@ def test_rotate_vector_xyz_src_to_xyz_rec():
     wref = np.array([-1., -2., 3.])
     np.testing.assert_allclose(wref, w, atol=1e-10)
 
+
 def test_coord_transform_lat_lon_depth_to_xyz():
     latitude, longitude, depth_in_m = 0., 0., 0.
     xyz = rotations.coord_transform_lat_lon_depth_to_xyz(
@@ -194,7 +195,8 @@ def test_coord_transform_lat_lon_depth_to_xyz():
 
     np.testing.assert_allclose(np.array([6371e3, 0., 0.]), xyz)
 
-def test_coord_transform_lat_lon_depth_to_xyz ():
+
+def test_coord_transform_lat_lon_depth_to_xyz_2():
     latitude, longitude, depth_in_m = 23., 32., 1100.
     xyz = rotations.coord_transform_lat_lon_depth_to_xyz(
         latitude, longitude, depth_in_m, planet_radius=6371e3)
@@ -204,4 +206,3 @@ def test_coord_transform_lat_lon_depth_to_xyz ():
 
     np.testing.assert_allclose(np.array([latitude, longitude, depth_in_m]),
                                np.array([lat, lon, dep]))
-
