@@ -46,6 +46,18 @@ planets such as Mars.
 
         </div>
 
+
+.. admonition:: For more information, please read our paper:
+
+    .. list-table::
+      :widths: 1
+
+      *  - | van Driel, M., Krischer, L., Stähler, S. C., Hosseini, K., and Nissen-Meyer, T. (2015).
+           | **Instaseis: instant global seismograms based on a broadband waveform database**
+           | *Solid Earth*, 6, 701-717
+           | http://dx.doi.org/10.5194/se-6-701-2015
+
+
 .. contents:: Contents
     :local:
     :depth: 2

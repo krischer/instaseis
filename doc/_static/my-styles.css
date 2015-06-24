@@ -40,3 +40,16 @@ dl > dt {
     border-color: #FFC4C4;
     color: #555555;
 }
+
+.admonition-for-more-information-please-read-our-paper {
+    margin-bottom: 0px;
+    padding-bottom: 0px;
+}
+
+.admonition-for-more-information-please-read-our-paper > table > tbody > tr > td{
+    border-width: 0px
+}
+
+.table {
+    margin-bottom: -10px
+}
