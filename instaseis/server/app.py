@@ -48,7 +48,7 @@ class SeismogramsHandler(tornado.web.RequestHandler):
     # Define the arguments for the seismogram endpoint.
     seismogram_arguments = {
         "components": {"type": str, "default": "ZNE"},
-        "kind": {"type": str, "default": "displacement"},
+        "unit": {"type": str, "default": "displacement"},
         "remove_source_shift": {"type": bool, "default": True},
         "dt": {"type": float},
         "a_lanczos": {"type": int, "default": 5},
@@ -122,10 +122,10 @@ class SeismogramsHandler(tornado.web.RequestHandler):
     def get(self):
         args = self.parse_arguments()
 
-        # Make sure the kinds arguments is valid.
-        args.kind = args.kind.lower()
-        if args.kind not in ["displacement", "velocity", "acceleration"]:
-            msg = ("Kind must be one of 'displacement', 'velocity', "
+        # Make sure the unit arguments is valid.
+        args.unit = args.unit.lower()
+        if args.unit not in ["displacement", "velocity", "acceleration"]:
+            msg = ("Unit must be one of 'displacement', 'velocity', "
                    "or 'acceleration'")
             raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
@@ -230,7 +230,7 @@ class SeismogramsHandler(tornado.web.RequestHandler):
         try:
             st = application.db.get_seismograms(
                 source=source, receiver=receiver, components=components,
-                kind=args.kind, remove_source_shift=args.remove_source_shift,
+                kind=args.unit, remove_source_shift=args.remove_source_shift,
                 reconvolve_stf=False, return_obspy_stream=True, dt=args.dt,
                 a_lanczos=args.a_lanczos)
         except Exception:

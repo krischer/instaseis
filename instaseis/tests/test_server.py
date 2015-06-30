@@ -807,7 +807,7 @@ def test_object_creation_for_seismogram_route(all_clients):
             latitude=basic_parameters["receiver_latitude"],
             longitude=basic_parameters["receiver_longitude"],
             depth_in_m=0.0)
-        assert p.call_args[1]["unit"] == "displacement"
+        assert p.call_args[1]["kind"] == "displacement"
         assert p.call_args[1]["remove_source_shift"] is True
         assert p.call_args[1]["reconvolve_stf"] is False
         assert p.call_args[1]["return_obspy_stream"] is True
@@ -837,7 +837,7 @@ def test_object_creation_for_seismogram_route(all_clients):
             latitude=basic_parameters["receiver_latitude"],
             longitude=basic_parameters["receiver_longitude"],
             depth_in_m=55.0, network="BW", station="ALTM")
-        assert p.call_args[1]["unit"] == "displacement"
+        assert p.call_args[1]["kind"] == "displacement"
         assert p.call_args[1]["remove_source_shift"] is True
         assert p.call_args[1]["reconvolve_stf"] is False
         assert p.call_args[1]["return_obspy_stream"] is True
@@ -864,7 +864,7 @@ def test_object_creation_for_seismogram_route(all_clients):
             latitude=basic_parameters["receiver_latitude"],
             longitude=basic_parameters["receiver_longitude"],
             depth_in_m=0.0)
-        assert p.call_args[1]["unit"] == "displacement"
+        assert p.call_args[1]["kind"] == "displacement"
         assert p.call_args[1]["remove_source_shift"] is True
         assert p.call_args[1]["reconvolve_stf"] is False
         assert p.call_args[1]["return_obspy_stream"] is True
@@ -895,7 +895,7 @@ def test_object_creation_for_seismogram_route(all_clients):
             latitude=basic_parameters["receiver_latitude"],
             longitude=basic_parameters["receiver_longitude"],
             depth_in_m=55.0, network="BW", station="ALTM")
-        assert p.call_args[1]["unit"] == "displacement"
+        assert p.call_args[1]["kind"] == "displacement"
         assert p.call_args[1]["remove_source_shift"] is True
         assert p.call_args[1]["reconvolve_stf"] is False
         assert p.call_args[1]["return_obspy_stream"] is True
@@ -922,7 +922,7 @@ def test_object_creation_for_seismogram_route(all_clients):
                 latitude=basic_parameters["receiver_latitude"],
                 longitude=basic_parameters["receiver_longitude"],
                 depth_in_m=0.0)
-            assert p.call_args[1]["unit"] == "displacement"
+            assert p.call_args[1]["kind"] == "displacement"
             assert p.call_args[1]["remove_source_shift"] is True
             assert p.call_args[1]["reconvolve_stf"] is False
             assert p.call_args[1]["return_obspy_stream"] is True
@@ -952,7 +952,7 @@ def test_object_creation_for_seismogram_route(all_clients):
                 latitude=basic_parameters["receiver_latitude"],
                 longitude=basic_parameters["receiver_longitude"],
                 depth_in_m=55.0, network="BW", station="ALTM")
-            assert p.call_args[1]["unit"] == "displacement"
+            assert p.call_args[1]["kind"] == "displacement"
             assert p.call_args[1]["remove_source_shift"] is True
             assert p.call_args[1]["reconvolve_stf"] is False
             assert p.call_args[1]["return_obspy_stream"] is True
@@ -968,7 +968,7 @@ def test_object_creation_for_seismogram_route(all_clients):
         assert request.code == 200
         assert p.call_count == 1
         assert p.call_args[1]["components"] == ["R", "T", "E"]
-        assert p.call_args[1]["unit"] == "displacement"
+        assert p.call_args[1]["kind"] == "displacement"
         assert p.call_args[1]["remove_source_shift"] is True
         assert p.call_args[1]["reconvolve_stf"] is False
         assert p.call_args[1]["return_obspy_stream"] is True
@@ -983,7 +983,7 @@ def test_object_creation_for_seismogram_route(all_clients):
         assert request.code == 200
         assert p.call_count == 1
         assert p.call_args[1]["components"] == ["Z", "N", "E"]
-        assert p.call_args[1]["unit"] == "acceleration"
+        assert p.call_args[1]["kind"] == "acceleration"
         assert p.call_args[1]["remove_source_shift"] is True
         assert p.call_args[1]["reconvolve_stf"] is False
         assert p.call_args[1]["return_obspy_stream"] is True
@@ -998,7 +998,7 @@ def test_object_creation_for_seismogram_route(all_clients):
         assert request.code == 200
         assert p.call_count == 1
         assert p.call_args[1]["components"] == ["Z", "N", "E"]
-        assert p.call_args[1]["unit"] == "velocity"
+        assert p.call_args[1]["kind"] == "velocity"
         assert p.call_args[1]["remove_source_shift"] is True
         assert p.call_args[1]["reconvolve_stf"] is False
         assert p.call_args[1]["return_obspy_stream"] is True
@@ -1013,7 +1013,7 @@ def test_object_creation_for_seismogram_route(all_clients):
         assert request.code == 200
         assert p.call_count == 1
         assert p.call_args[1]["components"] == ["Z", "N", "E"]
-        assert p.call_args[1]["unit"] == "velocity"
+        assert p.call_args[1]["kind"] == "velocity"
         assert p.call_args[1]["remove_source_shift"] is True
         assert p.call_args[1]["reconvolve_stf"] is False
         assert p.call_args[1]["return_obspy_stream"] is True
@@ -1028,7 +1028,7 @@ def test_object_creation_for_seismogram_route(all_clients):
         assert request.code == 200
         assert p.call_count == 1
         assert p.call_args[1]["components"] == ["Z", "N", "E"]
-        assert p.call_args[1]["unit"] == "displacement"
+        assert p.call_args[1]["kind"] == "displacement"
         assert p.call_args[1]["remove_source_shift"] is False
         assert p.call_args[1]["reconvolve_stf"] is False
         assert p.call_args[1]["return_obspy_stream"] is True
@@ -1044,7 +1044,7 @@ def test_object_creation_for_seismogram_route(all_clients):
         assert request.code == 200
         assert p.call_count == 1
         assert p.call_args[1]["components"] == ["Z", "N", "E"]
-        assert p.call_args[1]["unit"] == "displacement"
+        assert p.call_args[1]["kind"] == "displacement"
         assert p.call_args[1]["remove_source_shift"] is True
         assert p.call_args[1]["reconvolve_stf"] is False
         assert p.call_args[1]["return_obspy_stream"] is True
@@ -1062,7 +1062,7 @@ def test_object_creation_for_seismogram_route(all_clients):
         assert request.code == 200
         assert p.call_count == 1
         assert p.call_args[1]["components"] == ["Z", "N", "E"]
-        assert p.call_args[1]["unit"] == "acceleration"
+        assert p.call_args[1]["kind"] == "acceleration"
         assert p.call_args[1]["remove_source_shift"] is False
         assert p.call_args[1]["reconvolve_stf"] is False
         assert p.call_args[1]["return_obspy_stream"] is True
