@@ -181,7 +181,7 @@ Installing Instaseis
 User Installation
 ~~~~~~~~~~~~~~~~~
 
-Once released, installation of Instaseis is as easy as
+**Once released (not yet!)**, installation of Instaseis is as easy as
 
 .. code-block:: bash
 
