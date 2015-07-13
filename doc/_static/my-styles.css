@@ -53,3 +53,10 @@ dl > dt {
 .table {
     margin-bottom: -10px
 }
+
+@media all and ( min-width: 680px ) {
+    .div_style {
+        width:630px;
+        padding-bottom:472px !important;
+    }
+}

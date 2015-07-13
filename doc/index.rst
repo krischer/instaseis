@@ -57,6 +57,30 @@ planets such as Mars.
            | *Solid Earth*, 6, 701-717
            | http://dx.doi.org/10.5194/se-6-701-2015
 
+.. only:: html
+
+    Teaser Video
+    ------------
+
+    Get a first impression of the things Instaseis can do by taking a short
+    video tour of our graphical user interface (:ref:`gui-label`). Make sure
+    to watch it in HD!
+
+    .. raw:: html
+
+        <div class="container">
+            <div class="row">
+                <div class="embed-responsive embed-responsive-4by3
+                            center-block div_style">
+                    <iframe
+                        class="embed-responsive-item"
+                        src="https://www.youtube.com/embed/539R2_ArzLE?hd=1&vq=hd720"
+                        frameborder="0" allowfullscreen>
+                    </iframe>
+                </div>
+            </div>
+        </div>
+
 
 .. contents:: Contents
     :local:
@@ -358,6 +382,7 @@ to calculate synthetics based on standard file formats and web services.
     IU.ANMO..MXE | 2010-03-11T06:22:20Z - ... | 0.4 Hz, 732 samples
 
 
+.. _gui-label:
 
 GUI
 ---
