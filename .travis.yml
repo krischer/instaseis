@@ -27,7 +27,7 @@ before_install:
   # Only install the theme for Python 2.7 as it builds the docs.
   - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then pip install sphinx-bootstrap-theme ; fi
   # Currently only the ObsPy master supports Python 3.
-  - if [[ $TRAVIS_PYTHON_VERSION == '2.6' ]]; then pip install mock<1.0 obspy; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == '2.6' ]]; then pip install "mock<1.0" obspy; fi
   - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then pip install mock obspy ; fi
   - if [[ $TRAVIS_PYTHON_VERSION == '3.3' ]]; then pip install mock https://github.com/obspy/obspy/archive/master.zip ; fi
   - if [[ $TRAVIS_PYTHON_VERSION == '3.4' ]]; then pip install mock https://github.com/obspy/obspy/archive/master.zip ; fi
