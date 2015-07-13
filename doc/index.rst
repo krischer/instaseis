@@ -249,6 +249,22 @@ following resources are useful if you are starting out with Python and ObsPy:
 * `The ObsPy Documentation <http://docs.obspy.org/master>`_
 * `The ObsPy Tutorial <http://docs.obspy.org/master/tutorial/index.html>`_
 
+
+Acquiring A Database
+^^^^^^^^^^^^^^^^^^^^
+
+To use Instaseis, one requires access to a waveform database.
+`AxiSEM <http://axisem.info>`_ has to be used to calculate one from scratch. In
+the near future we plan to offer remote databases that Instaseis can then
+connect to. As these database tend to get very big we so far cannot offer them
+as a download. If you are interested in a big database, please contact us.
+
+To quickly get started, please download one of these low frequency
+example databases (please note that they may only be available temporarily):
+
+* `PREM 20 seconds dominant period <http://www.geophysik.uni-muenchen.de/~krischer/instaseis/20s_PREM_ANI_FORCES.tar.gz>`_ (581 MB)
+* `PREM 10 seconds dominant period <http://www.geophysik.uni-muenchen.de/~krischer/instaseis/10s_PREM_ANI_FORCES.tar>`_ (3.4 GB)
+
 Using Instaseis
 ^^^^^^^^^^^^^^^
 
