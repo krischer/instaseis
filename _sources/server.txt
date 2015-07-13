@@ -352,7 +352,7 @@ Filetype
 +-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
 | ``components``          | String   | False    | ZNE                         | The desired seismogram components. Any combination of Z, N, E, R, T.                 |
 +-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
-| ``kind``                | String   | False    | displacement                | The type of seismogram. One of ``displacement``, ``velocity``, o  ``acceleration``.  |
+| ``unit``                | String   | False    | displacement                | The type of seismogram. One of ``displacement``, ``velocity``, or ``acceleration``.  |
 +-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
 | ``remove_source_shift`` | Bool     | False    | True                        | Move the start time to the peak of the sliprate of the source time function.         |
 +-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
