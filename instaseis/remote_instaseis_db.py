@@ -77,31 +77,31 @@ class RemoteInstaseisDB(BaseInstaseisDB):
         params = {"components": "".join(components).upper()}
 
         # Start with the receiver.
-        params["receiver_latitude"] = receiver.latitude
-        params["receiver_longitude"] = receiver.longitude
+        params["receiverlatitude"] = receiver.latitude
+        params["receiverlongitude"] = receiver.longitude
         if receiver.depth_in_m is not None:
-            params["receiver_depth_in_m"] = receiver.depth_in_m
+            params["receiverdepthinm"] = receiver.depth_in_m
         if receiver.network:
-            params["network_code"] = receiver.network
+            params["networkcode"] = receiver.network
         if receiver.station:
-            params["station_code"] = receiver.station
+            params["stationcode"] = receiver.station
 
         # Do the source.
-        params["source_latitude"] = source.latitude
-        params["source_longitude"] = source.longitude
+        params["sourcelatitude"] = source.latitude
+        params["sourcelongitude"] = source.longitude
         if source.depth_in_m is not None:
-            params["source_depth_in_m"] = source.depth_in_m
+            params["sourcedepthinm"] = source.depth_in_m
         if isinstance(source, ForceSource):
-            params["f_r"] = source.f_r
-            params["f_t"] = source.f_t
-            params["f_p"] = source.f_p
+            params["fr"] = source.f_r
+            params["ft"] = source.f_t
+            params["fp"] = source.f_p
         elif isinstance(source, Source):
-            params["m_rr"] = source.m_rr
-            params["m_tt"] = source.m_tt
-            params["m_pp"] = source.m_pp
-            params["m_rt"] = source.m_rt
-            params["m_rp"] = source.m_rp
-            params["m_tp"] = source.m_tp
+            params["mrr"] = source.m_rr
+            params["mtt"] = source.m_tt
+            params["mpp"] = source.m_pp
+            params["mrt"] = source.m_rt
+            params["mrp"] = source.m_rp
+            params["mtp"] = source.m_tp
         else:
             raise NotImplementedError
 

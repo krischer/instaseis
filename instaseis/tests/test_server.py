@@ -1114,7 +1114,7 @@ def test_seismograms_retrieval(all_clients):
         longitude=basic_parameters["sourcelongitude"],
         depth_in_m=0.0,
         **dict((key[0] + "_" + key[1:], float(value))
-               for (key, value) in  mt.items()))
+               for (key, value) in mt.items()))
     receiver = instaseis.Receiver(
         latitude=basic_parameters["receiverlatitude"],
         longitude=basic_parameters["receiverlongitude"],
@@ -1149,7 +1149,7 @@ def test_seismograms_retrieval(all_clients):
         longitude=basic_parameters["sourcelongitude"],
         depth_in_m=5.0, origin_time=time,
         **dict((key[0] + "_" + key[1:], float(value))
-               for (key, value) in  mt.items()))
+               for (key, value) in mt.items()))
     receiver = instaseis.Receiver(
         latitude=basic_parameters["receiverlatitude"],
         longitude=basic_parameters["receiverlongitude"],
