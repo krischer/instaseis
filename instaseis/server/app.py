@@ -51,9 +51,9 @@ class SeismogramsHandler(tornado.web.RequestHandler):
     seismogram_arguments = {
         "components": {"type": str, "default": "ZNE"},
         "unit": {"type": str, "default": "displacement"},
-        "remove_source_shift": {"type": bool, "default": True},
+        "removesourceshift": {"type": bool, "default": True},
         "dt": {"type": float},
-        "a_lanczos": {"type": int, "default": 5},
+        "alanczos": {"type": int, "default": 5},
         # Source parameters.
         "source_latitude": {"type": float, "required": True},
         "source_longitude": {"type": float, "required": True},
@@ -148,8 +148,8 @@ class SeismogramsHandler(tornado.web.RequestHandler):
 
         # Make sure the lanczos window width is sensible. Don't allow values
         # smaller than 2 or larger than 20.
-        if not (2 <= args.a_lanczos <= 20):
-            msg = ("`a_lanczos` must not be smaller than 2 or larger than 20.")
+        if not (2 <= args.alanczos <= 20):
+            msg = ("`alanczos` must not be smaller than 2 or larger than 20.")
             raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
         # Figure out the type of source and construct the source object.
@@ -239,9 +239,9 @@ class SeismogramsHandler(tornado.web.RequestHandler):
         try:
             st = application.db.get_seismograms(
                 source=source, receiver=receiver, components=components,
-                kind=args.unit, remove_source_shift=args.remove_source_shift,
+                kind=args.unit, remove_source_shift=args.removesourceshift,
                 reconvolve_stf=False, return_obspy_stream=True, dt=args.dt,
-                a_lanczos=args.a_lanczos)
+                a_lanczos=args.alanczos)
         except Exception:
             msg = ("Could not extract seismogram. Make sure, the components "
                    "are valid, and the depth settings are correct.")

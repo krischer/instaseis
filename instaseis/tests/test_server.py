@@ -667,10 +667,10 @@ def test_seismograms_error_handling(all_clients):
     params["m_rt"] = "100000"
     params["m_rp"] = "100000"
     params["m_tp"] = "100000"
-    params["a_lanczos"] = "1"
+    params["alanczos"] = "1"
     request = client.fetch(_assemble_url(**params))
     assert request.code == 400
-    assert "`a_lanczos` must not be smaller" in request.reason.lower()
+    assert "`alanczos` must not be smaller" in request.reason.lower()
     params = copy.deepcopy(basic_parameters)
     params["m_tt"] = "100000"
     params["m_pp"] = "100000"
@@ -678,10 +678,10 @@ def test_seismograms_error_handling(all_clients):
     params["m_rt"] = "100000"
     params["m_rp"] = "100000"
     params["m_tp"] = "100000"
-    params["a_lanczos"] = "21"
+    params["alanczos"] = "21"
     request = client.fetch(_assemble_url(**params))
     assert request.code == 400
-    assert "`a_lanczos` must not be smaller" in request.reason.lower()
+    assert "`alanczos` must not be smaller" in request.reason.lower()
 
     # too many components raise to avoid abuse.
     params = copy.deepcopy(basic_parameters)
@@ -735,7 +735,7 @@ def test_conversion_to_boolean_parameters(all_clients):
 
     for value in truth_values:
         params = copy.deepcopy(basic_parameters)
-        params["remove_source_shift"] = value
+        params["removesourceshift"] = value
         _st = obspy.read()
 
         with mock.patch("instaseis.base_instaseis_db.BaseInstaseisDB"
@@ -747,7 +747,7 @@ def test_conversion_to_boolean_parameters(all_clients):
 
     for value in false_values:
         params = copy.deepcopy(basic_parameters)
-        params["remove_source_shift"] = value
+        params["removesourceshift"] = value
         _st = obspy.read()
 
         with mock.patch("instaseis.base_instaseis_db.BaseInstaseisDB"
@@ -760,10 +760,10 @@ def test_conversion_to_boolean_parameters(all_clients):
     # Test invalid values.
     for value in invalid_values:
         params = copy.deepcopy(basic_parameters)
-        params["remove_source_shift"] = value
+        params["removesourceshift"] = value
         request = client.fetch(_assemble_url(**params))
         assert request.code == 400
-        assert ("parameter 'remove_source_shift' could not be converted to "
+        assert ("parameter 'removesourceshift' could not be converted to "
                 "'bool'" in request.reason.lower())
 
 
@@ -1025,7 +1025,7 @@ def test_object_creation_for_seismogram_route(all_clients):
         p.reset_mock()
         params = copy.deepcopy(basic_parameters)
         params.update(mt)
-        params["remove_source_shift"] = "False"
+        params["removesourceshift"] = "False"
         request = client.fetch(_assemble_url(**params))
         assert request.code == 200
         assert p.call_count == 1
@@ -1041,7 +1041,7 @@ def test_object_creation_for_seismogram_route(all_clients):
         params = copy.deepcopy(basic_parameters)
         params.update(mt)
         params["dt"] = "0.1"
-        params["a_lanczos"] = "20"
+        params["alanczos"] = "20"
         request = client.fetch(_assemble_url(**params))
         assert request.code == 200
         assert p.call_count == 1
@@ -1057,9 +1057,9 @@ def test_object_creation_for_seismogram_route(all_clients):
         params = copy.deepcopy(basic_parameters)
         params.update(mt)
         params["dt"] = "0.1"
-        params["a_lanczos"] = "2"
+        params["alanczos"] = "2"
         params["unit"] = "ACCELERATION"
-        params["remove_source_shift"] = "False"
+        params["removesourceshift"] = "False"
         request = client.fetch(_assemble_url(**params))
         assert request.code == 200
         assert p.call_count == 1
@@ -1380,7 +1380,7 @@ def test_seismograms_retrieval(all_clients):
 
     params = copy.deepcopy(basic_parameters)
     params.update(mt)
-    params["remove_source_shift"] = "False"
+    params["removesourceshift"] = "False"
     request = client.fetch(_assemble_url(**params))
     st_server = obspy.read(request.buffer)
     st_db = db.get_seismograms(source=source, receiver=receiver,
@@ -1404,7 +1404,7 @@ def test_seismograms_retrieval(all_clients):
     params = copy.deepcopy(basic_parameters)
     params.update(mt)
     params["dt"] = "0.1"
-    params["a_lanczos"] = "20"
+    params["alanczos"] = "20"
     request = client.fetch(_assemble_url(**params))
     st_server = obspy.read(request.buffer)
     st_db = db.get_seismograms(source=source, receiver=receiver,
@@ -1428,9 +1428,9 @@ def test_seismograms_retrieval(all_clients):
     params = copy.deepcopy(basic_parameters)
     params.update(mt)
     params["dt"] = "0.1"
-    params["a_lanczos"] = "2"
+    params["alanczos"] = "2"
     params["unit"] = "ACCELERATION"
-    params["remove_source_shift"] = "False"
+    params["removesourceshift"] = "False"
     request = client.fetch(_assemble_url(**params))
     st_server = obspy.read(request.buffer)
     st_db = db.get_seismograms(source=source, receiver=receiver,
@@ -1530,7 +1530,7 @@ def test_output_formats(all_clients):
         "receiver_longitude": -10}
     mt = {"m_tt": "100000", "m_pp": "100000", "m_rr": "100000",
           "m_rt": "100000", "m_rp": "100000", "m_tp": "100000",
-          "components": "RT", "unit": "velocity", "dt": 2, "a_lanczos": 3,
+          "components": "RT", "unit": "velocity", "dt": 2, "alanczos": 3,
           "network_code": "BW", "station_code": "FURT"}
     basic_parameters.update(mt)
 
