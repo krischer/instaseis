@@ -55,16 +55,16 @@ class SeismogramsHandler(tornado.web.RequestHandler):
         "dt": {"type": float},
         "alanczos": {"type": int, "default": 5},
         # Source parameters.
-        "source_latitude": {"type": float, "required": True},
-        "source_longitude": {"type": float, "required": True},
-        "source_depth_in_m": {"type": float, "default": 0.0},
+        "sourcelatitude": {"type": float, "required": True},
+        "sourcelongitude": {"type": float, "required": True},
+        "sourcedepthinm": {"type": float, "default": 0.0},
         # Source can either be given as the moment tensor components in Nm.
-        "m_rr": {"type": float},
-        "m_tt": {"type": float},
-        "m_pp": {"type": float},
-        "m_rt": {"type": float},
-        "m_rp": {"type": float},
-        "m_tp": {"type": float},
+        "mrr": {"type": float},
+        "mtt": {"type": float},
+        "mpp": {"type": float},
+        "mrt": {"type": float},
+        "mrp": {"type": float},
+        "mtp": {"type": float},
         # Or as strike, dip, rake and M0.
         "strike": {"type": float},
         "dip": {"type": float},
@@ -154,8 +154,8 @@ class SeismogramsHandler(tornado.web.RequestHandler):
 
         # Figure out the type of source and construct the source object.
         src_params = {
-            "moment_tensor": set(["m_rr", "m_tt", "m_pp", "m_rt", "m_rp",
-                                  "m_tp"]),
+            "moment_tensor": set(["mrr", "mtt", "mpp", "mrt", "mrp",
+                                  "mtp"]),
             "strike_dip_rake": set(["strike", "dip", "rake", "M0"]),
             "force_source": set(["f_r", "f_t", "f_p"])
         }
@@ -175,12 +175,12 @@ class SeismogramsHandler(tornado.web.RequestHandler):
                 continue
             elif src_type == "moment_tensor":
                 try:
-                    source = Source(latitude=args.source_latitude,
-                                    longitude=args.source_longitude,
-                                    depth_in_m=args.source_depth_in_m,
-                                    m_rr=args.m_rr, m_tt=args.m_tt,
-                                    m_pp=args.m_pp, m_rt=args.m_rt,
-                                    m_rp=args.m_rp, m_tp=args.m_tp,
+                    source = Source(latitude=args.sourcelatitude,
+                                    longitude=args.sourcelongitude,
+                                    depth_in_m=args.sourcedepthinm,
+                                    m_rr=args.mrr, m_tt=args.mtt,
+                                    m_pp=args.mpp, m_rt=args.mrt,
+                                    m_rp=args.mrp, m_tp=args.mtp,
                                     origin_time=args.origin_time)
                 except:
                     msg = ("Could not construct moment tensor source with "
@@ -191,9 +191,9 @@ class SeismogramsHandler(tornado.web.RequestHandler):
             elif src_type == "strike_dip_rake":
                 try:
                     source = Source.from_strike_dip_rake(
-                        latitude=args.source_latitude,
-                        longitude=args.source_longitude,
-                        depth_in_m=args.source_depth_in_m,
+                        latitude=args.sourcelatitude,
+                        longitude=args.sourcelongitude,
+                        depth_in_m=args.sourcedepthinm,
                         strike=args.strike, dip=args.dip, rake=args.rake,
                         M0=args.M0, origin_time=args.origin_time)
                 except:
@@ -205,9 +205,9 @@ class SeismogramsHandler(tornado.web.RequestHandler):
                 break
             elif src_type == "force_source":
                 try:
-                    source = ForceSource(latitude=args.source_latitude,
-                                         longitude=args.source_longitude,
-                                         depth_in_m=args.source_depth_in_m,
+                    source = ForceSource(latitude=args.sourcelatitude,
+                                         longitude=args.sourcelongitude,
+                                         depth_in_m=args.sourcedepthinm,
                                          f_r=args.f_r, f_t=args.f_t,
                                          f_p=args.f_p,
                                          origin_time=args.origin_time)
@@ -294,16 +294,16 @@ class RawSeismogramsHandler(tornado.web.RequestHandler):
     seismogram_arguments = {
         "components": {"type": str, "default": "ZNE"},
         # Source parameters.
-        "source_latitude": {"type": float, "required": True},
-        "source_longitude": {"type": float, "required": True},
-        "source_depth_in_m": {"type": float, "default": 0.0},
+        "sourcelatitude": {"type": float, "required": True},
+        "sourcelongitude": {"type": float, "required": True},
+        "sourcedepthinm": {"type": float, "default": 0.0},
         # Source can either be given as the moment tensor components in Nm.
-        "m_rr": {"type": float},
-        "m_tt": {"type": float},
-        "m_pp": {"type": float},
-        "m_rt": {"type": float},
-        "m_rp": {"type": float},
-        "m_tp": {"type": float},
+        "mrr": {"type": float},
+        "mtt": {"type": float},
+        "mpp": {"type": float},
+        "mrt": {"type": float},
+        "mrp": {"type": float},
+        "mtp": {"type": float},
         # Or as strike, dip, rake and M0.
         "strike": {"type": float},
         "dip": {"type": float},
@@ -356,8 +356,8 @@ class RawSeismogramsHandler(tornado.web.RequestHandler):
 
         # Figure out the type of source and construct the source object.
         src_params = {
-            "moment_tensor": set(["m_rr", "m_tt", "m_pp", "m_rt", "m_rp",
-                                  "m_tp"]),
+            "moment_tensor": set(["mrr", "mtt", "mpp", "mrt", "mrp",
+                                  "mtp"]),
             "strike_dip_rake": set(["strike", "dip", "rake", "M0"]),
             "force_source": set(["f_r", "f_t", "f_p"])
         }
@@ -377,12 +377,12 @@ class RawSeismogramsHandler(tornado.web.RequestHandler):
                 continue
             elif src_type == "moment_tensor":
                 try:
-                    source = Source(latitude=args.source_latitude,
-                                    longitude=args.source_longitude,
-                                    depth_in_m=args.source_depth_in_m,
-                                    m_rr=args.m_rr, m_tt=args.m_tt,
-                                    m_pp=args.m_pp, m_rt=args.m_rt,
-                                    m_rp=args.m_rp, m_tp=args.m_tp,
+                    source = Source(latitude=args.sourcelatitude,
+                                    longitude=args.sourcelongitude,
+                                    depth_in_m=args.sourcedepthinm,
+                                    m_rr=args.mrr, m_tt=args.mtt,
+                                    m_pp=args.mpp, m_rt=args.mrt,
+                                    m_rp=args.mrp, m_tp=args.mtp,
                                     origin_time=args.origin_time)
                 except:
                     msg = ("Could not construct moment tensor source with "
@@ -393,9 +393,9 @@ class RawSeismogramsHandler(tornado.web.RequestHandler):
             elif src_type == "strike_dip_rake":
                 try:
                     source = Source.from_strike_dip_rake(
-                        latitude=args.source_latitude,
-                        longitude=args.source_longitude,
-                        depth_in_m=args.source_depth_in_m,
+                        latitude=args.sourcelatitude,
+                        longitude=args.sourcelongitude,
+                        depth_in_m=args.sourcedepthinm,
                         strike=args.strike, dip=args.dip, rake=args.rake,
                         M0=args.M0, origin_time=args.origin_time)
                 except:
@@ -407,9 +407,9 @@ class RawSeismogramsHandler(tornado.web.RequestHandler):
                 break
             elif src_type == "force_source":
                 try:
-                    source = ForceSource(latitude=args.source_latitude,
-                                         longitude=args.source_longitude,
-                                         depth_in_m=args.source_depth_in_m,
+                    source = ForceSource(latitude=args.sourcelatitude,
+                                         longitude=args.sourcelongitude,
+                                         depth_in_m=args.sourcedepthinm,
                                          f_r=args.f_r, f_t=args.f_t,
                                          f_p=args.f_p,
                                          origin_time=args.origin_time)
