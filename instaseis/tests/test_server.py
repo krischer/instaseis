@@ -293,7 +293,7 @@ def test_seismograms_raw_route(all_clients):
         params = copy.deepcopy(basic_parameters)
         params.update(fs)
         time = obspy.UTCDateTime(2008, 7, 6, 5, 4, 3)
-        params["origin_time"] = str(time)
+        params["origintime"] = str(time)
         request = client.fetch(_assemble_url_raw(**params))
         assert request.code == 200
 
@@ -324,7 +324,7 @@ def test_seismograms_raw_route(all_clients):
     params = copy.deepcopy(basic_parameters)
     time = obspy.UTCDateTime(2013, 1, 2, 3, 4, 5)
     params.update(mt)
-    params["origin_time"] = str(time)
+    params["origintime"] = str(time)
     request = client.fetch(_assemble_url_raw(**params))
     assert request.code == 200
 
@@ -425,7 +425,7 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
         p.reset_mock()
 
         params["sourcedepthinm"] = "5.0"
-        params["origin_time"] = str(time)
+        params["origintime"] = str(time)
         params["receiver_depth_in_m"] = "55.0"
         params["network_code"] = "BW"
         params["station_code"] = "ALTM"
@@ -471,7 +471,7 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
         p.reset_mock()
 
         params["sourcedepthinm"] = "5.0"
-        params["origin_time"] = str(time)
+        params["origintime"] = str(time)
         params["receiver_depth_in_m"] = "55.0"
         params["network_code"] = "BW"
         params["station_code"] = "ALTM"
@@ -518,7 +518,7 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
             p.reset_mock()
 
             params["sourcedepthinm"] = "5.0"
-            params["origin_time"] = str(time)
+            params["origintime"] = str(time)
             params["receiver_depth_in_m"] = "55.0"
             params["network_code"] = "BW"
             params["station_code"] = "ALTM"
@@ -825,7 +825,7 @@ def test_object_creation_for_seismogram_route(all_clients):
         p.reset_mock()
 
         params["sourcedepthinm"] = "5.0"
-        params["origin_time"] = str(time)
+        params["origintime"] = str(time)
         params["receiver_depth_in_m"] = "55.0"
         params["network_code"] = "BW"
         params["station_code"] = "ALTM"
@@ -883,7 +883,7 @@ def test_object_creation_for_seismogram_route(all_clients):
         p.reset_mock()
 
         params["sourcedepthinm"] = "5.0"
-        params["origin_time"] = str(time)
+        params["origintime"] = str(time)
         params["receiver_depth_in_m"] = "55.0"
         params["network_code"] = "BW"
         params["station_code"] = "ALTM"
@@ -942,7 +942,7 @@ def test_object_creation_for_seismogram_route(all_clients):
             p.reset_mock()
 
             params["sourcedepthinm"] = "5.0"
-            params["origin_time"] = str(time)
+            params["origintime"] = str(time)
             params["receiver_depth_in_m"] = "55.0"
             params["network_code"] = "BW"
             params["station_code"] = "ALTM"
@@ -1137,7 +1137,7 @@ def test_seismograms_retrieval(all_clients):
                                    atol=1E-10 * tr_server.data.ptp())
 
     params["sourcedepthinm"] = "5.0"
-    params["origin_time"] = str(time)
+    params["origintime"] = str(time)
     params["receiver_depth_in_m"] = "55.0"
     params["network_code"] = "BW"
     params["station_code"] = "ALTM"
@@ -1204,7 +1204,7 @@ def test_seismograms_retrieval(all_clients):
 
     # Moment tensor source with a couple more parameters.
     params["sourcedepthinm"] = "5.0"
-    params["origin_time"] = str(time)
+    params["origintime"] = str(time)
     params["receiver_depth_in_m"] = "55.0"
     params["network_code"] = "BW"
     params["station_code"] = "ALTM"
@@ -1274,7 +1274,7 @@ def test_seismograms_retrieval(all_clients):
                                        atol=1E-10 * tr_server.data.ptp())
 
         params["sourcedepthinm"] = "5.0"
-        params["origin_time"] = str(time)
+        params["origintime"] = str(time)
         params["receiver_depth_in_m"] = "55.0"
         params["network_code"] = "BW"
         params["station_code"] = "ALTM"

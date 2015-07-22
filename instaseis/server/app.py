@@ -75,8 +75,8 @@ class SeismogramsHandler(tornado.web.RequestHandler):
         "ft": {"type": float},
         "fp": {"type": float},
         # More optional source parameters.
-        "origin_time": {"type": obspy.UTCDateTime,
-                        "default": obspy.UTCDateTime(0)},
+        "origintime": {"type": obspy.UTCDateTime,
+                       "default": obspy.UTCDateTime(0)},
         # Receiver parameters.
         "receiver_latitude": {"type": float, "required": True},
         "receiver_longitude": {"type": float, "required": True},
@@ -181,7 +181,7 @@ class SeismogramsHandler(tornado.web.RequestHandler):
                                     m_rr=args.mrr, m_tt=args.mtt,
                                     m_pp=args.mpp, m_rt=args.mrt,
                                     m_rp=args.mrp, m_tp=args.mtp,
-                                    origin_time=args.origin_time)
+                                    origin_time=args.origintime)
                 except:
                     msg = ("Could not construct moment tensor source with "
                            "passed parameters. Check parameters for sanity.")
@@ -195,7 +195,7 @@ class SeismogramsHandler(tornado.web.RequestHandler):
                         longitude=args.sourcelongitude,
                         depth_in_m=args.sourcedepthinm,
                         strike=args.strike, dip=args.dip, rake=args.rake,
-                        M0=args.M0, origin_time=args.origin_time)
+                        M0=args.M0, origin_time=args.origintime)
                 except:
                     msg = ("Could not construct the source from the passed "
                            "strike/dip/rake parameters. Check parameter for "
@@ -210,7 +210,7 @@ class SeismogramsHandler(tornado.web.RequestHandler):
                                          depth_in_m=args.sourcedepthinm,
                                          f_r=args.fr, f_t=args.ft,
                                          f_p=args.fp,
-                                         origin_time=args.origin_time)
+                                         origin_time=args.origintime)
                 except:
                     msg = ("Could not construct force source with passed "
                            "parameters. Check parameters for sanity.")
@@ -314,8 +314,8 @@ class RawSeismogramsHandler(tornado.web.RequestHandler):
         "ft": {"type": float},
         "fp": {"type": float},
         # More optional source parameters.
-        "origin_time": {"type": obspy.UTCDateTime,
-                        "default": obspy.UTCDateTime(0)},
+        "origintime": {"type": obspy.UTCDateTime,
+                       "default": obspy.UTCDateTime(0)},
         # Receiver parameters.
         "receiver_latitude": {"type": float, "required": True},
         "receiver_longitude": {"type": float, "required": True},
@@ -383,7 +383,7 @@ class RawSeismogramsHandler(tornado.web.RequestHandler):
                                     m_rr=args.mrr, m_tt=args.mtt,
                                     m_pp=args.mpp, m_rt=args.mrt,
                                     m_rp=args.mrp, m_tp=args.mtp,
-                                    origin_time=args.origin_time)
+                                    origin_time=args.origintime)
                 except:
                     msg = ("Could not construct moment tensor source with "
                            "passed parameters. Check parameters for sanity.")
@@ -397,7 +397,7 @@ class RawSeismogramsHandler(tornado.web.RequestHandler):
                         longitude=args.sourcelongitude,
                         depth_in_m=args.sourcedepthinm,
                         strike=args.strike, dip=args.dip, rake=args.rake,
-                        M0=args.M0, origin_time=args.origin_time)
+                        M0=args.M0, origin_time=args.origintime)
                 except:
                     msg = ("Could not construct the source from the passed "
                            "strike/dip/rake parameters. Check parameter for "
@@ -412,7 +412,7 @@ class RawSeismogramsHandler(tornado.web.RequestHandler):
                                          depth_in_m=args.sourcedepthinm,
                                          f_r=args.fr, f_t=args.ft,
                                          f_p=args.fp,
-                                         origin_time=args.origin_time)
+                                         origin_time=args.origintime)
                 except:
                     msg = ("Could not construct force source with passed "
                            "parameters. Check parameters for sanity.")
