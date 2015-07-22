@@ -12,10 +12,12 @@ Tests for the Instaseis server.
 from __future__ import absolute_import
 
 import copy
+import io
 import json
+import zipfile
+
 import obspy
 import numpy as np
-import instaseis
 from .tornado_testing_fixtures import *  # NOQA
 
 # Conditionally import mock either from the stdlib or as a separate library.
@@ -1449,3 +1451,138 @@ def test_seismograms_retrieval(all_clients):
         # small values.
         np.testing.assert_allclose(tr_server.data, tr_db.data,
                                    atol=1E-10 * tr_server.data.ptp())
+
+
+def test_output_formats(all_clients):
+    """
+    The /seismograms route can return data either as MiniSEED or as zip
+    archive containing multiple files.
+    """
+    client = all_clients
+
+    basic_parameters = {
+        "source_latitude": 10,
+        "source_longitude": 10,
+        "receiver_latitude": -10,
+        "receiver_longitude": -10}
+    mt = {"m_tt": "100000", "m_pp": "100000", "m_rr": "100000",
+          "m_rt": "100000", "m_rp": "100000", "m_tp": "100000"}
+    basic_parameters.update(mt)
+
+    # First don't specify the format which should result in a miniseed file.
+    params = copy.deepcopy(basic_parameters)
+    request = client.fetch(_assemble_url(**params))
+    st = obspy.read(request.buffer)
+    for tr in st:
+        assert tr.stats._format == "MSEED"
+
+    # Specifying the miniseed format also work.
+    params = copy.deepcopy(basic_parameters)
+    params["format"] = "mseed"
+    request = client.fetch(_assemble_url(**params))
+    st = obspy.read(request.buffer)
+    for tr in st:
+        assert tr.stats._format == "MSEED"
+
+    # saczip results in a folder of multiple sac files.
+    params = copy.deepcopy(basic_parameters)
+    params["format"] = "saczip"
+    request = client.fetch(_assemble_url(**params))
+    # ObsPy needs the filename to be able to directly unpack zip files. We
+    # don't have a filename here so we unpack manually.
+    sac_st = obspy.Stream()
+    zip_obj = zipfile.ZipFile(request.buffer)
+    for name in zip_obj.namelist():
+        sac_st += obspy.read(io.BytesIO(zip_obj.read(name)))
+    for tr in sac_st:
+        assert tr.stats._format == "SAC"
+
+    # Otherwise they should be identical!
+    for tr in st.traces + sac_st.traces:
+        del tr.stats._format
+        try:
+            del tr.stats.sac
+        except KeyError:
+            pass
+        try:
+            del tr.stats.mseed
+        except KeyError:
+            pass
+
+    st.sort()
+    sac_st.sort()
+
+    for tr, sac_tr in zip(st, sac_st):
+        # Make sure the sampling rate is approximately equal.
+        np.testing.assert_allclose(tr.stats.delta, sac_tr.stats.delta)
+        # Now set one to the other to make sure the following comparision is
+        # meaningful
+        tr.stats.delta = sac_tr.stats.delta
+
+    # Now make sure the result is the same independent of the output format.
+    assert st == sac_st
+
+    # Once more with a couple more parameters.
+    basic_parameters = {
+        "source_latitude": 10,
+        "source_longitude": 10,
+        "receiver_latitude": -10,
+        "receiver_longitude": -10}
+    mt = {"m_tt": "100000", "m_pp": "100000", "m_rr": "100000",
+          "m_rt": "100000", "m_rp": "100000", "m_tp": "100000",
+          "components": "RT", "unit": "velocity", "dt": 2, "a_lanczos": 3,
+          "network_code": "BW", "station_code": "FURT"}
+    basic_parameters.update(mt)
+
+    # First don't specify the format which should result in a miniseed file.
+    params = copy.deepcopy(basic_parameters)
+    request = client.fetch(_assemble_url(**params))
+    st = obspy.read(request.buffer)
+    for tr in st:
+        assert tr.stats._format == "MSEED"
+
+    # Specifying the miniseed format also work.
+    params = copy.deepcopy(basic_parameters)
+    params["format"] = "mseed"
+    request = client.fetch(_assemble_url(**params))
+    st = obspy.read(request.buffer)
+    for tr in st:
+        assert tr.stats._format == "MSEED"
+
+    # saczip results in a folder of multiple sac files.
+    params = copy.deepcopy(basic_parameters)
+    params["format"] = "saczip"
+    request = client.fetch(_assemble_url(**params))
+    # ObsPy needs the filename to be able to directly unpack zip files. We
+    # don't have a filename here so we unpack manually.
+    sac_st = obspy.Stream()
+    zip_obj = zipfile.ZipFile(request.buffer)
+    for name in zip_obj.namelist():
+        sac_st += obspy.read(io.BytesIO(zip_obj.read(name)))
+    for tr in sac_st:
+        assert tr.stats._format == "SAC"
+
+    # Otherwise they should be identical!
+    for tr in st.traces + sac_st.traces:
+        del tr.stats._format
+        try:
+            del tr.stats.sac
+        except KeyError:
+            pass
+        try:
+            del tr.stats.mseed
+        except KeyError:
+            pass
+
+    st.sort()
+    sac_st.sort()
+
+    for tr, sac_tr in zip(st, sac_st):
+        # Make sure the sampling rate is approximately equal.
+        np.testing.assert_allclose(tr.stats.delta, sac_tr.stats.delta)
+        # Now set one to the other to make sure the following comparision is
+        # meaningful
+        tr.stats.delta = sac_tr.stats.delta
+
+    # Now make sure the result is the same independent of the output format.
+    assert st == sac_st
