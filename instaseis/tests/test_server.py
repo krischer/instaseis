@@ -175,9 +175,9 @@ def test_raw_seismograms_error_handling(all_clients):
     # Invalid force source. It only works in displ_only mode but here it
     # fails earlier.
     params = copy.deepcopy(basic_parameters)
-    params["f_r"] = "100000"
-    params["f_t"] = "100000"
-    params["f_p"] = "100000"
+    params["fr"] = "100000"
+    params["ft"] = "100000"
+    params["fp"] = "100000"
     params["sourcelatitude"] = "100"
     request = client.fetch(_assemble_url_raw(**params))
     assert request.code == 400
@@ -258,7 +258,7 @@ def test_seismograms_raw_route(all_clients):
     mt = {"mtt": "100000", "mpp": "100000", "mrr": "100000",
           "mrt": "100000", "mrp": "100000", "mtp": "100000"}
     sdr = {"strike": "10", "dip": "10", "rake": "10", "M0": "1000000"}
-    fs = {"f_r": "100000", "f_t": "100000", "f_p": "100000"}
+    fs = {"fr": "100000", "ft": "100000", "fp": "100000"}
 
     # Moment tensor source.
     params = copy.deepcopy(basic_parameters)
@@ -389,7 +389,7 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
     mt = {"mtt": "100000", "mpp": "100000", "mrr": "100000",
           "mrt": "100000", "mrp": "100000", "mtp": "100000"}
     sdr = {"strike": "10", "dip": "10", "rake": "10", "M0": "1000000"}
-    fs = {"f_r": "100000", "f_t": "100000", "f_p": "100000"}
+    fs = {"fr": "100000", "ft": "100000", "fp": "100000"}
 
     time = obspy.UTCDateTime(2010, 1, 2, 3, 4, 5)
 
@@ -507,7 +507,8 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
                 latitude=basic_parameters["sourcelatitude"],
                 longitude=basic_parameters["sourcelongitude"],
                 depth_in_m=0.0,
-                **dict((key, float(value)) for (key, value) in fs.items()))
+                **dict(("_".join(key), float(value))
+                       for (key, value) in fs.items()))
             assert p.call_args[1]["receiver"] == instaseis.Receiver(
                 latitude=basic_parameters["receiver_latitude"],
                 longitude=basic_parameters["receiver_longitude"],
@@ -531,7 +532,8 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
                 latitude=basic_parameters["sourcelatitude"],
                 longitude=basic_parameters["sourcelongitude"],
                 depth_in_m=5.0, origin_time=time,
-                **dict((key, float(value)) for (key, value) in fs.items()))
+                **dict(("_".join(key), float(value))
+                       for (key, value) in fs.items()))
             assert p.call_args[1]["receiver"] == instaseis.Receiver(
                 latitude=basic_parameters["receiver_latitude"],
                 longitude=basic_parameters["receiver_longitude"],
@@ -613,9 +615,9 @@ def test_seismograms_error_handling(all_clients):
     # Invalid force source. It only works in displ_only mode but here it
     # fails earlier.
     params = copy.deepcopy(basic_parameters)
-    params["f_r"] = "100000"
-    params["f_t"] = "100000"
-    params["f_p"] = "100000"
+    params["fr"] = "100000"
+    params["ft"] = "100000"
+    params["fp"] = "100000"
     params["sourcelatitude"] = "100"
     request = client.fetch(_assemble_url(**params))
     assert request.code == 400
@@ -785,7 +787,7 @@ def test_object_creation_for_seismogram_route(all_clients):
     mt = {"mtt": "100000", "mpp": "100000", "mrr": "100000",
           "mrt": "100000", "mrp": "100000", "mtp": "100000"}
     sdr = {"strike": "10", "dip": "10", "rake": "10", "M0": "1000000"}
-    fs = {"f_r": "100000", "f_t": "100000", "f_p": "100000"}
+    fs = {"fr": "100000", "ft": "100000", "fp": "100000"}
 
     time = obspy.UTCDateTime(2010, 1, 2, 3, 4, 5)
 
@@ -923,7 +925,8 @@ def test_object_creation_for_seismogram_route(all_clients):
                 latitude=basic_parameters["sourcelatitude"],
                 longitude=basic_parameters["sourcelongitude"],
                 depth_in_m=0.0,
-                **dict((key, float(value)) for (key, value) in fs.items()))
+                **dict(("_".join(key), float(value))
+                       for (key, value) in fs.items()))
             assert p.call_args[1]["receiver"] == instaseis.Receiver(
                 latitude=basic_parameters["receiver_latitude"],
                 longitude=basic_parameters["receiver_longitude"],
@@ -953,7 +956,8 @@ def test_object_creation_for_seismogram_route(all_clients):
                 latitude=basic_parameters["sourcelatitude"],
                 longitude=basic_parameters["sourcelongitude"],
                 depth_in_m=5.0, origin_time=time,
-                **dict((key, float(value)) for (key, value) in fs.items()))
+                **dict(("_".join(key), float(value))
+                       for (key, value) in fs.items()))
             assert p.call_args[1]["receiver"] == instaseis.Receiver(
                 latitude=basic_parameters["receiver_latitude"],
                 longitude=basic_parameters["receiver_longitude"],
@@ -1094,7 +1098,7 @@ def test_seismograms_retrieval(all_clients):
     mt = {"mtt": "100000", "mpp": "100000", "mrr": "100000",
           "mrt": "100000", "mrp": "100000", "mtp": "100000"}
     sdr = {"strike": "10", "dip": "10", "rake": "10", "M0": "1000000"}
-    fs = {"f_r": "100000", "f_t": "100000", "f_p": "100000"}
+    fs = {"fr": "100000", "ft": "100000", "fp": "100000"}
 
     time = obspy.UTCDateTime(2010, 1, 2, 3, 4, 5)
 
@@ -1245,7 +1249,8 @@ def test_seismograms_retrieval(all_clients):
             latitude=basic_parameters["sourcelatitude"],
             longitude=basic_parameters["sourcelongitude"],
             depth_in_m=0.0,
-            **dict((key, float(value)) for (key, value) in fs.items()))
+            **dict(("_".join(key), float(value))
+                   for (key, value) in fs.items()))
         receiver = instaseis.Receiver(
             latitude=basic_parameters["receiver_latitude"],
             longitude=basic_parameters["receiver_longitude"],
@@ -1281,7 +1286,8 @@ def test_seismograms_retrieval(all_clients):
             latitude=basic_parameters["sourcelatitude"],
             longitude=basic_parameters["sourcelongitude"],
             depth_in_m=5.0, origin_time=time,
-            **dict((key, float(value)) for (key, value) in fs.items()))
+            **dict(("_".join(key), float(value))
+                   for (key, value) in fs.items()))
         receiver = instaseis.Receiver(
             latitude=basic_parameters["receiver_latitude"],
             longitude=basic_parameters["receiver_longitude"],

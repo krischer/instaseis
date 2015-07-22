@@ -71,9 +71,9 @@ class SeismogramsHandler(tornado.web.RequestHandler):
         "rake": {"type": float},
         "M0": {"type": float},
         # Or as a force source.
-        "f_r": {"type": float},
-        "f_t": {"type": float},
-        "f_p": {"type": float},
+        "fr": {"type": float},
+        "ft": {"type": float},
+        "fp": {"type": float},
         # More optional source parameters.
         "origin_time": {"type": obspy.UTCDateTime,
                         "default": obspy.UTCDateTime(0)},
@@ -157,7 +157,7 @@ class SeismogramsHandler(tornado.web.RequestHandler):
             "moment_tensor": set(["mrr", "mtt", "mpp", "mrt", "mrp",
                                   "mtp"]),
             "strike_dip_rake": set(["strike", "dip", "rake", "M0"]),
-            "force_source": set(["f_r", "f_t", "f_p"])
+            "force_source": set(["fr", "ft", "fp"])
         }
 
         if len(args.components) > 5:
@@ -208,8 +208,8 @@ class SeismogramsHandler(tornado.web.RequestHandler):
                     source = ForceSource(latitude=args.sourcelatitude,
                                          longitude=args.sourcelongitude,
                                          depth_in_m=args.sourcedepthinm,
-                                         f_r=args.f_r, f_t=args.f_t,
-                                         f_p=args.f_p,
+                                         f_r=args.fr, f_t=args.ft,
+                                         f_p=args.fp,
                                          origin_time=args.origin_time)
                 except:
                     msg = ("Could not construct force source with passed "
@@ -310,9 +310,9 @@ class RawSeismogramsHandler(tornado.web.RequestHandler):
         "rake": {"type": float},
         "M0": {"type": float},
         # Or as a force source.
-        "f_r": {"type": float},
-        "f_t": {"type": float},
-        "f_p": {"type": float},
+        "fr": {"type": float},
+        "ft": {"type": float},
+        "fp": {"type": float},
         # More optional source parameters.
         "origin_time": {"type": obspy.UTCDateTime,
                         "default": obspy.UTCDateTime(0)},
@@ -359,7 +359,7 @@ class RawSeismogramsHandler(tornado.web.RequestHandler):
             "moment_tensor": set(["mrr", "mtt", "mpp", "mrt", "mrp",
                                   "mtp"]),
             "strike_dip_rake": set(["strike", "dip", "rake", "M0"]),
-            "force_source": set(["f_r", "f_t", "f_p"])
+            "force_source": set(["fr", "ft", "fp"])
         }
 
         if len(args.components) > 5:
@@ -410,8 +410,8 @@ class RawSeismogramsHandler(tornado.web.RequestHandler):
                     source = ForceSource(latitude=args.sourcelatitude,
                                          longitude=args.sourcelongitude,
                                          depth_in_m=args.sourcedepthinm,
-                                         f_r=args.f_r, f_t=args.f_t,
-                                         f_p=args.f_p,
+                                         f_r=args.fr, f_t=args.ft,
+                                         f_p=args.fp,
                                          origin_time=args.origin_time)
                 except:
                     msg = ("Could not construct force source with passed "
