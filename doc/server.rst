@@ -343,7 +343,9 @@ Description
 
 Content-Type
     application/octet-stream
+
     application/zip
+
 Filetype
     Returns MiniSEED files encoded with encoding format 4 (IEEE floating
     point) or a ZIP archive with SAC files.
