@@ -78,11 +78,11 @@ class SeismogramsHandler(tornado.web.RequestHandler):
         "origintime": {"type": obspy.UTCDateTime,
                        "default": obspy.UTCDateTime(0)},
         # Receiver parameters.
-        "receiver_latitude": {"type": float, "required": True},
-        "receiver_longitude": {"type": float, "required": True},
-        "receiver_depth_in_m": {"type": float, "default": 0.0},
-        "network_code": {"type": str},
-        "station_code": {"type": str},
+        "receiverlatitude": {"type": float, "required": True},
+        "receiverlongitude": {"type": float, "required": True},
+        "receiverdepthinm": {"type": float, "default": 0.0},
+        "networkcode": {"type": str},
+        "stationcode": {"type": str},
         "format": {"type": str, "default": "mseed"}
     }
 
@@ -226,11 +226,11 @@ class SeismogramsHandler(tornado.web.RequestHandler):
 
         # Construct the receiver object.
         try:
-            receiver = Receiver(latitude=args.receiver_latitude,
-                                longitude=args.receiver_longitude,
-                                network=args.network_code,
-                                station=args.station_code,
-                                depth_in_m=args.receiver_depth_in_m)
+            receiver = Receiver(latitude=args.receiverlatitude,
+                                longitude=args.receiverlongitude,
+                                network=args.networkcode,
+                                station=args.stationcode,
+                                depth_in_m=args.receiverdepthinm)
         except:
             msg = ("Could not construct receiver with passed parameters. "
                    "Check parameters for sanity.")
@@ -317,11 +317,11 @@ class RawSeismogramsHandler(tornado.web.RequestHandler):
         "origintime": {"type": obspy.UTCDateTime,
                        "default": obspy.UTCDateTime(0)},
         # Receiver parameters.
-        "receiver_latitude": {"type": float, "required": True},
-        "receiver_longitude": {"type": float, "required": True},
-        "receiver_depth_in_m": {"type": float, "default": 0.0},
-        "network_code": {"type": str},
-        "station_code": {"type": str}
+        "receiverlatitude": {"type": float, "required": True},
+        "receiverlongitude": {"type": float, "required": True},
+        "receiverdepthinm": {"type": float, "default": 0.0},
+        "networkcode": {"type": str},
+        "stationcode": {"type": str}
     }
 
     def parse_arguments(self):
@@ -428,11 +428,11 @@ class RawSeismogramsHandler(tornado.web.RequestHandler):
 
         # Construct the receiver object.
         try:
-            receiver = Receiver(latitude=args.receiver_latitude,
-                                longitude=args.receiver_longitude,
-                                network=args.network_code,
-                                station=args.station_code,
-                                depth_in_m=args.receiver_depth_in_m)
+            receiver = Receiver(latitude=args.receiverlatitude,
+                                longitude=args.receiverlongitude,
+                                network=args.networkcode,
+                                station=args.stationcode,
+                                depth_in_m=args.receiverdepthinm)
         except:
             msg = ("Could not construct receiver with passed parameters. "
                    "Check parameters for sanity.")

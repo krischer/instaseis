@@ -110,8 +110,8 @@ def test_raw_seismograms_error_handling(all_clients):
     basic_parameters = {
         "sourcelatitude": 10,
         "sourcelongitude": 10,
-        "receiver_latitude": -10,
-        "receiver_longitude": -10}
+        "receiverlatitude": -10,
+        "receiverlongitude": -10}
 
     # Remove the source latitude, a required parameter.
     params = copy.deepcopy(basic_parameters)
@@ -136,7 +136,7 @@ def test_raw_seismograms_error_handling(all_clients):
 
     # Invalid receiver.
     params = copy.deepcopy(basic_parameters)
-    params["receiver_latitude"] = "100"
+    params["receiverlatitude"] = "100"
     params["mtt"] = "100000"
     params["mpp"] = "100000"
     params["mrr"] = "100000"
@@ -251,8 +251,8 @@ def test_seismograms_raw_route(all_clients):
     basic_parameters = {
         "sourcelatitude": 10,
         "sourcelongitude": 10,
-        "receiver_latitude": -10,
-        "receiver_longitude": -10}
+        "receiverlatitude": -10,
+        "receiverlongitude": -10}
 
     # Various sources.
     mt = {"mtt": "100000", "mpp": "100000", "mrr": "100000",
@@ -336,8 +336,8 @@ def test_seismograms_raw_route(all_clients):
     # Test passing network and station codes.
     params = copy.deepcopy(basic_parameters)
     params.update(mt)
-    params["network_code"] = "BW"
-    params["station_code"] = "ALTM"
+    params["networkcode"] = "BW"
+    params["stationcode"] = "ALTM"
     request = client.fetch(_assemble_url_raw(**params))
     assert request.code == 200
 
@@ -356,7 +356,7 @@ def test_mu_is_passed_as_header_value(all_clients):
     """
     client = all_clients
     parameters = {"sourcelatitude": 10, "sourcelongitude": 10,
-                  "receiver_latitude": -10, "receiver_longitude": -10,
+                  "receiverlatitude": -10, "receiverlongitude": -10,
                   "mtt": "100000", "mpp": "100000", "mrr": "100000",
                   "mrt": "100000", "mrp": "100000", "mtp": "100000"}
 
@@ -382,8 +382,8 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
     basic_parameters = {
         "sourcelatitude": 10,
         "sourcelongitude": 10,
-        "receiver_latitude": -10,
-        "receiver_longitude": -10}
+        "receiverlatitude": -10,
+        "receiverlongitude": -10}
 
     # Various sources.
     mt = {"mtt": "100000", "mpp": "100000", "mrr": "100000",
@@ -417,8 +417,8 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
             **dict((key[0] + "_" + key[1:], float(value))
                    for (key, value) in mt.items()))
         assert p.call_args[1]["receiver"] == instaseis.Receiver(
-            latitude=basic_parameters["receiver_latitude"],
-            longitude=basic_parameters["receiver_longitude"],
+            latitude=basic_parameters["receiverlatitude"],
+            longitude=basic_parameters["receiverlongitude"],
             depth_in_m=0.0)
 
         # Moment tensor source with a couple more parameters.
@@ -426,9 +426,9 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
 
         params["sourcedepthinm"] = "5.0"
         params["origintime"] = str(time)
-        params["receiver_depth_in_m"] = "55.0"
-        params["network_code"] = "BW"
-        params["station_code"] = "ALTM"
+        params["receiverdepthinm"] = "55.0"
+        params["networkcode"] = "BW"
+        params["stationcode"] = "ALTM"
 
         request = client.fetch(_assemble_url_raw(**params))
         assert request.code == 200
@@ -442,8 +442,8 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
             **dict((key[0] + "_" + key[1:], float(value))
                    for (key, value) in mt.items()))
         assert p.call_args[1]["receiver"] == instaseis.Receiver(
-            latitude=basic_parameters["receiver_latitude"],
-            longitude=basic_parameters["receiver_longitude"],
+            latitude=basic_parameters["receiverlatitude"],
+            longitude=basic_parameters["receiverlongitude"],
             depth_in_m=55.0, network="BW", station="ALTM")
 
         # From strike, dip, rake
@@ -463,8 +463,8 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
                 depth_in_m=0.0,
                 **dict((key, float(value)) for (key, value) in sdr.items()))
         assert p.call_args[1]["receiver"] == instaseis.Receiver(
-            latitude=basic_parameters["receiver_latitude"],
-            longitude=basic_parameters["receiver_longitude"],
+            latitude=basic_parameters["receiverlatitude"],
+            longitude=basic_parameters["receiverlongitude"],
             depth_in_m=0.0)
 
         # Moment tensor source with a couple more parameters.
@@ -472,9 +472,9 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
 
         params["sourcedepthinm"] = "5.0"
         params["origintime"] = str(time)
-        params["receiver_depth_in_m"] = "55.0"
-        params["network_code"] = "BW"
-        params["station_code"] = "ALTM"
+        params["receiverdepthinm"] = "55.0"
+        params["networkcode"] = "BW"
+        params["stationcode"] = "ALTM"
 
         request = client.fetch(_assemble_url_raw(**params))
         assert request.code == 200
@@ -488,8 +488,8 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
                 depth_in_m=5.0, origin_time=time,
                 **dict((key, float(value)) for (key, value) in sdr.items()))
         assert p.call_args[1]["receiver"] == instaseis.Receiver(
-            latitude=basic_parameters["receiver_latitude"],
-            longitude=basic_parameters["receiver_longitude"],
+            latitude=basic_parameters["receiverlatitude"],
+            longitude=basic_parameters["receiverlongitude"],
             depth_in_m=55.0, network="BW", station="ALTM")
 
         # Force source only works for displ_only databases.
@@ -510,8 +510,8 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
                 **dict(("_".join(key), float(value))
                        for (key, value) in fs.items()))
             assert p.call_args[1]["receiver"] == instaseis.Receiver(
-                latitude=basic_parameters["receiver_latitude"],
-                longitude=basic_parameters["receiver_longitude"],
+                latitude=basic_parameters["receiverlatitude"],
+                longitude=basic_parameters["receiverlongitude"],
                 depth_in_m=0.0)
 
             # Moment tensor source with a couple more parameters.
@@ -519,9 +519,9 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
 
             params["sourcedepthinm"] = "5.0"
             params["origintime"] = str(time)
-            params["receiver_depth_in_m"] = "55.0"
-            params["network_code"] = "BW"
-            params["station_code"] = "ALTM"
+            params["receiverdepthinm"] = "55.0"
+            params["networkcode"] = "BW"
+            params["stationcode"] = "ALTM"
 
             request = client.fetch(_assemble_url_raw(**params))
             assert request.code == 200
@@ -535,8 +535,8 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
                 **dict(("_".join(key), float(value))
                        for (key, value) in fs.items()))
             assert p.call_args[1]["receiver"] == instaseis.Receiver(
-                latitude=basic_parameters["receiver_latitude"],
-                longitude=basic_parameters["receiver_longitude"],
+                latitude=basic_parameters["receiverlatitude"],
+                longitude=basic_parameters["receiverlongitude"],
                 depth_in_m=55.0, network="BW", station="ALTM")
 
 
@@ -550,8 +550,8 @@ def test_seismograms_error_handling(all_clients):
     basic_parameters = {
         "sourcelatitude": 10,
         "sourcelongitude": 10,
-        "receiver_latitude": -10,
-        "receiver_longitude": -10}
+        "receiverlatitude": -10,
+        "receiverlongitude": -10}
 
     # Remove the source latitude, a required parameter.
     params = copy.deepcopy(basic_parameters)
@@ -576,7 +576,7 @@ def test_seismograms_error_handling(all_clients):
 
     # Invalid receiver.
     params = copy.deepcopy(basic_parameters)
-    params["receiver_latitude"] = "100"
+    params["receiverlatitude"] = "100"
     params["mtt"] = "100000"
     params["mpp"] = "100000"
     params["mrr"] = "100000"
@@ -724,8 +724,8 @@ def test_conversion_to_boolean_parameters(all_clients):
     basic_parameters = {
         "sourcelatitude": 10,
         "sourcelongitude": 10,
-        "receiver_latitude": -10,
-        "receiver_longitude": -10,
+        "receiverlatitude": -10,
+        "receiverlongitude": -10,
         "mtt": "100000",
         "mpp": "100000",
         "mrr": "100000",
@@ -780,8 +780,8 @@ def test_object_creation_for_seismogram_route(all_clients):
     basic_parameters = {
         "sourcelatitude": 10,
         "sourcelongitude": 10,
-        "receiver_latitude": -10,
-        "receiver_longitude": -10}
+        "receiverlatitude": -10,
+        "receiverlongitude": -10}
 
     # Various sources.
     mt = {"mtt": "100000", "mpp": "100000", "mrr": "100000",
@@ -811,8 +811,8 @@ def test_object_creation_for_seismogram_route(all_clients):
             **dict((key[0] + "_" + key[1:], float(value))
                    for (key, value) in mt.items()))
         assert p.call_args[1]["receiver"] == instaseis.Receiver(
-            latitude=basic_parameters["receiver_latitude"],
-            longitude=basic_parameters["receiver_longitude"],
+            latitude=basic_parameters["receiverlatitude"],
+            longitude=basic_parameters["receiverlongitude"],
             depth_in_m=0.0)
         assert p.call_args[1]["kind"] == "displacement"
         assert p.call_args[1]["remove_source_shift"] is True
@@ -826,9 +826,9 @@ def test_object_creation_for_seismogram_route(all_clients):
 
         params["sourcedepthinm"] = "5.0"
         params["origintime"] = str(time)
-        params["receiver_depth_in_m"] = "55.0"
-        params["network_code"] = "BW"
-        params["station_code"] = "ALTM"
+        params["receiverdepthinm"] = "55.0"
+        params["networkcode"] = "BW"
+        params["stationcode"] = "ALTM"
 
         request = client.fetch(_assemble_url(**params))
         assert request.code == 200
@@ -842,8 +842,8 @@ def test_object_creation_for_seismogram_route(all_clients):
             **dict((key[0] + "_" + key[1:], float(value))
                    for (key, value) in mt.items()))
         assert p.call_args[1]["receiver"] == instaseis.Receiver(
-            latitude=basic_parameters["receiver_latitude"],
-            longitude=basic_parameters["receiver_longitude"],
+            latitude=basic_parameters["receiverlatitude"],
+            longitude=basic_parameters["receiverlongitude"],
             depth_in_m=55.0, network="BW", station="ALTM")
         assert p.call_args[1]["kind"] == "displacement"
         assert p.call_args[1]["remove_source_shift"] is True
@@ -869,8 +869,8 @@ def test_object_creation_for_seismogram_route(all_clients):
                 depth_in_m=0.0,
                 **dict((key, float(value)) for (key, value) in sdr.items()))
         assert p.call_args[1]["receiver"] == instaseis.Receiver(
-            latitude=basic_parameters["receiver_latitude"],
-            longitude=basic_parameters["receiver_longitude"],
+            latitude=basic_parameters["receiverlatitude"],
+            longitude=basic_parameters["receiverlongitude"],
             depth_in_m=0.0)
         assert p.call_args[1]["kind"] == "displacement"
         assert p.call_args[1]["remove_source_shift"] is True
@@ -884,9 +884,9 @@ def test_object_creation_for_seismogram_route(all_clients):
 
         params["sourcedepthinm"] = "5.0"
         params["origintime"] = str(time)
-        params["receiver_depth_in_m"] = "55.0"
-        params["network_code"] = "BW"
-        params["station_code"] = "ALTM"
+        params["receiverdepthinm"] = "55.0"
+        params["networkcode"] = "BW"
+        params["stationcode"] = "ALTM"
 
         request = client.fetch(_assemble_url(**params))
         assert request.code == 200
@@ -900,8 +900,8 @@ def test_object_creation_for_seismogram_route(all_clients):
                 depth_in_m=5.0, origin_time=time,
                 **dict((key, float(value)) for (key, value) in sdr.items()))
         assert p.call_args[1]["receiver"] == instaseis.Receiver(
-            latitude=basic_parameters["receiver_latitude"],
-            longitude=basic_parameters["receiver_longitude"],
+            latitude=basic_parameters["receiverlatitude"],
+            longitude=basic_parameters["receiverlongitude"],
             depth_in_m=55.0, network="BW", station="ALTM")
         assert p.call_args[1]["kind"] == "displacement"
         assert p.call_args[1]["remove_source_shift"] is True
@@ -928,8 +928,8 @@ def test_object_creation_for_seismogram_route(all_clients):
                 **dict(("_".join(key), float(value))
                        for (key, value) in fs.items()))
             assert p.call_args[1]["receiver"] == instaseis.Receiver(
-                latitude=basic_parameters["receiver_latitude"],
-                longitude=basic_parameters["receiver_longitude"],
+                latitude=basic_parameters["receiverlatitude"],
+                longitude=basic_parameters["receiverlongitude"],
                 depth_in_m=0.0)
             assert p.call_args[1]["kind"] == "displacement"
             assert p.call_args[1]["remove_source_shift"] is True
@@ -943,9 +943,9 @@ def test_object_creation_for_seismogram_route(all_clients):
 
             params["sourcedepthinm"] = "5.0"
             params["origintime"] = str(time)
-            params["receiver_depth_in_m"] = "55.0"
-            params["network_code"] = "BW"
-            params["station_code"] = "ALTM"
+            params["receiverdepthinm"] = "55.0"
+            params["networkcode"] = "BW"
+            params["stationcode"] = "ALTM"
 
             request = client.fetch(_assemble_url(**params))
             assert request.code == 200
@@ -959,8 +959,8 @@ def test_object_creation_for_seismogram_route(all_clients):
                 **dict(("_".join(key), float(value))
                        for (key, value) in fs.items()))
             assert p.call_args[1]["receiver"] == instaseis.Receiver(
-                latitude=basic_parameters["receiver_latitude"],
-                longitude=basic_parameters["receiver_longitude"],
+                latitude=basic_parameters["receiverlatitude"],
+                longitude=basic_parameters["receiverlongitude"],
                 depth_in_m=55.0, network="BW", station="ALTM")
             assert p.call_args[1]["kind"] == "displacement"
             assert p.call_args[1]["remove_source_shift"] is True
@@ -1091,8 +1091,8 @@ def test_seismograms_retrieval(all_clients):
     basic_parameters = {
         "sourcelatitude": 10,
         "sourcelongitude": 10,
-        "receiver_latitude": -10,
-        "receiver_longitude": -10}
+        "receiverlatitude": -10,
+        "receiverlongitude": -10}
 
     # Various sources.
     mt = {"mtt": "100000", "mpp": "100000", "mrr": "100000",
@@ -1116,8 +1116,8 @@ def test_seismograms_retrieval(all_clients):
         **dict((key[0] + "_" + key[1:], float(value))
                for (key, value) in  mt.items()))
     receiver = instaseis.Receiver(
-        latitude=basic_parameters["receiver_latitude"],
-        longitude=basic_parameters["receiver_longitude"],
+        latitude=basic_parameters["receiverlatitude"],
+        longitude=basic_parameters["receiverlongitude"],
         depth_in_m=0.0)
     st_db = db.get_seismograms(source=source, receiver=receiver,
                                components=components)
@@ -1138,9 +1138,9 @@ def test_seismograms_retrieval(all_clients):
 
     params["sourcedepthinm"] = "5.0"
     params["origintime"] = str(time)
-    params["receiver_depth_in_m"] = "55.0"
-    params["network_code"] = "BW"
-    params["station_code"] = "ALTM"
+    params["receiverdepthinm"] = "55.0"
+    params["networkcode"] = "BW"
+    params["stationcode"] = "ALTM"
     request = client.fetch(_assemble_url(**params))
     st_server = obspy.read(request.buffer)
 
@@ -1151,8 +1151,8 @@ def test_seismograms_retrieval(all_clients):
         **dict((key[0] + "_" + key[1:], float(value))
                for (key, value) in  mt.items()))
     receiver = instaseis.Receiver(
-        latitude=basic_parameters["receiver_latitude"],
-        longitude=basic_parameters["receiver_longitude"],
+        latitude=basic_parameters["receiverlatitude"],
+        longitude=basic_parameters["receiverlongitude"],
         depth_in_m=55.0, network="BW", station="ALTM")
     st_db = db.get_seismograms(source=source, receiver=receiver,
                                components=components)
@@ -1183,8 +1183,8 @@ def test_seismograms_retrieval(all_clients):
         depth_in_m=0.0,
         **dict((key, float(value)) for (key, value) in sdr.items()))
     receiver = instaseis.Receiver(
-        latitude=basic_parameters["receiver_latitude"],
-        longitude=basic_parameters["receiver_longitude"], depth_in_m=0.0)
+        latitude=basic_parameters["receiverlatitude"],
+        longitude=basic_parameters["receiverlongitude"], depth_in_m=0.0)
     st_db = db.get_seismograms(source=source, receiver=receiver,
                                components=components)
     for tr_server, tr_db in zip(st_server, st_db):
@@ -1205,9 +1205,9 @@ def test_seismograms_retrieval(all_clients):
     # Moment tensor source with a couple more parameters.
     params["sourcedepthinm"] = "5.0"
     params["origintime"] = str(time)
-    params["receiver_depth_in_m"] = "55.0"
-    params["network_code"] = "BW"
-    params["station_code"] = "ALTM"
+    params["receiverdepthinm"] = "55.0"
+    params["networkcode"] = "BW"
+    params["stationcode"] = "ALTM"
 
     request = client.fetch(_assemble_url(**params))
     st_server = obspy.read(request.buffer)
@@ -1218,8 +1218,8 @@ def test_seismograms_retrieval(all_clients):
         depth_in_m=5.0, origin_time=time,
         **dict((key, float(value)) for (key, value) in sdr.items()))
     receiver = instaseis.Receiver(
-        latitude=basic_parameters["receiver_latitude"],
-        longitude=basic_parameters["receiver_longitude"],
+        latitude=basic_parameters["receiverlatitude"],
+        longitude=basic_parameters["receiverlongitude"],
         depth_in_m=55.0, network="BW", station="ALTM")
     st_db = db.get_seismograms(source=source, receiver=receiver,
                                components=components)
@@ -1252,8 +1252,8 @@ def test_seismograms_retrieval(all_clients):
             **dict(("_".join(key), float(value))
                    for (key, value) in fs.items()))
         receiver = instaseis.Receiver(
-            latitude=basic_parameters["receiver_latitude"],
-            longitude=basic_parameters["receiver_longitude"],
+            latitude=basic_parameters["receiverlatitude"],
+            longitude=basic_parameters["receiverlongitude"],
             depth_in_m=0.0)
         st_db = db.get_seismograms(source=source, receiver=receiver,
                                    components=components)
@@ -1275,9 +1275,9 @@ def test_seismograms_retrieval(all_clients):
 
         params["sourcedepthinm"] = "5.0"
         params["origintime"] = str(time)
-        params["receiver_depth_in_m"] = "55.0"
-        params["network_code"] = "BW"
-        params["station_code"] = "ALTM"
+        params["receiverdepthinm"] = "55.0"
+        params["networkcode"] = "BW"
+        params["stationcode"] = "ALTM"
 
         request = client.fetch(_assemble_url(**params))
         st_server = obspy.read(request.buffer)
@@ -1289,8 +1289,8 @@ def test_seismograms_retrieval(all_clients):
             **dict(("_".join(key), float(value))
                    for (key, value) in fs.items()))
         receiver = instaseis.Receiver(
-            latitude=basic_parameters["receiver_latitude"],
-            longitude=basic_parameters["receiver_longitude"],
+            latitude=basic_parameters["receiverlatitude"],
+            longitude=basic_parameters["receiverlongitude"],
             depth_in_m=55.0, network="BW", station="ALTM")
         st_db = db.get_seismograms(source=source, receiver=receiver,
                                    components=components)
@@ -1317,8 +1317,8 @@ def test_seismograms_retrieval(all_clients):
         **dict((key[0] + "_" + key[1:], float(value))
                for (key, value) in mt.items()))
     receiver = instaseis.Receiver(
-        latitude=basic_parameters["receiver_latitude"],
-        longitude=basic_parameters["receiver_longitude"],
+        latitude=basic_parameters["receiverlatitude"],
+        longitude=basic_parameters["receiverlongitude"],
         depth_in_m=0.0)
 
     # Now test other the other parameters.
@@ -1476,8 +1476,8 @@ def test_output_formats(all_clients):
     basic_parameters = {
         "sourcelatitude": 10,
         "sourcelongitude": 10,
-        "receiver_latitude": -10,
-        "receiver_longitude": -10}
+        "receiverlatitude": -10,
+        "receiverlongitude": -10}
     mt = {"mtt": "100000", "mpp": "100000", "mrr": "100000",
           "mrt": "100000", "mrp": "100000", "mtp": "100000"}
     basic_parameters.update(mt)
@@ -1539,12 +1539,12 @@ def test_output_formats(all_clients):
     basic_parameters = {
         "sourcelatitude": 10,
         "sourcelongitude": 10,
-        "receiver_latitude": -10,
-        "receiver_longitude": -10}
+        "receiverlatitude": -10,
+        "receiverlongitude": -10}
     mt = {"mtt": "100000", "mpp": "100000", "mrr": "100000",
           "mrt": "100000", "mrp": "100000", "mtp": "100000",
           "components": "RT", "unit": "velocity", "dt": 2, "alanczos": 3,
-          "network_code": "BW", "station_code": "FURT"}
+          "networkcode": "BW", "stationcode": "FURT"}
     basic_parameters.update(mt)
 
     # First don't specify the format which should result in a miniseed file.
