@@ -12,6 +12,8 @@ Server offering a REST API for Instaseis.
 import copy
 import io
 import logging
+import zipfile
+
 import numpy as np
 import obspy
 import tornado.ioloop
@@ -80,7 +82,8 @@ class SeismogramsHandler(tornado.web.RequestHandler):
         "receiver_longitude": {"type": float, "required": True},
         "receiver_depth_in_m": {"type": float, "default": 0.0},
         "network_code": {"type": str},
-        "station_code": {"type": str}
+        "station_code": {"type": str},
+        "format": {"type": str, "default": "mseed"}
     }
 
     def parse_arguments(self):
@@ -127,6 +130,12 @@ class SeismogramsHandler(tornado.web.RequestHandler):
         if args.unit not in ["displacement", "velocity", "acceleration"]:
             msg = ("Unit must be one of 'displacement', 'velocity', "
                    "or 'acceleration'")
+            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+
+        # Make sure the output format is valid.
+        args.format = args.format.lower()
+        if args.format not in ("mseed", "saczip"):
+            msg = ("Format must either be 'mseed' or 'saczip'.")
             raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
         # Make sure that dt, if given is larger then 0.01. This should still
@@ -242,17 +251,40 @@ class SeismogramsHandler(tornado.web.RequestHandler):
         for tr in st:
             tr.data = np.require(tr.data, dtype=np.float32)
 
-        with io.BytesIO() as fh:
-            st.write(fh, format="mseed")
-            fh.seek(0, 0)
-            binary_data = fh.read()
+        if args.format == "mseed":
+            with io.BytesIO() as fh:
+                st.write(fh, format="mseed")
+                fh.seek(0, 0)
+                binary_data = fh.read()
+            content_type = "application/octet-stream"
+        # Write a number of SAC files into an archive.
+        elif args.format == "saczip":
+            with io.BytesIO() as fh:
+                with zipfile.ZipFile(fh, mode="w") as zh:
+                    for tr in st:
+                        with io.BytesIO() as temp:
+                            tr.write(temp, format="sac")
+                            temp.seek(0, 0)
+                            filename = "%s.sac" % tr.id
+                            zh.writestr(filename, temp.read())
+                fh.seek(0, 0)
+                binary_data = fh.read()
+            content_type = "application/zip"
+        else:
+            # Checked above and cannot really happen.
+            raise NotImplementedError
 
-        filename = "instaseis_seismogram_%s.mseed" % \
-            str(obspy.UTCDateTime()).replace(":", "_")
+        FILE_ENDINGS_MAP = {
+            "mseed": "mseed",
+            "saczip": "zip"}
+
+        filename = "instaseis_seismogram_%s.%s" % (
+            str(obspy.UTCDateTime()).replace(":", "_"),
+            FILE_ENDINGS_MAP[args.format])
 
         self.write(binary_data)
 
-        self.set_header("Content-Type", "application/octet-stream")
+        self.set_header("Content-Type", content_type)
         self.set_header("Content-Disposition",
                         "attachment; filename=%s" % filename)
 
