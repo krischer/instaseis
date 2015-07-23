@@ -1629,11 +1629,13 @@ def test_coordinates_route_with_stations_coordinates_callback(
     assert request.code == 200
     stations = json.loads(str(request.body.decode("utf8")))
 
-    assert stations == {"stations": [{
-        "latitude": 34.94591,
-        "longitude": -106.4572,
-        "network": "IU",
-        "station": "ANMO"}]}
+    assert stations == {
+        "count": 1,
+        "stations": [{
+            "latitude": 34.94591,
+            "longitude": -106.4572,
+            "network": "IU",
+            "station": "ANMO"}]}
 
     # Multiple stations with wildcard searches.
     request = client.fetch("/coordinates?network=IU,B*&station=ANT*,ANM?")
@@ -1641,6 +1643,7 @@ def test_coordinates_route_with_stations_coordinates_callback(
     stations = json.loads(str(request.body.decode("utf8")))
 
     assert stations == {
+        "count": 2,
         "stations": [{
             "latitude": 39.868,
             "longitude": 32.7934,

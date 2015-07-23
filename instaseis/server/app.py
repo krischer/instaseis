@@ -510,7 +510,7 @@ class CoordinatesHandler(tornado.web.RequestHandler):
             raise tornado.web.HTTPError(
                 404, log_message=msg, reason=msg)
 
-        self.write({"stations": coordinates})
+        self.write({"count": len(coordinates), "stations": coordinates})
         self.set_header("Access-Control-Allow-Origin", "*")
 
 
