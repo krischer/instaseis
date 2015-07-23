@@ -79,12 +79,16 @@ class SeismogramsHandler(tornado.web.RequestHandler):
         # More optional source parameters.
         "origintime": {"type": obspy.UTCDateTime,
                        "default": obspy.UTCDateTime(0)},
-        # Receiver parameters.
-        "receiverlatitude": {"type": float, "required": True},
-        "receiverlongitude": {"type": float, "required": True},
+        # Receivers can be specified either directly via their coordinates.
+        # In that case one can assign a network and station code.
+        "receiverlatitude": {"type": float},
+        "receiverlongitude": {"type": float},
         "receiverdepthinm": {"type": float, "default": 0.0},
         "networkcode": {"type": str},
         "stationcode": {"type": str},
+        # Or by querying a database.
+        "network": {"type": str},
+        "station": {"type": str},
         "format": {"type": str, "default": "mseed"}
     }
 
@@ -153,6 +157,31 @@ class SeismogramsHandler(tornado.web.RequestHandler):
         if not (2 <= args.alanczos <= 20):
             msg = ("`alanczos` must not be smaller than 2 or larger than 20.")
             raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+
+        # Figure out who the station coordinates are specified.
+        direct_receiver_settings = [args.receiverlatitude,
+                                    args.receiverlongitude]
+        query_receivers = [args.network, args.station]
+        if any(direct_receiver_settings) and any(query_receivers):
+            msg = ("Receiver coordinates can either be specified by passing "
+                   "the coordinates, or by specifying query parameters, "
+                   "but not both.")
+            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+        elif not(all(direct_receiver_settings) or all(query_receivers)):
+            msg = ("Must specify a full set of coordinates or a full set of "
+                   "receiver parameters.")
+            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+        elif all(direct_receiver_settings) and all(query_receivers):
+            # Should not happen.
+            raise NotImplementedError
+
+        # Make sure that the station coordinates callback is available if
+        # needed. Otherwise raise a 404.
+        if all(query_receivers) and \
+                not application.station_coordinates_callback:
+            msg = ("Server does not support station coordinates and thus no "
+                   "station queries.")
+            raise tornado.web.HTTPError(404, log_message=msg, reason=msg)
 
         # Figure out the type of source and construct the source object.
         src_params = {
@@ -226,70 +255,107 @@ class SeismogramsHandler(tornado.web.RequestHandler):
             msg = "No/insufficient source parameters specified"
             raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
+        # Generating even 100'000 receivers only takes ~150ms so its totally
+        # ok to generate them all at once here. The time to generate and
+        # send the seismograms will dominate.
+
         # Construct the receiver object.
-        try:
-            receiver = Receiver(latitude=args.receiverlatitude,
-                                longitude=args.receiverlongitude,
-                                network=args.networkcode,
-                                station=args.stationcode,
-                                depth_in_m=args.receiverdepthinm)
-        except:
-            msg = ("Could not construct receiver with passed parameters. "
-                   "Check parameters for sanity.")
-            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+        receivers = []
 
-        try:
-            st = application.db.get_seismograms(
-                source=source, receiver=receiver, components=components,
-                kind=args.unit, remove_source_shift=args.removesourceshift,
-                reconvolve_stf=False, return_obspy_stream=True, dt=args.dt,
-                a_lanczos=args.alanczos)
-        except Exception:
-            msg = ("Could not extract seismogram. Make sure, the components "
-                   "are valid, and the depth settings are correct.")
-            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+        if all(direct_receiver_settings):
+            try:
+                receiver = Receiver(latitude=args.receiverlatitude,
+                                    longitude=args.receiverlongitude,
+                                    network=args.networkcode,
+                                    station=args.stationcode,
+                                    depth_in_m=args.receiverdepthinm)
+            except:
+                msg = ("Could not construct receiver with passed parameters. "
+                       "Check parameters for sanity.")
+                raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+            receivers.append(Receiver)
+        elif all(query_receivers):
+            networks = args.network.split(",")
+            stations = args.station.split(",")
 
-        # Half the filesize but definitely sufficiently accurate.
-        for tr in st:
-            tr.data = np.require(tr.data, dtype=np.float32)
+            coordinates = application.station_coordinates_callback(
+                networks=networks, stations=stations)
 
-        if args.format == "mseed":
-            with io.BytesIO() as fh:
-                st.write(fh, format="mseed")
-                fh.seek(0, 0)
-                binary_data = fh.read()
-            content_type = "application/octet-stream"
-        # Write a number of SAC files into an archive.
-        elif args.format == "saczip":
-            with io.BytesIO() as fh:
-                with zipfile.ZipFile(fh, mode="w") as zh:
-                    for tr in st:
-                        with io.BytesIO() as temp:
-                            tr.write(temp, format="sac")
-                            temp.seek(0, 0)
-                            filename = "%s.sac" % tr.id
-                            zh.writestr(filename, temp.read())
-                fh.seek(0, 0)
-                binary_data = fh.read()
-            content_type = "application/zip"
-        else:
-            # Checked above and cannot really happen.
-            raise NotImplementedError
+            if not coordinates:
+                msg = "No coordinates found satisfying the query."
+                raise tornado.web.HTTPError(
+                    404, log_message=msg, reason=msg)
+                application.station_coordinates_callback(networks=args.network,
+                                                         stations=args.station)
 
-        FILE_ENDINGS_MAP = {
-            "mseed": "mseed",
-            "saczip": "zip"}
+            for station in coordinates:
+                try:
+                    receivers.append(Receiver(
+                        latitude=station["latitude"],
+                        longitude=station["longitude"],
+                        network=station["network"],
+                        station=station["station"],
+                        depth_in_m=0))
+                except:
+                    msg = ("Could not construct receiver with passed "
+                           "parameters. Check parameters for sanity.")
+                    raise tornado.web.HTTPError(400, log_message=msg,
+                                                reason=msg)
 
-        filename = "instaseis_seismogram_%s.%s" % (
-            str(obspy.UTCDateTime()).replace(":", "_"),
-            FILE_ENDINGS_MAP[args.format])
+        for receiver in receivers:
+            try:
+                st = application.db.get_seismograms(
+                    source=source, receiver=receiver, components=components,
+                    kind=args.unit, remove_source_shift=args.removesourceshift,
+                    reconvolve_stf=False, return_obspy_stream=True, dt=args.dt,
+                    a_lanczos=args.alanczos)
+            except Exception:
+                msg = ("Could not extract seismogram. Make sure, the components "
+                       "are valid, and the depth settings are correct.")
+                raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
-        self.write(binary_data)
+            # Half the filesize but definitely sufficiently accurate.
+            for tr in st:
+                tr.data = np.require(tr.data, dtype=np.float32)
+
+            if args.format == "mseed":
+                with io.BytesIO() as fh:
+                    st.write(fh, format="mseed")
+                    fh.seek(0, 0)
+                    binary_data = fh.read()
+                content_type = "application/octet-stream"
+            # Write a number of SAC files into an archive.
+            elif args.format == "saczip":
+                with io.BytesIO() as fh:
+                    with zipfile.ZipFile(fh, mode="w") as zh:
+                        for tr in st:
+                            with io.BytesIO() as temp:
+                                tr.write(temp, format="sac")
+                                temp.seek(0, 0)
+                                filename = "%s.sac" % tr.id
+                                zh.writestr(filename, temp.read())
+                    fh.seek(0, 0)
+                    binary_data = fh.read()
+                content_type = "application/zip"
+            else:
+                # Checked above and cannot really happen.
+                raise NotImplementedError
+
+            FILE_ENDINGS_MAP = {
+                "mseed": "mseed",
+                "saczip": "zip"}
+
+            filename = "instaseis_seismogram_%s.%s" % (
+                str(obspy.UTCDateTime()).replace(":", "_"),
+                FILE_ENDINGS_MAP[args.format])
+
+            self.write(binary_data)
 
         self.set_header("Content-Type", content_type)
         self.set_header("Content-Disposition",
                         "attachment; filename=%s" % filename)
         self.set_header("Access-Control-Allow-Origin", "*")
+        self.finish()
 
 
 class RawSeismogramsHandler(tornado.web.RequestHandler):
