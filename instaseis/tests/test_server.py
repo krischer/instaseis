@@ -1610,3 +1610,44 @@ def test_coordinates_route_with_no_coordinate_callback(all_clients):
     request = client.fetch("/coordinates?network=BW&station=FURT")
     assert request.code == 404
     assert request.reason == 'Server does not support station coordinates.'
+
+
+def test_coordinates_route_with_stations_coordinates_callback(
+        all_clients_station_coordinates_callback):
+    """
+    Tests the /coordinates route.
+    """
+    client = all_clients_station_coordinates_callback
+
+    # 404 is returned if no coordinates are found.
+    request = client.fetch("/coordinates?network=BW&station=FURT")
+    assert request.code == 404
+    assert request.reason == 'No coordinates found satisfying the query.'
+
+    # Single station.
+    request = client.fetch("/coordinates?network=IU&station=ANMO")
+    assert request.code == 200
+    stations = json.loads(str(request.body.decode("utf8")))
+
+    assert stations == {"stations": [{
+        "latitude": 34.94591,
+        "longitude": -106.4572,
+        "network": "IU",
+        "station": "ANMO"}]}
+
+    # Multiple stations with wildcard searches.
+    request = client.fetch("/coordinates?network=IU,B*&station=ANT*,ANM?")
+    assert request.code == 200
+    stations = json.loads(str(request.body.decode("utf8")))
+
+    assert stations == {
+        "stations": [{
+            "latitude": 39.868,
+            "longitude": 32.7934,
+            "network": "IU",
+            "station": "ANTO"
+        }, {
+            "latitude": 34.94591,
+            "longitude": -106.4572,
+            "network": "IU",
+            "station": "ANMO"}]}

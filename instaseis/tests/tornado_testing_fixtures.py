@@ -124,10 +124,38 @@ DBS = {
 }
 
 
-def create_async_client(path):
+def station_coordinates_mock_callback(networks, stations):
+    """
+    Mock station coordinates callback for the purpose of testing.
+
+    Return a single station for networks=["IU"] and stations=["ANMO"],
+    two stations for networks=["IU", "B*"] and stations=["ANT*", "ANM?"] and no
+    stations for all other combinations.
+    """
+    if networks == ["IU"] and stations == ["ANMO"]:
+        return [{
+            "latitude": 34.94591,
+            "longitude": -106.4572,
+            "network": "IU",
+            "station": "ANMO"}]
+    elif networks == ["IU", "B*"] and stations == ["ANT*", "ANM?"]:
+        return [{
+            "latitude": 39.868,
+            "longitude": 32.7934,
+            "network": "IU",
+            "station": "ANTO"
+         }, {
+            "latitude": 34.94591,
+            "longitude": -106.4572,
+            "network": "IU",
+            "station": "ANMO"}]
+    else:
+        return []
+
+
+def create_async_client(path, station_coordinates_callback):
     application.db = InstaseisDB(path)
-    # Defaults to None.
-    application.station_coordinates_callback = None
+    application.station_coordinates_callback = station_coordinates_callback
     # Build server as in testing:311
     sock, port = bind_unused_port()
     server = HTTPServer(application, io_loop=IOLoop.instance())
@@ -143,7 +171,18 @@ def all_clients(request):
     """
     Fixture returning all clients!
     """
-    return create_async_client(request.param)
+    return create_async_client(request.param,
+                               station_coordinates_callback=None)
+
+
+@pytest.fixture(params=list(DBS.values()))
+def all_clients_station_coordinates_callback(request):
+    """
+    Fixture returning all with a station coordinates callback.
+    """
+    return create_async_client(
+        request.param,
+        station_coordinates_callback=station_coordinates_mock_callback)
 
 
 def _add_callback(client):
@@ -162,7 +201,7 @@ def _add_callback(client):
 @pytest.fixture(params=list(DBS.values()))
 @responses.activate
 def all_remote_dbs(request):
-    client = create_async_client(request.param)
+    client = create_async_client(request.param, None)
 
     _add_callback(client)
 

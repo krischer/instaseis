@@ -55,14 +55,9 @@ class SeismogramsHandler(tornado.web.RequestHandler):
         "dt": {"type": float},
         "alanczos": {"type": int, "default": 5},
         # Source parameters.
-        "sourcelatitude": {"type": float},
-        "sourcelongitude": {"type": float},
+        "sourcelatitude": {"type": float, "required": True},
+        "sourcelongitude": {"type": float, "required": True},
         "sourcedepthinm": {"type": float, "default": 0.0},
-        # Network and stations. These can containt wildcards and will be
-        # searched upon if the server has been started with a callback that
-        # can do that..
-        "network": {"type": str},
-        "station": {"type": str},
         # Source can either be given as the moment tensor components in Nm.
         "mrr": {"type": float},
         "mtt": {"type": float},
@@ -505,6 +500,11 @@ class CoordinatesHandler(tornado.web.RequestHandler):
 
         coordinates = application.station_coordinates_callback(
             networks=networks, stations=stations)
+
+        if not coordinates:
+            msg = "No coordinates found satisfying the query."
+            raise tornado.web.HTTPError(
+                404, log_message=msg, reason=msg)
 
         self.write({"stations": coordinates})
 
