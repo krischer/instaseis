@@ -1651,3 +1651,48 @@ def test_coordinates_route_with_stations_coordinates_callback(
             "longitude": -106.4572,
             "network": "IU",
             "station": "ANMO"}]}
+
+
+def test_cors_headers(all_clients_station_coordinates_callback):
+    """
+    Check that all routes return CORS headers.
+    """
+    client = all_clients_station_coordinates_callback
+
+    request = client.fetch("/")
+    assert request.code == 200
+    assert "Access-Control-Allow-Origin" in request.headers
+    assert request.headers["Access-Control-Allow-Origin"] == "*"
+
+    request = client.fetch("/info")
+    assert request.code == 200
+    assert "Access-Control-Allow-Origin" in request.headers
+    assert request.headers["Access-Control-Allow-Origin"] == "*"
+
+    request = client.fetch("/coordinates?network=IU&station=ANMO")
+    assert request.code == 200
+    assert "Access-Control-Allow-Origin" in request.headers
+    assert request.headers["Access-Control-Allow-Origin"] == "*"
+
+    # raw seismograms route
+    params = {
+        "sourcelatitude": 10,
+        "sourcelongitude": 10,
+        "receiverlatitude": -10,
+        "receiverlongitude": -10,
+        "mtt": "100000",
+        "mpp": "100000",
+        "mrr": "100000",
+        "mrt": "100000",
+        "mrp": "100000",
+        "mtp": "100000"}
+    request = client.fetch(_assemble_url_raw(**params))
+    assert request.code == 200
+    assert "Access-Control-Allow-Origin" in request.headers
+    assert request.headers["Access-Control-Allow-Origin"] == "*"
+
+    # standard seismograms route
+    request = client.fetch(_assemble_url(**params))
+    assert request.code == 200
+    assert "Access-Control-Allow-Origin" in request.headers
+    assert request.headers["Access-Control-Allow-Origin"] == "*"
