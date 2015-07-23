@@ -31,6 +31,7 @@ class IndexHandler(tornado.web.RequestHandler):
             "version": __version__
         }
         self.write(response)
+        self.set_header("Access-Control-Allow-Origin", "*")
 
 
 class InfoHandler(tornado.web.RequestHandler):
@@ -44,6 +45,7 @@ class InfoHandler(tornado.web.RequestHandler):
         # necessary.
         info["directory"] = ""
         self.write(dict(info))
+        self.set_header("Access-Control-Allow-Origin", "*")
 
 
 class SeismogramsHandler(tornado.web.RequestHandler):
@@ -287,6 +289,7 @@ class SeismogramsHandler(tornado.web.RequestHandler):
         self.set_header("Content-Type", content_type)
         self.set_header("Content-Disposition",
                         "attachment; filename=%s" % filename)
+        self.set_header("Access-Control-Allow-Origin", "*")
 
 
 class RawSeismogramsHandler(tornado.web.RequestHandler):
@@ -478,6 +481,7 @@ class RawSeismogramsHandler(tornado.web.RequestHandler):
         # Passing mu in the HTTP header...not sure how well this plays with
         # proxies...
         self.set_header("Instaseis-Mu", "%f" % st[0].stats.instaseis.mu)
+        self.set_header("Access-Control-Allow-Origin", "*")
 
 
 class CoordinatesHandler(tornado.web.RequestHandler):
@@ -507,6 +511,7 @@ class CoordinatesHandler(tornado.web.RequestHandler):
                 404, log_message=msg, reason=msg)
 
         self.write({"stations": coordinates})
+        self.set_header("Access-Control-Allow-Origin", "*")
 
 
 application = tornado.web.Application([
