@@ -10,18 +10,74 @@ Server offering a REST API for Instaseis.
     (http://www.gnu.org/copyleft/lgpl.html)
 """
 import copy
+import functools
 import io
 import logging
+import threading
 import zipfile
 
 import numpy as np
 import obspy
+import tornado.gen
 import tornado.ioloop
 import tornado.web
 
 from ..import __version__
 from ..instaseis_db import InstaseisDB
 from .. import Source, ForceSource, Receiver
+
+
+def run_async(func):
+    @functools.wraps(func)
+    def async_func(*args, **kwargs):
+        func_hl = threading.Thread(target=func, args=args, kwargs=kwargs)
+        func_hl.start()
+        return func_hl
+    return async_func
+
+
+@run_async
+def _get_seismogram(db, source, receiver, components, unit,
+                    remove_source_shift, dt, a_lanczos, format, callback):
+    try:
+        st = db.get_seismograms(
+            source=source, receiver=receiver, components=components,
+            kind=unit, remove_source_shift=remove_source_shift,
+            reconvolve_stf=False, return_obspy_stream=True, dt=dt,
+            a_lanczos=a_lanczos)
+    except Exception:
+        msg = ("Could not extract seismogram. Make sure, the components "
+               "are valid, and the depth settings are correct.")
+        raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+
+    # Half the filesize but definitely sufficiently accurate.
+    for tr in st:
+        tr.data = np.require(tr.data, dtype=np.float32)
+
+    if format == "mseed":
+        with io.BytesIO() as fh:
+            st.write(fh, format="mseed")
+            fh.seek(0, 0)
+            binary_data = fh.read()
+        content_type = "application/octet-stream"
+    # Write a number of SAC files into an archive.
+    elif format == "saczip":
+        with io.BytesIO() as fh:
+            with zipfile.ZipFile(fh, mode="w") as zh:
+                for tr in st:
+                    with io.BytesIO() as temp:
+                        tr.write(temp, format="sac")
+                        temp.seek(0, 0)
+                        filename = "%s.sac" % tr.id
+                        zh.writestr(filename, temp.read())
+            fh.seek(0, 0)
+            binary_data = fh.read()
+        content_type = "application/zip"
+    else:
+        # Checked above and cannot really happen.
+        raise NotImplementedError
+
+    callback(binary_data, content_type)
 
 
 class IndexHandler(tornado.web.RequestHandler):
@@ -128,6 +184,8 @@ class SeismogramsHandler(tornado.web.RequestHandler):
             setattr(args, name, value)
         return args
 
+    @tornado.web.asynchronous
+    @tornado.gen.coroutine
     def get(self):
         args = self.parse_arguments()
 
@@ -259,9 +317,9 @@ class SeismogramsHandler(tornado.web.RequestHandler):
         # ok to generate them all at once here. The time to generate and
         # send the seismograms will dominate.
 
-        # Construct the receiver object.
         receivers = []
 
+        # Construct either a single receiver object.
         if all(direct_receiver_settings):
             try:
                 receiver = Receiver(latitude=args.receiverlatitude,
@@ -273,7 +331,8 @@ class SeismogramsHandler(tornado.web.RequestHandler):
                 msg = ("Could not construct receiver with passed parameters. "
                        "Check parameters for sanity.")
                 raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
-            receivers.append(Receiver)
+            receivers.append(receiver)
+        # Or a list of receivers.
         elif all(query_receivers):
             networks = args.network.split(",")
             stations = args.station.split(",")
@@ -302,54 +361,28 @@ class SeismogramsHandler(tornado.web.RequestHandler):
                     raise tornado.web.HTTPError(400, log_message=msg,
                                                 reason=msg)
 
+        # For each, get the synthetics, and stream it to the user.
         for receiver in receivers:
-            try:
-                st = application.db.get_seismograms(
-                    source=source, receiver=receiver, components=components,
-                    kind=args.unit, remove_source_shift=args.removesourceshift,
-                    reconvolve_stf=False, return_obspy_stream=True, dt=args.dt,
-                    a_lanczos=args.alanczos)
-            except Exception:
-                msg = ("Could not extract seismogram. Make sure, the components "
-                       "are valid, and the depth settings are correct.")
-                raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
-            # Half the filesize but definitely sufficiently accurate.
-            for tr in st:
-                tr.data = np.require(tr.data, dtype=np.float32)
+            response, _ = yield tornado.gen.Task(
+                _get_seismogram,
+                db=application.db, source=source, receiver=receiver,
+                remove_source_shift=args.removesourceshift,
+                components=components,  unit=args.unit, dt=args.dt,
+                a_lanczos=args.alanczos, format=args.format)
 
-            if args.format == "mseed":
-                with io.BytesIO() as fh:
-                    st.write(fh, format="mseed")
-                    fh.seek(0, 0)
-                    binary_data = fh.read()
-                content_type = "application/octet-stream"
-            # Write a number of SAC files into an archive.
-            elif args.format == "saczip":
-                with io.BytesIO() as fh:
-                    with zipfile.ZipFile(fh, mode="w") as zh:
-                        for tr in st:
-                            with io.BytesIO() as temp:
-                                tr.write(temp, format="sac")
-                                temp.seek(0, 0)
-                                filename = "%s.sac" % tr.id
-                                zh.writestr(filename, temp.read())
-                    fh.seek(0, 0)
-                    binary_data = fh.read()
-                content_type = "application/zip"
-            else:
-                # Checked above and cannot really happen.
-                raise NotImplementedError
-
-            FILE_ENDINGS_MAP = {
-                "mseed": "mseed",
-                "saczip": "zip"}
-
-            filename = "instaseis_seismogram_%s.%s" % (
-                str(obspy.UTCDateTime()).replace(":", "_"),
-                FILE_ENDINGS_MAP[args.format])
+            binary_data, content_type = response
 
             self.write(binary_data)
+            self.flush()
+
+        FILE_ENDINGS_MAP = {
+            "mseed": "mseed",
+            "saczip": "zip"}
+
+        filename = "instaseis_seismogram_%s.%s" % (
+            str(obspy.UTCDateTime()).replace(":", "_"),
+            FILE_ENDINGS_MAP[args.format])
 
         self.set_header("Content-Type", content_type)
         self.set_header("Content-Disposition",
