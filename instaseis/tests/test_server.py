@@ -1599,3 +1599,14 @@ def test_output_formats(all_clients):
 
     # Now make sure the result is the same independent of the output format.
     assert st == sac_st
+
+
+def test_coordinates_route_with_no_coordinate_callback(all_clients):
+    """
+    If no coordinate callback has been set, the coordinate route should
+    return 404.
+    """
+    client = all_clients
+    request = client.fetch("/coordinates?network=BW&station=FURT")
+    assert request.code == 404
+    assert request.reason == 'Server does not support station coordinates.'

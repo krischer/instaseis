@@ -55,9 +55,14 @@ class SeismogramsHandler(tornado.web.RequestHandler):
         "dt": {"type": float},
         "alanczos": {"type": int, "default": 5},
         # Source parameters.
-        "sourcelatitude": {"type": float, "required": True},
-        "sourcelongitude": {"type": float, "required": True},
+        "sourcelatitude": {"type": float},
+        "sourcelongitude": {"type": float},
         "sourcedepthinm": {"type": float, "default": 0.0},
+        # Network and stations. These can containt wildcards and will be
+        # searched upon if the server has been started with a callback that
+        # can do that..
+        "network": {"type": str},
+        "station": {"type": str},
         # Source can either be given as the moment tensor components in Nm.
         "mrr": {"type": float},
         "mtt": {"type": float},
@@ -480,17 +485,44 @@ class RawSeismogramsHandler(tornado.web.RequestHandler):
         self.set_header("Instaseis-Mu", "%f" % st[0].stats.instaseis.mu)
 
 
+class CoordinatesHandler(tornado.web.RequestHandler):
+    def get(self):
+        if application.station_coordinates_callback is None:
+            msg = "Server does not support station coordinates."
+            raise tornado.web.HTTPError(
+                404, log_message=msg, reason=msg)
+
+        networks = self.get_argument("network")
+        stations = self.get_argument("station")
+
+        if not networks or not stations:
+            msg = "Parameters 'network' and 'station' must be given."
+            raise tornado.web.HTTPError(
+                404, log_message=msg, reason=msg)
+
+        networks = networks.split(",")
+        stations = stations.split(",")
+
+        coordinates = application.station_coordinates_callback(
+            networks=networks, stations=stations)
+
+        self.write({"stations": coordinates})
+
+
 application = tornado.web.Application([
     (r"/seismograms", SeismogramsHandler),
     (r"/seismograms_raw", RawSeismogramsHandler),
     (r"/info", InfoHandler),
-    (r"/", IndexHandler)
+    (r"/", IndexHandler),
+    (r"/coordinates", CoordinatesHandler),
 ])
 
 
-def launch_io_loop(db_path, port, buffer_size_in_mb, quiet, log_level):
+def launch_io_loop(db_path, port, buffer_size_in_mb, quiet, log_level,
+                   station_coordinates_callback=None):
     application.db = InstaseisDB(db_path=db_path,
                                  buffer_size_in_mb=buffer_size_in_mb)
+    application.station_coordinates_callback = station_coordinates_callback
 
     if not quiet:
         # Get all tornado loggers.

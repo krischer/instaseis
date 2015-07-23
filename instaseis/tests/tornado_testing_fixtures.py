@@ -126,6 +126,8 @@ DBS = {
 
 def create_async_client(path):
     application.db = InstaseisDB(path)
+    # Defaults to None.
+    application.station_coordinates_callback = None
     # Build server as in testing:311
     sock, port = bind_unused_port()
     server = HTTPServer(application, io_loop=IOLoop.instance())
