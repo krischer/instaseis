@@ -1754,6 +1754,7 @@ def test_multiple_seismograms_retrieval_no_format_given(
 
     # Should now have 6 Stream objects.
     assert len(st_db) == 6
+    assert len(st_server) == 6
     for tr_server, tr_db in zip(st_server, st_db):
         # Remove the additional stats from both. This also assures both have
         # the  miniseed format.
@@ -1807,6 +1808,7 @@ def test_multiple_seismograms_retrieval_no_format_given(
 
     # Should now have only 4 Stream objects.
     assert len(st_db) == 4
+    assert len(st_server) == 4
     for tr_server, tr_db in zip(st_server, st_db):
         # Remove the additional stats from both. This also assures both have
         # the  miniseed format.
@@ -1860,6 +1862,7 @@ def test_multiple_seismograms_retrieval_no_format_given(
 
         # Should now have 10 Stream objects.
         assert len(st_db) == 10
+        assert len(st_server) == 10
         for tr_server, tr_db in zip(st_server, st_db):
             # Remove the additional stats from both. This also assures both
             # have the  miniseed format.
@@ -1932,6 +1935,7 @@ def test_multiple_seismograms_retrieval_no_format_given_single_station(
 
     # Should now have 3 Stream objects.
     assert len(st_db) == 3
+    assert len(st_server) == 3
     for tr_server, tr_db in zip(st_server, st_db):
         # Remove the additional stats from both. This also assures both have
         # the  miniseed format.
@@ -1983,6 +1987,7 @@ def test_multiple_seismograms_retrieval_no_format_given_single_station(
 
     # Should now have only 2 Stream objects.
     assert len(st_db) == 2
+    assert len(st_server) == 2
     for tr_server, tr_db in zip(st_server, st_db):
         # Remove the additional stats from both. This also assures both have
         # the  miniseed format.
@@ -2034,6 +2039,7 @@ def test_multiple_seismograms_retrieval_no_format_given_single_station(
 
         # Should now have 5 Stream objects.
         assert len(st_db) == 5
+        assert len(st_server) == 5
         for tr_server, tr_db in zip(st_server, st_db):
             # Remove the additional stats from both. This also assures both
             # have the  miniseed format.
@@ -2106,6 +2112,7 @@ def test_multiple_seismograms_retrieval_mseed_format(
 
     # Should now have 6 Stream objects.
     assert len(st_db) == 6
+    assert len(st_server) == 6
     for tr_server, tr_db in zip(st_server, st_db):
         # Remove the additional stats from both. This also assures both have
         # the  miniseed format.
@@ -2159,6 +2166,7 @@ def test_multiple_seismograms_retrieval_mseed_format(
 
     # Should now have only 4 Stream objects.
     assert len(st_db) == 4
+    assert len(st_server) == 4
     for tr_server, tr_db in zip(st_server, st_db):
         # Remove the additional stats from both. This also assures both have
         # the  miniseed format.
@@ -2212,10 +2220,214 @@ def test_multiple_seismograms_retrieval_mseed_format(
 
         # Should now have 10 Stream objects.
         assert len(st_db) == 10
+        assert len(st_server) == 10
+        assert len(st_server) == 10
         for tr_server, tr_db in zip(st_server, st_db):
             # Remove the additional stats from both. This also assures both
             # have the  miniseed format.
             del tr_server.stats.mseed
+            del tr_server.stats._format
+            del tr_db.stats.instaseis
+            # Sample spacing is very similar but not equal due to floating
+            # point accuracy.
+            np.testing.assert_allclose(tr_server.stats.delta,
+                                       tr_db.stats.delta)
+            tr_server.stats.delta = tr_db.stats.delta
+            assert tr_server.stats == tr_db.stats
+            # Relative tolerance not particularly useful when testing super
+            # small values.
+            np.testing.assert_allclose(tr_server.data, tr_db.data,
+                                       atol=1E-10 * tr_server.data.ptp())
+
+
+def test_multiple_seismograms_retrieval_saczip_format(
+        all_clients_station_coordinates_callback):
+    """
+    Tests  the retrieval of multiple station in one request with the saczip
+    format parameter.
+    """
+    client = all_clients_station_coordinates_callback
+    db = instaseis.open_db(client.filepath)
+
+    basic_parameters = {"sourcelatitude": 10, "sourcelongitude": 10,
+                        "format": "saczip"}
+
+    # Various sources.
+    mt = {"mtt": "100000", "mpp": "100000", "mrr": "100000",
+          "mrt": "100000", "mrp": "100000", "mtp": "100000"}
+    sdr = {"strike": "10", "dip": "10", "rake": "10", "M0": "1000000"}
+    fs = {"fr": "100000", "ft": "100000", "fp": "100000"}
+
+    time = obspy.UTCDateTime(2010, 1, 2, 3, 4, 5)
+
+    # Moment tensor source.
+    params = copy.deepcopy(basic_parameters)
+    params.update(mt)
+    # This will return two stations.
+    params["network"] = "IU,B*"
+    params["station"] = "ANT*,ANM?"
+
+    # Default format is MiniSEED>
+    request = client.fetch(_assemble_url(**params))
+    assert request.code == 200
+    assert request.headers["Content-Type"] == "application/zip"
+
+    # ObsPy needs the filename to be able to directly unpack zip files. We
+    # don't have a filename here so we unpack manually.
+    st_server = obspy.Stream()
+    zip_obj = zipfile.ZipFile(request.buffer)
+    for name in zip_obj.namelist():
+        st_server += obspy.read(io.BytesIO(zip_obj.read(name)))
+    for tr in st_server:
+        assert tr.stats._format == "SAC"
+    st_server.sort()
+
+    components = ["Z", "N", "E"]
+    source = instaseis.Source(
+        latitude=basic_parameters["sourcelatitude"],
+        longitude=basic_parameters["sourcelongitude"],
+        depth_in_m=0.0,
+        **dict((key[0] + "_" + key[1:], float(value))
+               for (key, value) in mt.items()))
+    receivers = [
+        instaseis.Receiver(latitude=39.868, longitude=32.7934,
+                           depth_in_m=0.0, network="IU", station="ANTO"),
+        instaseis.Receiver(latitude=34.94591, longitude=-106.4572,
+                           depth_in_m=0.0, network="IU", station="ANMO")]
+    st_db = obspy.Stream()
+    for receiver in receivers:
+        st_db += db.get_seismograms(source=source, receiver=receiver,
+                                    components=components)
+    st_db.sort()
+
+    # Should now have 6 Stream objects.
+    assert len(st_db) == 6
+    assert len(st_server) == 6
+    for tr_server, tr_db in zip(st_server, st_db):
+        # Remove the additional stats from both.
+        del tr_server.stats.sac
+        del tr_server.stats._format
+        del tr_db.stats.instaseis
+        # Sample spacing is very similar but not equal due to floating point
+        # accuracy.
+        np.testing.assert_allclose(tr_server.stats.delta, tr_db.stats.delta)
+        tr_server.stats.delta = tr_db.stats.delta
+        assert tr_server.stats == tr_db.stats
+        # Relative tolerance not particularly useful when testing super
+        # small values.
+        np.testing.assert_allclose(tr_server.data, tr_db.data,
+                                   atol=1E-10 * tr_server.data.ptp())
+
+    # Strike/dip/rake source, "RT" components
+    params = copy.deepcopy(basic_parameters)
+    params.update(sdr)
+    # This will return two stations.
+    params["network"] = "IU,B*"
+    params["station"] = "ANT*,ANM?"
+    params["components"] = "RT"
+    # A couple more parameters.
+    params["sourcedepthinm"] = "5.0"
+    params["origintime"] = str(time)
+
+    # Default format is MiniSEED>
+    request = client.fetch(_assemble_url(**params))
+    assert request.code == 200
+    assert request.headers["Content-Type"] == "application/zip"
+
+    # ObsPy needs the filename to be able to directly unpack zip files. We
+    # don't have a filename here so we unpack manually.
+    st_server = obspy.Stream()
+    zip_obj = zipfile.ZipFile(request.buffer)
+    for name in zip_obj.namelist():
+        st_server += obspy.read(io.BytesIO(zip_obj.read(name)))
+    for tr in st_server:
+        assert tr.stats._format == "SAC"
+    st_server.sort()
+
+    components = ["R", "T"]
+    source = instaseis.Source.from_strike_dip_rake(
+        latitude=basic_parameters["sourcelatitude"],
+        longitude=basic_parameters["sourcelongitude"],
+        depth_in_m=5.0, origin_time=time,
+        **dict((key, float(value)) for (key, value) in sdr.items()))
+    receivers = [
+        instaseis.Receiver(latitude=39.868, longitude=32.7934,
+                           depth_in_m=0.0, network="IU", station="ANTO"),
+        instaseis.Receiver(latitude=34.94591, longitude=-106.4572,
+                           depth_in_m=0.0, network="IU", station="ANMO")]
+    st_db = obspy.Stream()
+    for receiver in receivers:
+        st_db += db.get_seismograms(source=source, receiver=receiver,
+                                    components=components)
+    st_db.sort()
+
+    # Should now have only 4 Stream objects.
+    assert len(st_db) == 4
+    assert len(st_server) == 4
+    for tr_server, tr_db in zip(st_server, st_db):
+        # Remove the additional stats from both.
+        del tr_server.stats.sac
+        del tr_server.stats._format
+        del tr_db.stats.instaseis
+        # Sample spacing is very similar but not equal due to floating point
+        # accuracy.
+        np.testing.assert_allclose(tr_server.stats.delta, tr_db.stats.delta)
+        tr_server.stats.delta = tr_db.stats.delta
+        assert tr_server.stats == tr_db.stats
+        # Relative tolerance not particularly useful when testing super
+        # small values.
+        np.testing.assert_allclose(tr_server.data, tr_db.data,
+                                   atol=1E-10 * tr_server.data.ptp())
+
+    # Force source only works for displ_only databases.
+    # Force source, all 5 components.
+    if "displ_only" in client.filepath:
+        params = copy.deepcopy(basic_parameters)
+        params.update(fs)
+        # This will return two stations.
+        params["network"] = "IU,B*"
+        params["station"] = "ANT*,ANM?"
+        params["components"] = "NEZRT"
+
+        # Default format is MiniSEED>
+        request = client.fetch(_assemble_url(**params))
+        assert request.code == 200
+        assert request.headers["Content-Type"] == "application/zip"
+
+        # ObsPy needs the filename to be able to directly unpack zip files. We
+        # don't have a filename here so we unpack manually.
+        st_server = obspy.Stream()
+        zip_obj = zipfile.ZipFile(request.buffer)
+        for name in zip_obj.namelist():
+            st_server += obspy.read(io.BytesIO(zip_obj.read(name)))
+        for tr in st_server:
+            assert tr.stats._format == "SAC"
+        st_server.sort()
+
+        components = ["N", "E", "Z", "R", "T"]
+        source = instaseis.ForceSource(
+            latitude=basic_parameters["sourcelatitude"],
+            longitude=basic_parameters["sourcelongitude"],
+            depth_in_m=0.0,
+            **dict(("_".join(key), float(value))
+                   for (key, value) in fs.items()))
+        receivers = [
+            instaseis.Receiver(latitude=39.868, longitude=32.7934,
+                               depth_in_m=0.0, network="IU", station="ANTO"),
+            instaseis.Receiver(latitude=34.94591, longitude=-106.4572,
+                               depth_in_m=0.0, network="IU", station="ANMO")]
+        st_db = obspy.Stream()
+        for receiver in receivers:
+            st_db += db.get_seismograms(source=source, receiver=receiver,
+                                        components=components)
+        st_db.sort()
+
+        # Should now have 10 Stream objects.
+        assert len(st_db) == 10
+        assert len(st_server) == 10
+        for tr_server, tr_db in zip(st_server, st_db):
+            # Remove the additional stats from both.
+            del tr_server.stats.sac
             del tr_server.stats._format
             del tr_db.stats.instaseis
             # Sample spacing is very similar but not equal due to floating
