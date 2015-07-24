@@ -2,12 +2,10 @@ import copy
 
 import tornado.web
 
-from ..app import application
-
 
 class InfoHandler(tornado.web.RequestHandler):
     def get(self):
-        info = copy.deepcopy(application.db.info)
+        info = copy.deepcopy(self.application.db.info)
         # No need to write a custom encoder...
         info["datetime"] = str(info["datetime"])
         info["slip"] = list([float(_i) for _i in info["slip"]])

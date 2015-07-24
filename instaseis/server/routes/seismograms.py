@@ -9,7 +9,6 @@ import tornado.gen
 import tornado.web
 
 from ... import Source, ForceSource, Receiver
-from ..app import application
 
 
 class SeismogramsHandler(tornado.web.RequestHandler):
@@ -144,7 +143,7 @@ class SeismogramsHandler(tornado.web.RequestHandler):
         # Make sure that the station coordinates callback is available if
         # needed. Otherwise raise a 404.
         if all(query_receivers) and \
-                not application.station_coordinates_callback:
+                not self.application.station_coordinates_callback:
             msg = ("Server does not support station coordinates and thus no "
                    "station queries.")
             raise tornado.web.HTTPError(404, log_message=msg, reason=msg)
@@ -245,15 +244,15 @@ class SeismogramsHandler(tornado.web.RequestHandler):
             networks = args.network.split(",")
             stations = args.station.split(",")
 
-            coordinates = application.station_coordinates_callback(
+            coordinates = self.application.station_coordinates_callback(
                 networks=networks, stations=stations)
 
             if not coordinates:
                 msg = "No coordinates found satisfying the query."
                 raise tornado.web.HTTPError(
                     404, log_message=msg, reason=msg)
-                application.station_coordinates_callback(networks=args.network,
-                                                         stations=args.station)
+                self.application.station_coordinates_callback(
+                    networks=args.network, stations=args.station)
 
             for station in coordinates:
                 try:
@@ -274,7 +273,7 @@ class SeismogramsHandler(tornado.web.RequestHandler):
 
             response, _ = yield tornado.gen.Task(
                 _get_seismogram,
-                db=application.db, source=source, receiver=receiver,
+                db=self.application.db, source=source, receiver=receiver,
                 remove_source_shift=args.removesourceshift,
                 components=components,  unit=args.unit, dt=args.dt,
                 a_lanczos=args.alanczos, format=args.format)

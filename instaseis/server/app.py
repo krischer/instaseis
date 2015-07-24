@@ -17,10 +17,6 @@ import tornado.web
 
 from ..instaseis_db import InstaseisDB
 
-
-application = tornado.web.Application()
-
-
 from .routes.coordinates import CoordinatesHandler
 from .routes.index import IndexHandler
 from .routes.info import InfoHandler
@@ -28,17 +24,16 @@ from .routes.seismograms import SeismogramsHandler
 from .routes.seismograms_raw import RawSeismogramsHandler
 
 
-application.add_handlers("", [
-    (r"/seismograms", SeismogramsHandler),
-    (r"/seismograms_raw", RawSeismogramsHandler),
-    (r"/info", InfoHandler),
-    (r"/", IndexHandler),
-    (r"/coordinates", CoordinatesHandler)
-])
-
-
 def launch_io_loop(db_path, port, buffer_size_in_mb, quiet, log_level,
                    station_coordinates_callback=None):
+    application = tornado.web.Application([
+        (r"/seismograms", SeismogramsHandler),
+        (r"/seismograms_raw", RawSeismogramsHandler),
+        (r"/info", InfoHandler),
+        (r"/", IndexHandler),
+        (r"/coordinates", CoordinatesHandler)
+    ])
+
     application.db = InstaseisDB(db_path=db_path,
                                  buffer_size_in_mb=buffer_size_in_mb)
     application.station_coordinates_callback = station_coordinates_callback

@@ -5,7 +5,6 @@ import obspy
 import tornado.web
 
 from ... import Source, ForceSource, Receiver
-from ..app import application
 
 
 class RawSeismogramsHandler(tornado.web.RequestHandler):
@@ -160,10 +159,10 @@ class RawSeismogramsHandler(tornado.web.RequestHandler):
 
         # Get the most barebones seismograms possible.
         try:
-            application.db._get_seismograms_sanity_checks(
+            self.application.db._get_seismograms_sanity_checks(
                 source=source, receiver=receiver, components=components,
                 kind="displacement")
-            data = application.db._get_seismograms(
+            data = self.application.db._get_seismograms(
                 source=source, receiver=receiver, components=components)
         except Exception:
             msg = ("Could not extract seismogram. Make sure, the components "
@@ -171,9 +170,9 @@ class RawSeismogramsHandler(tornado.web.RequestHandler):
             raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
         try:
-            st = application.db._convert_to_stream(
+            st = self.application.db._convert_to_stream(
                 source=source, receiver=receiver, components=components,
-                data=data, dt_out=application.db.info.dt)
+                data=data, dt_out=self.application.db.info.dt)
         except Exception:
             msg = ("Could not convert seismogram to a Stream object.")
             raise tornado.web.HTTPError(500, log_message=msg, reason=msg)

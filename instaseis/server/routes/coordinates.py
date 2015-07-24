@@ -1,11 +1,9 @@
 import tornado.web
 
-from ..app import application
-
 
 class CoordinatesHandler(tornado.web.RequestHandler):
     def get(self):
-        if application.station_coordinates_callback is None:
+        if self.application.station_coordinates_callback is None:
             msg = "Server does not support station coordinates."
             raise tornado.web.HTTPError(
                 404, log_message=msg, reason=msg)
@@ -21,7 +19,7 @@ class CoordinatesHandler(tornado.web.RequestHandler):
         networks = networks.split(",")
         stations = stations.split(",")
 
-        coordinates = application.station_coordinates_callback(
+        coordinates = self.application.station_coordinates_callback(
             networks=networks, stations=stations)
 
         if not coordinates:
