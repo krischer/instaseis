@@ -26,6 +26,21 @@ from .routes.seismograms_raw import RawSeismogramsHandler
 
 def launch_io_loop(db_path, port, buffer_size_in_mb, quiet, log_level,
                    station_coordinates_callback=None):
+    """
+    Launch the instaseis server.
+
+    :param db_path: Path to the database on disc.
+    :param port: The desired port of the server.
+    :param buffer_size_in_mb: The buffer size in MB per buffer. In most
+        cases (which is also the worst case scenario) four buffers will be
+        created so over time the maximum memory usage will be four times
+        this value.
+    :param quiet: Do not log.
+    :param log_level: The log level, one of CRITICAL, ERROR, WARNING, INFO,
+        DEBUG, NOTSET
+    :param station_coordinates_callback: A callback function for station
+        coordinates. If not given, certain request will not be available.
+    """
     application = tornado.web.Application([
         (r"/seismograms", SeismogramsHandler),
         (r"/seismograms_raw", RawSeismogramsHandler),
