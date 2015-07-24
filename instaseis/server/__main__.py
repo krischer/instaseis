@@ -16,7 +16,6 @@ import os
 
 from instaseis.server.app import launch_io_loop
 
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         prog="python -m instaseis.server",
