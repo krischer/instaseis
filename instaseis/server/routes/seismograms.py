@@ -287,6 +287,12 @@ class SeismogramsHandler(InstaseisRequestHandler):
             msg = "No/insufficient source parameters specified"
             raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
+        if args.format == "mseed":
+            content_type = "application/octet-stream"
+        elif args.format == "saczip":
+            content_type = "application/zip"
+        self.set_header("Content-Type", content_type)
+
         # Generating even 100'000 receivers only takes ~150ms so its totally
         # ok to generate them all at once here. The time to generate and
         # send the seismograms will dominate.
@@ -359,12 +365,6 @@ class SeismogramsHandler(InstaseisRequestHandler):
         filename = "instaseis_seismogram_%s.%s" % (
             str(obspy.UTCDateTime()).replace(":", "_"),
             FILE_ENDINGS_MAP[args.format])
-
-        if format == "mseed":
-            content_type = "application/octet-stream"
-        elif format == "saczip":
-            content_type = "application/zip"
-        self.set_header("Content-Type", content_type)
 
         self.set_header("Content-Disposition",
                         "attachment; filename=%s" % filename)
