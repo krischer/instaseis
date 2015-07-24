@@ -11,6 +11,79 @@ import tornado.web
 from ... import Source, ForceSource, Receiver
 
 
+def run_async(func):
+    """
+    Decorator executing a function in a thread.
+
+    Adapted from http://stackoverflow.com/a/15952516/1657047
+    """
+    @functools.wraps(func)
+    def async_func(*args, **kwargs):
+        func_hl = threading.Thread(target=func, args=args, kwargs=kwargs)
+        func_hl.start()
+        return func_hl
+    return async_func
+
+
+@run_async
+def _get_seismogram(db, source, receiver, components, unit,
+                    remove_source_shift, dt, a_lanczos, format, callback):
+    """
+    Extract a seismogram from the passed db and write it either to a MiniSEED
+    or a SACZIP file.
+
+    :param db: An open instaseis database.
+    :param source: An instaseis source.
+    :param receiver: An instaseis receiver.
+    :param components: The components.
+    :param unit: The desired unit.
+    :param remove_source_shift: Remove the source time shift or not.
+    :param dt: dt to resample to.
+    :param a_lanczos: Width of the Lanczos kernel.
+    :param format:
+    :param callback: callback function of the coroutine.
+    """
+    try:
+        st = db.get_seismograms(
+            source=source, receiver=receiver, components=components,
+            kind=unit, remove_source_shift=remove_source_shift,
+            reconvolve_stf=False, return_obspy_stream=True, dt=dt,
+            a_lanczos=a_lanczos)
+    except Exception:
+        msg = ("Could not extract seismogram. Make sure, the components "
+               "are valid, and the depth settings are correct.")
+        raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+
+    # Half the filesize but definitely sufficiently accurate.
+    for tr in st:
+        tr.data = np.require(tr.data, dtype=np.float32)
+
+    if format == "mseed":
+        with io.BytesIO() as fh:
+            st.write(fh, format="mseed")
+            fh.seek(0, 0)
+            binary_data = fh.read()
+        content_type = "application/octet-stream"
+    # Write a number of SAC files into an archive.
+    elif format == "saczip":
+        with io.BytesIO() as fh:
+            with zipfile.ZipFile(fh, mode="w") as zh:
+                for tr in st:
+                    with io.BytesIO() as temp:
+                        tr.write(temp, format="sac")
+                        temp.seek(0, 0)
+                        filename = "%s.sac" % tr.id
+                        zh.writestr(filename, temp.read())
+            fh.seek(0, 0)
+            binary_data = fh.read()
+        content_type = "application/zip"
+    else:
+        # Checked above and cannot really happen.
+        raise NotImplementedError
+
+    callback(binary_data, content_type)
+
+
 class SeismogramsHandler(tornado.web.RequestHandler):
     # Define the arguments for the seismogram endpoint.
     seismogram_arguments = {
@@ -296,76 +369,3 @@ class SeismogramsHandler(tornado.web.RequestHandler):
                         "attachment; filename=%s" % filename)
         self.set_header("Access-Control-Allow-Origin", "*")
         self.finish()
-
-
-def run_async(func):
-    """
-    Decorator executing a function in a thread.
-
-    Adapted from http://stackoverflow.com/a/15952516/1657047
-    """
-    @functools.wraps(func)
-    def async_func(*args, **kwargs):
-        func_hl = threading.Thread(target=func, args=args, kwargs=kwargs)
-        func_hl.start()
-        return func_hl
-    return async_func
-
-
-@run_async
-def _get_seismogram(db, source, receiver, components, unit,
-                    remove_source_shift, dt, a_lanczos, format, callback):
-    """
-    Extract a seismogram from the passed db and write it either to a MiniSEED
-    or a SACZIP file.
-
-    :param db: An open instaseis database.
-    :param source: An instaseis source.
-    :param receiver: An instaseis receiver.
-    :param components: The components.
-    :param unit: The desired unit.
-    :param remove_source_shift: Remove the source time shift or not.
-    :param dt: dt to resample to.
-    :param a_lanczos: Width of the Lanczos kernel.
-    :param format:
-    :param callback: callback function of the coroutine.
-    """
-    try:
-        st = db.get_seismograms(
-            source=source, receiver=receiver, components=components,
-            kind=unit, remove_source_shift=remove_source_shift,
-            reconvolve_stf=False, return_obspy_stream=True, dt=dt,
-            a_lanczos=a_lanczos)
-    except Exception:
-        msg = ("Could not extract seismogram. Make sure, the components "
-               "are valid, and the depth settings are correct.")
-        raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
-
-    # Half the filesize but definitely sufficiently accurate.
-    for tr in st:
-        tr.data = np.require(tr.data, dtype=np.float32)
-
-    if format == "mseed":
-        with io.BytesIO() as fh:
-            st.write(fh, format="mseed")
-            fh.seek(0, 0)
-            binary_data = fh.read()
-        content_type = "application/octet-stream"
-    # Write a number of SAC files into an archive.
-    elif format == "saczip":
-        with io.BytesIO() as fh:
-            with zipfile.ZipFile(fh, mode="w") as zh:
-                for tr in st:
-                    with io.BytesIO() as temp:
-                        tr.write(temp, format="sac")
-                        temp.seek(0, 0)
-                        filename = "%s.sac" % tr.id
-                        zh.writestr(filename, temp.read())
-            fh.seek(0, 0)
-            binary_data = fh.read()
-        content_type = "application/zip"
-    else:
-        # Checked above and cannot really happen.
-        raise NotImplementedError
-
-    callback(binary_data, content_type)
