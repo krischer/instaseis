@@ -21,7 +21,7 @@ from tornado.testing import AsyncHTTPClient
 from tornado.util import raise_exc_info
 
 import instaseis
-from instaseis.server.app import application
+from instaseis.server.app import get_application
 from instaseis.instaseis_db import InstaseisDB
 
 
@@ -154,6 +154,7 @@ def station_coordinates_mock_callback(networks, stations):
 
 
 def create_async_client(path, station_coordinates_callback):
+    application = get_application()
     application.db = InstaseisDB(path)
     application.station_coordinates_callback = station_coordinates_callback
     # Build server as in testing:311

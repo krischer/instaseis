@@ -24,6 +24,22 @@ from .routes.seismograms import SeismogramsHandler
 from .routes.seismograms_raw import RawSeismogramsHandler
 
 
+def get_application():
+    """
+    Return the tornado application.
+
+    This is a seperate function to be able to get the same application
+    objects for the tests.
+    """
+    return tornado.web.Application([
+        (r"/seismograms", SeismogramsHandler),
+        (r"/seismograms_raw", RawSeismogramsHandler),
+        (r"/info", InfoHandler),
+        (r"/", IndexHandler),
+        (r"/coordinates", CoordinatesHandler)
+    ])
+
+
 def launch_io_loop(db_path, port, buffer_size_in_mb, quiet, log_level,
                    station_coordinates_callback=None):
     """
@@ -41,14 +57,7 @@ def launch_io_loop(db_path, port, buffer_size_in_mb, quiet, log_level,
     :param station_coordinates_callback: A callback function for station
         coordinates. If not given, certain request will not be available.
     """
-    application = tornado.web.Application([
-        (r"/seismograms", SeismogramsHandler),
-        (r"/seismograms_raw", RawSeismogramsHandler),
-        (r"/info", InfoHandler),
-        (r"/", IndexHandler),
-        (r"/coordinates", CoordinatesHandler)
-    ])
-
+    application = get_application()
     application.db = InstaseisDB(db_path=db_path,
                                  buffer_size_in_mb=buffer_size_in_mb)
     application.station_coordinates_callback = station_coordinates_callback
