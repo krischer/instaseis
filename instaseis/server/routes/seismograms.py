@@ -47,7 +47,8 @@ def _get_seismogram(db, source, receiver, components, unit,
     except Exception:
         msg = ("Could not extract seismogram. Make sure, the components "
                "are valid, and the depth settings are correct.")
-        raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+        callback(tornado.web.HTTPError(400, log_message=msg, reason=msg))
+        return
 
     # Half the filesize but definitely sufficiently accurate.
     for tr in st:
@@ -58,7 +59,6 @@ def _get_seismogram(db, source, receiver, components, unit,
             st.write(fh, format="mseed")
             fh.seek(0, 0)
             binary_data = fh.read()
-        content_type = "application/octet-stream"
     # Write a number of SAC files into an archive.
     elif format == "saczip":
         with io.BytesIO() as fh:
@@ -71,12 +71,11 @@ def _get_seismogram(db, source, receiver, components, unit,
                         zh.writestr(filename, temp.read())
             fh.seek(0, 0)
             binary_data = fh.read()
-        content_type = "application/zip"
     else:
         # Checked above and cannot really happen.
         raise NotImplementedError
 
-    callback(binary_data, content_type)
+    callback(binary_data)
 
 
 class SeismogramsHandler(InstaseisRequestHandler):
@@ -338,17 +337,19 @@ class SeismogramsHandler(InstaseisRequestHandler):
 
         # For each, get the synthetics, and stream it to the user.
         for receiver in receivers:
-
-            response, _ = yield tornado.gen.Task(
+            # Yield from the task. This enables a context switch and thus
+            # async behaviour.
+            response = yield tornado.gen.Task(
                 _get_seismogram,
                 db=self.application.db, source=source, receiver=receiver,
                 remove_source_shift=args.removesourceshift,
                 components=components,  unit=args.unit, dt=args.dt,
                 a_lanczos=args.alanczos, format=args.format)
 
-            binary_data, content_type = response
+            if isinstance(response, Exception):
+                raise response
 
-            self.write(binary_data)
+            self.write(response)
             self.flush()
 
         FILE_ENDINGS_MAP = {
@@ -359,7 +360,12 @@ class SeismogramsHandler(InstaseisRequestHandler):
             str(obspy.UTCDateTime()).replace(":", "_"),
             FILE_ENDINGS_MAP[args.format])
 
+        if format == "mseed":
+            content_type = "application/octet-stream"
+        elif format == "saczip":
+            content_type = "application/zip"
         self.set_header("Content-Type", content_type)
+
         self.set_header("Content-Disposition",
                         "attachment; filename=%s" % filename)
         self.finish()
