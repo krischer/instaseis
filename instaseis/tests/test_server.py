@@ -1876,3 +1876,177 @@ def test_multiple_seismograms_retrieval_no_format_given(
             # small values.
             np.testing.assert_allclose(tr_server.data, tr_db.data,
                                        atol=1E-10 * tr_server.data.ptp())
+
+
+def test_multiple_seismograms_retrieval_no_format_given_single_station(
+        all_clients_station_coordinates_callback):
+    """
+    Tests  the retrieval of multiple station in one request with no passed
+    format parameter. This results in miniseed return values.
+
+    In this case the query is constructed so that it only returns a single
+    station.
+    """
+    client = all_clients_station_coordinates_callback
+    db = instaseis.open_db(client.filepath)
+
+    basic_parameters = {"sourcelatitude": 10, "sourcelongitude": 10}
+
+    # Various sources.
+    mt = {"mtt": "100000", "mpp": "100000", "mrr": "100000",
+          "mrt": "100000", "mrp": "100000", "mtp": "100000"}
+    sdr = {"strike": "10", "dip": "10", "rake": "10", "M0": "1000000"}
+    fs = {"fr": "100000", "ft": "100000", "fp": "100000"}
+
+    time = obspy.UTCDateTime(2010, 1, 2, 3, 4, 5)
+
+    # Moment tensor source.
+    params = copy.deepcopy(basic_parameters)
+    params.update(mt)
+    # This will return two stations.
+    params["network"] = "IU"
+    params["station"] = "ANMO"
+
+    # Default format is MiniSEED>
+    request = client.fetch(_assemble_url(**params))
+    assert request.code == 200
+    assert request.headers["Content-Type"] == "application/octet-stream"
+    st_server = obspy.read(request.buffer)
+    st_server.sort()
+
+    components = ["Z", "N", "E"]
+    source = instaseis.Source(
+        latitude=basic_parameters["sourcelatitude"],
+        longitude=basic_parameters["sourcelongitude"],
+        depth_in_m=0.0,
+        **dict((key[0] + "_" + key[1:], float(value))
+               for (key, value) in mt.items()))
+    receivers = [
+        instaseis.Receiver(latitude=34.94591, longitude=-106.4572,
+                           depth_in_m=0.0, network="IU", station="ANMO")]
+    st_db = obspy.Stream()
+    for receiver in receivers:
+        st_db += db.get_seismograms(source=source, receiver=receiver,
+                                    components=components)
+    st_db.sort()
+
+    # Should now have 3 Stream objects.
+    assert len(st_db) == 3
+    for tr_server, tr_db in zip(st_server, st_db):
+        # Remove the additional stats from both. This also assures both have
+        # the  miniseed format.
+        del tr_server.stats.mseed
+        del tr_server.stats._format
+        del tr_db.stats.instaseis
+        # Sample spacing is very similar but not equal due to floating point
+        # accuracy.
+        np.testing.assert_allclose(tr_server.stats.delta, tr_db.stats.delta)
+        tr_server.stats.delta = tr_db.stats.delta
+        assert tr_server.stats == tr_db.stats
+        # Relative tolerance not particularly useful when testing super
+        # small values.
+        np.testing.assert_allclose(tr_server.data, tr_db.data,
+                                   atol=1E-10 * tr_server.data.ptp())
+
+    # Strike/dip/rake source, "RT" components
+    params = copy.deepcopy(basic_parameters)
+    params.update(sdr)
+    # This will return two stations.
+    params["network"] = "IU"
+    params["station"] = "ANMO"
+    params["components"] = "RT"
+    # A couple more parameters.
+    params["sourcedepthinm"] = "5.0"
+    params["origintime"] = str(time)
+
+    # Default format is MiniSEED>
+    request = client.fetch(_assemble_url(**params))
+    assert request.code == 200
+    assert request.headers["Content-Type"] == "application/octet-stream"
+    st_server = obspy.read(request.buffer)
+    st_server.sort()
+
+    components = ["R", "T"]
+    source = instaseis.Source.from_strike_dip_rake(
+        latitude=basic_parameters["sourcelatitude"],
+        longitude=basic_parameters["sourcelongitude"],
+        depth_in_m=5.0, origin_time=time,
+        **dict((key, float(value)) for (key, value) in sdr.items()))
+    receivers = [
+        instaseis.Receiver(latitude=34.94591, longitude=-106.4572,
+                           depth_in_m=0.0, network="IU", station="ANMO")]
+    st_db = obspy.Stream()
+    for receiver in receivers:
+        st_db += db.get_seismograms(source=source, receiver=receiver,
+                                    components=components)
+    st_db.sort()
+
+    # Should now have only 2 Stream objects.
+    assert len(st_db) == 2
+    for tr_server, tr_db in zip(st_server, st_db):
+        # Remove the additional stats from both. This also assures both have
+        # the  miniseed format.
+        del tr_server.stats.mseed
+        del tr_server.stats._format
+        del tr_db.stats.instaseis
+        # Sample spacing is very similar but not equal due to floating point
+        # accuracy.
+        np.testing.assert_allclose(tr_server.stats.delta, tr_db.stats.delta)
+        tr_server.stats.delta = tr_db.stats.delta
+        assert tr_server.stats == tr_db.stats
+        # Relative tolerance not particularly useful when testing super
+        # small values.
+        np.testing.assert_allclose(tr_server.data, tr_db.data,
+                                   atol=1E-10 * tr_server.data.ptp())
+
+    # Force source only works for displ_only databases.
+    # Force source, all 5 components.
+    if "displ_only" in client.filepath:
+        params = copy.deepcopy(basic_parameters)
+        params.update(fs)
+        # This will return two stations.
+        params["network"] = "IU"
+        params["station"] = "ANMO"
+        params["components"] = "NEZRT"
+
+        # Default format is MiniSEED>
+        request = client.fetch(_assemble_url(**params))
+        assert request.code == 200
+        assert request.headers["Content-Type"] == "application/octet-stream"
+        st_server = obspy.read(request.buffer)
+        st_server.sort()
+
+        components = ["N", "E", "Z", "R", "T"]
+        source = instaseis.ForceSource(
+            latitude=basic_parameters["sourcelatitude"],
+            longitude=basic_parameters["sourcelongitude"],
+            depth_in_m=0.0,
+            **dict(("_".join(key), float(value))
+                   for (key, value) in fs.items()))
+        receivers = [
+            instaseis.Receiver(latitude=34.94591, longitude=-106.4572,
+                               depth_in_m=0.0, network="IU", station="ANMO")]
+        st_db = obspy.Stream()
+        for receiver in receivers:
+            st_db += db.get_seismograms(source=source, receiver=receiver,
+                                        components=components)
+        st_db.sort()
+
+        # Should now have 5 Stream objects.
+        assert len(st_db) == 5
+        for tr_server, tr_db in zip(st_server, st_db):
+            # Remove the additional stats from both. This also assures both
+            # have the  miniseed format.
+            del tr_server.stats.mseed
+            del tr_server.stats._format
+            del tr_db.stats.instaseis
+            # Sample spacing is very similar but not equal due to floating
+            # point accuracy.
+            np.testing.assert_allclose(tr_server.stats.delta,
+                                       tr_db.stats.delta)
+            tr_server.stats.delta = tr_db.stats.delta
+            assert tr_server.stats == tr_db.stats
+            # Relative tolerance not particularly useful when testing super
+            # small values.
+            np.testing.assert_allclose(tr_server.data, tr_db.data,
+                                       atol=1E-10 * tr_server.data.ptp())
