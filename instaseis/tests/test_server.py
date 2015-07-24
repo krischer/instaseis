@@ -2228,3 +2228,25 @@ def test_multiple_seismograms_retrieval_mseed_format(
             # small values.
             np.testing.assert_allclose(tr_server.data, tr_db.data,
                                        atol=1E-10 * tr_server.data.ptp())
+
+
+def test_multiple_seismograms_retrieval_invalid_format(
+        all_clients_station_coordinates_callback):
+    """
+    Tests  the retrieval of multiple station with an invalid format.
+    """
+    client = all_clients_station_coordinates_callback
+
+    params = {"sourcelatitude": 10, "sourcelongitude": 10, "format": "bogus"}
+
+    mt = {"mtt": "100000", "mpp": "100000", "mrr": "100000",
+          "mrt": "100000", "mrp": "100000", "mtp": "100000"}
+    params.update(mt)
+    # This will return two stations.
+    params["network"] = "IU,B*"
+    params["station"] = "ANT*,ANM?"
+
+    # Default format is MiniSEED>
+    request = client.fetch(_assemble_url(**params))
+    assert request.code == 400
+    assert request.reason == "Format must either be 'mseed' or 'saczip'."
