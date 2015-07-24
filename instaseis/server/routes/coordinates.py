@@ -1,3 +1,12 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""
+:copyright:
+    Lion Krischer (krischer@geophysik.uni-muenchen.de), 2015
+:license:
+    GNU Lesser General Public License, Version 3 [non-commercial/academic use]
+    (http://www.gnu.org/copyleft/lgpl.html)
+"""
 import tornado.web
 
 
