@@ -14,6 +14,12 @@ import responses
 import socket
 import sys
 
+# Python 2.6 compat.
+try:
+    from collections import OrderedDict
+except ImportError:
+    from ordereddict import OrderedDict
+
 from tornado import netutil
 from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
@@ -115,13 +121,12 @@ def bind_unused_port():
     return sock, port
 
 
-# All test databases.
-DBS = {
-    "db_bwd_displ_only": os.path.join(DATA, "100s_db_bwd_displ_only"),
-    "db_bwd_strain_only": os.path.join(DATA, "100s_db_bwd_strain_only"),
-    "db_fwd": os.path.join(DATA, "100s_db_fwd"),
-    "db_fwd_deep": os.path.join(DATA, "100s_db_fwd_deep")
-}
+# All test databases. Fix order so tests can be executed in parallel.
+DBS = OrderedDict()
+DBS["db_bwd_displ_only"] = os.path.join(DATA, "100s_db_bwd_displ_only")
+DBS["db_bwd_strain_only"] = os.path.join(DATA, "100s_db_bwd_strain_only")
+DBS["db_fwd"] = os.path.join(DATA, "100s_db_fwd")
+DBS["db_fwd_deep"] = os.path.join(DATA, "100s_db_fwd_deep")
 
 
 def station_coordinates_mock_callback(networks, stations):
