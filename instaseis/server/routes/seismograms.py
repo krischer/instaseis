@@ -59,23 +59,20 @@ def _get_seismogram(db, source, receiver, components, unit,
             st.write(fh, format="mseed")
             fh.seek(0, 0)
             binary_data = fh.read()
+        callback(binary_data)
     # Write a number of SAC files into an archive.
     elif format == "saczip":
-        with io.BytesIO() as fh:
-            with zipfile.ZipFile(fh, mode="w") as zh:
-                for tr in st:
-                    with io.BytesIO() as temp:
-                        tr.write(temp, format="sac")
-                        temp.seek(0, 0)
-                        filename = "%s.sac" % tr.id
-                        zh.writestr(filename, temp.read())
-            fh.seek(0, 0)
-            binary_data = fh.read()
+        byte_strings = []
+        for tr in st:
+            with io.BytesIO() as temp:
+                tr.write(temp, format="sac")
+                temp.seek(0, 0)
+                filename = "%s.sac" % tr.id
+                byte_strings.append((filename, temp.read()))
+        callback(byte_strings)
     else:
         # Checked above and cannot really happen.
         raise NotImplementedError
-
-    callback(binary_data)
 
 
 class SeismogramsHandler(InstaseisRequestHandler):
@@ -341,6 +338,12 @@ class SeismogramsHandler(InstaseisRequestHandler):
                     raise tornado.web.HTTPError(400, log_message=msg,
                                                 reason=msg)
 
+        if args.format == "saczip":
+            buf = io.BytesIO()
+            zip_file = zipfile.ZipFile(buf, mode="w")
+            buf.seek(0, 0)
+            self.write(buf.read())
+
         # For each, get the synthetics, and stream it to the user.
         for receiver in receivers:
             # Yield from the task. This enables a context switch and thus
@@ -354,9 +357,28 @@ class SeismogramsHandler(InstaseisRequestHandler):
 
             if isinstance(response, Exception):
                 raise response
-
-            self.write(response)
+            elif isinstance(response, list):
+                cur_pos = buf.tell()
+                if args.format != "saczip":
+                    raise NotImplemented
+                for filename, content in response:
+                    zip_file.writestr(filename, content)
+                buf.seek(cur_pos, 0)
+                self.write(buf.read())
+                # for kwargs in zip_file.paths_to_write:
+                #     for data in zip_file._ZipFile__write(**kwargs):
+                #         self.write(data)
+            else:
+                self.write(response)
             self.flush()
+
+        if args.format == "saczip":
+            # Write the end of the zipfile.
+            pos = buf.tell()
+            zip_file.close()
+            buf.seek(pos, 0)
+            self.write(buf.read())
+            buf.close()
 
         FILE_ENDINGS_MAP = {
             "mseed": "mseed",
