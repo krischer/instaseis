@@ -365,9 +365,6 @@ class SeismogramsHandler(InstaseisRequestHandler):
                     zip_file.writestr(filename, content)
                 buf.seek(cur_pos, 0)
                 self.write(buf.read())
-                # for kwargs in zip_file.paths_to_write:
-                #     for data in zip_file._ZipFile__write(**kwargs):
-                #         self.write(data)
             else:
                 self.write(response)
             self.flush()
