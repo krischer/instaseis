@@ -75,6 +75,36 @@ def _get_seismogram(db, source, receiver, components, unit,
         raise NotImplementedError
 
 
+class IOQueue(object):
+    """
+    Object passed to the zipfile constructor which acts as a file-like object.
+
+    Iterating over the object yields the data pieces written to it since it
+    has last been iterated over DELETING those pieces at the end of each
+    loop. This enables the server to send unbounded zipfiles without running
+    into memory issues.
+    """
+    def __init__(self):
+        self.count = 0
+        self.data = []
+
+    def flush(self):
+        pass
+
+    def tell(self):
+        return self.count
+
+    def write(self, data):
+        self.data.append(data)
+        self.count += len(data)
+
+    def __iter__(self):
+        for _i in self.data:
+            yield _i
+        self.data = []
+        raise StopIteration
+
+
 class SeismogramsHandler(InstaseisRequestHandler):
     # Define the arguments for the seismogram endpoint.
     seismogram_arguments = {
@@ -351,10 +381,8 @@ class SeismogramsHandler(InstaseisRequestHandler):
                                                 reason=msg)
 
         if args.format == "saczip":
-            buf = io.BytesIO()
+            buf = IOQueue()
             zip_file = zipfile.ZipFile(buf, mode="w")
-            buf.seek(0, 0)
-            self.write(buf.read())
 
         # For each, get the synthetics, and stream it to the user.
         for receiver in receivers:
@@ -377,24 +405,21 @@ class SeismogramsHandler(InstaseisRequestHandler):
             if isinstance(response, Exception):
                 raise response
             elif isinstance(response, list):
-                cur_pos = buf.tell()
                 if args.format != "saczip":
                     raise NotImplemented
                 for filename, content in response:
                     zip_file.writestr(filename, content)
-                buf.seek(cur_pos, 0)
-                self.write(buf.read())
+                for data in buf:
+                    self.write(data)
             else:
                 self.write(response)
             self.flush()
 
         if args.format == "saczip":
             # Write the end of the zipfile.
-            pos = buf.tell()
             zip_file.close()
-            buf.seek(pos, 0)
-            self.write(buf.read())
-            buf.close()
+            for data in buf:
+                self.write(data)
 
         FILE_ENDINGS_MAP = {
             "mseed": "mseed",
