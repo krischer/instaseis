@@ -14,6 +14,7 @@ import functools
 import io
 import logging
 import threading
+import zipstream
 import zipfile
 
 import numpy as np
@@ -28,6 +29,11 @@ from .. import Source, ForceSource, Receiver
 
 
 def run_async(func):
+    """
+    Decorator executing a function in a thread.
+
+    Adapted from http://stackoverflow.com/a/15952516/1657047
+    """
     @functools.wraps(func)
     def async_func(*args, **kwargs):
         func_hl = threading.Thread(target=func, args=args, kwargs=kwargs)
@@ -39,6 +45,21 @@ def run_async(func):
 @run_async
 def _get_seismogram(db, source, receiver, components, unit,
                     remove_source_shift, dt, a_lanczos, format, callback):
+    """
+    Extract a seismogram from the passed db and write it either to a MiniSEED
+    or a SACZIP file.
+
+    :param db: An open instaseis database.
+    :param source: An instaseis source.
+    :param receiver: An instaseis receiver.
+    :param components: The components.
+    :param unit: The desired unit.
+    :param remove_source_shift: Remove the source time shift or not.
+    :param dt: dt to resample to.
+    :param a_lanczos: Width of the Lanczos kernel.
+    :param format:
+    :param callback: callback function of the coroutine.
+    """
     try:
         st = db.get_seismograms(
             source=source, receiver=receiver, components=components,
