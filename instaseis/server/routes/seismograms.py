@@ -119,6 +119,10 @@ class SeismogramsHandler(InstaseisRequestHandler):
         "format": {"type": str, "default": "mseed"}
     }
 
+    def __init__(self, *args, **kwargs):
+        self.__connection_closed = False
+        InstaseisRequestHandler.__init__(self, *args, **kwargs)
+
     def parse_arguments(self):
         args = obspy.core.AttribDict()
         for name, properties in self.seismogram_arguments.items():
@@ -154,6 +158,14 @@ class SeismogramsHandler(InstaseisRequestHandler):
                                                 reason=msg)
             setattr(args, name, value)
         return args
+
+    def on_connection_close(self):
+        """
+        Called when the client cancels the connection. Then the loop
+        requesting seismograms will stop.
+        """
+        InstaseisRequestHandler.on_connection_close(self)
+        self.__connection_closed = True
 
     @tornado.web.asynchronous
     @tornado.gen.coroutine
@@ -346,6 +358,13 @@ class SeismogramsHandler(InstaseisRequestHandler):
 
         # For each, get the synthetics, and stream it to the user.
         for receiver in receivers:
+            # Check if the connection is still open. The __connection_closed
+            # flag is set by the on_connection_close() method. This is
+            # pretty manual right now. Maybe there is a better way?
+            if self.__connection_closed:
+                self.flush()
+                self.finish()
+                return
             # Yield from the task. This enables a context switch and thus
             # async behaviour.
             response = yield tornado.gen.Task(
