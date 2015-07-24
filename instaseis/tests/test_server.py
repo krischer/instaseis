@@ -4,7 +4,7 @@
 Tests for the Instaseis server.
 
 :copyright:
-    Lion Krischer (krischer@geophysik.uni-muenchen.de), 2014
+    Lion Krischer (krischer@geophysik.uni-muenchen.de), 2014-2015
 :license:
     GNU Lesser General Public License, Version 3 [non-commercial/academic use]
     (http://www.gnu.org/copyleft/lgpl.html)
@@ -2246,7 +2246,28 @@ def test_multiple_seismograms_retrieval_invalid_format(
     params["network"] = "IU,B*"
     params["station"] = "ANT*,ANM?"
 
-    # Default format is MiniSEED>
     request = client.fetch(_assemble_url(**params))
     assert request.code == 400
     assert request.reason == "Format must either be 'mseed' or 'saczip'."
+
+
+def test_multiple_seismograms_retrieval_no_stations(
+        all_clients_station_coordinates_callback):
+    """
+    Tests  the retrieval of multiple station where the request ends up in no
+    found stations.
+    """
+    client = all_clients_station_coordinates_callback
+
+    params = {"sourcelatitude": 10, "sourcelongitude": 10}
+
+    mt = {"mtt": "100000", "mpp": "100000", "mrr": "100000",
+          "mrt": "100000", "mrp": "100000", "mtp": "100000"}
+    params.update(mt)
+    # This will return two stations.
+    params["network"] = "HE"
+    params["station"] = "LLO"
+
+    request = client.fetch(_assemble_url(**params))
+    assert request.code == 404
+    assert request.reason == "No coordinates found satisfying the query."
