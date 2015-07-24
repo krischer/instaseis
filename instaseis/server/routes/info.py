@@ -9,10 +9,10 @@
 """
 import copy
 
-import tornado.web
+from ..instaseis_request import InstaseisRequestHandler
 
 
-class InfoHandler(tornado.web.RequestHandler):
+class InfoHandler(InstaseisRequestHandler):
     def get(self):
         info = copy.deepcopy(self.application.db.info)
         # No need to write a custom encoder...
@@ -23,4 +23,3 @@ class InfoHandler(tornado.web.RequestHandler):
         # necessary.
         info["directory"] = ""
         self.write(dict(info))
-        self.set_header("Access-Control-Allow-Origin", "*")

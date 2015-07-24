@@ -9,8 +9,10 @@
 """
 import tornado.web
 
+from ..instaseis_request import InstaseisRequestHandler
 
-class CoordinatesHandler(tornado.web.RequestHandler):
+
+class CoordinatesHandler(InstaseisRequestHandler):
     def get(self):
         if self.application.station_coordinates_callback is None:
             msg = "Server does not support station coordinates."
@@ -37,4 +39,3 @@ class CoordinatesHandler(tornado.web.RequestHandler):
                 404, log_message=msg, reason=msg)
 
         self.write({"count": len(coordinates), "stations": coordinates})
-        self.set_header("Access-Control-Allow-Origin", "*")

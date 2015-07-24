@@ -14,9 +14,10 @@ import obspy
 import tornado.web
 
 from ... import Source, ForceSource, Receiver
+from ..instaseis_request import InstaseisRequestHandler
 
 
-class RawSeismogramsHandler(tornado.web.RequestHandler):
+class RawSeismogramsHandler(InstaseisRequestHandler):
     # Define the arguments for the seismogram endpoint.
     seismogram_arguments = {
         "components": {"type": str, "default": "ZNE"},
@@ -206,4 +207,3 @@ class RawSeismogramsHandler(tornado.web.RequestHandler):
         # Passing mu in the HTTP header...not sure how well this plays with
         # proxies...
         self.set_header("Instaseis-Mu", "%f" % st[0].stats.instaseis.mu)
-        self.set_header("Access-Control-Allow-Origin", "*")

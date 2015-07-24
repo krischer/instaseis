@@ -17,6 +17,7 @@ import tornado.web
 
 from ... import Source, ForceSource, Receiver
 from ..util import run_async
+from ..instaseis_request import InstaseisRequestHandler
 
 
 @run_async
@@ -78,7 +79,7 @@ def _get_seismogram(db, source, receiver, components, unit,
     callback(binary_data, content_type)
 
 
-class SeismogramsHandler(tornado.web.RequestHandler):
+class SeismogramsHandler(InstaseisRequestHandler):
     # Define the arguments for the seismogram endpoint.
     seismogram_arguments = {
         "components": {"type": str, "default": "ZNE"},
@@ -361,5 +362,4 @@ class SeismogramsHandler(tornado.web.RequestHandler):
         self.set_header("Content-Type", content_type)
         self.set_header("Content-Disposition",
                         "attachment; filename=%s" % filename)
-        self.set_header("Access-Control-Allow-Origin", "*")
         self.finish()
