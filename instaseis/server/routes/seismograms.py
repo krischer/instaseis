@@ -200,15 +200,7 @@ class SeismogramsHandler(InstaseisRequestHandler):
             if value is not None:
                 try:
                     t = properties["type"]
-                    if t is bool and not isinstance(value, bool):
-                        if value.lower() in ["1", "true", "t", "y"]:
-                            value = True
-                        elif value.lower() in ["0", "false", "f", "n"]:
-                            value = False
-                        else:
-                            raise ValueError
-                    else:
-                        value = properties["type"](value)
+                    value = properties["type"](value)
                 except:
                     msg = "Parameter '%s' could not be converted to '%s'." % (
                         name, str(properties["type"].__name__))

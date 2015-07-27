@@ -714,63 +714,6 @@ def test_seismograms_error_handling(all_clients):
     assert "a request with no components will not re" in request.reason.lower()
 
 
-def test_conversion_to_boolean_parameters(all_clients):
-    """
-    Boolean values can be specified in a number of ways. Test that these are
-    working as expected.
-    """
-    client = all_clients
-
-    basic_parameters = {
-        "sourcelatitude": 10,
-        "sourcelongitude": 10,
-        "receiverlatitude": -10,
-        "receiverlongitude": -10,
-        "mtt": "100000",
-        "mpp": "100000",
-        "mrr": "100000",
-        "mrt": "100000",
-        "mrp": "100000",
-        "mtp": "100000"}
-
-    truth_values = ["1", "true", "TRUE", "True", "T", "t", "y", "Y"]
-    false_values = ["0", "false", "FALSE", "False", "F", "f", "n", "N"]
-    invalid_values = ["A", "HMMMM", "234"]
-
-    for value in truth_values:
-        params = copy.deepcopy(basic_parameters)
-        params["removesourceshift"] = value
-        _st = obspy.read()
-
-        with mock.patch("instaseis.base_instaseis_db.BaseInstaseisDB"
-                        ".get_seismograms") as p:
-            p.return_value = _st
-            client.fetch(_assemble_url(**params))
-            assert p.call_count == 1
-            assert p.call_args[1]["remove_source_shift"] is True
-
-    for value in false_values:
-        params = copy.deepcopy(basic_parameters)
-        params["removesourceshift"] = value
-        _st = obspy.read()
-
-        with mock.patch("instaseis.base_instaseis_db.BaseInstaseisDB"
-                        ".get_seismograms") as p:
-            p.return_value = _st
-            client.fetch(_assemble_url(**params))
-            assert p.call_count == 1
-            assert p.call_args[1]["remove_source_shift"] is False
-
-    # Test invalid values.
-    for value in invalid_values:
-        params = copy.deepcopy(basic_parameters)
-        params["removesourceshift"] = value
-        request = client.fetch(_assemble_url(**params))
-        assert request.code == 400
-        assert ("parameter 'removesourceshift' could not be converted to "
-                "'bool'" in request.reason.lower())
-
-
 def test_object_creation_for_seismogram_route(all_clients):
     """
     Tests that the correct objects are created for the seismogram route.
