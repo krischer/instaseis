@@ -260,8 +260,9 @@ class Source(SourceOrReceiver):
         :param m_rt: moment tensor components in r, theta, phi in Nm
         :param m_rp: moment tensor components in r, theta, phi in Nm
         :param m_tp: moment tensor components in r, theta, phi in Nm
-        :param time_shift: correction of the origin time in seconds. only
-            useful in the context of finite sources
+        :param time_shift: correction of the origin time in seconds. Useful
+            in the context of finite source or user defined source time
+            functions.
         :param sliprate: normalized source time function (sliprate)
         :param dt: sampling of the source time function
         :param origin_time: The origin time of the source. This will be the

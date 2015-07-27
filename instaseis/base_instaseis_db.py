@@ -254,7 +254,7 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
         for _i, source in enumerate(sources):
             data = self.get_seismograms(
                 source, receiver, components, reconvolve_stf=True,
-                return_obspy_stream=False)
+                return_obspy_stream=False, remove_source_shift=False)
 
             if correct_mu:
                 corr_fac = data["mu"] / DEFAULT_MU,

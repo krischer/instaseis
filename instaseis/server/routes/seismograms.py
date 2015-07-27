@@ -16,13 +16,15 @@ import tornado.gen
 import tornado.web
 
 from ... import Source, ForceSource, Receiver
+from ...lanczos import lanczos_resamp
 from ..util import run_async
 from ..instaseis_request import InstaseisRequestHandler
 
 
 @run_async
-def _get_seismogram(db, source, receiver, components, unit,
-                    remove_source_shift, dt, a_lanczos, format, callback):
+def _get_seismogram(db, source, receiver, components, unit, dt, a_lanczos,
+                    origin_time, starttime, endtime, src_shift, format,
+                    callback):
     """
     Extract a seismogram from the passed db and write it either to a MiniSEED
     or a SACZIP file.
@@ -35,23 +37,40 @@ def _get_seismogram(db, source, receiver, components, unit,
     :param remove_source_shift: Remove the source time shift or not.
     :param dt: dt to resample to.
     :param a_lanczos: Width of the Lanczos kernel.
+    :param origin_time: The peak of the source time function will be set to
+        that.
+    :param starttime: The desired start time of the seismogram.
+    :param endtime: The desired end time of the seismogram.
+    :param src_shift: The peak of the source time function in seconds
+        relative to the first sample.
     :param format:
     :param callback: callback function of the coroutine.
     """
     try:
         st = db.get_seismograms(
             source=source, receiver=receiver, components=components,
-            kind=unit, remove_source_shift=remove_source_shift,
-            reconvolve_stf=False, return_obspy_stream=True, dt=dt,
-            a_lanczos=a_lanczos)
+            kind=unit, remove_source_shift=False,
+            reconvolve_stf=False, return_obspy_stream=True, dt=None)
     except Exception:
         msg = ("Could not extract seismogram. Make sure, the components "
                "are valid, and the depth settings are correct.")
         callback(tornado.web.HTTPError(400, log_message=msg, reason=msg))
         return
 
-    # Half the filesize but definitely sufficiently accurate.
     for tr in st:
+        # Adjust for the source shift.
+        tr.stats.starttime = origin_time - src_shift
+
+    # Trim, potentially pad with zeroes. Previous checks ensure that no
+    # padding will happen at the end.
+    st.trim(starttime, endtime, pad=True, fill_value=0.0, nearest_sample=False)
+
+    for tr in st:
+        # Resample now to deal with the padding and what not.
+        if dt is not None:
+            tr.data = lanczos_resamp(si=tr.data, dt_old=tr.data.delta,
+                                     dt_new=dt, a=a_lanczos)
+        # Half the filesize but definitely sufficiently accurate.
         tr.data = np.require(tr.data, dtype=np.float32)
 
     if format == "mseed":
@@ -110,13 +129,14 @@ class SeismogramsHandler(InstaseisRequestHandler):
     seismogram_arguments = {
         "components": {"type": str, "default": "ZNE"},
         "unit": {"type": str, "default": "displacement"},
-        "removesourceshift": {"type": bool, "default": True},
         "dt": {"type": float},
         "alanczos": {"type": int, "default": 5},
+
         # Source parameters.
         "sourcelatitude": {"type": float, "required": True},
         "sourcelongitude": {"type": float, "required": True},
         "sourcedepthinm": {"type": float, "default": 0.0},
+
         # Source can either be given as the moment tensor components in Nm.
         "mrr": {"type": float},
         "mtt": {"type": float},
@@ -124,18 +144,24 @@ class SeismogramsHandler(InstaseisRequestHandler):
         "mrt": {"type": float},
         "mrp": {"type": float},
         "mtp": {"type": float},
+
         # Or as strike, dip, rake and M0.
         "strike": {"type": float},
         "dip": {"type": float},
         "rake": {"type": float},
         "M0": {"type": float},
+
         # Or as a force source.
         "fr": {"type": float},
         "ft": {"type": float},
         "fp": {"type": float},
-        # More optional source parameters.
-        "origintime": {"type": obspy.UTCDateTime,
-                       "default": obspy.UTCDateTime(0)},
+
+        # 5 parameters influence the final times of the returned seismograms.
+        "origintime": {"type": obspy.UTCDateTime},
+        "starttime": {"type": obspy.UTCDateTime},
+        "endtime": {"type": obspy.UTCDateTime},
+        "duration": {"type": float},
+
         # Receivers can be specified either directly via their coordinates.
         # In that case one can assign a network and station code.
         "receiverlatitude": {"type": float},
@@ -143,9 +169,11 @@ class SeismogramsHandler(InstaseisRequestHandler):
         "receiverdepthinm": {"type": float, "default": 0.0},
         "networkcode": {"type": str},
         "stationcode": {"type": str},
+
         # Or by querying a database.
         "network": {"type": str},
         "station": {"type": str},
+
         "format": {"type": str, "default": "mseed"}
     }
 
@@ -270,6 +298,66 @@ class SeismogramsHandler(InstaseisRequestHandler):
             msg = "A request with no components will not return anything..."
             raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
+        # Figure out the time settings.
+        info = self.application.db.info
+
+        # The time shift necessary to set the origin time to the peak of the
+        # source time function. Will be the time of the peak of the original
+        # source time function in AxiSEM or the peak of the gaussian
+        # function if reconvolved with it.
+        src_shift = info.src_shift
+
+        # Start time and origin time. If either is not set, one will be set
+        # to the other. If neither is set, both will be set to posix timestamp
+        # 0.
+        if args.origintime is None and args.starttime is None:
+            args.origintime = obspy.UTCDateTime(0)
+            args.starttime = obspy.UTCDateTime(0)
+        elif args.origintime is None:
+            args.origintime = args.starttime
+        elif args.starttime is None:
+            args.starttime = args.origintime
+
+        # Duration and endtime parameters are mutually exclusive.
+        if args.duration is not None and args.endtime is not None:
+            msg = ("'duration' and 'endtime' parameters cannot both be passed "
+                   "at the same time.")
+            raise tornado.web.HTTPError(404, log_message=msg, reason=msg)
+        # Get the temporal extents of the extracted seismograms.
+        seismogram_starttime = args.origintime - src_shift
+        seismogram_endtime = \
+            seismogram_starttime + (info.npts - 1) * info.dt
+
+        # Get the desired endtime.
+        if args.duration is None and args.endtime is None:
+            args.endtime = seismogram_endtime
+        elif args.endtime is None:
+            args.endtime = args.starttime + args.duration
+
+        # The desired seismogram start time must be before the end time of the
+        # seismograms.
+        if args.starttime >= seismogram_endtime:
+            msg = ("The `starttime` must be before the seismogram ends.")
+            raise tornado.web.HTTPError(404, log_message=msg, reason=msg)
+
+        # The endtime must be within the seismogram window
+        if not (seismogram_starttime <= args.endtime <= seismogram_endtime):
+            msg = ("The end time of the seismograms lies outside the allowed "
+                   "range.")
+            raise tornado.web.HTTPError(404, log_message=msg, reason=msg)
+
+        if args.starttime >= args.endtime:
+            msg = ("The calculated start time of the seismograms must be "
+                   "before the calculated end time.")
+            raise tornado.web.HTTPError(404, log_message=msg, reason=msg)
+
+        # Arbitrary limit: The starttime can be at max one hour before the
+        # origin time.
+        if args.starttime < (seismogram_starttime - 3600):
+            msg = ("The seismogram can start at the maximum one hour before "
+                   "the origin time.")
+            raise tornado.web.HTTPError(404, log_message=msg, reason=msg)
+
         components = list(args.components)
         for src_type, params in src_params.items():
             src_params = [getattr(args, _i) for _i in params]
@@ -282,8 +370,7 @@ class SeismogramsHandler(InstaseisRequestHandler):
                                     depth_in_m=args.sourcedepthinm,
                                     m_rr=args.mrr, m_tt=args.mtt,
                                     m_pp=args.mpp, m_rt=args.mrt,
-                                    m_rp=args.mrp, m_tp=args.mtp,
-                                    origin_time=args.origintime)
+                                    m_rp=args.mrp, m_tp=args.mtp)
                 except:
                     msg = ("Could not construct moment tensor source with "
                            "passed parameters. Check parameters for sanity.")
@@ -297,7 +384,7 @@ class SeismogramsHandler(InstaseisRequestHandler):
                         longitude=args.sourcelongitude,
                         depth_in_m=args.sourcedepthinm,
                         strike=args.strike, dip=args.dip, rake=args.rake,
-                        M0=args.M0, origin_time=args.origintime)
+                        M0=args.M0)
                 except:
                     msg = ("Could not construct the source from the passed "
                            "strike/dip/rake parameters. Check parameter for "
@@ -311,8 +398,7 @@ class SeismogramsHandler(InstaseisRequestHandler):
                                          longitude=args.sourcelongitude,
                                          depth_in_m=args.sourcedepthinm,
                                          f_r=args.fr, f_t=args.ft,
-                                         f_p=args.fp,
-                                         origin_time=args.origintime)
+                                         f_p=args.fp)
                 except:
                     msg = ("Could not construct force source with passed "
                            "parameters. Check parameters for sanity.")
@@ -398,9 +484,10 @@ class SeismogramsHandler(InstaseisRequestHandler):
             response = yield tornado.gen.Task(
                 _get_seismogram,
                 db=self.application.db, source=source, receiver=receiver,
-                remove_source_shift=args.removesourceshift,
-                components=components,  unit=args.unit, dt=args.dt,
-                a_lanczos=args.alanczos, format=args.format)
+                components=components, unit=args.unit, dt=args.dt,
+                a_lanczos=args.alanczos, origin_time=args.origintime,
+                starttime=args.starttime, endtime=args.endtime,
+                src_shift=src_shift, format=args.format)
 
             if isinstance(response, Exception):
                 raise response

@@ -488,7 +488,8 @@ def test_finite_source():
         components=('Z', 'N', 'E', 'R', 'T'), dt=0.1)
     st_ref = instaseis_bwd.get_seismograms(
         source=source, receiver=receiver,
-        components=('Z', 'N', 'E', 'R', 'T'), dt=0.1, reconvolve_stf=True)
+        components=('Z', 'N', 'E', 'R', 'T'), dt=0.1, reconvolve_stf=True,
+        remove_source_shift=False)
 
     np.testing.assert_allclose(st_fin.select(component='Z')[0].data,
                                st_ref.select(component='Z')[0].data,
