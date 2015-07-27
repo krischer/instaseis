@@ -23,6 +23,7 @@ from scipy.integrate import cumtrapz
 
 from . import lanczos
 from .source import Source, ForceSource, Receiver
+from .helpers import get_band_code
 
 
 DEFAULT_MU = 32e9
@@ -174,7 +175,7 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
             origin_time = UTCDateTime(0)
         # Convert to an ObsPy Stream object.
         st = Stream()
-        band_code = BaseInstaseisDB._get_band_code(dt_out)
+        band_code = get_band_code(dt_out)
         instaseis_header = AttribDict(mu=data["mu"])
         for comp in components:
             tr = Trace(data=data[comp],
@@ -280,7 +281,7 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
         st = Stream()
         if dt is None:
             dt = self.info.dt
-        band_code = self._get_band_code(dt)
+        band_code = get_band_code(dt)
         for comp in components:
             tr = Trace(data=data_summed[comp],
                        header={"delta": dt,
@@ -345,25 +346,6 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
                               'from forward DB. Using depth from the DB.')
 
         return source, receiver
-
-    @staticmethod
-    def _get_band_code(dt):
-        """
-        Figure out the channel band code. Done as in SPECFEM.
-        """
-        if dt <= 0.001:
-            band_code = "F"
-        elif dt <= 0.004:
-            band_code = "C"
-        elif dt <= 0.0125:
-            band_code = "H"
-        elif dt <= 0.1:
-            band_code = "B"
-        elif dt < 1:
-            band_code = "M"
-        else:
-            band_code = "L"
-        return band_code
 
     @property
     def info(self):

@@ -16,6 +16,7 @@ import tornado.gen
 import tornado.web
 
 from ... import Source, ForceSource, Receiver
+from ...helpers import get_band_code
 from ...lanczos import lanczos_resamp
 from ..util import run_async
 from ..instaseis_request import InstaseisRequestHandler
@@ -70,6 +71,10 @@ def _get_seismogram(db, source, receiver, components, unit, dt, a_lanczos,
         if dt is not None:
             tr.data = lanczos_resamp(si=tr.data, dt_old=tr.stats.delta,
                                      dt_new=dt, a=a_lanczos)
+            tr.stats.delta = dt
+            # The channel mapping has to be reapplied.
+            tr.stats.channel = get_band_code(dt) + tr.stats.channel[1:]
+
         # Half the filesize but definitely sufficiently accurate.
         tr.data = np.require(tr.data, dtype=np.float32)
 

@@ -21,6 +21,7 @@ import shutil
 
 from instaseis.instaseis_db import InstaseisDB
 from instaseis import Source, Receiver, ForceSource
+from instaseis.helpers import get_band_code
 
 from .testdata import BWD_TEST_DATA, FWD_TEST_DATA
 from .testdata import BWD_STRAIN_ONLY_TEST_DATA, BWD_FORCE_TEST_DATA
@@ -528,7 +529,7 @@ def test_get_band_code_method():
         33.0: "L"
     }
     for dt, letter in codes.items():
-        assert InstaseisDB._get_band_code(dt) == letter
+        assert get_band_code(dt) == letter
 
 
 def test_origin_time_of_resulting_seismograms():

@@ -1327,29 +1327,6 @@ def test_seismograms_retrieval(all_clients):
 
     params = copy.deepcopy(basic_parameters)
     params.update(mt)
-    params["removesourceshift"] = "False"
-    request = client.fetch(_assemble_url(**params))
-    st_server = obspy.read(request.buffer)
-    st_db = db.get_seismograms(source=source, receiver=receiver,
-                               remove_source_shift=False)
-    for tr_server, tr_db in zip(st_server, st_db):
-        # Remove the additional stats from both.
-        del tr_server.stats.mseed
-        del tr_server.stats._format
-        del tr_db.stats.instaseis
-        # Sample spacing is very similar but not equal due to floating
-        # point accuracy.
-        np.testing.assert_allclose(tr_server.stats.delta,
-                                   tr_db.stats.delta)
-        tr_server.stats.delta = tr_db.stats.delta
-        assert tr_server.stats == tr_db.stats
-        # Relative tolerance not particularly useful when testing super
-        # small values.
-        np.testing.assert_allclose(tr_server.data, tr_db.data,
-                                   atol=1E-10 * tr_server.data.ptp())
-
-    params = copy.deepcopy(basic_parameters)
-    params.update(mt)
     params["dt"] = "0.1"
     params["alanczos"] = "20"
     request = client.fetch(_assemble_url(**params))
@@ -1377,12 +1354,11 @@ def test_seismograms_retrieval(all_clients):
     params["dt"] = "0.1"
     params["alanczos"] = "2"
     params["unit"] = "ACCELERATION"
-    params["removesourceshift"] = "False"
     request = client.fetch(_assemble_url(**params))
     st_server = obspy.read(request.buffer)
     st_db = db.get_seismograms(source=source, receiver=receiver,
                                dt=0.1, a_lanczos=2, kind="acceleration",
-                               remove_source_shift=False)
+                               remove_source_shift=True)
     for tr_server, tr_db in zip(st_server, st_db):
         # Remove the additional stats from both.
         del tr_server.stats.mseed

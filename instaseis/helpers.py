@@ -37,3 +37,22 @@ def load_lib():
         lib = C.CDLL(filename)
         cache.append(lib)
         return lib
+
+
+def get_band_code(dt):
+    """
+    Figure out the channel band code. Done as in SPECFEM.
+    """
+    if dt <= 0.001:
+        band_code = "F"
+    elif dt <= 0.004:
+        band_code = "C"
+    elif dt <= 0.0125:
+        band_code = "H"
+    elif dt <= 0.1:
+        band_code = "B"
+    elif dt < 1:
+        band_code = "M"
+    else:
+        band_code = "L"
+    return band_code
