@@ -68,7 +68,7 @@ def _get_seismogram(db, source, receiver, components, unit, dt, a_lanczos,
     for tr in st:
         # Resample now to deal with the padding and what not.
         if dt is not None:
-            tr.data = lanczos_resamp(si=tr.data, dt_old=tr.data.delta,
+            tr.data = lanczos_resamp(si=tr.data, dt_old=tr.stats.delta,
                                      dt_new=dt, a=a_lanczos)
         # Half the filesize but definitely sufficiently accurate.
         tr.data = np.require(tr.data, dtype=np.float32)
@@ -297,7 +297,7 @@ class SeismogramsHandler(InstaseisRequestHandler):
         # source time function. Will be the time of the peak of the original
         # source time function in AxiSEM or the peak of the gaussian
         # function if reconvolved with it.
-        src_shift = info.src_shift
+        src_shift = info.src_shift_samples * info.dt
 
         # Start time and origin time. If either is not set, one will be set
         # to the other. If neither is set, both will be set to posix timestamp
