@@ -2444,8 +2444,11 @@ def test_unknown_parameter_raises(all_clients):
 
     # Adding a random other parameter raises
     params["bogus"] = "bogus"
+    params["random"] = "stuff"
     request = client.fetch(_assemble_url_raw(**params))
     assert request.code == 400
+    assert request.reason == ("The following unknown parameters have been "
+                              "passed: 'bogus', 'random'")
 
     # Same with /seismograms route.
     params = {
@@ -2456,6 +2459,9 @@ def test_unknown_parameter_raises(all_clients):
     assert request.code == 200
 
     # Adding a random other parameter raises
+    params["random"] = "stuff"
     params["bogus"] = "bogus"
     request = client.fetch(_assemble_url(**params))
     assert request.code == 400
+    assert request.reason == ("The following unknown parameters have been "
+                              "passed: 'bogus', 'random'")
