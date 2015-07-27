@@ -2426,3 +2426,36 @@ def test_multiple_seismograms_retrieval_no_stations(
     request = client.fetch(_assemble_url(**params))
     assert request.code == 404
     assert request.reason == "No coordinates found satisfying the query."
+
+
+def test_unknown_parameter_raises(all_clients):
+    """
+    Unknown parameters should raise.
+    """
+    client = all_clients
+
+    # Normal request works fine.
+    params = {
+        "sourcelatitude": 10, "sourcelongitude": 10, "receiverlatitude": -10,
+        "receiverlongitude": -10, "mtt": "100000", "mpp": "100000",
+        "mrr": "100000", "mrt": "100000", "mrp": "100000", "mtp": "100000"}
+    request = client.fetch(_assemble_url_raw(**params))
+    assert request.code == 200
+
+    # Adding a random other parameter raises
+    params["bogus"] = "bogus"
+    request = client.fetch(_assemble_url_raw(**params))
+    assert request.code == 400
+
+    # Same with /seismograms route.
+    params = {
+        "sourcelatitude": 10, "sourcelongitude": 10, "receiverlatitude": -10,
+        "receiverlongitude": -10, "mtt": "100000", "mpp": "100000",
+        "mrr": "100000", "mrt": "100000", "mrp": "100000", "mtp": "100000"}
+    request = client.fetch(_assemble_url(**params))
+    assert request.code == 200
+
+    # Adding a random other parameter raises
+    params["bogus"] = "bogus"
+    request = client.fetch(_assemble_url(**params))
+    assert request.code == 400
