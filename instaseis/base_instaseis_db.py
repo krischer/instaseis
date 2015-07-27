@@ -113,8 +113,11 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
             if remove_source_shift and not reconvolve_stf:
                 data[comp] = data[comp][self.info.src_shift_samples:]
             elif reconvolve_stf:
+                if remove_source_shift:
+                    raise ValueError("'remove_source_shift' argument not "
+                                     "compatible with 'reconvolve_stf'.")
                 if source.dt is None or source.sliprate is None:
-                    raise RuntimeError("source has no source time function")
+                    raise ValueError("source has no source time function")
 
                 if stf_map[self.info.stf] not in [0, 1]:
                     raise NotImplementedError(
