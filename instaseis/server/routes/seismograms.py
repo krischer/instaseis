@@ -190,6 +190,23 @@ class SeismogramsHandler(InstaseisRequestHandler):
                 ", ".join("'%s'" % _i for _i in sorted(unknown_arguments)))
             raise tornado.web.HTTPError(400, log_message=msg,
                                         reason=msg)
+
+        # Check for duplicates.
+        duplicates = []
+        for key, value in self.request.arguments.items():
+            if len(value) == 1:
+                continue
+            elif len(value) == 0:
+                # This should not happen.
+                raise NotImplementedError
+            else:
+                duplicates.append(key)
+        if duplicates:
+            msg = "Duplicate parameters: %s" % (
+                ", ".join("'%s'" % _i for _i in sorted(duplicates)))
+            raise tornado.web.HTTPError(400, log_message=msg,
+                                        reason=msg)
+
         args = obspy.core.AttribDict()
         for name, properties in self.seismogram_arguments.items():
             if "required" in properties:
