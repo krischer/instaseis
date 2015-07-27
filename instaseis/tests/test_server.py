@@ -2465,3 +2465,43 @@ def test_unknown_parameter_raises(all_clients):
     assert request.code == 400
     assert request.reason == ("The following unknown parameters have been "
                               "passed: 'bogus', 'random'")
+
+
+def test_passing_duplicate_parameter_raises(all_clients):
+    """
+    While valid with HTTP, duplicate parameters are not allowed within
+    instaseis. This should thus raise an error to avoid confusion of users.
+    """
+    client = all_clients
+
+    # Normal request works fine.
+    params = {
+        "sourcelatitude": 10, "sourcelongitude": 10, "receiverlatitude": -10,
+        "receiverlongitude": -10, "mtt": "100000", "mpp": "100000",
+        "mrr": "100000", "mrt": "100000", "mrp": "100000", "mtp": "100000"}
+    url = _assemble_url_raw(**params)
+    request = client.fetch(url)
+    assert request.code == 200
+
+    # Adding two duplicate parameters raises.
+    url += "&receiverlatitude=10&mrt=10"
+    request = client.fetch(url)
+    assert request.code == 400
+    assert request.reason == ("Duplicate parameters: 'mrt', "
+                              "'receiverlatitude'")
+
+    # Same with /seismograms route.
+    params = {
+        "sourcelatitude": 10, "sourcelongitude": 10, "receiverlatitude": -10,
+        "receiverlongitude": -10, "mtt": "100000", "mpp": "100000",
+        "mrr": "100000", "mrt": "100000", "mrp": "100000", "mtp": "100000"}
+    url = _assemble_url(**params)
+    request = client.fetch(url)
+    assert request.code == 200
+
+    # Adding two duplicate parameters raises.
+    url += "&receiverlatitude=10&mrt=10"
+    request = client.fetch(url)
+    assert request.code == 400
+    assert request.reason == ("Duplicate parameters: 'mrt', "
+                              "'receiverlatitude'")
