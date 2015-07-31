@@ -62,19 +62,23 @@ def _get_seismogram(db, source, receiver, components, unit, dt, a_lanczos,
         # Adjust for the source shift.
         tr.stats.starttime = origin_time - src_shift
 
-    # Trim, potentially pad with zeroes. Previous checks ensure that no
-    # padding will happen at the end.
-    st.trim(starttime, endtime, pad=True, fill_value=0.0, nearest_sample=False)
-
     for tr in st:
-        # Resample now to deal with the padding and what not.
+        # Resample if needed.
         if dt is not None:
-            interpolate_trace(tr, sampling_rate=1.0 / dt, a=a_lanczos)
+            # Force interpolation in a way that a sample is at the origin time.
+            starttime = origin_time - int(src_shift / tr.stats.delta) * \
+                                      tr.stats.delta
+            interpolate_trace(tr, sampling_rate=1.0 / dt, a=a_lanczos,
+                              starttime=starttime)
             # The channel mapping has to be reapplied.
             tr.stats.channel = get_band_code(dt) + tr.stats.channel[1:]
 
         # Half the filesize but definitely sufficiently accurate.
         tr.data = np.require(tr.data, dtype=np.float32)
+
+    # Trim, potentially pad with zeroes. Previous checks ensure that no
+    # padding will happen at the end.
+    st.trim(starttime, endtime, pad=True, fill_value=0.0, nearest_sample=False)
 
     if format == "mseed":
         with io.BytesIO() as fh:

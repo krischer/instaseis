@@ -21,7 +21,7 @@ import inspect
 from mpl_toolkits.basemap import Basemap
 import numpy as np
 from obspy.imaging.mopad_wrapper import Beach
-from obspy.core.util.geodetics import locations2degrees, gps2DistAzimuth
+from obspy.core.util import geodetics
 from obspy.taup import TauPyModel
 import os
 import sys
@@ -404,9 +404,10 @@ class Window(QtGui.QMainWindow):
                 if not st:
                     return
 
-                baz = gps2DistAzimuth(self.finite_source.CMT.latitude,
-                                      self.finite_source.CMT.longitude,
-                                      rec.latitude, rec.longitude)[2]
+                baz = geodetics.gps2DistAzimuth(
+                    self.finite_source.CMT.latitude,
+                    self.finite_source.CMT.longitude,
+                    rec.latitude, rec.longitude)[2]
                 self.st_copy = st.copy()
                 st.rotate('NE->RT', baz)
                 st += self.st_copy
@@ -447,7 +448,7 @@ class Window(QtGui.QMainWindow):
             return
 
         if bool(self.ui.tt_times.checkState()):
-            great_circle_distance = locations2degrees(
+            great_circle_distance = geodetics.locations2degrees(
                 src_latitude, src_longitude,
                 rec.latitude, rec.longitude)
             self.tts = tau_model.get_travel_times(
