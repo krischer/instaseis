@@ -17,7 +17,7 @@ import collections
 import functools
 import numpy as np
 import obspy
-from obspy.core.util.geodetics import FlinnEngdahl
+from obspy.core.util.geodetics.flinnengdahl import FlinnEngdahl
 from obspy.signal.filter import lowpass
 from obspy.signal.util import nextpow2
 import obspy.xseed
