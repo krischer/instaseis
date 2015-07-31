@@ -133,7 +133,7 @@ lib = MyExtension('instaseis',
                       os.path.join(src, "finite_elem_mapping.f90"),
                       os.path.join(src, "spectral_basis.f90"),
                       os.path.join(src, "sem_derivatives.f90"),
-                      os.path.join(src, "lanczos.f90"),
+                      os.path.join(src, "lanczos.c"),
                   ])
 
 INSTALL_REQUIRES = ["netCDF4 >= 1.1",
@@ -203,8 +203,7 @@ if __name__ == "__main__":
 
     # Attempt to remove the mod files once again.
     for filename in ["finite_elem_mapping.mod", "global_parameters.mod",
-                     "lanczos.mod", "sem_derivatives.mod",
-                     "spectral_basis.mod"]:
+                     "sem_derivatives.mod", "spectral_basis.mod"]:
         try:
             os.remove(filename)
         except:

@@ -148,8 +148,12 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
                     dataf * stf_conv_f / stf_deconv_f)[:self.info.npts]
 
             if dt is not None:
-                data[comp] = lanczos.lanczos_resamp(
-                    data[comp], self.info.dt, dt_out, a_lanczos)
+                new_npts = \
+                    int((len(data[comp]) - 1) * self.info.dt / dt_out) + 1
+                data[comp] = lanczos.lanczos_interpolation(
+                    data=data[comp], old_start=0, old_dt=self.info.dt,
+                    new_start=0, new_dt=dt_out, new_npts=new_npts,
+                    a=a_lanczos, window="lanczos")
 
             # taking derivative or integral to get the desired kind of
             # seismogram
@@ -274,8 +278,12 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
 
         if dt is not None:
             for comp in components:
-                data_summed[comp] = lanczos.lanczos_resamp(
-                    data_summed[comp], self.info.dt, dt, a_lanczos)
+                new_npts = \
+                    int((len(data_summed[comp]) - 1) * self.info.dt / dt) + 1
+                data_summed[comp] = lanczos.lanczos_interpolation(
+                    data=data[comp], old_start=0, old_dt=self.info.dt,
+                    new_start=0, new_dt=dt, new_npts=new_npts,
+                    a=a_lanczos, window="lanczos")
 
         # Convert to an ObsPy Stream object.
         st = Stream()

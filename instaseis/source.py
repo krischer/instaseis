@@ -20,7 +20,7 @@ import obspy
 from obspy.core.util.geodetics.flinnengdahl import FlinnEngdahl
 from obspy.signal.filter import lowpass
 from obspy.signal.util import nextpow2
-import obspy.xseed
+import obspy.xseed.parser
 import os
 from scipy import interp
 import warnings
@@ -859,7 +859,7 @@ class Receiver(SourceOrReceiver):
             return [Receiver(latitude=coords[0], longitude=coords[1],
                              network=filename_or_obj.stats.network,
                              station=filename_or_obj.stats.station)]
-        elif isinstance(filename_or_obj, obspy.xseed.Parser):
+        elif isinstance(filename_or_obj, obspy.xseed.parser.Parser):
             inv = filename_or_obj.getInventory()
             stations = collections.defaultdict(list)
             for chan in inv["channels"]:
@@ -904,7 +904,7 @@ class Receiver(SourceOrReceiver):
 
         # Last but not least try to parse it as a SEED file.
         try:
-            return Receiver.parse(obspy.xseed.Parser(filename_or_obj))
+            return Receiver.parse(obspy.xseed.parser.Parser(filename_or_obj))
         except ReceiverParseError as e:
             raise e
         except:

@@ -17,7 +17,7 @@ import tornado.web
 
 from ... import Source, ForceSource, Receiver
 from ...helpers import get_band_code
-from ...lanczos import lanczos_resamp
+from ...lanczos import interpolate_trace
 from ..util import run_async
 from ..instaseis_request import InstaseisRequestHandler
 
@@ -69,9 +69,7 @@ def _get_seismogram(db, source, receiver, components, unit, dt, a_lanczos,
     for tr in st:
         # Resample now to deal with the padding and what not.
         if dt is not None:
-            tr.data = lanczos_resamp(si=tr.data, dt_old=tr.stats.delta,
-                                     dt_new=dt, a=a_lanczos)
-            tr.stats.delta = dt
+            interpolate_trace(tr, sampling_rate=1.0 / dt, a=a_lanczos)
             # The channel mapping has to be reapplied.
             tr.stats.channel = get_band_code(dt) + tr.stats.channel[1:]
 
@@ -229,7 +227,6 @@ class SeismogramsHandler(InstaseisRequestHandler):
                 value = self.get_argument(name, default=default)
             if value is not None:
                 try:
-                    t = properties["type"]
                     value = properties["type"](value)
                 except:
                     msg = "Parameter '%s' could not be converted to '%s'." % (
