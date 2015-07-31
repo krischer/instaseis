@@ -153,7 +153,7 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
                 data[comp] = lanczos.lanczos_interpolation(
                     data=data[comp], old_start=0, old_dt=self.info.dt,
                     new_start=0, new_dt=dt_out, new_npts=new_npts,
-                    a=a_lanczos, window="lanczos")
+                    a=a_lanczos, window="blackman")
 
             # taking derivative or integral to get the desired kind of
             # seismogram
@@ -283,7 +283,7 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
                 data_summed[comp] = lanczos.lanczos_interpolation(
                     data=data[comp], old_start=0, old_dt=self.info.dt,
                     new_start=0, new_dt=dt, new_npts=new_npts,
-                    a=a_lanczos, window="lanczos")
+                    a=a_lanczos, window="blackman")
 
         # Convert to an ObsPy Stream object.
         st = Stream()

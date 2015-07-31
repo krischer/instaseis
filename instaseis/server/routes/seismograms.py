@@ -69,7 +69,7 @@ def _get_seismogram(db, source, receiver, components, unit, dt, a_lanczos,
             starttime = origin_time - int(src_shift / tr.stats.delta) * \
                                       tr.stats.delta
             interpolate_trace(tr, sampling_rate=1.0 / dt, a=a_lanczos,
-                              starttime=starttime)
+                              starttime=starttime, window="blackman")
             # The channel mapping has to be reapplied.
             tr.stats.channel = get_band_code(dt) + tr.stats.channel[1:]
 
