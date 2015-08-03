@@ -152,11 +152,19 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
                 # to make sure that that the peak of the source time
                 # function is exactly hit by a sample point.
 
-                # Number of sample intervals before the origin time in term
-                # of the new dt.
-                shift = round(self.info.src_shift % dt, 8)
-                duration = (len(data[comp]) - 1) * self.info.dt - shift
-                new_npts = int(round(duration / dt, 6)) + 1
+                # If it cleanly divides within one microsecond,
+                # make integer based calculations.
+                if round(self.info.src_shift / dt, 6) % 1.0 == 0:
+                    shift_in_samples = int(round(self.info.src_shift / dt, 6))
+                    shift = \
+                        (self.info.src_shift_samples - shift_in_samples) * dt
+                    shift = round(shift, 6)
+                    duration = (len(data[comp]) - 1) * self.info.dt - shift
+                    new_npts = int(round(duration / dt, 6)) + 1
+                else:
+                    shift = round(self.info.src_shift % dt, 8)
+                    duration = (len(data[comp]) - 1) * self.info.dt - shift
+                    new_npts = int(round(duration / dt, 6)) + 1
 
                 data[comp] = lanczos.lanczos_interpolation(
                     data=data[comp], old_start=0, old_dt=self.info.dt,
@@ -179,7 +187,7 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
             # boundary effects as possible.
             if remove_source_shift:
                 if dt is not None:
-                    data[comp] = data[comp][round(int(time_shift / dt), 8):]
+                    data[comp] = data[comp][int(round(time_shift / dt, 6)):]
                 else:
                     # If no resampling happens, removing the source shift is
                     # simple.
@@ -309,13 +317,16 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
                 # This is a bit tricky. We want to resample but we also want
                 # to make sure that that the peak of the source time
                 # function is exactly hit by a sample point.
-                starttime = round(self.info.src_shift - (
-                    int(round(self.info.src_shift / dt, 5)) * dt), 5)
-                duration = (len(data[comp]) - 1) * self.info.dt - starttime
-                new_npts = int(round(duration / dt, 5)) + 1
+
+                # Number of sample intervals before the origin time in term
+                # of the new dt.
+                shift = round(self.info.src_shift % dt, 8)
+                duration = (len(data[comp]) - 1) * self.info.dt - shift
+                new_npts = int(round(duration / dt, 6)) + 1
+
                 data_summed[comp] = lanczos.lanczos_interpolation(
-                    data=data[comp], old_start=0, old_dt=self.info.dt,
-                    new_start=starttime, new_dt=dt, new_npts=new_npts,
+                    data=data_summed[comp], old_start=0, old_dt=self.info.dt,
+                    new_start=shift, new_dt=dt, new_npts=new_npts,
                     a=a_lanczos, window="blackman")
 
         # Convert to an ObsPy Stream object.
