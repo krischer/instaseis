@@ -171,7 +171,7 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
                     data=data[comp], old_start=0, old_dt=self.info.dt,
                     new_start=shift, new_dt=dt, new_npts=new_npts,
                     a=a_lanczos, window="blackman")
-                time_shift = self.info.src_shift - shift
+                ref_sample = int(round((self.info.src_shift - shift) / dt, 6))
 
                 # The resampling assumes zeros outside the data range. This
                 # does not introduce any errors at the beginning as the data is
@@ -186,7 +186,7 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
                     data[comp] = \
                         data[comp][:-int(np.ceil(affected_area / dt))]
             else:
-                time_shift = self.info.src_shift
+                ref_sample = self.info.src_shift_samples
 
             # Integrate/differentiate before removing the source shift in
             # order to reduce boundary effects at the start of the signal.
@@ -201,31 +201,32 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
             # time function.
             if remove_source_shift:
                 if dt is not None:
-                    data[comp] = data[comp][int(round(time_shift / dt, 6)):]
+                    data[comp] = data[comp][ref_sample:]
                 else:
                     # If no resampling happens, removing the source shift is
                     # simple.
                     data[comp] = data[comp][self.info.src_shift_samples:]
-                time_shift = 0
+                ref_sample = 0
             elif reconvolve_stf:
-                time_shift = 0
+                ref_sample = 0
 
         if return_obspy_stream:
             return self._convert_to_stream(source=source, receiver=receiver,
                                            components=components,
                                            data=data, dt_out=dt_out,
-                                           time_shift=time_shift)
+                                           ref_sample=ref_sample)
         else:
             return data
 
     @staticmethod
     def _convert_to_stream(source, receiver, components, data, dt_out,
-                           time_shift):
+                           ref_sample):
         if hasattr(source, "origin_time"):
             origin_time = source.origin_time
         else:
             origin_time = UTCDateTime(0)
-        origin_time -= time_shift
+
+        origin_time -= ref_sample * dt_out
 
         # Convert to an ObsPy Stream object.
         st = Stream()

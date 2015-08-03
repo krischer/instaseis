@@ -16,16 +16,13 @@ import tornado.gen
 import tornado.web
 
 from ... import Source, ForceSource, Receiver
-from ...helpers import get_band_code
-from ...lanczos import interpolate_trace
 from ..util import run_async
 from ..instaseis_request import InstaseisRequestHandler
 
 
 @run_async
 def _get_seismogram(db, source, receiver, components, unit, dt, a_lanczos,
-                    origin_time, starttime, endtime, src_shift, format,
-                    callback):
+                    starttime, endtime, format, callback):
     """
     Extract a seismogram from the passed db and write it either to a MiniSEED
     or a SACZIP file.
@@ -38,12 +35,8 @@ def _get_seismogram(db, source, receiver, components, unit, dt, a_lanczos,
     :param remove_source_shift: Remove the source time shift or not.
     :param dt: dt to resample to.
     :param a_lanczos: Width of the Lanczos kernel.
-    :param origin_time: The peak of the source time function will be set to
-        that.
     :param starttime: The desired start time of the seismogram.
     :param endtime: The desired end time of the seismogram.
-    :param src_shift: The peak of the source time function in seconds
-        relative to the first sample.
     :param format:
     :param callback: callback function of the coroutine.
     """
@@ -51,7 +44,8 @@ def _get_seismogram(db, source, receiver, components, unit, dt, a_lanczos,
         st = db.get_seismograms(
             source=source, receiver=receiver, components=components,
             kind=unit, remove_source_shift=False,
-            reconvolve_stf=False, return_obspy_stream=True, dt=None)
+            reconvolve_stf=False, return_obspy_stream=True, dt=dt,
+            a_lanczos=a_lanczos)
     except Exception:
         msg = ("Could not extract seismogram. Make sure, the components "
                "are valid, and the depth settings are correct.")
@@ -59,26 +53,6 @@ def _get_seismogram(db, source, receiver, components, unit, dt, a_lanczos,
         return
 
     for tr in st:
-        # Adjust for the source shift.
-        tr.stats.starttime = origin_time - src_shift
-
-        # Resample if needed.
-        if dt is not None:
-            # This is a bit tricky. We want to resample but we also want
-            # to make sure that that the peak of the source time
-            # function is exactly hit by a sample point.
-            starttime = round(src_shift - (
-                int(round(src_shift / dt, 5)) * dt), 5)
-            starttime = origin_time - starttime
-            duration = tr.stats.endtime - starttime
-            new_npts = int(round(duration / dt, 5)) + 1
-            interpolate_trace(tr, sampling_rate=1.0 / dt, a=a_lanczos,
-                              starttime=starttime, npts=new_npts,
-                              window="blackman")
-
-            # The channel mapping has to be reapplied.
-            tr.stats.channel = get_band_code(dt) + tr.stats.channel[1:]
-
         # Half the filesize but definitely sufficiently accurate.
         tr.data = np.require(tr.data, dtype=np.float32)
 
@@ -352,10 +326,13 @@ class SeismogramsHandler(InstaseisRequestHandler):
             msg = ("'duration' and 'endtime' parameters cannot both be passed "
                    "at the same time.")
             raise tornado.web.HTTPError(404, log_message=msg, reason=msg)
+
         # Get the temporal extents of the extracted seismograms.
         seismogram_starttime = args.origintime - src_shift
+        # A small buffer of 1 % of a sample  to guard against floating point
+        # inaccuracies for the .trim() method.
         seismogram_endtime = \
-            seismogram_starttime + (info.npts - 1) * info.dt
+            seismogram_starttime + (info.npts - 1 + 0.01) * info.dt
 
         # Get the desired endtime.
         if args.duration is None and args.endtime is None:
@@ -399,7 +376,8 @@ class SeismogramsHandler(InstaseisRequestHandler):
                                     depth_in_m=args.sourcedepthinm,
                                     m_rr=args.mrr, m_tt=args.mtt,
                                     m_pp=args.mpp, m_rt=args.mrt,
-                                    m_rp=args.mrp, m_tp=args.mtp)
+                                    m_rp=args.mrp, m_tp=args.mtp,
+                                    origin_time=args.origintime)
                 except:
                     msg = ("Could not construct moment tensor source with "
                            "passed parameters. Check parameters for sanity.")
@@ -413,7 +391,7 @@ class SeismogramsHandler(InstaseisRequestHandler):
                         longitude=args.sourcelongitude,
                         depth_in_m=args.sourcedepthinm,
                         strike=args.strike, dip=args.dip, rake=args.rake,
-                        M0=args.M0)
+                        M0=args.M0, origin_time=args.origintime)
                 except:
                     msg = ("Could not construct the source from the passed "
                            "strike/dip/rake parameters. Check parameter for "
@@ -427,7 +405,8 @@ class SeismogramsHandler(InstaseisRequestHandler):
                                          longitude=args.sourcelongitude,
                                          depth_in_m=args.sourcedepthinm,
                                          f_r=args.fr, f_t=args.ft,
-                                         f_p=args.fp)
+                                         f_p=args.fp,
+                                         origin_time=args.origintime)
                 except:
                     msg = ("Could not construct force source with passed "
                            "parameters. Check parameters for sanity.")
@@ -514,9 +493,8 @@ class SeismogramsHandler(InstaseisRequestHandler):
                 _get_seismogram,
                 db=self.application.db, source=source, receiver=receiver,
                 components=components, unit=args.unit, dt=args.dt,
-                a_lanczos=args.alanczos, origin_time=args.origintime,
-                starttime=args.starttime, endtime=args.endtime,
-                src_shift=src_shift, format=args.format)
+                a_lanczos=args.alanczos, starttime=args.starttime,
+                endtime=args.endtime, format=args.format)
 
             if isinstance(response, Exception):
                 raise response

@@ -657,7 +657,8 @@ def test_resampling_and_time_settings(db):
     st = db.get_seismograms(source=source, receiver=receiver,
                             remove_source_shift=False)
     for tr in st:
-        assert tr.stats.starttime == origin_time - db.info.src_shift
+        assert tr.stats.starttime == origin_time - \
+            (db.info.src_shift_samples * db.info.dt)
     # This should now contain 7 more samples.
     assert st[0].stats.npts == length + 7
 

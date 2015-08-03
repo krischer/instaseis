@@ -207,7 +207,7 @@ class RawSeismogramsHandler(InstaseisRequestHandler):
         try:
             st = self.application.db._convert_to_stream(
                 source=source, receiver=receiver, components=components,
-                data=data, dt_out=self.application.db.info.dt, time_shift=0)
+                data=data, dt_out=self.application.db.info.dt, ref_sample=0)
         except Exception:
             msg = ("Could not convert seismogram to a Stream object.")
             raise tornado.web.HTTPError(500, log_message=msg, reason=msg)

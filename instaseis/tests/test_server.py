@@ -396,6 +396,8 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
     with mock.patch("instaseis.instaseis_db.InstaseisDB._get_seismograms") \
             as p:
         _st = obspy.read()
+        for tr in _st:
+            tr.stats.starttime = obspy.UTCDateTime(0)
         data = {}
         data["mu"] = 1.0
         for tr in _st:
@@ -737,6 +739,8 @@ def test_object_creation_for_seismogram_route(all_clients):
     with mock.patch("instaseis.instaseis_db.InstaseisDB.get_seismograms") \
             as p:
         _st = obspy.read()
+        for tr in _st:
+            tr.stats.starttime = obspy.UTCDateTime(0)
         p.return_value = _st
 
         # Moment tensor source.
@@ -1055,6 +1059,7 @@ def test_seismograms_retrieval(all_clients):
         depth_in_m=0.0)
     st_db = db.get_seismograms(source=source, receiver=receiver,
                                components=components)
+
     for tr_server, tr_db in zip(st_server, st_db):
         # Remove the additional stats from both.
         del tr_server.stats.mseed
@@ -1332,7 +1337,7 @@ def test_seismograms_retrieval(all_clients):
     request = client.fetch(_assemble_url(**params))
     st_server = obspy.read(request.buffer)
     st_db = db.get_seismograms(source=source, receiver=receiver,
-                               dt=0.1, a_lanczos=20)
+                               dt=0.1, a_lanczos=1)
     for tr_server, tr_db in zip(st_server, st_db):
         # Remove the additional stats from both.
         del tr_server.stats.mseed
@@ -1358,7 +1363,7 @@ def test_seismograms_retrieval(all_clients):
     request = client.fetch(_assemble_url(**params))
     st_server = obspy.read(request.buffer)
     st_db = db.get_seismograms(source=source, receiver=receiver,
-                               dt=0.1, a_lanczos=2, kind="acceleration",
+                               dt=0.1, a_lanczos=1, kind="acceleration",
                                remove_source_shift=True)
     for tr_server, tr_db in zip(st_server, st_db):
         # Remove the additional stats from both.
