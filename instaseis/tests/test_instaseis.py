@@ -494,11 +494,12 @@ def test_finite_source():
     dt = instaseis_bwd.info.dt / 4
     st_fin = instaseis_bwd.get_seismograms_finite_source(
         sources=[source], receiver=receiver,
-        components=('Z', 'N', 'E', 'R', 'T'), dt=dt)
+        components=('Z', 'N', 'E', 'R', 'T'), dt=dt,
+        a_lanczos=1)
     st_ref = instaseis_bwd.get_seismograms(
         source=source, receiver=receiver,
         components=('Z', 'N', 'E', 'R', 'T'), dt=dt, reconvolve_stf=True,
-        remove_source_shift=False)
+        remove_source_shift=False, a_lanczos=1)
 
     np.testing.assert_allclose(st_fin.select(component='Z')[0].data,
                                st_ref.select(component='Z')[0].data,
@@ -668,17 +669,19 @@ def test_resampling_and_time_settings(db):
     # resample in a way that the given origin time is at the peak of the
     # source time function.
     st_r_shift = db.get_seismograms(source=source, receiver=receiver,
-                                    remove_source_shift=True, dt=12)
+                                    remove_source_shift=True, dt=12,
+                                    a_lanczos=1)
     for tr in st_r_shift:
         assert tr.stats.starttime == origin_time
     length = st_r_shift[0].stats.npts
 
     st = db.get_seismograms(source=source, receiver=receiver,
-                            remove_source_shift=False, dt=12)
+                            remove_source_shift=False, dt=12,
+                            a_lanczos=1)
     for tr in st:
         assert tr.stats.starttime == origin_time - 14 * 12
 
-    # Now this shoul have exactly 14 samples more then without removing the
+    # Now this should have exactly 14 samples more then without removing the
     # source shift.
     assert length + 14 == tr.stats.npts
 

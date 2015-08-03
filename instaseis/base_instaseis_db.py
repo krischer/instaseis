@@ -16,9 +16,10 @@ from __future__ import (absolute_import, division, print_function,
 from future.utils import with_metaclass
 
 from abc import ABCMeta, abstractmethod
+import warnings
+
 import numpy as np
 from obspy.core import AttribDict, Stream, Trace, UTCDateTime
-import warnings
 from scipy.integrate import cumtrapz
 
 from . import lanczos
@@ -171,6 +172,19 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
                     new_start=shift, new_dt=dt, new_npts=new_npts,
                     a=a_lanczos, window="blackman")
                 time_shift = self.info.src_shift - shift
+
+                # The resampling assumes zeros outside the data range. This
+                # does not introduce any errors at the beginning as the data is
+                # actually zero there but it does affect the end. We will
+                # remove all samples that are affected by the boundary
+                # conditions here.
+                #
+                # Also don't cut it for the "identify" interpolation which is
+                # important for testing.
+                if round(dt / self.info.dt, 6) != 1.0:
+                    affected_area = a_lanczos * self.info.dt
+                    data[comp] = \
+                        data[comp][:-int(np.ceil(affected_area / dt))]
             else:
                 time_shift = self.info.src_shift
 
@@ -322,6 +336,19 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
                     data=data_summed[comp], old_start=0, old_dt=self.info.dt,
                     new_start=0, new_dt=dt, new_npts=new_npts,
                     a=a_lanczos, window="blackman")
+
+                # The resampling assumes zeros outside the data range. This
+                # does not introduce any errors at the beginning as the data is
+                # actually zero there but it does affect the end. We will
+                # remove all samples that are affected by the boundary
+                # conditions here.
+                #
+                # Also don't cut it for the "identify" interpolation which is
+                # important for testing.
+                if round(dt / self.info.dt, 6) != 1.0:
+                    affected_area = a_lanczos * self.info.dt
+                    data_summed[comp] = \
+                        data_summed[comp][:-int(np.ceil(affected_area / dt))]
 
         # Convert to an ObsPy Stream object.
         st = Stream()
