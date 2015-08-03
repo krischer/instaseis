@@ -111,9 +111,7 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
             n_derivative += 2
 
         for comp in components:
-            if remove_source_shift and not reconvolve_stf:
-                data[comp] = data[comp][self.info.src_shift_samples:]
-            elif reconvolve_stf:
+            if reconvolve_stf:
                 if remove_source_shift:
                     raise ValueError("'remove_source_shift' argument not "
                                      "compatible with 'reconvolve_stf'.")
@@ -148,21 +146,41 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
                     dataf * stf_conv_f / stf_deconv_f)[:self.info.npts]
 
             if dt is not None:
-                new_npts = \
-                    int((len(data[comp]) - 1) * self.info.dt / dt_out) + 1
+                # This is a bit tricky. We want to resample but we also want
+                # to make sure that that the peak of the source time
+                # function is exactly hit by a sample point.
+                starttime = round(self.info.src_shift - (
+                    int(round(self.info.src_shift / dt, 5)) * dt), 5)
+                duration = (len(data[comp]) - 1) * self.info.dt - starttime
+                new_npts = int(round(duration / dt, 5)) + 1
+
                 data[comp] = lanczos.lanczos_interpolation(
                     data=data[comp], old_start=0, old_dt=self.info.dt,
-                    new_start=0, new_dt=dt_out, new_npts=new_npts,
+                    new_start=starttime, new_dt=dt, new_npts=new_npts,
                     a=a_lanczos, window="blackman")
 
-            # taking derivative or integral to get the desired kind of
-            # seismogram
+            # Integrate/differentiate before removing the source shift in
+            # order to reduce boundary effects at the start of the signal.
             for _ in np.arange(n_derivative):
                 data[comp] = np.gradient(data[comp], [dt_out])
 
             for _ in np.arange(-n_derivative):
                 # adding a zero at the beginning to avoid phase shift
-                data[comp] = cumtrapz(data[comp], dx=dt_out, initial=0.)
+                data[comp] = cumtrapz(data[comp], dx=dt_out, initial=0.0)
+
+            # Remove the source shift at the very end to have as little
+            # boundary effects as possible.
+            if remove_source_shift:
+                if dt is not None:
+                    starttime = round(self.info.src_shift - (
+                        int(round(self.info.src_shift / dt, 5)) * dt), 5)
+                    data[comp] = \
+                        data[comp][int(round(
+                            (self.info.src_shift - starttime) / dt, 5)):]
+                else:
+                    # If no resampling happens, removing the source shift is
+                    # simple.
+                    data[comp] = data[comp][self.info.src_shift_samples:]
 
         if return_obspy_stream:
             return self._convert_to_stream(source=source, receiver=receiver,
@@ -278,11 +296,16 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
 
         if dt is not None:
             for comp in components:
-                new_npts = \
-                    int((len(data_summed[comp]) - 1) * self.info.dt / dt) + 1
+                # This is a bit tricky. We want to resample but we also want
+                # to make sure that that the peak of the source time
+                # function is exactly hit by a sample point.
+                starttime = round(self.info.src_shift - (
+                    int(round(self.info.src_shift / dt, 5)) * dt), 5)
+                duration = (len(data[comp]) - 1) * self.info.dt - starttime
+                new_npts = int(round(duration / dt, 5)) + 1
                 data_summed[comp] = lanczos.lanczos_interpolation(
                     data=data[comp], old_start=0, old_dt=self.info.dt,
-                    new_start=0, new_dt=dt, new_npts=new_npts,
+                    new_start=starttime, new_dt=dt, new_npts=new_npts,
                     a=a_lanczos, window="blackman")
 
         # Convert to an ObsPy Stream object.

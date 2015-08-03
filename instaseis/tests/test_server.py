@@ -1338,6 +1338,7 @@ def test_seismograms_retrieval(all_clients):
         del tr_server.stats.mseed
         del tr_server.stats._format
         del tr_db.stats.instaseis
+
         # Sample spacing is very similar but not equal due to floating
         # point accuracy.
         np.testing.assert_allclose(tr_server.stats.delta,

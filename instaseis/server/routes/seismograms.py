@@ -62,14 +62,20 @@ def _get_seismogram(db, source, receiver, components, unit, dt, a_lanczos,
         # Adjust for the source shift.
         tr.stats.starttime = origin_time - src_shift
 
-    for tr in st:
         # Resample if needed.
         if dt is not None:
-            # Force interpolation in a way that a sample is at the origin time.
-            starttime = origin_time - int(src_shift / tr.stats.delta) * \
-                                      tr.stats.delta
+            # This is a bit tricky. We want to resample but we also want
+            # to make sure that that the peak of the source time
+            # function is exactly hit by a sample point.
+            starttime = round(src_shift - (
+                int(round(src_shift / dt, 5)) * dt), 5)
+            starttime = origin_time - starttime
+            duration = tr.stats.endtime - starttime
+            new_npts = int(round(duration / dt, 5)) + 1
             interpolate_trace(tr, sampling_rate=1.0 / dt, a=a_lanczos,
-                              starttime=starttime, window="blackman")
+                              starttime=starttime, npts=new_npts,
+                              window="blackman")
+
             # The channel mapping has to be reapplied.
             tr.stats.channel = get_band_code(dt) + tr.stats.channel[1:]
 

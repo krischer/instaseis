@@ -204,10 +204,11 @@ def test_incremental_bwd():
     assert instaseis_bwd.meshes.px.strain_buffer.efficiency == 1.0 / 2.0
     assert instaseis_bwd.meshes.pz.strain_buffer.efficiency == 1.0 / 2.0
 
-    # test resampling
+    # test resampling with a no-op interpolation.
     dt = instaseis_bwd.info.dt
     st_bwd = instaseis_bwd.get_seismograms(
-        source=source, receiver=receiver, components=('Z'), dt=dt)
+        source=source, receiver=receiver, components=('Z'), dt=dt,
+        a_lanczos=5)
     np.testing.assert_allclose(st_bwd.select(component='Z')[0].data,
                                BWD_TEST_DATA["Z"], rtol=1E-7, atol=1E-12)
 
