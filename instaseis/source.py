@@ -265,10 +265,11 @@ class Source(SourceOrReceiver):
             functions.
         :param sliprate: normalized source time function (sliprate)
         :param dt: sampling of the source time function
-        :param origin_time: The origin time of the source. This will be the
-            time of the first sample in the final seismogram. Be careful to
-            adjust it for any time shift or STF (de)convolution effects.
-
+        :param origin_time: The origin time of the source. If you don't
+            reconvolve with another source time function this time is the
+            peak of the source time function used to generate the database.
+            If you reconvolve with another source time function this time is
+            the time of the first sample of the final seismogram.
 
         >>> import instaseis
         >>> source = instaseis.Source(
@@ -450,9 +451,11 @@ class Source(SourceOrReceiver):
             useful in the context of finite sources
         :param sliprate: normalized source time function (sliprate)
         :param dt: sampling of the source time function
-        :param origin_time: The origin time of the source. This will be the
-            time of the first sample in the final seismogram. Be careful to
-            adjust it for any time shift or STF (de)convolution effects.
+        :param origin_time: The origin time of the source. If you don't
+            reconvolve with another source time function this time is the
+            peak of the source time function used to generate the database.
+            If you reconvolve with another source time function this time is
+            the time of the first sample of the final seismogram.
 
         >>> import instaseis
         >>> source = instaseis.Source.from_strike_dip_rake(
@@ -676,9 +679,11 @@ class ForceSource(SourceOrReceiver):
     :param f_r: force components in r, theta, phi in N
     :param f_t: force components in r, theta, phi in N
     :param f_p: force components in r, theta, phi in N
-    :param origin_time: The origin time of the source. This will be the
-        time of the first sample in the final seismogram. Be careful to
-        adjust it for any time shift or STF (de)convolution effects.
+    :param origin_time: The origin time of the source. If you don't
+        reconvolve with another source time function this time is the
+        peak of the source time function used to generate the database.
+        If you reconvolve with another source time function this time is
+        the time of the first sample of the final seismogram.
 
 
     >>> import instaseis

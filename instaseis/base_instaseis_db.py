@@ -53,9 +53,10 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
         :param kind: The desired units of the seismogram:
             ``"displacement"``, ``"velocity"``, or ``"acceleration"``.
         :type remove_source_shift: bool, optional
-        :param remove_source_shift: Move the starttime of the seismogram to
+        :param remove_source_shift: Move the start time of the seismogram to
             the peak of the sliprate from the source time function used to
-            generate the database.
+            generate the database. This has the effect that the first sample
+            is at the time of the origin time in the seismogram if available.
         :type reconvolve_stf: bool, optional
         :param reconvolve_stf: Deconvolve the source time function used in
             the AxiSEM run and convolve with the STF attached to the source.
@@ -110,11 +111,12 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
         if isinstance(source, ForceSource):
             n_derivative += 2
 
+        if reconvolve_stf and remove_source_shift:
+            raise ValueError("'remove_source_shift' argument not "
+                             "compatible with 'reconvolve_stf'.")
+
         for comp in components:
             if reconvolve_stf:
-                if remove_source_shift:
-                    raise ValueError("'remove_source_shift' argument not "
-                                     "compatible with 'reconvolve_stf'.")
                 if source.dt is None or source.sliprate is None:
                     raise ValueError("source has no source time function")
 
@@ -149,15 +151,20 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
                 # This is a bit tricky. We want to resample but we also want
                 # to make sure that that the peak of the source time
                 # function is exactly hit by a sample point.
-                starttime = round(self.info.src_shift - (
-                    int(round(self.info.src_shift / dt, 5)) * dt), 5)
-                duration = (len(data[comp]) - 1) * self.info.dt - starttime
-                new_npts = int(round(duration / dt, 5)) + 1
+
+                # Number of sample intervals before the origin time in term
+                # of the new dt.
+                shift = round(self.info.src_shift % dt, 8)
+                duration = (len(data[comp]) - 1) * self.info.dt - shift
+                new_npts = int(round(duration / dt, 6)) + 1
 
                 data[comp] = lanczos.lanczos_interpolation(
                     data=data[comp], old_start=0, old_dt=self.info.dt,
-                    new_start=starttime, new_dt=dt, new_npts=new_npts,
+                    new_start=shift, new_dt=dt, new_npts=new_npts,
                     a=a_lanczos, window="blackman")
+                time_shift = self.info.src_shift - shift
+            else:
+                time_shift = self.info.src_shift
 
             # Integrate/differentiate before removing the source shift in
             # order to reduce boundary effects at the start of the signal.
@@ -172,29 +179,30 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
             # boundary effects as possible.
             if remove_source_shift:
                 if dt is not None:
-                    starttime = round(self.info.src_shift - (
-                        int(round(self.info.src_shift / dt, 5)) * dt), 5)
-                    data[comp] = \
-                        data[comp][int(round(
-                            (self.info.src_shift - starttime) / dt, 5)):]
+                    data[comp] = data[comp][round(int(time_shift / dt), 8):]
                 else:
                     # If no resampling happens, removing the source shift is
                     # simple.
                     data[comp] = data[comp][self.info.src_shift_samples:]
+                time_shift = 0
 
         if return_obspy_stream:
             return self._convert_to_stream(source=source, receiver=receiver,
                                            components=components,
-                                           data=data, dt_out=dt_out)
+                                           data=data, dt_out=dt_out,
+                                           time_shift=time_shift)
         else:
             return data
 
     @staticmethod
-    def _convert_to_stream(source, receiver, components, data, dt_out):
+    def _convert_to_stream(source, receiver, components, data, dt_out,
+                           time_shift):
         if hasattr(source, "origin_time"):
             origin_time = source.origin_time
         else:
             origin_time = UTCDateTime(0)
+        origin_time -= time_shift
+
         # Convert to an ObsPy Stream object.
         st = Stream()
         band_code = get_band_code(dt_out)
