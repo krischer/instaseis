@@ -58,6 +58,7 @@ def _get_seismogram(db, source, receiver, components, unit, dt, a_lanczos,
 
     # Trim, potentially pad with zeroes. Previous checks ensure that no
     # padding will happen at the end.
+    endtime = min(min(_i.stats.endtime for _i in st), endtime)
     st.trim(starttime, endtime, pad=True, fill_value=0.0, nearest_sample=False)
 
     if format == "mseed":
@@ -256,8 +257,8 @@ class SeismogramsHandler(InstaseisRequestHandler):
 
         # Make sure the lanczos window width is sensible. Don't allow values
         # smaller than 2 or larger than 20.
-        if not (2 <= args.alanczos <= 20):
-            msg = ("`alanczos` must not be smaller than 2 or larger than 20.")
+        if not (1 <= args.alanczos <= 20):
+            msg = ("`alanczos` must not be smaller than 1 or larger than 20.")
             raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
         # Figure out who the station coordinates are specified.

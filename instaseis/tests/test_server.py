@@ -1333,7 +1333,7 @@ def test_seismograms_retrieval(all_clients):
     params = copy.deepcopy(basic_parameters)
     params.update(mt)
     params["dt"] = "0.1"
-    params["alanczos"] = "20"
+    params["alanczos"] = "1"
     request = client.fetch(_assemble_url(**params))
     st_server = obspy.read(request.buffer)
     st_db = db.get_seismograms(source=source, receiver=receiver,
@@ -1363,7 +1363,7 @@ def test_seismograms_retrieval(all_clients):
     request = client.fetch(_assemble_url(**params))
     st_server = obspy.read(request.buffer)
     st_db = db.get_seismograms(source=source, receiver=receiver,
-                               dt=0.1, a_lanczos=1, kind="acceleration",
+                               dt=0.1, a_lanczos=2, kind="acceleration",
                                remove_source_shift=True)
     for tr_server, tr_db in zip(st_server, st_db):
         # Remove the additional stats from both.
