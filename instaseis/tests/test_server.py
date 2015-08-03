@@ -665,7 +665,7 @@ def test_seismograms_error_handling(all_clients):
     assert request.code == 400
     assert "the smallest possible dt is 0.01" in request.reason.lower()
 
-    # lanzcos window is too wide or too narrow.
+    # lanczos window is too wide or too narrow.
     params = copy.deepcopy(basic_parameters)
     params["mtt"] = "100000"
     params["mpp"] = "100000"
@@ -673,7 +673,7 @@ def test_seismograms_error_handling(all_clients):
     params["mrt"] = "100000"
     params["mrp"] = "100000"
     params["mtp"] = "100000"
-    params["alanczos"] = "1"
+    params["alanczos"] = "0"
     request = client.fetch(_assemble_url(**params))
     assert request.code == 400
     assert "`alanczos` must not be smaller" in request.reason.lower()
