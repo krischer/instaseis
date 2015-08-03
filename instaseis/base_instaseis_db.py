@@ -152,12 +152,12 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
                 # to make sure that that the peak of the source time
                 # function is exactly hit by a sample point.
 
-                # If it cleanly divides within one microsecond,
+                # If it cleanly divides within ten microseconds,
                 # make integer based calculations.
-                if round(self.info.src_shift / dt, 6) % 1.0 == 0:
-                    shift_in_samples = int(round(self.info.src_shift / dt, 6))
-                    shift = \
-                        (self.info.src_shift_samples - shift_in_samples) * dt
+                if round(self.info.src_shift / dt, 5) % 1.0 == 0:
+                    shift_in_samples = int(round(self.info.src_shift / dt, 5))
+                    shift = (self.info.src_shift_samples * self.info.dt) - \
+                        (shift_in_samples * dt)
                     shift = round(shift, 6)
                     duration = (len(data[comp]) - 1) * self.info.dt - shift
                     new_npts = int(round(duration / dt, 6)) + 1
@@ -314,19 +314,13 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
 
         if dt is not None:
             for comp in components:
-                # This is a bit tricky. We want to resample but we also want
-                # to make sure that that the peak of the source time
-                # function is exactly hit by a sample point.
-
-                # Number of sample intervals before the origin time in term
-                # of the new dt.
-                shift = round(self.info.src_shift % dt, 8)
-                duration = (len(data[comp]) - 1) * self.info.dt - shift
-                new_npts = int(round(duration / dt, 6)) + 1
-
+                # We don't need to align a sample to the peak of the source
+                # time function here.
+                new_npts = int(round(
+                    (len(data[comp]) - 1) * self.info.dt / dt, 6) + 1)
                 data_summed[comp] = lanczos.lanczos_interpolation(
                     data=data_summed[comp], old_start=0, old_dt=self.info.dt,
-                    new_start=shift, new_dt=dt, new_npts=new_npts,
+                    new_start=0, new_dt=dt, new_npts=new_npts,
                     a=a_lanczos, window="blackman")
 
         # Convert to an ObsPy Stream object.

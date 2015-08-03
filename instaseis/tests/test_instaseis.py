@@ -489,12 +489,15 @@ def test_finite_source():
 
     source.set_sliprate(sliprate, dt, time_shift=0., normalize=True)
 
+    # We can only do a dt that is a clean multiple of the original dt as
+    # otherwise we will have small time shifts.
+    dt = instaseis_bwd.info.dt / 4
     st_fin = instaseis_bwd.get_seismograms_finite_source(
         sources=[source], receiver=receiver,
-        components=('Z', 'N', 'E', 'R', 'T'), dt=0.1)
+        components=('Z', 'N', 'E', 'R', 'T'), dt=dt)
     st_ref = instaseis_bwd.get_seismograms(
         source=source, receiver=receiver,
-        components=('Z', 'N', 'E', 'R', 'T'), dt=0.1, reconvolve_stf=True,
+        components=('Z', 'N', 'E', 'R', 'T'), dt=dt, reconvolve_stf=True,
         remove_source_shift=False)
 
     np.testing.assert_allclose(st_fin.select(component='Z')[0].data,
