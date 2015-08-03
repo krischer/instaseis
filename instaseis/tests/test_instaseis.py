@@ -31,6 +31,9 @@ from .testdata import BWD_STRAIN_ONLY_TEST_DATA, BWD_FORCE_TEST_DATA
 DATA = os.path.join(os.path.dirname(os.path.abspath(
     inspect.getfile(inspect.currentframe()))), "data")
 
+DBS = [os.path.join(DATA, "100s_db_fwd"),
+       os.path.join(DATA, "100s_db_bwd_displ_only")]
+
 
 def test_fwd_vs_bwd():
     """
@@ -618,3 +621,63 @@ def test_higher_level_event_and_receiver_parsing():
     assert st[0].stats.starttime == org.time
     assert st[0].stats.network == "TA"
     assert st[0].stats.station == "Q56A"
+
+
+@pytest.mark.parametrize("db", DBS)
+def test_resampling_and_time_settings(db):
+    """
+    This tests should assure that the origin time is always the peak of the
+    source time function.
+    """
+    db = InstaseisDB(db)
+
+    origin_time = obspy.UTCDateTime(2015, 1, 1, 1, 1)
+
+    source = Source(latitude=4., longitude=3.0, depth_in_m=0,
+                    m_rr=4.71e+17, m_tt=3.81e+17, m_pp=-4.74e+17,
+                    m_rt=3.99e+17, m_rp=-8.05e+17, m_tp=-1.23e+17,
+                    origin_time=origin_time)
+    receiver = Receiver(latitude=10., longitude=20., depth_in_m=0)
+
+    # The `remove_source_shift` argument will cut away the first couple of
+    # samples. This results in the first sample being the origin time.
+    st_r_shift = db.get_seismograms(source=source, receiver=receiver,
+                                    remove_source_shift=True)
+    for tr in st_r_shift:
+        assert tr.stats.starttime == origin_time
+    length = st_r_shift[0].stats.npts
+
+    # Now if we don't remove it we should have a couple more samples. If we
+    # don't resample it should be more or less exact.
+    st = db.get_seismograms(source=source, receiver=receiver,
+                            remove_source_shift=False)
+    for tr in st:
+        assert tr.stats.starttime == origin_time - db.info.src_shift
+    # This should now contain 7 more samples.
+    assert st[0].stats.npts == length + 7
+
+    # Make sure the shift does what is is supposed to do.
+    for tr_r, tr in zip(st_r_shift, st):
+        np.testing.assert_allclose(tr_r.data, tr[7:], atol=1E-9)
+
+    # This becomes a bit trickier if resampling is involved. It will always
+    # resample in a way that the given origin time is at the peak of the
+    # source time function.
+    st_r_shift = db.get_seismograms(source=source, receiver=receiver,
+                                    remove_source_shift=True, dt=12)
+    for tr in st_r_shift:
+        assert tr.stats.starttime == origin_time
+    length = st_r_shift[0].stats.npts
+
+    st = db.get_seismograms(source=source, receiver=receiver,
+                            remove_source_shift=False, dt=12)
+    for tr in st:
+        assert tr.stats.starttime == origin_time - 14 * 12
+
+    # Now this shoul have exactly 14 samples more then without removing the
+    # source shift.
+    assert length + 14 == tr.stats.npts
+
+    # Make sure the shift does what is is supposed to do.
+    for tr_r, tr in zip(st_r_shift, st):
+        np.testing.assert_allclose(tr_r.data, tr[14:], atol=1E-9)
