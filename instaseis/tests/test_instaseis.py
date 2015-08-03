@@ -751,3 +751,54 @@ def test_time_settings_with_resample_stf(db):
         remove_source_shift=False, dt=1.0)
     for tr in st:
         assert tr.stats.starttime == origin_time
+
+
+@pytest.mark.parametrize("db", DBS)
+def test_remove_samples_at_end_for_lanczos(db):
+    """
+    Remove some samples at the end for the Lanczos resampling to avoid
+    boundary effects.
+    """
+    db = InstaseisDB(db)
+
+    origin_time = obspy.UTCDateTime(2015, 1, 1, 1, 1)
+
+    source = Source(latitude=4., longitude=3.0, depth_in_m=0,
+                    m_rr=4.71e+17, m_tt=3.81e+17, m_pp=-4.74e+17,
+                    m_rt=3.99e+17, m_rp=-8.05e+17, m_tp=-1.23e+17,
+                    origin_time=origin_time)
+    receiver = Receiver(latitude=10., longitude=20., depth_in_m=0)
+
+    st = db.get_seismograms(source=source, receiver=receiver,
+                            remove_source_shift=True)
+
+    # The "identify" interpolation will still perform the interpolation but
+    # nothing will be cut. This is a special, hard-coded case mainly for
+    # testing. But it also not wrong.
+    st_2 = db.get_seismograms(source=source, receiver=receiver,
+                              remove_source_shift=True, dt=db.info.dt,
+                              a_lanczos=1)
+    for tr, tr_2 in zip(st, st_2):
+        assert tr == tr_2
+
+    # The original dt is a bit more then 24, so a dt of twelve should result
+    # in three missing samples for a=1, and 5 for a=2.
+    samples = int((st_2[0].stats.endtime - st_2[0].stats.starttime) / 12.0) + 1
+
+    st_3 = db.get_seismograms(source=source, receiver=receiver,
+                              remove_source_shift=True, dt=12,
+                              a_lanczos=1)
+    for tr in st_3:
+        assert tr.stats.npts == samples - 3
+
+    st_4 = db.get_seismograms(source=source, receiver=receiver,
+                              remove_source_shift=True, dt=12,
+                              a_lanczos=2)
+    for tr in st_4:
+        assert tr.stats.npts == samples - 5
+
+    st_5 = db.get_seismograms(source=source, receiver=receiver,
+                              remove_source_shift=True, dt=12,
+                              a_lanczos=3)
+    for tr in st_5:
+        assert tr.stats.npts == samples - 7
