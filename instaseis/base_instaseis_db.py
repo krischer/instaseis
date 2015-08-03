@@ -185,6 +185,8 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
                     # simple.
                     data[comp] = data[comp][self.info.src_shift_samples:]
                 time_shift = 0
+            elif reconvolve_stf:
+                time_shift = 0
 
         if return_obspy_stream:
             return self._convert_to_stream(source=source, receiver=receiver,

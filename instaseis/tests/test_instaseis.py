@@ -681,3 +681,52 @@ def test_resampling_and_time_settings(db):
     # Make sure the shift does what is is supposed to do.
     for tr_r, tr in zip(st_r_shift, st):
         np.testing.assert_allclose(tr_r.data, tr[14:], atol=1E-9)
+
+
+@pytest.mark.parametrize("db", DBS)
+def test_time_settings_with_resample_stf(db):
+    """
+    Test the time settings with resampling an stf. In that case the rules
+    are pretty simple: The first sample will always be set to the origin time.
+    """
+    from obspy.signal.filter import lowpass
+
+    origin_time = obspy.UTCDateTime(2015, 1, 1, 1, 1)
+
+    db = InstaseisDB(db)
+
+    receiver = Receiver(latitude=42.6390, longitude=74.4940)
+    source = Source(
+        latitude=89.91, longitude=0.0, depth_in_m=12000,
+        m_rr=4.710000e+24 / 1E7,
+        m_tt=3.810000e+22 / 1E7,
+        m_pp=-4.740000e+24 / 1E7,
+        m_rt=3.990000e+23 / 1E7,
+        m_rp=-8.050000e+23 / 1E7,
+        m_tp=-1.230000e+24 / 1E7,
+        origin_time=origin_time)
+
+    dt = db.info.dt
+    sliprate = np.zeros(1000)
+    sliprate[0] = 1.
+    sliprate = lowpass(sliprate, 1./100., 1./dt, corners=4)
+
+    source.set_sliprate(sliprate, dt, time_shift=0., normalize=True)
+
+    # Using both reconvolve stf and remove source shift results in an error.
+    with pytest.raises(ValueError) as err:
+        db.get_seismograms(
+            source=source, receiver=receiver,
+            components=('Z', 'N', 'E', 'R', 'T'), dt=0.1, reconvolve_stf=True,
+            remove_source_shift=True)
+    assert isinstance(err.value, ValueError)
+    assert err.value.args[0] == ("'remove_source_shift' argument not "
+                                 "compatible with 'reconvolve_stf'.")
+
+    # No matter the dt, the first sample will always be set to the origin time.
+    st = db.get_seismograms(
+        source=source, receiver=receiver,
+        components=('Z', 'N', 'E', 'R', 'T'), reconvolve_stf=True,
+        remove_source_shift=False)
+    for tr in st:
+        assert tr.stats.starttime == origin_time
