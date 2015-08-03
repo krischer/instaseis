@@ -734,3 +734,17 @@ def test_time_settings_with_resample_stf(db):
         remove_source_shift=False)
     for tr in st:
         assert tr.stats.starttime == origin_time
+
+    st = db.get_seismograms(
+        source=source, receiver=receiver,
+        components=('Z', 'N', 'E', 'R', 'T'), reconvolve_stf=True,
+        remove_source_shift=False, dt=0.1)
+    for tr in st:
+        assert tr.stats.starttime == origin_time
+
+    st = db.get_seismograms(
+        source=source, receiver=receiver,
+        components=('Z', 'N', 'E', 'R', 'T'), reconvolve_stf=True,
+        remove_source_shift=False, dt=1.0)
+    for tr in st:
+        assert tr.stats.starttime == origin_time
