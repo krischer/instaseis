@@ -183,8 +183,8 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
                 # adding a zero at the beginning to avoid phase shift
                 data[comp] = cumtrapz(data[comp], dx=dt_out, initial=0.0)
 
-            # Remove the source shift at the very end to have as little
-            # boundary effects as possible.
+            # If desired, remove the samples before the peak of the source
+            # time function.
             if remove_source_shift:
                 if dt is not None:
                     data[comp] = data[comp][int(round(time_shift / dt, 6)):]
