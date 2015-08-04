@@ -57,7 +57,8 @@ def _get_seismogram(db, source, receiver, components, unit, dt, a_lanczos,
         # Half the filesize but definitely sufficiently accurate.
         tr.data = np.require(tr.data, dtype=np.float32)
 
-    # Sanity checks. Raise internal server erros in case something fails.
+    # Sanity checks. Raise internal server errors in case something fails.
+    # This should not happen and should have been caught before.
     if endtime > st[0].stats.endtime:
         msg = ("Endtime larger then the extracted endtime: endtime=%s, "
                "largest db endtime=%s" % (endtime, st[0].stats.endtime))
@@ -330,7 +331,7 @@ class SeismogramsHandler(InstaseisRequestHandler):
         if args.duration is not None and args.endtime is not None:
             msg = ("'duration' and 'endtime' parameters cannot both be passed "
                    "at the same time.")
-            raise tornado.web.HTTPError(404, log_message=msg, reason=msg)
+            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
         # Figure out the temporal range of the seismograms. These represent
         # the possible temporal range of the seismograms.
@@ -349,20 +350,20 @@ class SeismogramsHandler(InstaseisRequestHandler):
         # seismograms.
         if args.starttime >= ti["endtime"]:
             msg = ("The `starttime` must be before the seismogram ends.")
-            raise tornado.web.HTTPError(404, log_message=msg, reason=msg)
+            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
         # The endtime must be within the seismogram window
         if not (ti["starttime"] <= args.endtime <= ti["endtime"]):
             msg = ("The end time of the seismograms lies outside the allowed "
                    "range.")
-            raise tornado.web.HTTPError(404, log_message=msg, reason=msg)
+            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
         # Arbitrary limit: The starttime can be at max one hour before the
         # origin time.
         if args.starttime < (ti["starttime"] - 3600):
             msg = ("The seismogram can start at the maximum one hour before "
                    "the origin time.")
-            raise tornado.web.HTTPError(404, log_message=msg, reason=msg)
+            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
         components = list(args.components)
         for src_type, params in src_params.items():

@@ -2508,3 +2508,55 @@ def test_passing_duplicate_parameter_raises(all_clients):
     assert request.code == 400
     assert request.reason == ("Duplicate parameters: 'mrt', "
                               "'receiverlatitude'")
+
+
+def test_passing_invalid_time_settings_raises(all_clients):
+    """
+    Tests that invalid time settings raise.
+    """
+    origin_time = obspy.UTCDateTime(2015, 1, 1)
+    client = all_clients
+    params = {
+        "sourcelatitude": 10, "sourcelongitude": 10, "receiverlatitude": -10,
+        "receiverlongitude": -10, "mtt": "100000", "mpp": "100000",
+        "mrr": "100000", "mrt": "100000", "mrp": "100000", "mtp": "100000",
+        "origintime": str(origin_time)}
+
+    # This should work fine.
+    url = _assemble_url(**params)
+    request = client.fetch(url)
+    assert request.code == 200
+
+    # The remainder should not.
+    p = copy.deepcopy(params)
+    p["starttime"] = str(origin_time + 1E6)
+    url = _assemble_url(**p)
+    request = client.fetch(url)
+    assert request.code == 400
+    assert request.reason == ("The `starttime` must be before the seismogram "
+                              "ends.")
+
+    p = copy.deepcopy(params)
+    p["endtime"] = str(origin_time + 100)
+    p["duration"] = 20
+    url = _assemble_url(**p)
+    request = client.fetch(url)
+    assert request.code == 400
+    assert request.reason == ("'duration' and 'endtime' parameters cannot "
+                              "both be passed at the same time.")
+
+    p = copy.deepcopy(params)
+    p["endtime"] = str(origin_time - 1E6)
+    url = _assemble_url(**p)
+    request = client.fetch(url)
+    assert request.code == 400
+    assert request.reason == ("The end time of the seismograms lies outside "
+                              "the allowed range.")
+
+    p = copy.deepcopy(params)
+    p["starttime"] = str(origin_time - 1E6)
+    url = _assemble_url(**p)
+    request = client.fetch(url)
+    assert request.code == 400
+    assert request.reason == ("The seismogram can start at the maximum one "
+                              "hour before the origin time.")
