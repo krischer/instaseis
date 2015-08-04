@@ -917,7 +917,7 @@ def test_get_time_information(db):
     assert times["samples_cut_at_end"] == 3
     assert times["ref_sample"] == 14
     assert round(times["time_shift_at_beginning"], 4) == \
-       round(((7 * db.info.dt) / 12.0) % 1 * 12.0, 4)
+        round(((7 * db.info.dt) / 12.0) % 1 * 12.0, 4)
     assert times["npts_before_shift_removal"] == 145
     assert times["npts"] == 131
     assert tr.stats.npts == times["npts"]
@@ -939,7 +939,7 @@ def test_get_time_information(db):
     assert times["samples_cut_at_end"] == 5
     assert times["ref_sample"] == 14
     assert round(times["time_shift_at_beginning"], 4) == \
-           round(((7 * db.info.dt) / 12.0) % 1 * 12.0, 4)
+        round(((7 * db.info.dt) / 12.0) % 1 * 12.0, 4)
     assert times["npts_before_shift_removal"] == 143
     assert times["npts"] == 129
     assert tr.stats.npts == times["npts"]
@@ -960,7 +960,7 @@ def test_get_time_information(db):
     assert times["samples_cut_at_end"] == 15
     assert times["ref_sample"] == 14
     assert round(times["time_shift_at_beginning"], 4) == \
-           round(((7 * db.info.dt) / 12.0) % 1 * 12.0, 4)
+        round(((7 * db.info.dt) / 12.0) % 1 * 12.0, 4)
     assert times["npts_before_shift_removal"] == 133
     assert times["npts"] == 119
     assert tr.stats.npts == times["npts"]
@@ -983,7 +983,7 @@ def test_get_time_information(db):
     assert times["samples_cut_at_end"] == 3
     assert times["ref_sample"] == 14
     assert round(times["time_shift_at_beginning"], 4) == \
-           round(((7 * db.info.dt) / 12.0) % 1 * 12.0, 4)
+        round(((7 * db.info.dt) / 12.0) % 1 * 12.0, 4)
     assert times["npts_before_shift_removal"] == 145
     assert times["npts"] == 145
     assert tr.stats.npts == times["npts"]
@@ -1005,7 +1005,7 @@ def test_get_time_information(db):
     assert times["samples_cut_at_end"] == 5
     assert times["ref_sample"] == 14
     assert round(times["time_shift_at_beginning"], 4) == \
-           round(((7 * db.info.dt) / 12.0) % 1 * 12.0, 4)
+        round(((7 * db.info.dt) / 12.0) % 1 * 12.0, 4)
     assert times["npts_before_shift_removal"] == 143
     assert times["npts"] == 143
     assert tr.stats.npts == times["npts"]
@@ -1026,7 +1026,7 @@ def test_get_time_information(db):
     assert times["samples_cut_at_end"] == 15
     assert times["ref_sample"] == 14
     assert round(times["time_shift_at_beginning"], 4) == \
-           round(((7 * db.info.dt) / 12.0) % 1 * 12.0, 4)
+        round(((7 * db.info.dt) / 12.0) % 1 * 12.0, 4)
     assert times["npts_before_shift_removal"] == 133
     assert times["npts"] == 133
     assert tr.stats.npts == times["npts"]

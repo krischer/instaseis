@@ -519,10 +519,10 @@ def get_seismogram_times(info, origin_time, dt, a_lanczos,
     make sure the time handling and calculations are consistent across
     Instaseis.
 
-    :param info:
-    :param dt:
-    :param a:
-    :return:
+    :param info: The info dictionary of a database.
+    :param dt: The desired new sampling rate. None if not set.
+    :param a_lanczos: The width of the lanczos kernel.
+    :param remove_source_shift: Remove or don't remove the source time shift.
     """
     dt_out = dt or info.dt
 
