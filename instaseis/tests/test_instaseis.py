@@ -20,7 +20,7 @@ import pytest
 import shutil
 
 from instaseis.instaseis_db import InstaseisDB
-from instaseis.base_instaseis_db import get_seismogram_times
+from instaseis.base_instaseis_db import _get_seismogram_times
 from instaseis import Source, Receiver, ForceSource
 from instaseis.helpers import get_band_code
 
@@ -809,7 +809,7 @@ def test_remove_samples_at_end_for_lanczos(db):
 @pytest.mark.parametrize("db", DBS)
 def test_get_time_information(db):
     """
-    Tests the get_seismogram_times() function. Also make sure it is
+    Tests the _get_seismogram_times() function. Also make sure it is
     consistent with the actually produces seismograms.
     """
     db = InstaseisDB(db)
@@ -828,7 +828,7 @@ def test_get_time_information(db):
            "a_lanczos": 5}
     tr = db.get_seismograms(source=source, receiver=receiver,
                             components=["Z"], **par)[0]
-    times = get_seismogram_times(info=db.info, origin_time=origin_time, **par)
+    times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
 
     assert tr.stats.starttime == times["starttime"]
     assert tr.stats.starttime == origin_time
@@ -847,7 +847,7 @@ def test_get_time_information(db):
            "a_lanczos": 5}
     tr = db.get_seismograms(source=source, receiver=receiver,
                             components=["Z"], **par)[0]
-    times = get_seismogram_times(info=db.info, origin_time=origin_time, **par)
+    times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
 
     assert tr.stats.starttime == times["starttime"]
     assert tr.stats.starttime == origin_time - 7 * db.info.dt
@@ -868,7 +868,7 @@ def test_get_time_information(db):
            "a_lanczos": 2}
     tr = db.get_seismograms(source=source, receiver=receiver,
                             components=["Z"], **par)[0]
-    times = get_seismogram_times(info=db.info, origin_time=origin_time, **par)
+    times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
 
     assert tr.stats.starttime == times["starttime"]
     assert tr.stats.starttime == origin_time
@@ -886,7 +886,7 @@ def test_get_time_information(db):
            "a_lanczos": 5}
     tr = db.get_seismograms(source=source, receiver=receiver,
                             components=["Z"], **par)[0]
-    times = get_seismogram_times(info=db.info, origin_time=origin_time, **par)
+    times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
 
     assert tr.stats.starttime == times["starttime"]
     assert tr.stats.starttime == origin_time - 7 * db.info.dt
@@ -905,7 +905,7 @@ def test_get_time_information(db):
            "a_lanczos": 1}
     tr = db.get_seismograms(source=source, receiver=receiver,
                             components=["Z"], **par)[0]
-    times = get_seismogram_times(info=db.info, origin_time=origin_time, **par)
+    times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
 
     assert tr.stats.starttime == times["starttime"]
     assert tr.stats.starttime == origin_time
@@ -927,7 +927,7 @@ def test_get_time_information(db):
            "a_lanczos": 2}
     tr = db.get_seismograms(source=source, receiver=receiver,
                             components=["Z"], **par)[0]
-    times = get_seismogram_times(info=db.info, origin_time=origin_time, **par)
+    times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
 
     assert tr.stats.starttime == times["starttime"]
     assert tr.stats.starttime == origin_time
@@ -949,7 +949,7 @@ def test_get_time_information(db):
            "a_lanczos": 7}
     tr = db.get_seismograms(source=source, receiver=receiver,
                             components=["Z"], **par)[0]
-    times = get_seismogram_times(info=db.info, origin_time=origin_time, **par)
+    times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
 
     assert tr.stats.starttime == times["starttime"]
     assert tr.stats.starttime == origin_time
@@ -971,7 +971,7 @@ def test_get_time_information(db):
            "a_lanczos": 1}
     tr = db.get_seismograms(source=source, receiver=receiver,
                             components=["Z"], **par)[0]
-    times = get_seismogram_times(info=db.info, origin_time=origin_time, **par)
+    times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
 
     assert tr.stats.starttime == times["starttime"]
     assert tr.stats.starttime == origin_time - 14 * 12.0
@@ -993,7 +993,7 @@ def test_get_time_information(db):
            "a_lanczos": 2}
     tr = db.get_seismograms(source=source, receiver=receiver,
                             components=["Z"], **par)[0]
-    times = get_seismogram_times(info=db.info, origin_time=origin_time, **par)
+    times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
 
     assert tr.stats.starttime == times["starttime"]
     assert tr.stats.starttime == origin_time - 14 * 12
@@ -1015,7 +1015,7 @@ def test_get_time_information(db):
            "a_lanczos": 7}
     tr = db.get_seismograms(source=source, receiver=receiver,
                             components=["Z"], **par)[0]
-    times = get_seismogram_times(info=db.info, origin_time=origin_time, **par)
+    times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
 
     assert tr.stats.starttime == times["starttime"]
     assert tr.stats.starttime == origin_time - 14 * 12

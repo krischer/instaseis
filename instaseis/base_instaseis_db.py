@@ -509,8 +509,8 @@ def sizeof_fmt(num):
     return "%3.1f %s" % (num, "TB")
 
 
-def get_seismogram_times(info, origin_time, dt, a_lanczos,
-                         remove_source_shift):
+def _get_seismogram_times(info, origin_time, dt, a_lanczos,
+                          remove_source_shift):
     """
     Helper function to calculate the final times of seismograms.
 
