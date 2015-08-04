@@ -15,7 +15,6 @@ import tornado.web
 
 from ... import Source, ForceSource, Receiver
 from ..instaseis_request import InstaseisRequestHandler
-from ...base_instaseis_db import _get_seismogram_times
 
 
 class RawSeismogramsHandler(InstaseisRequestHandler):
