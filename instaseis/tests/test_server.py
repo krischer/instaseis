@@ -728,6 +728,8 @@ def test_object_creation_for_seismogram_route(all_clients):
         "receiverlatitude": -10,
         "receiverlongitude": -10}
 
+    dt = 24.724845445855724
+
     # Various sources.
     mt = {"mtt": "100000", "mpp": "100000", "mrr": "100000",
           "mrt": "100000", "mrp": "100000", "mtp": "100000"}
@@ -740,7 +742,8 @@ def test_object_creation_for_seismogram_route(all_clients):
             as p:
         _st = obspy.read()
         for tr in _st:
-            tr.stats.starttime = obspy.UTCDateTime(0)
+            tr.stats.starttime = obspy.UTCDateTime(0) - 7 * dt
+            tr.stats.delta = dt
         p.return_value = _st
 
         # Moment tensor source.
@@ -778,8 +781,10 @@ def test_object_creation_for_seismogram_route(all_clients):
         params["stationcode"] = "ALTM"
 
         # We need to adjust the time values for the mock here.
+        _st.traces = obspy.read().traces
         for tr in _st:
-            tr.stats.starttime = time - 1
+            tr.stats.starttime = time - 1 - 7 * dt
+            tr.stats.delta = dt
 
         request = client.fetch(_assemble_url(**params))
         assert request.code == 200
@@ -805,8 +810,10 @@ def test_object_creation_for_seismogram_route(all_clients):
 
         # From strike, dip, rake
         p.reset_mock()
+        _st.traces = obspy.read().traces
         for tr in _st:
-            tr.stats.starttime = obspy.UTCDateTime(0)
+            tr.stats.starttime = obspy.UTCDateTime(0) - 7 * dt
+            tr.stats.delta = dt
 
         params = copy.deepcopy(basic_parameters)
         params.update(sdr)
@@ -834,8 +841,10 @@ def test_object_creation_for_seismogram_route(all_clients):
 
         # Moment tensor source with a couple more parameters.
         p.reset_mock()
+        _st.traces = obspy.read().traces
         for tr in _st:
-            tr.stats.starttime = time - 1
+            tr.stats.starttime = time - 1 - 7 * dt
+            tr.stats.delta = dt
 
         params["sourcedepthinm"] = "5.0"
         params["origintime"] = str(time)
@@ -868,8 +877,10 @@ def test_object_creation_for_seismogram_route(all_clients):
         # Force source only works for displ_only databases.
         if "displ_only" in client.filepath:
             p.reset_mock()
+            _st.traces = obspy.read().traces
             for tr in _st:
-                tr.stats.starttime = obspy.UTCDateTime(0)
+                tr.stats.starttime = obspy.UTCDateTime(0) - 7 * dt
+                tr.stats.delta = dt
 
             params = copy.deepcopy(basic_parameters)
             params.update(fs)
@@ -897,8 +908,10 @@ def test_object_creation_for_seismogram_route(all_clients):
 
             # Moment tensor source with a couple more parameters.
             p.reset_mock()
+            _st.traces = obspy.read().traces
             for tr in _st:
-                tr.stats.starttime = time - 1
+                tr.stats.starttime = time - 1 - 7 * dt
+                tr.stats.delta = dt
 
             params["sourcedepthinm"] = "5.0"
             params["origintime"] = str(time)
@@ -931,8 +944,10 @@ def test_object_creation_for_seismogram_route(all_clients):
         # Now test other the other parameters.
         p.reset_mock()
 
+        _st.traces = obspy.read().traces
         for tr in _st:
-            tr.stats.starttime = obspy.UTCDateTime(0)
+            tr.stats.starttime = obspy.UTCDateTime(0) - 7 * dt
+            tr.stats.delta = dt
 
         params = copy.deepcopy(basic_parameters)
         params.update(mt)
@@ -1011,6 +1026,10 @@ def test_object_creation_for_seismogram_route(all_clients):
         assert p.call_args[1]["a_lanczos"] == 20
 
         p.reset_mock()
+        _st.traces = obspy.read().traces
+        for tr in _st:
+            tr.stats.starttime = obspy.UTCDateTime(0) - 7 * dt
+            tr.stats.delta = dt
         params = copy.deepcopy(basic_parameters)
         params.update(mt)
         params["dt"] = "0.1"

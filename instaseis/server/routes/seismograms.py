@@ -57,9 +57,19 @@ def _get_seismogram(db, source, receiver, components, unit, dt, a_lanczos,
         # Half the filesize but definitely sufficiently accurate.
         tr.data = np.require(tr.data, dtype=np.float32)
 
-    # Trim, potentially pad with zeroes. Previous checks ensure that no
-    # padding will happen at the end.
-    endtime = min(min(_i.stats.endtime for _i in st), endtime)
+    # Sanity checks. Raise internal server erros in case something fails.
+    if endtime > st[0].stats.endtime:
+        msg = ("Endtime larger then the extracted endtime: endtime=%s, "
+               "largest db endtime=%s" % (endtime, st[0].stats.endtime))
+        callback(tornado.web.HTTPError(500, log_message=msg, reason=msg))
+        return
+    if starttime < st[0].stats.starttime - 3600.0:
+        msg = ("Starttime more than one hour before the starttime of the "
+               "seismograms.")
+        callback(tornado.web.HTTPError(500, log_message=msg, reason=msg))
+        return
+
+    # Trim, potentially pad with zeroes.
     st.trim(starttime, endtime, pad=True, fill_value=0.0, nearest_sample=False)
 
     if format == "mseed":
