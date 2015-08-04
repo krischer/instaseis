@@ -2554,9 +2554,102 @@ def test_passing_invalid_time_settings_raises(all_clients):
                               "the allowed range.")
 
     p = copy.deepcopy(params)
-    p["starttime"] = str(origin_time - 1E6)
+    p["starttime"] = str(origin_time - 3800)
     url = _assemble_url(**p)
     request = client.fetch(url)
     assert request.code == 400
     assert request.reason == ("The seismogram can start at the maximum one "
                               "hour before the origin time.")
+
+
+def test_time_settings_for_seismograms_route(all_clients):
+    """
+    Tests the advanced time settings.
+    """
+    client = all_clients
+
+    origin_time = obspy.UTCDateTime(2015, 1, 1)
+
+    client = all_clients
+    # Resample to 1Hz to simplify the logic.
+    params = {
+        "sourcelatitude": 10, "sourcelongitude": 10, "receiverlatitude": -10,
+        "receiverlongitude": -10, "mtt": "100000", "mpp": "100000",
+        "mrr": "100000", "mrt": "100000", "mrp": "100000", "mtp": "100000",
+        "dt": 1.0, "alanczos": 1, "origintime": str(origin_time)}
+
+    p = copy.deepcopy(params)
+    url = _assemble_url(**p)
+    request = client.fetch(url)
+    st = obspy.read(request.buffer)
+
+    # This should start at the origin time.
+    for tr in st:
+        assert tr.stats.starttime == origin_time
+
+    # Different starttime.
+    p = copy.deepcopy(params)
+    p["starttime"] = origin_time - 10
+    url = _assemble_url(**p)
+    request = client.fetch(url)
+    st_2 = obspy.read(request.buffer)
+
+    for tr in st_2:
+        assert tr.stats.starttime == origin_time - 10
+
+    org_endtime = st[0].stats.endtime
+
+    # Nonetheless the seismograms should still be identical for the time
+    # starting at the origin time.
+    for tr1, tr2 in zip(st, st_2.slice(starttime=origin_time)):
+        del tr1.stats.mseed
+        del tr2.stats.mseed
+        del tr2.stats.processing
+        assert tr1 == tr2
+
+    # Test endtime settings.
+    p = copy.deepcopy(params)
+    p["endtime"] = origin_time + 10
+    url = _assemble_url(**p)
+    request = client.fetch(url)
+    st_2 = obspy.read(request.buffer)
+
+    for tr in st_2:
+        assert tr.stats.starttime == origin_time
+        assert tr.stats.endtime == origin_time + 10
+
+    # Can also be done via the duration setting.
+    p = copy.deepcopy(params)
+    p["duration"] = 10
+    url = _assemble_url(**p)
+    request = client.fetch(url)
+    st_2 = obspy.read(request.buffer)
+
+    for tr in st_2:
+        assert tr.stats.starttime == origin_time
+        assert tr.stats.endtime == origin_time + 10
+
+    # If starttime is given, the duration is relative to the starttime.
+    p = copy.deepcopy(params)
+    p["duration"] = 10
+    p["starttime"] = origin_time - 5
+    url = _assemble_url(**p)
+    request = client.fetch(url)
+    st_2 = obspy.read(request.buffer)
+
+    for tr in st_2:
+        assert tr.stats.starttime == origin_time - 5
+        assert tr.stats.endtime == origin_time + 5
+
+    # Will be padded with zeros in the front. Attempting to pad with zeros
+    # in the back will raise an error but that is tested elsewhere.
+    p = copy.deepcopy(params)
+    p["starttime"] = origin_time - 1800
+    url = _assemble_url(**p)
+    request = client.fetch(url)
+    st_2 = obspy.read(request.buffer)
+
+    for tr in st_2:
+        assert tr.stats.starttime == origin_time - 1800
+        assert tr.stats.endtime == org_endtime
+        np.testing.assert_allclose(tr.data[:100], np.zeros(100))
