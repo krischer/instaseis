@@ -523,6 +523,21 @@ def _get_seismogram_times(info, origin_time, dt, a_lanczos,
     :param dt: The desired new sampling rate. None if not set.
     :param a_lanczos: The width of the lanczos kernel.
     :param remove_source_shift: Remove or don't remove the source time shift.
+
+    Returned dictionary has the following keys:
+
+    * ``'ref_sample'``: The reference sample, e.g. the sample in the array
+        whose time will be the origin time. This is only valid before the
+        source shift is removed.
+    * ``'starttime'``: The final start time of the seismogram.
+    * ``'npts'``: The final number of samples of the seismogram.
+    * ``'samples_cut_at_end'``: The number of samples cut at the end.
+    * ``'time_shift_at_beginning'``: The time shift at the beginning if
+        resampled to a new sampling rate. This is necessary to always make
+        sure one sample is exactly at the origin time.
+    * ``'endtime'``: The final end time of the seismogram.
+    * ``'npts_before_shift_removal'``: The number of samples before the
+        source time shift has been removed.
     """
     dt_out = dt or info.dt
 
