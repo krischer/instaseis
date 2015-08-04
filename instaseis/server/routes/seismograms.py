@@ -16,6 +16,7 @@ import tornado.gen
 import tornado.web
 
 from ... import Source, ForceSource, Receiver
+from ...base_instaseis_db import _get_seismogram_times
 from ..util import run_async
 from ..instaseis_request import InstaseisRequestHandler
 
@@ -302,14 +303,7 @@ class SeismogramsHandler(InstaseisRequestHandler):
             msg = "A request with no components will not return anything..."
             raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
-        # Figure out the time settings.
         info = self.application.db.info
-
-        # The time shift necessary to set the origin time to the peak of the
-        # source time function. Will be the time of the peak of the original
-        # source time function in AxiSEM or the peak of the gaussian
-        # function if reconvolved with it.
-        src_shift = info.src_shift_samples * info.dt
 
         # Start time and origin time. If either is not set, one will be set
         # to the other. If neither is set, both will be set to posix timestamp
@@ -328,39 +322,34 @@ class SeismogramsHandler(InstaseisRequestHandler):
                    "at the same time.")
             raise tornado.web.HTTPError(404, log_message=msg, reason=msg)
 
-        # Get the temporal extents of the extracted seismograms.
-        seismogram_starttime = args.origintime - src_shift
-        # A small buffer of 1 % of a sample  to guard against floating point
-        # inaccuracies for the .trim() method.
-        seismogram_endtime = \
-            seismogram_starttime + (info.npts - 1 + 0.01) * info.dt
+        # Figure out the temporal range of the seismograms. These represent
+        # the possible temporal range of the seismograms.
+        ti = _get_seismogram_times(
+            info=info, origin_time=args.origintime,
+            dt=args.dt, a_lanczos=args.alanczos, remove_source_shift=False,
+            reconvolve_stf=True)
 
         # Get the desired endtime.
         if args.duration is None and args.endtime is None:
-            args.endtime = seismogram_endtime
+            args.endtime = ti["endtime"]
         elif args.endtime is None:
             args.endtime = args.starttime + args.duration
 
         # The desired seismogram start time must be before the end time of the
         # seismograms.
-        if args.starttime >= seismogram_endtime:
+        if args.starttime >= ti["endtime"]:
             msg = ("The `starttime` must be before the seismogram ends.")
             raise tornado.web.HTTPError(404, log_message=msg, reason=msg)
 
         # The endtime must be within the seismogram window
-        if not (seismogram_starttime <= args.endtime <= seismogram_endtime):
+        if not (ti["starttime"] <= args.endtime <= ti["endtime"]):
             msg = ("The end time of the seismograms lies outside the allowed "
                    "range.")
             raise tornado.web.HTTPError(404, log_message=msg, reason=msg)
 
-        if args.starttime >= args.endtime:
-            msg = ("The calculated start time of the seismograms must be "
-                   "before the calculated end time.")
-            raise tornado.web.HTTPError(404, log_message=msg, reason=msg)
-
         # Arbitrary limit: The starttime can be at max one hour before the
         # origin time.
-        if args.starttime < (seismogram_starttime - 3600):
+        if args.starttime < (ti["starttime"] - 3600):
             msg = ("The seismogram can start at the maximum one hour before "
                    "the origin time.")
             raise tornado.web.HTTPError(404, log_message=msg, reason=msg)
