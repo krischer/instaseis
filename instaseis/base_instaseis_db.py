@@ -116,6 +116,16 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
             raise ValueError("'remove_source_shift' argument not "
                              "compatible with 'reconvolve_stf'.")
 
+        if hasattr(source, "origin_time"):
+            origin_time = source.origin_time
+        else:
+            origin_time = UTCDateTime(0)
+
+        # Calculate the final time information about the seismograms.
+        time_information = _get_seismogram_times(
+            info=self.info, origin_time=origin_time, dt=dt,
+            a_lanczos=a_lanczos, remove_source_shift=remove_source_shift)
+
         for comp in components:
             if reconvolve_stf:
                 if source.dt is None or source.sliprate is None:
@@ -149,45 +159,13 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
                     dataf * stf_conv_f / stf_deconv_f)[:self.info.npts]
 
             if dt is not None:
-                # This is a bit tricky. We want to resample but we also want
-                # to make sure that that the peak of the source time
-                # function is exactly hit by a sample point.
-
-                # If it cleanly divides within ten microseconds,
-                # make integer based calculations.
-                if round(self.info.src_shift / dt, 5) % 1.0 == 0:
-                    ref_sample = int(round(self.info.src_shift / dt, 5))
-                    shift = (self.info.src_shift_samples * self.info.dt) - \
-                        (ref_sample * dt)
-                    shift = round(shift, 6)
-                    duration = (self.info.npts - 1) * self.info.dt - shift
-                    new_npts = int(round(duration / dt, 6)) + 1
-                else:
-                    shift = round(self.info.src_shift % dt, 8)
-                    duration = (self.info.npts - 1) * self.info.dt - shift
-                    new_npts = int(round(duration / dt, 6)) + 1
-                    ref_sample = \
-                        int(round((self.info.src_shift - shift) / dt, 6))
-
                 data[comp] = lanczos.lanczos_interpolation(
                     data=data[comp], old_start=0, old_dt=self.info.dt,
-                    new_start=shift, new_dt=dt, new_npts=new_npts,
-                    a=a_lanczos, window="blackman")
-
-                # The resampling assumes zeros outside the data range. This
-                # does not introduce any errors at the beginning as the data is
-                # actually zero there but it does affect the end. We will
-                # remove all samples that are affected by the boundary
-                # conditions here.
-                #
-                # Also don't cut it for the "identify" interpolation which is
-                # important for testing.
-                if round(dt / self.info.dt, 6) != 1.0:
-                    affected_area = a_lanczos * self.info.dt
-                    data[comp] = \
-                        data[comp][:-int(np.ceil(affected_area / dt))]
-            else:
-                ref_sample = self.info.src_shift_samples
+                    new_start=time_information["time_shift_at_beginning"],
+                    new_dt=dt,
+                    new_npts=time_information["npts_before_shift_removal"],
+                    a=a_lanczos,
+                    window="blackman")
 
             # Integrate/differentiate before removing the source shift in
             # order to reduce boundary effects at the start of the signal.
@@ -201,34 +179,17 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
             # If desired, remove the samples before the peak of the source
             # time function.
             if remove_source_shift:
-                if dt is not None:
-                    data[comp] = data[comp][ref_sample:]
-                else:
-                    # If no resampling happens, removing the source shift is
-                    # simple.
-                    data[comp] = data[comp][self.info.src_shift_samples:]
-                ref_sample = 0
-            elif reconvolve_stf:
-                ref_sample = 0
+                data[comp] = data[comp][time_information["ref_sample"]:]
 
         if return_obspy_stream:
-            return self._convert_to_stream(source=source, receiver=receiver,
-                                           components=components,
-                                           data=data, dt_out=dt_out,
-                                           ref_sample=ref_sample)
+            return self._convert_to_stream(
+                receiver=receiver, components=components, data=data,
+                dt_out=dt_out, starttime=time_information["starttime"])
         else:
             return data
 
     @staticmethod
-    def _convert_to_stream(source, receiver, components, data, dt_out,
-                           ref_sample):
-        if hasattr(source, "origin_time"):
-            origin_time = source.origin_time
-        else:
-            origin_time = UTCDateTime(0)
-
-        origin_time -= ref_sample * dt_out
-
+    def _convert_to_stream(receiver, components, data, dt_out, starttime):
         # Convert to an ObsPy Stream object.
         st = Stream()
         band_code = get_band_code(dt_out)
@@ -236,7 +197,7 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
         for comp in components:
             tr = Trace(data=data[comp],
                        header={"delta": dt_out,
-                               "starttime": origin_time,
+                               "starttime": starttime,
                                "station": receiver.station,
                                "network": receiver.network,
                                "channel": "%sX%s" % (band_code, comp),
@@ -510,7 +471,7 @@ def sizeof_fmt(num):
 
 
 def _get_seismogram_times(info, origin_time, dt, a_lanczos,
-                          remove_source_shift):
+                          remove_source_shift, reconvolve_stf=False):
     """
     Helper function to calculate the final times of seismograms.
 
@@ -523,6 +484,8 @@ def _get_seismogram_times(info, origin_time, dt, a_lanczos,
     :param dt: The desired new sampling rate. None if not set.
     :param a_lanczos: The width of the lanczos kernel.
     :param remove_source_shift: Remove or don't remove the source time shift.
+    :param reconvolve_stf: Set to true if reconvolved with a custom STF,
+        then the time shift are no longer applied.
 
     Returned dictionary has the following keys:
 
