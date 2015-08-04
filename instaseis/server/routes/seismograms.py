@@ -337,7 +337,7 @@ class SeismogramsHandler(InstaseisRequestHandler):
         ti = _get_seismogram_times(
             info=info, origin_time=args.origintime,
             dt=args.dt, a_lanczos=args.alanczos, remove_source_shift=False,
-            reconvolve_stf=True)
+            reconvolve_stf=False)
 
         # Get the desired endtime.
         if args.duration is None and args.endtime is None:
