@@ -777,17 +777,19 @@ def test_object_creation_for_seismogram_route(all_clients):
         params["networkcode"] = "BW"
         params["stationcode"] = "ALTM"
 
+        # We need to adjust the time values for the mock here.
+        for tr in _st:
+            tr.stats.starttime = time - 1
+
         request = client.fetch(_assemble_url(**params))
         assert request.code == 200
 
         assert p.call_count == 1
         assert p.call_args[1]["components"] == ["Z", "N", "E"]
-        # Origin time is not passed to the underlying source object but
-        # dealt with outside of it.
         assert p.call_args[1]["source"] == instaseis.Source(
             latitude=basic_parameters["sourcelatitude"],
             longitude=basic_parameters["sourcelongitude"],
-            depth_in_m=5.0, origin_time=obspy.UTCDateTime(0),
+            depth_in_m=5.0, origin_time=time,
             **dict((key[0] + "_" + key[1:], float(value))
                    for (key, value) in mt.items()))
         assert p.call_args[1]["receiver"] == instaseis.Receiver(
@@ -803,6 +805,8 @@ def test_object_creation_for_seismogram_route(all_clients):
 
         # From strike, dip, rake
         p.reset_mock()
+        for tr in _st:
+            tr.stats.starttime = obspy.UTCDateTime(0)
 
         params = copy.deepcopy(basic_parameters)
         params.update(sdr)
@@ -830,6 +834,8 @@ def test_object_creation_for_seismogram_route(all_clients):
 
         # Moment tensor source with a couple more parameters.
         p.reset_mock()
+        for tr in _st:
+            tr.stats.starttime = time - 1
 
         params["sourcedepthinm"] = "5.0"
         params["origintime"] = str(time)
@@ -842,13 +848,11 @@ def test_object_creation_for_seismogram_route(all_clients):
 
         assert p.call_count == 1
         assert p.call_args[1]["components"] == ["Z", "N", "E"]
-        # Origin time is not passed to the source object but dealt with
-        # outside of it.
         assert p.call_args[1]["source"] == \
             instaseis.Source.from_strike_dip_rake(
                 latitude=basic_parameters["sourcelatitude"],
                 longitude=basic_parameters["sourcelongitude"],
-                depth_in_m=5.0, origin_time=obspy.UTCDateTime(0),
+                depth_in_m=5.0, origin_time=time,
                 **dict((key, float(value)) for (key, value) in sdr.items()))
         assert p.call_args[1]["receiver"] == instaseis.Receiver(
             latitude=basic_parameters["receiverlatitude"],
@@ -864,6 +868,8 @@ def test_object_creation_for_seismogram_route(all_clients):
         # Force source only works for displ_only databases.
         if "displ_only" in client.filepath:
             p.reset_mock()
+            for tr in _st:
+                tr.stats.starttime = obspy.UTCDateTime(0)
 
             params = copy.deepcopy(basic_parameters)
             params.update(fs)
@@ -891,6 +897,8 @@ def test_object_creation_for_seismogram_route(all_clients):
 
             # Moment tensor source with a couple more parameters.
             p.reset_mock()
+            for tr in _st:
+                tr.stats.starttime = time - 1
 
             params["sourcedepthinm"] = "5.0"
             params["origintime"] = str(time)
@@ -903,11 +911,10 @@ def test_object_creation_for_seismogram_route(all_clients):
 
             assert p.call_count == 1
             assert p.call_args[1]["components"] == ["Z", "N", "E"]
-            # origin time is dealt with outside of the source object.
             assert p.call_args[1]["source"] == instaseis.ForceSource(
                 latitude=basic_parameters["sourcelatitude"],
                 longitude=basic_parameters["sourcelongitude"],
-                depth_in_m=5.0, origin_time=obspy.UTCDateTime(0),
+                depth_in_m=5.0, origin_time=time,
                 **dict(("_".join(key), float(value))
                        for (key, value) in fs.items()))
             assert p.call_args[1]["receiver"] == instaseis.Receiver(
@@ -923,6 +930,10 @@ def test_object_creation_for_seismogram_route(all_clients):
 
         # Now test other the other parameters.
         p.reset_mock()
+
+        for tr in _st:
+            tr.stats.starttime = obspy.UTCDateTime(0)
+
         params = copy.deepcopy(basic_parameters)
         params.update(mt)
         params["components"] = "RTE"
@@ -982,8 +993,6 @@ def test_object_creation_for_seismogram_route(all_clients):
         assert p.call_args[1]["return_obspy_stream"] is True
         assert p.call_args[1]["dt"] is None
 
-        # This happens outside of get_seismograms() thus is also not called
-        # here...
         p.reset_mock()
         params = copy.deepcopy(basic_parameters)
         params.update(mt)
@@ -998,7 +1007,8 @@ def test_object_creation_for_seismogram_route(all_clients):
         assert p.call_args[1]["remove_source_shift"] is False
         assert p.call_args[1]["reconvolve_stf"] is False
         assert p.call_args[1]["return_obspy_stream"] is True
-        assert p.call_args[1]["dt"] == None
+        assert p.call_args[1]["dt"] == 0.1
+        assert p.call_args[1]["a_lanczos"] == 20
 
         p.reset_mock()
         params = copy.deepcopy(basic_parameters)
@@ -1015,7 +1025,8 @@ def test_object_creation_for_seismogram_route(all_clients):
         assert p.call_args[1]["remove_source_shift"] is False
         assert p.call_args[1]["reconvolve_stf"] is False
         assert p.call_args[1]["return_obspy_stream"] is True
-        assert p.call_args[1]["dt"] == None
+        assert p.call_args[1]["dt"] == 0.1
+        assert p.call_args[1]["a_lanczos"] == 2
 
 
 def test_seismograms_retrieval(all_clients):
