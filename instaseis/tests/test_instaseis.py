@@ -13,6 +13,7 @@ Basic integration tests for the AxiSEM database Python interface.
 from __future__ import absolute_import
 
 import inspect
+import math
 import numpy as np
 import obspy
 import os
@@ -1029,4 +1030,130 @@ def test_get_time_information(db):
         round(((7 * db.info.dt) / 12.0) % 1 * 12.0, 4)
     assert times["npts_before_shift_removal"] == 133
     assert times["npts"] == 133
+    assert tr.stats.npts == times["npts"]
+
+
+@pytest.mark.parametrize("db", DBS)
+def test_get_time_information_reconvolve_stf(db):
+    """
+    Tests the _get_seismogram_times() function but with reconvolve_stf = True.
+    In that case time shifts and what not are no longer applied.
+    """
+    from obspy.signal.filter import lowpass
+    db = InstaseisDB(db)
+
+    origin_time = obspy.UTCDateTime(2015, 1, 1, 1, 1)
+
+    source = Source(latitude=4., longitude=3.0, depth_in_m=0,
+                    m_rr=4.71e+17, m_tt=3.81e+17, m_pp=-4.74e+17,
+                    m_rt=3.99e+17, m_rp=-8.05e+17, m_tp=-1.23e+17,
+                    origin_time=origin_time)
+    receiver = Receiver(latitude=10., longitude=20., depth_in_m=0)
+    dt = db.info.dt
+    sliprate = np.zeros(1000)
+    sliprate[0] = 1.
+    sliprate = lowpass(sliprate, 1./100., 1./dt, corners=4)
+
+    source.set_sliprate(sliprate, dt, time_shift=0., normalize=True)
+
+    # remove_source_shift and reconvolve_stf cannot be true at the same time.
+    par = {"remove_source_shift": True,
+           "reconvolve_stf": True,
+           "dt": None,
+           "a_lanczos": 5}
+    with pytest.raises(ValueError) as err:
+        _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
+    assert err.value.args[0] == (
+        "'remove_source_shift' argument not compatible with 'reconvolve_stf'.")
+
+    par = {"remove_source_shift": False,
+           "reconvolve_stf": True,
+           "dt": None,
+           "a_lanczos": 5}
+    tr = db.get_seismograms(source=source, receiver=receiver,
+                            components=["Z"], **par)[0]
+    times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
+
+    # The seismogram will always start with the origin time and the
+    # ref_sample is always 0.
+    assert tr.stats.starttime == times["starttime"]
+    assert tr.stats.starttime == origin_time
+    assert tr.stats.endtime == times["endtime"]
+    assert tr.stats.endtime == origin_time + 72 * db.info.dt
+    assert times["samples_cut_at_end"] == 0
+    assert times["ref_sample"] == 0
+    assert times["time_shift_at_beginning"] == 0
+    assert times["npts_before_shift_removal"] == 73
+    assert times["npts"] == 73
+    assert times["npts"] == times["npts_before_shift_removal"]
+    assert tr.stats.npts == times["npts"]
+
+    # A couple more with lanczos a.
+    par = {"remove_source_shift": False,
+           "reconvolve_stf": True,
+           "dt": 12.0,
+           "a_lanczos": 1}
+    tr = db.get_seismograms(source=source, receiver=receiver,
+                            components=["Z"], **par)[0]
+    times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
+
+    assert tr.stats.starttime == times["starttime"]
+    assert tr.stats.starttime == origin_time
+    assert tr.stats.endtime == times["endtime"]
+    # 72 sample intervals fit with db.info.dt.
+    endtime_with_dt = int((72 * db.info.dt) / 12.0) * 12.0
+    endtime_minus_a = \
+        endtime_with_dt - int(math.ceil(1 * db.info.dt / 12.0)) * 12.0
+    assert tr.stats.endtime == origin_time + int(endtime_minus_a / 12.0) * 12.0
+    assert times["samples_cut_at_end"] == 3
+    assert times["ref_sample"] == 0
+    assert times["time_shift_at_beginning"] == 0
+    assert times["npts_before_shift_removal"] == 146
+    assert times["npts"] == 146
+    assert times["npts"] == times["npts_before_shift_removal"]
+    assert tr.stats.npts == times["npts"]
+
+    par = {"remove_source_shift": False,
+           "reconvolve_stf": True,
+           "dt": 12.0,
+           "a_lanczos": 2}
+    tr = db.get_seismograms(source=source, receiver=receiver,
+                            components=["Z"], **par)[0]
+    times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
+
+    assert tr.stats.starttime == times["starttime"]
+    assert tr.stats.starttime == origin_time
+    assert tr.stats.endtime == times["endtime"]
+    # 65 sample intervals fit with db.info.dt.
+    endtime_with_dt = int((72 * db.info.dt) / 12.0) * 12.0
+    endtime_minus_a = endtime_with_dt - 2 * db.info.dt
+    assert tr.stats.endtime == origin_time + int(endtime_minus_a / 12.0) * 12.0
+    assert times["samples_cut_at_end"] == 5
+    assert times["ref_sample"] == 0
+    assert times["time_shift_at_beginning"] == 0
+    assert times["npts_before_shift_removal"] == 144
+    assert times["npts"] == 144
+    assert times["npts"] == times["npts_before_shift_removal"]
+    assert tr.stats.npts == times["npts"]
+
+    par = {"remove_source_shift": False,
+           "reconvolve_stf": True,
+           "dt": 12.0,
+           "a_lanczos": 7}
+    tr = db.get_seismograms(source=source, receiver=receiver,
+                            components=["Z"], **par)[0]
+    times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
+
+    assert tr.stats.starttime == times["starttime"]
+    assert tr.stats.starttime == origin_time
+    assert tr.stats.endtime == times["endtime"]
+    endtime_with_dt = int((72 * db.info.dt) / 12.0) * 12.0
+    endtime_minus_a = endtime_with_dt - 7 * db.info.dt
+    assert tr.stats.endtime == origin_time + int(endtime_minus_a / 12.0) * 12.0
+    assert times["samples_cut_at_end"] == 15
+    assert times["ref_sample"] == 0
+    assert times["time_shift_at_beginning"] == 0
+    assert times["npts_before_shift_removal"] == 134
+    assert times["npts"] == 134
+    assert times["npts"] == times["npts_before_shift_removal"]
     assert tr.stats.npts == times["npts"]

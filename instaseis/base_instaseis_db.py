@@ -124,7 +124,8 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
         # Calculate the final time information about the seismograms.
         time_information = _get_seismogram_times(
             info=self.info, origin_time=origin_time, dt=dt,
-            a_lanczos=a_lanczos, remove_source_shift=remove_source_shift)
+            a_lanczos=a_lanczos, remove_source_shift=remove_source_shift,
+            reconvolve_stf=reconvolve_stf)
 
         for comp in components:
             if reconvolve_stf:
@@ -502,34 +503,44 @@ def _get_seismogram_times(info, origin_time, dt, a_lanczos,
     * ``'npts_before_shift_removal'``: The number of samples before the
         source time shift has been removed.
     """
+    if reconvolve_stf and remove_source_shift:
+        raise ValueError("'remove_source_shift' argument not "
+                         "compatible with 'reconvolve_stf'.")
+
     dt_out = dt or info.dt
 
     ti = {}
     ti["samples_cut_at_end"] = 0
 
     if dt is not None:
-        # This is a bit tricky. We want to resample but we also want
-        # to make sure that that the peak of the source time
-        # function is exactly hit by a sample point.
+        if not reconvolve_stf:
+            # This is a bit tricky. We want to resample but we also want
+            # to make sure that that the peak of the source time
+            # function is exactly hit by a sample point.
 
-        # If it cleanly divides within ten microseconds,
-        # make integer based calculations.
-        if round(info.src_shift / dt, 5) % 1.0 == 0:
-            ref_sample = int(round(info.src_shift / dt, 5))
-            shift = (info.src_shift_samples * info.dt) - \
-                    (ref_sample * dt)
-            shift = round(shift, 6)
-            duration = (info.npts - 1) * info.dt - shift
-            new_npts = int(round(duration / dt, 6)) + 1
+            # If it cleanly divides within ten microseconds,
+            # make integer based calculations.
+            if round(info.src_shift / dt, 5) % 1.0 == 0:
+                ref_sample = int(round(info.src_shift / dt, 5))
+                shift = (info.src_shift_samples * info.dt) - \
+                        (ref_sample * dt)
+                shift = round(shift, 6)
+                duration = (info.npts - 1) * info.dt - shift
+                new_npts = int(round(duration / dt, 6)) + 1
+            else:
+                shift = round(info.src_shift % dt, 8)
+                duration = (info.npts - 1) * info.dt - shift
+                new_npts = int(round(duration / dt, 6)) + 1
+                ref_sample = \
+                    int(round((info.src_shift - shift) / dt, 6))
+
+            ti["time_shift_at_beginning"] = shift
+            ti["npts_before_shift_removal"] = new_npts
         else:
-            shift = round(info.src_shift % dt, 8)
-            duration = (info.npts - 1) * info.dt - shift
-            new_npts = int(round(duration / dt, 6)) + 1
-            ref_sample = \
-                int(round((info.src_shift - shift) / dt, 6))
-
-        ti["time_shift_at_beginning"] = shift
-        ti["npts_before_shift_removal"] = new_npts
+            ti["time_shift_at_beginning"] = 0
+            ti["npts_before_shift_removal"] = \
+                int(round((info.npts - 1) * info.dt / dt, 6)) + 1
+            ref_sample = 0
 
         # The resampling assumes zeros outside the data range. This
         # does not introduce any errors at the beginning as the data is
@@ -545,7 +556,10 @@ def _get_seismogram_times(info, origin_time, dt, a_lanczos,
                 int(np.ceil(affected_area / dt))
             ti["npts_before_shift_removal"] -= ti["samples_cut_at_end"]
     else:
-        ref_sample = info.src_shift_samples
+        if not reconvolve_stf:
+            ref_sample = info.src_shift_samples
+        else:
+            ref_sample = 0
         ti["time_shift_at_beginning"] = 0
         ti["npts_before_shift_removal"] = info.npts
 
