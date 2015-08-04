@@ -208,7 +208,7 @@ class RawSeismogramsHandler(InstaseisRequestHandler):
             st = self.application.db._convert_to_stream(
                 receiver=receiver, components=components,
                 data=data, dt_out=self.application.db.info.dt,
-                starttime=obspy.UTCDateTime(0))
+                starttime=args.origintime)
         except Exception:
             msg = ("Could not convert seismogram to a Stream object.")
             raise tornado.web.HTTPError(500, log_message=msg, reason=msg)
