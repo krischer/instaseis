@@ -20,6 +20,7 @@ import pytest
 import shutil
 
 from instaseis.instaseis_db import InstaseisDB
+from instaseis.base_instaseis_db import get_seismogram_times
 from instaseis import Source, Receiver, ForceSource
 from instaseis.helpers import get_band_code
 
@@ -803,3 +804,163 @@ def test_remove_samples_at_end_for_lanczos(db):
                               a_lanczos=3)
     for tr in st_5:
         assert tr.stats.npts == samples - 7
+
+
+@pytest.mark.parametrize("db", DBS)
+def test_get_time_information(db):
+    """
+    Tests the get_seismogram_times() function. Also make sure it is
+    consistent with the actually produces seismograms.
+    """
+    db = InstaseisDB(db)
+
+    origin_time = obspy.UTCDateTime(2015, 1, 1, 1, 1)
+
+    source = Source(latitude=4., longitude=3.0, depth_in_m=0,
+                    m_rr=4.71e+17, m_tt=3.81e+17, m_pp=-4.74e+17,
+                    m_rt=3.99e+17, m_rp=-8.05e+17, m_tp=-1.23e+17,
+                    origin_time=origin_time)
+    receiver = Receiver(latitude=10., longitude=20., depth_in_m=0)
+
+    # First case is very simple.
+    par = {"remove_source_shift": True,
+           "dt": None,
+           "a_lanczos": 5}
+    tr = db.get_seismograms(source=source, receiver=receiver,
+                            components=["Z"], **par)[0]
+    times = get_seismogram_times(info=db.info, origin_time=origin_time, **par)
+
+    assert tr.stats.starttime == times["starttime"]
+    assert tr.stats.starttime == origin_time
+    assert tr.stats.endtime == times["endtime"]
+    assert tr.stats.endtime == origin_time + 65 * db.info.dt
+    assert times["samples_cut_at_end"] == 0
+    assert times["ref_sample"] == 7
+    assert times["time_shift_at_beginning"] == 0
+    assert times["npts_before_shift_removal"] == 73
+    assert times["npts"] == 66
+    assert tr.stats.npts == times["npts"]
+
+    # Now the same, but without removal of the the source shift.
+    par = {"remove_source_shift": False,
+           "dt": None,
+           "a_lanczos": 5}
+    tr = db.get_seismograms(source=source, receiver=receiver,
+                            components=["Z"], **par)[0]
+    times = get_seismogram_times(info=db.info, origin_time=origin_time, **par)
+
+    assert tr.stats.starttime == times["starttime"]
+    assert tr.stats.starttime == origin_time - 7 * db.info.dt
+    assert tr.stats.endtime == times["endtime"]
+    assert tr.stats.endtime == origin_time + 65 * db.info.dt
+    assert times["samples_cut_at_end"] == 0
+    assert times["ref_sample"] == 7
+    assert times["time_shift_at_beginning"] == 0
+    assert times["npts_before_shift_removal"] == 73
+    assert times["npts"] == 73
+    assert tr.stats.npts == times["npts"]
+
+    # The "identify" interpolation will still perform the interpolation but
+    # nothing will be cut. This is a special, hard-coded case mainly for
+    # testing. But it also not wrong.
+    par = {"remove_source_shift": True,
+           "dt": db.info.dt,
+           "a_lanczos": 2}
+    tr = db.get_seismograms(source=source, receiver=receiver,
+                            components=["Z"], **par)[0]
+    times = get_seismogram_times(info=db.info, origin_time=origin_time, **par)
+
+    assert tr.stats.starttime == times["starttime"]
+    assert tr.stats.starttime == origin_time
+    assert tr.stats.endtime == times["endtime"]
+    assert tr.stats.endtime == origin_time + 65 * db.info.dt
+    assert times["samples_cut_at_end"] == 0
+    assert times["ref_sample"] == 7
+    assert times["time_shift_at_beginning"] == 0
+    assert times["npts_before_shift_removal"] == 73
+    assert times["npts"] == 66
+    assert tr.stats.npts == times["npts"]
+
+    par = {"remove_source_shift": False,
+           "dt": db.info.dt,
+           "a_lanczos": 5}
+    tr = db.get_seismograms(source=source, receiver=receiver,
+                            components=["Z"], **par)[0]
+    times = get_seismogram_times(info=db.info, origin_time=origin_time, **par)
+
+    assert tr.stats.starttime == times["starttime"]
+    assert tr.stats.starttime == origin_time - 7 * db.info.dt
+    assert tr.stats.endtime == times["endtime"]
+    assert tr.stats.endtime == origin_time + 65 * db.info.dt
+    assert times["samples_cut_at_end"] == 0
+    assert times["ref_sample"] == 7
+    assert times["time_shift_at_beginning"] == 0
+    assert times["npts_before_shift_removal"] == 73
+    assert times["npts"] == 73
+    assert tr.stats.npts == times["npts"]
+
+    # Now resampling with various values of a.
+    par = {"remove_source_shift": True,
+           "dt": 12.0,
+           "a_lanczos": 1}
+    tr = db.get_seismograms(source=source, receiver=receiver,
+                            components=["Z"], **par)[0]
+    times = get_seismogram_times(info=db.info, origin_time=origin_time, **par)
+
+    assert tr.stats.starttime == times["starttime"]
+    assert tr.stats.starttime == origin_time
+    assert tr.stats.endtime == times["endtime"]
+    # 65 sample intervals fit with db.info.dt.
+    endtime_with_dt = int((65 * db.info.dt) / 12.0) * 12.0
+    endtime_minus_a = endtime_with_dt - 1 * db.info.dt
+    assert tr.stats.endtime == origin_time + int(endtime_minus_a / 12.0) * 12.0
+    assert times["samples_cut_at_end"] == 3
+    assert times["ref_sample"] == 14
+    assert round(times["time_shift_at_beginning"], 4) == \
+       round(((7 * db.info.dt) / 12.0) % 1 * 12.0, 4)
+    assert times["npts_before_shift_removal"] == 145
+    assert times["npts"] == 131
+    assert tr.stats.npts == times["npts"]
+
+    par = {"remove_source_shift": True,
+           "dt": 12.0,
+           "a_lanczos": 2}
+    tr = db.get_seismograms(source=source, receiver=receiver,
+                            components=["Z"], **par)[0]
+    times = get_seismogram_times(info=db.info, origin_time=origin_time, **par)
+
+    assert tr.stats.starttime == times["starttime"]
+    assert tr.stats.starttime == origin_time
+    assert tr.stats.endtime == times["endtime"]
+    # 65 sample intervals fit with db.info.dt.
+    endtime_with_dt = int((65 * db.info.dt) / 12.0) * 12.0
+    endtime_minus_a = endtime_with_dt - 2 * db.info.dt
+    assert tr.stats.endtime == origin_time + int(endtime_minus_a / 12.0) * 12.0
+    assert times["samples_cut_at_end"] == 5
+    assert times["ref_sample"] == 14
+    assert round(times["time_shift_at_beginning"], 4) == \
+           round(((7 * db.info.dt) / 12.0) % 1 * 12.0, 4)
+    assert times["npts_before_shift_removal"] == 143
+    assert times["npts"] == 129
+    assert tr.stats.npts == times["npts"]
+
+    par = {"remove_source_shift": True,
+           "dt": 12.0,
+           "a_lanczos": 7}
+    tr = db.get_seismograms(source=source, receiver=receiver,
+                            components=["Z"], **par)[0]
+    times = get_seismogram_times(info=db.info, origin_time=origin_time, **par)
+
+    assert tr.stats.starttime == times["starttime"]
+    assert tr.stats.starttime == origin_time
+    assert tr.stats.endtime == times["endtime"]
+    endtime_with_dt = int((65 * db.info.dt) / 12.0) * 12.0
+    endtime_minus_a = endtime_with_dt - 7 * db.info.dt
+    assert tr.stats.endtime == origin_time + int(endtime_minus_a / 12.0) * 12.0
+    assert times["samples_cut_at_end"] == 15
+    assert times["ref_sample"] == 14
+    assert round(times["time_shift_at_beginning"], 4) == \
+           round(((7 * db.info.dt) / 12.0) % 1 * 12.0, 4)
+    assert times["npts_before_shift_removal"] == 133
+    assert times["npts"] == 119
+    assert tr.stats.npts == times["npts"]

@@ -156,22 +156,23 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
                 # If it cleanly divides within ten microseconds,
                 # make integer based calculations.
                 if round(self.info.src_shift / dt, 5) % 1.0 == 0:
-                    shift_in_samples = int(round(self.info.src_shift / dt, 5))
+                    ref_sample = int(round(self.info.src_shift / dt, 5))
                     shift = (self.info.src_shift_samples * self.info.dt) - \
-                        (shift_in_samples * dt)
+                        (ref_sample * dt)
                     shift = round(shift, 6)
-                    duration = (len(data[comp]) - 1) * self.info.dt - shift
+                    duration = (self.info.npts - 1) * self.info.dt - shift
                     new_npts = int(round(duration / dt, 6)) + 1
                 else:
                     shift = round(self.info.src_shift % dt, 8)
-                    duration = (len(data[comp]) - 1) * self.info.dt - shift
+                    duration = (self.info.npts - 1) * self.info.dt - shift
                     new_npts = int(round(duration / dt, 6)) + 1
+                    ref_sample = \
+                        int(round((self.info.src_shift - shift) / dt, 6))
 
                 data[comp] = lanczos.lanczos_interpolation(
                     data=data[comp], old_start=0, old_dt=self.info.dt,
                     new_start=shift, new_dt=dt, new_npts=new_npts,
                     a=a_lanczos, window="blackman")
-                ref_sample = int(round((self.info.src_shift - shift) / dt, 6))
 
                 # The resampling assumes zeros outside the data range. This
                 # does not introduce any errors at the beginning as the data is
@@ -506,3 +507,79 @@ def sizeof_fmt(num):
             return "%3.1f %s" % (num, x)
         num /= 1024.0
     return "%3.1f %s" % (num, "TB")
+
+
+def get_seismogram_times(info, origin_time, dt, a_lanczos,
+                         remove_source_shift):
+    """
+    Helper function to calculate the final times of seismograms.
+
+    It also calculates all the necessary information to determine the final
+    times of the seismograms and how to cut the data. This is important to
+    make sure the time handling and calculations are consistent across
+    Instaseis.
+
+    :param info:
+    :param dt:
+    :param a:
+    :return:
+    """
+    dt_out = dt or info.dt
+
+    ti = {}
+    ti["samples_cut_at_end"] = 0
+
+    if dt is not None:
+        # This is a bit tricky. We want to resample but we also want
+        # to make sure that that the peak of the source time
+        # function is exactly hit by a sample point.
+
+        # If it cleanly divides within ten microseconds,
+        # make integer based calculations.
+        if round(info.src_shift / dt, 5) % 1.0 == 0:
+            ref_sample = int(round(info.src_shift / dt, 5))
+            shift = (info.src_shift_samples * info.dt) - \
+                    (ref_sample * dt)
+            shift = round(shift, 6)
+            duration = (info.npts - 1) * info.dt - shift
+            new_npts = int(round(duration / dt, 6)) + 1
+        else:
+            shift = round(info.src_shift % dt, 8)
+            duration = (info.npts - 1) * info.dt - shift
+            new_npts = int(round(duration / dt, 6)) + 1
+            ref_sample = \
+                int(round((info.src_shift - shift) / dt, 6))
+
+        ti["time_shift_at_beginning"] = shift
+        ti["npts_before_shift_removal"] = new_npts
+
+        # The resampling assumes zeros outside the data range. This
+        # does not introduce any errors at the beginning as the data is
+        # actually zero there but it does affect the end. We will
+        # remove all samples that are affected by the boundary
+        # conditions here.
+        #
+        # Also don't cut it for the "identify" interpolation which is
+        # important for testing.
+        if round(dt / info.dt, 6) != 1.0:
+            affected_area = a_lanczos * info.dt
+            ti["samples_cut_at_end"] = \
+                int(np.ceil(affected_area / dt))
+            ti["npts_before_shift_removal"] -= ti["samples_cut_at_end"]
+    else:
+        ref_sample = info.src_shift_samples
+        ti["time_shift_at_beginning"] = 0
+        ti["npts_before_shift_removal"] = info.npts
+
+    # The reference sample, e.g. the sample at origin time.
+    ti["ref_sample"] = ref_sample
+
+    if remove_source_shift:
+        ti["starttime"] = origin_time
+        ti["npts"] = ti["npts_before_shift_removal"] - ti["ref_sample"]
+    else:
+        ti["starttime"] = origin_time - ti["ref_sample"] * dt_out
+        ti["npts"] = ti["npts_before_shift_removal"]
+    ti["endtime"] = ti["starttime"] + (ti["npts"] - 1) * dt_out
+
+    return ti
