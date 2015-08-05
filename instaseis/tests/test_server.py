@@ -2699,3 +2699,37 @@ def test_event_route_with_no_event_callback(all_clients):
     request = client.fetch("/event?id=B071791B")
     assert request.code == 404
     assert request.reason == 'Server does not support event information.'
+
+
+def test_event_route_with_event_coordinates_callback(
+        all_clients_event_callback):
+    """
+    Tests the /event route.
+    """
+    client = all_clients_event_callback
+
+    # Missing 'id' parameter.
+    request = client.fetch("/event")
+    assert request.code == 400
+    assert request.reason == "'id' parameter is required."
+
+    # Unknown event.
+    request = client.fetch("/event?id=bogus")
+    assert request.code == 404
+    assert request.reason == "Event not found."
+
+    # Known event.
+    request = client.fetch("/event?id=B071791B")
+    assert request.code == 200
+    event = json.loads(str(request.body.decode("utf8")))
+
+    assert event == {
+        "m_rr": -58000000000000000,
+        "m_tt": 78100000000000000,
+        "m_pp": -20100000000000000,
+        "m_rt": -56500000000000000,
+        "m_rp": 108100000000000000,
+        "m_tp": 315300000000000000,
+        "latitude": -3.8,
+        "longitude": -104.21,
+        "origin_time": "1991-07-17T16:41:33.100000Z"}

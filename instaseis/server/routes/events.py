@@ -20,7 +20,7 @@ class EventHandler(InstaseisRequestHandler):
                 404, log_message=msg, reason=msg)
 
         if "id" not in self.request.arguments:
-            msg = "'event_id' argument is required."
+            msg = "'id' parameter is required."
             raise tornado.web.HTTPError(
                 400, log_message=msg, reason=msg)
 
