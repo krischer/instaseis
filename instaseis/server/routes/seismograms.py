@@ -184,7 +184,7 @@ class SeismogramsHandler(InstaseisRequestHandler):
         "network": {"type": str},
         "station": {"type": str},
 
-        "format": {"type": str, "default": "miniseed"}
+        "format": {"type": str, "default": "saczip"}
     }
 
     def __init__(self, *args, **kwargs):

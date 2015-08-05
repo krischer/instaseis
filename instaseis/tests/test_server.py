@@ -1060,7 +1060,8 @@ def test_seismograms_retrieval(all_clients):
         "sourcelatitude": 10,
         "sourcelongitude": 10,
         "receiverlatitude": -10,
-        "receiverlongitude": -10}
+        "receiverlongitude": -10,
+        "format": "miniseed"}
 
     # Various sources.
     mt = {"mtt": "100000", "mpp": "100000", "mrr": "100000",
@@ -1415,7 +1416,7 @@ def test_seismograms_retrieval(all_clients):
 def test_output_formats(all_clients):
     """
     The /seismograms route can return data either as MiniSEED or as zip
-    archive containing multiple files.
+    archive containing multiple SAC files.
     """
     client = all_clients
 
@@ -1428,14 +1429,7 @@ def test_output_formats(all_clients):
           "mrt": "100000", "mrp": "100000", "mtp": "100000"}
     basic_parameters.update(mt)
 
-    # First don't specify the format which should result in a miniseed file.
-    params = copy.deepcopy(basic_parameters)
-    request = client.fetch(_assemble_url(**params))
-    st = obspy.read(request.buffer)
-    for tr in st:
-        assert tr.stats._format == "MSEED"
-
-    # Specifying the miniseed format also work.
+    # First try to get a MiniSEED file.
     params = copy.deepcopy(basic_parameters)
     params["format"] = "miniseed"
     request = client.fetch(_assemble_url(**params))
@@ -1480,6 +1474,17 @@ def test_output_formats(all_clients):
 
     # Now make sure the result is the same independent of the output format.
     assert st == sac_st
+
+    # Specifying the saczip format also work.
+    params = copy.deepcopy(basic_parameters)
+    params["format"] = "saczip"
+    request = client.fetch(_assemble_url(**params))
+    sac_st = obspy.Stream()
+    zip_obj = zipfile.ZipFile(request.buffer)
+    for name in zip_obj.namelist():
+        sac_st += obspy.read(io.BytesIO(zip_obj.read(name)))
+    for tr in sac_st:
+        assert tr.stats._format == "SAC"
 
     # Once more with a couple more parameters.
     basic_parameters = {
@@ -1493,14 +1498,7 @@ def test_output_formats(all_clients):
           "networkcode": "BW", "stationcode": "FURT"}
     basic_parameters.update(mt)
 
-    # First don't specify the format which should result in a miniseed file.
-    params = copy.deepcopy(basic_parameters)
-    request = client.fetch(_assemble_url(**params))
-    st = obspy.read(request.buffer)
-    for tr in st:
-        assert tr.stats._format == "MSEED"
-
-    # Specifying the miniseed format also work.
+    # First get a MiniSEED file.
     params = copy.deepcopy(basic_parameters)
     params["format"] = "miniseed"
     request = client.fetch(_assemble_url(**params))
@@ -1545,6 +1543,17 @@ def test_output_formats(all_clients):
 
     # Now make sure the result is the same independent of the output format.
     assert st == sac_st
+
+    # Specifying the saczip format also work.
+    params = copy.deepcopy(basic_parameters)
+    params["format"] = "saczip"
+    request = client.fetch(_assemble_url(**params))
+    sac_st = obspy.Stream()
+    zip_obj = zipfile.ZipFile(request.buffer)
+    for name in zip_obj.namelist():
+        sac_st += obspy.read(io.BytesIO(zip_obj.read(name)))
+    for tr in sac_st:
+        assert tr.stats._format == "SAC"
 
 
 def test_coordinates_route_with_no_coordinate_callback(all_clients):
@@ -1686,7 +1695,7 @@ def test_multiple_seismograms_retrieval_no_format_given(
         all_clients_station_coordinates_callback):
     """
     Tests  the retrieval of multiple station in one request with no passed
-    format parameter. This results in miniseed return values.
+    format parameter. This results in saczip return values.
     """
     client = all_clients_station_coordinates_callback
     db = instaseis.open_db(client.filepath)
@@ -1711,8 +1720,11 @@ def test_multiple_seismograms_retrieval_no_format_given(
     # Default format is MiniSEED>
     request = client.fetch(_assemble_url(**params))
     assert request.code == 200
-    assert request.headers["Content-Type"] == "application/octet-stream"
-    st_server = obspy.read(request.buffer)
+    assert request.headers["Content-Type"] == "application/zip"
+    st_server = obspy.Stream()
+    zip_obj = zipfile.ZipFile(request.buffer)
+    for name in zip_obj.namelist():
+        st_server += obspy.read(io.BytesIO(zip_obj.read(name)))
     st_server.sort()
 
     components = ["Z", "N", "E"]
@@ -1737,9 +1749,8 @@ def test_multiple_seismograms_retrieval_no_format_given(
     assert len(st_db) == 6
     assert len(st_server) == 6
     for tr_server, tr_db in zip(st_server, st_db):
-        # Remove the additional stats from both. This also assures both have
-        # the  miniseed format.
-        del tr_server.stats.mseed
+        # Remove the additional stats from both.
+        del tr_server.stats.sac
         del tr_server.stats._format
         del tr_db.stats.instaseis
         # Sample spacing is very similar but not equal due to floating point
@@ -1766,8 +1777,11 @@ def test_multiple_seismograms_retrieval_no_format_given(
     # Default format is MiniSEED>
     request = client.fetch(_assemble_url(**params))
     assert request.code == 200
-    assert request.headers["Content-Type"] == "application/octet-stream"
-    st_server = obspy.read(request.buffer)
+    assert request.headers["Content-Type"] == "application/zip"
+    st_server = obspy.Stream()
+    zip_obj = zipfile.ZipFile(request.buffer)
+    for name in zip_obj.namelist():
+        st_server += obspy.read(io.BytesIO(zip_obj.read(name)))
     st_server.sort()
 
     components = ["R", "T"]
@@ -1793,7 +1807,7 @@ def test_multiple_seismograms_retrieval_no_format_given(
     for tr_server, tr_db in zip(st_server, st_db):
         # Remove the additional stats from both. This also assures both have
         # the  miniseed format.
-        del tr_server.stats.mseed
+        del tr_server.stats.sac
         del tr_server.stats._format
         del tr_db.stats.instaseis
         # Sample spacing is very similar but not equal due to floating point
@@ -1819,8 +1833,11 @@ def test_multiple_seismograms_retrieval_no_format_given(
         # Default format is MiniSEED>
         request = client.fetch(_assemble_url(**params))
         assert request.code == 200
-        assert request.headers["Content-Type"] == "application/octet-stream"
-        st_server = obspy.read(request.buffer)
+        assert request.headers["Content-Type"] == "application/zip"
+        st_server = obspy.Stream()
+        zip_obj = zipfile.ZipFile(request.buffer)
+        for name in zip_obj.namelist():
+            st_server += obspy.read(io.BytesIO(zip_obj.read(name)))
         st_server.sort()
 
         components = ["N", "E", "Z", "R", "T"]
@@ -1845,9 +1862,8 @@ def test_multiple_seismograms_retrieval_no_format_given(
         assert len(st_db) == 10
         assert len(st_server) == 10
         for tr_server, tr_db in zip(st_server, st_db):
-            # Remove the additional stats from both. This also assures both
-            # have the  miniseed format.
-            del tr_server.stats.mseed
+            # Remove the additional stats from both.
+            del tr_server.stats.sac
             del tr_server.stats._format
             del tr_db.stats.instaseis
             # Sample spacing is very similar but not equal due to floating
@@ -1866,7 +1882,7 @@ def test_multiple_seismograms_retrieval_no_format_given_single_station(
         all_clients_station_coordinates_callback):
     """
     Tests  the retrieval of multiple station in one request with no passed
-    format parameter. This results in miniseed return values.
+    format parameter. This results in sac return values.
 
     In this case the query is constructed so that it only returns a single
     station.
@@ -1894,8 +1910,11 @@ def test_multiple_seismograms_retrieval_no_format_given_single_station(
     # Default format is MiniSEED>
     request = client.fetch(_assemble_url(**params))
     assert request.code == 200
-    assert request.headers["Content-Type"] == "application/octet-stream"
-    st_server = obspy.read(request.buffer)
+    assert request.headers["Content-Type"] == "application/zip"
+    st_server = obspy.Stream()
+    zip_obj = zipfile.ZipFile(request.buffer)
+    for name in zip_obj.namelist():
+        st_server += obspy.read(io.BytesIO(zip_obj.read(name)))
     st_server.sort()
 
     components = ["Z", "N", "E"]
@@ -1918,9 +1937,8 @@ def test_multiple_seismograms_retrieval_no_format_given_single_station(
     assert len(st_db) == 3
     assert len(st_server) == 3
     for tr_server, tr_db in zip(st_server, st_db):
-        # Remove the additional stats from both. This also assures both have
-        # the  miniseed format.
-        del tr_server.stats.mseed
+        # Remove the additional stats from both.
+        del tr_server.stats.sac
         del tr_server.stats._format
         del tr_db.stats.instaseis
         # Sample spacing is very similar but not equal due to floating point
@@ -1947,8 +1965,11 @@ def test_multiple_seismograms_retrieval_no_format_given_single_station(
     # Default format is MiniSEED>
     request = client.fetch(_assemble_url(**params))
     assert request.code == 200
-    assert request.headers["Content-Type"] == "application/octet-stream"
-    st_server = obspy.read(request.buffer)
+    assert request.headers["Content-Type"] == "application/zip"
+    st_server = obspy.Stream()
+    zip_obj = zipfile.ZipFile(request.buffer)
+    for name in zip_obj.namelist():
+        st_server += obspy.read(io.BytesIO(zip_obj.read(name)))
     st_server.sort()
 
     components = ["R", "T"]
@@ -1970,9 +1991,8 @@ def test_multiple_seismograms_retrieval_no_format_given_single_station(
     assert len(st_db) == 2
     assert len(st_server) == 2
     for tr_server, tr_db in zip(st_server, st_db):
-        # Remove the additional stats from both. This also assures both have
-        # the  miniseed format.
-        del tr_server.stats.mseed
+        # Remove the additional stats from both.
+        del tr_server.stats.sac
         del tr_server.stats._format
         del tr_db.stats.instaseis
         # Sample spacing is very similar but not equal due to floating point
@@ -1998,8 +2018,11 @@ def test_multiple_seismograms_retrieval_no_format_given_single_station(
         # Default format is MiniSEED>
         request = client.fetch(_assemble_url(**params))
         assert request.code == 200
-        assert request.headers["Content-Type"] == "application/octet-stream"
-        st_server = obspy.read(request.buffer)
+        assert request.headers["Content-Type"] == "application/zip"
+        st_server = obspy.Stream()
+        zip_obj = zipfile.ZipFile(request.buffer)
+        for name in zip_obj.namelist():
+            st_server += obspy.read(io.BytesIO(zip_obj.read(name)))
         st_server.sort()
 
         components = ["N", "E", "Z", "R", "T"]
@@ -2022,9 +2045,8 @@ def test_multiple_seismograms_retrieval_no_format_given_single_station(
         assert len(st_db) == 5
         assert len(st_server) == 5
         for tr_server, tr_db in zip(st_server, st_db):
-            # Remove the additional stats from both. This also assures both
-            # have the  miniseed format.
-            del tr_server.stats.mseed
+            # Remove the additional stats from both.
+            del tr_server.stats.sac
             del tr_server.stats._format
             del tr_db.stats.instaseis
             # Sample spacing is very similar but not equal due to floating
@@ -2611,7 +2633,8 @@ def test_time_settings_for_seismograms_route(all_clients):
         "sourcelatitude": 10, "sourcelongitude": 10, "receiverlatitude": -10,
         "receiverlongitude": -10, "mtt": "100000", "mpp": "100000",
         "mrr": "100000", "mrt": "100000", "mrp": "100000", "mtp": "100000",
-        "dt": 1.0, "alanczos": 1, "origintime": str(origin_time)}
+        "dt": 1.0, "alanczos": 1, "origintime": str(origin_time),
+        "format": "miniseed"}
 
     p = copy.deepcopy(params)
     url = _assemble_url(**p)
@@ -2861,7 +2884,8 @@ def test_event_parameters_by_querying(all_clients_event_callback):
     client = all_clients_event_callback
     db = instaseis.open_db(client.filepath)
 
-    params = {"receiverlatitude": 10, "receiverlongitude": 10}
+    params = {"receiverlatitude": 10, "receiverlongitude": 10,
+              "format": "miniseed"}
 
     p = copy.deepcopy(params)
     p["event_id"] = "B071791B"
@@ -2932,7 +2956,7 @@ def test_label_parameter(all_clients):
     params = {"sourcelatitude": 10, "sourcelongitude": 10, "mtt": "100000",
               "mpp": "100000", "mrr": "100000", "mrt": "100000",
               "mrp": "100000", "mtp": "100000", "receiverlatitude": 20,
-              "receiverlongitude": 20}
+              "receiverlongitude": 20, "format": "miniseed"}
 
     # No specified label will result in it having a generic label.
     p = copy.deepcopy(params)
