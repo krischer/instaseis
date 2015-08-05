@@ -26,7 +26,10 @@ cache = []
 
 WGS_A = 6378137.0
 WGS_B = 6356752.314245
-FACTOR = 1.0 - (WGS_A - WGS_B) / WGS_A
+
+
+_f = (WGS_A - WGS_B) / WGS_A
+E_2 = 2 * _f - _f ** 2
 
 
 def load_lib():
@@ -67,8 +70,6 @@ def wgs84_to_geocentric_latitude(lat):
     """
     Convert a latitude defined on the WGS84 ellipsoid to geocentric
     coordinates.
-
-    Thanks to Kasra Hosseini for the original code snippet!
     """
     # Singularities close to the pole and the equator. Just return the value
     # in that case.
@@ -76,9 +77,4 @@ def wgs84_to_geocentric_latitude(lat):
             abs(lat + 90.0) < 1E-6:
         return lat
 
-    fac = (WGS_B / WGS_A) ** 2
-
-    colat = math.radians(90.0 - lat)
-
-    geocen_colat = 0.5 * math.pi - math.atan(fac / math.tan(colat))
-    return 90.0 - math.degrees(geocen_colat)
+    return math.degrees(math.atan((1 - E_2) * math.tan(math.radians(lat))))
