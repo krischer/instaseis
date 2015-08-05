@@ -41,7 +41,8 @@ def get_application():
 
 
 def launch_io_loop(db_path, port, buffer_size_in_mb, quiet, log_level,
-                   station_coordinates_callback=None):
+                   station_coordinates_callback=None,
+                   event_info_callback=None):
     """
     Launch the instaseis server.
 
@@ -55,12 +56,15 @@ def launch_io_loop(db_path, port, buffer_size_in_mb, quiet, log_level,
     :param log_level: The log level, one of CRITICAL, ERROR, WARNING, INFO,
         DEBUG, NOTSET
     :param station_coordinates_callback: A callback function for station
-        coordinates. If not given, certain request will not be available.
+        coordinates. If not given, certain requests will not be available.
+    :param station_coordinates_callback: A callback function returning event
+        information. If not given, certain requests will not be available.
     """
     application = get_application()
     application.db = InstaseisDB(db_path=db_path,
                                  buffer_size_in_mb=buffer_size_in_mb)
     application.station_coordinates_callback = station_coordinates_callback
+    application.event_info_callback = event_info_callback
 
     if not quiet:
         # Get all tornado loggers.

@@ -23,7 +23,7 @@ import shutil
 from instaseis.instaseis_db import InstaseisDB
 from instaseis.base_instaseis_db import _get_seismogram_times
 from instaseis import Source, Receiver, ForceSource
-from instaseis.helpers import get_band_code
+from instaseis.helpers import get_band_code, wgs84_to_geocentric_latitude
 
 from .testdata import BWD_TEST_DATA, FWD_TEST_DATA
 from .testdata import BWD_STRAIN_ONLY_TEST_DATA, BWD_FORCE_TEST_DATA
@@ -1157,3 +1157,31 @@ def test_get_time_information_reconvolve_stf(db):
     assert times["npts"] == 134
     assert times["npts"] == times["npts_before_shift_removal"]
     assert tr.stats.npts == times["npts"]
+
+
+def test_wgs84_to_geocentric():
+    """
+    Tests the utility function.
+    """
+    assert wgs84_to_geocentric_latitude(0.0) == 0.0
+    assert wgs84_to_geocentric_latitude(90.0) == 90.0
+    assert wgs84_to_geocentric_latitude(-90.0) == -90.0
+
+    # Difference minimal close to the poles and the equator.
+    assert abs(wgs84_to_geocentric_latitude(0.1) - 0.1) < 1E-3
+    assert abs(wgs84_to_geocentric_latitude(-0.1) + 0.1) < 1E-3
+    assert abs(wgs84_to_geocentric_latitude(89.9) - 89.9) < 1E-3
+    assert abs(wgs84_to_geocentric_latitude(-89.9) + 89.9) < 1E-3
+
+    # The geographic latitude is larger then the geocentric on the northern
+    # hemisphere.
+    for _i in range(1, 90):
+        assert _i > wgs84_to_geocentric_latitude(_i)
+
+    # The opposite is true on the southern hemisphere.
+    for _i in range(-1, -90, -1):
+        assert _i < wgs84_to_geocentric_latitude(_i)
+
+    # Small check to test the approximate ranges.
+    assert 0.19 < 45.0 - wgs84_to_geocentric_latitude(45.0) < 0.2
+    assert -0.19 > -45 - wgs84_to_geocentric_latitude(-45.0) > -0.2
