@@ -31,7 +31,7 @@ import os
 CACHE = {}
 
 
-class EventNotFoundError(Exception):
+class EventNotFoundError(ValueError):
     pass
 
 
@@ -75,7 +75,7 @@ def create_event_json_file(output_filename):
         json.dump(events, fh)
 
 
-def get_event_information(filename, event_id):
+def get_event_information(event_id, filename):
     """
     Return the event information for the given event id as a dictionary.
     """
@@ -98,5 +98,5 @@ if __name__ == "__main__":
     create_event_json_file(FILENAME)
 
     import pprint
-    pprint.pprint(get_event_information(FILENAME, "C201308081707A"))
-    pprint.pprint(get_event_information(FILENAME, "B071791B"))
+    pprint.pprint(get_event_information("C201308081707A", FILENAME))
+    pprint.pprint(get_event_information("B071791B", FILENAME))

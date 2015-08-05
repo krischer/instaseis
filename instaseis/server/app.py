@@ -18,6 +18,7 @@ import tornado.web
 from ..instaseis_db import InstaseisDB
 
 from .routes.coordinates import CoordinatesHandler
+from .routes.events import EventHandler
 from .routes.index import IndexHandler
 from .routes.info import InfoHandler
 from .routes.seismograms import SeismogramsHandler
@@ -36,7 +37,8 @@ def get_application():
         (r"/seismograms_raw", RawSeismogramsHandler),
         (r"/info", InfoHandler),
         (r"/", IndexHandler),
-        (r"/coordinates", CoordinatesHandler)
+        (r"/coordinates", CoordinatesHandler),
+        (r"/event", EventHandler)
     ])
 
 
@@ -57,7 +59,7 @@ def launch_io_loop(db_path, port, buffer_size_in_mb, quiet, log_level,
         DEBUG, NOTSET
     :param station_coordinates_callback: A callback function for station
         coordinates. If not given, certain requests will not be available.
-    :param station_coordinates_callback: A callback function returning event
+    :param event_info_callback: A callback function returning event
         information. If not given, certain requests will not be available.
     """
     application = get_application()

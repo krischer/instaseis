@@ -18,11 +18,18 @@ import os
 from instaseis.server.app import launch_io_loop
 
 from station_resolver import parse_station_file, get_coordinates
+from event_resolver import get_event_information, create_event_json_file
 
-# Simple example assuming a file `station_list.txt` exists in the current
-# directory.
-FILENAME = "station_list.txt"
-conn, cursor = parse_station_file(FILENAME)
+
+STATION_FILENAME = "station_list.txt"
+conn, cursor = parse_station_file(STATION_FILENAME)
+
+EVENT_FILENAME = "event_db.json"
+create_event_json_file(EVENT_FILENAME)
+
+
+def get_event(event_id):
+    return get_event_information(event_id=event_id, filename=EVENT_FILENAME)
 
 
 def get_station_coordinates(networks, stations):
@@ -55,4 +62,5 @@ if __name__ == "__main__":
     launch_io_loop(db_path=db_path, port=args.port,
                    buffer_size_in_mb=args.buffer_size_in_mb,
                    quiet=args.quiet, log_level=args.log_level,
-                   station_coordinates_callback=get_station_coordinates)
+                   station_coordinates_callback=get_station_coordinates,
+                   event_info_callback=get_event)
