@@ -136,7 +136,7 @@ class SeismogramsHandler(InstaseisRequestHandler):
         "components": {"type": str, "default": "ZNE"},
         "unit": {"type": str, "default": "displacement"},
         "dt": {"type": float},
-        "alanczos": {"type": int, "default": 5},
+        "alanczos": {"type": int, "default": 12},
         "label": {"type": str},
 
         # Source parameters.
