@@ -2777,3 +2777,24 @@ def test_station_query_various_failures(
     request = client.fetch(_assemble_url(**p))
     assert request.code == 404
     assert request.reason == ("No coordinates found satisfying the query.")
+
+
+def test_station_query_no_callback(all_clients):
+    """
+    Test the error message when no station callback is available.
+    """
+    client = all_clients
+
+    params = {"sourcelatitude": 10, "sourcelongitude": 10, "mtt": "100000",
+              "mpp": "100000", "mrr": "100000", "mrt": "100000",
+              "mrp": "100000", "mtp": "100000"}
+
+    p = copy.deepcopy(params)
+    p["network"] = "IU,B*"
+    p["station"] = "ANT*,ANM?"
+
+    request = client.fetch(_assemble_url(**p))
+    assert request.code == 404
+    assert request.reason == (
+        "Server does not support station coordinates and thus no station "
+        "queries.")
