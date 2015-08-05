@@ -422,22 +422,25 @@ Filetype
 
 +-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
 | Parameter               | Type     | Required | Default Value               | Description                                                                          |
++=========================+==========+==========+=============================+======================================================================================+
+| **Output parameters**                                                                                                                                              |
 +-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
-| Output parameters                                                                                                                                                  |
-+-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
-| ``format``              | String   | False    | saczip                      |  Output format. ``miniseed`` (MiniSEED) or ``saczip`` (SAC files in a zip archive).  |
+| ``format``              | String   | False    | saczip                      | Specify output file to be either MiniSEED or a ZIP archive of SAC files, either      |
+|                         |          |          |                             | ``miniseed`` or ``saczip``.                                                          |
 +-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
 | ``label``               | String   | False    |                             |  Specify a label to be included in file names and HTTP file name suggestions.        |
 +-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
-| ``components``          | String   | False    | ZNE                         | The desired seismogram components. Any combination of Z, N, E, R, T.                 |
+| ``components``          | String   | False    | ZNE                         | Specify the orientation of the synthetic seismograms as a list of any combination of |
+|                         |          |          |                             | ``Z`` (vertical), ``N`` (north), ``E`` (east), ``R`` (radial), ``T`` (transverse).   |
 +-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
-| ``unit``                | String   | False    | displacement                | The type of seismogram. One of ``displacement``, ``velocity``, or ``acceleration``.  |
+| ``units``               | String   | False    | displacement                | Specify either ``displacement``, ``velocity`` or ``acceleration`` for the synthetics.|
 +-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
 | ``dt``                  | Float    | False    |                             | If given, seismograms will be resampled to the desired sample spacing.               |
 +-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
-| ``alanczos``            | Integer  | False    | 12                          | Width of the Lanczos kernel used for resampling.                                     |
+| ``alanczos``            | Integer  | False    | 12                          | Specify the width of the Lanczos kernel used for resampling to requested sample      |
+|                         |          |          |                             | interval.                                                                            |
 +-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
-| Temporal Parameters                                                                                                                                                |
+| **Time Parameters**                                                                                                                                                |
 +-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
 | ``origintime``          | Datetime | False    | 1970-01-01T00:00:00.000000Z | Time of the peak of the source time function.                                        |
 +-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+

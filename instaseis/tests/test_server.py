@@ -646,7 +646,7 @@ def test_seismograms_error_handling(all_clients):
     params["mrt"] = "100000"
     params["mrp"] = "100000"
     params["mtp"] = "100000"
-    params["unit"] = "fun"
+    params["units"] = "fun"
     request = client.fetch(_assemble_url(**params))
     assert request.code == 400
     assert "unit must be one of" in request.reason.lower()
@@ -966,7 +966,7 @@ def test_object_creation_for_seismogram_route(all_clients):
         p.reset_mock()
         params = copy.deepcopy(basic_parameters)
         params.update(mt)
-        params["unit"] = "acceleration"
+        params["units"] = "acceleration"
         request = client.fetch(_assemble_url(**params))
         assert request.code == 200
         assert p.call_count == 1
@@ -981,7 +981,7 @@ def test_object_creation_for_seismogram_route(all_clients):
         p.reset_mock()
         params = copy.deepcopy(basic_parameters)
         params.update(mt)
-        params["unit"] = "velocity"
+        params["units"] = "velocity"
         request = client.fetch(_assemble_url(**params))
         assert request.code == 200
         assert p.call_count == 1
@@ -996,7 +996,7 @@ def test_object_creation_for_seismogram_route(all_clients):
         p.reset_mock()
         params = copy.deepcopy(basic_parameters)
         params.update(mt)
-        params["unit"] = "VeLoCity"
+        params["units"] = "VeLoCity"
         request = client.fetch(_assemble_url(**params))
         assert request.code == 200
         assert p.call_count == 1
@@ -1034,7 +1034,7 @@ def test_object_creation_for_seismogram_route(all_clients):
         params.update(mt)
         params["dt"] = "0.1"
         params["alanczos"] = "2"
-        params["unit"] = "ACCELERATION"
+        params["units"] = "ACCELERATION"
         request = client.fetch(_assemble_url(**params))
         assert request.code == 200
         assert p.call_count == 1
@@ -1317,7 +1317,7 @@ def test_seismograms_retrieval(all_clients):
 
     params = copy.deepcopy(basic_parameters)
     params.update(mt)
-    params["unit"] = "acceleration"
+    params["units"] = "acceleration"
     request = client.fetch(_assemble_url(**params))
     st_server = obspy.read(request.buffer)
     st_db = db.get_seismograms(source=source, receiver=receiver,
@@ -1340,7 +1340,7 @@ def test_seismograms_retrieval(all_clients):
 
     params = copy.deepcopy(basic_parameters)
     params.update(mt)
-    params["unit"] = "velocity"
+    params["units"] = "velocity"
     request = client.fetch(_assemble_url(**params))
     st_server = obspy.read(request.buffer)
     st_db = db.get_seismograms(source=source, receiver=receiver,
@@ -1390,7 +1390,7 @@ def test_seismograms_retrieval(all_clients):
     params.update(mt)
     params["dt"] = "0.1"
     params["alanczos"] = "2"
-    params["unit"] = "ACCELERATION"
+    params["units"] = "ACCELERATION"
     request = client.fetch(_assemble_url(**params))
     st_server = obspy.read(request.buffer)
     st_db = db.get_seismograms(source=source, receiver=receiver,
@@ -1494,7 +1494,7 @@ def test_output_formats(all_clients):
         "receiverlongitude": -10}
     mt = {"mtt": "100000", "mpp": "100000", "mrr": "100000",
           "mrt": "100000", "mrp": "100000", "mtp": "100000",
-          "components": "RT", "unit": "velocity", "dt": 2, "alanczos": 3,
+          "components": "RT", "units": "velocity", "dt": 2, "alanczos": 3,
           "networkcode": "BW", "stationcode": "FURT"}
     basic_parameters.update(mt)
 

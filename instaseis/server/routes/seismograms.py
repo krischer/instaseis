@@ -22,7 +22,7 @@ from ..instaseis_request import InstaseisRequestHandler
 
 
 @run_async
-def _get_seismogram(db, source, receiver, components, unit, dt, a_lanczos,
+def _get_seismogram(db, source, receiver, components, units, dt, a_lanczos,
                     starttime, endtime, format, label, callback):
     """
     Extract a seismogram from the passed db and write it either to a MiniSEED
@@ -32,7 +32,7 @@ def _get_seismogram(db, source, receiver, components, unit, dt, a_lanczos,
     :param source: An instaseis source.
     :param receiver: An instaseis receiver.
     :param components: The components.
-    :param unit: The desired unit.
+    :param units: The desired units.
     :param remove_source_shift: Remove the source time shift or not.
     :param dt: dt to resample to.
     :param a_lanczos: Width of the Lanczos kernel.
@@ -50,7 +50,7 @@ def _get_seismogram(db, source, receiver, components, unit, dt, a_lanczos,
     try:
         st = db.get_seismograms(
             source=source, receiver=receiver, components=components,
-            kind=unit, remove_source_shift=False,
+            kind=units, remove_source_shift=False,
             reconvolve_stf=False, return_obspy_stream=True, dt=dt,
             a_lanczos=a_lanczos)
     except Exception:
@@ -134,7 +134,7 @@ class SeismogramsHandler(InstaseisRequestHandler):
     # Define the arguments for the seismogram endpoint.
     seismogram_arguments = {
         "components": {"type": str, "default": "ZNE"},
-        "unit": {"type": str, "default": "displacement"},
+        "units": {"type": str, "default": "displacement"},
         "dt": {"type": float},
         "alanczos": {"type": int, "default": 12},
         "label": {"type": str},
@@ -257,8 +257,8 @@ class SeismogramsHandler(InstaseisRequestHandler):
         args = self.parse_arguments()
 
         # Make sure the unit arguments is valid.
-        args.unit = args.unit.lower()
-        if args.unit not in ["displacement", "velocity", "acceleration"]:
+        args.units = args.units.lower()
+        if args.units not in ["displacement", "velocity", "acceleration"]:
             msg = ("Unit must be one of 'displacement', 'velocity', "
                    "or 'acceleration'")
             raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
@@ -563,7 +563,7 @@ class SeismogramsHandler(InstaseisRequestHandler):
             response = yield tornado.gen.Task(
                 _get_seismogram,
                 db=self.application.db, source=source, receiver=receiver,
-                components=components, unit=args.unit, dt=args.dt,
+                components=components, units=args.units, dt=args.dt,
                 a_lanczos=args.alanczos, starttime=args.starttime,
                 endtime=args.endtime, format=args.format,
                 label=args.label)
