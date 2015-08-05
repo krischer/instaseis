@@ -2688,3 +2688,14 @@ def test_time_settings_for_seismograms_route(all_clients):
         assert tr.stats.starttime == origin_time - 1800
         assert tr.stats.endtime == org_endtime
         np.testing.assert_allclose(tr.data[:100], np.zeros(100))
+
+
+def test_event_route_with_no_event_callback(all_clients):
+    """
+    If no event information callback has been set, the event route should
+    return 404.
+    """
+    client = all_clients
+    request = client.fetch("/event?id=B071791B")
+    assert request.code == 404
+    assert request.reason == 'Server does not support event information.'
