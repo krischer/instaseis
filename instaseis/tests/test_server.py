@@ -561,7 +561,7 @@ def test_seismograms_error_handling(all_clients):
     request = client.fetch(_assemble_url(**params))
     assert request.code == 400
     assert request.reason == \
-        "Required parameter 'sourcelatitude' not given."
+        "No/insufficient source parameters specified"
 
     # Invalid type.
     params = copy.deepcopy(basic_parameters)
