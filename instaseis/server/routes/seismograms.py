@@ -38,7 +38,7 @@ def _get_seismogram(db, source, receiver, components, unit, dt, a_lanczos,
     :param a_lanczos: Width of the Lanczos kernel.
     :param starttime: The desired start time of the seismogram.
     :param endtime: The desired end time of the seismogram.
-    :param format: The output format. Either "mseed" or "saczip".
+    :param format: The output format. Either "miniseed" or "saczip".
     :param label: Prefix for the filename within the SAC zip file.
     :param callback: callback function of the coroutine.
     """
@@ -79,7 +79,7 @@ def _get_seismogram(db, source, receiver, components, unit, dt, a_lanczos,
     # Trim, potentially pad with zeroes.
     st.trim(starttime, endtime, pad=True, fill_value=0.0, nearest_sample=False)
 
-    if format == "mseed":
+    if format == "miniseed":
         with io.BytesIO() as fh:
             st.write(fh, format="mseed")
             fh.seek(0, 0)
@@ -184,7 +184,7 @@ class SeismogramsHandler(InstaseisRequestHandler):
         "network": {"type": str},
         "station": {"type": str},
 
-        "format": {"type": str, "default": "mseed"}
+        "format": {"type": str, "default": "miniseed"}
     }
 
     def __init__(self, *args, **kwargs):
@@ -265,8 +265,8 @@ class SeismogramsHandler(InstaseisRequestHandler):
 
         # Make sure the output format is valid.
         args.format = args.format.lower()
-        if args.format not in ("mseed", "saczip"):
-            msg = ("Format must either be 'mseed' or 'saczip'.")
+        if args.format not in ("miniseed", "saczip"):
+            msg = ("Format must either be 'miniseed' or 'saczip'.")
             raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
         # Make sure that dt, if given is larger then 0.01. This should still
@@ -475,14 +475,14 @@ class SeismogramsHandler(InstaseisRequestHandler):
                 msg = "No/insufficient source parameters specified"
                 raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
-        if args.format == "mseed":
+        if args.format == "miniseed":
             content_type = "application/octet-stream"
         elif args.format == "saczip":
             content_type = "application/zip"
         self.set_header("Content-Type", content_type)
 
         FILE_ENDINGS_MAP = {
-            "mseed": "mseed",
+            "miniseed": "mseed",
             "saczip": "zip"}
 
         if args.label:

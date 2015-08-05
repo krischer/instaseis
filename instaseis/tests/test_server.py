@@ -1437,7 +1437,7 @@ def test_output_formats(all_clients):
 
     # Specifying the miniseed format also work.
     params = copy.deepcopy(basic_parameters)
-    params["format"] = "mseed"
+    params["format"] = "miniseed"
     request = client.fetch(_assemble_url(**params))
     st = obspy.read(request.buffer)
     for tr in st:
@@ -1502,7 +1502,7 @@ def test_output_formats(all_clients):
 
     # Specifying the miniseed format also work.
     params = copy.deepcopy(basic_parameters)
-    params["format"] = "mseed"
+    params["format"] = "miniseed"
     request = client.fetch(_assemble_url(**params))
     st = obspy.read(request.buffer)
     for tr in st:
@@ -2049,7 +2049,7 @@ def test_multiple_seismograms_retrieval_mseed_format(
     db = instaseis.open_db(client.filepath)
 
     basic_parameters = {"sourcelatitude": 10, "sourcelongitude": 10,
-                        "format": "mseed"}
+                        "format": "miniseed"}
 
     # Various sources.
     mt = {"mtt": "100000", "mpp": "100000", "mrr": "100000",
@@ -2441,7 +2441,7 @@ def test_multiple_seismograms_retrieval_invalid_format(
 
     request = client.fetch(_assemble_url(**params))
     assert request.code == 400
-    assert request.reason == "Format must either be 'mseed' or 'saczip'."
+    assert request.reason == "Format must either be 'miniseed' or 'saczip'."
 
 
 def test_multiple_seismograms_retrieval_no_stations(
