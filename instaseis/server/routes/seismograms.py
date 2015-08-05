@@ -312,6 +312,33 @@ class SeismogramsHandler(InstaseisRequestHandler):
 
         info = self.application.db.info
 
+        src_params = {
+            "moment_tensor": set(["mrr", "mtt", "mpp", "mrt", "mrp",
+                                  "mtp"]),
+            "strike_dip_rake": set(["strike", "dip", "rake", "M0"]),
+            "force_source": set(["fr", "ft", "fp"])
+        }
+
+        if args.event_id is not None:
+            # If the event id is given, the origin time cannot be given as
+            # well.
+            if args.origintime is not None:
+                msg = ("'event_id' and 'origintime' parameters cannot both be "
+                       "passed at the same time.")
+                raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+
+            # If the event_id is given, all the other source parameters must
+            # be None.
+            all_src_params = set([_i for _j in src_params.values()
+                                  for _i in _j])
+            given_params = [_i for _i in all_src_params
+                            if getattr(args, _i) is not None]
+            if given_params:
+                msg = ("The following parameters cannot be used if "
+                       "'event_id' is a parameter: %s" % ', '.join(
+                        "'%s'" % i for i in sorted(given_params)))
+                raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+
         # Start time and origin time. If either is not set, one will be set
         # to the other. If neither is set, both will be set to posix timestamp
         # 0.
@@ -363,68 +390,67 @@ class SeismogramsHandler(InstaseisRequestHandler):
 
         components = list(args.components)
 
-        # Figure out the type of source and construct the source object.
-        src_params = {
-            "moment_tensor": set(["mrr", "mtt", "mpp", "mrt", "mrp",
-                                  "mtp"]),
-            "strike_dip_rake": set(["strike", "dip", "rake", "M0"]),
-            "force_source": set(["fr", "ft", "fp"])
-        }
-
-        for src_type, params in src_params.items():
-            src_params = [getattr(args, _i) for _i in params]
-            if None in src_params:
-                continue
-            elif src_type == "moment_tensor":
-                try:
-                    source = Source(latitude=args.sourcelatitude,
-                                    longitude=args.sourcelongitude,
-                                    depth_in_m=args.sourcedepthinm,
-                                    m_rr=args.mrr, m_tt=args.mtt,
-                                    m_pp=args.mpp, m_rt=args.mrt,
-                                    m_rp=args.mrp, m_tp=args.mtp,
-                                    origin_time=args.origintime)
-                except:
-                    msg = ("Could not construct moment tensor source with "
-                           "passed parameters. Check parameters for sanity.")
-                    raise tornado.web.HTTPError(400, log_message=msg,
-                                                reason=msg)
-                break
-            elif src_type == "strike_dip_rake":
-                try:
-                    source = Source.from_strike_dip_rake(
-                        latitude=args.sourcelatitude,
-                        longitude=args.sourcelongitude,
-                        depth_in_m=args.sourcedepthinm,
-                        strike=args.strike, dip=args.dip, rake=args.rake,
-                        M0=args.M0, origin_time=args.origintime)
-                except:
-                    msg = ("Could not construct the source from the passed "
-                           "strike/dip/rake parameters. Check parameter for "
-                           "sanity.")
-                    raise tornado.web.HTTPError(400, log_message=msg,
-                                                reason=msg)
-                break
-            elif src_type == "force_source":
-                try:
-                    source = ForceSource(latitude=args.sourcelatitude,
-                                         longitude=args.sourcelongitude,
-                                         depth_in_m=args.sourcedepthinm,
-                                         f_r=args.fr, f_t=args.ft,
-                                         f_p=args.fp,
-                                         origin_time=args.origintime)
-                except:
-                    msg = ("Could not construct force source with passed "
-                           "parameters. Check parameters for sanity.")
-                    raise tornado.web.HTTPError(400, log_message=msg,
-                                                reason=msg)
-                break
-            else:
-                # Cannot really happen.
-                raise NotImplementedError
+        # Source can be either directly specified or by passing an event id.
+        if args.event_id is not None:
+            # If the event_id is
+            all_src_params = set([_i for _j in src_params.values()
+                                  for _i in _j])
         else:
-            msg = "No/insufficient source parameters specified"
-            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+            for src_type, params in src_params.items():
+                src_params = [getattr(args, _i) for _i in params]
+                if None in src_params:
+                    continue
+                elif src_type == "moment_tensor":
+                    try:
+                        source = Source(latitude=args.sourcelatitude,
+                                        longitude=args.sourcelongitude,
+                                        depth_in_m=args.sourcedepthinm,
+                                        m_rr=args.mrr, m_tt=args.mtt,
+                                        m_pp=args.mpp, m_rt=args.mrt,
+                                        m_rp=args.mrp, m_tp=args.mtp,
+                                        origin_time=args.origintime)
+                    except:
+                        msg = ("Could not construct moment tensor source with "
+                               "passed parameters. Check parameters for "
+                               "sanity.")
+                        raise tornado.web.HTTPError(400, log_message=msg,
+                                                    reason=msg)
+                    break
+                elif src_type == "strike_dip_rake":
+                    try:
+                        source = Source.from_strike_dip_rake(
+                            latitude=args.sourcelatitude,
+                            longitude=args.sourcelongitude,
+                            depth_in_m=args.sourcedepthinm,
+                            strike=args.strike, dip=args.dip, rake=args.rake,
+                            M0=args.M0, origin_time=args.origintime)
+                    except:
+                        msg = ("Could not construct the source from the "
+                               "passed strike/dip/rake parameters. Check "
+                               "parameter for sanity.")
+                        raise tornado.web.HTTPError(400, log_message=msg,
+                                                    reason=msg)
+                    break
+                elif src_type == "force_source":
+                    try:
+                        source = ForceSource(latitude=args.sourcelatitude,
+                                             longitude=args.sourcelongitude,
+                                             depth_in_m=args.sourcedepthinm,
+                                             f_r=args.fr, f_t=args.ft,
+                                             f_p=args.fp,
+                                             origin_time=args.origintime)
+                    except:
+                        msg = ("Could not construct force source with passed "
+                               "parameters. Check parameters for sanity.")
+                        raise tornado.web.HTTPError(400, log_message=msg,
+                                                    reason=msg)
+                    break
+                else:
+                    # Cannot really happen.
+                    raise NotImplementedError
+            else:
+                msg = "No/insufficient source parameters specified"
+                raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
         if args.format == "mseed":
             content_type = "application/octet-stream"
@@ -435,7 +461,6 @@ class SeismogramsHandler(InstaseisRequestHandler):
         # Generating even 100'000 receivers only takes ~150ms so its totally
         # ok to generate them all at once here. The time to generate and
         # send the seismograms will dominate.
-
         receivers = []
 
         # Construct either a single receiver object.
