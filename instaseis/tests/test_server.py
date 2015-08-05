@@ -2732,6 +2732,7 @@ def test_event_route_with_event_coordinates_callback(
         "m_tp": 315300000000000000,
         "latitude": -3.8,
         "longitude": -104.21,
+        "depth_in_m": 0,
         "origin_time": "1991-07-17T16:41:33.100000Z"}
 
 

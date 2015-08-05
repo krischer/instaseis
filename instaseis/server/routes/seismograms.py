@@ -420,7 +420,7 @@ class SeismogramsHandler(InstaseisRequestHandler):
                     try:
                         source = Source(latitude=args.sourcelatitude,
                                         longitude=args.sourcelongitude,
-                                        depth_in_m=args.sourcedepthinm,
+                                        depth_in_m=args.sourcedepthinm or 0.0,
                                         m_rr=args.mrr, m_tt=args.mtt,
                                         m_pp=args.mpp, m_rt=args.mrt,
                                         m_rp=args.mrp, m_tp=args.mtp,
@@ -437,7 +437,7 @@ class SeismogramsHandler(InstaseisRequestHandler):
                         source = Source.from_strike_dip_rake(
                             latitude=args.sourcelatitude,
                             longitude=args.sourcelongitude,
-                            depth_in_m=args.sourcedepthinm,
+                            depth_in_m=args.sourcedepthinm or 0.0,
                             strike=args.strike, dip=args.dip, rake=args.rake,
                             M0=args.M0, origin_time=args.origintime)
                     except:
@@ -449,12 +449,12 @@ class SeismogramsHandler(InstaseisRequestHandler):
                     break
                 elif src_type == "force_source":
                     try:
-                        source = ForceSource(latitude=args.sourcelatitude,
-                                             longitude=args.sourcelongitude,
-                                             depth_in_m=args.sourcedepthinm,
-                                             f_r=args.fr, f_t=args.ft,
-                                             f_p=args.fp,
-                                             origin_time=args.origintime)
+                        source = ForceSource(
+                            latitude=args.sourcelatitude,
+                            longitude=args.sourcelongitude,
+                            depth_in_m=args.sourcedepthinm or 0.0,
+                            f_r=args.fr, f_t=args.ft, f_p=args.fp,
+                            origin_time=args.origintime)
                     except:
                         msg = ("Could not construct force source with passed "
                                "parameters. Check parameters for sanity.")
