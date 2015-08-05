@@ -24,7 +24,7 @@ from .base_instaseis_db import BaseInstaseisDB, DEFAULT_MU
 
 from future import standard_library
 with standard_library.hooks():
-    from urllib.parse import urlunparse, urlencode, urlparse
+    from urllib.parse import urlencode, urlparse
 
 
 class RemoteInstaseisDB(BaseInstaseisDB):
@@ -135,8 +135,13 @@ class RemoteInstaseisDB(BaseInstaseisDB):
     def _get_url(self, path, **kwargs):
         if self._path:
             path = "/" + self._path + "/" + path
-        return urlunparse((self._scheme, self._netloc, path, None,
-                           urlencode(kwargs), None))
+
+        url = "%s://%s" % (self._scheme, self._netloc)
+        if path:
+            url += "/%s" % path
+        if kwargs:
+            url += "?%s" % urlencode(kwargs)
+        return url
 
     def _download_url(self, url, unpack_json=False):
         """
