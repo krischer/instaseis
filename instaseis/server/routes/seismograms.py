@@ -23,7 +23,7 @@ from ..instaseis_request import InstaseisRequestHandler
 
 @run_async
 def _get_seismogram(db, source, receiver, components, unit, dt, a_lanczos,
-                    starttime, endtime, format, callback):
+                    starttime, endtime, format, label, callback):
     """
     Extract a seismogram from the passed db and write it either to a MiniSEED
     or a SACZIP file.
@@ -38,9 +38,15 @@ def _get_seismogram(db, source, receiver, components, unit, dt, a_lanczos,
     :param a_lanczos: Width of the Lanczos kernel.
     :param starttime: The desired start time of the seismogram.
     :param endtime: The desired end time of the seismogram.
-    :param format:
+    :param format: The output format. Either "mseed" or "saczip".
+    :param label: Prefix for the filename within the SAC zip file.
     :param callback: callback function of the coroutine.
     """
+    if not label:
+        label = ""
+    else:
+        label += "_"
+
     try:
         st = db.get_seismograms(
             source=source, receiver=receiver, components=components,
@@ -86,7 +92,7 @@ def _get_seismogram(db, source, receiver, components, unit, dt, a_lanczos,
             with io.BytesIO() as temp:
                 tr.write(temp, format="sac")
                 temp.seek(0, 0)
-                filename = "%s.sac" % tr.id
+                filename = "%s%s.sac" % (label, tr.id)
                 byte_strings.append((filename, temp.read()))
         callback(byte_strings)
     else:
@@ -131,6 +137,7 @@ class SeismogramsHandler(InstaseisRequestHandler):
         "unit": {"type": str, "default": "displacement"},
         "dt": {"type": float},
         "alanczos": {"type": int, "default": 5},
+        "label": {"type": str},
 
         # Source parameters.
         "sourcelatitude": {"type": float},
@@ -541,7 +548,8 @@ class SeismogramsHandler(InstaseisRequestHandler):
                 db=self.application.db, source=source, receiver=receiver,
                 components=components, unit=args.unit, dt=args.dt,
                 a_lanczos=args.alanczos, starttime=args.starttime,
-                endtime=args.endtime, format=args.format)
+                endtime=args.endtime, format=args.format,
+                label=args.label)
 
             if isinstance(response, Exception):
                 raise response
@@ -566,7 +574,13 @@ class SeismogramsHandler(InstaseisRequestHandler):
             "mseed": "mseed",
             "saczip": "zip"}
 
-        filename = "instaseis_seismogram_%s.%s" % (
+        if args.label:
+            label = args.label
+        else:
+            label = "instaseis_seismogram"
+
+        filename = "%s_%s.%s" % (
+            label,
             str(obspy.UTCDateTime()).replace(":", "_"),
             FILE_ENDINGS_MAP[args.format])
 
