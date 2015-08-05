@@ -156,6 +156,9 @@ class SeismogramsHandler(InstaseisRequestHandler):
         "ft": {"type": float},
         "fp": {"type": float},
 
+        # Or last but not least by specifying an event id.
+        "event_id": {"type": str},
+
         # 5 parameters influence the final times of the returned seismograms.
         "origintime": {"type": obspy.UTCDateTime},
         "starttime": {"type": obspy.UTCDateTime},
@@ -298,14 +301,6 @@ class SeismogramsHandler(InstaseisRequestHandler):
                    "station queries.")
             raise tornado.web.HTTPError(404, log_message=msg, reason=msg)
 
-        # Figure out the type of source and construct the source object.
-        src_params = {
-            "moment_tensor": set(["mrr", "mtt", "mpp", "mrt", "mrp",
-                                  "mtp"]),
-            "strike_dip_rake": set(["strike", "dip", "rake", "M0"]),
-            "force_source": set(["fr", "ft", "fp"])
-        }
-
         if len(args.components) > 5:
             msg = "A maximum of 5 components can be requested."
             raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
@@ -366,6 +361,15 @@ class SeismogramsHandler(InstaseisRequestHandler):
             raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
         components = list(args.components)
+
+        # Figure out the type of source and construct the source object.
+        src_params = {
+            "moment_tensor": set(["mrr", "mtt", "mpp", "mrt", "mrp",
+                                  "mtp"]),
+            "strike_dip_rake": set(["strike", "dip", "rake", "M0"]),
+            "force_source": set(["fr", "ft", "fp"])
+        }
+
         for src_type, params in src_params.items():
             src_params = [getattr(args, _i) for _i in params]
             if None in src_params:
