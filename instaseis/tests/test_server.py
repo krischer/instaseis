@@ -1652,6 +1652,36 @@ def test_cors_headers(all_clients_all_callbacks):
     assert request.headers["Access-Control-Allow-Origin"] == "*"
 
 
+def test_cors_headers_failing_requests(all_clients_all_callbacks):
+    """
+    Check that all routes return CORS headers also for failing requests.
+    """
+    client = all_clients_all_callbacks
+
+    request = client.fetch("/coordinates")
+    assert request.code == 400
+    assert "Access-Control-Allow-Origin" in request.headers
+    assert request.headers["Access-Control-Allow-Origin"] == "*"
+
+    request = client.fetch("/event")
+    assert request.code == 400
+    assert "Access-Control-Allow-Origin" in request.headers
+    assert request.headers["Access-Control-Allow-Origin"] == "*"
+
+    # raw seismograms route
+    params = {}
+    request = client.fetch(_assemble_url_raw(**params))
+    assert request.code == 400
+    assert "Access-Control-Allow-Origin" in request.headers
+    assert request.headers["Access-Control-Allow-Origin"] == "*"
+
+    # standard seismograms route
+    request = client.fetch(_assemble_url(**params))
+    assert request.code == 400
+    assert "Access-Control-Allow-Origin" in request.headers
+    assert request.headers["Access-Control-Allow-Origin"] == "*"
+
+
 def test_multiple_seismograms_retrieval_no_format_given(
         all_clients_station_coordinates_callback):
     """
