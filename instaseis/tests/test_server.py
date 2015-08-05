@@ -2798,3 +2798,20 @@ def test_station_query_no_callback(all_clients):
     assert request.reason == (
         "Server does not support station coordinates and thus no station "
         "queries.")
+
+
+def test_event_query_no_callbacks(all_clients):
+    """
+    Test the error message when no event callback is available.
+    """
+    client = all_clients
+
+    params = {"receiverlatitude": 10, "receiverlongitude": 10}
+
+    p = copy.deepcopy(params)
+    p["event_id"] = "B071791B"
+
+    request = client.fetch(_assemble_url(**p))
+    assert request.code == 404
+    assert request.reason == (
+        "Server does not support event information and thus no event queries.")

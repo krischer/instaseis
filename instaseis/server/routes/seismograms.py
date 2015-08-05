@@ -133,8 +133,8 @@ class SeismogramsHandler(InstaseisRequestHandler):
         "alanczos": {"type": int, "default": 5},
 
         # Source parameters.
-        "sourcelatitude": {"type": float, "required": True},
-        "sourcelongitude": {"type": float, "required": True},
+        "sourcelatitude": {"type": float},
+        "sourcelongitude": {"type": float},
         "sourcedepthinm": {"type": float, "default": 0.0},
 
         # Source can either be given as the moment tensor components in Nm.
@@ -320,6 +320,10 @@ class SeismogramsHandler(InstaseisRequestHandler):
         }
 
         if args.event_id is not None:
+            if not self.application.event_info_callback:
+                msg = ("Server does not support event information and thus no "
+                       "event queries.")
+                raise tornado.web.HTTPError(404, log_message=msg, reason=msg)
             # If the event id is given, the origin time cannot be given as
             # well.
             if args.origintime is not None:
