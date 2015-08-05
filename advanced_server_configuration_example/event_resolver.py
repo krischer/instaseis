@@ -23,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
+import copy
 import json
 import obspy
 import os
@@ -88,7 +89,7 @@ def get_event_information(event_id, filename):
     if event_id not in events:
         raise EventNotFoundError
 
-    event = events[event_id]
+    event = copy.deepcopy(events[event_id])
     event["origin_time"] = obspy.UTCDateTime(event["origin_time"])
     return event
 
