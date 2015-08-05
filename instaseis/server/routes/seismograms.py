@@ -277,9 +277,10 @@ class SeismogramsHandler(InstaseisRequestHandler):
             raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
         # Figure out who the station coordinates are specified.
-        direct_receiver_settings = [args.receiverlatitude,
-                                    args.receiverlongitude]
-        query_receivers = [args.network, args.station]
+        direct_receiver_settings = [
+            i is not None
+            for i in (args.receiverlatitude, args.receiverlongitude)]
+        query_receivers = [i is not None for i in (args.network, args.station)]
         if any(direct_receiver_settings) and any(query_receivers):
             msg = ("Receiver coordinates can either be specified by passing "
                    "the coordinates, or by specifying query parameters, "

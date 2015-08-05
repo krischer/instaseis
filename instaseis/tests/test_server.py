@@ -2733,3 +2733,47 @@ def test_event_route_with_event_coordinates_callback(
         "latitude": -3.8,
         "longitude": -104.21,
         "origin_time": "1991-07-17T16:41:33.100000Z"}
+
+
+def test_station_query_various_failures(
+        all_clients_station_coordinates_callback):
+    """
+    The station query can fail for various reasons.
+    """
+    client = all_clients_station_coordinates_callback
+
+    params = {"sourcelatitude": 10, "sourcelongitude": 10, "mtt": "100000",
+              "mpp": "100000", "mrr": "100000", "mrt": "100000",
+              "mrp": "100000", "mtp": "100000"}
+
+    # It fails if receiver coordinates and query params are passed.
+    p = copy.deepcopy(params)
+    p["network"] = "IU,B*"
+    p["station"] = "ANT*,ANM?"
+    p["receiverlatitude"] = 1.0
+
+    request = client.fetch(_assemble_url(**p))
+    assert request.code == 400
+    assert request.reason == (
+        "Receiver coordinates can either be specified by passing "
+        "the coordinates, or by specifying query parameters, "
+        "but not both.")
+
+    # It also fails if only one part is given.
+    p = copy.deepcopy(params)
+    p["network"] = "IU,B*"
+
+    request = client.fetch(_assemble_url(**p))
+    assert request.code == 400
+    assert request.reason == (
+        "Must specify a full set of coordinates or a full set of receiver "
+        "parameters.")
+
+    # It also fails if it does not find any networks and stations.
+    p = copy.deepcopy(params)
+    p["network"] = "X*"
+    p["station"] = "Y*"
+
+    request = client.fetch(_assemble_url(**p))
+    assert request.code == 404
+    assert request.reason == ("No coordinates found satisfying the query.")
