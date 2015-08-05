@@ -2896,3 +2896,14 @@ def test_event_parameters_by_querying(all_clients_event_callback):
         assert tr.stats == tr_db.stats
         np.testing.assert_allclose(tr.data, tr_db.data,
                                    atol=tr.data.ptp() / 1E9)
+
+    # Also perform a mock comparison to test the actually created object.
+    with mock.patch("instaseis.instaseis_db.InstaseisDB.get_seismograms") \
+            as patch:
+        _st = obspy.read()
+        for tr in _st:
+            tr.stats.starttime = source.origin_time - 0.01
+        patch.return_value = _st
+        client.fetch(_assemble_url(**p))
+
+    assert patch.call_args[1]["source"] == source
