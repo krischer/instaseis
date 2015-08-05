@@ -129,6 +129,24 @@ DBS["db_fwd"] = os.path.join(DATA, "100s_db_fwd")
 DBS["db_fwd_deep"] = os.path.join(DATA, "100s_db_fwd_deep")
 
 
+def event_info_mock_callback(event_id):
+    """
+    Mock the event info callback for the purpose of testing.
+    """
+    if event_id == "B071791B":
+        {"m_rr": -58000000000000000,
+         "m_tt": 78100000000000000,
+         "m_pp": -20100000000000000,
+         "m_rt": -56500000000000000,
+         "m_rp": 108100000000000000,
+         "m_tp": 315300000000000000,
+         "latitude": -3.8,
+         "longitude": -104.21,
+         "origin_time": "1991-07-17T16:41:33.100000Z"}
+    else:
+        raise ValueError
+
+
 def station_coordinates_mock_callback(networks, stations):
     """
     Mock station coordinates callback for the purpose of testing.
@@ -158,10 +176,12 @@ def station_coordinates_mock_callback(networks, stations):
         return []
 
 
-def create_async_client(path, station_coordinates_callback):
+def create_async_client(path, station_coordinates_callback=None,
+                        event_info_callback=None):
     application = get_application()
     application.db = InstaseisDB(path)
     application.station_coordinates_callback = station_coordinates_callback
+    application.event_info_callback = event_info_callback
     # Build server as in testing:311
     sock, port = bind_unused_port()
     server = HTTPServer(application, io_loop=IOLoop.instance())
@@ -189,6 +209,16 @@ def all_clients_station_coordinates_callback(request):
     return create_async_client(
         request.param,
         station_coordinates_callback=station_coordinates_mock_callback)
+
+
+@pytest.fixture(params=list(DBS.values()))
+def all_clients_event_callback(request):
+    """
+    Fixture returning all with a event info callback.
+    """
+    return create_async_client(
+        request.param,
+        event_info_callback=event_info_mock_callback)
 
 
 def _add_callback(client):
