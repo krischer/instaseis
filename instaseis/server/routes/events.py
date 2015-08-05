@@ -19,12 +19,12 @@ class EventHandler(InstaseisRequestHandler):
             raise tornado.web.HTTPError(
                 404, log_message=msg, reason=msg)
 
-        if "event_id" not in self.request.arguments:
+        if "id" not in self.request.arguments:
             msg = "'event_id' argument is required."
             raise tornado.web.HTTPError(
                 400, log_message=msg, reason=msg)
 
-        event_id = self.get_argument("event_id")
+        event_id = self.get_argument("id")
 
         try:
             event = self.application.event_info_callback(event_id)

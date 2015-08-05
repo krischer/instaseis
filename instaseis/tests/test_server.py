@@ -1623,7 +1623,7 @@ def test_cors_headers(all_clients_all_callbacks):
     assert "Access-Control-Allow-Origin" in request.headers
     assert request.headers["Access-Control-Allow-Origin"] == "*"
 
-    request = client.fetch("/event?event_id=B071791B")
+    request = client.fetch("/event?id=B071791B")
     assert request.code == 200
     assert "Access-Control-Allow-Origin" in request.headers
     assert request.headers["Access-Control-Allow-Origin"] == "*"
