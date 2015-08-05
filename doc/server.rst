@@ -174,7 +174,7 @@ REST-like API Documentation
 
 If you wish to use the Instaseis Server without the Python client this
 documentation might be helpful. The Instaseis server offers a REST-like API
-with currently four endpoints only supporting GET.
+with currently five endpoints only supporting GET.
 
 .. contents:: Endpoints
     :local:
@@ -245,6 +245,44 @@ Example Response
             "user": "di29kub on login05",
             "velocity_model": "ak135f",
         }
+
+GET /coordinates
+^^^^^^^^^^^^^^^^
+
+Description
+    Station coordinates if the server has been configured with them.
+
+Content-Type
+    application/json; charset=UTF-8
+
+Example Response
+    .. code-block:: json
+
+        {
+            "count": 2,
+            "stations": [
+                {
+                    "latitude": 39.868,
+                    "longitude": 32.7934,
+                    "network": "IU",
+                    "station": "ANTO"
+                },
+                {
+                    "latitude": 34.94591,
+                    "longitude": -106.4572,
+                    "network": "IU",
+                    "station": "ANMO"
+                }
+            ]
+        }
+
++-------------------------+----------+----------+-----------------------------+----------------------------------------------------------------------+
+| Parameter               | Type     | Required | Default Value               | Description                                                          |
++=========================+==========+==========+=============================+======================================================================+
+| ``network``             | String   | True     |                             | Wildcarded network codes, e.g. ``I*,B?,AU``.                         |
++-------------------------+----------+----------+-----------------------------+----------------------------------------------------------------------+
+| ``station``             | String   | True     |                             | Wildcarded station codes, e.g. ``A*,ANMO``.                          |
++-------------------------+----------+----------+-----------------------------+----------------------------------------------------------------------+
 
 GET /seismograms_raw
 ^^^^^^^^^^^^^^^^^^^^
@@ -387,9 +425,9 @@ Filetype
 +-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
 | ... or by using wildcard searches over network and station codes. Potentially returns multiple stations.                                                           |
 +-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
-| ``network``             | String   | False    |                             | Wildcarded network codes, e.g. ``"I*,B?,AU"``                                        |
+| ``network``             | String   | False    |                             | Wildcarded network codes, e.g. ``I*,B?,AU``.                                         |
 +-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
-| ``station``             | String   | False    |                             | Wildcarded station codes, e.g. ``A*,ANMO``                                           |
+| ``station``             | String   | False    |                             | Wildcarded station codes, e.g. ``A*,ANMO``.                                          |
 +-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
 | Source Parameters                                                                                                                                                  |
 +-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
