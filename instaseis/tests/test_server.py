@@ -1602,11 +1602,11 @@ def test_coordinates_route_with_stations_coordinates_callback(
             "station": "ANMO"}]}
 
 
-def test_cors_headers(all_clients_station_coordinates_callback):
+def test_cors_headers(all_clients_all_callbacks):
     """
     Check that all routes return CORS headers.
     """
-    client = all_clients_station_coordinates_callback
+    client = all_clients_all_callbacks
 
     request = client.fetch("/")
     assert request.code == 200
@@ -1619,6 +1619,11 @@ def test_cors_headers(all_clients_station_coordinates_callback):
     assert request.headers["Access-Control-Allow-Origin"] == "*"
 
     request = client.fetch("/coordinates?network=IU&station=ANMO")
+    assert request.code == 200
+    assert "Access-Control-Allow-Origin" in request.headers
+    assert request.headers["Access-Control-Allow-Origin"] == "*"
+
+    request = client.fetch("/event?event_id=B071791B")
     assert request.code == 200
     assert "Access-Control-Allow-Origin" in request.headers
     assert request.headers["Access-Control-Allow-Origin"] == "*"

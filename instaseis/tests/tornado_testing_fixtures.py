@@ -134,15 +134,16 @@ def event_info_mock_callback(event_id):
     Mock the event info callback for the purpose of testing.
     """
     if event_id == "B071791B":
-        {"m_rr": -58000000000000000,
-         "m_tt": 78100000000000000,
-         "m_pp": -20100000000000000,
-         "m_rt": -56500000000000000,
-         "m_rp": 108100000000000000,
-         "m_tp": 315300000000000000,
-         "latitude": -3.8,
-         "longitude": -104.21,
-         "origin_time": "1991-07-17T16:41:33.100000Z"}
+        return {
+            "m_rr": -58000000000000000,
+            "m_tt": 78100000000000000,
+            "m_pp": -20100000000000000,
+            "m_rt": -56500000000000000,
+            "m_rp": 108100000000000000,
+            "m_tp": 315300000000000000,
+            "latitude": -3.8,
+            "longitude": -104.21,
+            "origin_time": "1991-07-17T16:41:33.100000Z"}
     else:
         raise ValueError
 
