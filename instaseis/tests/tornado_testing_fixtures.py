@@ -221,6 +221,17 @@ def all_clients_event_callback(request):
         event_info_callback=event_info_mock_callback)
 
 
+@pytest.fixture(params=list(DBS.values()))
+def all_clients_all_callbacks(request):
+    """
+    Fixture returning all clients with all callbacks.
+    """
+    return create_async_client(
+        request.param,
+        station_coordinates_callback=station_coordinates_mock_callback,
+        event_info_callback=event_info_mock_callback)
+
+
 def _add_callback(client):
     def request_callback(request):
         req = client.fetch(request.path_url)
