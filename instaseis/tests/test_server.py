@@ -2815,3 +2815,39 @@ def test_event_query_no_callbacks(all_clients):
     assert request.code == 404
     assert request.reason == (
         "Server does not support event information and thus no event queries.")
+
+
+def test_event_query_various_failures(all_clients_event_callback):
+    """
+    Various failure states of the event_id queries.
+    """
+    client = all_clients_event_callback
+
+    params = {"receiverlatitude": 10, "receiverlongitude": 10}
+
+    p = copy.deepcopy(params)
+    p["event_id"] = "B071791B"
+    p["mrt"] = 10.01
+    p["sourcelatitude"] = -20
+    p["sourcelongitude"] = -20
+    p["sourcedepthinm"] = -20
+
+    # Cannot not pass other source parameters along.
+    request = client.fetch(_assemble_url(**p))
+    assert request.code == 400
+    assert request.reason == (
+        "The following parameters cannot be used if 'event_id' is a "
+        "parameter: 'mrt', 'sourcedepthinm', 'sourcelatitude', "
+        "'sourcelongitude'")
+
+    # Neither can the origin time be specified.
+    p = copy.deepcopy(params)
+    p["event_id"] = "B071791B"
+    p["origintime"] = obspy.UTCDateTime(2014, 1, 1)
+
+    # Cannot not pass other source parameters along.
+    request = client.fetch(_assemble_url(**p))
+    assert request.code == 400
+    assert request.reason == (
+        "'event_id' and 'origintime' parameters cannot both be passed at the "
+        "same time.")

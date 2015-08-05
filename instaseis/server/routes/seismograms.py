@@ -335,6 +335,9 @@ class SeismogramsHandler(InstaseisRequestHandler):
             # be None.
             all_src_params = set([_i for _j in src_params.values()
                                   for _i in _j])
+            all_src_params.add("sourcelatitude")
+            all_src_params.add("sourcelongitude")
+            all_src_params.add("sourcedepthinm")
             given_params = [_i for _i in all_src_params
                             if getattr(args, _i) is not None]
             if given_params:
