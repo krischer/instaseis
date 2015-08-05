@@ -481,6 +481,23 @@ class SeismogramsHandler(InstaseisRequestHandler):
             content_type = "application/zip"
         self.set_header("Content-Type", content_type)
 
+        FILE_ENDINGS_MAP = {
+            "mseed": "mseed",
+            "saczip": "zip"}
+
+        if args.label:
+            label = args.label
+        else:
+            label = "instaseis_seismogram"
+
+        filename = "%s_%s.%s" % (
+            label,
+            str(obspy.UTCDateTime()).replace(":", "_"),
+            FILE_ENDINGS_MAP[args.format])
+
+        self.set_header("Content-Disposition",
+                        "attachment; filename=%s" % filename)
+
         # Generating even 100'000 receivers only takes ~150ms so its totally
         # ok to generate them all at once here. The time to generate and
         # send the seismograms will dominate.
@@ -570,20 +587,4 @@ class SeismogramsHandler(InstaseisRequestHandler):
             for data in buf:
                 self.write(data)
 
-        FILE_ENDINGS_MAP = {
-            "mseed": "mseed",
-            "saczip": "zip"}
-
-        if args.label:
-            label = args.label
-        else:
-            label = "instaseis_seismogram"
-
-        filename = "%s_%s.%s" % (
-            label,
-            str(obspy.UTCDateTime()).replace(":", "_"),
-            FILE_ENDINGS_MAP[args.format])
-
-        self.set_header("Content-Disposition",
-                        "attachment; filename=%s" % filename)
         self.finish()

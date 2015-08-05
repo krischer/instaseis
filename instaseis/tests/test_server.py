@@ -2920,3 +2920,84 @@ def test_event_query_seismogram_non_existent_event(all_clients_event_callback):
     request = client.fetch(_assemble_url(**params))
     assert request.code == 404
     assert request.reason == "Event not found."
+
+
+def test_label_parameter(all_clients):
+    """
+    Test the 'label' parameter of the /seismograms route.
+    """
+    prefix = "attachment; filename="
+    client = all_clients
+
+    params = {"sourcelatitude": 10, "sourcelongitude": 10, "mtt": "100000",
+              "mpp": "100000", "mrr": "100000", "mrt": "100000",
+              "mrp": "100000", "mtp": "100000", "receiverlatitude": 20,
+              "receiverlongitude": 20}
+
+    # No specified label will result in it having a generic label.
+    p = copy.deepcopy(params)
+
+    request = client.fetch(_assemble_url(**p))
+    assert request.code == 200
+
+    filename = request.headers["Content-Disposition"]
+    assert filename.startswith(prefix)
+
+    filename = filename[len(prefix):]
+    assert filename.startswith("instaseis_seismogram_")
+    assert filename.endswith(".mseed")
+
+    # The same is true if saczip is used but in that case the ending is zip
+    # and all the files inside have the trace id as the name.
+    p = copy.deepcopy(params)
+    p["format"] = "saczip"
+
+    request = client.fetch(_assemble_url(**p))
+    assert request.code == 200
+
+    filename = request.headers["Content-Disposition"]
+    assert filename.startswith(prefix)
+
+    filename = filename[len(prefix):]
+    assert filename.startswith("instaseis_seismogram_")
+    assert filename.endswith(".zip")
+
+    with zipfile.ZipFile(request.buffer) as fh:
+        names = fh.namelist()
+
+    assert sorted(names) == sorted(["...LXZ.sac", "...LXN.sac", "...LXE.sac"])
+
+    # Now pass one. It will replace the filename prefix.
+    p = copy.deepcopy(params)
+    p["label"] = "Tohoku"
+
+    request = client.fetch(_assemble_url(**p))
+    assert request.code == 200
+
+    filename = request.headers["Content-Disposition"]
+    assert filename.startswith(prefix)
+
+    filename = filename[len(prefix):]
+    assert filename.startswith("Tohoku_")
+    assert filename.endswith(".mseed")
+
+    # Same for saczip and also the files in the zip should change.
+    p = copy.deepcopy(params)
+    p["format"] = "saczip"
+    p["label"] = "Tohoku"
+
+    request = client.fetch(_assemble_url(**p))
+    assert request.code == 200
+
+    filename = request.headers["Content-Disposition"]
+    assert filename.startswith(prefix)
+
+    filename = filename[len(prefix):]
+    assert filename.startswith("Tohoku_")
+    assert filename.endswith(".zip")
+
+    with zipfile.ZipFile(request.buffer) as fh:
+        names = fh.namelist()
+
+    assert sorted(names) == sorted([
+        "Tohoku_...LXZ.sac", "Tohoku_...LXN.sac", "Tohoku_...LXE.sac"])
