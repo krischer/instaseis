@@ -2907,3 +2907,16 @@ def test_event_parameters_by_querying(all_clients_event_callback):
         client.fetch(_assemble_url(**p))
 
     assert patch.call_args[1]["source"] == source
+
+
+def test_event_query_seismogram_non_existent_event(all_clients_event_callback):
+    """
+    Tests querying for an event that is not found.
+    """
+    client = all_clients_event_callback
+
+    params = {"receiverlatitude": 10, "receiverlongitude": 10,
+              "event_id": "bogus"}
+    request = client.fetch(_assemble_url(**params))
+    assert request.code == 404
+    assert request.reason == "Event not found."
