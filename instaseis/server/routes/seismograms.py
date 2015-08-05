@@ -135,7 +135,7 @@ class SeismogramsHandler(InstaseisRequestHandler):
         # Source parameters.
         "sourcelatitude": {"type": float},
         "sourcelongitude": {"type": float},
-        "sourcedepthinm": {"type": float, "default": 0.0},
+        "sourcedepthinm": {"type": float},
 
         # Source can either be given as the moment tensor components in Nm.
         "mrr": {"type": float},
@@ -346,6 +346,16 @@ class SeismogramsHandler(InstaseisRequestHandler):
                         "'%s'" % i for i in sorted(given_params)))
                 raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
+            # It has to be extracted here to get the origin time. This
+            # results in a bit of spaghetti code but that's just how it is...
+            try:
+                __event = self.application.event_info_callback(args.event_id)
+            except ValueError:
+                msg = "Event not found."
+                raise tornado.web.HTTPError(404, log_message=msg, reason=msg)
+            __event["origin_time"] = obspy.UTCDateTime(__event["origin_time"])
+            args.origintime = __event["origin_time"]
+
         # Start time and origin time. If either is not set, one will be set
         # to the other. If neither is set, both will be set to posix timestamp
         # 0.
@@ -399,9 +409,8 @@ class SeismogramsHandler(InstaseisRequestHandler):
 
         # Source can be either directly specified or by passing an event id.
         if args.event_id is not None:
-            # If the event_id is
-            all_src_params = set([_i for _j in src_params.values()
-                                  for _i in _j])
+            # Use previously extracted event information.
+            source = Source(**__event)
         else:
             for src_type, params in src_params.items():
                 src_params = [getattr(args, _i) for _i in params]

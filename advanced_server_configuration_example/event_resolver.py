@@ -64,6 +64,7 @@ def create_event_json_file(output_filename):
         events[gcmt_id] = {
             "latitude": float(origin.latitude),
             "longitude": float(origin.longitude),
+            "depth_in_m": float(origin.depth),
             "origin_time": str(origin.time),
             "m_rr": mt.m_rr,
             "m_tt": mt.m_tt,

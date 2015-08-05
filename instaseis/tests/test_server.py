@@ -2851,3 +2851,47 @@ def test_event_query_various_failures(all_clients_event_callback):
     assert request.reason == (
         "'event_id' and 'origintime' parameters cannot both be passed at the "
         "same time.")
+
+
+def test_event_parameters_by_querying(all_clients_event_callback):
+    """
+    Test the query by event_id.
+    """
+    client = all_clients_event_callback
+    db = instaseis.open_db(client.filepath)
+
+    params = {"receiverlatitude": 10, "receiverlongitude": 10}
+
+    p = copy.deepcopy(params)
+    p["event_id"] = "B071791B"
+
+    request = client.fetch(_assemble_url(**p))
+    assert request.code == 200
+    st = obspy.read(request.buffer)
+
+    # Test it against a manually queried seismogram.
+    source = instaseis.Source(
+        latitude=-3.8,
+        longitude=-104.21,
+        depth_in_m=0,
+        m_pp=-20100000000000000,
+        m_rt=-56500000000000000,
+        m_rp=108100000000000000,
+        m_rr=-58000000000000000,
+        m_tp=315300000000000000,
+        m_tt=78100000000000000,
+        origin_time=obspy.UTCDateTime("1991-07-17T16:41:33.100000Z"))
+    receiver = instaseis.Receiver(latitude=10, longitude=10, depth_in_m=0.0)
+
+    st_db = db.get_seismograms(source=source, receiver=receiver)
+
+    for tr, tr_db in zip(st, st_db):
+        del tr.stats._format
+        del tr.stats.mseed
+        del tr_db.stats.instaseis
+
+        np.testing.assert_allclose([tr.stats.delta], [tr_db.stats.delta])
+        tr.stats.delta = tr_db.stats.delta
+        assert tr.stats == tr_db.stats
+        np.testing.assert_allclose(tr.data, tr_db.data,
+                                   atol=tr.data.ptp() / 1E9)
