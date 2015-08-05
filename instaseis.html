@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Main Instaseis Classes &mdash; instaseis 0.0.1a-147-g92f3 documentation</title>
+    <title>Main Instaseis Classes &mdash; instaseis 0.0.1a-262-ge03f documentation</title>
     
     <link rel="stylesheet" href="_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.0.1a-147-g92f3',
+        VERSION:     '0.0.1a-262-ge03f',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -31,7 +31,7 @@
     <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="_static/bootstrap-3.3.4/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.0.1a-147-g92f3 documentation" href="index.html" />
+    <link rel="top" title="instaseis 0.0.1a-262-ge03f documentation" href="index.html" />
     <link rel="next" title="Instaseis Server" href="server.html" />
     <link rel="prev" title="Instaseis: Instant Global Seismograms Based on a Broadband Waveform Database" href="index.html" />
 <meta charset='utf-8'>
@@ -53,7 +53,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-147-g92f3</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-262-ge03f</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -194,9 +194,10 @@ containing any combination of <code class="docutils literal"><span class="pre">&
 <code class="docutils literal"><span class="pre">&quot;R&quot;</span></code>, and <code class="docutils literal"><span class="pre">&quot;T&quot;</span></code>.</li>
 <li><strong>kind</strong> (<em>str, optional</em>) &#8211; The desired units of the seismogram:
 <code class="docutils literal"><span class="pre">&quot;displacement&quot;</span></code>, <code class="docutils literal"><span class="pre">&quot;velocity&quot;</span></code>, or <code class="docutils literal"><span class="pre">&quot;acceleration&quot;</span></code>.</li>
-<li><strong>remove_source_shift</strong> (<em>bool, optional</em>) &#8211; Move the starttime of the seismogram to
+<li><strong>remove_source_shift</strong> (<em>bool, optional</em>) &#8211; Move the start time of the seismogram to
 the peak of the sliprate from the source time function used to
-generate the database.</li>
+generate the database. This has the effect that the first sample
+is at the time of the origin time in the seismogram if available.</li>
 <li><strong>reconvolve_stf</strong> (<em>bool, optional</em>) &#8211; Deconvolve the source time function used in
 the AxiSEM run and convolve with the STF attached to the source.
 For this to be stable, the new STF needs to bandlimited.</li>
