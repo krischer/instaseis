@@ -130,6 +130,25 @@ class IOQueue(object):
         raise StopIteration
 
 
+def _tolist(value, count):
+    value = [float(i) for i in value.split(",")]
+    if len(value) not in count:
+        raise ValueError
+    return value
+
+
+def _momenttensor(value):
+    return _tolist(value, (6,))
+
+
+def _doublecouple(value):
+    return _tolist(value, (3, 4))
+
+
+def _forcesource(value):
+    return _tolist(value, (3,))
+
+
 class SeismogramsHandler(InstaseisRequestHandler):
     # Define the arguments for the seismogram endpoint.
     seismogram_arguments = {
@@ -145,28 +164,16 @@ class SeismogramsHandler(InstaseisRequestHandler):
         "sourcedepthinm": {"type": float},
 
         # Source can either be given as the moment tensor components in Nm.
-        "mrr": {"type": float},
-        "mtt": {"type": float},
-        "mpp": {"type": float},
-        "mrt": {"type": float},
-        "mrp": {"type": float},
-        "mtp": {"type": float},
-
+        "sourcemomenttensor": {"type": _momenttensor},
         # Or as strike, dip, rake and M0.
-        "strike": {"type": float},
-        "dip": {"type": float},
-        "rake": {"type": float},
-        "M0": {"type": float},
-
+        "sourcedoublecouple": {"type": _doublecouple},
         # Or as a force source.
-        "fr": {"type": float},
-        "ft": {"type": float},
-        "fp": {"type": float},
+        "sourceforce": {"type": _forcesource},
 
         # Or last but not least by specifying an event id.
         "event_id": {"type": str},
 
-        # 5 parameters influence the final times of the returned seismograms.
+        # Time parameters.
         "origintime": {"type": obspy.UTCDateTime},
         "starttime": {"type": obspy.UTCDateTime},
         "endtime": {"type": obspy.UTCDateTime},
@@ -190,12 +197,6 @@ class SeismogramsHandler(InstaseisRequestHandler):
     def __init__(self, *args, **kwargs):
         self.__connection_closed = False
         InstaseisRequestHandler.__init__(self, *args, **kwargs)
-        self.src_params = {
-            "moment_tensor": set(["mrr", "mtt", "mpp", "mrt", "mrp",
-                                  "mtp"]),
-            "strike_dip_rake": set(["strike", "dip", "rake", "M0"]),
-            "force_source": set(["fr", "ft", "fp"])
-        }
 
     def parse_arguments(self):
         # Make sure that no additional arguments are passed.
@@ -263,7 +264,8 @@ class SeismogramsHandler(InstaseisRequestHandler):
 
     def validate_parameters(self, args):
         """
-        Some simple validations collected here.
+        Function attempting to validate that the passed parameters are
+        valid. Does not need to check the types as that has already been done.
         """
         # Make sure the unit arguments is valid.
         args.units = args.units.lower()
@@ -292,6 +294,11 @@ class SeismogramsHandler(InstaseisRequestHandler):
             msg = ("`alanczos` must not be smaller than 1 or larger than 20.")
             raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
+        all_src_params = set(["sourcemomenttensor", "sourcedoublecouple",
+                              "sourceforce", "sourcelatitude",
+                              "sourcelongitude", "sourcedepthinm"])
+        given_params = set([_i for _i in all_src_params
+                            if getattr(args, _i) is not None])
         if args.event_id is not None:
             if not self.application.event_info_callback:
                 msg = ("Server does not support event information and thus no "
@@ -306,19 +313,46 @@ class SeismogramsHandler(InstaseisRequestHandler):
 
             # If the event_id is given, all the other source parameters must
             # be None.
-            all_src_params = set([_i for _j in self.src_params.values()
-                                  for _i in _j])
-            all_src_params.add("sourcelatitude")
-            all_src_params.add("sourcelongitude")
-            all_src_params.add("sourcedepthinm")
-            given_params = [_i for _i in all_src_params
-                            if getattr(args, _i) is not None]
             if given_params:
                 msg = ("The following parameters cannot be used if "
                        "'event_id' is a parameter: %s" % ', '.join(
                         "'%s'" % i for i in sorted(given_params)))
-
                 raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+        # Otherwise the source locations and exactly one of the other values
+        # has to set!
+        else:
+            if not given_params:
+                msg = "No source specified"
+                raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+            # Needs all of these.
+            required_parameters = set(["sourcelatitude", "sourcelongitude",
+                                       "sourcedepthinm"])
+            # And exactly one of these.
+            one_off = set(["sourcemomenttensor", "sourcedoublecouple",
+                           "sourceforce", "eventid"])
+
+            missing_parameters = required_parameters.difference(given_params)
+            if missing_parameters:
+                msg = "The following required parameters are missing: %s" % (
+                    ", ".join("'%s'" % _i
+                              for _i in sorted(missing_parameters)))
+                raise tornado.web.HTTPError(
+                    400, log_message=msg, reason=msg)
+
+            has_parameters = given_params.intersection(one_off)
+            if len(has_parameters) > 1:
+                msg = "Only one of these parameters can be given " \
+                      "simultaneously: %s" % (
+                        ", ".join("'%s'" % _i
+                                  for _i in sorted(has_parameters)))
+                raise tornado.web.HTTPError(
+                    400, log_message=msg, reason=msg)
+            elif not has_parameters:
+                msg = "One of the following has to be given: %s" % (
+                          ", ".join("'%s'" % _i
+                                    for _i in sorted(one_off)))
+                raise tornado.web.HTTPError(
+                    400, log_message=msg, reason=msg)
 
         # Figure out who the station coordinates are specified.
         direct_receiver_settings = [
@@ -359,59 +393,60 @@ class SeismogramsHandler(InstaseisRequestHandler):
         if args.event_id is not None:
             # Use previously extracted event information.
             source = Source(**__event)
+        # Otherwise parse it to one of the supported source types.
         else:
-            for src_type, params in self.src_params.items():
-                src_params = [getattr(args, _i) for _i in params]
-                if None in src_params:
-                    continue
-                elif src_type == "moment_tensor":
-                    try:
-                        source = Source(latitude=args.sourcelatitude,
-                                        longitude=args.sourcelongitude,
-                                        depth_in_m=args.sourcedepthinm or 0.0,
-                                        m_rr=args.mrr, m_tt=args.mtt,
-                                        m_pp=args.mpp, m_rt=args.mrt,
-                                        m_rp=args.mrp, m_tp=args.mtp,
-                                        origin_time=args.origintime)
-                    except:
-                        msg = ("Could not construct moment tensor source with "
-                               "passed parameters. Check parameters for "
-                               "sanity.")
-                        raise tornado.web.HTTPError(400, log_message=msg,
-                                                    reason=msg)
-                    break
-                elif src_type == "strike_dip_rake":
-                    try:
-                        source = Source.from_strike_dip_rake(
-                            latitude=args.sourcelatitude,
-                            longitude=args.sourcelongitude,
-                            depth_in_m=args.sourcedepthinm or 0.0,
-                            strike=args.strike, dip=args.dip, rake=args.rake,
-                            M0=args.M0, origin_time=args.origintime)
-                    except:
-                        msg = ("Could not construct the source from the "
-                               "passed strike/dip/rake parameters. Check "
-                               "parameter for sanity.")
-                        raise tornado.web.HTTPError(400, log_message=msg,
-                                                    reason=msg)
-                    break
-                elif src_type == "force_source":
-                    try:
-                        source = ForceSource(
-                            latitude=args.sourcelatitude,
-                            longitude=args.sourcelongitude,
-                            depth_in_m=args.sourcedepthinm or 0.0,
-                            f_r=args.fr, f_t=args.ft, f_p=args.fp,
-                            origin_time=args.origintime)
-                    except:
-                        msg = ("Could not construct force source with passed "
-                               "parameters. Check parameters for sanity.")
-                        raise tornado.web.HTTPError(400, log_message=msg,
-                                                    reason=msg)
-                    break
+            if args.sourcemomenttensor:
+                m = args.sourcemomenttensor
+                try:
+                    source = Source(latitude=args.sourcelatitude,
+                                    longitude=args.sourcelongitude,
+                                    depth_in_m=args.sourcedepthinm,
+                                    m_rr=m[0], m_tt=m[1],
+                                    m_pp=m[2], m_rt=m[3],
+                                    m_rp=m[4], m_tp=m[5],
+                                    origin_time=args.origintime)
+                except:
+                    msg = ("Could not construct moment tensor source with "
+                           "passed parameters. Check parameters for "
+                           "sanity.")
+                    raise tornado.web.HTTPError(400, log_message=msg,
+                                                reason=msg)
+            elif args.sourcedoublecouple:
+                m = args.sourcedoublecouple
+
+                # The seismic moment defaults to 1E19.
+                if len(m) == 4:
+                    m0 = m[3]
                 else:
-                    # Cannot really happen.
-                    raise NotImplementedError
+                    m0 = 1E19
+
+                try:
+                    source = Source.from_strike_dip_rake(
+                        latitude=args.sourcelatitude,
+                        longitude=args.sourcelongitude,
+                        depth_in_m=args.sourcedepthinm,
+                        strike=m[0], dip=m[1], rake=m[2],
+                        M0=m0, origin_time=args.origintime)
+                except:
+                    msg = ("Could not construct the source from the "
+                           "passed strike/dip/rake parameters. Check "
+                           "parameter for sanity.")
+                    raise tornado.web.HTTPError(400, log_message=msg,
+                                                reason=msg)
+            elif args.sourceforce:
+                m = args.sourceforce
+                try:
+                    source = ForceSource(
+                        latitude=args.sourcelatitude,
+                        longitude=args.sourcelongitude,
+                        depth_in_m=args.sourcedepthinm,
+                        f_r=m[0], f_t=m[1], f_p=m[2],
+                        origin_time=args.origintime)
+                except:
+                    msg = ("Could not construct force source with passed "
+                           "parameters. Check parameters for sanity.")
+                    raise tornado.web.HTTPError(400, log_message=msg,
+                                                reason=msg)
             else:
                 msg = "No/insufficient source parameters specified"
                 raise tornado.web.HTTPError(400, log_message=msg, reason=msg)

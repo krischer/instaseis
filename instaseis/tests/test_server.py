@@ -552,6 +552,7 @@ def test_seismograms_error_handling(all_clients):
     basic_parameters = {
         "sourcelatitude": 10,
         "sourcelongitude": 10,
+        "sourcedepthinm": 0,
         "receiverlatitude": -10,
         "receiverlongitude": -10}
 
@@ -561,7 +562,7 @@ def test_seismograms_error_handling(all_clients):
     request = client.fetch(_assemble_url(**params))
     assert request.code == 400
     assert request.reason == \
-        "No/insufficient source parameters specified"
+        "The following required parameters are missing: 'sourcelatitude'"
 
     # Invalid type.
     params = copy.deepcopy(basic_parameters)
@@ -574,29 +575,21 @@ def test_seismograms_error_handling(all_clients):
     # No source.
     request = client.fetch(_assemble_url(**basic_parameters))
     assert request.code == 400
-    assert request.reason == "No/insufficient source parameters specified"
+    assert request.reason == (
+        "One of the following has to be given: 'eventid', "
+        "'sourcedoublecouple', 'sourceforce', 'sourcemomenttensor'")
 
     # Invalid receiver.
     params = copy.deepcopy(basic_parameters)
     params["receiverlatitude"] = "100"
-    params["mtt"] = "100000"
-    params["mpp"] = "100000"
-    params["mrr"] = "100000"
-    params["mrt"] = "100000"
-    params["mrp"] = "100000"
-    params["mtp"] = "100000"
+    params["sourcemomenttensor"] = "100000,100000,100000,100000,100000,100000"
     request = client.fetch(_assemble_url(**params))
     assert request.code == 400
     assert "could not construct receiver with " in request.reason.lower()
 
     # Invalid MT source.
     params = copy.deepcopy(basic_parameters)
-    params["mtt"] = "100000"
-    params["mpp"] = "100000"
-    params["mrr"] = "100000"
-    params["mrt"] = "100000"
-    params["mrp"] = "100000"
-    params["mtp"] = "100000"
+    params["sourcemomenttensor"] = "100000,100000,100000,100000,100000,100000"
     params["sourcelatitude"] = "100"
     request = client.fetch(_assemble_url(**params))
     assert request.code == 400
@@ -604,10 +597,7 @@ def test_seismograms_error_handling(all_clients):
 
     # Invalid strike/dip/rake
     params = copy.deepcopy(basic_parameters)
-    params["strike"] = "45"
-    params["dip"] = "45"
-    params["rake"] = "45"
-    params["M0"] = "450000"
+    params["sourcedoublecouple"] = "45,45,45,450000"
     params["sourcelatitude"] = "100"
     request = client.fetch(_assemble_url(**params))
     assert request.code == 400
@@ -617,9 +607,7 @@ def test_seismograms_error_handling(all_clients):
     # Invalid force source. It only works in displ_only mode but here it
     # fails earlier.
     params = copy.deepcopy(basic_parameters)
-    params["fr"] = "100000"
-    params["ft"] = "100000"
-    params["fp"] = "100000"
+    params["sourceforce"] = "100000,100000,100000"
     params["sourcelatitude"] = "100"
     request = client.fetch(_assemble_url(**params))
     assert request.code == 400
@@ -627,12 +615,7 @@ def test_seismograms_error_handling(all_clients):
 
     # Could not extract seismogram.
     params = copy.deepcopy(basic_parameters)
-    params["mtt"] = "100000"
-    params["mpp"] = "100000"
-    params["mrr"] = "100000"
-    params["mrt"] = "100000"
-    params["mrp"] = "100000"
-    params["mtp"] = "100000"
+    params["sourcemomenttensor"] = "100000,100000,100000,100000,100000,100000"
     params["components"] = "ABC"
     request = client.fetch(_assemble_url(**params))
     assert request.code == 400
@@ -640,12 +623,7 @@ def test_seismograms_error_handling(all_clients):
 
     # Wrong type of seismogram requested.
     params = copy.deepcopy(basic_parameters)
-    params["mtt"] = "100000"
-    params["mpp"] = "100000"
-    params["mrr"] = "100000"
-    params["mrt"] = "100000"
-    params["mrp"] = "100000"
-    params["mtp"] = "100000"
+    params["sourcemomenttensor"] = "100000,100000,100000,100000,100000,100000"
     params["units"] = "fun"
     request = client.fetch(_assemble_url(**params))
     assert request.code == 400
@@ -654,12 +632,7 @@ def test_seismograms_error_handling(all_clients):
     # dt is too small - protects the server from having to serve humongous
     # files.
     params = copy.deepcopy(basic_parameters)
-    params["mtt"] = "100000"
-    params["mpp"] = "100000"
-    params["mrr"] = "100000"
-    params["mrt"] = "100000"
-    params["mrp"] = "100000"
-    params["mtp"] = "100000"
+    params["sourcemomenttensor"] = "100000,100000,100000,100000,100000,100000"
     params["dt"] = "0.009"
     request = client.fetch(_assemble_url(**params))
     assert request.code == 400
@@ -667,23 +640,13 @@ def test_seismograms_error_handling(all_clients):
 
     # lanczos window is too wide or too narrow.
     params = copy.deepcopy(basic_parameters)
-    params["mtt"] = "100000"
-    params["mpp"] = "100000"
-    params["mrr"] = "100000"
-    params["mrt"] = "100000"
-    params["mrp"] = "100000"
-    params["mtp"] = "100000"
+    params["sourcemomenttensor"] = "100000,100000,100000,100000,100000,100000"
     params["alanczos"] = "0"
     request = client.fetch(_assemble_url(**params))
     assert request.code == 400
     assert "`alanczos` must not be smaller" in request.reason.lower()
     params = copy.deepcopy(basic_parameters)
-    params["mtt"] = "100000"
-    params["mpp"] = "100000"
-    params["mrr"] = "100000"
-    params["mrt"] = "100000"
-    params["mrp"] = "100000"
-    params["mtp"] = "100000"
+    params["sourcemomenttensor"] = "100000,100000,100000,100000,100000,100000"
     params["alanczos"] = "21"
     request = client.fetch(_assemble_url(**params))
     assert request.code == 400
@@ -691,12 +654,7 @@ def test_seismograms_error_handling(all_clients):
 
     # too many components raise to avoid abuse.
     params = copy.deepcopy(basic_parameters)
-    params["mtt"] = "100000"
-    params["mpp"] = "100000"
-    params["mrr"] = "100000"
-    params["mrt"] = "100000"
-    params["mrp"] = "100000"
-    params["mtp"] = "100000"
+    params["sourcemomenttensor"] = "100000,100000,100000,100000,100000,100000"
     params["components"] = "NNEERRTTZZ"
     request = client.fetch(_assemble_url(**params))
     assert request.code == 400
@@ -704,12 +662,7 @@ def test_seismograms_error_handling(all_clients):
 
     # At least one components must be requested.
     params = copy.deepcopy(basic_parameters)
-    params["mtt"] = "100000"
-    params["mpp"] = "100000"
-    params["mrr"] = "100000"
-    params["mrt"] = "100000"
-    params["mrp"] = "100000"
-    params["mtp"] = "100000"
+    params["sourcemomenttensor"] = "100000,100000,100000,100000,100000,100000"
     params["components"] = ""
     request = client.fetch(_assemble_url(**params))
     assert request.code == 400
@@ -725,6 +678,7 @@ def test_object_creation_for_seismogram_route(all_clients):
     basic_parameters = {
         "sourcelatitude": 10,
         "sourcelongitude": 10,
+        "sourcedepthinm": 0,
         "receiverlatitude": -10,
         "receiverlongitude": -10}
 
@@ -733,8 +687,11 @@ def test_object_creation_for_seismogram_route(all_clients):
     # Various sources.
     mt = {"mtt": "100000", "mpp": "100000", "mrr": "100000",
           "mrt": "100000", "mrp": "100000", "mtp": "100000"}
+    mt_param = "100000,100000,100000,100000,100000,100000"
     sdr = {"strike": "10", "dip": "10", "rake": "10", "M0": "1000000"}
+    sdr_param = "10,10,10,1000000"
     fs = {"fr": "100000", "ft": "100000", "fp": "100000"}
+    fs_param = "100000,100000,100000"
 
     time = obspy.UTCDateTime(2010, 1, 2, 3, 4, 5)
 
@@ -748,7 +705,7 @@ def test_object_creation_for_seismogram_route(all_clients):
 
         # Moment tensor source.
         params = copy.deepcopy(basic_parameters)
-        params.update(mt)
+        params["sourcemomenttensor"] = mt_param
         request = client.fetch(_assemble_url(**params))
         assert request.code == 200
 
@@ -816,7 +773,7 @@ def test_object_creation_for_seismogram_route(all_clients):
             tr.stats.delta = dt
 
         params = copy.deepcopy(basic_parameters)
-        params.update(sdr)
+        params["sourcedoublecouple"] = sdr_param
         request = client.fetch(_assemble_url(**params))
         assert request.code == 200
 
@@ -883,7 +840,7 @@ def test_object_creation_for_seismogram_route(all_clients):
                 tr.stats.delta = dt
 
             params = copy.deepcopy(basic_parameters)
-            params.update(fs)
+            params["sourceforce"] = fs_param
             request = client.fetch(_assemble_url(**params))
             assert request.code == 200
 
@@ -950,7 +907,7 @@ def test_object_creation_for_seismogram_route(all_clients):
             tr.stats.delta = dt
 
         params = copy.deepcopy(basic_parameters)
-        params.update(mt)
+        params["sourcemomenttensor"] = mt_param
         params["components"] = "RTE"
         request = client.fetch(_assemble_url(**params))
         assert request.code == 200
@@ -965,7 +922,7 @@ def test_object_creation_for_seismogram_route(all_clients):
 
         p.reset_mock()
         params = copy.deepcopy(basic_parameters)
-        params.update(mt)
+        params["sourcemomenttensor"] = mt_param
         params["units"] = "acceleration"
         request = client.fetch(_assemble_url(**params))
         assert request.code == 200
@@ -980,7 +937,7 @@ def test_object_creation_for_seismogram_route(all_clients):
 
         p.reset_mock()
         params = copy.deepcopy(basic_parameters)
-        params.update(mt)
+        params["sourcemomenttensor"] = mt_param
         params["units"] = "velocity"
         request = client.fetch(_assemble_url(**params))
         assert request.code == 200
@@ -995,7 +952,7 @@ def test_object_creation_for_seismogram_route(all_clients):
 
         p.reset_mock()
         params = copy.deepcopy(basic_parameters)
-        params.update(mt)
+        params["sourcemomenttensor"] = mt_param
         params["units"] = "VeLoCity"
         request = client.fetch(_assemble_url(**params))
         assert request.code == 200
@@ -1010,7 +967,7 @@ def test_object_creation_for_seismogram_route(all_clients):
 
         p.reset_mock()
         params = copy.deepcopy(basic_parameters)
-        params.update(mt)
+        params["sourcemomenttensor"] = mt_param
         params["dt"] = "0.1"
         params["alanczos"] = "20"
         request = client.fetch(_assemble_url(**params))
@@ -1031,7 +988,7 @@ def test_object_creation_for_seismogram_route(all_clients):
             tr.stats.starttime = obspy.UTCDateTime(0) - 7 * dt
             tr.stats.delta = dt
         params = copy.deepcopy(basic_parameters)
-        params.update(mt)
+        params["sourcemomenttensor"] = mt_param
         params["dt"] = "0.1"
         params["alanczos"] = "2"
         params["units"] = "ACCELERATION"
@@ -1059,6 +1016,7 @@ def test_seismograms_retrieval(all_clients):
     basic_parameters = {
         "sourcelatitude": 10,
         "sourcelongitude": 10,
+        "sourcedepthinm": 0,
         "receiverlatitude": -10,
         "receiverlongitude": -10,
         "format": "miniseed"}
@@ -1066,14 +1024,17 @@ def test_seismograms_retrieval(all_clients):
     # Various sources.
     mt = {"mtt": "100000", "mpp": "100000", "mrr": "100000",
           "mrt": "100000", "mrp": "100000", "mtp": "100000"}
+    mt_param = "100000,100000,100000,100000,100000,100000"
     sdr = {"strike": "10", "dip": "10", "rake": "10", "M0": "1000000"}
+    sdr_param = "10,10,10,1000000"
     fs = {"fr": "100000", "ft": "100000", "fp": "100000"}
+    fs_param = "100000,100000,100000"
 
     time = obspy.UTCDateTime(2010, 1, 2, 3, 4, 5)
 
     # Moment tensor source.
     params = copy.deepcopy(basic_parameters)
-    params.update(mt)
+    params["sourcemomenttensor"] = mt_param
     request = client.fetch(_assemble_url(**params))
     st_server = obspy.read(request.buffer)
 
@@ -1143,7 +1104,7 @@ def test_seismograms_retrieval(all_clients):
 
     # From strike, dip, rake
     params = copy.deepcopy(basic_parameters)
-    params.update(sdr)
+    params["sourcedoublecouple"] = sdr_param
     request = client.fetch(_assemble_url(**params))
     st_server = obspy.read(request.buffer)
 
@@ -1211,7 +1172,7 @@ def test_seismograms_retrieval(all_clients):
     # Force source only works for displ_only databases.
     if "displ_only" in client.filepath:
         params = copy.deepcopy(basic_parameters)
-        params.update(fs)
+        params["sourceforce"] = fs_param
         request = client.fetch(_assemble_url(**params))
         st_server = obspy.read(request.buffer)
 
@@ -1293,7 +1254,7 @@ def test_seismograms_retrieval(all_clients):
 
     # Now test other the other parameters.
     params = copy.deepcopy(basic_parameters)
-    params.update(mt)
+    params["sourcemomenttensor"] = mt_param
     params["components"] = "RTE"
     request = client.fetch(_assemble_url(**params))
     st_server = obspy.read(request.buffer)
@@ -1316,7 +1277,7 @@ def test_seismograms_retrieval(all_clients):
                                    atol=1E-10 * tr_server.data.ptp())
 
     params = copy.deepcopy(basic_parameters)
-    params.update(mt)
+    params["sourcemomenttensor"] = mt_param
     params["units"] = "acceleration"
     request = client.fetch(_assemble_url(**params))
     st_server = obspy.read(request.buffer)
@@ -1339,7 +1300,7 @@ def test_seismograms_retrieval(all_clients):
                                    atol=1E-10 * tr_server.data.ptp())
 
     params = copy.deepcopy(basic_parameters)
-    params.update(mt)
+    params["sourcemomenttensor"] = mt_param
     params["units"] = "velocity"
     request = client.fetch(_assemble_url(**params))
     st_server = obspy.read(request.buffer)
@@ -1362,7 +1323,7 @@ def test_seismograms_retrieval(all_clients):
                                    atol=1E-10 * tr_server.data.ptp())
 
     params = copy.deepcopy(basic_parameters)
-    params.update(mt)
+    params["sourcemomenttensor"] = mt_param
     params["dt"] = "0.1"
     params["alanczos"] = "1"
     request = client.fetch(_assemble_url(**params))
@@ -1387,7 +1348,7 @@ def test_seismograms_retrieval(all_clients):
                                    atol=1E-10 * tr_server.data.ptp())
 
     params = copy.deepcopy(basic_parameters)
-    params.update(mt)
+    params["sourcemomenttensor"] = mt_param
     params["dt"] = "0.1"
     params["alanczos"] = "2"
     params["units"] = "ACCELERATION"
@@ -1423,11 +1384,10 @@ def test_output_formats(all_clients):
     basic_parameters = {
         "sourcelatitude": 10,
         "sourcelongitude": 10,
+        "sourcedepthinm": 0,
         "receiverlatitude": -10,
-        "receiverlongitude": -10}
-    mt = {"mtt": "100000", "mpp": "100000", "mrr": "100000",
-          "mrt": "100000", "mrp": "100000", "mtp": "100000"}
-    basic_parameters.update(mt)
+        "receiverlongitude": -10,
+        "sourcemomenttensor": "100000,100000,100000,100000,100000,100000"}
 
     # First try to get a MiniSEED file.
     params = copy.deepcopy(basic_parameters)
@@ -1468,7 +1428,7 @@ def test_output_formats(all_clients):
     for tr, sac_tr in zip(st, sac_st):
         # Make sure the sampling rate is approximately equal.
         np.testing.assert_allclose(tr.stats.delta, sac_tr.stats.delta)
-        # Now set one to the other to make sure the following comparision is
+        # Now set one to the other to make sure the following comparison is
         # meaningful
         tr.stats.delta = sac_tr.stats.delta
 
@@ -1490,10 +1450,10 @@ def test_output_formats(all_clients):
     basic_parameters = {
         "sourcelatitude": 10,
         "sourcelongitude": 10,
+        "sourcedepthinm": 0,
         "receiverlatitude": -10,
         "receiverlongitude": -10}
-    mt = {"mtt": "100000", "mpp": "100000", "mrr": "100000",
-          "mrt": "100000", "mrp": "100000", "mtp": "100000",
+    mt = {"sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
           "components": "RT", "units": "velocity", "dt": 2, "alanczos": 3,
           "networkcode": "BW", "stationcode": "FURT"}
     basic_parameters.update(mt)
@@ -1663,6 +1623,13 @@ def test_cors_headers(all_clients_all_callbacks):
     assert request.headers["Access-Control-Allow-Origin"] == "*"
 
     # standard seismograms route
+    params = {
+        "sourcelatitude": 10,
+        "sourcelongitude": 10,
+        "sourcedepthinm": 0,
+        "receiverlatitude": -10,
+        "receiverlongitude": -10,
+        "sourcemomenttensor": "100000,100000,100000,100000,100000,100000"}
     request = client.fetch(_assemble_url(**params))
     assert request.code == 200
     assert "Access-Control-Allow-Origin" in request.headers
@@ -1713,19 +1680,23 @@ def test_multiple_seismograms_retrieval_no_format_given(
     client = all_clients_station_coordinates_callback
     db = instaseis.open_db(client.filepath)
 
-    basic_parameters = {"sourcelatitude": 10, "sourcelongitude": 10}
+    basic_parameters = {"sourcelatitude": 10, "sourcelongitude": 10,
+                        "sourcedepthinm": 0.0}
 
     # Various sources.
     mt = {"mtt": "100000", "mpp": "100000", "mrr": "100000",
           "mrt": "100000", "mrp": "100000", "mtp": "100000"}
+    mt_param = "100000,100000,100000,100000,100000,100000"
     sdr = {"strike": "10", "dip": "10", "rake": "10", "M0": "1000000"}
+    sdr_param = "10,10,10,1000000"
     fs = {"fr": "100000", "ft": "100000", "fp": "100000"}
+    fs_param = "100000,100000,100000"
 
     time = obspy.UTCDateTime(2010, 1, 2, 3, 4, 5)
 
     # Moment tensor source.
     params = copy.deepcopy(basic_parameters)
-    params.update(mt)
+    params["sourcemomenttensor"] = mt_param
     # This will return two stations.
     params["network"] = "IU,B*"
     params["station"] = "ANT*,ANM?"
@@ -1778,7 +1749,7 @@ def test_multiple_seismograms_retrieval_no_format_given(
 
     # Strike/dip/rake source, "RT" components
     params = copy.deepcopy(basic_parameters)
-    params.update(sdr)
+    params["sourcedoublecouple"] = sdr_param
     # This will return two stations.
     params["network"] = "IU,B*"
     params["station"] = "ANT*,ANM?"
@@ -1837,7 +1808,7 @@ def test_multiple_seismograms_retrieval_no_format_given(
     # Force source, all 5 components.
     if "displ_only" in client.filepath:
         params = copy.deepcopy(basic_parameters)
-        params.update(fs)
+        params["sourceforce"] = fs_param
         # This will return two stations.
         params["network"] = "IU,B*"
         params["station"] = "ANT*,ANM?"
@@ -1903,24 +1874,28 @@ def test_multiple_seismograms_retrieval_no_format_given_single_station(
     client = all_clients_station_coordinates_callback
     db = instaseis.open_db(client.filepath)
 
-    basic_parameters = {"sourcelatitude": 10, "sourcelongitude": 10}
+    basic_parameters = {"sourcelatitude": 10, "sourcelongitude": 10,
+                        "sourcedepthinm": 0}
 
     # Various sources.
     mt = {"mtt": "100000", "mpp": "100000", "mrr": "100000",
           "mrt": "100000", "mrp": "100000", "mtp": "100000"}
+    mt_param = "100000,100000,100000,100000,100000,100000"
     sdr = {"strike": "10", "dip": "10", "rake": "10", "M0": "1000000"}
+    sdr_param = "10,10,10,1000000"
     fs = {"fr": "100000", "ft": "100000", "fp": "100000"}
+    fs_param = "100000,100000,100000"
 
     time = obspy.UTCDateTime(2010, 1, 2, 3, 4, 5)
 
     # Moment tensor source.
     params = copy.deepcopy(basic_parameters)
-    params.update(mt)
+    params["sourcemomenttensor"] = mt_param
     # This will return two stations.
     params["network"] = "IU"
     params["station"] = "ANMO"
 
-    # Default format is MiniSEED>
+    # Default format is saczip.
     request = client.fetch(_assemble_url(**params))
     assert request.code == 200
     assert request.headers["Content-Type"] == "application/zip"
@@ -1966,7 +1941,7 @@ def test_multiple_seismograms_retrieval_no_format_given_single_station(
 
     # Strike/dip/rake source, "RT" components
     params = copy.deepcopy(basic_parameters)
-    params.update(sdr)
+    params["sourcedoublecouple"] = sdr_param
     # This will return two stations.
     params["network"] = "IU"
     params["station"] = "ANMO"
@@ -2022,7 +1997,7 @@ def test_multiple_seismograms_retrieval_no_format_given_single_station(
     # Force source, all 5 components.
     if "displ_only" in client.filepath:
         params = copy.deepcopy(basic_parameters)
-        params.update(fs)
+        params["sourceforce"] = fs_param
         # This will return two stations.
         params["network"] = "IU"
         params["station"] = "ANMO"
@@ -2084,19 +2059,22 @@ def test_multiple_seismograms_retrieval_mseed_format(
     db = instaseis.open_db(client.filepath)
 
     basic_parameters = {"sourcelatitude": 10, "sourcelongitude": 10,
-                        "format": "miniseed"}
+                        "format": "miniseed", "sourcedepthinm": 0}
 
     # Various sources.
     mt = {"mtt": "100000", "mpp": "100000", "mrr": "100000",
           "mrt": "100000", "mrp": "100000", "mtp": "100000"}
+    mt_param = "100000,100000,100000,100000,100000,100000"
     sdr = {"strike": "10", "dip": "10", "rake": "10", "M0": "1000000"}
+    sdr_param = "10,10,10,1000000"
     fs = {"fr": "100000", "ft": "100000", "fp": "100000"}
+    fs_param = "100000,100000,100000"
 
     time = obspy.UTCDateTime(2010, 1, 2, 3, 4, 5)
 
     # Moment tensor source.
     params = copy.deepcopy(basic_parameters)
-    params.update(mt)
+    params["sourcemomenttensor"] = mt_param
     # This will return two stations.
     params["network"] = "IU,B*"
     params["station"] = "ANT*,ANM?"
@@ -2147,7 +2125,7 @@ def test_multiple_seismograms_retrieval_mseed_format(
 
     # Strike/dip/rake source, "RT" components
     params = copy.deepcopy(basic_parameters)
-    params.update(sdr)
+    params["sourcedoublecouple"] = sdr_param
     # This will return two stations.
     params["network"] = "IU,B*"
     params["station"] = "ANT*,ANM?"
@@ -2203,7 +2181,7 @@ def test_multiple_seismograms_retrieval_mseed_format(
     # Force source, all 5 components.
     if "displ_only" in client.filepath:
         params = copy.deepcopy(basic_parameters)
-        params.update(fs)
+        params["sourceforce"] = fs_param
         # This will return two stations.
         params["network"] = "IU,B*"
         params["station"] = "ANT*,ANM?"
@@ -2266,19 +2244,22 @@ def test_multiple_seismograms_retrieval_saczip_format(
     db = instaseis.open_db(client.filepath)
 
     basic_parameters = {"sourcelatitude": 10, "sourcelongitude": 10,
-                        "format": "saczip"}
+                        "sourcedepthinm": 0, "format": "saczip"}
 
     # Various sources.
     mt = {"mtt": "100000", "mpp": "100000", "mrr": "100000",
           "mrt": "100000", "mrp": "100000", "mtp": "100000"}
+    mt_param = "100000,100000,100000,100000,100000,100000"
     sdr = {"strike": "10", "dip": "10", "rake": "10", "M0": "1000000"}
+    sdr_param = "10,10,10,1000000"
     fs = {"fr": "100000", "ft": "100000", "fp": "100000"}
+    fs_param = "100000,100000,100000"
 
     time = obspy.UTCDateTime(2010, 1, 2, 3, 4, 5)
 
     # Moment tensor source.
     params = copy.deepcopy(basic_parameters)
-    params.update(mt)
+    params["sourcemomenttensor"] = mt_param
     # This will return two stations.
     params["network"] = "IU,B*"
     params["station"] = "ANT*,ANM?"
@@ -2336,7 +2317,7 @@ def test_multiple_seismograms_retrieval_saczip_format(
 
     # Strike/dip/rake source, "RT" components
     params = copy.deepcopy(basic_parameters)
-    params.update(sdr)
+    params["sourcedoublecouple"] = sdr_param
     # This will return two stations.
     params["network"] = "IU,B*"
     params["station"] = "ANT*,ANM?"
@@ -2399,7 +2380,7 @@ def test_multiple_seismograms_retrieval_saczip_format(
     # Force source, all 5 components.
     if "displ_only" in client.filepath:
         params = copy.deepcopy(basic_parameters)
-        params.update(fs)
+        params["sourceforce"] = fs_param
         # This will return two stations.
         params["network"] = "IU,B*"
         params["station"] = "ANT*,ANM?"
@@ -2465,11 +2446,10 @@ def test_multiple_seismograms_retrieval_invalid_format(
     """
     client = all_clients_station_coordinates_callback
 
-    params = {"sourcelatitude": 10, "sourcelongitude": 10, "format": "bogus"}
-
-    mt = {"mtt": "100000", "mpp": "100000", "mrr": "100000",
-          "mrt": "100000", "mrp": "100000", "mtp": "100000"}
-    params.update(mt)
+    params = {
+        "sourcelatitude": 10, "sourcelongitude": 10, "sourcedepthinm": 0,
+        "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
+        "format": "bogus"}
     # This will return two stations.
     params["network"] = "IU,B*"
     params["station"] = "ANT*,ANM?"
@@ -2487,11 +2467,9 @@ def test_multiple_seismograms_retrieval_no_stations(
     """
     client = all_clients_station_coordinates_callback
 
-    params = {"sourcelatitude": 10, "sourcelongitude": 10}
-
-    mt = {"mtt": "100000", "mpp": "100000", "mrr": "100000",
-          "mrt": "100000", "mrp": "100000", "mtp": "100000"}
-    params.update(mt)
+    params = {
+        "sourcelatitude": 10, "sourcelongitude": 10, "sourcedepthinm": 0,
+        "sourcemomenttensor": "100000,100000,100000,100000,100000,100000"}
     # This will return two stations.
     params["network"] = "HE"
     params["station"] = "LLO"
@@ -2526,8 +2504,8 @@ def test_unknown_parameter_raises(all_clients):
     # Same with /seismograms route.
     params = {
         "sourcelatitude": 10, "sourcelongitude": 10, "receiverlatitude": -10,
-        "receiverlongitude": -10, "mtt": "100000", "mpp": "100000",
-        "mrr": "100000", "mrt": "100000", "mrp": "100000", "mtp": "100000"}
+        "receiverlongitude": -10, "sourcedepthinm": 0,
+        "sourcemomenttensor": "100000,100000,100000,100000,100000,100000"}
     request = client.fetch(_assemble_url(**params))
     assert request.code == 200
 
@@ -2566,18 +2544,18 @@ def test_passing_duplicate_parameter_raises(all_clients):
     # Same with /seismograms route.
     params = {
         "sourcelatitude": 10, "sourcelongitude": 10, "receiverlatitude": -10,
-        "receiverlongitude": -10, "mtt": "100000", "mpp": "100000",
-        "mrr": "100000", "mrt": "100000", "mrp": "100000", "mtp": "100000"}
+        "receiverlongitude": -10, "sourcedepthinm": 0,
+        "sourcemomenttensor": "100000,100000,100000,100000,100000,100000"}
     url = _assemble_url(**params)
     request = client.fetch(url)
     assert request.code == 200
 
     # Adding two duplicate parameters raises.
-    url += "&receiverlatitude=10&mrt=10"
+    url += "&receiverlatitude=10&sourcemomenttensor=10"
     request = client.fetch(url)
     assert request.code == 400
-    assert request.reason == ("Duplicate parameters: 'mrt', "
-                              "'receiverlatitude'")
+    assert request.reason == (
+        "Duplicate parameters: 'receiverlatitude', 'sourcemomenttensor'")
 
 
 def test_passing_invalid_time_settings_raises(all_clients):
@@ -2588,8 +2566,8 @@ def test_passing_invalid_time_settings_raises(all_clients):
     client = all_clients
     params = {
         "sourcelatitude": 10, "sourcelongitude": 10, "receiverlatitude": -10,
-        "receiverlongitude": -10, "mtt": "100000", "mpp": "100000",
-        "mrr": "100000", "mrt": "100000", "mrp": "100000", "mtp": "100000",
+        "receiverlongitude": -10, "sourcedepthinm": 0,
+        "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
         "origintime": str(origin_time)}
 
     # This should work fine.
@@ -2644,8 +2622,8 @@ def test_time_settings_for_seismograms_route(all_clients):
     # Resample to 1Hz to simplify the logic.
     params = {
         "sourcelatitude": 10, "sourcelongitude": 10, "receiverlatitude": -10,
-        "receiverlongitude": -10, "mtt": "100000", "mpp": "100000",
-        "mrr": "100000", "mrt": "100000", "mrp": "100000", "mtp": "100000",
+        "receiverlongitude": -10, "sourcedepthinm": 0,
+        "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
         "dt": 1.0, "alanczos": 1, "origintime": str(origin_time),
         "format": "miniseed"}
 
@@ -2779,9 +2757,9 @@ def test_station_query_various_failures(
     """
     client = all_clients_station_coordinates_callback
 
-    params = {"sourcelatitude": 10, "sourcelongitude": 10, "mtt": "100000",
-              "mpp": "100000", "mrr": "100000", "mrt": "100000",
-              "mrp": "100000", "mtp": "100000"}
+    params = {
+        "sourcelatitude": 10, "sourcelongitude": 10, "sourcedepthinm": 0,
+        "sourcemomenttensor": "100000,100000,100000,100000,100000,100000"}
 
     # It fails if receiver coordinates and query params are passed.
     p = copy.deepcopy(params)
@@ -2822,9 +2800,9 @@ def test_station_query_no_callback(all_clients):
     """
     client = all_clients
 
-    params = {"sourcelatitude": 10, "sourcelongitude": 10, "mtt": "100000",
-              "mpp": "100000", "mrr": "100000", "mrt": "100000",
-              "mrp": "100000", "mtp": "100000"}
+    params = {
+        "sourcelatitude": 10, "sourcelongitude": 10, "sourcedepthinm": 0,
+        "sourcemomenttensor": "100000,100000,100000,100000,100000,100000"}
 
     p = copy.deepcopy(params)
     p["network"] = "IU,B*"
@@ -2864,7 +2842,7 @@ def test_event_query_various_failures(all_clients_event_callback):
 
     p = copy.deepcopy(params)
     p["event_id"] = "B071791B"
-    p["mrt"] = 10.01
+    p["sourcemomenttensor"] = "1,1,1,1,1,1"
     p["sourcelatitude"] = -20
     p["sourcelongitude"] = -20
     p["sourcedepthinm"] = -20
@@ -2874,8 +2852,8 @@ def test_event_query_various_failures(all_clients_event_callback):
     assert request.code == 400
     assert request.reason == (
         "The following parameters cannot be used if 'event_id' is a "
-        "parameter: 'mrt', 'sourcedepthinm', 'sourcelatitude', "
-        "'sourcelongitude'")
+        "parameter: 'sourcedepthinm', 'sourcelatitude', "
+        "'sourcelongitude', 'sourcemomenttensor'")
 
     # Neither can the origin time be specified.
     p = copy.deepcopy(params)
@@ -2966,10 +2944,10 @@ def test_label_parameter(all_clients):
     prefix = "attachment; filename="
     client = all_clients
 
-    params = {"sourcelatitude": 10, "sourcelongitude": 10, "mtt": "100000",
-              "mpp": "100000", "mrr": "100000", "mrt": "100000",
-              "mrp": "100000", "mtp": "100000", "receiverlatitude": 20,
-              "receiverlongitude": 20, "format": "miniseed"}
+    params = {
+        "sourcelatitude": 10, "sourcelongitude": 10, "sourcedepthinm": 0,
+        "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
+        "receiverlatitude": 20, "receiverlongitude": 20, "format": "miniseed"}
 
     # No specified label will result in it having a generic label.
     p = copy.deepcopy(params)
