@@ -552,7 +552,7 @@ def test_seismograms_error_handling(all_clients):
     basic_parameters = {
         "sourcelatitude": 10,
         "sourcelongitude": 10,
-        "sourcedepthinm": 0,
+        "sourcedepthinmeters": 0,
         "receiverlatitude": -10,
         "receiverlongitude": -10}
 
@@ -678,7 +678,7 @@ def test_object_creation_for_seismogram_route(all_clients):
     basic_parameters = {
         "sourcelatitude": 10,
         "sourcelongitude": 10,
-        "sourcedepthinm": 0,
+        "sourcedepthinmeters": 0,
         "receiverlatitude": -10,
         "receiverlongitude": -10}
 
@@ -731,9 +731,9 @@ def test_object_creation_for_seismogram_route(all_clients):
         # Moment tensor source with a couple more parameters.
         p.reset_mock()
 
-        params["sourcedepthinm"] = "5.0"
+        params["sourcedepthinmeters"] = "5.0"
         params["origintime"] = str(time)
-        params["receiverdepthinm"] = "55.0"
+        params["receiverdepthinmeters"] = "55.0"
         params["networkcode"] = "BW"
         params["stationcode"] = "ALTM"
 
@@ -803,9 +803,9 @@ def test_object_creation_for_seismogram_route(all_clients):
             tr.stats.starttime = time - 1 - 7 * dt
             tr.stats.delta = dt
 
-        params["sourcedepthinm"] = "5.0"
+        params["sourcedepthinmeters"] = "5.0"
         params["origintime"] = str(time)
-        params["receiverdepthinm"] = "55.0"
+        params["receiverdepthinmeters"] = "55.0"
         params["networkcode"] = "BW"
         params["stationcode"] = "ALTM"
 
@@ -870,9 +870,9 @@ def test_object_creation_for_seismogram_route(all_clients):
                 tr.stats.starttime = time - 1 - 7 * dt
                 tr.stats.delta = dt
 
-            params["sourcedepthinm"] = "5.0"
+            params["sourcedepthinmeters"] = "5.0"
             params["origintime"] = str(time)
-            params["receiverdepthinm"] = "55.0"
+            params["receiverdepthinmeters"] = "55.0"
             params["networkcode"] = "BW"
             params["stationcode"] = "ALTM"
 
@@ -1016,7 +1016,7 @@ def test_seismograms_retrieval(all_clients):
     basic_parameters = {
         "sourcelatitude": 10,
         "sourcelongitude": 10,
-        "sourcedepthinm": 0,
+        "sourcedepthinmeters": 0,
         "receiverlatitude": -10,
         "receiverlongitude": -10,
         "format": "miniseed"}
@@ -1067,9 +1067,9 @@ def test_seismograms_retrieval(all_clients):
         np.testing.assert_allclose(tr_server.data, tr_db.data,
                                    atol=1E-10 * tr_server.data.ptp())
 
-    params["sourcedepthinm"] = "5.0"
+    params["sourcedepthinmeters"] = "5.0"
     params["origintime"] = str(time)
-    params["receiverdepthinm"] = "55.0"
+    params["receiverdepthinmeters"] = "55.0"
     params["networkcode"] = "BW"
     params["stationcode"] = "ALTM"
     request = client.fetch(_assemble_url(**params))
@@ -1134,9 +1134,9 @@ def test_seismograms_retrieval(all_clients):
                                    atol=1E-10 * tr_server.data.ptp())
 
     # Moment tensor source with a couple more parameters.
-    params["sourcedepthinm"] = "5.0"
+    params["sourcedepthinmeters"] = "5.0"
     params["origintime"] = str(time)
-    params["receiverdepthinm"] = "55.0"
+    params["receiverdepthinmeters"] = "55.0"
     params["networkcode"] = "BW"
     params["stationcode"] = "ALTM"
 
@@ -1204,9 +1204,9 @@ def test_seismograms_retrieval(all_clients):
             np.testing.assert_allclose(tr_server.data, tr_db.data,
                                        atol=1E-10 * tr_server.data.ptp())
 
-        params["sourcedepthinm"] = "5.0"
+        params["sourcedepthinmeters"] = "5.0"
         params["origintime"] = str(time)
-        params["receiverdepthinm"] = "55.0"
+        params["receiverdepthinmeters"] = "55.0"
         params["networkcode"] = "BW"
         params["stationcode"] = "ALTM"
 
@@ -1384,7 +1384,7 @@ def test_output_formats(all_clients):
     basic_parameters = {
         "sourcelatitude": 10,
         "sourcelongitude": 10,
-        "sourcedepthinm": 0,
+        "sourcedepthinmeters": 0,
         "receiverlatitude": -10,
         "receiverlongitude": -10,
         "sourcemomenttensor": "100000,100000,100000,100000,100000,100000"}
@@ -1450,7 +1450,7 @@ def test_output_formats(all_clients):
     basic_parameters = {
         "sourcelatitude": 10,
         "sourcelongitude": 10,
-        "sourcedepthinm": 0,
+        "sourcedepthinmeters": 0,
         "receiverlatitude": -10,
         "receiverlongitude": -10}
     mt = {"sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
@@ -1626,7 +1626,7 @@ def test_cors_headers(all_clients_all_callbacks):
     params = {
         "sourcelatitude": 10,
         "sourcelongitude": 10,
-        "sourcedepthinm": 0,
+        "sourcedepthinmeters": 0,
         "receiverlatitude": -10,
         "receiverlongitude": -10,
         "sourcemomenttensor": "100000,100000,100000,100000,100000,100000"}
@@ -1681,7 +1681,7 @@ def test_multiple_seismograms_retrieval_no_format_given(
     db = instaseis.open_db(client.filepath)
 
     basic_parameters = {"sourcelatitude": 10, "sourcelongitude": 10,
-                        "sourcedepthinm": 0.0}
+                        "sourcedepthinmeters": 0.0}
 
     # Various sources.
     mt = {"mtt": "100000", "mpp": "100000", "mrr": "100000",
@@ -1755,7 +1755,7 @@ def test_multiple_seismograms_retrieval_no_format_given(
     params["station"] = "ANT*,ANM?"
     params["components"] = "RT"
     # A couple more parameters.
-    params["sourcedepthinm"] = "5.0"
+    params["sourcedepthinmeters"] = "5.0"
     params["origintime"] = str(time)
 
     # Default format is MiniSEED>
@@ -1875,7 +1875,7 @@ def test_multiple_seismograms_retrieval_no_format_given_single_station(
     db = instaseis.open_db(client.filepath)
 
     basic_parameters = {"sourcelatitude": 10, "sourcelongitude": 10,
-                        "sourcedepthinm": 0}
+                        "sourcedepthinmeters": 0}
 
     # Various sources.
     mt = {"mtt": "100000", "mpp": "100000", "mrr": "100000",
@@ -1947,7 +1947,7 @@ def test_multiple_seismograms_retrieval_no_format_given_single_station(
     params["station"] = "ANMO"
     params["components"] = "RT"
     # A couple more parameters.
-    params["sourcedepthinm"] = "5.0"
+    params["sourcedepthinmeters"] = "5.0"
     params["origintime"] = str(time)
 
     # Default format is MiniSEED>
@@ -2059,7 +2059,7 @@ def test_multiple_seismograms_retrieval_mseed_format(
     db = instaseis.open_db(client.filepath)
 
     basic_parameters = {"sourcelatitude": 10, "sourcelongitude": 10,
-                        "format": "miniseed", "sourcedepthinm": 0}
+                        "format": "miniseed", "sourcedepthinmeters": 0}
 
     # Various sources.
     mt = {"mtt": "100000", "mpp": "100000", "mrr": "100000",
@@ -2131,7 +2131,7 @@ def test_multiple_seismograms_retrieval_mseed_format(
     params["station"] = "ANT*,ANM?"
     params["components"] = "RT"
     # A couple more parameters.
-    params["sourcedepthinm"] = "5.0"
+    params["sourcedepthinmeters"] = "5.0"
     params["origintime"] = str(time)
 
     # Default format is MiniSEED>
@@ -2244,7 +2244,7 @@ def test_multiple_seismograms_retrieval_saczip_format(
     db = instaseis.open_db(client.filepath)
 
     basic_parameters = {"sourcelatitude": 10, "sourcelongitude": 10,
-                        "sourcedepthinm": 0, "format": "saczip"}
+                        "sourcedepthinmeters": 0, "format": "saczip"}
 
     # Various sources.
     mt = {"mtt": "100000", "mpp": "100000", "mrr": "100000",
@@ -2323,7 +2323,7 @@ def test_multiple_seismograms_retrieval_saczip_format(
     params["station"] = "ANT*,ANM?"
     params["components"] = "RT"
     # A couple more parameters.
-    params["sourcedepthinm"] = "5.0"
+    params["sourcedepthinmeters"] = "5.0"
     params["origintime"] = str(time)
 
     # Default format is MiniSEED>
@@ -2447,7 +2447,7 @@ def test_multiple_seismograms_retrieval_invalid_format(
     client = all_clients_station_coordinates_callback
 
     params = {
-        "sourcelatitude": 10, "sourcelongitude": 10, "sourcedepthinm": 0,
+        "sourcelatitude": 10, "sourcelongitude": 10, "sourcedepthinmeters": 0,
         "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
         "format": "bogus"}
     # This will return two stations.
@@ -2468,7 +2468,7 @@ def test_multiple_seismograms_retrieval_no_stations(
     client = all_clients_station_coordinates_callback
 
     params = {
-        "sourcelatitude": 10, "sourcelongitude": 10, "sourcedepthinm": 0,
+        "sourcelatitude": 10, "sourcelongitude": 10, "sourcedepthinmeters": 0,
         "sourcemomenttensor": "100000,100000,100000,100000,100000,100000"}
     # This will return two stations.
     params["network"] = "HE"
@@ -2504,7 +2504,7 @@ def test_unknown_parameter_raises(all_clients):
     # Same with /seismograms route.
     params = {
         "sourcelatitude": 10, "sourcelongitude": 10, "receiverlatitude": -10,
-        "receiverlongitude": -10, "sourcedepthinm": 0,
+        "receiverlongitude": -10, "sourcedepthinmeters": 0,
         "sourcemomenttensor": "100000,100000,100000,100000,100000,100000"}
     request = client.fetch(_assemble_url(**params))
     assert request.code == 200
@@ -2544,7 +2544,7 @@ def test_passing_duplicate_parameter_raises(all_clients):
     # Same with /seismograms route.
     params = {
         "sourcelatitude": 10, "sourcelongitude": 10, "receiverlatitude": -10,
-        "receiverlongitude": -10, "sourcedepthinm": 0,
+        "receiverlongitude": -10, "sourcedepthinmeters": 0,
         "sourcemomenttensor": "100000,100000,100000,100000,100000,100000"}
     url = _assemble_url(**params)
     request = client.fetch(url)
@@ -2566,7 +2566,7 @@ def test_passing_invalid_time_settings_raises(all_clients):
     client = all_clients
     params = {
         "sourcelatitude": 10, "sourcelongitude": 10, "receiverlatitude": -10,
-        "receiverlongitude": -10, "sourcedepthinm": 0,
+        "receiverlongitude": -10, "sourcedepthinmeters": 0,
         "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
         "origintime": str(origin_time)}
 
@@ -2622,7 +2622,7 @@ def test_time_settings_for_seismograms_route(all_clients):
     # Resample to 1Hz to simplify the logic.
     params = {
         "sourcelatitude": 10, "sourcelongitude": 10, "receiverlatitude": -10,
-        "receiverlongitude": -10, "sourcedepthinm": 0,
+        "receiverlongitude": -10, "sourcedepthinmeters": 0,
         "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
         "dt": 1.0, "alanczos": 1, "origintime": str(origin_time),
         "format": "miniseed"}
@@ -2758,7 +2758,7 @@ def test_station_query_various_failures(
     client = all_clients_station_coordinates_callback
 
     params = {
-        "sourcelatitude": 10, "sourcelongitude": 10, "sourcedepthinm": 0,
+        "sourcelatitude": 10, "sourcelongitude": 10, "sourcedepthinmeters": 0,
         "sourcemomenttensor": "100000,100000,100000,100000,100000,100000"}
 
     # It fails if receiver coordinates and query params are passed.
@@ -2801,7 +2801,7 @@ def test_station_query_no_callback(all_clients):
     client = all_clients
 
     params = {
-        "sourcelatitude": 10, "sourcelongitude": 10, "sourcedepthinm": 0,
+        "sourcelatitude": 10, "sourcelongitude": 10, "sourcedepthinmeters": 0,
         "sourcemomenttensor": "100000,100000,100000,100000,100000,100000"}
 
     p = copy.deepcopy(params)
@@ -2845,14 +2845,14 @@ def test_event_query_various_failures(all_clients_event_callback):
     p["sourcemomenttensor"] = "1,1,1,1,1,1"
     p["sourcelatitude"] = -20
     p["sourcelongitude"] = -20
-    p["sourcedepthinm"] = -20
+    p["sourcedepthinmeters"] = -20
 
     # Cannot not pass other source parameters along.
     request = client.fetch(_assemble_url(**p))
     assert request.code == 400
     assert request.reason == (
         "The following parameters cannot be used if 'event_id' is a "
-        "parameter: 'sourcedepthinm', 'sourcelatitude', "
+        "parameter: 'sourcedepthinmeters', 'sourcelatitude', "
         "'sourcelongitude', 'sourcemomenttensor'")
 
     # Neither can the origin time be specified.
@@ -2945,7 +2945,7 @@ def test_label_parameter(all_clients):
     client = all_clients
 
     params = {
-        "sourcelatitude": 10, "sourcelongitude": 10, "sourcedepthinm": 0,
+        "sourcelatitude": 10, "sourcelongitude": 10, "sourcedepthinmeters": 0,
         "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
         "receiverlatitude": 20, "receiverlongitude": 20, "format": "miniseed"}
 

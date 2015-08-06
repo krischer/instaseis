@@ -161,7 +161,7 @@ class SeismogramsHandler(InstaseisRequestHandler):
         # Source parameters.
         "sourcelatitude": {"type": float},
         "sourcelongitude": {"type": float},
-        "sourcedepthinm": {"type": float},
+        "sourcedepthinmeters": {"type": float},
 
         # Source can either be given as the moment tensor components in Nm.
         "sourcemomenttensor": {"type": _momenttensor},
@@ -183,7 +183,7 @@ class SeismogramsHandler(InstaseisRequestHandler):
         # In that case one can assign a network and station code.
         "receiverlatitude": {"type": float},
         "receiverlongitude": {"type": float},
-        "receiverdepthinm": {"type": float, "default": 0.0},
+        "receiverdepthinmeters": {"type": float, "default": 0.0},
         "networkcode": {"type": str},
         "stationcode": {"type": str},
 
@@ -296,7 +296,7 @@ class SeismogramsHandler(InstaseisRequestHandler):
 
         all_src_params = set(["sourcemomenttensor", "sourcedoublecouple",
                               "sourceforce", "sourcelatitude",
-                              "sourcelongitude", "sourcedepthinm"])
+                              "sourcelongitude", "sourcedepthinmeters"])
         given_params = set([_i for _i in all_src_params
                             if getattr(args, _i) is not None])
         if args.event_id is not None:
@@ -326,7 +326,7 @@ class SeismogramsHandler(InstaseisRequestHandler):
                 raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
             # Needs all of these.
             required_parameters = set(["sourcelatitude", "sourcelongitude",
-                                       "sourcedepthinm"])
+                                       "sourcedepthinmeters"])
             # And exactly one of these.
             one_off = set(["sourcemomenttensor", "sourcedoublecouple",
                            "sourceforce", "eventid"])
@@ -400,7 +400,7 @@ class SeismogramsHandler(InstaseisRequestHandler):
                 try:
                     source = Source(latitude=args.sourcelatitude,
                                     longitude=args.sourcelongitude,
-                                    depth_in_m=args.sourcedepthinm,
+                                    depth_in_m=args.sourcedepthinmeters,
                                     m_rr=m[0], m_tt=m[1],
                                     m_pp=m[2], m_rt=m[3],
                                     m_rp=m[4], m_tp=m[5],
@@ -424,7 +424,7 @@ class SeismogramsHandler(InstaseisRequestHandler):
                     source = Source.from_strike_dip_rake(
                         latitude=args.sourcelatitude,
                         longitude=args.sourcelongitude,
-                        depth_in_m=args.sourcedepthinm,
+                        depth_in_m=args.sourcedepthinmeters,
                         strike=m[0], dip=m[1], rake=m[2],
                         M0=m0, origin_time=args.origintime)
                 except:
@@ -439,7 +439,7 @@ class SeismogramsHandler(InstaseisRequestHandler):
                     source = ForceSource(
                         latitude=args.sourcelatitude,
                         longitude=args.sourcelongitude,
-                        depth_in_m=args.sourcedepthinm,
+                        depth_in_m=args.sourcedepthinmeters,
                         f_r=m[0], f_t=m[1], f_p=m[2],
                         origin_time=args.origintime)
                 except:
@@ -462,7 +462,7 @@ class SeismogramsHandler(InstaseisRequestHandler):
                                     longitude=args.receiverlongitude,
                                     network=args.networkcode,
                                     station=args.stationcode,
-                                    depth_in_m=args.receiverdepthinm)
+                                    depth_in_m=args.receiverdepthinmeters)
             except:
                 msg = ("Could not construct receiver with passed parameters. "
                        "Check parameters for sanity.")
