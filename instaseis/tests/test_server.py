@@ -2982,6 +2982,10 @@ def test_label_parameter(all_clients):
     with zipfile.ZipFile(request.buffer) as fh:
         names = fh.namelist()
 
+    zip_obj = zipfile.ZipFile(request.buffer)
+    names = zip_obj.namelist()
+    zip_obj.close()
+
     assert sorted(names) == sorted(
         ["XX.SYN..LXZ.sac", "XX.SYN..LXN.sac", "XX.SYN..LXE.sac"])
 
@@ -3014,8 +3018,9 @@ def test_label_parameter(all_clients):
     assert filename.startswith("Tohoku_")
     assert filename.endswith(".zip")
 
-    with zipfile.ZipFile(request.buffer) as fh:
-        names = fh.namelist()
+    zip_obj = zipfile.ZipFile(request.buffer)
+    names = zip_obj.namelist()
+    zip_obj.close()
 
     assert sorted(names) == sorted([
         "Tohoku_XX.SYN..LXZ.sac",
