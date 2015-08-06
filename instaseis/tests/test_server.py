@@ -3116,3 +3116,51 @@ def test_ttimes_route(all_clients_ttimes_callback):
     result = json.loads(str(request.body.decode("utf8")))
     assert list(result.keys()) == ["travel_time"]
     assert abs(result["travel_time"] - 1090.081 < 1E-2)
+
+
+def test_network_and_station_code_settings(all_clients):
+    """
+    Tests the network and station code settings.
+    """
+    client = all_clients
+
+    params = {
+        "sourcelatitude": 10, "sourcelongitude": 10, "sourcedepthinmeters": 0,
+        "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
+        "receiverlatitude": 20, "receiverlongitude": 20, "format": "miniseed"}
+
+    # Default network and station codes.
+    p = copy.deepcopy(params)
+    request = client.fetch(_assemble_url(**p))
+    assert request.code == 200
+    for tr in obspy.read(request.buffer):
+        assert tr.stats.network == "XX"
+        assert tr.stats.station == "SYN"
+
+    # Set only the network code.
+    p = copy.deepcopy(params)
+    p["networkcode"] = "BW"
+    request = client.fetch(_assemble_url(**p))
+    assert request.code == 200
+    for tr in obspy.read(request.buffer):
+        assert tr.stats.network == "BW"
+        assert tr.stats.station == "SYN"
+
+    # Set only the station code.
+    p = copy.deepcopy(params)
+    p["stationcode"] = "INS"
+    request = client.fetch(_assemble_url(**p))
+    assert request.code == 200
+    for tr in obspy.read(request.buffer):
+        assert tr.stats.network == "XX"
+        assert tr.stats.station == "INS"
+
+    # Set both.
+    p = copy.deepcopy(params)
+    p["networkcode"] = "BW"
+    p["stationcode"] = "INS"
+    request = client.fetch(_assemble_url(**p))
+    assert request.code == 200
+    for tr in obspy.read(request.buffer):
+        assert tr.stats.network == "BW"
+        assert tr.stats.station == "INS"
