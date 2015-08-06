@@ -46,6 +46,10 @@ tau_model = TauPyModel(model="ak135")
 def get_travel_time(sourcelatitude, sourcelongitude, sourcedepthinmeters,
                     receiverlatitude, receiverlongitude,
                     receiverdepthinmeters, phase_name):
+    if receiverdepthinmeters:
+        raise ValueError("This travel time implementation cannot calculate "
+                         "buried receivers.")
+
     great_circle_distance = geodetics.locations2degrees(
         sourcelatitude, sourcelongitude, receiverlatitude, receiverlongitude)
 

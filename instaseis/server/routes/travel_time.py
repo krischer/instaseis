@@ -36,14 +36,14 @@ class TravelTimeHandler(InstaseisRequestHandler):
             tt = self.application.travel_time_callback(
                 sourcelatitude=float(self.get_argument("sourcelatitude")),
                 sourcelongitude=float(self.get_argument("sourcelongitude")),
-                sourcedepthinmeters=
-                float(self.get_argument("sourcedepthinmeters")),
-                receiverlatitude =
-                float(self.get_argument("receiverlatitude")),
-                receiverlongitude =
-                float(self.get_argument("receiverlongitude")),
-                receiverdepthinmeters =
-                float(self.get_argument("receiverdepthinmeters")),
+                sourcedepthinmeters=float(
+                    self.get_argument("sourcedepthinmeters")),
+                receiverlatitude=float(
+                    self.get_argument("receiverlatitude")),
+                receiverlongitude=float(
+                    self.get_argument("receiverlongitude")),
+                receiverdepthinmeters=float(
+                    self.get_argument("receiverdepthinmeters")),
                 phase_name=self.get_argument("phase"))
         except ValueError as e:
             err_msg = str(e)

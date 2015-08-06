@@ -26,6 +26,9 @@ from tornado.ioloop import IOLoop
 from tornado.testing import AsyncHTTPClient
 from tornado.util import raise_exc_info
 
+from obspy.taup import TauPyModel
+from obspy.core.util import geodetics
+
 import instaseis
 from instaseis.server.app import get_application
 from instaseis.instaseis_db import InstaseisDB
@@ -34,6 +37,8 @@ from instaseis.instaseis_db import InstaseisDB
 # Most generic way to get the data folder path.
 DATA = os.path.join(os.path.dirname(os.path.abspath(
     inspect.getfile(inspect.currentframe()))), "data")
+
+MODEL = TauPyModel("ak135")
 
 
 class AsyncClient(object):
@@ -178,12 +183,39 @@ def station_coordinates_mock_callback(networks, stations):
         return []
 
 
+def get_travel_time(sourcelatitude, sourcelongitude, sourcedepthinmeters,
+                    receiverlatitude, receiverlongitude,
+                    receiverdepthinmeters, phase_name):
+    """
+    Fully working travel time callback implementation.
+    """
+    if receiverdepthinmeters:
+        raise ValueError("This travel time implementation cannot calculate "
+                         "buried receivers.")
+
+    great_circle_distance = geodetics.locations2degrees(
+        sourcelatitude, sourcelongitude, receiverlatitude, receiverlongitude)
+
+    tts = MODEL.get_travel_times(
+        source_depth_in_km=sourcedepthinmeters / 1000.0,
+        distance_in_degree=great_circle_distance,
+        phase_list=[phase_name])
+
+    if not tts:
+        return None
+
+    # For any phase, return the first time.
+    return tts[0].time
+
+
 def create_async_client(path, station_coordinates_callback=None,
-                        event_info_callback=None):
+                        event_info_callback=None,
+                        travel_time_callback=None):
     application = get_application()
     application.db = InstaseisDB(path)
     application.station_coordinates_callback = station_coordinates_callback
     application.event_info_callback = event_info_callback
+    application.travel_time_callback = travel_time_callback
     # Build server as in testing:311
     sock, port = bind_unused_port()
     server = HTTPServer(application, io_loop=IOLoop.instance())
@@ -224,6 +256,16 @@ def all_clients_event_callback(request):
 
 
 @pytest.fixture(params=list(DBS.values()))
+def all_clients_ttimes_callback(request):
+    """
+    Fixture returning all clients with a travel time callback.
+    """
+    return create_async_client(
+        request.param,
+        travel_time_callback=get_travel_time)
+
+
+@pytest.fixture(params=list(DBS.values()))
 def all_clients_all_callbacks(request):
     """
     Fixture returning all clients with all callbacks.
@@ -231,7 +273,8 @@ def all_clients_all_callbacks(request):
     return create_async_client(
         request.param,
         station_coordinates_callback=station_coordinates_mock_callback,
-        event_info_callback=event_info_mock_callback)
+        event_info_callback=event_info_mock_callback,
+        travel_time_callback=get_travel_time)
 
 
 def _add_callback(client):

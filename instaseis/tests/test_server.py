@@ -1637,6 +1637,14 @@ def test_cors_headers(all_clients_all_callbacks):
     assert "Access-Control-Allow-Origin" in request.headers
     assert request.headers["Access-Control-Allow-Origin"] == "*"
 
+    request = client.fetch(
+        "/ttimes?sourcelatitude=50&sourcelongitude=10&"
+        "sourcedepthinmeters=0&receiverlatitude=40&receiverlongitude=90&"
+        "receiverdepthinmeters=0&phase=P")
+    assert request.code == 200
+    assert "Access-Control-Allow-Origin" in request.headers
+    assert request.headers["Access-Control-Allow-Origin"] == "*"
+
     # raw seismograms route
     params = {
         "sourcelatitude": 10,
@@ -1673,6 +1681,11 @@ def test_cors_headers_failing_requests(all_clients_all_callbacks):
     assert request.headers["Access-Control-Allow-Origin"] == "*"
 
     request = client.fetch("/event")
+    assert request.code == 400
+    assert "Access-Control-Allow-Origin" in request.headers
+    assert request.headers["Access-Control-Allow-Origin"] == "*"
+
+    request = client.fetch("/ttimes")
     assert request.code == 400
     assert "Access-Control-Allow-Origin" in request.headers
     assert request.headers["Access-Control-Allow-Origin"] == "*"

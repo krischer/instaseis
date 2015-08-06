@@ -72,6 +72,10 @@ def launch_io_loop(db_path, port, buffer_size_in_mb, quiet, log_level,
                                  buffer_size_in_mb=buffer_size_in_mb)
     application.station_coordinates_callback = station_coordinates_callback
     application.event_info_callback = event_info_callback
+
+    # This is a callback as currently the instaseis databases don't store
+    # the 1D model so we need a way to specify the actually used model. Also
+    # gives the option to use other travel time calculation codes.
     application.travel_time_callback = travel_time_callback
 
     if not quiet:
