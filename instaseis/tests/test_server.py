@@ -2825,7 +2825,7 @@ def test_event_query_no_callbacks(all_clients):
     params = {"receiverlatitude": 10, "receiverlongitude": 10}
 
     p = copy.deepcopy(params)
-    p["event_id"] = "B071791B"
+    p["eventid"] = "B071791B"
 
     request = client.fetch(_assemble_url(**p))
     assert request.code == 404
@@ -2835,14 +2835,14 @@ def test_event_query_no_callbacks(all_clients):
 
 def test_event_query_various_failures(all_clients_event_callback):
     """
-    Various failure states of the event_id queries.
+    Various failure states of the eventid queries.
     """
     client = all_clients_event_callback
 
     params = {"receiverlatitude": 10, "receiverlongitude": 10}
 
     p = copy.deepcopy(params)
-    p["event_id"] = "B071791B"
+    p["eventid"] = "B071791B"
     p["sourcemomenttensor"] = "1,1,1,1,1,1"
     p["sourcelatitude"] = -20
     p["sourcelongitude"] = -20
@@ -2852,26 +2852,26 @@ def test_event_query_various_failures(all_clients_event_callback):
     request = client.fetch(_assemble_url(**p))
     assert request.code == 400
     assert request.reason == (
-        "The following parameters cannot be used if 'event_id' is a "
+        "The following parameters cannot be used if 'eventid' is a "
         "parameter: 'sourcedepthinmeters', 'sourcelatitude', "
         "'sourcelongitude', 'sourcemomenttensor'")
 
     # Neither can the origin time be specified.
     p = copy.deepcopy(params)
-    p["event_id"] = "B071791B"
+    p["eventid"] = "B071791B"
     p["origintime"] = obspy.UTCDateTime(2014, 1, 1)
 
     # Cannot not pass other source parameters along.
     request = client.fetch(_assemble_url(**p))
     assert request.code == 400
     assert request.reason == (
-        "'event_id' and 'origintime' parameters cannot both be passed at the "
+        "'eventid' and 'origintime' parameters cannot both be passed at the "
         "same time.")
 
 
 def test_event_parameters_by_querying(all_clients_event_callback):
     """
-    Test the query by event_id.
+    Test the query by eventid.
     """
     client = all_clients_event_callback
     db = instaseis.open_db(client.filepath)
@@ -2880,7 +2880,7 @@ def test_event_parameters_by_querying(all_clients_event_callback):
               "format": "miniseed"}
 
     p = copy.deepcopy(params)
-    p["event_id"] = "B071791B"
+    p["eventid"] = "B071791B"
 
     request = client.fetch(_assemble_url(**p))
     assert request.code == 200
@@ -2933,7 +2933,7 @@ def test_event_query_seismogram_non_existent_event(all_clients_event_callback):
     client = all_clients_event_callback
 
     params = {"receiverlatitude": 10, "receiverlongitude": 10,
-              "event_id": "bogus"}
+              "eventid": "bogus"}
     request = client.fetch(_assemble_url(**params))
     assert request.code == 404
     assert request.reason == "Event not found."

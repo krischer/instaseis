@@ -171,7 +171,7 @@ class SeismogramsHandler(InstaseisRequestHandler):
         "sourceforce": {"type": _forcesource},
 
         # Or last but not least by specifying an event id.
-        "event_id": {"type": str},
+        "eventid": {"type": str},
 
         # Time parameters.
         "origintime": {"type": obspy.UTCDateTime},
@@ -299,7 +299,7 @@ class SeismogramsHandler(InstaseisRequestHandler):
                               "sourcelongitude", "sourcedepthinmeters"])
         given_params = set([_i for _i in all_src_params
                             if getattr(args, _i) is not None])
-        if args.event_id is not None:
+        if args.eventid is not None:
             if not self.application.event_info_callback:
                 msg = ("Server does not support event information and thus no "
                        "event queries.")
@@ -307,15 +307,15 @@ class SeismogramsHandler(InstaseisRequestHandler):
             # If the event id is given, the origin time cannot be given as
             # well.
             if args.origintime is not None:
-                msg = ("'event_id' and 'origintime' parameters cannot both be "
+                msg = ("'eventid' and 'origintime' parameters cannot both be "
                        "passed at the same time.")
                 raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
-            # If the event_id is given, all the other source parameters must
+            # If the eventid is given, all the other source parameters must
             # be None.
             if given_params:
                 msg = ("The following parameters cannot be used if "
-                       "'event_id' is a parameter: %s" % ', '.join(
+                       "'eventid' is a parameter: %s" % ', '.join(
                         "'%s'" % i for i in sorted(given_params)))
                 raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
         # Otherwise the source locations and exactly one of the other values
@@ -390,7 +390,7 @@ class SeismogramsHandler(InstaseisRequestHandler):
 
     def get_source(self, args, __event):
         # Source can be either directly specified or by passing an event id.
-        if args.event_id is not None:
+        if args.eventid is not None:
             # Use previously extracted event information.
             source = Source(**__event)
         # Otherwise parse it to one of the supported source types.
@@ -581,13 +581,13 @@ class SeismogramsHandler(InstaseisRequestHandler):
     def get(self):
         args = self.parse_arguments()
 
-        if args.event_id is not None:
+        if args.eventid is not None:
             # It has to be extracted here to get the origin time which is
             # needed to parse the time settings which might in turn be
             # needed for the sources. This results in a bit of spaghetti code
             # but that's just how it is...
             try:
-                __event = self.application.event_info_callback(args.event_id)
+                __event = self.application.event_info_callback(args.eventid)
             except ValueError:
                 msg = "Event not found."
                 raise tornado.web.HTTPError(404, log_message=msg, reason=msg)
