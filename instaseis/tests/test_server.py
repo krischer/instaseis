@@ -2979,9 +2979,6 @@ def test_label_parameter(all_clients):
     assert filename.startswith("instaseis_seismogram_")
     assert filename.endswith(".zip")
 
-    with zipfile.ZipFile(request.buffer) as fh:
-        names = fh.namelist()
-
     zip_obj = zipfile.ZipFile(request.buffer)
     names = zip_obj.namelist()
     zip_obj.close()
