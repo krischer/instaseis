@@ -241,6 +241,10 @@ class SeismogramsHandler(InstaseisRequestHandler):
                     raise tornado.web.HTTPError(400, log_message=msg,
                                                 reason=msg)
             setattr(args, name, value)
+
+        # Validate some of them right here.
+        self.validate_parameters(args)
+
         return args
 
     def on_connection_close(self):
@@ -251,11 +255,10 @@ class SeismogramsHandler(InstaseisRequestHandler):
         InstaseisRequestHandler.on_connection_close(self)
         self.__connection_closed = True
 
-    @tornado.web.asynchronous
-    @tornado.gen.coroutine
-    def get(self):
-        args = self.parse_arguments()
-
+    def validate_parameters(self, args):
+        """
+        Some simple validations collected here.
+        """
         # Make sure the unit arguments is valid.
         args.units = args.units.lower()
         if args.units not in ["displacement", "velocity", "acceleration"]:
@@ -282,6 +285,11 @@ class SeismogramsHandler(InstaseisRequestHandler):
         if not (1 <= args.alanczos <= 20):
             msg = ("`alanczos` must not be smaller than 1 or larger than 20.")
             raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+
+    @tornado.web.asynchronous
+    @tornado.gen.coroutine
+    def get(self):
+        args = self.parse_arguments()
 
         # Figure out who the station coordinates are specified.
         direct_receiver_settings = [
