@@ -3095,6 +3095,16 @@ def test_ttimes_route(all_clients_ttimes_callback):
     assert request.code == 404
     assert request.reason == "No ray for the given geometry and phase found."
 
+    # Many implementations will not have a receiverdepth. This one does not.
+    request = client.fetch(
+        "/ttimes?sourcelatitude=50&sourcelongitude=10&"
+        "sourcedepthinmeters=0&receiverlatitude=40&receiverlongitude=90&"
+        "receiverdepthinmeters=20&phase=Pdiff")
+    assert request.code == 400
+    assert request.reason == ("Failed to calculate travel time due to: This "
+                              "travel time implementation cannot calculate "
+                              "buried receivers.")
+
     # Last but not least test some actual travel times.
     # No such phase at that distance.
     request = client.fetch(
