@@ -19,6 +19,7 @@ from ..instaseis_db import InstaseisDB
 
 from .routes.coordinates import CoordinatesHandler
 from .routes.events import EventHandler
+from .routes.travel_time import TravelTimeHandler
 from .routes.index import IndexHandler
 from .routes.info import InfoHandler
 from .routes.seismograms import SeismogramsHandler
@@ -38,13 +39,15 @@ def get_application():
         (r"/info", InfoHandler),
         (r"/", IndexHandler),
         (r"/coordinates", CoordinatesHandler),
-        (r"/event", EventHandler)
+        (r"/event", EventHandler),
+        (r"/ttimes", TravelTimeHandler)
     ])
 
 
 def launch_io_loop(db_path, port, buffer_size_in_mb, quiet, log_level,
                    station_coordinates_callback=None,
-                   event_info_callback=None):
+                   event_info_callback=None,
+                   travel_time_callback=None):
     """
     Launch the instaseis server.
 
@@ -61,12 +64,15 @@ def launch_io_loop(db_path, port, buffer_size_in_mb, quiet, log_level,
         coordinates. If not given, certain requests will not be available.
     :param event_info_callback: A callback function returning event
         information. If not given, certain requests will not be available.
+    :param travel_time_callback: A callback function returning the travel
+        time for certain seismic phase and a given source/receiver geometry.
     """
     application = get_application()
     application.db = InstaseisDB(db_path=db_path,
                                  buffer_size_in_mb=buffer_size_in_mb)
     application.station_coordinates_callback = station_coordinates_callback
     application.event_info_callback = event_info_callback
+    application.travel_time_callback = travel_time_callback
 
     if not quiet:
         # Get all tornado loggers.

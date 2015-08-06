@@ -15,6 +15,9 @@ from __future__ import (absolute_import, division, print_function,
 import argparse
 import os
 
+from obspy.core.util import geodetics
+from obspy.taup import TauPyModel
+
 from instaseis.server.app import launch_io_loop
 
 from station_resolver import parse_station_file, get_coordinates
@@ -35,6 +38,27 @@ def get_event(event_id):
 def get_station_coordinates(networks, stations):
     return get_coordinates(cursor, networks=networks,
                            stations=stations)
+
+
+tau_model = TauPyModel(model="ak135")
+
+
+def get_travel_time(sourcelatitude, sourcelongitude, sourcedepthinmeters,
+                    receiverlatitude, receiverlongitude,
+                    receiverdepthinmeters, phase_name):
+    great_circle_distance = geodetics.locations2degrees(
+        sourcelatitude, sourcelongitude, receiverlatitude, receiverlongitude)
+
+    tts = tau_model.get_travel_times(
+        source_depth_in_km=sourcedepthinmeters / 1000.0,
+        distance_in_degree=great_circle_distance,
+        phase_list=[phase_name])
+
+    if not tts:
+        return None
+
+    # For any phase, return the first time.
+    return tts[0].time
 
 
 if __name__ == "__main__":
@@ -63,4 +87,5 @@ if __name__ == "__main__":
                    buffer_size_in_mb=args.buffer_size_in_mb,
                    quiet=args.quiet, log_level=args.log_level,
                    station_coordinates_callback=get_station_coordinates,
-                   event_info_callback=get_event)
+                   event_info_callback=get_event,
+                   travel_time_callback=get_travel_time)
