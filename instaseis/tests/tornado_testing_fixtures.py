@@ -196,10 +196,13 @@ def get_travel_time(sourcelatitude, sourcelongitude, sourcedepthinmeters,
     great_circle_distance = geodetics.locations2degrees(
         sourcelatitude, sourcelongitude, receiverlatitude, receiverlongitude)
 
-    tts = MODEL.get_travel_times(
-        source_depth_in_km=sourcedepthinmeters / 1000.0,
-        distance_in_degree=great_circle_distance,
-        phase_list=[phase_name])
+    try:
+        tts = MODEL.get_travel_times(
+            source_depth_in_km=sourcedepthinmeters / 1000.0,
+            distance_in_degree=great_circle_distance,
+            phase_list=[phase_name])
+    except Exception as e:
+        raise ValueError(str(e))
 
     if not tts:
         return None

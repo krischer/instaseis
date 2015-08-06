@@ -3038,3 +3038,88 @@ def test_label_parameter(all_clients):
 
     assert sorted(names) == sorted([
         "Tohoku_...LXZ.sac", "Tohoku_...LXN.sac", "Tohoku_...LXE.sac"])
+
+
+def test_ttimes_route_no_callback(all_clients):
+    """
+    Tests the ttimes route with no available callbacks.
+    """
+    client = all_clients
+
+    request = client.fetch(
+        "/ttimes?sourcelatitude=50&sourcelongitude=10&"
+        "sourcedepthinmeters=0&receiverlatitude=40&receiverlongitude=90&"
+        "receiverdepthinmeters=0&phase=P")
+    assert request.code == 404
+    assert request.reason == (
+        "Server does not support travel time calculations.")
+
+
+def test_ttimes_route(all_clients_ttimes_callback):
+    """
+    Test for the ttimes route.
+    """
+    client = all_clients_ttimes_callback
+
+    # Test with missing parameters.
+    request = client.fetch(
+        "/ttimes?sourcelatitude=50&sourcelongitude=10&"
+        "sourcedepthinmeters=0&receiverlatitude=40&receiverlongitude=90")
+    assert request.code == 400
+    assert request.reason == (
+        "The following required parameters are missing: "
+        "'phase', 'receiverdepthinmeters'")
+
+    # Invalid phase name
+    request = client.fetch(
+        "/ttimes?sourcelatitude=50&sourcelongitude=10&"
+        "sourcedepthinmeters=0&receiverlatitude=40&receiverlongitude=90&"
+        "receiverdepthinmeters=0&phase=bogs")
+    assert request.code == 400
+    assert request.reason == "Invalid phase name."
+
+    # Other error, e.g. negative depth.
+    request = client.fetch(
+        "/ttimes?sourcelatitude=50&sourcelongitude=10&"
+        "sourcedepthinmeters=-200&receiverlatitude=40&receiverlongitude=90&"
+        "receiverdepthinmeters=0&phase=P")
+    assert request.code == 400
+    assert request.reason == ("Failed to calculate travel time due to: No "
+                              "layer contains this depth")
+
+    # No such phase at that distance.
+    request = client.fetch(
+        "/ttimes?sourcelatitude=50&sourcelongitude=10&"
+        "sourcedepthinmeters=0&receiverlatitude=40&receiverlongitude=90&"
+        "receiverdepthinmeters=0&phase=Pdiff")
+    assert request.code == 404
+    assert request.reason == "No ray for the given geometry and phase found."
+
+    # Last but not least test some actual travel times.
+    # No such phase at that distance.
+    request = client.fetch(
+        "/ttimes?sourcelatitude=0&sourcelongitude=0&"
+        "sourcedepthinmeters=300000&receiverlatitude=0&receiverlongitude=50&"
+        "receiverdepthinmeters=0&phase=P")
+    assert request.code == 200
+    result = json.loads(str(request.body.decode("utf8")))
+    assert list(result.keys()) == ["travel_time"]
+    assert abs(result["travel_time"] - 504.357 < 1E-2)
+
+    request = client.fetch(
+        "/ttimes?sourcelatitude=0&sourcelongitude=0&"
+        "sourcedepthinmeters=300000&receiverlatitude=0&receiverlongitude=50&"
+        "receiverdepthinmeters=0&phase=PP")
+    assert request.code == 200
+    result = json.loads(str(request.body.decode("utf8")))
+    assert list(result.keys()) == ["travel_time"]
+    assert abs(result["travel_time"] - 622.559 < 1E-2)
+
+    request = client.fetch(
+        "/ttimes?sourcelatitude=0&sourcelongitude=0&"
+        "sourcedepthinmeters=300000&receiverlatitude=0&receiverlongitude=50&"
+        "receiverdepthinmeters=0&phase=sPKiKP")
+    assert request.code == 200
+    result = json.loads(str(request.body.decode("utf8")))
+    assert list(result.keys()) == ["travel_time"]
+    assert abs(result["travel_time"] - 1090.081 < 1E-2)

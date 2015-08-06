@@ -24,11 +24,11 @@ class TravelTimeHandler(InstaseisRequestHandler):
             "receiverlatitude", "receiverlongitude", "receiverdepthinmeters",
             "phase")
 
-        missing_parameters = [_i for _i in required_parameters if _i not in
-                              self.request.arguments]
+        missing_parameters = sorted([_i for _i in required_parameters
+                                     if _i not in self.request.arguments])
         if missing_parameters:
             msg = "The following required parameters are missing: %s" % (
-                ",".join("'%s'" % _i for _i in missing_parameters))
+                ", ".join("'%s'" % _i for _i in missing_parameters))
             raise tornado.web.HTTPError(
                 400, log_message=msg, reason=msg)
 
@@ -48,10 +48,10 @@ class TravelTimeHandler(InstaseisRequestHandler):
         except ValueError as e:
             err_msg = str(e)
             if err_msg.lower().startswith("invalid phase name"):
-                msg = "Invalid Phase Name."
+                msg = "Invalid phase name."
             else:
                 msg = "Failed to calculate travel time due to: %s" % str(e)
-            raise tornado.web.HTTPError(404, log_message=msg, reason=msg)
+            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
         if tt is None:
             msg = "No ray for the given geometry and phase found."
