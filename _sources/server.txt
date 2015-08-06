@@ -174,7 +174,7 @@ REST-like API Documentation
 
 If you wish to use the Instaseis Server without the Python client this
 documentation might be helpful. The Instaseis server offers a REST-like API
-with currently six endpoints only supporting GET.
+with currently seven endpoints only supporting GET.
 
 .. contents:: Endpoints
     :local:
@@ -316,6 +316,41 @@ Example Response
 | ``id``                  | String   | True     |                             | The event id.                                                        |
 +-------------------------+----------+----------+-----------------------------+----------------------------------------------------------------------+
 
+GET /ttimes
+^^^^^^^^^^^
+
+Description
+    Get theoretical arrival times through a 1D Earth model if the server has been configured with that capability.
+
+Content-Type
+    application/json; charset=UTF-8
+
+Example Response
+    .. code-block:: json
+
+        {
+            "travel_time": 570.8677703798731
+        }
+
++--------------------------+----------+----------+--------------------------------------------------------------------------------------------------------------+
+| Parameter                | Type     | Required | Description                                                                                                  |
++==========================+==========+==========+==============================================================================================================+
+| ``sourcelatitude``       | Float    | True     | Geocentric latitude of the source.                                                                           |
++--------------------------+----------+----------+--------------------------------------------------------------------------------------------------------------+
+| ``sourcelongitude``      | Float    | True     | Longitude of the source.                                                                                     |
++--------------------------+----------+----------+--------------------------------------------------------------------------------------------------------------+
+| ``sourcedepthinmeters``  | Float    | True     | Depth of the source in meters.                                                                               |
++--------------------------+----------+----------+--------------------------------------------------------------------------------------------------------------+
+| ``receiverlatitude``     | Float    | True     | Geocentric latitude of the receiver.                                                                         |
++--------------------------+----------+----------+--------------------------------------------------------------------------------------------------------------+
+| ``receiverlongitude``    | Float    | True     | Longitude of the receiver.                                                                                   |
++--------------------------+----------+----------+--------------------------------------------------------------------------------------------------------------+
+| ``receiverdepthinmeters``| Float    | True     | Depth of the receiver in meters. Many implementations will raise an error if this is not zero as they cannot |
+|                          |          |          | deal with buried receivers.                                                                                  |
++--------------------------+----------+----------+--------------------------------------------------------------------------------------------------------------+
+| ``phase``                | Float    | True     | The phase name. Depending on the travel time implementation this can be very flexible.                       |
++--------------------------+----------+----------+--------------------------------------------------------------------------------------------------------------+
+
 GET /seismograms_raw
 ^^^^^^^^^^^^^^^^^^^^
 
@@ -422,20 +457,29 @@ Filetype
 
 +-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
 | Parameter               | Type     | Required | Default Value               | Description                                                                          |
++=========================+==========+==========+=============================+======================================================================================+
+| **Output parameters**                                                                                                                                              |
 +-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
-| ``components``          | String   | False    | ZNE                         | The desired seismogram components. Any combination of Z, N, E, R, T.                 |
+| ``format``              | String   | False    | saczip                      | Specify output file to be either MiniSEED or a ZIP archive of SAC files, either      |
+|                         |          |          |                             | ``miniseed`` or ``saczip``.                                                          |
 +-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
-| ``unit``                | String   | False    | displacement                | The type of seismogram. One of ``displacement``, ``velocity``, or ``acceleration``.  |
+| ``label``               | String   | False    |                             |  Specify a label to be included in file names and HTTP file name suggestions.        |
++-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
+| ``components``          | String   | False    | ZNE                         | Specify the orientation of the synthetic seismograms as a list of any combination of |
+|                         |          |          |                             | ``Z`` (vertical), ``N`` (north), ``E`` (east), ``R`` (radial), ``T`` (transverse).   |
++-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
+| ``units``               | String   | False    | displacement                | Specify either ``displacement``, ``velocity`` or ``acceleration`` for the synthetics.|
 +-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
 | ``dt``                  | Float    | False    |                             | If given, seismograms will be resampled to the desired sample spacing.               |
 +-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
-| ``alanczos``            | Integer  | False    | 5                           | Width of the Lanczos kernel used for resampling.                                     |
+| ``alanczos``            | Integer  | False    | 12                          | Specify the width of the Lanczos kernel used for resampling to requested sample      |
+|                         |          |          |                             | interval.                                                                            |
 +-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
-| ``format``              | String   | False    | mseed                       |  Output format. ``mseed`` (MiniSEED) or ``saczip`` (SAC files in a zip archive).     |
+| **Time Parameters**                                                                                                                                                |
 +-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
-| Temporal Parameters                                                                                                                                                |
-+-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
-| ``origintime``          | Datetime | False    | 1970-01-01T00:00:00.000000Z | Time of the peak of the source time function.                                        |
+| ``origintime``          | Datetime | False    | 1970-01-01T00:00:00.000000Z | Specify the source origin time. This must be specified as an                         |
+|                         |          |          |                             | absolute date and time. This time coincides with the peak of the                     |
+|                         |          |          |                             | source time function.                                                                |
 +-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
 | ``starttime``           | Datetime | False    |                             | Start time of the returned seismograms. Might imply zero padding at front.           |
 +-------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
