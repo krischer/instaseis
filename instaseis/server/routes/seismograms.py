@@ -294,6 +294,16 @@ class SeismogramsHandler(InstaseisRequestHandler):
             msg = ("`alanczos` must not be smaller than 1 or larger than 20.")
             raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
+        # The networkcode and stationcode parameters have a maximum number
+        # of letters.
+        if args.stationcode and len(args.stationcode) > 5:
+            msg = "'stationcode' must have 5 or fewer letters."
+            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+
+        if args.networkcode and len(args.networkcode) > 2:
+            msg = "'networkcode' must have 2 or fewer letters."
+            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+
         all_src_params = set(["sourcemomenttensor", "sourcedoublecouple",
                               "sourceforce", "sourcelatitude",
                               "sourcelongitude", "sourcedepthinmeters"])

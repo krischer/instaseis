@@ -3164,3 +3164,17 @@ def test_network_and_station_code_settings(all_clients):
     for tr in obspy.read(request.buffer):
         assert tr.stats.network == "BW"
         assert tr.stats.station == "INS"
+
+    # Station code is limited to five letters.
+    p = copy.deepcopy(params)
+    p["stationcode"] = "123456"
+    request = client.fetch(_assemble_url(**p))
+    assert request.code == 400
+    assert request.reason == "'stationcode' must have 5 or fewer letters."
+
+    # Network code is limited to two letters.
+    p = copy.deepcopy(params)
+    p["networkcode"] = "123"
+    request = client.fetch(_assemble_url(**p))
+    assert request.code == 400
+    assert request.reason == "'networkcode' must have 2 or fewer letters."
