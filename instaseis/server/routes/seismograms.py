@@ -184,8 +184,8 @@ class SeismogramsHandler(InstaseisRequestHandler):
         "receiverlatitude": {"type": float},
         "receiverlongitude": {"type": float},
         "receiverdepthinmeters": {"type": float, "default": 0.0},
-        "networkcode": {"type": str},
-        "stationcode": {"type": str},
+        "networkcode": {"type": str, "default": "XX"},
+        "stationcode": {"type": str, "default": "SYN"},
 
         # Or by querying a database.
         "network": {"type": str},

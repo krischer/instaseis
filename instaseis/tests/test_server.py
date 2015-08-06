@@ -720,7 +720,7 @@ def test_object_creation_for_seismogram_route(all_clients):
         assert p.call_args[1]["receiver"] == instaseis.Receiver(
             latitude=basic_parameters["receiverlatitude"],
             longitude=basic_parameters["receiverlongitude"],
-            depth_in_m=0.0)
+            depth_in_m=0.0, network="XX", station="SYN")
         assert p.call_args[1]["kind"] == "displacement"
         # Remove source shift is always False.
         assert p.call_args[1]["remove_source_shift"] is False
@@ -788,7 +788,7 @@ def test_object_creation_for_seismogram_route(all_clients):
         assert p.call_args[1]["receiver"] == instaseis.Receiver(
             latitude=basic_parameters["receiverlatitude"],
             longitude=basic_parameters["receiverlongitude"],
-            depth_in_m=0.0)
+            depth_in_m=0.0, network="XX", station="SYN")
         assert p.call_args[1]["kind"] == "displacement"
         # Remove source shift is always False
         assert p.call_args[1]["remove_source_shift"] is False
@@ -855,7 +855,7 @@ def test_object_creation_for_seismogram_route(all_clients):
             assert p.call_args[1]["receiver"] == instaseis.Receiver(
                 latitude=basic_parameters["receiverlatitude"],
                 longitude=basic_parameters["receiverlongitude"],
-                depth_in_m=0.0)
+                depth_in_m=0.0, network="XX", station="SYN")
             assert p.call_args[1]["kind"] == "displacement"
             # Remove source shift is always False
             assert p.call_args[1]["remove_source_shift"] is False
@@ -1048,7 +1048,7 @@ def test_seismograms_retrieval(all_clients):
     receiver = instaseis.Receiver(
         latitude=basic_parameters["receiverlatitude"],
         longitude=basic_parameters["receiverlongitude"],
-        depth_in_m=0.0)
+        depth_in_m=0.0, network="XX", station="SYN")
     st_db = db.get_seismograms(source=source, receiver=receiver,
                                components=components)
 
@@ -1115,7 +1115,8 @@ def test_seismograms_retrieval(all_clients):
         **dict((key, float(value)) for (key, value) in sdr.items()))
     receiver = instaseis.Receiver(
         latitude=basic_parameters["receiverlatitude"],
-        longitude=basic_parameters["receiverlongitude"], depth_in_m=0.0)
+        longitude=basic_parameters["receiverlongitude"], depth_in_m=0.0,
+        network="XX", station="SYN")
     st_db = db.get_seismograms(source=source, receiver=receiver,
                                components=components)
     for tr_server, tr_db in zip(st_server, st_db):
@@ -1185,7 +1186,7 @@ def test_seismograms_retrieval(all_clients):
         receiver = instaseis.Receiver(
             latitude=basic_parameters["receiverlatitude"],
             longitude=basic_parameters["receiverlongitude"],
-            depth_in_m=0.0)
+            depth_in_m=0.0, network="XX", station="SYN")
         st_db = db.get_seismograms(source=source, receiver=receiver,
                                    components=components)
         for tr_server, tr_db in zip(st_server, st_db):
@@ -1250,7 +1251,7 @@ def test_seismograms_retrieval(all_clients):
     receiver = instaseis.Receiver(
         latitude=basic_parameters["receiverlatitude"],
         longitude=basic_parameters["receiverlongitude"],
-        depth_in_m=0.0)
+        depth_in_m=0.0, network="XX", station="SYN")
 
     # Now test other the other parameters.
     params = copy.deepcopy(basic_parameters)
@@ -2897,7 +2898,8 @@ def test_event_parameters_by_querying(all_clients_event_callback):
         m_tp=315300000000000000,
         m_tt=78100000000000000,
         origin_time=obspy.UTCDateTime("1991-07-17T16:41:33.100000Z"))
-    receiver = instaseis.Receiver(latitude=10, longitude=10, depth_in_m=0.0)
+    receiver = instaseis.Receiver(latitude=10, longitude=10, depth_in_m=0.0,
+                                  network="XX", station="SYN")
 
     st_db = db.get_seismograms(source=source, receiver=receiver)
 
@@ -2980,7 +2982,8 @@ def test_label_parameter(all_clients):
     with zipfile.ZipFile(request.buffer) as fh:
         names = fh.namelist()
 
-    assert sorted(names) == sorted(["...LXZ.sac", "...LXN.sac", "...LXE.sac"])
+    assert sorted(names) == sorted(
+        ["XX.SYN..LXZ.sac", "XX.SYN..LXN.sac", "XX.SYN..LXE.sac"])
 
     # Now pass one. It will replace the filename prefix.
     p = copy.deepcopy(params)
@@ -3015,7 +3018,9 @@ def test_label_parameter(all_clients):
         names = fh.namelist()
 
     assert sorted(names) == sorted([
-        "Tohoku_...LXZ.sac", "Tohoku_...LXN.sac", "Tohoku_...LXE.sac"])
+        "Tohoku_XX.SYN..LXZ.sac",
+        "Tohoku_XX.SYN..LXN.sac",
+        "Tohoku_XX.SYN..LXE.sac"])
 
 
 def test_ttimes_route_no_callback(all_clients):
