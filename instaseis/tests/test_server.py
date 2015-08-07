@@ -2586,15 +2586,6 @@ def test_passing_invalid_time_settings_raises(all_clients):
                               "ends.")
 
     p = copy.deepcopy(params)
-    p["endtime"] = str(origin_time + 100)
-    p["duration"] = 20
-    url = _assemble_url(**p)
-    request = client.fetch(url)
-    assert request.code == 400
-    assert request.reason == ("'duration' and 'endtime' parameters cannot "
-                              "both be passed at the same time.")
-
-    p = copy.deepcopy(params)
     p["endtime"] = str(origin_time - 1E6)
     url = _assemble_url(**p)
     request = client.fetch(url)
@@ -2668,9 +2659,10 @@ def test_time_settings_for_seismograms_route(all_clients):
         assert tr.stats.starttime == origin_time
         assert tr.stats.endtime == origin_time + 10
 
-    # Can also be done via the duration setting.
+    # Can also be done by passing a float which will be interpreted as an
+    # offset in respect to the starttime.
     p = copy.deepcopy(params)
-    p["duration"] = 10
+    p["endtime"] = 10.0
     url = _assemble_url(**p)
     request = client.fetch(url)
     st_2 = obspy.read(request.buffer)
@@ -2681,7 +2673,7 @@ def test_time_settings_for_seismograms_route(all_clients):
 
     # If starttime is given, the duration is relative to the starttime.
     p = copy.deepcopy(params)
-    p["duration"] = 10
+    p["endtime"] = 10
     p["starttime"] = origin_time - 5
     url = _assemble_url(**p)
     request = client.fetch(url)

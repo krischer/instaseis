@@ -8,6 +8,7 @@
     (http://www.gnu.org/copyleft/lgpl.html)
 """
 import io
+import re
 import zipfile
 
 import numpy as np
@@ -19,6 +20,9 @@ from ... import Source, ForceSource, Receiver
 from ...base_instaseis_db import _get_seismogram_times
 from ..util import run_async
 from ..instaseis_request import InstaseisRequestHandler
+
+# Valid phase offset pattern including capture groups.
+PHASE_OFFSET_PATTERN = re.compile(r"(^[A-Za-z0-9^]+)([\+-])([\deE\.\-\+]+$)")
 
 
 @run_async
@@ -149,6 +153,33 @@ def _forcesource(value):
     return _tolist(value, (3,))
 
 
+def _validtimesetting(value):
+    try:
+        return obspy.UTCDateTime(value)
+    except:
+        pass
+
+    try:
+        return float(value)
+    except:
+        pass
+
+    m = PHASE_OFFSET_PATTERN.match(value)
+    if m is None:
+        raise ValueError
+
+    operator = m.group(2)
+    if operator == "+":
+        offset = float(m.group(3))
+    else:
+        offset = -float(m.group(3))
+
+    return {
+        "phase": m.group(1),
+        "offset": offset
+    }
+
+
 class SeismogramsHandler(InstaseisRequestHandler):
     # Define the arguments for the seismogram endpoint.
     seismogram_arguments = {
@@ -175,9 +206,8 @@ class SeismogramsHandler(InstaseisRequestHandler):
 
         # Time parameters.
         "origintime": {"type": obspy.UTCDateTime},
-        "starttime": {"type": obspy.UTCDateTime},
-        "endtime": {"type": obspy.UTCDateTime},
-        "duration": {"type": float},
+        "starttime": {"type": _validtimesetting},
+        "endtime": {"type": _validtimesetting},
 
         # Receivers can be specified either directly via their coordinates.
         # In that case one can assign a network and station code.
@@ -513,54 +543,68 @@ class SeismogramsHandler(InstaseisRequestHandler):
         return receivers
 
     def parse_time_settings(self, args):
-        # Start time and origin time. If either is not set, one will be set
-        # to the other. If neither is set, both will be set to posix timestamp
-        # 0.
-        if args.origintime is None and args.starttime is None:
+        """
+        Attempt to figure out the time settings.
+
+        This is pretty messy unfortunately. After this method has been
+        called, args.origintime will always be set to an absolute time.
+
+        args.starttime and args.endtime will either be set to absolute times
+        or dictionaries describing phase relative offsets.
+
+        Returns the maximum possible start-and endtimes.
+        """
+        if args.origintime is None:
             args.origintime = obspy.UTCDateTime(0)
-            args.starttime = obspy.UTCDateTime(0)
-        elif args.origintime is None:
-            args.origintime = args.starttime
-        elif args.starttime is None:
+
+        # The origin time will be always set. If the starttime is not set,
+        # set it to the origin time.
+        if args.starttime is None:
             args.starttime = args.origintime
 
-        # Duration and endtime parameters are mutually exclusive.
-        if args.duration is not None and args.endtime is not None:
-            msg = ("'duration' and 'endtime' parameters cannot both be passed "
-                   "at the same time.")
-            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+        # Now it becomes a bit ugly. If the starttime is a float, treat it
+        # relative to the origin time.
+        if isinstance(args.starttime, float):
+            args.starttime = args.origintime + args.starttime
+        # Same with the endtime
+        if isinstance(args.endtime, float):
+            if isinstance(args.starttime, obspy.UTCDateTime):
+                args.endtime = args.starttime + args.endtime
+            else:
+                args.endtime = args.origintime + args.endtime
 
-        # Figure out the temporal range of the seismograms. These represent
-        # the possible temporal range of the seismograms.
+        # Figure out the maximum temporal range of the seismograms.
         ti = _get_seismogram_times(
             info=self.application.db.info, origin_time=args.origintime,
             dt=args.dt, a_lanczos=args.alanczos, remove_source_shift=False,
             reconvolve_stf=False)
 
-        # Get the desired endtime.
-        if args.duration is None and args.endtime is None:
+        # If the endtime is not set, do it here.
+        if args.endtime is None:
             args.endtime = ti["endtime"]
-        elif args.endtime is None:
-            args.endtime = args.starttime + args.duration
 
-        # The desired seismogram start time must be before the end time of the
-        # seismograms.
-        if args.starttime >= ti["endtime"]:
-            msg = ("The `starttime` must be before the seismogram ends.")
-            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+        # Do a couple of sanity checks here.
+        if isinstance(args.starttime, obspy.UTCDateTime):
+            # The desired seismogram start time must be before the end time of
+            # the seismograms.
+            if args.starttime >= ti["endtime"]:
+                msg = ("The `starttime` must be before the seismogram ends.")
+                raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+            # Arbitrary limit: The starttime can be at max one hour before the
+            # origin time.
+            if args.starttime < (ti["starttime"] - 3600):
+                msg = ("The seismogram can start at the maximum one hour "
+                       "before the origin time.")
+                raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
-        # The endtime must be within the seismogram window
-        if not (ti["starttime"] <= args.endtime <= ti["endtime"]):
-            msg = ("The end time of the seismograms lies outside the allowed "
-                   "range.")
-            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+        if isinstance(args.endtime, obspy.UTCDateTime):
+            # The endtime must be within the seismogram window
+            if not (ti["starttime"] <= args.endtime <= ti["endtime"]):
+                msg = ("The end time of the seismograms lies outside the "
+                       "allowed range.")
+                raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
-        # Arbitrary limit: The starttime can be at max one hour before the
-        # origin time.
-        if args.starttime < (ti["starttime"] - 3600):
-            msg = ("The seismogram can start at the maximum one hour before "
-                   "the origin time.")
-            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+        return ti["starttime"], ti["endtime"]
 
     def set_headers(self, args):
         if args.format == "miniseed":
@@ -586,6 +630,21 @@ class SeismogramsHandler(InstaseisRequestHandler):
         self.set_header("Content-Disposition",
                         "attachment; filename=%s" % filename)
 
+    def get_ttime(self, source, receiver, phase):
+        if self.application.travel_time_callback is None:
+            msg = "Server does not support travel time calculations."
+            raise tornado.web.HTTPError(
+                404, log_message=msg, reason=msg)
+        tt = self.application.travel_time_callback(
+            sourcelatitude=source.latitude,
+            sourcelongitude=source.longitude,
+            sourcedepthinmeters=source.depth_in_m,
+            receiverlatitude=receiver.latitude,
+            receiverlongitude=receiver.longitude,
+            receiverdepthinmeters=receiver.depth_in_m,
+            phase_name=phase)
+        return tt
+
     @tornado.web.asynchronous
     @tornado.gen.coroutine
     def get(self):
@@ -608,7 +667,7 @@ class SeismogramsHandler(InstaseisRequestHandler):
         else:
             __event = None
 
-        self.parse_time_settings(args)
+        min_starttime, max_endtime = self.parse_time_settings(args)
         self.set_headers(args)
 
         source = self.get_source(args, __event)
@@ -624,6 +683,7 @@ class SeismogramsHandler(InstaseisRequestHandler):
             buf = IOQueue()
             zip_file = zipfile.ZipFile(buf, mode="w")
 
+        count = 0
         # Loop over each receiver, get the synthetics and stream it to the
         # user.
         for receiver in receivers:
@@ -638,14 +698,40 @@ class SeismogramsHandler(InstaseisRequestHandler):
                 self.finish()
                 return
 
+            # Check if start- or endtime are phase relative. If yes
+            # calculate the new start- and/or endtime.
+            if isinstance(args.starttime, obspy.core.AttribDict):
+                tt = self.get_ttime(source=source, receiver=receiver,
+                                    phase=args.starttime["phase"])
+                if tt is None:
+                    continue
+                starttime = args.origintime + tt + args.starttime["offset"]
+            else:
+                starttime = args.starttime
+
+            if starttime < min_starttime - 3600.0:
+                continue
+
+            if isinstance(args.endtime, obspy.core.AttribDict):
+                tt = self.get_ttime(source=source, receiver=receiver,
+                                    phase=args.endtime["phase"])
+                if tt is None:
+                    continue
+                endtime = args.origintime + tt + args.endtime["offset"]
+            else:
+                endtime = args.endtime
+
+            if endtime > max_endtime:
+                continue
+
             # Yield from the task. This enables a context switch and thus
             # async behaviour.
             response = yield tornado.gen.Task(
                 _get_seismogram,
                 db=self.application.db, source=source, receiver=receiver,
                 components=list(args.components), units=args.units, dt=args.dt,
-                a_lanczos=args.alanczos, starttime=args.starttime,
-                endtime=args.endtime, format=args.format,
+                a_lanczos=args.alanczos, starttime=starttime,
+                endtime=endtime, format=args.format,
                 label=args.label)
 
             # If an exception is returned from the task, re-raise it here.
@@ -665,6 +751,15 @@ class SeismogramsHandler(InstaseisRequestHandler):
             else:
                 self.write(response)
             self.flush()
+
+            count += 1
+
+        # If nothing is written, raise an error. This should really only
+        # happen with phase relative offsets with phases not coinciding with
+        # the source - receiver geometry.
+        if not count:
+            msg = "No seismograms could be calculated matching the query."
+            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
         # Write the end of the zipfile in case necessary.
         if args.format == "saczip":
