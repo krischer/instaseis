@@ -3083,7 +3083,6 @@ def test_ttimes_route(all_clients_ttimes_callback):
                               "buried receivers.")
 
     # Last but not least test some actual travel times.
-    # No such phase at that distance.
     request = client.fetch(
         "/ttimes?sourcelatitude=0&sourcelongitude=0&"
         "sourcedepthinmeters=300000&receiverlatitude=0&receiverlongitude=50&"
@@ -3172,3 +3171,84 @@ def test_network_and_station_code_settings(all_clients):
     request = client.fetch(_assemble_url(**p))
     assert request.code == 400
     assert request.reason == "'networkcode' must have 2 or fewer letters."
+
+
+def test_phase_relative_offsets(all_clients_ttimes_callback):
+    """
+    Test phase relative offsets.
+
+    + must be encoded with %2B
+    - must be encoded with %2D
+    """
+    client = all_clients_ttimes_callback
+
+    # At a distance of 50 degrees and with a source depth of 300 km:
+    # P: 504.357 seconds
+    # PP: 622.559 seconds
+    # sPKiKP: 1090.081 seconds
+
+    params = {
+        "sourcelatitude": 0, "sourcelongitude": 0,
+        "sourcedepthinmeters": 300000,
+        "receiverlatitude": 0, "receiverlongitude": 50,
+        "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
+        "components": "Z", "dt": 0.1,
+        "format": "miniseed"}
+
+    # Normal seismogram.
+    p = copy.deepcopy(params)
+    request = client.fetch(_assemble_url(**p))
+    assert request.code == 200
+    tr = obspy.read(request.buffer)[0]
+    starttime, endtime = tr.stats.starttime, tr.stats.endtime
+
+    # Start 10 seconds before the P arrival.
+    p = copy.deepcopy(params)
+    p["starttime"] = "P%2D10"
+    request = client.fetch(_assemble_url(**p))
+    assert request.code == 200
+    tr = obspy.read(request.buffer)[0]
+
+    assert abs((tr.stats.starttime) - (starttime + 504.357 - 10)) < 0.1
+    assert tr.stats.endtime == endtime
+
+    # Starts 10 seconds after the P arrival
+    p = copy.deepcopy(params)
+    p["starttime"] = "P%2B10"
+    request = client.fetch(_assemble_url(**p))
+    assert request.code == 200
+    tr = obspy.read(request.buffer)[0]
+
+    assert abs((tr.stats.starttime) - (starttime + 504.357 + 10)) < 0.1
+    assert tr.stats.endtime == endtime
+
+    # Ends 15 seconds before the PP arrival
+    p = copy.deepcopy(params)
+    p["endtime"] = "PP%2D15"
+    request = client.fetch(_assemble_url(**p))
+    assert request.code == 200
+    tr = obspy.read(request.buffer)[0]
+
+    assert tr.stats.starttime == starttime
+    assert abs((tr.stats.endtime) - (starttime + 622.559 - 15)) < 0.1
+
+    # Ends 15 seconds after the PP arrival
+    p = copy.deepcopy(params)
+    p["endtime"] = "PP%2B15"
+    request = client.fetch(_assemble_url(**p))
+    assert request.code == 200
+    tr = obspy.read(request.buffer)[0]
+
+    assert tr.stats.starttime == starttime
+    assert abs((tr.stats.endtime) - (starttime + 622.559 + 15)) < 0.1
+
+    # Starts 5 seconds before the PP and ends 2 seconds after the sPKiKP phase.
+    p = copy.deepcopy(params)
+    p["starttime"] = "PP%2D5"
+    p["endtime"] = "sPKiKP%2B2"
+    request = client.fetch(_assemble_url(**p))
+    assert request.code == 200
+    tr = obspy.read(request.buffer)[0]
+
+    assert abs((tr.stats.starttime) - (starttime + 622.559 - 5)) < 0.1
+    assert abs((tr.stats.endtime) - (starttime + 1090.081 + 2)) < 0.1
