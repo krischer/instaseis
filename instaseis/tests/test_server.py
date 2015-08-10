@@ -3417,3 +3417,86 @@ def test_phase_relative_offset_different_time_representations(
     tr = obspy.read(request.buffer)[0]
     assert abs((tr.stats.starttime) - (starttime + 504.357 + 10)) < 0.1
     assert tr.stats.endtime == endtime
+
+
+def test_phase_relative_offset_failures(all_clients_ttimes_callback):
+    """
+    Tests some common failures for the phase relative offsets.
+    """
+    client = all_clients_ttimes_callback
+
+    params = {
+        "sourcelatitude": 0, "sourcelongitude": 0,
+        "sourcedepthinmeters": 300000,
+        "receiverlatitude": 0, "receiverlongitude": 50,
+        "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
+        "components": "Z", "dt": 0.1,
+        "format": "miniseed"}
+
+    # Illegal phase.
+    p = copy.deepcopy(params)
+    p["starttime"] = "bogus%2D10"
+    request = client.fetch(_assemble_url(**p))
+    assert request.code == 400
+    assert request.reason == "Invalid phase name: bogus"
+
+    # Phase not available at that distance.
+    p = copy.deepcopy(params)
+    p["starttime"] = "Pdiff%2D10"
+    request = client.fetch(_assemble_url(**p))
+    assert request.code == 400
+    assert request.reason == (
+        "No seismograms found for the given phase relative "
+        "offsets. This could either be due to the chosen phase "
+        "not existing for the specific source-receiver geometry "
+        "or arriving too late/with too large offsets if the "
+        "database is not long enough.")
+
+
+def test_phase_relative_offsets_multiple_stations(all_clients_all_callbacks):
+    client = all_clients_all_callbacks
+
+    # Now test multiple receiveers.
+    # This is constructed in such a way that only one station will have a P
+    # phase (due to the distance). So this is tested here.
+    params = {
+        "sourcelatitude": -39, "sourcelongitude": 20,
+        "sourcedepthinmeters": 300000,
+        "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
+        "components": "Z", "dt": 0.1,
+        "format": "miniseed", "network": "IU,B*", "station": "ANT*,ANM?",
+        "starttime": "P%2D10"}
+    request = client.fetch(_assemble_url(**params))
+    assert request.code == 200
+    st = obspy.read(request.buffer)
+    assert len(st) == 1
+
+    # Now get both.
+    params = {
+        "sourcelatitude": 39, "sourcelongitude": 20,
+        "sourcedepthinmeters": 300000,
+        "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
+        "components": "Z", "dt": 0.1,
+        "format": "miniseed", "network": "IU,B*", "station": "ANT*,ANM?",
+        "starttime": "P%2D10"}
+    request = client.fetch(_assemble_url(**params))
+    assert request.code == 200
+    st = obspy.read(request.buffer)
+    assert len(st) == 2
+
+    # Or one also does not get any. In that case an error is raised.
+    params = {
+        "sourcelatitude": 39, "sourcelongitude": 20,
+        "sourcedepthinmeters": 300000,
+        "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
+        "components": "Z", "dt": 0.1,
+        "format": "miniseed", "network": "IU,B*", "station": "ANT*,ANM?",
+        "starttime": "P%2D10000"}
+    request = client.fetch(_assemble_url(**params))
+    assert request.code == 400
+    assert request.reason == (
+        "No seismograms found for the given phase relative "
+        "offsets. This could either be due to the chosen phase "
+        "not existing for the specific source-receiver geometry "
+        "or arriving too late/with too large offsets if the "
+        "database is not long enough.")

@@ -780,7 +780,11 @@ class SeismogramsHandler(InstaseisRequestHandler):
         # happen with phase relative offsets with phases not coinciding with
         # the source - receiver geometry.
         if not count:
-            msg = "No seismograms could be calculated matching the query."
+            msg = ("No seismograms found for the given phase relative "
+                   "offsets. This could either be due to the chosen phase "
+                   "not existing for the specific source-receiver geometry "
+                   "or arriving too late/with too large offsets if the "
+                   "database is not long enough.")
             raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
         # Write the end of the zipfile in case necessary.
