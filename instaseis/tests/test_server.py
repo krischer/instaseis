@@ -3358,6 +3358,19 @@ def test_phase_relative_offsets(all_clients_ttimes_callback):
     assert abs((tr.stats.starttime) - (starttime + 622.559 - 5)) < 0.1
     assert abs((tr.stats.endtime) - (starttime + 1090.081 + 2)) < 0.1
 
+    # Combinations with relative end times are also possible. Relative start
+    # times are always relative to the origin time so it does not matter in
+    # that case.
+    p = copy.deepcopy(params)
+    p["starttime"] = "PP%2D5"
+    p["endtime"] = 10.0
+    request = client.fetch(_assemble_url(**p))
+    assert request.code == 200
+    tr = obspy.read(request.buffer)[0]
+
+    assert abs((tr.stats.starttime) - (starttime + 622.559 - 5)) < 0.1
+    assert abs((tr.stats.endtime) - (starttime + 622.559 - 5 + 10)) < 0.1
+
 
 def test_phase_relative_offsets_but_no_ttimes_callback(all_clients):
     client = all_clients

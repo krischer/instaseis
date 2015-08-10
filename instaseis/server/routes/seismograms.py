@@ -570,12 +570,17 @@ class SeismogramsHandler(InstaseisRequestHandler):
         # relative to the origin time.
         if isinstance(args.starttime, float):
             args.starttime = args.origintime + args.starttime
-        # Same with the endtime
+
+        # Now deal with the endtime.
         if isinstance(args.endtime, float):
+            # If the start time is already known as an absolute time,
+            # just add it.
             if isinstance(args.starttime, obspy.UTCDateTime):
                 args.endtime = args.starttime + args.endtime
+            # Otherwise the start time has to be a phase relative time and
+            # is dealt with later.
             else:
-                args.endtime = args.origintime + args.endtime
+                assert isinstance(args.starttime, obspy.core.AttribDict)
 
         # Figure out the maximum temporal range of the seismograms.
         ti = _get_seismogram_times(
@@ -777,6 +782,9 @@ class SeismogramsHandler(InstaseisRequestHandler):
                 if tt is None:
                     continue
                 endtime = args.origintime + tt + args.endtime["offset"]
+            # Endtime relative to phase relative starttime.
+            elif isinstance(args.endtime, float):
+                endtime = starttime + args.endtime
             else:
                 endtime = args.endtime
 
