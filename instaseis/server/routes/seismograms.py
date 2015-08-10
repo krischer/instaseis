@@ -83,6 +83,9 @@ def _get_seismogram(db, source, receiver, components, units, dt, a_lanczos,
     # Trim, potentially pad with zeroes.
     st.trim(starttime, endtime, pad=True, fill_value=0.0, nearest_sample=False)
 
+    # Checked in another function and just a sanity check.
+    assert format in ("miniseed", "saczip")
+
     if format == "miniseed":
         with io.BytesIO() as fh:
             st.write(fh, format="mseed")
@@ -99,9 +102,6 @@ def _get_seismogram(db, source, receiver, components, units, dt, a_lanczos,
                 filename = "%s%s.sac" % (label, tr.id)
                 byte_strings.append((filename, temp.read()))
         callback(byte_strings)
-    else:
-        # Checked above and cannot really happen.
-        raise NotImplementedError
 
 
 class IOQueue(object):
@@ -195,11 +195,14 @@ class SeismogramsHandler(InstaseisRequestHandler):
         "sourcedepthinmeters": {"type": float},
 
         # Source can either be given as the moment tensor components in Nm.
-        "sourcemomenttensor": {"type": _momenttensor},
+        "sourcemomenttensor": {"type": _momenttensor,
+                               "format": "Mrr,Mtt,Mpp,Mrt,Mrp,Mtp"},
         # Or as strike, dip, rake and M0.
-        "sourcedoublecouple": {"type": _doublecouple},
+        "sourcedoublecouple": {"type": _doublecouple,
+                               "format": "strike,dip,rake[,M0]"},
         # Or as a force source.
-        "sourceforce": {"type": _forcesource},
+        "sourceforce": {"type": _forcesource,
+                        "format": "Fr,Ft,Fp"},
 
         # Or last but not least by specifying an event id.
         "eventid": {"type": str},
@@ -243,9 +246,6 @@ class SeismogramsHandler(InstaseisRequestHandler):
         for key, value in self.request.arguments.items():
             if len(value) == 1:
                 continue
-            elif len(value) == 0:
-                # This should not happen.
-                raise NotImplementedError
             else:
                 duplicates.append(key)
         if duplicates:
@@ -256,25 +256,22 @@ class SeismogramsHandler(InstaseisRequestHandler):
 
         args = obspy.core.AttribDict()
         for name, properties in self.seismogram_arguments.items():
-            if "required" in properties:
-                try:
-                    value = self.get_argument(name)
-                except:
-                    msg = "Required parameter '%s' not given." % name
-                    raise tornado.web.HTTPError(400, log_message=msg,
-                                                reason=msg)
+            if "default" in properties:
+                default = properties["default"]
             else:
-                if "default" in properties:
-                    default = properties["default"]
-                else:
-                    default = None
-                value = self.get_argument(name, default=default)
+                default = None
+            value = self.get_argument(name, default=default)
             if value is not None:
                 try:
                     value = properties["type"](value)
                 except:
-                    msg = "Parameter '%s' could not be converted to '%s'." % (
-                        name, str(properties["type"].__name__))
+                    if "format" in properties:
+                        msg = "Parameter '%s' must be formatted as: '%s'" % (
+                            name, properties["format"])
+                    else:
+                        msg = ("Parameter '%s' could not be converted to "
+                               "'%s'.") % (
+                            name, str(properties["type"].__name__))
                     raise tornado.web.HTTPError(400, log_message=msg,
                                                 reason=msg)
             setattr(args, name, value)
@@ -460,6 +457,11 @@ class SeismogramsHandler(InstaseisRequestHandler):
                 else:
                     m0 = 1E19
 
+                if m0 < 0:
+                    msg = "Seismic moment must not be negative."
+                    raise tornado.web.HTTPError(400, log_message=msg,
+                                                reason=msg)
+
                 try:
                     source = Source.from_strike_dip_rake(
                         latitude=args.sourcelatitude,
@@ -520,8 +522,6 @@ class SeismogramsHandler(InstaseisRequestHandler):
                 msg = "No coordinates found satisfying the query."
                 raise tornado.web.HTTPError(
                     404, log_message=msg, reason=msg)
-                self.application.station_coordinates_callback(
-                    networks=args.network, stations=args.station)
 
             for station in coordinates:
                 try:
@@ -649,9 +649,42 @@ class SeismogramsHandler(InstaseisRequestHandler):
             if err_msg.lower().startswith("invalid phase name"):
                 msg = "Invalid phase name: %s" % phase
             else:
-                msg = "Failed to calculate travel time due to: %s" % str(e)
+                msg = "Failed to calculate travel time due to: %s" % err_msg
             raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
         return tt
+
+    def validate_geometry(self, source, receiver):
+        """
+        Validate the source-receiver geometry.
+        """
+        info = self.application.db.info
+
+        # XXX: Will have to be changed once we have a database recorded for
+        # example on the ocean bottom.
+        if info.is_reciprocal:
+            # Receiver must be at the surface.
+            if receiver.depth_in_m is not None:
+                if receiver.depth_in_m != 0.0:
+                    msg = "Receiver must be at the surface for reciprocal " \
+                          "databases."
+                    raise tornado.web.HTTPError(400, log_message=msg,
+                                                reason=msg)
+            # Source depth must be within the allowed range.
+            if not ((info.planet_radius - info.max_radius) <=
+                    source.depth_in_m <=
+                    (info.planet_radius - info.min_radius)):
+                msg = ("Source depth must be within the database range: %.1f "
+                       "- %.1f meters.") % (
+                        info.planet_radius - info.max_radius,
+                        info.planet_radius - info.min_radius)
+                raise tornado.web.HTTPError(400, log_message=msg,
+                                            reason=msg)
+        else:
+            # The source depth must coincide with the one in the database.
+            if source.depth_in_m != info.source_depth * 1000:
+                    msg = "Source depth must be: %.1f km" % info.source_depth
+                    raise tornado.web.HTTPError(400, log_message=msg,
+                                                reason=msg)
 
     @tornado.web.asynchronous
     @tornado.gen.coroutine
@@ -746,6 +779,9 @@ class SeismogramsHandler(InstaseisRequestHandler):
             if endtime > max_endtime:
                 continue
 
+            # Validate the source-receiver geometry.
+            self.validate_geometry(source=source, receiver=receiver)
+
             # Yield from the task. This enables a context switch and thus
             # async behaviour.
             response = yield tornado.gen.Task(
@@ -762,8 +798,7 @@ class SeismogramsHandler(InstaseisRequestHandler):
             # It might return a list, in that case each item is a bytestring
             # of SAC file.
             elif isinstance(response, list):
-                if args.format != "saczip":
-                    raise NotImplemented
+                assert args.format == "saczip"
                 for filename, content in response:
                     zip_file.writestr(filename, content)
                 for data in buf:

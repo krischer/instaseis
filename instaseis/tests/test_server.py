@@ -831,6 +831,37 @@ def test_object_creation_for_seismogram_route(all_clients):
         assert p.call_args[1]["return_obspy_stream"] is True
         assert p.call_args[1]["dt"] is None
 
+        # If the seismic moment is not given, it will be set to 1E19
+        p.reset_mock()
+        _st.traces = obspy.read().traces
+        for tr in _st:
+            tr.stats.starttime = obspy.UTCDateTime(0) - 7 * dt
+            tr.stats.delta = dt
+
+        params = copy.deepcopy(basic_parameters)
+        params["sourcedoublecouple"] = "10,10,10"
+        request = client.fetch(_assemble_url(**params))
+        assert request.code == 200
+
+        assert p.call_count == 1
+        assert p.call_args[1]["components"] == ["Z", "N", "E"]
+        assert p.call_args[1]["source"] == \
+            instaseis.Source.from_strike_dip_rake(
+                latitude=basic_parameters["sourcelatitude"],
+                longitude=basic_parameters["sourcelongitude"],
+                depth_in_m=0.0,
+                strike=10, dip=10, rake=10, M0=1E19)
+        assert p.call_args[1]["receiver"] == instaseis.Receiver(
+            latitude=basic_parameters["receiverlatitude"],
+            longitude=basic_parameters["receiverlongitude"],
+            depth_in_m=0.0, network="XX", station="SYN")
+        assert p.call_args[1]["kind"] == "displacement"
+        # Remove source shift is always False
+        assert p.call_args[1]["remove_source_shift"] is False
+        assert p.call_args[1]["reconvolve_stf"] is False
+        assert p.call_args[1]["return_obspy_stream"] is True
+        assert p.call_args[1]["dt"] is None
+
         # Force source only works for displ_only databases.
         if "displ_only" in client.filepath:
             p.reset_mock()
@@ -2638,6 +2669,17 @@ def test_time_settings_for_seismograms_route(all_clients):
     for tr in st_2:
         assert tr.stats.starttime == origin_time - 10
 
+    # Can also be given as a float in which case it will be interpreted as
+    # an offset to the origin time.
+    p = copy.deepcopy(params)
+    p["starttime"] = -10
+    url = _assemble_url(**p)
+    request = client.fetch(url)
+    st_2 = obspy.read(request.buffer)
+
+    for tr in st_2:
+        assert tr.stats.starttime == origin_time - 10
+
     org_endtime = st[0].stats.endtime
 
     # Nonetheless the seismograms should still be identical for the time
@@ -2912,8 +2954,10 @@ def test_event_parameters_by_querying(all_clients_event_callback):
         _st = obspy.read()
         for tr in _st:
             tr.stats.starttime = source.origin_time - 0.01
+            tr.stats.delta = 10.0
         patch.return_value = _st
-        client.fetch(_assemble_url(**p))
+        result = client.fetch(_assemble_url(**p))
+        assert result.code == 200
 
     assert patch.call_args[1]["source"] == source
 
@@ -3471,6 +3515,20 @@ def test_phase_relative_offsets_multiple_stations(all_clients_all_callbacks):
     st = obspy.read(request.buffer)
     assert len(st) == 1
 
+    # This is constructed in such a way that only one station will have a P
+    # phase (due to the distance). So this is tested here.
+    params = {
+        "sourcelatitude": -39, "sourcelongitude": 20,
+        "sourcedepthinmeters": 300000,
+        "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
+        "components": "Z", "dt": 0.1,
+        "format": "miniseed", "network": "IU,B*", "station": "ANT*,ANM?",
+        "endtime": "P%2D10"}
+    request = client.fetch(_assemble_url(**params))
+    assert request.code == 200
+    st = obspy.read(request.buffer)
+    assert len(st) == 1
+
     # Now get both.
     params = {
         "sourcelatitude": 39, "sourcelongitude": 20,
@@ -3500,3 +3558,183 @@ def test_phase_relative_offsets_multiple_stations(all_clients_all_callbacks):
         "not existing for the specific source-receiver geometry "
         "or arriving too late/with too large offsets if the "
         "database is not long enough.")
+
+    # Or one also does not get any. In that case an error is raised.
+    params = {
+        "sourcelatitude": 39, "sourcelongitude": 20,
+        "sourcedepthinmeters": 300000,
+        "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
+        "components": "Z", "dt": 0.1,
+        "format": "miniseed", "network": "IU,B*", "station": "ANT*,ANM?",
+        "endtime": "P%2B10000"}
+    request = client.fetch(_assemble_url(**params))
+    assert request.code == 400
+    assert request.reason == (
+        "No seismograms found for the given phase relative "
+        "offsets. This could either be due to the chosen phase "
+        "not existing for the specific source-receiver geometry "
+        "or arriving too late/with too large offsets if the "
+        "database is not long enough.")
+
+
+def test_various_failure_conditions(all_clients_all_callbacks):
+    client = all_clients_all_callbacks
+    db = instaseis.open_db(client.filepath, read_on_demand=True)
+
+    # no source mechanism given.
+    params = {
+        "sourcelatitude": -39, "sourcelongitude": 20,
+        "sourcedepthinmeters": 300000,
+        "components": "Z", "dt": 0.1,
+        "format": "miniseed", "network": "IU,B*", "station": "ANT*,ANM?"}
+    request = client.fetch(_assemble_url(**params))
+    assert request.code == 400
+    assert request.reason == (
+        "One of the following has to be given: 'eventid', "
+        "'sourcedoublecouple', 'sourceforce', 'sourcemomenttensor'")
+
+    # moment tensor is missing a component.
+    params = {
+        "sourcelatitude": -39, "sourcelongitude": 20,
+        "sourcedepthinmeters": 300000,
+        "sourcemomenttensor": "100000,100000,100000,100000,100000",
+        "components": "Z", "dt": 0.1,
+        "format": "miniseed", "network": "IU,B*", "station": "ANT*,ANM?"}
+    request = client.fetch(_assemble_url(**params))
+    assert request.code == 400
+    assert request.reason == (
+        "Parameter 'sourcemomenttensor' must be formatted as: "
+        "'Mrr,Mtt,Mpp,Mrt,Mrp,Mtp'")
+
+    # moment tensor has an invalid component.
+    params = {
+        "sourcelatitude": -39, "sourcelongitude": 20,
+        "sourcedepthinmeters": 300000,
+        "sourcemomenttensor": "100000,100000,100000,100000,100000,bogus",
+        "components": "Z", "dt": 0.1,
+        "format": "miniseed", "network": "IU,B*", "station": "ANT*,ANM?"}
+    request = client.fetch(_assemble_url(**params))
+    assert request.code == 400
+    assert request.reason == (
+        "Parameter 'sourcemomenttensor' must be formatted as: "
+        "'Mrr,Mtt,Mpp,Mrt,Mrp,Mtp'")
+
+    # sourcedoublecouple is missing a component.
+    params = {
+        "sourcelatitude": -39, "sourcelongitude": 20,
+        "sourcedepthinmeters": 300000,
+        "sourcedoublecouple": "100000,100000",
+        "components": "Z", "dt": 0.1,
+        "format": "miniseed", "network": "IU,B*", "station": "ANT*,ANM?"}
+    request = client.fetch(_assemble_url(**params))
+    assert request.code == 400
+    assert request.reason == (
+        "Parameter 'sourcedoublecouple' must be formatted as: "
+        "'strike,dip,rake[,M0]'")
+
+    # sourcedoublecouple has an extra component.
+    params = {
+        "sourcelatitude": -39, "sourcelongitude": 20,
+        "sourcedepthinmeters": 300000,
+        "sourcedoublecouple": "100000,100000,10,11,12",
+        "components": "Z", "dt": 0.1,
+        "format": "miniseed", "network": "IU,B*", "station": "ANT*,ANM?"}
+    request = client.fetch(_assemble_url(**params))
+    assert request.code == 400
+    assert request.reason == (
+        "Parameter 'sourcedoublecouple' must be formatted as: "
+        "'strike,dip,rake[,M0]'")
+
+    # sourcedoublecouple has an invalid component.
+    params = {
+        "sourcelatitude": -39, "sourcelongitude": 20,
+        "sourcedepthinmeters": 300000,
+        "sourcedoublecouple": "100000,100000,10,bogus",
+        "components": "Z", "dt": 0.1,
+        "format": "miniseed", "network": "IU,B*", "station": "ANT*,ANM?"}
+    request = client.fetch(_assemble_url(**params))
+    assert request.code == 400
+    assert request.reason == (
+        "Parameter 'sourcedoublecouple' must be formatted as: "
+        "'strike,dip,rake[,M0]'")
+
+    # sourceforce is missing a component.
+    params = {
+        "sourcelatitude": -39, "sourcelongitude": 20,
+        "sourcedepthinmeters": 300000,
+        "sourceforce": "100000,100000",
+        "components": "Z", "dt": 0.1,
+        "format": "miniseed", "network": "IU,B*", "station": "ANT*,ANM?"}
+    request = client.fetch(_assemble_url(**params))
+    assert request.code == 400
+    assert request.reason == (
+        "Parameter 'sourceforce' must be formatted as: "
+        "'Fr,Ft,Fp'")
+
+    # sourceforce has an invalid component.
+    params = {
+        "sourcelatitude": -39, "sourcelongitude": 20,
+        "sourcedepthinmeters": 300000,
+        "sourceforce": "100000,100000,bogus",
+        "components": "Z", "dt": 0.1,
+        "format": "miniseed", "network": "IU,B*", "station": "ANT*,ANM?"}
+    request = client.fetch(_assemble_url(**params))
+    assert request.code == 400
+    assert request.reason == (
+        "Parameter 'sourceforce' must be formatted as: "
+        "'Fr,Ft,Fp'")
+
+    # Seismic moment cannot be negative.
+    params = {
+        "sourcelatitude": -39, "sourcelongitude": 20,
+        "sourcedepthinmeters": 300000,
+        "sourcedoublecouple": "100000,100000,10,-10",
+        "components": "Z", "dt": 0.1,
+        "format": "miniseed", "network": "IU,B*", "station": "ANT*,ANM?"}
+    request = client.fetch(_assemble_url(**params))
+    assert request.code == 400
+    assert request.reason == "Seismic moment must not be negative."
+
+    if db.info.is_reciprocal:
+        # Receiver depth must be at the surface for a reciprocal database.
+        params = {
+            "sourcelatitude": -39, "sourcelongitude": 20,
+            "sourcedepthinmeters": 0,
+            "sourcedoublecouple": "10,10,10,10",
+            "receiverlatitude": 10, "receiverlongitude": 10,
+            "receiverdepthinmeters": 10,
+            "components": "Z", "dt": 0.1,
+            "format": "miniseed"}
+        request = client.fetch(_assemble_url(**params))
+        assert request.code == 400
+        assert request.reason == ("Receiver must be at the surface for "
+                                  "reciprocal databases.")
+
+        # A too deep source depth raises.
+        params = {
+            "sourcelatitude": -39, "sourcelongitude": 20,
+            "sourcedepthinmeters": 3E9,
+            "sourcedoublecouple": "10,10,10,10",
+            "receiverlatitude": 10, "receiverlongitude": 10,
+            "components": "Z", "dt": 0.1,
+            "format": "miniseed"}
+        request = client.fetch(_assemble_url(**params))
+        assert request.code == 400
+        assert request.reason == ("Source depth must be within the database "
+                                  "range: 0.0 - 371000.0 meters.")
+
+    # For a forward database the source depth must be equal to the database
+    # depth!
+    if db.info.is_reciprocal is False:
+        params = {
+            "sourcelatitude": -39, "sourcelongitude": 20,
+            "sourcedepthinmeters": 14,
+            "sourcedoublecouple": "10,10,10,10",
+            "receiverlatitude": 10, "receiverlongitude": 10,
+            "receiverdepthinmeters": 10,
+            "components": "Z", "dt": 0.1,
+            "format": "miniseed"}
+        request = client.fetch(_assemble_url(**params))
+        assert request.code == 400
+        assert request.reason == (
+            "Source depth must be: %.1f km" % db.info.source_depth)
