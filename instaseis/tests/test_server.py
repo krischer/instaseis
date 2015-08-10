@@ -2754,14 +2754,14 @@ def test_time_settings_for_seismograms_route(all_clients):
     # Can also be done by passing a float which will be interpreted as an
     # offset in respect to the starttime.
     p = copy.deepcopy(params)
-    p["endtime"] = 10.0
+    p["endtime"] = 13.0
     url = _assemble_url(**p)
     request = client.fetch(url)
     st_2 = obspy.read(request.buffer)
 
     for tr in st_2:
         assert tr.stats.starttime == origin_time
-        assert tr.stats.endtime == origin_time + 10
+        assert tr.stats.endtime == origin_time + 13
 
     # If starttime is given, the duration is relative to the starttime.
     p = copy.deepcopy(params)
@@ -3763,6 +3763,34 @@ def test_various_failure_conditions(all_clients_all_callbacks):
     request = client.fetch(_assemble_url(**params))
     assert request.code == 400
     assert request.reason == "Seismic moment must not be negative."
+
+    # Funky phase offset setting.
+    params = {
+        "sourcelatitude": -39, "sourcelongitude": 20,
+        "sourcedepthinmeters": 300000,
+        "sourcedoublecouple": "100000,100000,10,10",
+        "components": "Z", "dt": 0.1,
+        "starttime": "P+!A",
+        "format": "miniseed", "network": "IU,B*", "station": "ANT*,ANM?"}
+    request = client.fetch(_assemble_url(**params))
+    assert request.code == 400
+    assert request.reason == (
+        "Parameter 'starttime' must be formatted as: 'Datetime "
+        "String/Float/Phase+-Offset'")
+
+    # Mixing different source settings.
+    params = {
+        "sourcelatitude": -39, "sourcelongitude": 20,
+        "sourcedepthinmeters": 300000,
+        "sourcedoublecouple": "100000,100000,10,10",
+        "sourceforce": "10,10,10",
+        "components": "Z", "dt": 0.1,
+        "format": "miniseed", "network": "IU,B*", "station": "ANT*,ANM?"}
+    request = client.fetch(_assemble_url(**params))
+    assert request.code == 400
+    assert request.reason == ("Only one of these parameters can be given "
+                              "simultaneously: 'sourcedoublecouple', "
+                              "'sourceforce'")
 
     if db.info.is_reciprocal:
         # Receiver depth must be at the surface for a reciprocal database.

@@ -209,8 +209,10 @@ class SeismogramsHandler(InstaseisRequestHandler):
 
         # Time parameters.
         "origintime": {"type": obspy.UTCDateTime},
-        "starttime": {"type": _validtimesetting},
-        "endtime": {"type": _validtimesetting},
+        "starttime": {"type": _validtimesetting,
+                      "format": "Datetime String/Float/Phase+-Offset"},
+        "endtime": {"type": _validtimesetting,
+                    "format": "Datetime String/Float/Phase+-Offset"},
 
         # Receivers can be specified either directly via their coordinates.
         # In that case one can assign a network and station code.
@@ -405,9 +407,9 @@ class SeismogramsHandler(InstaseisRequestHandler):
             msg = ("Must specify a full set of coordinates or a full set of "
                    "receiver parameters.")
             raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
-        elif all(direct_receiver_settings) and all(query_receivers):
-            # Should not happen.
-            raise NotImplementedError
+
+        # Should not happen.
+        assert not (all(direct_receiver_settings) and all(query_receivers))
 
         # Make sure that the station coordinates callback is available if
         # needed. Otherwise raise a 404.
@@ -432,6 +434,10 @@ class SeismogramsHandler(InstaseisRequestHandler):
             source = Source(**__event)
         # Otherwise parse it to one of the supported source types.
         else:
+            # Already checked before - just make sure.
+            assert args.sourcemomenttensor or args.sourcedoublecouple or \
+               args.sourceforce
+
             if args.sourcemomenttensor:
                 m = args.sourcemomenttensor
                 try:
@@ -489,12 +495,14 @@ class SeismogramsHandler(InstaseisRequestHandler):
                            "parameters. Check parameters for sanity.")
                     raise tornado.web.HTTPError(400, log_message=msg,
                                                 reason=msg)
-            else:
-                msg = "No/insufficient source parameters specified"
-                raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
         return source
 
     def get_receivers(self, args):
+        # Already checked before - just make sure the settings are valid.
+        assert (args.receiverlatitude is not None and
+                args.receiverlongitude is not None) or \
+           (args.network and args.station)
+
         receivers = []
 
         # Construct either a single receiver object.
@@ -536,10 +544,6 @@ class SeismogramsHandler(InstaseisRequestHandler):
                            "parameters. Check parameters for sanity.")
                     raise tornado.web.HTTPError(400, log_message=msg,
                                                 reason=msg)
-        else:
-            msg = "Should not happen."
-            raise tornado.web.HTTPError(500, log_message=msg, reason=msg)
-
         return receivers
 
     def parse_time_settings(self, args):
