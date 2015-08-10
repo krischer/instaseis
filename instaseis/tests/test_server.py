@@ -3252,3 +3252,40 @@ def test_phase_relative_offsets(all_clients_ttimes_callback):
 
     assert abs((tr.stats.starttime) - (starttime + 622.559 - 5)) < 0.1
     assert abs((tr.stats.endtime) - (starttime + 1090.081 + 2)) < 0.1
+
+
+def test_phase_relative_offsets_but_no_ttimes_callback(all_clients):
+    client = all_clients
+
+    params = {
+        "sourcelatitude": 0, "sourcelongitude": 0,
+        "sourcedepthinmeters": 300000,
+        "receiverlatitude": 0, "receiverlongitude": 50,
+        "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
+        "components": "Z", "dt": 0.1,
+        "format": "miniseed"}
+
+    # Test for starttime.
+    p = copy.deepcopy(params)
+    p["starttime"] = "P%2D10"
+    request = client.fetch(_assemble_url(**p))
+    assert request.code == 404
+    assert request.reason == (
+        "Server does not support travel time calculations.")
+
+    # Test for endtime.
+    p = copy.deepcopy(params)
+    p["endtime"] = "P%2D10"
+    request = client.fetch(_assemble_url(**p))
+    assert request.code == 404
+    assert request.reason == (
+        "Server does not support travel time calculations.")
+
+    # Test for both.
+    p = copy.deepcopy(params)
+    p["starttime"] = "P%2D10"
+    p["endtime"] = "S%2B10"
+    request = client.fetch(_assemble_url(**p))
+    assert request.code == 404
+    assert request.reason == (
+        "Server does not support travel time calculations.")
