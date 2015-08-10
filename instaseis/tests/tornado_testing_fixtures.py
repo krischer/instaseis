@@ -226,6 +226,13 @@ def create_async_client(path, station_coordinates_callback=None,
     client = AsyncClient(server, AsyncHTTPClient())
     client.filepath = path
     client.port = port
+    # Flag to help deal with forward/backwards databases.
+    if "bwd" in os.path.basename(path):
+        client.is_reciprocal = True
+        client.source_depth = 0.0
+    else:
+        client.is_reciprocal = False
+        client.source_depth = application.db.info.source_depth * 1000
     return client
 
 

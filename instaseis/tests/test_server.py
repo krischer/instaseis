@@ -552,7 +552,7 @@ def test_seismograms_error_handling(all_clients):
     basic_parameters = {
         "sourcelatitude": 10,
         "sourcelongitude": 10,
-        "sourcedepthinmeters": 0,
+        "sourcedepthinmeters": client.source_depth,
         "receiverlatitude": -10,
         "receiverlongitude": -10}
 
@@ -678,7 +678,7 @@ def test_object_creation_for_seismogram_route(all_clients):
     basic_parameters = {
         "sourcelatitude": 10,
         "sourcelongitude": 10,
-        "sourcedepthinmeters": 0,
+        "sourcedepthinmeters": client.source_depth,
         "receiverlatitude": -10,
         "receiverlongitude": -10}
 
@@ -714,7 +714,7 @@ def test_object_creation_for_seismogram_route(all_clients):
         assert p.call_args[1]["source"] == instaseis.Source(
             latitude=basic_parameters["sourcelatitude"],
             longitude=basic_parameters["sourcelongitude"],
-            depth_in_m=0.0,
+            depth_in_m=client.source_depth,
             **dict((key[0] + "_" + key[1:], float(value))
                    for (key, value) in mt.items()))
         assert p.call_args[1]["receiver"] == instaseis.Receiver(
@@ -731,9 +731,15 @@ def test_object_creation_for_seismogram_route(all_clients):
         # Moment tensor source with a couple more parameters.
         p.reset_mock()
 
-        params["sourcedepthinmeters"] = "5.0"
+        # Source depth can only be set for reciprocal databases.
+        if client.is_reciprocal:
+            params["sourcedepthinmeters"] = "5.0"
+            params["receiverdepthinmeters"] = "0.0"
+        # Receiverdepth setting only valid for forward databases.
+        else:
+            params["receiverdepthinmeters"] = "55.0"
+
         params["origintime"] = str(time)
-        params["receiverdepthinmeters"] = "55.0"
         params["networkcode"] = "BW"
         params["stationcode"] = "ALTM"
 
@@ -751,13 +757,15 @@ def test_object_creation_for_seismogram_route(all_clients):
         assert p.call_args[1]["source"] == instaseis.Source(
             latitude=basic_parameters["sourcelatitude"],
             longitude=basic_parameters["sourcelongitude"],
-            depth_in_m=5.0, origin_time=time,
+            depth_in_m=params["sourcedepthinmeters"],
+            origin_time=time,
             **dict((key[0] + "_" + key[1:], float(value))
                    for (key, value) in mt.items()))
         assert p.call_args[1]["receiver"] == instaseis.Receiver(
             latitude=basic_parameters["receiverlatitude"],
             longitude=basic_parameters["receiverlongitude"],
-            depth_in_m=55.0, network="BW", station="ALTM")
+            depth_in_m=params["receiverdepthinmeters"],
+            network="BW", station="ALTM")
         assert p.call_args[1]["kind"] == "displacement"
         # Remove source shift is always False
         assert p.call_args[1]["remove_source_shift"] is False
@@ -783,7 +791,7 @@ def test_object_creation_for_seismogram_route(all_clients):
             instaseis.Source.from_strike_dip_rake(
                 latitude=basic_parameters["sourcelatitude"],
                 longitude=basic_parameters["sourcelongitude"],
-                depth_in_m=0.0,
+                depth_in_m=basic_parameters["sourcedepthinmeters"],
                 **dict((key, float(value)) for (key, value) in sdr.items()))
         assert p.call_args[1]["receiver"] == instaseis.Receiver(
             latitude=basic_parameters["receiverlatitude"],
@@ -803,9 +811,14 @@ def test_object_creation_for_seismogram_route(all_clients):
             tr.stats.starttime = time - 1 - 7 * dt
             tr.stats.delta = dt
 
-        params["sourcedepthinmeters"] = "5.0"
+        # Source depth can only be set for reciprocal databases.
+        if client.is_reciprocal:
+            params["sourcedepthinmeters"] = "5.0"
+            params["receiverdepthinmeters"] = "0.0"
+        else:
+            params["receiverdepthinmeters"] = "55.0"
+
         params["origintime"] = str(time)
-        params["receiverdepthinmeters"] = "55.0"
         params["networkcode"] = "BW"
         params["stationcode"] = "ALTM"
 
@@ -818,12 +831,14 @@ def test_object_creation_for_seismogram_route(all_clients):
             instaseis.Source.from_strike_dip_rake(
                 latitude=basic_parameters["sourcelatitude"],
                 longitude=basic_parameters["sourcelongitude"],
-                depth_in_m=5.0, origin_time=time,
+                depth_in_m=params["sourcedepthinmeters"],
+                origin_time=time,
                 **dict((key, float(value)) for (key, value) in sdr.items()))
         assert p.call_args[1]["receiver"] == instaseis.Receiver(
             latitude=basic_parameters["receiverlatitude"],
             longitude=basic_parameters["receiverlongitude"],
-            depth_in_m=55.0, network="BW", station="ALTM")
+            depth_in_m=params["receiverdepthinmeters"],
+            network="BW", station="ALTM")
         assert p.call_args[1]["kind"] == "displacement"
         # Remove source shift is always False
         assert p.call_args[1]["remove_source_shift"] is False
@@ -849,7 +864,7 @@ def test_object_creation_for_seismogram_route(all_clients):
             instaseis.Source.from_strike_dip_rake(
                 latitude=basic_parameters["sourcelatitude"],
                 longitude=basic_parameters["sourcelongitude"],
-                depth_in_m=0.0,
+                depth_in_m=basic_parameters["sourcedepthinmeters"],
                 strike=10, dip=10, rake=10, M0=1E19)
         assert p.call_args[1]["receiver"] == instaseis.Receiver(
             latitude=basic_parameters["receiverlatitude"],
@@ -903,7 +918,7 @@ def test_object_creation_for_seismogram_route(all_clients):
 
             params["sourcedepthinmeters"] = "5.0"
             params["origintime"] = str(time)
-            params["receiverdepthinmeters"] = "55.0"
+            params["receiverdepthinmeters"] = "0.0"
             params["networkcode"] = "BW"
             params["stationcode"] = "ALTM"
 
@@ -921,7 +936,7 @@ def test_object_creation_for_seismogram_route(all_clients):
             assert p.call_args[1]["receiver"] == instaseis.Receiver(
                 latitude=basic_parameters["receiverlatitude"],
                 longitude=basic_parameters["receiverlongitude"],
-                depth_in_m=55.0, network="BW", station="ALTM")
+                depth_in_m=0.0, network="BW", station="ALTM")
             assert p.call_args[1]["kind"] == "displacement"
             # Remove source shift is always False
             assert p.call_args[1]["remove_source_shift"] is False
@@ -1047,7 +1062,7 @@ def test_seismograms_retrieval(all_clients):
     basic_parameters = {
         "sourcelatitude": 10,
         "sourcelongitude": 10,
-        "sourcedepthinmeters": 0,
+        "sourcedepthinmeters": client.source_depth,
         "receiverlatitude": -10,
         "receiverlongitude": -10,
         "format": "miniseed"}
@@ -1098,9 +1113,14 @@ def test_seismograms_retrieval(all_clients):
         np.testing.assert_allclose(tr_server.data, tr_db.data,
                                    atol=1E-10 * tr_server.data.ptp())
 
-    params["sourcedepthinmeters"] = "5.0"
+    if client.is_reciprocal:
+        params["sourcedepthinmeters"] = "5.0"
+        params["receiverdepthinmeters"] = "0.0"
+    else:
+        params["sourcedepthinmeters"] = str(client.source_depth)
+        params["receiverdepthinmeters"] = "55.0"
+
     params["origintime"] = str(time)
-    params["receiverdepthinmeters"] = "55.0"
     params["networkcode"] = "BW"
     params["stationcode"] = "ALTM"
     request = client.fetch(_assemble_url(**params))
@@ -1109,13 +1129,15 @@ def test_seismograms_retrieval(all_clients):
     source = instaseis.Source(
         latitude=basic_parameters["sourcelatitude"],
         longitude=basic_parameters["sourcelongitude"],
-        depth_in_m=5.0, origin_time=time,
+        depth_in_m=params["sourcedepthinmeters"],
+        origin_time=time,
         **dict((key[0] + "_" + key[1:], float(value))
                for (key, value) in mt.items()))
     receiver = instaseis.Receiver(
         latitude=basic_parameters["receiverlatitude"],
         longitude=basic_parameters["receiverlongitude"],
-        depth_in_m=55.0, network="BW", station="ALTM")
+        depth_in_m=params["receiverdepthinmeters"],
+        network="BW", station="ALTM")
     st_db = db.get_seismograms(source=source, receiver=receiver,
                                components=components)
     for tr_server, tr_db in zip(st_server, st_db):
@@ -1166,9 +1188,14 @@ def test_seismograms_retrieval(all_clients):
                                    atol=1E-10 * tr_server.data.ptp())
 
     # Moment tensor source with a couple more parameters.
-    params["sourcedepthinmeters"] = "5.0"
+    if client.is_reciprocal:
+        params["sourcedepthinmeters"] = "5.0"
+        params["receiverdepthinmeters"] = "0.0"
+    else:
+        params["sourcedepthinmeters"] = str(client.source_depth)
+        params["receiverdepthinmeters"] = "55.0"
+
     params["origintime"] = str(time)
-    params["receiverdepthinmeters"] = "55.0"
     params["networkcode"] = "BW"
     params["stationcode"] = "ALTM"
 
@@ -1178,12 +1205,14 @@ def test_seismograms_retrieval(all_clients):
     source = instaseis.Source.from_strike_dip_rake(
         latitude=basic_parameters["sourcelatitude"],
         longitude=basic_parameters["sourcelongitude"],
-        depth_in_m=5.0, origin_time=time,
+        depth_in_m=params["sourcedepthinmeters"],
+        origin_time=time,
         **dict((key, float(value)) for (key, value) in sdr.items()))
     receiver = instaseis.Receiver(
         latitude=basic_parameters["receiverlatitude"],
         longitude=basic_parameters["receiverlongitude"],
-        depth_in_m=55.0, network="BW", station="ALTM")
+        depth_in_m=params["receiverdepthinmeters"],
+        network="BW", station="ALTM")
     st_db = db.get_seismograms(source=source, receiver=receiver,
                                components=components)
     for tr_server, tr_db in zip(st_server, st_db):
@@ -1236,9 +1265,14 @@ def test_seismograms_retrieval(all_clients):
             np.testing.assert_allclose(tr_server.data, tr_db.data,
                                        atol=1E-10 * tr_server.data.ptp())
 
-        params["sourcedepthinmeters"] = "5.0"
+        if client.is_reciprocal:
+            params["sourcedepthinmeters"] = "5.0"
+            params["receiverdepthinmeters"] = "0.0"
+        else:
+            params["sourcedepthinmeters"] = "0.0"
+            params["receiverdepthinmeters"] = "55.0"
+
         params["origintime"] = str(time)
-        params["receiverdepthinmeters"] = "55.0"
         params["networkcode"] = "BW"
         params["stationcode"] = "ALTM"
 
@@ -1248,13 +1282,15 @@ def test_seismograms_retrieval(all_clients):
         source = instaseis.ForceSource(
             latitude=basic_parameters["sourcelatitude"],
             longitude=basic_parameters["sourcelongitude"],
-            depth_in_m=5.0, origin_time=time,
+            depth_in_m=params["sourcedepthinmeters"],
+            origin_time=time,
             **dict(("_".join(key), float(value))
                    for (key, value) in fs.items()))
         receiver = instaseis.Receiver(
             latitude=basic_parameters["receiverlatitude"],
             longitude=basic_parameters["receiverlongitude"],
-            depth_in_m=55.0, network="BW", station="ALTM")
+            depth_in_m=params["receiverdepthinmeters"],
+            network="BW", station="ALTM")
         st_db = db.get_seismograms(source=source, receiver=receiver,
                                    components=components)
         for tr_server, tr_db in zip(st_server, st_db):
@@ -1416,7 +1452,7 @@ def test_output_formats(all_clients):
     basic_parameters = {
         "sourcelatitude": 10,
         "sourcelongitude": 10,
-        "sourcedepthinmeters": 0,
+        "sourcedepthinmeters": client.source_depth,
         "receiverlatitude": -10,
         "receiverlongitude": -10,
         "sourcemomenttensor": "100000,100000,100000,100000,100000,100000"}
@@ -1482,7 +1518,7 @@ def test_output_formats(all_clients):
     basic_parameters = {
         "sourcelatitude": 10,
         "sourcelongitude": 10,
-        "sourcedepthinmeters": 0,
+        "sourcedepthinmeters": client.source_depth,
         "receiverlatitude": -10,
         "receiverlongitude": -10}
     mt = {"sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
@@ -1631,8 +1667,8 @@ def test_cors_headers(all_clients_all_callbacks):
 
     request = client.fetch(
         "/ttimes?sourcelatitude=50&sourcelongitude=10&"
-        "sourcedepthinmeters=0&receiverlatitude=40&receiverlongitude=90&"
-        "receiverdepthinmeters=0&phase=P")
+        "sourcedepthinmeters=%i&receiverlatitude=40&receiverlongitude=90&"
+        "receiverdepthinmeters=0&phase=P" % client.source_depth)
     assert request.code == 200
     assert "Access-Control-Allow-Origin" in request.headers
     assert request.headers["Access-Control-Allow-Origin"] == "*"
@@ -1658,7 +1694,7 @@ def test_cors_headers(all_clients_all_callbacks):
     params = {
         "sourcelatitude": 10,
         "sourcelongitude": 10,
-        "sourcedepthinmeters": 0,
+        "sourcedepthinmeters": client.source_depth,
         "receiverlatitude": -10,
         "receiverlongitude": -10,
         "sourcemomenttensor": "100000,100000,100000,100000,100000,100000"}
@@ -1713,7 +1749,7 @@ def test_multiple_seismograms_retrieval_no_format_given(
     db = instaseis.open_db(client.filepath)
 
     basic_parameters = {"sourcelatitude": 10, "sourcelongitude": 10,
-                        "sourcedepthinmeters": 0.0}
+                        "sourcedepthinmeters": client.source_depth}
 
     # Various sources.
     mt = {"mtt": "100000", "mpp": "100000", "mrr": "100000",
@@ -1787,7 +1823,8 @@ def test_multiple_seismograms_retrieval_no_format_given(
     params["station"] = "ANT*,ANM?"
     params["components"] = "RT"
     # A couple more parameters.
-    params["sourcedepthinmeters"] = "5.0"
+    if client.is_reciprocal is True:
+        params["sourcedepthinmeters"] = "5.0"
     params["origintime"] = str(time)
 
     # Default format is MiniSEED>
@@ -1907,7 +1944,7 @@ def test_multiple_seismograms_retrieval_no_format_given_single_station(
     db = instaseis.open_db(client.filepath)
 
     basic_parameters = {"sourcelatitude": 10, "sourcelongitude": 10,
-                        "sourcedepthinmeters": 0}
+                        "sourcedepthinmeters": client.source_depth}
 
     # Various sources.
     mt = {"mtt": "100000", "mpp": "100000", "mrr": "100000",
@@ -1979,7 +2016,10 @@ def test_multiple_seismograms_retrieval_no_format_given_single_station(
     params["station"] = "ANMO"
     params["components"] = "RT"
     # A couple more parameters.
-    params["sourcedepthinmeters"] = "5.0"
+    if client.is_reciprocal:
+        params["sourcedepthinmeters"] = "5.0"
+    else:
+        params["sourcedepthinmeters"] = str(client.source_depth)
     params["origintime"] = str(time)
 
     # Default format is MiniSEED>
@@ -1996,7 +2036,8 @@ def test_multiple_seismograms_retrieval_no_format_given_single_station(
     source = instaseis.Source.from_strike_dip_rake(
         latitude=basic_parameters["sourcelatitude"],
         longitude=basic_parameters["sourcelongitude"],
-        depth_in_m=5.0, origin_time=time,
+        depth_in_m=params["sourcedepthinmeters"],
+        origin_time=time,
         **dict((key, float(value)) for (key, value) in sdr.items()))
     receivers = [
         instaseis.Receiver(latitude=34.94591, longitude=-106.4572,
@@ -2091,7 +2132,8 @@ def test_multiple_seismograms_retrieval_mseed_format(
     db = instaseis.open_db(client.filepath)
 
     basic_parameters = {"sourcelatitude": 10, "sourcelongitude": 10,
-                        "format": "miniseed", "sourcedepthinmeters": 0}
+                        "format": "miniseed",
+                        "sourcedepthinmeters": client.source_depth}
 
     # Various sources.
     mt = {"mtt": "100000", "mpp": "100000", "mrr": "100000",
@@ -2163,8 +2205,11 @@ def test_multiple_seismograms_retrieval_mseed_format(
     params["station"] = "ANT*,ANM?"
     params["components"] = "RT"
     # A couple more parameters.
-    params["sourcedepthinmeters"] = "5.0"
     params["origintime"] = str(time)
+    if client.is_reciprocal:
+        params["sourcedepthinmeters"] = "5.0"
+    else:
+        params["sourcedepthinmeters"] = str(client.source_depth)
 
     # Default format is MiniSEED>
     request = client.fetch(_assemble_url(**params))
@@ -2177,7 +2222,8 @@ def test_multiple_seismograms_retrieval_mseed_format(
     source = instaseis.Source.from_strike_dip_rake(
         latitude=basic_parameters["sourcelatitude"],
         longitude=basic_parameters["sourcelongitude"],
-        depth_in_m=5.0, origin_time=time,
+        depth_in_m=params["sourcedepthinmeters"],
+        origin_time=time,
         **dict((key, float(value)) for (key, value) in sdr.items()))
     receivers = [
         instaseis.Receiver(latitude=39.868, longitude=32.7934,
@@ -2276,7 +2322,8 @@ def test_multiple_seismograms_retrieval_saczip_format(
     db = instaseis.open_db(client.filepath)
 
     basic_parameters = {"sourcelatitude": 10, "sourcelongitude": 10,
-                        "sourcedepthinmeters": 0, "format": "saczip"}
+                        "sourcedepthinmeters": client.source_depth,
+                        "format": "saczip"}
 
     # Various sources.
     mt = {"mtt": "100000", "mpp": "100000", "mrr": "100000",
@@ -2355,10 +2402,13 @@ def test_multiple_seismograms_retrieval_saczip_format(
     params["station"] = "ANT*,ANM?"
     params["components"] = "RT"
     # A couple more parameters.
-    params["sourcedepthinmeters"] = "5.0"
     params["origintime"] = str(time)
+    if client.is_reciprocal:
+        params["sourcedepthinmeters"] = "5.0"
+    else:
+        params["sourcedepthinmeters"] = str(client.source_depth)
 
-    # Default format is MiniSEED>
+    # Default format is saczip.
     request = client.fetch(_assemble_url(**params))
     assert request.code == 200
     assert request.headers["Content-Type"] == "application/zip"
@@ -2536,7 +2586,7 @@ def test_unknown_parameter_raises(all_clients):
     # Same with /seismograms route.
     params = {
         "sourcelatitude": 10, "sourcelongitude": 10, "receiverlatitude": -10,
-        "receiverlongitude": -10, "sourcedepthinmeters": 0,
+        "receiverlongitude": -10, "sourcedepthinmeters": client.source_depth,
         "sourcemomenttensor": "100000,100000,100000,100000,100000,100000"}
     request = client.fetch(_assemble_url(**params))
     assert request.code == 200
@@ -2576,7 +2626,7 @@ def test_passing_duplicate_parameter_raises(all_clients):
     # Same with /seismograms route.
     params = {
         "sourcelatitude": 10, "sourcelongitude": 10, "receiverlatitude": -10,
-        "receiverlongitude": -10, "sourcedepthinmeters": 0,
+        "receiverlongitude": -10, "sourcedepthinmeters": client.source_depth,
         "sourcemomenttensor": "100000,100000,100000,100000,100000,100000"}
     url = _assemble_url(**params)
     request = client.fetch(url)
@@ -2598,7 +2648,7 @@ def test_passing_invalid_time_settings_raises(all_clients):
     client = all_clients
     params = {
         "sourcelatitude": 10, "sourcelongitude": 10, "receiverlatitude": -10,
-        "receiverlongitude": -10, "sourcedepthinmeters": 0,
+        "receiverlongitude": -10, "sourcedepthinmeters": client.source_depth,
         "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
         "origintime": str(origin_time)}
 
@@ -2645,7 +2695,7 @@ def test_time_settings_for_seismograms_route(all_clients):
     # Resample to 1Hz to simplify the logic.
     params = {
         "sourcelatitude": 10, "sourcelongitude": 10, "receiverlatitude": -10,
-        "receiverlongitude": -10, "sourcedepthinmeters": 0,
+        "receiverlongitude": -10, "sourcedepthinmeters": client.source_depth,
         "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
         "dt": 1.0, "alanczos": 1, "origintime": str(origin_time),
         "format": "miniseed"}
@@ -2908,6 +2958,11 @@ def test_event_parameters_by_querying(all_clients_event_callback):
     Test the query by eventid.
     """
     client = all_clients_event_callback
+
+    # Only works for reciprocal databases. Otherwise the depth if fixed.
+    if not client.is_reciprocal:
+        return
+
     db = instaseis.open_db(client.filepath)
 
     params = {"receiverlatitude": 10, "receiverlongitude": 10,
@@ -2983,7 +3038,8 @@ def test_label_parameter(all_clients):
     client = all_clients
 
     params = {
-        "sourcelatitude": 10, "sourcelongitude": 10, "sourcedepthinmeters": 0,
+        "sourcelatitude": 10, "sourcelongitude": 10,
+        "sourcedepthinmeters": client.source_depth,
         "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
         "receiverlatitude": 20, "receiverlongitude": 20, "format": "miniseed"}
 
@@ -3162,7 +3218,8 @@ def test_network_and_station_code_settings(all_clients):
     client = all_clients
 
     params = {
-        "sourcelatitude": 10, "sourcelongitude": 10, "sourcedepthinmeters": 0,
+        "sourcelatitude": 10, "sourcelongitude": 10,
+        "sourcedepthinmeters": client.source_depth,
         "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
         "receiverlatitude": 20, "receiverlongitude": 20, "format": "miniseed"}
 
@@ -3225,6 +3282,10 @@ def test_phase_relative_offsets(all_clients_ttimes_callback):
     - must be encoded with %2D
     """
     client = all_clients_ttimes_callback
+
+    # Only for reciprocal ones as the depth is fixed otherwise.
+    if not client.is_reciprocal:
+        return
 
     # At a distance of 50 degrees and with a source depth of 300 km:
     # P: 504.357 seconds
@@ -3338,6 +3399,10 @@ def test_phase_relative_offsets_but_no_ttimes_callback(all_clients):
 def test_phase_relative_offset_different_time_representations(
         all_clients_ttimes_callback):
     client = all_clients_ttimes_callback
+
+    # Different source depth for non-reciprocal client...
+    if not client.is_reciprocal:
+        return
 
     params = {
         "sourcelatitude": 0, "sourcelongitude": 0,
@@ -3499,6 +3564,10 @@ def test_phase_relative_offset_failures(all_clients_ttimes_callback):
 
 def test_phase_relative_offsets_multiple_stations(all_clients_all_callbacks):
     client = all_clients_all_callbacks
+
+    # Only for reciprocal ones as the depth is different otherwise...
+    if not client.is_reciprocal:
+        return
 
     # Now test multiple receiveers.
     # This is constructed in such a way that only one station will have a P
