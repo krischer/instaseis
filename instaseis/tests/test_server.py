@@ -3289,3 +3289,131 @@ def test_phase_relative_offsets_but_no_ttimes_callback(all_clients):
     assert request.code == 404
     assert request.reason == (
         "Server does not support travel time calculations.")
+
+
+def test_phase_relative_offset_different_time_representations(
+        all_clients_ttimes_callback):
+    client = all_clients_ttimes_callback
+
+    params = {
+        "sourcelatitude": 0, "sourcelongitude": 0,
+        "sourcedepthinmeters": 300000,
+        "receiverlatitude": 0, "receiverlongitude": 50,
+        "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
+        "components": "Z", "dt": 0.1,
+        "format": "miniseed"}
+
+    # Normal seismogram.
+    p = copy.deepcopy(params)
+    request = client.fetch(_assemble_url(**p))
+    assert request.code == 200
+    tr = obspy.read(request.buffer)[0]
+    starttime, endtime = tr.stats.starttime, tr.stats.endtime
+
+    # P+10
+    p = copy.deepcopy(params)
+    p["starttime"] = "P%2D10"
+    request = client.fetch(_assemble_url(**p))
+    assert request.code == 200
+    tr = obspy.read(request.buffer)[0]
+    assert abs((tr.stats.starttime) - (starttime + 504.357 - 10)) < 0.1
+    assert tr.stats.endtime == endtime
+
+    # P-10
+    p = copy.deepcopy(params)
+    p["starttime"] = "P%2B10"
+    request = client.fetch(_assemble_url(**p))
+    assert request.code == 200
+    tr = obspy.read(request.buffer)[0]
+    assert abs((tr.stats.starttime) - (starttime + 504.357 + 10)) < 0.1
+    assert tr.stats.endtime == endtime
+
+    # P+10.0
+    p = copy.deepcopy(params)
+    p["starttime"] = "P%2D10.0"
+    request = client.fetch(_assemble_url(**p))
+    assert request.code == 200
+    tr = obspy.read(request.buffer)[0]
+    assert abs((tr.stats.starttime) - (starttime + 504.357 - 10)) < 0.1
+    assert tr.stats.endtime == endtime
+
+    # P-10.0
+    p = copy.deepcopy(params)
+    p["starttime"] = "P%2B10.0"
+    request = client.fetch(_assemble_url(**p))
+    assert request.code == 200
+    tr = obspy.read(request.buffer)[0]
+    assert abs((tr.stats.starttime) - (starttime + 504.357 + 10)) < 0.1
+    assert tr.stats.endtime == endtime
+
+    # P+10.000
+    p = copy.deepcopy(params)
+    p["starttime"] = "P%2D10.000"
+    request = client.fetch(_assemble_url(**p))
+    assert request.code == 200
+    tr = obspy.read(request.buffer)[0]
+    assert abs((tr.stats.starttime) - (starttime + 504.357 - 10)) < 0.1
+    assert tr.stats.endtime == endtime
+
+    # P-10.000
+    p = copy.deepcopy(params)
+    p["starttime"] = "P%2B10.000"
+    request = client.fetch(_assemble_url(**p))
+    assert request.code == 200
+    tr = obspy.read(request.buffer)[0]
+    assert abs((tr.stats.starttime) - (starttime + 504.357 + 10)) < 0.1
+    assert tr.stats.endtime == endtime
+
+    # P+1E1
+    p = copy.deepcopy(params)
+    p["starttime"] = "P%2D1E1"
+    request = client.fetch(_assemble_url(**p))
+    assert request.code == 200
+    tr = obspy.read(request.buffer)[0]
+    assert abs((tr.stats.starttime) - (starttime + 504.357 - 10)) < 0.1
+    assert tr.stats.endtime == endtime
+
+    # P-1E1
+    p = copy.deepcopy(params)
+    p["starttime"] = "P%2B1E1"
+    request = client.fetch(_assemble_url(**p))
+    assert request.code == 200
+    tr = obspy.read(request.buffer)[0]
+    assert abs((tr.stats.starttime) - (starttime + 504.357 + 10)) < 0.1
+    assert tr.stats.endtime == endtime
+
+    # P+1.0E1
+    p = copy.deepcopy(params)
+    p["starttime"] = "P%2D1.0E1"
+    request = client.fetch(_assemble_url(**p))
+    assert request.code == 200
+    tr = obspy.read(request.buffer)[0]
+    assert abs((tr.stats.starttime) - (starttime + 504.357 - 10)) < 0.1
+    assert tr.stats.endtime == endtime
+
+    # P-1.0E1
+    p = copy.deepcopy(params)
+    p["starttime"] = "P%2B1.0E1"
+    request = client.fetch(_assemble_url(**p))
+    assert request.code == 200
+    tr = obspy.read(request.buffer)[0]
+    assert abs((tr.stats.starttime) - (starttime + 504.357 + 10)) < 0.1
+    assert tr.stats.endtime == endtime
+
+    # P+1e1
+    p = copy.deepcopy(params)
+    p["starttime"] = "P%2D1e1"
+    request = client.fetch(_assemble_url(**p))
+    assert request.code == 200
+    tr = obspy.read(request.buffer)[0]
+    assert abs((tr.stats.starttime) - (starttime + 504.357 - 10)) < 0.1
+    assert tr.stats.endtime == endtime
+
+    # P-1e1
+    p = copy.deepcopy(params)
+    p["starttime"] = "P%2B1e1"
+    request = client.fetch(_assemble_url(**p))
+    assert request.code == 200
+    tr = obspy.read(request.buffer)[0]
+    assert abs((tr.stats.starttime) - (starttime + 504.357 + 10)) < 0.1
+    assert tr.stats.endtime == endtime
