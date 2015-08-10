@@ -552,7 +552,7 @@ class SeismogramsHandler(InstaseisRequestHandler):
         args.starttime and args.endtime will either be set to absolute times
         or dictionaries describing phase relative offsets.
 
-        Returns the maximum possible start-and endtimes.
+        Returns the minium possible start- and the maximum possible endtime.
         """
         if args.origintime is None:
             args.origintime = obspy.UTCDateTime(0)
@@ -635,19 +635,29 @@ class SeismogramsHandler(InstaseisRequestHandler):
             msg = "Server does not support travel time calculations."
             raise tornado.web.HTTPError(
                 404, log_message=msg, reason=msg)
-        tt = self.application.travel_time_callback(
-            sourcelatitude=source.latitude,
-            sourcelongitude=source.longitude,
-            sourcedepthinmeters=source.depth_in_m,
-            receiverlatitude=receiver.latitude,
-            receiverlongitude=receiver.longitude,
-            receiverdepthinmeters=receiver.depth_in_m,
-            phase_name=phase)
+        try:
+            tt = self.application.travel_time_callback(
+                sourcelatitude=source.latitude,
+                sourcelongitude=source.longitude,
+                sourcedepthinmeters=source.depth_in_m,
+                receiverlatitude=receiver.latitude,
+                receiverlongitude=receiver.longitude,
+                receiverdepthinmeters=receiver.depth_in_m,
+                phase_name=phase)
+        except ValueError as e:
+            err_msg = str(e)
+            if err_msg.lower().startswith("invalid phase name"):
+                msg = "Invalid phase name: %s" % phase
+            else:
+                msg = "Failed to calculate travel time due to: %s" % str(e)
+            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
         return tt
 
     @tornado.web.asynchronous
     @tornado.gen.coroutine
     def get(self):
+        # Parse the arguments. This will also perform a number of sanity
+        # checks.
         args = self.parse_arguments()
 
         if args.eventid is not None:
@@ -660,9 +670,17 @@ class SeismogramsHandler(InstaseisRequestHandler):
             except ValueError:
                 msg = "Event not found."
                 raise tornado.web.HTTPError(404, log_message=msg, reason=msg)
+
+            if not isinstance(__event, dict) or \
+                    sorted(__event.keys()) != sorted((
+                    "m_rr", "m_tt", "m_pp", "m_rt", "m_rp", "m_tp", "latitude",
+                    "longitude", "depth_in_m", "origin_time")):
+                msg = "Event callback returned an invalid result."
+                raise tornado.web.HTTPError(500, log_message=msg, reason="")
             __event["origin_time"] = obspy.UTCDateTime(__event["origin_time"])
 
-            # In case the event is extracted, set the origin time.
+            # In case the event is extracted, set the origin time to the
+            # time of the event.
             args.origintime = __event["origin_time"]
         else:
             __event = None
@@ -683,7 +701,11 @@ class SeismogramsHandler(InstaseisRequestHandler):
             buf = IOQueue()
             zip_file = zipfile.ZipFile(buf, mode="w")
 
+        # Count the number of successful extractions. Phase relative offsets
+        # could result in no actually calculated seismograms. In that case
+        # we would like to raise an error.
         count = 0
+
         # Loop over each receiver, get the synthetics and stream it to the
         # user.
         for receiver in receivers:
@@ -698,8 +720,8 @@ class SeismogramsHandler(InstaseisRequestHandler):
                 self.finish()
                 return
 
-            # Check if start- or endtime are phase relative. If yes
-            # calculate the new start- and/or endtime.
+            # Check if start- or end time are phase relative. If yes
+            # calculate the new start- and/or end time.
             if isinstance(args.starttime, obspy.core.AttribDict):
                 tt = self.get_ttime(source=source, receiver=receiver,
                                     phase=args.starttime["phase"])
