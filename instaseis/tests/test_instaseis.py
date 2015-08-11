@@ -599,7 +599,10 @@ def test_higher_level_event_and_receiver_parsing():
     org = event.origins[0]
     mt = event.focal_mechanisms[0].moment_tensor.tensor
 
-    org.latitude = 89.91
+    # Convert everything to WGS84 values. Instaseis will assume them to be
+    # wgs84 and convert it to geocentric.
+
+    org.latitude = geocentric_to_wgs84_latitude(89.91)
     org.longitude = 0.0
     org.depth = 12000
     org.time = obspy.UTCDateTime(2014, 1, 5)
@@ -612,7 +615,7 @@ def test_higher_level_event_and_receiver_parsing():
 
     # Same with the receiver objects.
     inv = obspy.read_inventory(os.path.join(DATA, "TA.Q56A..BH.xml"))
-    inv[0][0].latitude = 42.6390
+    inv[0][0].latitude = geocentric_to_wgs84_latitude(42.6390)
     inv[0][0].longitude = 74.4940
     inv[0][0].elevation = 0.0
     inv[0][0].channels = []

@@ -16,6 +16,7 @@ import os
 import numpy as np
 
 from instaseis import Source, FiniteSource
+from instaseis.helpers import wgs84_to_geocentric_latitude
 from instaseis.source import moment2magnitude, magnitude2moment
 from instaseis.source import fault_vectors_lmn, strike_dip_rake_from_ln
 
@@ -54,21 +55,28 @@ def test_parse_CMTSOLUTIONS_file(tmpdir):
     src_params = np.array([src.latitude, src.longitude, src.depth_in_m,
                            src.m_rr, src.m_tt, src.m_pp, src.m_rt, src.m_rp,
                            src.m_tp], dtype="float64")
+    # Latitude will have assumed to be WGS84 and converted to geocentric
+    # latitude.
     np.testing.assert_allclose(src_params, np.array(
-        (37.91, -77.93, 12000, 4.71E17, 3.81E15, -4.74E17, 3.99E16, -8.05E16,
+        (wgs84_to_geocentric_latitude(37.91), -77.93, 12000, 4.71E17,
+         3.81E15, -4.74E17, 3.99E16, -8.05E16,
          -1.23E17), dtype="float64"))
     assert src.origin_time == origin_time
 
+    # Write again. Reset latitude beforehand.
     filename = os.path.join(str(tmpdir), "CMTSOLUTIONS2")
+    src.latitude = 37.91
     src.write_CMTSOLUTION_file(filename)
 
+    # This time there is no need to convert latitudes. Writing will convert
+    # to WGS84 and reading will convert back.
     src = Source.parse(filename)
     src_params = np.array([src.latitude, src.longitude, src.depth_in_m,
                            src.m_rr, src.m_tt, src.m_pp, src.m_rt, src.m_rp,
                            src.m_tp], dtype="float64")
     np.testing.assert_allclose(src_params, np.array(
         (37.91, -77.93, 12000, 4.71E17, 3.81E15, -4.74E17, 3.99E16, -8.05E16,
-         -1.23E17), dtype="float64"))
+         -1.23E17), dtype="float64"), rtol=1E-5)
     assert src.origin_time == origin_time
 
 
@@ -76,10 +84,11 @@ def _assert_src(src):
     """
     We constantly test the same event in various configurations.
     """
+    # Latitude will have been assumed to be WGS84 and converted to geocentric!
     assert (src.latitude, src.longitude, src.depth_in_m, src.m_rr, src.m_tt,
             src.m_pp, src.m_rt, src.m_rp, src.m_tp) == \
-           (36.97, -3.54, 609800.0, -2.16E18, 5.36E17, 1.62E18, 1.3E16,
-            3.23E18, 1.75E18)
+           (wgs84_to_geocentric_latitude(36.97), -3.54, 609800.0, -2.16E18,
+            5.36E17, 1.62E18, 1.3E16, 3.23E18, 1.75E18)
 
     # Also check the time!
     assert src.origin_time == obspy.UTCDateTime("2010-04-11T22:08:12.800000Z")
