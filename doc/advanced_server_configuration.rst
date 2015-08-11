@@ -42,8 +42,8 @@ with that: :func:`instaseis.helpers.wgs84_to_geocentric_latitude`
 
 **Affected routes:**
 
-* ``/coordinates``
-* ``/seismograms``
+* :doc:`routes/coordinates`
+* :doc:`routes/seismograms`
 
 
 **Function Signature:**
@@ -105,8 +105,8 @@ that: :func:`instaseis.helpers.wgs84_to_geocentric_latitude`
 
 **Affected routes:**
 
-* ``/event``
-* ``/seismograms``
+* :doc:`routes/event`
+* :doc:`routes/seismograms`
 
 **Function Signature:**
 
@@ -162,8 +162,8 @@ that has been used to calculate the databases.
 
 **Affected routes:**
 
-* ``/ttimes``
-* ``/seismograms``
+* :doc:`routes/ttimes`
+* :doc:`routes/seismograms`
 
 
 **Function Signature:**
