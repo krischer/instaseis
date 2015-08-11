@@ -20,6 +20,7 @@ from ... import Source, ForceSource, Receiver
 from ...base_instaseis_db import _get_seismogram_times
 from ..util import run_async
 from ..instaseis_request import InstaseisRequestHandler
+from ...helpers import geocentric_to_wgs84_latitude
 
 # Valid phase offset pattern including capture groups.
 PHASE_OFFSET_PATTERN = re.compile(r"(^[A-Za-z0-9^]+)([\+-])([\deE\.\-\+]+$)")
@@ -96,6 +97,25 @@ def _get_seismogram(db, source, receiver, components, units, dt, kernelwidth,
     elif format == "saczip":
         byte_strings = []
         for tr in st:
+            # Write SAC headers.
+            tr.stats.sac = obspy.core.AttribDict()
+            # Write WGS84 coordinates to the SAC files.
+            tr.stats.sac.stla = geocentric_to_wgs84_latitude(receiver.latitude)
+            tr.stats.sac.stlo = receiver.longitude
+            tr.stats.sac.stdp = receiver.depth_in_m
+            tr.stats.sac.stel = 0.0
+            tr.stats.sac.evla = geocentric_to_wgs84_latitude(source.latitude)
+            tr.stats.sac.evlo = source.longitude
+            tr.stats.sac.evdp = source.depth_in_m
+            # Force source has no magnitude.
+            if not isinstance(source, ForceSource):
+                tr.stats.sac.mag = source.moment_magnitude
+            # Thats what SPECFEM uses for a moment magnitude....
+            tr.stats.sac.imagtyp = 55
+            # The event origin time relative to the reference which I'll
+            # just assume to be the starttime here?
+            tr.stats.sac.o = source.origin_time - starttime
+
             with io.BytesIO() as temp:
                 tr.write(temp, format="sac")
                 temp.seek(0, 0)

@@ -20,6 +20,8 @@ import obspy
 import numpy as np
 from .tornado_testing_fixtures import *  # NOQA
 
+from instaseis.helpers import geocentric_to_wgs84_latitude
+
 # Conditionally import mock either from the stdlib or as a separate library.
 import sys
 if sys.version_info[0] == 2:
@@ -3860,3 +3862,40 @@ def test_various_failure_conditions(all_clients_all_callbacks):
         assert request.code == 400
         assert request.reason == (
             "Source depth must be: %.1f km" % db.info.source_depth)
+
+
+def test_sac_headers(all_clients):
+    """
+    Tests the sac headers.
+    """
+    client = all_clients
+
+    params = {
+        "sourcelatitude": 1, "sourcelongitude": 12,
+        "sourcedepthinmeters": client.source_depth,
+        "sourcemomenttensor": "1E15,1E15,1E15,1E15,1E15,1E15",
+        "dt": 0.1, "starttime": "-1.5", "receiverlatitude": 22,
+        "receiverlongitude": 44, "format": "saczip"}
+    request = client.fetch(_assemble_url(**params))
+    assert request.code == 200
+    st = obspy.Stream()
+    zip_obj = zipfile.ZipFile(request.buffer)
+    for name in zip_obj.namelist():
+        st += obspy.read(io.BytesIO(zip_obj.read(name)))
+    for tr in st:
+        assert tr.stats._format == "SAC"
+        # Instaseis will write SAC coordinates in WGS84!
+        # Assert the station headers.
+        assert abs(tr.stats.sac.stla - geocentric_to_wgs84_latitude(22)) < 1E-6
+        assert abs(tr.stats.sac.stlo - 44) < 1E-6
+        assert abs(tr.stats.sac.stdp - 0.0) < 1E-6
+        assert abs(tr.stats.sac.stel - 0.0) < 1E-6
+        # Assert the event parameters.
+        assert abs(tr.stats.sac.evla - geocentric_to_wgs84_latitude(1)) < 1E-6
+        assert abs(tr.stats.sac.evlo - 12) < 1E-6
+        assert abs(tr.stats.sac.evdp - client.source_depth) < 1E-6
+        assert abs(tr.stats.sac.mag - 4.22) < 1E-2
+        # Thats what SPECFEM uses for a moment magnitude....
+        assert tr.stats.sac.imagtyp == 55
+        # Assume the reference time is the starttime.
+        assert abs(tr.stats.sac.o - 1.5) < 1E-6
