@@ -1023,6 +1023,9 @@ class FiniteSource(object):
         Initialize a finite source object from a 'standard rupture format'
         (.srf) file
 
+        Coordinates are assumed to be defined on the WGS84 ellipsoid and
+        will be converted to geocentric coordinates.
+
         :param filename: path to the .srf file
         :type filename: str
         :param normalize: normalize the sliprate to 1
@@ -1059,6 +1062,10 @@ class FiniteSource(object):
             for _ in np.arange(npoints):
                 lon, lat, dep, stk, dip, area, tinit, dt = \
                     map(float, f.readline().split())
+
+                # Convert latitude to a geocentric latitude.
+                lat = wgs84_to_geocentric_latitude(lat)
+
                 rake, slip1, nt1, slip2, nt2, slip3, nt3 = \
                     map(float, f.readline().split())
 
@@ -1110,6 +1117,9 @@ class FiniteSource(object):
         """
         Initialize a finite source object from a (.param) file available from
         the USGS website
+
+        Coordinates are assumed to be defined on the WGS84 ellipsoid and
+        will be converted to geocentric coordinates.
 
         :param filename: path to the .param file
         :type filename: str
@@ -1168,6 +1178,9 @@ class FiniteSource(object):
                     # Lat. Lon. depth slip rake strike dip t_rup t_ris t_fal mo
                     (lat, lon, dep, slip, rake, stk, dip, tinit, trise, tfall,
                         M0) = map(float, line.split())
+
+                    # Convert latitude to a geocentric latitude.
+                    lat = wgs84_to_geocentric_latitude(lat)
 
                     dep *= 1e3    # km > m
                     slip *= 1e-2  # cm > m
