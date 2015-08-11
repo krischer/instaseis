@@ -329,6 +329,12 @@ class SeismogramsHandler(InstaseisRequestHandler):
             msg = ("Format must either be 'miniseed' or 'saczip'.")
             raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
+        # If its essentially equal to the internal sampling rate just set it
+        # to equal to ease the following comparisons.
+        if args.dt and \
+                abs(args.dt - self.application.db.info.dt) / args.dt < 1E-7:
+            args.dt = self.application.db.info.dt
+
         # Make sure that dt, if given is larger then 0.01. This should still
         # be plenty for any use case but prevents the server from having to
         # send massive amounts of data in the case of user errors.
