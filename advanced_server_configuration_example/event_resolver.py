@@ -28,6 +28,8 @@ import json
 import obspy
 import os
 
+from instaseis.helpers import wgs84_to_geocentric_latitude
+
 
 CACHE = {}
 
@@ -92,6 +94,8 @@ def get_event_information(event_id, filename):
 
     event = copy.deepcopy(events[event_id])
     event["origin_time"] = obspy.UTCDateTime(event["origin_time"])
+    # Convert latitude to a geocentric latitude.
+    event["latitude"] = wgs84_to_geocentric_latitude(event["latitude"])
     return event
 
 
