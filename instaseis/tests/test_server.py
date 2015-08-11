@@ -255,10 +255,10 @@ def test_seismograms_raw_route(all_clients):
         "receiverlongitude": -10}
 
     # Various sources.
-    mt = {"mtt": "100000", "mpp": "100000", "mrr": "100000",
-          "mrt": "100000", "mrp": "100000", "mtp": "100000"}
-    sdr = {"strike": "10", "dip": "10", "rake": "10", "M0": "1000000"}
-    fs = {"fr": "100000", "ft": "100000", "fp": "100000"}
+    mt = {"mtt": "100000", "mpp": "200000", "mrr": "300000",
+          "mrt": "400000", "mrp": "500000", "mtp": "600000"}
+    sdr = {"strike": "10", "dip": "20", "rake": "30", "M0": "1000000"}
+    fs = {"fr": "100000", "ft": "200000", "fp": "300000"}
 
     # Moment tensor source.
     params = copy.deepcopy(basic_parameters)
@@ -386,10 +386,10 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
         "receiverlongitude": -10}
 
     # Various sources.
-    mt = {"mtt": "100000", "mpp": "100000", "mrr": "100000",
-          "mrt": "100000", "mrp": "100000", "mtp": "100000"}
-    sdr = {"strike": "10", "dip": "10", "rake": "10", "M0": "1000000"}
-    fs = {"fr": "100000", "ft": "100000", "fp": "100000"}
+    mt = {"mtt": "100000", "mpp": "200000", "mrr": "300000",
+          "mrt": "400000", "mrp": "500000", "mtp": "600000"}
+    sdr = {"strike": "10", "dip": "20", "rake": "30", "M0": "1000000"}
+    fs = {"fr": "100000", "ft": "200000", "fp": "300000"}
 
     time = obspy.UTCDateTime(2010, 1, 2, 3, 4, 5)
 
@@ -685,13 +685,13 @@ def test_object_creation_for_seismogram_route(all_clients):
     dt = 24.724845445855724
 
     # Various sources.
-    mt = {"mtt": "100000", "mpp": "100000", "mrr": "100000",
-          "mrt": "100000", "mrp": "100000", "mtp": "100000"}
-    mt_param = "100000,100000,100000,100000,100000,100000"
-    sdr = {"strike": "10", "dip": "10", "rake": "10", "M0": "1000000"}
-    sdr_param = "10,10,10,1000000"
-    fs = {"fr": "100000", "ft": "100000", "fp": "100000"}
-    fs_param = "100000,100000,100000"
+    mt = {"mrr": "100000", "mtt": "200000", "mpp": "300000",
+          "mrt": "400000", "mrp": "500000", "mtp": "600000"}
+    mt_param = "100000,200000,300000,400000,500000,600000"
+    sdr = {"strike": "10", "dip": "20", "rake": "30", "M0": "1000000"}
+    sdr_param = "10,20,30,1000000"
+    fs = {"fr": "100000", "ft": "200000", "fp": "300000"}
+    fs_param = "100000,200000,300000"
 
     time = obspy.UTCDateTime(2010, 1, 2, 3, 4, 5)
 
@@ -1068,13 +1068,13 @@ def test_seismograms_retrieval(all_clients):
         "format": "miniseed"}
 
     # Various sources.
-    mt = {"mtt": "100000", "mpp": "100000", "mrr": "100000",
-          "mrt": "100000", "mrp": "100000", "mtp": "100000"}
-    mt_param = "100000,100000,100000,100000,100000,100000"
-    sdr = {"strike": "10", "dip": "10", "rake": "10", "M0": "1000000"}
-    sdr_param = "10,10,10,1000000"
-    fs = {"fr": "100000", "ft": "100000", "fp": "100000"}
-    fs_param = "100000,100000,100000"
+    mt = {"mrr": "100000", "mtt": "200000", "mpp": "300000",
+          "mrt": "400000", "mrp": "500000", "mtp": "600000"}
+    mt_param = "100000,200000,300000,400000,500000,600000"
+    sdr = {"strike": "10", "dip": "20", "rake": "30", "M0": "1000000"}
+    sdr_param = "10,20,30,1000000"
+    fs = {"fr": "100000", "ft": "200000", "fp": "300000"}
+    fs_param = "100000,200000,300000"
 
     time = obspy.UTCDateTime(2010, 1, 2, 3, 4, 5)
 
@@ -1947,13 +1947,13 @@ def test_multiple_seismograms_retrieval_no_format_given_single_station(
                         "sourcedepthinmeters": client.source_depth}
 
     # Various sources.
-    mt = {"mtt": "100000", "mpp": "100000", "mrr": "100000",
-          "mrt": "100000", "mrp": "100000", "mtp": "100000"}
-    mt_param = "100000,100000,100000,100000,100000,100000"
-    sdr = {"strike": "10", "dip": "10", "rake": "10", "M0": "1000000"}
-    sdr_param = "10,10,10,1000000"
-    fs = {"fr": "100000", "ft": "100000", "fp": "100000"}
-    fs_param = "100000,100000,100000"
+    mt = {"mrr": "100000", "mtt": "200000", "mpp": "300000",
+          "mrt": "400000", "mrp": "500000", "mtp": "600000"}
+    mt_param = "100000,200000,300000,400000,500000,600000"
+    sdr = {"strike": "10", "dip": "20", "rake": "30", "M0": "1000000"}
+    sdr_param = "10,20,30,1000000"
+    fs = {"fr": "100000", "ft": "200000", "fp": "300000"}
+    fs_param = "100000,200000,300000"
 
     time = obspy.UTCDateTime(2010, 1, 2, 3, 4, 5)
 
