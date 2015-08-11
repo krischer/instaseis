@@ -638,7 +638,7 @@ def test_seismograms_error_handling(all_clients):
     assert request.code == 400
     assert "the smallest possible dt is 0.01" in request.reason.lower()
 
-    # lanczos window is too wide or too narrow.
+    # interpolation kernel width is too wide or too narrow.
     params = copy.deepcopy(basic_parameters)
     params["sourcemomenttensor"] = "100000,100000,100000,100000,100000,100000"
     params["kernelwidth"] = "0"
@@ -1026,7 +1026,7 @@ def test_object_creation_for_seismogram_route(all_clients):
         assert p.call_args[1]["reconvolve_stf"] is False
         assert p.call_args[1]["return_obspy_stream"] is True
         assert p.call_args[1]["dt"] == 0.1
-        assert p.call_args[1]["a_lanczos"] == 20
+        assert p.call_args[1]["kernelwidth"] == 20
 
         p.reset_mock()
         _st.traces = obspy.read().traces
@@ -1048,7 +1048,7 @@ def test_object_creation_for_seismogram_route(all_clients):
         assert p.call_args[1]["reconvolve_stf"] is False
         assert p.call_args[1]["return_obspy_stream"] is True
         assert p.call_args[1]["dt"] == 0.1
-        assert p.call_args[1]["a_lanczos"] == 2
+        assert p.call_args[1]["kernelwidth"] == 2
 
 
 def test_seismograms_retrieval(all_clients):
@@ -1397,7 +1397,7 @@ def test_seismograms_retrieval(all_clients):
     request = client.fetch(_assemble_url(**params))
     st_server = obspy.read(request.buffer)
     st_db = db.get_seismograms(source=source, receiver=receiver,
-                               dt=0.1, a_lanczos=1)
+                               dt=0.1, kernelwidth=1)
     for tr_server, tr_db in zip(st_server, st_db):
         # Remove the additional stats from both.
         del tr_server.stats.mseed
@@ -1423,7 +1423,7 @@ def test_seismograms_retrieval(all_clients):
     request = client.fetch(_assemble_url(**params))
     st_server = obspy.read(request.buffer)
     st_db = db.get_seismograms(source=source, receiver=receiver,
-                               dt=0.1, a_lanczos=2, kind="acceleration",
+                               dt=0.1, kernelwidth=2, kind="acceleration",
                                remove_source_shift=True)
     for tr_server, tr_db in zip(st_server, st_db):
         # Remove the additional stats from both.

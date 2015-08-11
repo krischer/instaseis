@@ -39,7 +39,7 @@ def _get_seismogram(db, source, receiver, components, units, dt, kernelwidth,
     :param units: The desired units.
     :param remove_source_shift: Remove the source time shift or not.
     :param dt: dt to resample to.
-    :param kernelwidth: Width of the Lanczos kernel.
+    :param kernelwidth: Width of the interpolation kernel.
     :param starttime: The desired start time of the seismogram.
     :param endtime: The desired end time of the seismogram.
     :param format: The output format. Either "miniseed" or "saczip".
@@ -56,7 +56,7 @@ def _get_seismogram(db, source, receiver, components, units, dt, kernelwidth,
             source=source, receiver=receiver, components=components,
             kind=units, remove_source_shift=False,
             reconvolve_stf=False, return_obspy_stream=True, dt=dt,
-            a_lanczos=kernelwidth)
+            kernelwidth=kernelwidth)
     except Exception:
         msg = ("Could not extract seismogram. Make sure, the components "
                "are valid, and the depth settings are correct.")
@@ -317,8 +317,8 @@ class SeismogramsHandler(InstaseisRequestHandler):
                    "smaller value and resample locally if needed.")
             raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
-        # Make sure the lanczos window width is sensible. Don't allow values
-        # smaller than 2 or larger than 20.
+        # Make sure the interpolation kernel width is sensible. Don't allow
+        # values smaller than 1 or larger than 20.
         if not (1 <= args.kernelwidth <= 20):
             msg = ("`kernelwidth` must not be smaller than 1 or larger than "
                    "20.")
@@ -586,8 +586,8 @@ class SeismogramsHandler(InstaseisRequestHandler):
         # Figure out the maximum temporal range of the seismograms.
         ti = _get_seismogram_times(
             info=self.application.db.info, origin_time=args.origintime,
-            dt=args.dt, a_lanczos=args.kernelwidth, remove_source_shift=False,
-            reconvolve_stf=False)
+            dt=args.dt, kernelwidth=args.kernelwidth,
+            remove_source_shift=False, reconvolve_stf=False)
 
         # If the endtime is not set, do it here.
         if args.endtime is None:

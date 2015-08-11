@@ -98,10 +98,10 @@ def test_seismogram_extraction(all_remote_dbs):
               "remove_source_shift": False}
     _compare_streams(r_db, l_db, kwargs)
 
-    # Test lanzcos resampling.
+    # Test resampling.
     kwargs = {"source": source, "receiver": receiver,
               "components": ["Z", "N", "E", "R", "T"],
-              "dt": 1.0, "a_lanczos": 6}
+              "dt": 1.0, "kernelwidth": 6}
     _compare_streams(r_db, l_db, kwargs)
 
     # Test force source.

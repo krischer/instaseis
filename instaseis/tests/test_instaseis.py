@@ -214,7 +214,7 @@ def test_incremental_bwd():
     dt = instaseis_bwd.info.dt
     st_bwd = instaseis_bwd.get_seismograms(
         source=source, receiver=receiver, components=('Z'), dt=dt,
-        a_lanczos=5)
+        kernelwidth=5)
 
     np.testing.assert_allclose(st_bwd.select(component='Z')[0].data,
                                BWD_TEST_DATA["Z"], rtol=1E-7, atol=1E-12)
@@ -498,11 +498,11 @@ def test_finite_source():
     st_fin = instaseis_bwd.get_seismograms_finite_source(
         sources=[source], receiver=receiver,
         components=('Z', 'N', 'E', 'R', 'T'), dt=dt,
-        a_lanczos=1)
+        kernelwidth=1)
     st_ref = instaseis_bwd.get_seismograms(
         source=source, receiver=receiver,
         components=('Z', 'N', 'E', 'R', 'T'), dt=dt, reconvolve_stf=True,
-        remove_source_shift=False, a_lanczos=1)
+        remove_source_shift=False, kernelwidth=1)
 
     np.testing.assert_allclose(st_fin.select(component='Z')[0].data,
                                st_ref.select(component='Z')[0].data,
@@ -677,14 +677,14 @@ def test_resampling_and_time_settings(db):
     # source time function.
     st_r_shift = db.get_seismograms(source=source, receiver=receiver,
                                     remove_source_shift=True, dt=12,
-                                    a_lanczos=1)
+                                    kernelwidth=1)
     for tr in st_r_shift:
         assert tr.stats.starttime == origin_time
     length = st_r_shift[0].stats.npts
 
     st = db.get_seismograms(source=source, receiver=receiver,
                             remove_source_shift=False, dt=12,
-                            a_lanczos=1)
+                            kernelwidth=1)
     for tr in st:
         assert tr.stats.starttime == origin_time - 14 * 12
 
@@ -761,10 +761,10 @@ def test_time_settings_with_resample_stf(db):
 
 
 @pytest.mark.parametrize("db", DBS)
-def test_remove_samples_at_end_for_lanczos(db):
+def test_remove_samples_at_end_for_interpolation(db):
     """
-    Remove some samples at the end for the Lanczos resampling to avoid
-    boundary effects.
+    Remove some samples at the end for the resampling to avoid boundary
+    effects.
     """
     db = InstaseisDB(db)
 
@@ -784,7 +784,7 @@ def test_remove_samples_at_end_for_lanczos(db):
     # testing. But it also not wrong.
     st_2 = db.get_seismograms(source=source, receiver=receiver,
                               remove_source_shift=True, dt=db.info.dt,
-                              a_lanczos=1)
+                              kernelwidth=1)
     for tr, tr_2 in zip(st, st_2):
         assert tr == tr_2
 
@@ -794,19 +794,19 @@ def test_remove_samples_at_end_for_lanczos(db):
 
     st_3 = db.get_seismograms(source=source, receiver=receiver,
                               remove_source_shift=True, dt=12,
-                              a_lanczos=1)
+                              kernelwidth=1)
     for tr in st_3:
         assert tr.stats.npts == samples - 3
 
     st_4 = db.get_seismograms(source=source, receiver=receiver,
                               remove_source_shift=True, dt=12,
-                              a_lanczos=2)
+                              kernelwidth=2)
     for tr in st_4:
         assert tr.stats.npts == samples - 5
 
     st_5 = db.get_seismograms(source=source, receiver=receiver,
                               remove_source_shift=True, dt=12,
-                              a_lanczos=3)
+                              kernelwidth=3)
     for tr in st_5:
         assert tr.stats.npts == samples - 7
 
@@ -830,7 +830,7 @@ def test_get_time_information(db):
     # First case is very simple.
     par = {"remove_source_shift": True,
            "dt": None,
-           "a_lanczos": 5}
+           "kernelwidth": 5}
     tr = db.get_seismograms(source=source, receiver=receiver,
                             components=["Z"], **par)[0]
     times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
@@ -849,7 +849,7 @@ def test_get_time_information(db):
     # Now the same, but without removal of the the source shift.
     par = {"remove_source_shift": False,
            "dt": None,
-           "a_lanczos": 5}
+           "kernelwidth": 5}
     tr = db.get_seismograms(source=source, receiver=receiver,
                             components=["Z"], **par)[0]
     times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
@@ -870,7 +870,7 @@ def test_get_time_information(db):
     # testing. But it also not wrong.
     par = {"remove_source_shift": True,
            "dt": db.info.dt,
-           "a_lanczos": 2}
+           "kernelwidth": 2}
     tr = db.get_seismograms(source=source, receiver=receiver,
                             components=["Z"], **par)[0]
     times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
@@ -888,7 +888,7 @@ def test_get_time_information(db):
 
     par = {"remove_source_shift": False,
            "dt": db.info.dt,
-           "a_lanczos": 5}
+           "kernelwidth": 5}
     tr = db.get_seismograms(source=source, receiver=receiver,
                             components=["Z"], **par)[0]
     times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
@@ -907,7 +907,7 @@ def test_get_time_information(db):
     # Now resampling with various values of a.
     par = {"remove_source_shift": True,
            "dt": 12.0,
-           "a_lanczos": 1}
+           "kernelwidth": 1}
     tr = db.get_seismograms(source=source, receiver=receiver,
                             components=["Z"], **par)[0]
     times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
@@ -929,7 +929,7 @@ def test_get_time_information(db):
 
     par = {"remove_source_shift": True,
            "dt": 12.0,
-           "a_lanczos": 2}
+           "kernelwidth": 2}
     tr = db.get_seismograms(source=source, receiver=receiver,
                             components=["Z"], **par)[0]
     times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
@@ -951,7 +951,7 @@ def test_get_time_information(db):
 
     par = {"remove_source_shift": True,
            "dt": 12.0,
-           "a_lanczos": 7}
+           "kernelwidth": 7}
     tr = db.get_seismograms(source=source, receiver=receiver,
                             components=["Z"], **par)[0]
     times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
@@ -973,7 +973,7 @@ def test_get_time_information(db):
     # Same once again but this time no source time shift
     par = {"remove_source_shift": False,
            "dt": 12.0,
-           "a_lanczos": 1}
+           "kernelwidth": 1}
     tr = db.get_seismograms(source=source, receiver=receiver,
                             components=["Z"], **par)[0]
     times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
@@ -995,7 +995,7 @@ def test_get_time_information(db):
 
     par = {"remove_source_shift": False,
            "dt": 12.0,
-           "a_lanczos": 2}
+           "kernelwidth": 2}
     tr = db.get_seismograms(source=source, receiver=receiver,
                             components=["Z"], **par)[0]
     times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
@@ -1017,7 +1017,7 @@ def test_get_time_information(db):
 
     par = {"remove_source_shift": False,
            "dt": 12.0,
-           "a_lanczos": 7}
+           "kernelwidth": 7}
     tr = db.get_seismograms(source=source, receiver=receiver,
                             components=["Z"], **par)[0]
     times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
@@ -1064,7 +1064,7 @@ def test_get_time_information_reconvolve_stf(db):
     par = {"remove_source_shift": True,
            "reconvolve_stf": True,
            "dt": None,
-           "a_lanczos": 5}
+           "kernelwidth": 5}
     with pytest.raises(ValueError) as err:
         _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
     assert err.value.args[0] == (
@@ -1073,7 +1073,7 @@ def test_get_time_information_reconvolve_stf(db):
     par = {"remove_source_shift": False,
            "reconvolve_stf": True,
            "dt": None,
-           "a_lanczos": 5}
+           "kernelwidth": 5}
     tr = db.get_seismograms(source=source, receiver=receiver,
                             components=["Z"], **par)[0]
     times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
@@ -1092,11 +1092,11 @@ def test_get_time_information_reconvolve_stf(db):
     assert times["npts"] == times["npts_before_shift_removal"]
     assert tr.stats.npts == times["npts"]
 
-    # A couple more with lanczos a.
+    # A couple more with a given interpolation kernel width.
     par = {"remove_source_shift": False,
            "reconvolve_stf": True,
            "dt": 12.0,
-           "a_lanczos": 1}
+           "kernelwidth": 1}
     tr = db.get_seismograms(source=source, receiver=receiver,
                             components=["Z"], **par)[0]
     times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
@@ -1120,7 +1120,7 @@ def test_get_time_information_reconvolve_stf(db):
     par = {"remove_source_shift": False,
            "reconvolve_stf": True,
            "dt": 12.0,
-           "a_lanczos": 2}
+           "kernelwidth": 2}
     tr = db.get_seismograms(source=source, receiver=receiver,
                             components=["Z"], **par)[0]
     times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
@@ -1143,7 +1143,7 @@ def test_get_time_information_reconvolve_stf(db):
     par = {"remove_source_shift": False,
            "reconvolve_stf": True,
            "dt": 12.0,
-           "a_lanczos": 7}
+           "kernelwidth": 7}
     tr = db.get_seismograms(source=source, receiver=receiver,
                             components=["Z"], **par)[0]
     times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)

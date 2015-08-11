@@ -37,7 +37,7 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
     def get_seismograms(self, source, receiver, components=("Z", "N", "E"),
                         kind='displacement', remove_source_shift=True,
                         reconvolve_stf=False, return_obspy_stream=True,
-                        dt=None, a_lanczos=5):
+                        dt=None, kernelwidth=5):
         """
         Extract seismograms from the Green's function database.
 
@@ -69,8 +69,10 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
         :type dt: float, optional
         :param dt: Desired sampling rate of the seismograms. Resampling is done
             using a Lanczos kernel.
-        :type a_lanczos: int, optional
-        :param a_lanczos: The width of the kernel used in the resampling.
+        :type kernelwidth: int, optional
+        :param kernelwidth: The width of the sinc kernel used for resampling in
+            terms of the original sampling interval. Best choose something
+            between 10 and 20.
 
         :returns: Multi component seismograms.
         :rtype: A :class:`obspy.core.stream.Stream` object or a dictionary
@@ -124,7 +126,7 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
         # Calculate the final time information about the seismograms.
         time_information = _get_seismogram_times(
             info=self.info, origin_time=origin_time, dt=dt,
-            a_lanczos=a_lanczos, remove_source_shift=remove_source_shift,
+            kernelwidth=kernelwidth, remove_source_shift=remove_source_shift,
             reconvolve_stf=reconvolve_stf)
 
         for comp in components:
@@ -165,7 +167,7 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
                     new_start=time_information["time_shift_at_beginning"],
                     new_dt=dt,
                     new_npts=time_information["npts_before_shift_removal"],
-                    a=a_lanczos,
+                    a=kernelwidth,
                     window="blackman")
 
             # Integrate/differentiate before removing the source shift in
@@ -230,7 +232,7 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
     def get_seismograms_finite_source(self, sources, receiver,
                                       components=("Z", "N", "E"),
                                       kind='displacement', dt=None,
-                                      a_lanczos=5, correct_mu=False,
+                                      kernelwidth=5, correct_mu=False,
                                       progress_callback=None):
         """
         Extract seismograms for a finite source from an Instaseis database.
@@ -250,8 +252,10 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
         :type dt: float, optional
         :param dt: Desired sampling rate of the seismograms. Resampling is done
             using a Lanczos kernel.
-        :type a_lanczos: int, optional
-        :param a_lanczos: The width of the kernel used in the resampling.
+        :type kernelwidth: int, optional
+        :param kernelwidth: The width of the sinc kernel used for resampling in
+            terms of the original sampling interval. Best choose something
+            between 10 and 20.
         :type correct_mu: bool, optional
         :param correct_mu: Correct the source magnitude for the actual shear
             modulus from the model.
@@ -299,7 +303,7 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
                 data_summed[comp] = lanczos.lanczos_interpolation(
                     data=data_summed[comp], old_start=0, old_dt=self.info.dt,
                     new_start=0, new_dt=dt, new_npts=new_npts,
-                    a=a_lanczos, window="blackman")
+                    a=kernelwidth, window="blackman")
 
                 # The resampling assumes zeros outside the data range. This
                 # does not introduce any errors at the beginning as the data is
@@ -310,7 +314,7 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
                 # Also don't cut it for the "identify" interpolation which is
                 # important for testing.
                 if round(dt / self.info.dt, 6) != 1.0:
-                    affected_area = a_lanczos * self.info.dt
+                    affected_area = kernelwidth * self.info.dt
                     data_summed[comp] = \
                         data_summed[comp][:-int(np.ceil(affected_area / dt))]
 
@@ -471,7 +475,7 @@ def sizeof_fmt(num):
     return "%3.1f %s" % (num, "TB")
 
 
-def _get_seismogram_times(info, origin_time, dt, a_lanczos,
+def _get_seismogram_times(info, origin_time, dt, kernelwidth,
                           remove_source_shift, reconvolve_stf=False):
     """
     Helper function to calculate the final times of seismograms.
@@ -483,7 +487,7 @@ def _get_seismogram_times(info, origin_time, dt, a_lanczos,
 
     :param info: The info dictionary of a database.
     :param dt: The desired new sampling rate. None if not set.
-    :param a_lanczos: The width of the lanczos kernel.
+    :param kernelwidth: The width of the interpolation kernel.
     :param remove_source_shift: Remove or don't remove the source time shift.
     :param reconvolve_stf: Set to true if reconvolved with a custom STF,
         then the time shift are no longer applied.
@@ -551,7 +555,7 @@ def _get_seismogram_times(info, origin_time, dt, a_lanczos,
         # Also don't cut it for the "identify" interpolation which is
         # important for testing.
         if round(dt / info.dt, 6) != 1.0:
-            affected_area = a_lanczos * info.dt
+            affected_area = kernelwidth * info.dt
             ti["samples_cut_at_end"] = \
                 int(np.ceil(affected_area / dt))
             ti["npts_before_shift_removal"] -= ti["samples_cut_at_end"]
