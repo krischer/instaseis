@@ -26,7 +26,7 @@ PHASE_OFFSET_PATTERN = re.compile(r"(^[A-Za-z0-9^]+)([\+-])([\deE\.\-\+]+$)")
 
 
 @run_async
-def _get_seismogram(db, source, receiver, components, units, dt, a_lanczos,
+def _get_seismogram(db, source, receiver, components, units, dt, kernelwidth,
                     starttime, endtime, format, label, callback):
     """
     Extract a seismogram from the passed db and write it either to a MiniSEED
@@ -39,7 +39,7 @@ def _get_seismogram(db, source, receiver, components, units, dt, a_lanczos,
     :param units: The desired units.
     :param remove_source_shift: Remove the source time shift or not.
     :param dt: dt to resample to.
-    :param a_lanczos: Width of the Lanczos kernel.
+    :param kernelwidth: Width of the Lanczos kernel.
     :param starttime: The desired start time of the seismogram.
     :param endtime: The desired end time of the seismogram.
     :param format: The output format. Either "miniseed" or "saczip".
@@ -56,7 +56,7 @@ def _get_seismogram(db, source, receiver, components, units, dt, a_lanczos,
             source=source, receiver=receiver, components=components,
             kind=units, remove_source_shift=False,
             reconvolve_stf=False, return_obspy_stream=True, dt=dt,
-            a_lanczos=a_lanczos)
+            a_lanczos=kernelwidth)
     except Exception:
         msg = ("Could not extract seismogram. Make sure, the components "
                "are valid, and the depth settings are correct.")
@@ -186,7 +186,7 @@ class SeismogramsHandler(InstaseisRequestHandler):
         "components": {"type": str, "default": "ZNE"},
         "units": {"type": str, "default": "displacement"},
         "dt": {"type": float},
-        "alanczos": {"type": int, "default": 12},
+        "kernelwidth": {"type": int, "default": 12},
         "label": {"type": str},
 
         # Source parameters.
@@ -319,8 +319,9 @@ class SeismogramsHandler(InstaseisRequestHandler):
 
         # Make sure the lanczos window width is sensible. Don't allow values
         # smaller than 2 or larger than 20.
-        if not (1 <= args.alanczos <= 20):
-            msg = ("`alanczos` must not be smaller than 1 or larger than 20.")
+        if not (1 <= args.kernelwidth <= 20):
+            msg = ("`kernelwidth` must not be smaller than 1 or larger than "
+                   "20.")
             raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
         # The networkcode and stationcode parameters have a maximum number
@@ -585,7 +586,7 @@ class SeismogramsHandler(InstaseisRequestHandler):
         # Figure out the maximum temporal range of the seismograms.
         ti = _get_seismogram_times(
             info=self.application.db.info, origin_time=args.origintime,
-            dt=args.dt, a_lanczos=args.alanczos, remove_source_shift=False,
+            dt=args.dt, a_lanczos=args.kernelwidth, remove_source_shift=False,
             reconvolve_stf=False)
 
         # If the endtime is not set, do it here.
@@ -800,7 +801,7 @@ class SeismogramsHandler(InstaseisRequestHandler):
                 _get_seismogram,
                 db=self.application.db, source=source, receiver=receiver,
                 components=list(args.components), units=args.units, dt=args.dt,
-                a_lanczos=args.alanczos, starttime=starttime,
+                kernelwidth=args.kernelwidth, starttime=starttime,
                 endtime=endtime, format=args.format,
                 label=args.label)
 

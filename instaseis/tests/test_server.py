@@ -641,16 +641,16 @@ def test_seismograms_error_handling(all_clients):
     # lanczos window is too wide or too narrow.
     params = copy.deepcopy(basic_parameters)
     params["sourcemomenttensor"] = "100000,100000,100000,100000,100000,100000"
-    params["alanczos"] = "0"
+    params["kernelwidth"] = "0"
     request = client.fetch(_assemble_url(**params))
     assert request.code == 400
-    assert "`alanczos` must not be smaller" in request.reason.lower()
+    assert "`kernelwidth` must not be smaller" in request.reason.lower()
     params = copy.deepcopy(basic_parameters)
     params["sourcemomenttensor"] = "100000,100000,100000,100000,100000,100000"
-    params["alanczos"] = "21"
+    params["kernelwidth"] = "21"
     request = client.fetch(_assemble_url(**params))
     assert request.code == 400
-    assert "`alanczos` must not be smaller" in request.reason.lower()
+    assert "`kernelwidth` must not be smaller" in request.reason.lower()
 
     # too many components raise to avoid abuse.
     params = copy.deepcopy(basic_parameters)
@@ -1015,7 +1015,7 @@ def test_object_creation_for_seismogram_route(all_clients):
         params = copy.deepcopy(basic_parameters)
         params["sourcemomenttensor"] = mt_param
         params["dt"] = "0.1"
-        params["alanczos"] = "20"
+        params["kernelwidth"] = "20"
         request = client.fetch(_assemble_url(**params))
         assert request.code == 200
         assert p.call_count == 1
@@ -1036,7 +1036,7 @@ def test_object_creation_for_seismogram_route(all_clients):
         params = copy.deepcopy(basic_parameters)
         params["sourcemomenttensor"] = mt_param
         params["dt"] = "0.1"
-        params["alanczos"] = "2"
+        params["kernelwidth"] = "2"
         params["units"] = "ACCELERATION"
         request = client.fetch(_assemble_url(**params))
         assert request.code == 200
@@ -1393,7 +1393,7 @@ def test_seismograms_retrieval(all_clients):
     params = copy.deepcopy(basic_parameters)
     params["sourcemomenttensor"] = mt_param
     params["dt"] = "0.1"
-    params["alanczos"] = "1"
+    params["kernelwidth"] = "1"
     request = client.fetch(_assemble_url(**params))
     st_server = obspy.read(request.buffer)
     st_db = db.get_seismograms(source=source, receiver=receiver,
@@ -1418,7 +1418,7 @@ def test_seismograms_retrieval(all_clients):
     params = copy.deepcopy(basic_parameters)
     params["sourcemomenttensor"] = mt_param
     params["dt"] = "0.1"
-    params["alanczos"] = "2"
+    params["kernelwidth"] = "2"
     params["units"] = "ACCELERATION"
     request = client.fetch(_assemble_url(**params))
     st_server = obspy.read(request.buffer)
@@ -1522,7 +1522,7 @@ def test_output_formats(all_clients):
         "receiverlatitude": -10,
         "receiverlongitude": -10}
     mt = {"sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
-          "components": "RT", "units": "velocity", "dt": 2, "alanczos": 3,
+          "components": "RT", "units": "velocity", "dt": 2, "kernelwidth": 3,
           "networkcode": "BW", "stationcode": "FURT"}
     basic_parameters.update(mt)
 
@@ -2697,7 +2697,7 @@ def test_time_settings_for_seismograms_route(all_clients):
         "sourcelatitude": 10, "sourcelongitude": 10, "receiverlatitude": -10,
         "receiverlongitude": -10, "sourcedepthinmeters": client.source_depth,
         "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
-        "dt": 1.0, "alanczos": 1, "origintime": str(origin_time),
+        "dt": 1.0, "kernelwidth": 1, "origintime": str(origin_time),
         "format": "miniseed"}
 
     p = copy.deepcopy(params)
