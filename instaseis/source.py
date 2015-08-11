@@ -252,7 +252,7 @@ class Source(SourceOrReceiver):
                  time_shift=None, sliprate=None, dt=None,
                  origin_time=obspy.UTCDateTime(0)):
         """
-        :param latitude: latitude of the source in degree
+        :param latitude: geocentric latitude of the source in degree
         :param longitude: longitude of the source in degree
         :param depth_in_m: source depth in m
         :param m_rr: moment tensor components in r, theta, phi in Nm
@@ -312,6 +312,9 @@ class Source(SourceOrReceiver):
 
         For anything ObsPy related, it must contain a full moment tensor,
         otherwise it will raise an error.
+
+        Coordinates are assumed to be defined on the WGS84 ellipsoid and
+        will be converted to geocentric coordinates.
 
         :param filename_or_obj: The object or filename to parse.
 
@@ -387,6 +390,9 @@ class Source(SourceOrReceiver):
         """
         Initialize a source object from a CMTSOLUTION file.
 
+        Coordinates are assumed to be defined on the WGS84 ellipsoid and
+        will be converted to geocentric coordinates.
+
         :param filename: path to the CMTSOLUTION file
 
         >>> import instaseis
@@ -442,7 +448,7 @@ class Source(SourceOrReceiver):
         Initialize a source object from a shear source parameterized by strike,
         dip and rake.
 
-        :param latitude: latitude of the source in degree
+        :param latitude: geocentric latitude of the source in degree
         :param longitude: longitude of the source in degree
         :param depth_in_m: source depth in m
         :param strike: strike of the fault in degree
@@ -518,6 +524,9 @@ class Source(SourceOrReceiver):
     def write_CMTSOLUTION_file(self, filename):
         """
         Initialize a source object from a CMTSOLUTION file.
+
+        Coordinates are assumed to be defined in geocentric coordinates and
+        will be coordinates defined on the WGS84 ellipsoid.
 
         :param filename: path to the CMTSOLUTION file
         """
@@ -677,7 +686,7 @@ class ForceSource(SourceOrReceiver):
     """
     Class to handle a seismic force source.
 
-    :param latitude: latitude of the source in degree
+    :param latitude: geocentric latitude of the source in degree
     :param longitude: longitude of the source in degree
     :param depth_in_m: source depth in m
     :param f_r: force components in r, theta, phi in N
@@ -742,7 +751,7 @@ class Receiver(SourceOrReceiver):
     Class dealing with seismic receivers.
 
     :type latitude: float
-    :param latitude: The latitude of the receiver in degree.
+    :param latitude: The geocentric latitude of the receiver in degree.
     :type longitude: float
     :param longitude: The longitude of the receiver in degree.
     :type depth_in_m: float
@@ -791,6 +800,9 @@ class Receiver(SourceOrReceiver):
         SEED files, and a number of ObsPy objects. This method can
         furthermore work with anything ObsPy can deal with (filename, URL,
         memory files, ...).
+
+        Coordinates are assumed to be defined on the WGS84 ellipsoid and
+        will be converted to geocentric coordinates.
 
         :param filename_or_obj: Filename/URL/Python object
         :param network_code: Network code needed to parse ObsPy station
@@ -930,6 +942,9 @@ class Receiver(SourceOrReceiver):
     def _parse_stations_file(filename):
         """
         Parses a custom STATIONS file format to a list of Receiver objects.
+
+        Coordinates are assumed to be defined on the WGS84 ellipsoid and
+        will be converted to geocentric coordinates.
 
         :param filename: Filename
         :return: List of :class:`~instaseis.source.Receiver` objects.
@@ -1181,7 +1196,7 @@ class FiniteSource(object):
         Initialize a source object from a shear source parameterized by strike,
         dip and rake.
 
-        :param latitude: latitude of the source centroid in degree
+        :param latitude: geocentric latitude of the source centroid in degree
         :param longitude: longitude of the source centroid in degree
         :param depth_in_m: source centroid depth in m
         :param strike: strike of the fault in degree
