@@ -68,8 +68,18 @@ def get_band_code(dt):
 
 def wgs84_to_geocentric_latitude(lat):
     """
-    Convert a latitude defined on the WGS84 ellipsoid to geocentric
-    coordinates.
+    Convert a latitude defined on the WGS84 ellipsoid to a geocentric one.
+
+    >>> wgs84_to_geocentric_latitude(0.0)
+    0.0
+    >>> wgs84_to_geocentric_latitude(90.0)
+    90.0
+    >>> wgs84_to_geocentric_latitude(-90.0)
+    -90.0
+    >>> wgs84_to_geocentric_latitude(45.0)
+    44.80757678401642
+    >>> wgs84_to_geocentric_latitude(-45.0)
+    -44.80757678401642
     """
     # Singularities close to the pole and the equator. Just return the value
     # in that case.

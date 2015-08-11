@@ -437,5 +437,7 @@ Detailed Documentation
    :maxdepth: 2
 
    instaseis
-   server
    source
+   server
+   advanced_server_configuration
+   helpers
