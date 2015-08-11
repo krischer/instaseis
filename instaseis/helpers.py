@@ -88,3 +88,27 @@ def wgs84_to_geocentric_latitude(lat):
         return lat
 
     return math.degrees(math.atan((1 - E_2) * math.tan(math.radians(lat))))
+
+
+def geocentric_to_wgs84_latitude(lat):
+    """
+    Convert a geocentric latitude to one defined on the WGS84 ellipsoid.
+
+    >>> wgs84_to_geocentric_latitude(0.0)
+    0.0
+    >>> wgs84_to_geocentric_latitude(90.0)
+    90.0
+    >>> wgs84_to_geocentric_latitude(-90.0)
+    -90.0
+    >>> wgs84_to_geocentric_latitude(45.0)
+    44.80757678401642
+    >>> wgs84_to_geocentric_latitude(-45.0)
+    -44.80757678401642
+    """
+    # Singularities close to the pole and the equator. Just return the value
+    # in that case.
+    if abs(lat) < 1E-6 or abs(lat - 90) < 1E-6 or \
+                    abs(lat + 90.0) < 1E-6:
+        return lat
+
+    return math.degrees(math.atan(math.tan(math.radians(lat)) / (1 - E_2)))

@@ -23,7 +23,8 @@ import shutil
 from instaseis.instaseis_db import InstaseisDB
 from instaseis.base_instaseis_db import _get_seismogram_times
 from instaseis import Source, Receiver, ForceSource
-from instaseis.helpers import get_band_code, wgs84_to_geocentric_latitude
+from instaseis.helpers import (get_band_code, wgs84_to_geocentric_latitude,
+                               geocentric_to_wgs84_latitude)
 
 from .testdata import BWD_TEST_DATA, FWD_TEST_DATA
 from .testdata import BWD_STRAIN_ONLY_TEST_DATA, BWD_FORCE_TEST_DATA
@@ -1185,3 +1186,47 @@ def test_wgs84_to_geocentric():
     # Small check to test the approximate ranges.
     assert 0.19 < 45.0 - wgs84_to_geocentric_latitude(45.0) < 0.2
     assert -0.19 > -45 - wgs84_to_geocentric_latitude(-45.0) > -0.2
+
+
+def test_geocentric_to_wgs84():
+    """
+    Tests the utility function.
+    """
+    assert geocentric_to_wgs84_latitude(0.0) == 0.0
+    assert geocentric_to_wgs84_latitude(90.0) == 90.0
+    assert geocentric_to_wgs84_latitude(-90.0) == -90.0
+
+    # Difference minimal close to the poles and the equator.
+    assert abs(geocentric_to_wgs84_latitude(0.1) - 0.1) < 1E-3
+    assert abs(geocentric_to_wgs84_latitude(-0.1) + 0.1) < 1E-3
+    assert abs(geocentric_to_wgs84_latitude(89.9) - 89.9) < 1E-3
+    assert abs(geocentric_to_wgs84_latitude(-89.9) + 89.9) < 1E-3
+
+    # The geographic latitude is larger then the geocentric on the northern
+    # hemisphere.
+    for _i in range(1, 90):
+        assert _i < geocentric_to_wgs84_latitude(_i)
+
+    # The opposite is true on the southern hemisphere.
+    for _i in range(-1, -90, -1):
+        assert _i > geocentric_to_wgs84_latitude(_i)
+
+    # Small check to test the approximate ranges.
+    assert -0.19 > 45.0 - geocentric_to_wgs84_latitude(45.0) > -0.2
+    assert 0.19 < -45 - geocentric_to_wgs84_latitude(-45.0) < 0.2
+
+
+def test_coordinate_conversions_round_trips():
+    """
+    Tests round tripping of the coordinate conversion routines.
+    """
+    values = np.linspace(-90, 90, 100)
+    for value in values:
+        value = float(value)
+        there = wgs84_to_geocentric_latitude(value)
+        back = geocentric_to_wgs84_latitude(there)
+        assert abs(back - value) < 1E-12
+
+        there = geocentric_to_wgs84_latitude(value)
+        back = wgs84_to_geocentric_latitude(there)
+        assert abs(back - value) < 1E-12
