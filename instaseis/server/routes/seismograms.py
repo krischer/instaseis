@@ -337,6 +337,13 @@ class SeismogramsHandler(InstaseisRequestHandler):
                    "smaller value and resample locally if needed.")
             raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
+        # Also make sure it does not downsample.
+        if args.dt is not None and args.dt > self.application.db.info.dt:
+            msg = ("Cannot downsample. The sampling interval of the database "
+                   "is %.5f seconds. Make sure to choose a smaller or equal "
+                   "one." % self.application.db.info.dt)
+            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+
         # Make sure the interpolation kernel width is sensible. Don't allow
         # values smaller than 1 or larger than 20.
         if not (1 <= args.kernelwidth <= 20):

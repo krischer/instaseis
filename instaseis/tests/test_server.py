@@ -3899,3 +3899,66 @@ def test_sac_headers(all_clients):
         assert tr.stats.sac.imagtyp == 55
         # Assume the reference time is the starttime.
         assert abs(tr.stats.sac.o - 1.5) < 1E-6
+
+
+def test_dt_settings(all_clients):
+    """
+    Cannot downsample nor sample to more than 100 Hz.
+    """
+    client = all_clients
+
+    # Requesting exactly at the initial sampling rate works.
+    params = {
+        "sourcelatitude": 1, "sourcelongitude": 12,
+        "sourcedepthinmeters": client.source_depth,
+        "sourcemomenttensor": "1E15,1E15,1E15,1E15,1E15,1E15",
+        "dt": client.info.dt,
+        "receiverlatitude": 22, "receiverlongitude": 44}
+    request = client.fetch(_assemble_url(**params))
+    assert request.code == 200
+
+    # Request exactly at 100 Hz works.
+    params = {
+        "sourcelatitude": 1, "sourcelongitude": 12,
+        "sourcedepthinmeters": client.source_depth,
+        "sourcemomenttensor": "1E15,1E15,1E15,1E15,1E15,1E15",
+        "dt": 0.01,
+        "receiverlatitude": 22, "receiverlongitude": 44}
+    request = client.fetch(_assemble_url(**params))
+    assert request.code == 200
+
+    # Requesting at something in between works.
+    params = {
+        "sourcelatitude": 1, "sourcelongitude": 12,
+        "sourcedepthinmeters": client.source_depth,
+        "sourcemomenttensor": "1E15,1E15,1E15,1E15,1E15,1E15",
+        "dt": 0.123,
+        "receiverlatitude": 22, "receiverlongitude": 44}
+    request = client.fetch(_assemble_url(**params))
+    assert request.code == 200
+
+    # Requesting a tiny bit above does not work.
+    params = {
+        "sourcelatitude": 1, "sourcelongitude": 12,
+        "sourcedepthinmeters": client.source_depth,
+        "sourcemomenttensor": "1E15,1E15,1E15,1E15,1E15,1E15",
+        "dt": 0.009,
+        "receiverlatitude": 22, "receiverlongitude": 44}
+    request = client.fetch(_assemble_url(**params))
+    assert request.code == 400
+    assert request.reason == (
+        "The smallest possible dt is 0.01. Please choose a smaller value and "
+        "resample locally if needed.")
+
+    # Requesting a tiny bit below also does not work.
+    params = {
+        "sourcelatitude": 1, "sourcelongitude": 12,
+        "sourcedepthinmeters": client.source_depth,
+        "sourcemomenttensor": "1E15,1E15,1E15,1E15,1E15,1E15",
+        "dt": client.info.dt + 0.001,
+        "receiverlatitude": 22, "receiverlongitude": 44}
+    request = client.fetch(_assemble_url(**params))
+    assert request.code == 400
+    assert request.reason == (
+        "Cannot downsample. The sampling interval of the database is "
+        "24.72485 seconds. Make sure to choose a smaller or equal one.")

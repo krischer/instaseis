@@ -233,6 +233,7 @@ def create_async_client(path, station_coordinates_callback=None,
     else:
         client.is_reciprocal = False
         client.source_depth = application.db.info.source_depth * 1000
+    client.info = application.db.info
     return client
 
 
