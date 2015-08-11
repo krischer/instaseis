@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>instaseis.source &mdash; instaseis 0.0.1a-284-gff25 documentation</title>
+    <title>instaseis.source &mdash; instaseis 0.0.1a-311-g267b documentation</title>
     
     <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.0.1a-284-gff25',
+        VERSION:     '0.0.1a-311-g267b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -31,7 +31,7 @@
     <script type="text/javascript" src="../../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../../_static/bootstrap-3.3.4/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../../_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.0.1a-284-gff25 documentation" href="../../index.html" />
+    <link rel="top" title="instaseis 0.0.1a-311-g267b documentation" href="../../index.html" />
     <link rel="up" title="instaseis" href="../instaseis.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-284-gff25</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-311-g267b</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -73,8 +73,10 @@
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul>
 <li class="toctree-l1"><a class="reference internal" href="../../instaseis.html">Main Instaseis Classes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../server.html">Instaseis Server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../source.html">Sources and Receivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../helpers.html">Utility Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../server.html">Instaseis Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced_server_configuration.html">Advanced Server Configuration</a></li>
 </ul>
 </ul>
 </li>
@@ -134,6 +136,7 @@
 
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">ReceiverParseError</span><span class="p">,</span> <span class="n">SourceParseError</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">rotations</span>
+<span class="kn">from</span> <span class="nn">.helpers</span> <span class="kn">import</span> <span class="n">wgs84_to_geocentric_latitude</span><span class="p">,</span> <span class="n">geocentric_to_wgs84_latitude</span>
 
 <span class="n">DEFAULT_MU</span> <span class="o">=</span> <span class="mf">32e9</span>
 
@@ -358,7 +361,7 @@
                  <span class="n">time_shift</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">sliprate</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                  <span class="n">origin_time</span><span class="o">=</span><span class="n">obspy</span><span class="o">.</span><span class="n">UTCDateTime</span><span class="p">(</span><span class="mi">0</span><span class="p">)):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param latitude: latitude of the source in degree</span>
+<span class="sd">        :param latitude: geocentric latitude of the source in degree</span>
 <span class="sd">        :param longitude: longitude of the source in degree</span>
 <span class="sd">        :param depth_in_m: source depth in m</span>
 <span class="sd">        :param m_rr: moment tensor components in r, theta, phi in Nm</span>
@@ -419,6 +422,9 @@
 <span class="sd">        For anything ObsPy related, it must contain a full moment tensor,</span>
 <span class="sd">        otherwise it will raise an error.</span>
 
+<span class="sd">        Coordinates are assumed to be defined on the WGS84 ellipsoid and</span>
+<span class="sd">        will be converted to geocentric coordinates.</span>
+
 <span class="sd">        :param filename_or_obj: The object or filename to parse.</span>
 
 
@@ -475,7 +481,7 @@
                 <span class="k">raise</span> <span class="n">SourceParseError</span><span class="p">(</span><span class="s">&quot;Event must contain a moment tensor.&quot;</span><span class="p">)</span>
             <span class="n">t</span> <span class="o">=</span> <span class="n">fm</span><span class="o">.</span><span class="n">moment_tensor</span><span class="o">.</span><span class="n">tensor</span>
             <span class="k">return</span> <span class="n">Source</span><span class="p">(</span>
-                <span class="n">latitude</span><span class="o">=</span><span class="n">org</span><span class="o">.</span><span class="n">latitude</span><span class="p">,</span>
+                <span class="n">latitude</span><span class="o">=</span><span class="n">wgs84_to_geocentric_latitude</span><span class="p">(</span><span class="n">org</span><span class="o">.</span><span class="n">latitude</span><span class="p">),</span>
                 <span class="n">longitude</span><span class="o">=</span><span class="n">org</span><span class="o">.</span><span class="n">longitude</span><span class="p">,</span>
                 <span class="n">depth_in_m</span><span class="o">=</span><span class="n">org</span><span class="o">.</span><span class="n">depth</span><span class="p">,</span>
                 <span class="n">origin_time</span><span class="o">=</span><span class="n">org</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
@@ -492,6 +498,9 @@
 <div class="viewcode-block" id="Source.from_CMTSOLUTION_file"><a class="viewcode-back" href="../../source.html#instaseis.source.Source.from_CMTSOLUTION_file">[docs]</a>    <span class="k">def</span> <span class="nf">from_CMTSOLUTION_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize a source object from a CMTSOLUTION file.</span>
+
+<span class="sd">        Coordinates are assumed to be defined on the WGS84 ellipsoid and</span>
+<span class="sd">        will be converted to geocentric coordinates.</span>
 
 <span class="sd">        :param filename: path to the CMTSOLUTION file</span>
 
@@ -536,8 +545,9 @@
             <span class="n">m_rp</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="mf">1e7</span>
             <span class="n">m_tp</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="mf">1e7</span>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="p">(</span><span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="p">,</span> <span class="n">depth_in_m</span><span class="p">,</span> <span class="n">m_rr</span><span class="p">,</span> <span class="n">m_tt</span><span class="p">,</span> <span class="n">m_pp</span><span class="p">,</span> <span class="n">m_rt</span><span class="p">,</span>
-                    <span class="n">m_rp</span><span class="p">,</span> <span class="n">m_tp</span><span class="p">,</span> <span class="n">time_shift</span><span class="p">,</span> <span class="n">origin_time</span><span class="o">=</span><span class="n">origin_time</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">(</span><span class="n">wgs84_to_geocentric_latitude</span><span class="p">(</span><span class="n">latitude</span><span class="p">),</span> <span class="n">longitude</span><span class="p">,</span>
+                    <span class="n">depth_in_m</span><span class="p">,</span> <span class="n">m_rr</span><span class="p">,</span> <span class="n">m_tt</span><span class="p">,</span> <span class="n">m_pp</span><span class="p">,</span> <span class="n">m_rt</span><span class="p">,</span> <span class="n">m_rp</span><span class="p">,</span> <span class="n">m_tp</span><span class="p">,</span> <span class="n">time_shift</span><span class="p">,</span>
+                    <span class="n">origin_time</span><span class="o">=</span><span class="n">origin_time</span><span class="p">)</span>
 </div>
     <span class="nd">@classmethod</span>
 <div class="viewcode-block" id="Source.from_strike_dip_rake"><a class="viewcode-back" href="../../source.html#instaseis.source.Source.from_strike_dip_rake">[docs]</a>    <span class="k">def</span> <span class="nf">from_strike_dip_rake</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="p">,</span> <span class="n">depth_in_m</span><span class="p">,</span> <span class="n">strike</span><span class="p">,</span>
@@ -547,7 +557,7 @@
 <span class="sd">        Initialize a source object from a shear source parameterized by strike,</span>
 <span class="sd">        dip and rake.</span>
 
-<span class="sd">        :param latitude: latitude of the source in degree</span>
+<span class="sd">        :param latitude: geocentric latitude of the source in degree</span>
 <span class="sd">        :param longitude: longitude of the source in degree</span>
 <span class="sd">        :param depth_in_m: source depth in m</span>
 <span class="sd">        :param strike: strike of the fault in degree</span>
@@ -624,6 +634,9 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize a source object from a CMTSOLUTION file.</span>
 
+<span class="sd">        Coordinates are assumed to be defined in geocentric coordinates and</span>
+<span class="sd">        will be coordinates defined on the WGS84 ellipsoid.</span>
+
 <span class="sd">        :param filename: path to the CMTSOLUTION file</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
@@ -638,7 +651,7 @@
                         <span class="bp">self</span><span class="o">.</span><span class="n">origin_time</span><span class="o">.</span><span class="n">minute</span><span class="p">,</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">origin_time</span><span class="o">.</span><span class="n">second</span> <span class="o">+</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">origin_time</span><span class="o">.</span><span class="n">microsecond</span> <span class="o">/</span> <span class="mf">1E6</span><span class="p">,</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">latitude</span><span class="p">,</span>
+                        <span class="n">geocentric_to_wgs84_latitude</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">latitude</span><span class="p">),</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">longitude</span><span class="p">,</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">depth_in_m</span> <span class="o">/</span> <span class="mf">1e3</span><span class="p">,</span>
                         <span class="c"># Just write the moment magnitude twice...we don&#39;t</span>
@@ -650,7 +663,9 @@
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;event name:  nn</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;time shift:     </span><span class="si">%5.2f</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time_shift</span><span class="p">,))</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;half duration:  0.0</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;latitude:       </span><span class="si">%7.4f</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">latitude</span><span class="p">,))</span>
+            <span class="c"># Convert latitude to WGS84.</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;latitude:       </span><span class="si">%7.4f</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                <span class="n">geocentric_to_wgs84_latitude</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">latitude</span><span class="p">),))</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;longitude:      </span><span class="si">%7.4f</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">longitude</span><span class="p">,))</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;depth:          </span><span class="si">%7.4f</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">depth_in_m</span> <span class="o">/</span> <span class="mf">1e3</span><span class="p">,))</span>
 
@@ -780,7 +795,7 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class to handle a seismic force source.</span>
 
-<span class="sd">    :param latitude: latitude of the source in degree</span>
+<span class="sd">    :param latitude: geocentric latitude of the source in degree</span>
 <span class="sd">    :param longitude: longitude of the source in degree</span>
 <span class="sd">    :param depth_in_m: source depth in m</span>
 <span class="sd">    :param f_r: force components in r, theta, phi in N</span>
@@ -845,7 +860,7 @@
 <span class="sd">    Class dealing with seismic receivers.</span>
 
 <span class="sd">    :type latitude: float</span>
-<span class="sd">    :param latitude: The latitude of the receiver in degree.</span>
+<span class="sd">    :param latitude: The geocentric latitude of the receiver in degree.</span>
 <span class="sd">    :type longitude: float</span>
 <span class="sd">    :param longitude: The longitude of the receiver in degree.</span>
 <span class="sd">    :type depth_in_m: float</span>
@@ -895,6 +910,9 @@
 <span class="sd">        furthermore work with anything ObsPy can deal with (filename, URL,</span>
 <span class="sd">        memory files, ...).</span>
 
+<span class="sd">        Coordinates are assumed to be defined on the WGS84 ellipsoid and</span>
+<span class="sd">        will be converted to geocentric coordinates.</span>
+
 <span class="sd">        :param filename_or_obj: Filename/URL/Python object</span>
 <span class="sd">        :param network_code: Network code needed to parse ObsPy station</span>
 <span class="sd">            objects. Likely only needed for the recursive part of this method.</span>
@@ -934,7 +952,8 @@
             <span class="c"># If there are no channels, use the station coordinates.</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">filename_or_obj</span><span class="o">.</span><span class="n">channels</span><span class="p">:</span>
                 <span class="k">return</span> <span class="p">[</span><span class="n">Receiver</span><span class="p">(</span>
-                    <span class="n">latitude</span><span class="o">=</span><span class="n">filename_or_obj</span><span class="o">.</span><span class="n">latitude</span><span class="p">,</span>
+                    <span class="n">latitude</span><span class="o">=</span><span class="n">wgs84_to_geocentric_latitude</span><span class="p">(</span>
+                        <span class="n">filename_or_obj</span><span class="o">.</span><span class="n">latitude</span><span class="p">),</span>
                     <span class="n">longitude</span><span class="o">=</span><span class="n">filename_or_obj</span><span class="o">.</span><span class="n">longitude</span><span class="p">,</span>
                     <span class="n">network</span><span class="o">=</span><span class="n">network_code</span><span class="p">,</span> <span class="n">station</span><span class="o">=</span><span class="n">filename_or_obj</span><span class="o">.</span><span class="n">code</span><span class="p">)]</span>
             <span class="c"># Otherwise use the channel information. Raise an error if the</span>
@@ -950,9 +969,11 @@
                         <span class="s">&quot;are not identical.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">network_code</span><span class="p">,</span>
                                                 <span class="n">filename_or_obj</span><span class="o">.</span><span class="n">code</span><span class="p">))</span>
                 <span class="n">coords</span> <span class="o">=</span> <span class="n">coords</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
-                <span class="k">return</span> <span class="p">[</span><span class="n">Receiver</span><span class="p">(</span><span class="n">latitude</span><span class="o">=</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">longitude</span><span class="o">=</span><span class="n">coords</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
-                                 <span class="n">network</span><span class="o">=</span><span class="n">network_code</span><span class="p">,</span>
-                                 <span class="n">station</span><span class="o">=</span><span class="n">filename_or_obj</span><span class="o">.</span><span class="n">code</span><span class="p">)]</span>
+                <span class="k">return</span> <span class="p">[</span><span class="n">Receiver</span><span class="p">(</span>
+                    <span class="n">latitude</span><span class="o">=</span><span class="n">wgs84_to_geocentric_latitude</span><span class="p">(</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+                    <span class="n">longitude</span><span class="o">=</span><span class="n">coords</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                    <span class="n">network</span><span class="o">=</span><span class="n">network_code</span><span class="p">,</span>
+                    <span class="n">station</span><span class="o">=</span><span class="n">filename_or_obj</span><span class="o">.</span><span class="n">code</span><span class="p">)]</span>
         <span class="c"># ObsPy Stream (SAC files contain coordinates).</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">filename_or_obj</span><span class="p">,</span> <span class="n">obspy</span><span class="o">.</span><span class="n">Stream</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">tr</span> <span class="ow">in</span> <span class="n">filename_or_obj</span><span class="p">:</span>
@@ -968,7 +989,8 @@
                 <span class="k">raise</span> <span class="n">ReceiverParseError</span><span class="p">(</span>
                     <span class="s">&quot;SAC file does not contain coordinates for channel &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span>
                     <span class="n">filename_or_obj</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
-            <span class="k">return</span> <span class="p">[</span><span class="n">Receiver</span><span class="p">(</span><span class="n">latitude</span><span class="o">=</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">longitude</span><span class="o">=</span><span class="n">coords</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">Receiver</span><span class="p">(</span><span class="n">latitude</span><span class="o">=</span><span class="n">wgs84_to_geocentric_latitude</span><span class="p">(</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+                             <span class="n">longitude</span><span class="o">=</span><span class="n">coords</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
                              <span class="n">network</span><span class="o">=</span><span class="n">filename_or_obj</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">network</span><span class="p">,</span>
                              <span class="n">station</span><span class="o">=</span><span class="n">filename_or_obj</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">station</span><span class="p">)]</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">filename_or_obj</span><span class="p">,</span> <span class="n">obspy</span><span class="o">.</span><span class="n">xseed</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">Parser</span><span class="p">):</span>
@@ -983,10 +1005,11 @@
                     <span class="k">raise</span> <span class="n">ReceiverParseError</span><span class="p">(</span>
                         <span class="s">&quot;The coordinates of the channels of station &#39;</span><span class="si">%s</span><span class="s">.</span><span class="si">%s</span><span class="s">&#39; &quot;</span>
                         <span class="s">&quot;are not identical&quot;</span> <span class="o">%</span> <span class="n">key</span><span class="p">)</span>
-                <span class="n">receivers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Receiver</span><span class="p">(</span><span class="n">latitude</span><span class="o">=</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
-                                          <span class="n">longitude</span><span class="o">=</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
-                                          <span class="n">network</span><span class="o">=</span><span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-                                          <span class="n">station</span><span class="o">=</span><span class="n">key</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+                <span class="n">receivers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Receiver</span><span class="p">(</span>
+                    <span class="n">latitude</span><span class="o">=</span><span class="n">wgs84_to_geocentric_latitude</span><span class="p">(</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]),</span>
+                    <span class="n">longitude</span><span class="o">=</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+                    <span class="n">network</span><span class="o">=</span><span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="n">station</span><span class="o">=</span><span class="n">key</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
             <span class="k">return</span> <span class="n">receivers</span>
 
         <span class="c"># Check if its anything ObsPy can read and recurse.</span>
@@ -1029,6 +1052,9 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parses a custom STATIONS file format to a list of Receiver objects.</span>
 
+<span class="sd">        Coordinates are assumed to be defined on the WGS84 ellipsoid and</span>
+<span class="sd">        will be converted to geocentric coordinates.</span>
+
 <span class="sd">        :param filename: Filename</span>
 <span class="sd">        :return: List of :class:`~instaseis.source.Receiver` objects.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1037,7 +1063,7 @@
 
             <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
                 <span class="n">station</span><span class="p">,</span> <span class="n">network</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
-                <span class="n">lat</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span>
+                <span class="n">lat</span> <span class="o">=</span> <span class="n">wgs84_to_geocentric_latitude</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">lat</span><span class="p">))</span>
                 <span class="n">lon</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">lon</span><span class="p">)</span>
                 <span class="n">receivers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Receiver</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">network</span><span class="p">,</span> <span class="n">station</span><span class="p">))</span>
 
@@ -1106,6 +1132,9 @@
 <span class="sd">        Initialize a finite source object from a &#39;standard rupture format&#39;</span>
 <span class="sd">        (.srf) file</span>
 
+<span class="sd">        Coordinates are assumed to be defined on the WGS84 ellipsoid and</span>
+<span class="sd">        will be converted to geocentric coordinates.</span>
+
 <span class="sd">        :param filename: path to the .srf file</span>
 <span class="sd">        :type filename: str</span>
 <span class="sd">        :param normalize: normalize the sliprate to 1</span>
@@ -1142,6 +1171,10 @@
             <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">npoints</span><span class="p">):</span>
                 <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">dep</span><span class="p">,</span> <span class="n">stk</span><span class="p">,</span> <span class="n">dip</span><span class="p">,</span> <span class="n">area</span><span class="p">,</span> <span class="n">tinit</span><span class="p">,</span> <span class="n">dt</span> <span class="o">=</span> \
                     <span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+
+                <span class="c"># Convert latitude to a geocentric latitude.</span>
+                <span class="n">lat</span> <span class="o">=</span> <span class="n">wgs84_to_geocentric_latitude</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span>
+
                 <span class="n">rake</span><span class="p">,</span> <span class="n">slip1</span><span class="p">,</span> <span class="n">nt1</span><span class="p">,</span> <span class="n">slip2</span><span class="p">,</span> <span class="n">nt2</span><span class="p">,</span> <span class="n">slip3</span><span class="p">,</span> <span class="n">nt3</span> <span class="o">=</span> \
                     <span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
 
@@ -1193,6 +1226,9 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize a finite source object from a (.param) file available from</span>
 <span class="sd">        the USGS website</span>
+
+<span class="sd">        Coordinates are assumed to be defined on the WGS84 ellipsoid and</span>
+<span class="sd">        will be converted to geocentric coordinates.</span>
 
 <span class="sd">        :param filename: path to the .param file</span>
 <span class="sd">        :type filename: str</span>
@@ -1252,6 +1288,9 @@
                     <span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">dep</span><span class="p">,</span> <span class="n">slip</span><span class="p">,</span> <span class="n">rake</span><span class="p">,</span> <span class="n">stk</span><span class="p">,</span> <span class="n">dip</span><span class="p">,</span> <span class="n">tinit</span><span class="p">,</span> <span class="n">trise</span><span class="p">,</span> <span class="n">tfall</span><span class="p">,</span>
                         <span class="n">M0</span><span class="p">)</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
 
+                    <span class="c"># Convert latitude to a geocentric latitude.</span>
+                    <span class="n">lat</span> <span class="o">=</span> <span class="n">wgs84_to_geocentric_latitude</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span>
+
                     <span class="n">dep</span> <span class="o">*=</span> <span class="mf">1e3</span>    <span class="c"># km &gt; m</span>
                     <span class="n">slip</span> <span class="o">*=</span> <span class="mf">1e-2</span>  <span class="c"># cm &gt; m</span>
                     <span class="n">M0</span> <span class="o">*=</span> <span class="mf">1e-7</span>    <span class="c"># dyn / cm &gt; N * m</span>
@@ -1279,7 +1318,7 @@
 <span class="sd">        Initialize a source object from a shear source parameterized by strike,</span>
 <span class="sd">        dip and rake.</span>
 
-<span class="sd">        :param latitude: latitude of the source centroid in degree</span>
+<span class="sd">        :param latitude: geocentric latitude of the source centroid in degree</span>
 <span class="sd">        :param longitude: longitude of the source centroid in degree</span>
 <span class="sd">        :param depth_in_m: source centroid depth in m</span>
 <span class="sd">        :param strike: strike of the fault in degree</span>
@@ -1603,7 +1642,7 @@
       
     </p>
     <p>
-        &copy; Copyright 2014, Lion Krischer and Martin van Driel.<br/>
+        &copy; Copyright 2014-2015, Lion Krischer and Martin van Driel.<br/>
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.<br/>
     </p>
   </div>

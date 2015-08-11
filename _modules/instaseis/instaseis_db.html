@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>instaseis.instaseis_db &mdash; instaseis 0.0.1a-284-gff25 documentation</title>
+    <title>instaseis.instaseis_db &mdash; instaseis 0.0.1a-311-g267b documentation</title>
     
     <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.0.1a-284-gff25',
+        VERSION:     '0.0.1a-311-g267b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -31,7 +31,7 @@
     <script type="text/javascript" src="../../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../../_static/bootstrap-3.3.4/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../../_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.0.1a-284-gff25 documentation" href="../../index.html" />
+    <link rel="top" title="instaseis 0.0.1a-311-g267b documentation" href="../../index.html" />
     <link rel="up" title="instaseis" href="../instaseis.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-284-gff25</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-311-g267b</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -73,8 +73,10 @@
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul>
 <li class="toctree-l1"><a class="reference internal" href="../../instaseis.html">Main Instaseis Classes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../server.html">Instaseis Server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../source.html">Sources and Receivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../helpers.html">Utility Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../server.html">Instaseis Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced_server_configuration.html">Advanced Server Configuration</a></li>
 </ul>
 </ul>
 </li>
@@ -782,8 +784,8 @@
             <span class="n">slip</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">stf_norm</span><span class="p">,</span>
             <span class="n">sliprate</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">stf_d_norm</span><span class="p">,</span>
             <span class="n">spatial_order</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">npol</span><span class="p">),</span>
-            <span class="n">min_radius</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">kwf_rmin</span><span class="p">),</span>
-            <span class="n">max_radius</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">kwf_rmax</span><span class="p">),</span>
+            <span class="n">min_radius</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">kwf_rmin</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1e3</span><span class="p">,</span>
+            <span class="n">max_radius</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">kwf_rmax</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1e3</span><span class="p">,</span>
             <span class="n">planet_radius</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">planet_radius</span><span class="p">),</span>
             <span class="n">min_d</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">kwf_colatmin</span><span class="p">),</span>
             <span class="n">max_d</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">kwf_colatmax</span><span class="p">),</span>
@@ -809,7 +811,7 @@
       
     </p>
     <p>
-        &copy; Copyright 2014, Lion Krischer and Martin van Driel.<br/>
+        &copy; Copyright 2014-2015, Lion Krischer and Martin van Driel.<br/>
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.<br/>
     </p>
   </div>

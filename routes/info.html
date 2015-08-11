@@ -1,0 +1,178 @@
+
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>GET /info &mdash; instaseis 0.0.1a-311-g267b documentation</title>
+    
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootswatch-3.3.4/simplex/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/my-styles.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.0.1a-311-g267b',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-3.3.4/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="instaseis 0.0.1a-311-g267b documentation" href="../index.html" />
+    <link rel="up" title="Instaseis Server" href="../server.html" />
+    <link rel="next" title="GET /coordinates" href="coordinates.html" />
+    <link rel="prev" title="GET /" href="root.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html">
+          Instaseis</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-311-g267b</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="http://axisem.info">AxiSEM</a></li>
+                <li><a href="http://obspy.org">ObsPy</a></li>
+                <li><a href="http://github.com/krischer/instaseis">GitHub</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../instaseis.html">Main Instaseis Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source.html">Sources and Receivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../helpers.html">Utility Functions</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../server.html">Instaseis Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_server_configuration.html">Advanced Server Configuration</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      
+  <div class="section" id="get-info">
+<h1>GET /info<a class="headerlink" href="#get-info" title="Permalink to this headline">¶</a></h1>
+<dl class="docutils">
+<dt>Description</dt>
+<dd>Detailed information about the Instaseis database offered from this
+particular server.</dd>
+<dt>Content-Type</dt>
+<dd>application/json; charset=UTF-8</dd>
+<dt>Example Response</dt>
+<dd><div class="first last highlight-json"><div class="highlight"><pre><span class="p">{</span>
+    <span class="nt">&quot;attenuation&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+    <span class="nt">&quot;axisem_version&quot;</span><span class="p">:</span> <span class="s2">&quot;615a180&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;compiler&quot;</span><span class="p">:</span> <span class="s2">&quot;ifort 1400&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;components&quot;</span><span class="p">:</span> <span class="s2">&quot;vertical and horizontal&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;datetime&quot;</span><span class="p">:</span> <span class="s2">&quot;2014-11-07T18:48:29.000000Z&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;directory&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;dt&quot;</span><span class="p">:</span> <span class="mf">0.4874457469080638</span><span class="p">,</span>
+    <span class="nt">&quot;dump_type&quot;</span><span class="p">:</span> <span class="s2">&quot;displ_only&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;excitation_type&quot;</span><span class="p">:</span> <span class="s2">&quot;dipole&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;filesize&quot;</span><span class="p">:</span> <span class="mi">948145144202</span><span class="p">,</span>
+    <span class="nt">&quot;format_version&quot;</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span>
+    <span class="nt">&quot;is_reciprocal&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+    <span class="nt">&quot;length&quot;</span><span class="p">:</span> <span class="mf">3699.713219032204</span><span class="p">,</span>
+    <span class="nt">&quot;max_d&quot;</span><span class="p">:</span> <span class="mi">180</span><span class="p">,</span>
+    <span class="nt">&quot;max_radius&quot;</span><span class="p">:</span> <span class="mi">6371</span><span class="p">,</span>
+    <span class="nt">&quot;min_d&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="nt">&quot;min_radius&quot;</span><span class="p">:</span> <span class="mi">5671</span><span class="p">,</span>
+    <span class="nt">&quot;nfft&quot;</span><span class="p">:</span> <span class="mi">16384</span><span class="p">,</span>
+    <span class="nt">&quot;npts&quot;</span><span class="p">:</span> <span class="mi">7591</span>
+    <span class="s2">&quot;period&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="nt">&quot;planet_radius&quot;</span><span class="p">:</span> <span class="mi">6371000</span><span class="p">,</span>
+    <span class="nt">&quot;slip&quot;</span><span class="p">:</span> <span class="p">[</span> <span class="s2">&quot;...&quot;</span> <span class="p">],</span>
+    <span class="nt">&quot;sliprate&quot;</span><span class="p">:</span> <span class="p">[</span> <span class="s2">&quot;...&quot;</span> <span class="p">],</span>
+    <span class="nt">&quot;sampling_rate&quot;</span><span class="p">:</span> <span class="mf">2.05151036057477</span><span class="p">,</span>
+    <span class="nt">&quot;source_depth&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+    <span class="nt">&quot;spatial_order&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+    <span class="nt">&quot;src_shift&quot;</span><span class="p">:</span> <span class="mf">3.4121203422546387</span><span class="p">,</span>
+    <span class="nt">&quot;src_shift_samples&quot;</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span>
+    <span class="nt">&quot;stf&quot;</span><span class="p">:</span> <span class="s2">&quot;errorf&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;time_scheme&quot;</span><span class="p">:</span> <span class="s2">&quot;symplec4&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;user&quot;</span><span class="p">:</span> <span class="s2">&quot;di29kub on login05&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;velocity_model&quot;</span><span class="p">:</span> <span class="s2">&quot;ak135f&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2014-2015, Lion Krischer and Martin van Driel.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

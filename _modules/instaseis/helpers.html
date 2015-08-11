@@ -1,0 +1,243 @@
+
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>instaseis.helpers &mdash; instaseis 0.0.1a-311-g267b documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/bootswatch-3.3.4/simplex/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/my-styles.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.0.1a-311-g267b',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../../_static/bootstrap-3.3.4/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../../_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="instaseis 0.0.1a-311-g267b documentation" href="../../index.html" />
+    <link rel="up" title="instaseis" href="../instaseis.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../index.html">
+          Instaseis</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-311-g267b</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="http://axisem.info">AxiSEM</a></li>
+                <li><a href="http://obspy.org">ObsPy</a></li>
+                <li><a href="http://github.com/krischer/instaseis">GitHub</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../instaseis.html">Main Instaseis Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../source.html">Sources and Receivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../helpers.html">Utility Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../server.html">Instaseis Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced_server_configuration.html">Advanced Server Configuration</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      
+  <h1>Source code for instaseis.helpers</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/env python</span>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Library loading helper.</span>
+
+<span class="sd">:copyright:</span>
+<span class="sd">    Lion Krischer (krischer@geophysik.uni-muenchen.de), 2014</span>
+<span class="sd">:license:</span>
+<span class="sd">    GNU Lesser General Public License, Version 3 [non-commercial/academic use]</span>
+<span class="sd">    (http://www.gnu.org/copyleft/lgpl.html)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="p">(</span><span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span>
+                        <span class="n">unicode_literals</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">ctypes</span> <span class="kn">as</span> <span class="nn">C</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+
+<span class="n">LIB_DIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span>
+    <span class="n">inspect</span><span class="o">.</span><span class="n">getfile</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">currentframe</span><span class="p">()))),</span> <span class="s">&quot;lib&quot;</span><span class="p">)</span>
+
+<span class="n">cache</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="n">WGS_A</span> <span class="o">=</span> <span class="mf">6378137.0</span>
+<span class="n">WGS_B</span> <span class="o">=</span> <span class="mf">6356752.314245</span>
+
+
+<span class="n">_f</span> <span class="o">=</span> <span class="p">(</span><span class="n">WGS_A</span> <span class="o">-</span> <span class="n">WGS_B</span><span class="p">)</span> <span class="o">/</span> <span class="n">WGS_A</span>
+<span class="n">E_2</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">_f</span> <span class="o">-</span> <span class="n">_f</span> <span class="o">**</span> <span class="mi">2</span>
+
+
+<span class="k">def</span> <span class="nf">load_lib</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">cache</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">cache</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c"># Enable a couple of different library naming schemes.</span>
+        <span class="n">possible_files</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">LIB_DIR</span><span class="p">,</span> <span class="s">&quot;instaseis*.so&quot;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">possible_files</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Could not find suitable instaseis shared &quot;</span>
+                             <span class="s">&quot;library.&quot;</span><span class="p">)</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">possible_files</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">lib</span> <span class="o">=</span> <span class="n">C</span><span class="o">.</span><span class="n">CDLL</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="n">cache</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lib</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">lib</span>
+
+
+<span class="k">def</span> <span class="nf">get_band_code</span><span class="p">(</span><span class="n">dt</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Figure out the channel band code. Done as in SPECFEM.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">dt</span> <span class="o">&lt;=</span> <span class="mf">0.001</span><span class="p">:</span>
+        <span class="n">band_code</span> <span class="o">=</span> <span class="s">&quot;F&quot;</span>
+    <span class="k">elif</span> <span class="n">dt</span> <span class="o">&lt;=</span> <span class="mf">0.004</span><span class="p">:</span>
+        <span class="n">band_code</span> <span class="o">=</span> <span class="s">&quot;C&quot;</span>
+    <span class="k">elif</span> <span class="n">dt</span> <span class="o">&lt;=</span> <span class="mf">0.0125</span><span class="p">:</span>
+        <span class="n">band_code</span> <span class="o">=</span> <span class="s">&quot;H&quot;</span>
+    <span class="k">elif</span> <span class="n">dt</span> <span class="o">&lt;=</span> <span class="mf">0.1</span><span class="p">:</span>
+        <span class="n">band_code</span> <span class="o">=</span> <span class="s">&quot;B&quot;</span>
+    <span class="k">elif</span> <span class="n">dt</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">band_code</span> <span class="o">=</span> <span class="s">&quot;M&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">band_code</span> <span class="o">=</span> <span class="s">&quot;L&quot;</span>
+    <span class="k">return</span> <span class="n">band_code</span>
+
+
+<div class="viewcode-block" id="wgs84_to_geocentric_latitude"><a class="viewcode-back" href="../../helpers.html#instaseis.helpers.wgs84_to_geocentric_latitude">[docs]</a><span class="k">def</span> <span class="nf">wgs84_to_geocentric_latitude</span><span class="p">(</span><span class="n">lat</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert a latitude defined on the WGS84 ellipsoid to a geocentric one.</span>
+
+<span class="sd">    &gt;&gt;&gt; wgs84_to_geocentric_latitude(0.0)</span>
+<span class="sd">    0.0</span>
+<span class="sd">    &gt;&gt;&gt; wgs84_to_geocentric_latitude(90.0)</span>
+<span class="sd">    90.0</span>
+<span class="sd">    &gt;&gt;&gt; wgs84_to_geocentric_latitude(-90.0)</span>
+<span class="sd">    -90.0</span>
+<span class="sd">    &gt;&gt;&gt; wgs84_to_geocentric_latitude(45.0)</span>
+<span class="sd">    44.80757678401642</span>
+<span class="sd">    &gt;&gt;&gt; wgs84_to_geocentric_latitude(-45.0)</span>
+<span class="sd">    -44.80757678401642</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c"># Singularities close to the pole and the equator. Just return the value</span>
+    <span class="c"># in that case.</span>
+    <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1E-6</span> <span class="ow">or</span> <span class="nb">abs</span><span class="p">(</span><span class="n">lat</span> <span class="o">-</span> <span class="mi">90</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1E-6</span> <span class="ow">or</span> \
+            <span class="nb">abs</span><span class="p">(</span><span class="n">lat</span> <span class="o">+</span> <span class="mf">90.0</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1E-6</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">lat</span>
+
+    <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">atan</span><span class="p">((</span><span class="mi">1</span> <span class="o">-</span> <span class="n">E_2</span><span class="p">)</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">tan</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">lat</span><span class="p">))))</span>
+
+</div>
+<div class="viewcode-block" id="geocentric_to_wgs84_latitude"><a class="viewcode-back" href="../../helpers.html#instaseis.helpers.geocentric_to_wgs84_latitude">[docs]</a><span class="k">def</span> <span class="nf">geocentric_to_wgs84_latitude</span><span class="p">(</span><span class="n">lat</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert a geocentric latitude to one defined on the WGS84 ellipsoid.</span>
+
+<span class="sd">    &gt;&gt;&gt; geocentric_to_wgs84_latitude(0.0)</span>
+<span class="sd">    0.0</span>
+<span class="sd">    &gt;&gt;&gt; geocentric_to_wgs84_latitude(90.0)</span>
+<span class="sd">    90.0</span>
+<span class="sd">    &gt;&gt;&gt; geocentric_to_wgs84_latitude(-90.0)</span>
+<span class="sd">    -90.0</span>
+<span class="sd">    &gt;&gt;&gt; geocentric_to_wgs84_latitude(45.0)</span>
+<span class="sd">    45.19242321598358</span>
+<span class="sd">    &gt;&gt;&gt; geocentric_to_wgs84_latitude(-45.0)</span>
+<span class="sd">    -45.19242321598358</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c"># Singularities close to the pole and the equator. Just return the value</span>
+    <span class="c"># in that case.</span>
+    <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1E-6</span> <span class="ow">or</span> <span class="nb">abs</span><span class="p">(</span><span class="n">lat</span> <span class="o">-</span> <span class="mi">90</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1E-6</span> <span class="ow">or</span> \
+            <span class="nb">abs</span><span class="p">(</span><span class="n">lat</span> <span class="o">+</span> <span class="mf">90.0</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1E-6</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">lat</span>
+
+    <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">atan</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">tan</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">lat</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">E_2</span><span class="p">)))</span></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2014-2015, Lion Krischer and Martin van Driel.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

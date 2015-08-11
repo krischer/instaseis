@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>instaseis.base_instaseis_db &mdash; instaseis 0.0.1a-284-gff25 documentation</title>
+    <title>instaseis.base_instaseis_db &mdash; instaseis 0.0.1a-311-g267b documentation</title>
     
     <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.0.1a-284-gff25',
+        VERSION:     '0.0.1a-311-g267b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -31,7 +31,7 @@
     <script type="text/javascript" src="../../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../../_static/bootstrap-3.3.4/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../../_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.0.1a-284-gff25 documentation" href="../../index.html" />
+    <link rel="top" title="instaseis 0.0.1a-311-g267b documentation" href="../../index.html" />
     <link rel="up" title="instaseis" href="../instaseis.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-284-gff25</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-311-g267b</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -73,8 +73,10 @@
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul>
 <li class="toctree-l1"><a class="reference internal" href="../../instaseis.html">Main Instaseis Classes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../server.html">Instaseis Server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../source.html">Sources and Receivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../helpers.html">Utility Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../server.html">Instaseis Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced_server_configuration.html">Advanced Server Configuration</a></li>
 </ul>
 </ul>
 </li>
@@ -144,7 +146,7 @@
 <div class="viewcode-block" id="BaseInstaseisDB.get_seismograms"><a class="viewcode-back" href="../../instaseis.html#instaseis.base_instaseis_db.BaseInstaseisDB.get_seismograms">[docs]</a>    <span class="k">def</span> <span class="nf">get_seismograms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">receiver</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="p">(</span><span class="s">&quot;Z&quot;</span><span class="p">,</span> <span class="s">&quot;N&quot;</span><span class="p">,</span> <span class="s">&quot;E&quot;</span><span class="p">),</span>
                         <span class="n">kind</span><span class="o">=</span><span class="s">&#39;displacement&#39;</span><span class="p">,</span> <span class="n">remove_source_shift</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
                         <span class="n">reconvolve_stf</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">return_obspy_stream</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-                        <span class="n">dt</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">a_lanczos</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+                        <span class="n">dt</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">kernelwidth</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Extract seismograms from the Green&#39;s function database.</span>
 
@@ -176,8 +178,10 @@
 <span class="sd">        :type dt: float, optional</span>
 <span class="sd">        :param dt: Desired sampling rate of the seismograms. Resampling is done</span>
 <span class="sd">            using a Lanczos kernel.</span>
-<span class="sd">        :type a_lanczos: int, optional</span>
-<span class="sd">        :param a_lanczos: The width of the kernel used in the resampling.</span>
+<span class="sd">        :type kernelwidth: int, optional</span>
+<span class="sd">        :param kernelwidth: The width of the sinc kernel used for resampling in</span>
+<span class="sd">            terms of the original sampling interval. Best choose something</span>
+<span class="sd">            between 10 and 20.</span>
 
 <span class="sd">        :returns: Multi component seismograms.</span>
 <span class="sd">        :rtype: A :class:`obspy.core.stream.Stream` object or a dictionary</span>
@@ -231,7 +235,7 @@
         <span class="c"># Calculate the final time information about the seismograms.</span>
         <span class="n">time_information</span> <span class="o">=</span> <span class="n">_get_seismogram_times</span><span class="p">(</span>
             <span class="n">info</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">,</span> <span class="n">origin_time</span><span class="o">=</span><span class="n">origin_time</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span>
-            <span class="n">a_lanczos</span><span class="o">=</span><span class="n">a_lanczos</span><span class="p">,</span> <span class="n">remove_source_shift</span><span class="o">=</span><span class="n">remove_source_shift</span><span class="p">,</span>
+            <span class="n">kernelwidth</span><span class="o">=</span><span class="n">kernelwidth</span><span class="p">,</span> <span class="n">remove_source_shift</span><span class="o">=</span><span class="n">remove_source_shift</span><span class="p">,</span>
             <span class="n">reconvolve_stf</span><span class="o">=</span><span class="n">reconvolve_stf</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">components</span><span class="p">:</span>
@@ -272,7 +276,7 @@
                     <span class="n">new_start</span><span class="o">=</span><span class="n">time_information</span><span class="p">[</span><span class="s">&quot;time_shift_at_beginning&quot;</span><span class="p">],</span>
                     <span class="n">new_dt</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span>
                     <span class="n">new_npts</span><span class="o">=</span><span class="n">time_information</span><span class="p">[</span><span class="s">&quot;npts_before_shift_removal&quot;</span><span class="p">],</span>
-                    <span class="n">a</span><span class="o">=</span><span class="n">a_lanczos</span><span class="p">,</span>
+                    <span class="n">a</span><span class="o">=</span><span class="n">kernelwidth</span><span class="p">,</span>
                     <span class="n">window</span><span class="o">=</span><span class="s">&quot;blackman&quot;</span><span class="p">)</span>
 
             <span class="c"># Integrate/differentiate before removing the source shift in</span>
@@ -337,7 +341,7 @@
 <div class="viewcode-block" id="BaseInstaseisDB.get_seismograms_finite_source"><a class="viewcode-back" href="../../instaseis.html#instaseis.base_instaseis_db.BaseInstaseisDB.get_seismograms_finite_source">[docs]</a>    <span class="k">def</span> <span class="nf">get_seismograms_finite_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sources</span><span class="p">,</span> <span class="n">receiver</span><span class="p">,</span>
                                       <span class="n">components</span><span class="o">=</span><span class="p">(</span><span class="s">&quot;Z&quot;</span><span class="p">,</span> <span class="s">&quot;N&quot;</span><span class="p">,</span> <span class="s">&quot;E&quot;</span><span class="p">),</span>
                                       <span class="n">kind</span><span class="o">=</span><span class="s">&#39;displacement&#39;</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                                      <span class="n">a_lanczos</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">correct_mu</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                                      <span class="n">kernelwidth</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">correct_mu</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
                                       <span class="n">progress_callback</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Extract seismograms for a finite source from an Instaseis database.</span>
@@ -357,8 +361,10 @@
 <span class="sd">        :type dt: float, optional</span>
 <span class="sd">        :param dt: Desired sampling rate of the seismograms. Resampling is done</span>
 <span class="sd">            using a Lanczos kernel.</span>
-<span class="sd">        :type a_lanczos: int, optional</span>
-<span class="sd">        :param a_lanczos: The width of the kernel used in the resampling.</span>
+<span class="sd">        :type kernelwidth: int, optional</span>
+<span class="sd">        :param kernelwidth: The width of the sinc kernel used for resampling in</span>
+<span class="sd">            terms of the original sampling interval. Best choose something</span>
+<span class="sd">            between 10 and 20.</span>
 <span class="sd">        :type correct_mu: bool, optional</span>
 <span class="sd">        :param correct_mu: Correct the source magnitude for the actual shear</span>
 <span class="sd">            modulus from the model.</span>
@@ -406,7 +412,7 @@
                 <span class="n">data_summed</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">=</span> <span class="n">lanczos</span><span class="o">.</span><span class="n">lanczos_interpolation</span><span class="p">(</span>
                     <span class="n">data</span><span class="o">=</span><span class="n">data_summed</span><span class="p">[</span><span class="n">comp</span><span class="p">],</span> <span class="n">old_start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">old_dt</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span>
                     <span class="n">new_start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">new_dt</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span> <span class="n">new_npts</span><span class="o">=</span><span class="n">new_npts</span><span class="p">,</span>
-                    <span class="n">a</span><span class="o">=</span><span class="n">a_lanczos</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="s">&quot;blackman&quot;</span><span class="p">)</span>
+                    <span class="n">a</span><span class="o">=</span><span class="n">kernelwidth</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="s">&quot;blackman&quot;</span><span class="p">)</span>
 
                 <span class="c"># The resampling assumes zeros outside the data range. This</span>
                 <span class="c"># does not introduce any errors at the beginning as the data is</span>
@@ -417,7 +423,7 @@
                 <span class="c"># Also don&#39;t cut it for the &quot;identify&quot; interpolation which is</span>
                 <span class="c"># important for testing.</span>
                 <span class="k">if</span> <span class="nb">round</span><span class="p">(</span><span class="n">dt</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span> <span class="o">!=</span> <span class="mf">1.0</span><span class="p">:</span>
-                    <span class="n">affected_area</span> <span class="o">=</span> <span class="n">a_lanczos</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">dt</span>
+                    <span class="n">affected_area</span> <span class="o">=</span> <span class="n">kernelwidth</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">dt</span>
                     <span class="n">data_summed</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">=</span> \
                         <span class="n">data_summed</span><span class="p">[</span><span class="n">comp</span><span class="p">][:</span><span class="o">-</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">affected_area</span> <span class="o">/</span> <span class="n">dt</span><span class="p">))]</span>
 
@@ -548,8 +554,8 @@
             <span class="n">stf</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">stf</span><span class="p">,</span>
             <span class="n">src_shift</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">src_shift</span><span class="p">,</span>
             <span class="n">spatial_order</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">spatial_order</span><span class="p">,</span>
-            <span class="n">min_radius</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">min_radius</span><span class="p">,</span>
-            <span class="n">max_radius</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">max_radius</span><span class="p">,</span>
+            <span class="n">min_radius</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">min_radius</span> <span class="o">/</span> <span class="mf">1.0E3</span><span class="p">,</span>
+            <span class="n">max_radius</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">max_radius</span> <span class="o">/</span> <span class="mf">1.0E3</span><span class="p">,</span>
             <span class="n">planet_radius</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">planet_radius</span> <span class="o">/</span> <span class="mf">1.0E3</span><span class="p">,</span>
             <span class="n">min_d</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">min_d</span><span class="p">,</span>
             <span class="n">max_d</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">max_d</span><span class="p">,</span>
@@ -578,7 +584,7 @@
     <span class="k">return</span> <span class="s">&quot;</span><span class="si">%3.1f</span><span class="s"> </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">num</span><span class="p">,</span> <span class="s">&quot;TB&quot;</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_get_seismogram_times</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="n">origin_time</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">a_lanczos</span><span class="p">,</span>
+<span class="k">def</span> <span class="nf">_get_seismogram_times</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="n">origin_time</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">kernelwidth</span><span class="p">,</span>
                           <span class="n">remove_source_shift</span><span class="p">,</span> <span class="n">reconvolve_stf</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Helper function to calculate the final times of seismograms.</span>
@@ -590,7 +596,7 @@
 
 <span class="sd">    :param info: The info dictionary of a database.</span>
 <span class="sd">    :param dt: The desired new sampling rate. None if not set.</span>
-<span class="sd">    :param a_lanczos: The width of the lanczos kernel.</span>
+<span class="sd">    :param kernelwidth: The width of the interpolation kernel.</span>
 <span class="sd">    :param remove_source_shift: Remove or don&#39;t remove the source time shift.</span>
 <span class="sd">    :param reconvolve_stf: Set to true if reconvolved with a custom STF,</span>
 <span class="sd">        then the time shift are no longer applied.</span>
@@ -658,7 +664,7 @@
         <span class="c"># Also don&#39;t cut it for the &quot;identify&quot; interpolation which is</span>
         <span class="c"># important for testing.</span>
         <span class="k">if</span> <span class="nb">round</span><span class="p">(</span><span class="n">dt</span> <span class="o">/</span> <span class="n">info</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span> <span class="o">!=</span> <span class="mf">1.0</span><span class="p">:</span>
-            <span class="n">affected_area</span> <span class="o">=</span> <span class="n">a_lanczos</span> <span class="o">*</span> <span class="n">info</span><span class="o">.</span><span class="n">dt</span>
+            <span class="n">affected_area</span> <span class="o">=</span> <span class="n">kernelwidth</span> <span class="o">*</span> <span class="n">info</span><span class="o">.</span><span class="n">dt</span>
             <span class="n">ti</span><span class="p">[</span><span class="s">&quot;samples_cut_at_end&quot;</span><span class="p">]</span> <span class="o">=</span> \
                 <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">affected_area</span> <span class="o">/</span> <span class="n">dt</span><span class="p">))</span>
             <span class="n">ti</span><span class="p">[</span><span class="s">&quot;npts_before_shift_removal&quot;</span><span class="p">]</span> <span class="o">-=</span> <span class="n">ti</span><span class="p">[</span><span class="s">&quot;samples_cut_at_end&quot;</span><span class="p">]</span>
@@ -695,7 +701,7 @@
       
     </p>
     <p>
-        &copy; Copyright 2014, Lion Krischer and Martin van Driel.<br/>
+        &copy; Copyright 2014-2015, Lion Krischer and Martin van Driel.<br/>
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.<br/>
     </p>
   </div>

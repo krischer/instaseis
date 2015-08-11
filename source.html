@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Sources and Receivers &mdash; instaseis 0.0.1a-284-gff25 documentation</title>
+    <title>Sources and Receivers &mdash; instaseis 0.0.1a-311-g267b documentation</title>
     
     <link rel="stylesheet" href="_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.0.1a-284-gff25',
+        VERSION:     '0.0.1a-311-g267b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -31,8 +31,9 @@
     <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="_static/bootstrap-3.3.4/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.0.1a-284-gff25 documentation" href="index.html" />
-    <link rel="prev" title="Instaseis Server" href="server.html" />
+    <link rel="top" title="instaseis 0.0.1a-311-g267b documentation" href="index.html" />
+    <link rel="next" title="Utility Functions" href="helpers.html" />
+    <link rel="prev" title="Main Instaseis Classes" href="instaseis.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
@@ -52,7 +53,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-284-gff25</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-311-g267b</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -73,8 +74,10 @@
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="instaseis.html">Main Instaseis Classes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="server.html">Instaseis Server</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="">Sources and Receivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="helpers.html">Utility Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="server.html">Instaseis Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced_server_configuration.html">Advanced Server Configuration</a></li>
 </ul>
 </ul>
 </li>
@@ -111,6 +114,23 @@ sources. <a class="reference internal" href="#instaseis.source.Source" title="in
 or double couple sources, <a class="reference internal" href="#instaseis.source.ForceSource" title="instaseis.source.ForceSource"><code class="xref py py-class docutils literal"><span class="pre">ForceSource</span></code></a> object are
 (as the name implies) force sources, and finite source are represented by the
 <a class="reference internal" href="#instaseis.source.FiniteSource" title="instaseis.source.FiniteSource"><code class="xref py py-class docutils literal"><span class="pre">FiniteSource</span></code></a> class.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Instaseis works with geocentric coordinates. Coordinates in for example
+QuakeML files are defined on the WGS84 ellipsoid. Thus they need to be
+converted. Instaseis performs this conversion if it is used to read from
+any file format - if you create the source objects yourself you have to
+take care to pass geocentric coordinates. The difference in both can be up
+to 20 kilometers. Depending on the application, <strong>this is not an effect you
+can savely ignore</strong>.</p>
+<p>The ruleset within Instaseis is simple:</p>
+<ol class="last arabic simple">
+<li>Source and receiver objects are always in geocentric coordinates.</li>
+<li>If parsed from any outside file (QuakeML/SEED/SAC/StationXML/...) the
+coordinates are assumed to be WGS84 and will be converted so the
+source/receiver objects are again in geocentric coordinates.</li>
+</ol>
+</div>
 <div class="contents local topic" id="contents">
 <ul class="simple">
 <li><a class="reference internal" href="#receiver" id="id1">Receiver</a></li>
@@ -130,7 +150,7 @@ or double couple sources, <a class="reference internal" href="#instaseis.source.
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>latitude</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; The latitude of the receiver in degree.</li>
+<li><strong>latitude</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; The geocentric latitude of the receiver in degree.</li>
 <li><strong>longitude</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; The longitude of the receiver in degree.</li>
 <li><strong>depth_in_m</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; The depth of the receiver in meters. Only</li>
 <li><strong>network</strong> (<em>str, optional</em>) &#8211; The network id of the receiver.</li>
@@ -162,6 +182,8 @@ meant as a single entry point for receiver information from any source.</p>
 SEED files, and a number of ObsPy objects. This method can
 furthermore work with anything ObsPy can deal with (filename, URL,
 memory files, ...).</p>
+<p>Coordinates are assumed to be defined on the WGS84 ellipsoid and
+will be converted to geocentric coordinates.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -203,7 +225,7 @@ function.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>latitude</strong> &#8211; latitude of the source in degree</li>
+<li><strong>latitude</strong> &#8211; geocentric latitude of the source in degree</li>
 <li><strong>longitude</strong> &#8211; longitude of the source in degree</li>
 <li><strong>depth_in_m</strong> &#8211; source depth in m</li>
 <li><strong>m_rr</strong> &#8211; moment tensor components in r, theta, phi in Nm</li>
@@ -257,6 +279,8 @@ the time of the first sample of the final seismogram.</li>
 <dt id="instaseis.source.Source.from_CMTSOLUTION_file">
 <em class="property">classmethod </em><code class="descname">from_CMTSOLUTION_file</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/source.html#Source.from_CMTSOLUTION_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.Source.from_CMTSOLUTION_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize a source object from a CMTSOLUTION file.</p>
+<p>Coordinates are assumed to be defined on the WGS84 ellipsoid and
+will be converted to geocentric coordinates.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -294,7 +318,7 @@ dip and rake.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>latitude</strong> &#8211; latitude of the source in degree</li>
+<li><strong>latitude</strong> &#8211; geocentric latitude of the source in degree</li>
 <li><strong>longitude</strong> &#8211; longitude of the source in degree</li>
 <li><strong>depth_in_m</strong> &#8211; source depth in m</li>
 <li><strong>strike</strong> &#8211; strike of the fault in degree</li>
@@ -356,6 +380,8 @@ anything ObsPy can read, ObsPy event related objects,
 and CMTSOLUTION files.</p>
 <p>For anything ObsPy related, it must contain a full moment tensor,
 otherwise it will raise an error.</p>
+<p>Coordinates are assumed to be defined on the WGS84 ellipsoid and
+will be converted to geocentric coordinates.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -478,6 +504,8 @@ notation:
 <dt id="instaseis.source.Source.write_CMTSOLUTION_file">
 <code class="descname">write_CMTSOLUTION_file</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/source.html#Source.write_CMTSOLUTION_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.Source.write_CMTSOLUTION_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize a source object from a CMTSOLUTION file.</p>
+<p>Coordinates are assumed to be defined in geocentric coordinates and
+will be coordinates defined on the WGS84 ellipsoid.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -503,7 +531,7 @@ notation:
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>latitude</strong> &#8211; latitude of the source in degree</li>
+<li><strong>latitude</strong> &#8211; geocentric latitude of the source in degree</li>
 <li><strong>longitude</strong> &#8211; longitude of the source in degree</li>
 <li><strong>depth_in_m</strong> &#8211; source depth in m</li>
 <li><strong>f_r</strong> &#8211; force components in r, theta, phi in N</li>
@@ -602,7 +630,7 @@ dip and rake.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>latitude</strong> &#8211; latitude of the source centroid in degree</li>
+<li><strong>latitude</strong> &#8211; geocentric latitude of the source centroid in degree</li>
 <li><strong>longitude</strong> &#8211; longitude of the source centroid in degree</li>
 <li><strong>depth_in_m</strong> &#8211; source centroid depth in m</li>
 <li><strong>strike</strong> &#8211; strike of the fault in degree</li>
@@ -632,6 +660,8 @@ to propagate the rupture in negative rake direction.</li>
 <em class="property">classmethod </em><code class="descname">from_srf_file</code><span class="sig-paren">(</span><em>filename</em>, <em>normalize=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/source.html#FiniteSource.from_srf_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.FiniteSource.from_srf_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize a finite source object from a &#8216;standard rupture format&#8217;
 (.srf) file</p>
+<p>Coordinates are assumed to be defined on the WGS84 ellipsoid and
+will be converted to geocentric coordinates.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -671,6 +701,8 @@ to propagate the rupture in negative rake direction.</li>
 <em class="property">classmethod </em><code class="descname">from_usgs_param_file</code><span class="sig-paren">(</span><em>filename</em>, <em>npts=10000</em>, <em>dt=0.1</em>, <em>trise_min=1.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/source.html#FiniteSource.from_usgs_param_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.FiniteSource.from_usgs_param_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize a finite source object from a (.param) file available from
 the USGS website</p>
+<p>Coordinates are assumed to be defined on the WGS84 ellipsoid and
+will be converted to geocentric coordinates.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -803,7 +835,7 @@ interpolation for all pointsources in the finite source.</p>
       
     </p>
     <p>
-        &copy; Copyright 2014, Lion Krischer and Martin van Driel.<br/>
+        &copy; Copyright 2014-2015, Lion Krischer and Martin van Driel.<br/>
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.<br/>
     </p>
   </div>

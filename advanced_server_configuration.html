@@ -1,0 +1,357 @@
+
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Advanced Server Configuration &mdash; instaseis 0.0.1a-311-g267b documentation</title>
+    
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootswatch-3.3.4/simplex/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/my-styles.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.0.1a-311-g267b',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.3.4/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="instaseis 0.0.1a-311-g267b documentation" href="index.html" />
+    <link rel="prev" title="GET /seismograms" href="routes/seismograms.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">
+          Instaseis</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-311-g267b</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="http://axisem.info">AxiSEM</a></li>
+                <li><a href="http://obspy.org">ObsPy</a></li>
+                <li><a href="http://github.com/krischer/instaseis">GitHub</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="instaseis.html">Main Instaseis Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="source.html">Sources and Receivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="helpers.html">Utility Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="server.html">Instaseis Server</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Advanced Server Configuration</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      
+  <div class="section" id="advanced-server-configuration">
+<h1>Advanced Server Configuration<a class="headerlink" href="#advanced-server-configuration" title="Permalink to this headline">¶</a></h1>
+<p>Certain advanced functionality requires a more extensive server configuration.
+This is a bit more work but you can tweak that functionality to best suite your
+own needs.</p>
+<p>You can find a complete example implementation <a class="reference external" href="https://github.com/krischer/instaseis/tree/master/advanced_server_configuration_example">here</a>.</p>
+<p>It works by implementing up to three callback functions to:</p>
+<ul class="simple">
+<li>resolve station coordinates from network and station codes</li>
+<li>resolve event parameters from event ids</li>
+<li>calculate theoretical travel times</li>
+</ul>
+<p>You can choose to implement any number of these - appropriate error messages
+will be raised if the server requires a callback function this is not
+available. The rest will keep on working just fine.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Please raise a <code class="docutils literal"><span class="pre">ValueError</span></code> within in the callback functions if something
+does not go as expected. That will be caught by Instaseis; other exceptions
+will result in a return code 500 (internal server error).</p>
+</div>
+<div class="contents local topic" id="contents-of-this-page">
+<p class="topic-title first">Contents of this Page</p>
+<ul class="simple">
+<li><a class="reference internal" href="#station-coordinates-callback" id="id2">Station Coordinates Callback</a></li>
+<li><a class="reference internal" href="#event-parameters-callback" id="id3">Event Parameters Callback</a></li>
+<li><a class="reference internal" href="#travel-time-callback" id="id4">Travel Time Callback</a></li>
+<li><a class="reference internal" href="#hooking-it-up-to-the-instaseis-server" id="id5">Hooking it up to the Instaseis Server</a></li>
+</ul>
+</div>
+<div class="section" id="station-coordinates-callback">
+<h2><a class="toc-backref" href="#id2">Station Coordinates Callback</a><a class="headerlink" href="#station-coordinates-callback" title="Permalink to this headline">¶</a></h2>
+<p>This callback function is used for the <code class="docutils literal"><span class="pre">/coordinates</span></code> route, as well as
+<code class="docutils literal"><span class="pre">network</span></code> and <code class="docutils literal"><span class="pre">station</span></code> based queries in the <code class="docutils literal"><span class="pre">/seismograms</span></code> route. It
+resolves network and station code searches to actual coordinates. How the
+coordinates are resolved is up to the users but make sure it is fast. Also make
+sure the coordinates are geocentric. Instaseis has a helper function to aid
+with that: <a class="reference internal" href="helpers.html#instaseis.helpers.wgs84_to_geocentric_latitude" title="instaseis.helpers.wgs84_to_geocentric_latitude"><code class="xref py py-func docutils literal"><span class="pre">instaseis.helpers.wgs84_to_geocentric_latitude()</span></code></a></p>
+<p><strong>Affected routes:</strong></p>
+<ul class="simple">
+<li><a class="reference internal" href="routes/coordinates.html"><em>GET /coordinates</em></a></li>
+<li><a class="reference internal" href="routes/seismograms.html"><em>GET /seismograms</em></a></li>
+</ul>
+<p><strong>Function Signature:</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">get_station_coordinates</span><span class="p">(</span><span class="n">networks</span><span class="p">,</span> <span class="n">stations</span><span class="p">):</span>
+    <span class="o">...</span>
+    <span class="k">return</span> <span class="p">[</span><span class="o">...</span><span class="p">]</span>
+</pre></div>
+</div>
+<p><strong>Parameters:</strong></p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">networks</span></code>: [<em>list of strings</em>], list of case-insensitive network ids. Wildcards <code class="docutils literal"><span class="pre">*</span></code> and <code class="docutils literal"><span class="pre">?</span></code> are allowed.</li>
+<li><code class="docutils literal"><span class="pre">stations</span></code>: [<em>list of strings</em>], list of case-insensitive station ids. Wildcards <code class="docutils literal"><span class="pre">*</span></code> and <code class="docutils literal"><span class="pre">?</span></code> are allowed.</li>
+</ul>
+<p><strong>Return Values:</strong></p>
+<ul class="simple">
+<li>A list with one dictionary per found station if successful. Each dictionary
+has the following keys: <code class="docutils literal"><span class="pre">&quot;network&quot;</span></code>, <code class="docutils literal"><span class="pre">&quot;station&quot;</span></code>, <code class="docutils literal"><span class="pre">&quot;latitude&quot;</span></code>,
+<code class="docutils literal"><span class="pre">&quot;longitude&quot;</span></code>.</li>
+<li>An empty list if no station matching the query has been found.</li>
+<li>Raise a <code class="docutils literal"><span class="pre">ValueError</span></code> for other cases.</li>
+</ul>
+<p><strong>Examples:</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">get_station_coordinates</span><span class="p">(</span><span class="n">networks</span><span class="o">=</span><span class="p">[</span><span class="s">&quot;IU&quot;</span><span class="p">],</span> <span class="n">stations</span><span class="p">[</span><span class="s">&quot;ANMO&quot;</span><span class="p">])</span>
+<span class="go">[{&quot;latitude&quot;: 34.94591,</span>
+<span class="go">   &quot;longitude&quot;: -106.4572,</span>
+<span class="go">   &quot;network&quot;: &quot;IU&quot;,</span>
+<span class="go">   &quot;station&quot;: &quot;ANMO&quot;}]</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_station_coordinates</span><span class="p">(</span><span class="n">networks</span><span class="o">=</span><span class="p">[</span><span class="s">&quot;IU&quot;</span><span class="p">,</span> <span class="s">&quot;B*&quot;</span><span class="p">],</span> <span class="n">stations</span><span class="p">[</span><span class="s">&quot;ANT*&quot;</span><span class="p">,</span> <span class="s">&quot;ANM?&quot;</span><span class="p">])</span>
+<span class="go">[{&quot;latitude&quot;: 39.868,</span>
+<span class="go">  &quot;longitude&quot;: 32.7934,</span>
+<span class="go">  &quot;network&quot;: &quot;IU&quot;,</span>
+<span class="go">  &quot;station&quot;: &quot;ANTO&quot;</span>
+<span class="go"> }, {</span>
+<span class="go">  &quot;latitude&quot;: 34.94591,</span>
+<span class="go">  &quot;longitude&quot;: -106.4572,</span>
+<span class="go">  &quot;network&quot;: &quot;IU&quot;,</span>
+<span class="go">  &quot;station&quot;: &quot;ANMO&quot;}]</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_station_coordinates</span><span class="p">(</span><span class="n">networks</span><span class="o">=</span><span class="p">[</span><span class="s">&quot;AA&quot;</span><span class="p">,</span> <span class="s">&quot;BB&quot;</span><span class="p">],</span> <span class="n">stations</span><span class="p">[</span><span class="s">&quot;CC&quot;</span><span class="p">,</span> <span class="s">&quot;DD&quot;</span><span class="p">])</span>
+<span class="go">[]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="event-parameters-callback">
+<h2><a class="toc-backref" href="#id3">Event Parameters Callback</a><a class="headerlink" href="#event-parameters-callback" title="Permalink to this headline">¶</a></h2>
+<p>This callback function has a single purpose: resolve an event identifier to
+event parameters. Users could choose to call an external web service within
+that function or query a local database. It is used for the <code class="docutils literal"><span class="pre">/event</span></code> route as
+well as event identifier based queries in the <code class="docutils literal"><span class="pre">/seismograms</span></code> route. Make sure
+the coordinates are geocentric. Instaseis has a helper function to aid with
+that: <a class="reference internal" href="helpers.html#instaseis.helpers.wgs84_to_geocentric_latitude" title="instaseis.helpers.wgs84_to_geocentric_latitude"><code class="xref py py-func docutils literal"><span class="pre">instaseis.helpers.wgs84_to_geocentric_latitude()</span></code></a></p>
+<p><strong>Affected routes:</strong></p>
+<ul class="simple">
+<li><a class="reference internal" href="routes/event.html"><em>GET /event</em></a></li>
+<li><a class="reference internal" href="routes/seismograms.html"><em>GET /seismograms</em></a></li>
+</ul>
+<p><strong>Function Signature:</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">get_event</span><span class="p">(</span><span class="n">event_id</span><span class="p">):</span>
+    <span class="o">...</span>
+    <span class="k">return</span> <span class="p">{</span><span class="o">...</span><span class="p">}</span>
+</pre></div>
+</div>
+<p><strong>Parameters:</strong></p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">event_id</span></code>: [<em>str</em>], event identifier</li>
+</ul>
+<p><strong>Return Values:</strong></p>
+<ul class="simple">
+<li>A dictionary with the event parameters and the following keys: <code class="docutils literal"><span class="pre">&quot;m_rr&quot;</span></code>,
+<code class="docutils literal"><span class="pre">&quot;m_tt&quot;</span></code>, <code class="docutils literal"><span class="pre">&quot;m_pp&quot;</span></code>, <code class="docutils literal"><span class="pre">&quot;m_rt&quot;</span></code>, <code class="docutils literal"><span class="pre">&quot;m_rp&quot;</span></code>, <code class="docutils literal"><span class="pre">&quot;m_tp&quot;</span></code>, <code class="docutils literal"><span class="pre">&quot;latitude&quot;</span></code>,
+<code class="docutils literal"><span class="pre">&quot;longitude&quot;</span></code>, <code class="docutils literal"><span class="pre">&quot;depth_in_m&quot;</span></code>, <code class="docutils literal"><span class="pre">&quot;origin_time&quot;</span></code>. The tensor components
+have to be in <em>Nm</em>.</li>
+<li>A <code class="docutils literal"><span class="pre">ValueError</span></code> will be always be interpreted as a not found event.</li>
+</ul>
+<p><strong>Examples:</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">get_event</span><span class="p">(</span><span class="s">&quot;B071791B&quot;</span><span class="p">)</span>
+<span class="go">{&quot;m_rr&quot;: -58000000000000000,</span>
+<span class="go"> &quot;m_tt&quot;: 78100000000000000,</span>
+<span class="go"> &quot;m_pp&quot;: -20100000000000000,</span>
+<span class="go"> &quot;m_rt&quot;: -56500000000000000,</span>
+<span class="go"> &quot;m_rp&quot;: 108100000000000000,</span>
+<span class="go"> &quot;m_tp&quot;: 315300000000000000,</span>
+<span class="go"> &quot;latitude&quot;: -3.8,</span>
+<span class="go"> &quot;longitude&quot;: -104.21,</span>
+<span class="go"> &quot;depth_in_m&quot;: 0,</span>
+<span class="go"> &quot;origin_time&quot;: &quot;1991-07-17T16:41:33.100000Z&quot;}</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_event</span><span class="p">(</span><span class="s">&quot;random_things&quot;</span><span class="p">)</span>
+<span class="go">ValueError: Event not found.</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="travel-time-callback">
+<h2><a class="toc-backref" href="#id4">Travel Time Callback</a><a class="headerlink" href="#travel-time-callback" title="Permalink to this headline">¶</a></h2>
+<p>This callback function is used for the <code class="docutils literal"><span class="pre">/ttimes</span></code> route and for the phase
+relative start and end times in the <code class="docutils literal"><span class="pre">/seismograms</span></code> route. It receives source
+and receiver coordinates as well as a phase name and is supposed to return the
+travel time from source to receiver for that particular phase in seconds. The
+coordinates can be assumed to be geocentric and the calculations should happen
+in a spherical planet. Make sure to perform the calculations in the same model
+that has been used to calculate the databases.</p>
+<p><strong>Affected routes:</strong></p>
+<ul class="simple">
+<li><a class="reference internal" href="routes/ttimes.html"><em>GET /ttimes</em></a></li>
+<li><a class="reference internal" href="routes/seismograms.html"><em>GET /seismograms</em></a></li>
+</ul>
+<p><strong>Function Signature:</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">get_travel_time</span><span class="p">(</span><span class="n">sourcelatitude</span><span class="p">,</span> <span class="n">sourcelongitude</span><span class="p">,</span> <span class="n">sourcedepthinmeters</span><span class="p">,</span>
+                    <span class="n">receiverlatitude</span><span class="p">,</span> <span class="n">receiverlongitude</span><span class="p">,</span>
+                    <span class="n">receiverdepthinmeters</span><span class="p">,</span> <span class="n">phase_name</span><span class="p">):</span>
+    <span class="o">...</span>
+    <span class="k">return</span> <span class="n">ttime</span>
+</pre></div>
+</div>
+<p><strong>Parameters:</strong></p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">sourcelatitude</span></code>: [<em>float</em>], geocentric source latitude</li>
+<li><code class="docutils literal"><span class="pre">sourcelongitude</span></code>: [<em>float</em>], source longitude</li>
+<li><code class="docutils literal"><span class="pre">sourcedepthinmeters</span></code>: [<em>float</em>], source depth in meters</li>
+<li><code class="docutils literal"><span class="pre">receiverlatitude</span></code>: [<em>float</em>], geocentric receiver latitude</li>
+<li><code class="docutils literal"><span class="pre">receiverlongitude</span></code>: [<em>float</em>], receiver longitude</li>
+<li><code class="docutils literal"><span class="pre">receiverdepthinmeters</span></code>: [<em>float</em>], receiver depth in meters</li>
+<li><code class="docutils literal"><span class="pre">phase_name</span></code>: [<em>str</em>], case-sensitive phase name</li>
+</ul>
+<p><strong>Return Values:</strong></p>
+<ul class="simple">
+<li>Travel time in seconds if successful.</li>
+<li><code class="docutils literal"><span class="pre">None</span></code> if phase has no arrival for the given source-receiver geometry.</li>
+<li>Raise a <code class="docutils literal"><span class="pre">ValueError</span></code> for other cases, e.g. unknown phase name, invalid source-receiver geometry, ...</li>
+</ul>
+<p><strong>Examples:</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">get_travel_time</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">50.0</span><span class="p">,</span> <span class="mi">300000</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s">&quot;P&quot;</span><span class="p">)</span>
+<span class="go">504.357</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_travel_time</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">50.0</span><span class="p">,</span> <span class="mi">300000</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s">&quot;Pdiff&quot;</span><span class="p">)</span>
+<span class="go">None</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_travel_time</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">50.0</span><span class="p">,</span> <span class="mi">300000</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s">&quot;bogus&quot;</span><span class="p">)</span>
+<span class="go">ValueError: Invalid phase name.</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="hooking-it-up-to-the-instaseis-server">
+<h2><a class="toc-backref" href="#id5">Hooking it up to the Instaseis Server</a><a class="headerlink" href="#hooking-it-up-to-the-instaseis-server" title="Permalink to this headline">¶</a></h2>
+<p>Best have a look at the full example implementation <a class="reference external" href="https://github.com/krischer/instaseis/tree/master/advanced_server_configuration_example">here</a>.</p>
+<p>You will have to create a new file and pass the three callback functions to the
+<code class="docutils literal"><span class="pre">launch_io_loop()</span></code> function. The following code snippet will give you a
+similar command line interface to the default Instaseis server:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="p">(</span><span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span>
+                        <span class="n">unicode_literals</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">from</span> <span class="nn">instaseis.server.app</span> <span class="kn">import</span> <span class="n">launch_io_loop</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span>
+        <span class="n">prog</span><span class="o">=</span><span class="s">&quot;python -m instaseis.server&quot;</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s">&#39;Launch an Instaseis server offering seismograms with a &#39;</span>
+                    <span class="s">&#39;REST API.&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&#39;--port&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s">&#39;Server port.&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&#39;--buffer_size_in_mb&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
+                        <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">&#39;Size of the buffer in MB&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&#39;db_path&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s">&#39;Database path&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s">&#39;--quiet&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s">&#39;store_true&#39;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s">&quot;Don&#39;t print any output. Overwrites the &#39;log_level` setting.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s">&#39;--log-level&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s">&#39;INFO&#39;</span><span class="p">,</span>
+        <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;CRITICAL&#39;</span><span class="p">,</span> <span class="s">&#39;ERROR&#39;</span><span class="p">,</span> <span class="s">&#39;WARNING&#39;</span><span class="p">,</span> <span class="s">&#39;INFO&#39;</span><span class="p">,</span> <span class="s">&#39;DEBUG&#39;</span><span class="p">,</span> <span class="s">&#39;NOTSET&#39;</span><span class="p">],</span>
+        <span class="n">help</span><span class="o">=</span><span class="s">&#39;The log level for all Tornado loggers.&#39;</span><span class="p">)</span>
+
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+    <span class="n">db_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">db_path</span><span class="p">)</span>
+
+    <span class="n">launch_io_loop</span><span class="p">(</span><span class="n">db_path</span><span class="o">=</span><span class="n">db_path</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">port</span><span class="p">,</span>
+                   <span class="n">buffer_size_in_mb</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">buffer_size_in_mb</span><span class="p">,</span>
+                   <span class="n">quiet</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">quiet</span><span class="p">,</span> <span class="n">log_level</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">log_level</span><span class="p">,</span>
+                   <span class="n">station_coordinates_callback</span><span class="o">=</span><span class="n">get_station_coordinates</span><span class="p">,</span>
+                   <span class="n">event_info_callback</span><span class="o">=</span><span class="n">get_event</span><span class="p">,</span>
+                   <span class="n">travel_time_callback</span><span class="o">=</span><span class="n">get_travel_time</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2014-2015, Lion Krischer and Martin van Driel.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

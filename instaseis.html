@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Main Instaseis Classes &mdash; instaseis 0.0.1a-284-gff25 documentation</title>
+    <title>Main Instaseis Classes &mdash; instaseis 0.0.1a-311-g267b documentation</title>
     
     <link rel="stylesheet" href="_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.0.1a-284-gff25',
+        VERSION:     '0.0.1a-311-g267b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -31,8 +31,8 @@
     <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="_static/bootstrap-3.3.4/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.0.1a-284-gff25 documentation" href="index.html" />
-    <link rel="next" title="Instaseis Server" href="server.html" />
+    <link rel="top" title="instaseis 0.0.1a-311-g267b documentation" href="index.html" />
+    <link rel="next" title="Sources and Receivers" href="source.html" />
     <link rel="prev" title="Instaseis: Instant Global Seismograms Based on a Broadband Waveform Database" href="index.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
@@ -53,7 +53,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-284-gff25</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-311-g267b</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -74,8 +74,10 @@
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="">Main Instaseis Classes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="server.html">Instaseis Server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="source.html">Sources and Receivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="helpers.html">Utility Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="server.html">Instaseis Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced_server_configuration.html">Advanced Server Configuration</a></li>
 </ul>
 </ul>
 </li>
@@ -179,7 +181,7 @@ search the child directories for the  necessary files and open them.</p>
 <dd><p>Base class for all Instaseis database classes defining the user interface.</p>
 <dl class="method">
 <dt id="instaseis.base_instaseis_db.BaseInstaseisDB.get_seismograms">
-<code class="descname">get_seismograms</code><span class="sig-paren">(</span><em>source</em>, <em>receiver</em>, <em>components=(u'Z'</em>, <em>u'N'</em>, <em>u'E')</em>, <em>kind=u'displacement'</em>, <em>remove_source_shift=True</em>, <em>reconvolve_stf=False</em>, <em>return_obspy_stream=True</em>, <em>dt=None</em>, <em>a_lanczos=5</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/base_instaseis_db.html#BaseInstaseisDB.get_seismograms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.base_instaseis_db.BaseInstaseisDB.get_seismograms" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_seismograms</code><span class="sig-paren">(</span><em>source</em>, <em>receiver</em>, <em>components=(u'Z'</em>, <em>u'N'</em>, <em>u'E')</em>, <em>kind=u'displacement'</em>, <em>remove_source_shift=True</em>, <em>reconvolve_stf=False</em>, <em>return_obspy_stream=True</em>, <em>dt=None</em>, <em>kernelwidth=5</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/base_instaseis_db.html#BaseInstaseisDB.get_seismograms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.base_instaseis_db.BaseInstaseisDB.get_seismograms" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extract seismograms from the Green&#8217;s function database.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -206,7 +208,9 @@ For this to be stable, the new STF needs to bandlimited.</li>
 containing the raw NumPy arrays.</li>
 <li><strong>dt</strong> (<em>float, optional</em>) &#8211; Desired sampling rate of the seismograms. Resampling is done
 using a Lanczos kernel.</li>
-<li><strong>a_lanczos</strong> (<em>int, optional</em>) &#8211; The width of the kernel used in the resampling.</li>
+<li><strong>kernelwidth</strong> (<em>int, optional</em>) &#8211; The width of the sinc kernel used for resampling in
+terms of the original sampling interval. Best choose something
+between 10 and 20.</li>
 </ul>
 </td>
 </tr>
@@ -223,7 +227,7 @@ with NumPy arrays as values.</p>
 
 <dl class="method">
 <dt id="instaseis.base_instaseis_db.BaseInstaseisDB.get_seismograms_finite_source">
-<code class="descname">get_seismograms_finite_source</code><span class="sig-paren">(</span><em>sources</em>, <em>receiver</em>, <em>components=(u'Z'</em>, <em>u'N'</em>, <em>u'E')</em>, <em>kind=u'displacement'</em>, <em>dt=None</em>, <em>a_lanczos=5</em>, <em>correct_mu=False</em>, <em>progress_callback=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/base_instaseis_db.html#BaseInstaseisDB.get_seismograms_finite_source"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.base_instaseis_db.BaseInstaseisDB.get_seismograms_finite_source" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_seismograms_finite_source</code><span class="sig-paren">(</span><em>sources</em>, <em>receiver</em>, <em>components=(u'Z'</em>, <em>u'N'</em>, <em>u'E')</em>, <em>kind=u'displacement'</em>, <em>dt=None</em>, <em>kernelwidth=5</em>, <em>correct_mu=False</em>, <em>progress_callback=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/base_instaseis_db.html#BaseInstaseisDB.get_seismograms_finite_source"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.base_instaseis_db.BaseInstaseisDB.get_seismograms_finite_source" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extract seismograms for a finite source from an Instaseis database.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -240,7 +244,9 @@ containing any combination of <code class="docutils literal"><span class="pre">&
 <code class="docutils literal"><span class="pre">&quot;displacement&quot;</span></code>, <code class="docutils literal"><span class="pre">&quot;velocity&quot;</span></code>, or <code class="docutils literal"><span class="pre">&quot;acceleration&quot;</span></code>.</li>
 <li><strong>dt</strong> (<em>float, optional</em>) &#8211; Desired sampling rate of the seismograms. Resampling is done
 using a Lanczos kernel.</li>
-<li><strong>a_lanczos</strong> (<em>int, optional</em>) &#8211; The width of the kernel used in the resampling.</li>
+<li><strong>kernelwidth</strong> (<em>int, optional</em>) &#8211; The width of the sinc kernel used for resampling in
+terms of the original sampling interval. Best choose something
+between 10 and 20.</li>
 <li><strong>correct_mu</strong> (<em>bool, optional</em>) &#8211; Correct the source magnitude for the actual shear
 modulus from the model.</li>
 <li><strong>progress_callback</strong> (<em>function, optional</em>) &#8211; Optional callback function that will be
@@ -328,7 +334,7 @@ useful e.g. for finite sources, default).</li>
       
     </p>
     <p>
-        &copy; Copyright 2014, Lion Krischer and Martin van Driel.<br/>
+        &copy; Copyright 2014-2015, Lion Krischer and Martin van Driel.<br/>
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.<br/>
     </p>
   </div>
