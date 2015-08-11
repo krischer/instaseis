@@ -438,6 +438,6 @@ Detailed Documentation
 
    instaseis
    source
+   helpers
    server
    advanced_server_configuration
-   helpers
