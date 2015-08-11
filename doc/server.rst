@@ -29,6 +29,11 @@ probably a good idea to choose it as big as your machine allows.
 For a reciprocal database with horizontal and vertical components Instaseis
 will create 4 buffers, each ``buffer_size_in_mb`` in size.
 
+.. note::
+
+    Some functionality requires an advanced server setup. Please view the
+    :doc:`advanced_server_configuration` for details.
+
 Connecting to a Server
 ======================
 
@@ -249,6 +254,11 @@ Example Response
 GET /coordinates
 ^^^^^^^^^^^^^^^^
 
+.. note::
+
+    Requires an advanced server setup. Please view the
+    :doc:`advanced_server_configuration` for details.
+
 Description
     Station coordinates if the server has been configured to serve them.
 
@@ -287,6 +297,11 @@ Example Response
 GET /event
 ^^^^^^^^^^
 
+.. note::
+
+    Requires an advanced server setup. Please view the
+    :doc:`advanced_server_configuration` for details.
+
 Description
     Event information if the server has been configured to serve it.
 
@@ -318,6 +333,11 @@ Example Response
 
 GET /ttimes
 ^^^^^^^^^^^
+
+.. note::
+
+    Requires an advanced server setup. Please view the
+    :doc:`advanced_server_configuration` for details.
 
 Description
     Get theoretical arrival times through a 1D Earth model if the server has been configured with that capability.
@@ -436,6 +456,12 @@ Filetype
 
 GET /seismograms
 ^^^^^^^^^^^^^^^^
+
+.. note::
+
+    Some parts of this route require an advanced server setup. Please view the
+    :doc:`advanced_server_configuration` for details. The parts that don't will
+    keep working even with a normal configuration.
 
 Description
     Returns Instaseis seismograms. In addition to the functionality of the
