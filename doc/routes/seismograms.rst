@@ -9,21 +9,16 @@ GET /seismograms
 
 Description
     Returns Instaseis seismograms. In addition to the functionality of the
-    ``/seismograms_raw`` route this one also offers the possibility to convert
-    every seismogram to displacement, velocity, or acceleration. It furthermore
-    can shift the start time of the data to the peak of the source time
-    function's sliprate and resample the data to an arbitrary (up to 100 Hz)
-    sampling rate. This route is suitable to be queried by any program able
-    to use HTTP.
+    ``/seismograms_raw`` route this one has quite a couple of convenience
+    function and is suitable to be queried by any program able to use HTTP
 
 Content-Type
-    application/octet-stream
-
-    application/zip
+    * ``application/zip`` (if zipped SAC data is requested)
+    * ``application/octet-stream`` (if MiniSEED data is requested)
 
 Filetype
-    Returns MiniSEED files encoded with encoding format 4 (IEEE floating
-    point) or a ZIP archive with SAC files.
+    Returns a ZIP archive with SAC files or MiniSEED files encoded with
+    encoding format 4 (IEEE floating point).
 
 +-----------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
 | Parameter                   | Type     | Required | Default Value               | Description                                                                          |
@@ -33,7 +28,7 @@ Filetype
 | ``format``                  | String   | False    | saczip                      | Specify output file to be either MiniSEED or a ZIP archive of SAC files, either      |
 |                             |          |          |                             | ``miniseed`` or ``saczip``.                                                          |
 +-----------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
-| ``label``                   | String   | False    |                             |  Specify a label to be included in file names and HTTP file name suggestions.        |
+| ``label``                   | String   | False    |                             | Specify a label to be included in file names and HTTP file name suggestions.         |
 +-----------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
 | ``components``              | String   | False    | ZNE                         | Specify the orientation of the synthetic seismograms as a list of any combination of |
 |                             |          |          |                             | ``Z`` (vertical), ``N`` (north), ``E`` (east), ``R`` (radial), ``T`` (transverse).   |
@@ -42,8 +37,8 @@ Filetype
 +-----------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
 | ``dt``                      | Float    | False    |                             | If given, seismograms will be resampled to the desired sample spacing.               |
 +-----------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
-| ``alanczos``                | Integer  | False    | 12                          | Specify the width of the Lanczos kernel used for resampling to requested sample      |
-|                             |          |          |                             | interval.                                                                            |
+| ``kernelwidth``             | Integer  | False    | 12                          | Specify the width of the sinc kernel used for resampling to requested sample         |
+|                             |          |          |                             | interval in terms of the original sampling interval.                                 |
 +-----------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
 | **Time Parameters**                                                                                                                                                    |
 +-----------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
@@ -51,11 +46,31 @@ Filetype
 |                             |          |          |                             | absolute date and time. This time coincides with the peak of the                     |
 |                             |          |          |                             | source time function.                                                                |
 +-----------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
-| ``starttime``               | Datetime | False    |                             | Start time of the returned seismograms. Might imply zero padding at front.           |
+| ``starttime``               | Datetime | False    |                             | Specifies the desired start time for the synthetic trace(s). This may be specified   |
+|                             |          |          |                             | as either:                                                                           |
+|                             |          |          |                             |                                                                                      |
+|                             |          |          |                             | * an absolute date and time                                                          |
+|                             |          |          |                             | * a phase-relative offset                                                            |
+|                             |          |          |                             | * an offset from origin time in seconds                                              |
+|                             |          |          |                             |                                                                                      |
+|                             |          |          |                             | If the value is recognized as a date and time, it is interpreted as an absolute time.|
+|                             |          |          |                             | If the value is in the form ``phase[+-]offset`` it is interpreted as a               |
+|                             |          |          |                             | phase-relative time, for example ``P-10`` (meaning P-wave arrival time minus 10      |
+|                             |          |          |                             | seconds). If the value is a numerical value it is interpreted as an offset, in       |
+|                             |          |          |                             | seconds, from the origin time.                                                       |
 +-----------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
-| ``endtime``                 | Datetime | False    |                             | End time of the returned seismogram.                                                 |
-+-----------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
-| ``duration``                | Float    | False    |                             | Duration of the returned seismograms in seconds relative to the start time.          |
+| ``endtime``                 | Datetime | False    |                             | Specifies the desired end time for the synthetic trace(s). This may be specified     |
+|                             |          |          |                             | as either:                                                                           |
+|                             |          |          |                             |                                                                                      |
+|                             |          |          |                             | * an absolute date and time                                                          |
+|                             |          |          |                             | * a phase-relative offset                                                            |
+|                             |          |          |                             | * an offset (duration) from start time in seconds                                    |
+|                             |          |          |                             |                                                                                      |
+|                             |          |          |                             | If the value is recognized as a date and time, it is interpreted as an absolute time.|
+|                             |          |          |                             | If the value is in the form ``phase[+-]offset`` it is interpreted as a               |
+|                             |          |          |                             | phase-relative time, for example ``P-10`` (meaning P-wave arrival time minus 10      |
+|                             |          |          |                             | seconds). If the value is a numerical value it is interpreted as an offset, in       |
+|                             |          |          |                             | seconds, from the start time.                                                        |
 +-----------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
 | **Receiver Parameters**                                                                                                                                                |
 +-----------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
