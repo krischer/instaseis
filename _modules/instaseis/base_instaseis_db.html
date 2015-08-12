@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>instaseis.base_instaseis_db &mdash; instaseis 0.0.1a-313-gb174 documentation</title>
+    <title>instaseis.base_instaseis_db &mdash; instaseis 0.0.1a-314-g1ef4 documentation</title>
     
     <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.0.1a-313-gb174',
+        VERSION:     '0.0.1a-314-g1ef4',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -31,7 +31,7 @@
     <script type="text/javascript" src="../../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../../_static/bootstrap-3.3.4/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../../_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.0.1a-313-gb174 documentation" href="../../index.html" />
+    <link rel="top" title="instaseis 0.0.1a-314-g1ef4 documentation" href="../../index.html" />
     <link rel="up" title="instaseis" href="../instaseis.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-313-gb174</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-314-g1ef4</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -146,7 +146,7 @@
 <div class="viewcode-block" id="BaseInstaseisDB.get_seismograms"><a class="viewcode-back" href="../../instaseis.html#instaseis.base_instaseis_db.BaseInstaseisDB.get_seismograms">[docs]</a>    <span class="k">def</span> <span class="nf">get_seismograms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">receiver</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="p">(</span><span class="s">&quot;Z&quot;</span><span class="p">,</span> <span class="s">&quot;N&quot;</span><span class="p">,</span> <span class="s">&quot;E&quot;</span><span class="p">),</span>
                         <span class="n">kind</span><span class="o">=</span><span class="s">&#39;displacement&#39;</span><span class="p">,</span> <span class="n">remove_source_shift</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
                         <span class="n">reconvolve_stf</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">return_obspy_stream</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-                        <span class="n">dt</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">kernelwidth</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+                        <span class="n">dt</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">kernelwidth</span><span class="o">=</span><span class="mi">12</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Extract seismograms from the Green&#39;s function database.</span>
 
@@ -163,10 +163,9 @@
 <span class="sd">        :param kind: The desired units of the seismogram:</span>
 <span class="sd">            ``&quot;displacement&quot;``, ``&quot;velocity&quot;``, or ``&quot;acceleration&quot;``.</span>
 <span class="sd">        :type remove_source_shift: bool, optional</span>
-<span class="sd">        :param remove_source_shift: Move the start time of the seismogram to</span>
-<span class="sd">            the peak of the sliprate from the source time function used to</span>
-<span class="sd">            generate the database. This has the effect that the first sample</span>
-<span class="sd">            is at the time of the origin time in the seismogram if available.</span>
+<span class="sd">        :param remove_source_shift: Cut all samples before the peak of the</span>
+<span class="sd">            source time function. This has the effect that the first sample</span>
+<span class="sd">            is the origin time of the source.</span>
 <span class="sd">        :type reconvolve_stf: bool, optional</span>
 <span class="sd">        :param reconvolve_stf: Deconvolve the source time function used in</span>
 <span class="sd">            the AxiSEM run and convolve with the STF attached to the source.</span>
@@ -341,7 +340,7 @@
 <div class="viewcode-block" id="BaseInstaseisDB.get_seismograms_finite_source"><a class="viewcode-back" href="../../instaseis.html#instaseis.base_instaseis_db.BaseInstaseisDB.get_seismograms_finite_source">[docs]</a>    <span class="k">def</span> <span class="nf">get_seismograms_finite_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sources</span><span class="p">,</span> <span class="n">receiver</span><span class="p">,</span>
                                       <span class="n">components</span><span class="o">=</span><span class="p">(</span><span class="s">&quot;Z&quot;</span><span class="p">,</span> <span class="s">&quot;N&quot;</span><span class="p">,</span> <span class="s">&quot;E&quot;</span><span class="p">),</span>
                                       <span class="n">kind</span><span class="o">=</span><span class="s">&#39;displacement&#39;</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                                      <span class="n">kernelwidth</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">correct_mu</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                                      <span class="n">kernelwidth</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">correct_mu</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
                                       <span class="n">progress_callback</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Extract seismograms for a finite source from an Instaseis database.</span>
