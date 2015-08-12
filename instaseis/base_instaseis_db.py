@@ -37,7 +37,7 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
     def get_seismograms(self, source, receiver, components=("Z", "N", "E"),
                         kind='displacement', remove_source_shift=True,
                         reconvolve_stf=False, return_obspy_stream=True,
-                        dt=None, kernelwidth=5):
+                        dt=None, kernelwidth=12):
         """
         Extract seismograms from the Green's function database.
 
@@ -54,10 +54,9 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
         :param kind: The desired units of the seismogram:
             ``"displacement"``, ``"velocity"``, or ``"acceleration"``.
         :type remove_source_shift: bool, optional
-        :param remove_source_shift: Move the start time of the seismogram to
-            the peak of the sliprate from the source time function used to
-            generate the database. This has the effect that the first sample
-            is at the time of the origin time in the seismogram if available.
+        :param remove_source_shift: Cut all samples before the peak of the
+            source time function. This has the effect that the first sample
+            is the origin time of the source.
         :type reconvolve_stf: bool, optional
         :param reconvolve_stf: Deconvolve the source time function used in
             the AxiSEM run and convolve with the STF attached to the source.
@@ -232,7 +231,7 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
     def get_seismograms_finite_source(self, sources, receiver,
                                       components=("Z", "N", "E"),
                                       kind='displacement', dt=None,
-                                      kernelwidth=5, correct_mu=False,
+                                      kernelwidth=12, correct_mu=False,
                                       progress_callback=None):
         """
         Extract seismograms for a finite source from an Instaseis database.
