@@ -34,6 +34,123 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
     """
     Base class for all Instaseis database classes defining the user interface.
     """
+    def get_greens_seiscomp(self, epicentral_distance_degree,
+                            source_depth_in_m, kind='displacement',
+                            return_obspy_stream=True, dt=None, kernelwidth=12):
+        """
+        Extract Green's function from the Green's function database in the
+        format assumed by Seiscomp, i.e. the components TSS, ZSS, RSS, TDS,
+        ZDS, RDS, ZDD, RDD, ZEP, REP as defined in
+
+        Minson, Sarah E., and Douglas S. Dreger. 2008. “Stable Inversions for
+        Complete Moment Tensors.” Geophysical Journal International 174 (2):
+        585–592.  doi:10.1111/j.1365-246X.2008.03797.x.
+
+        :param epicentral_distance_degree: The epicentral distance in degree.
+        :type epicentral_distance_degree: float
+        :param source_depth_in_m: The source depth in m below the surface.
+        :type source_depth_in_m: float
+        :param kind: The desired units of the seismogram:
+            ``"displacement"``, ``"velocity"``, or ``"acceleration"``.
+        :type kind: str, optional
+        :param dt: Desired sampling rate of the Green's functions. Resampling
+            is done using a Lanczos kernel.
+        :type dt: float, optional
+        :param kernelwidth: The width of the sinc kernel used for resampling in
+            terms of the original sampling interval. Best choose something
+            between 10 and 20.
+        :type kernelwidth: int, optional
+
+        :returns: Multi component seismograms.
+        :rtype: A :class:`obspy.core.stream.Stream` object or a dictionary
+            with NumPy arrays as values.
+        """
+        self._get_greens_seiscomp_sanity_checks(epicentral_distance_degree,
+                                                source_depth_in_m, kind)
+
+        src_latitude, src_longitude = 90., 0.
+        rec_latitude, rec_longitude = 90. - epicentral_distance_degree, 0.
+
+        # sources according to https://github.com/krischer/instaseis/issues/8
+        # transformed to r, theta, phi
+        #
+        # Mtt =  Mxx, Mpp = Myy, Mrr =  Mzz
+        # Mrp = -Myz, Mrt = Mxz, Mtp = -Mxy
+        #
+        # Mrr   Mtt   Mpp    Mrt    Mrp    Mtp
+        #  0     0     0      0      0     -1.0    m1
+        #  0     1.0  -1.0    0      0      0      m2
+        #  0     0     0      0     -1.0    0      m3
+        #  0     0     0      1.0    0      0      m4
+        #  1.0   1.0   1.0    0      0      0      m6
+        #  2.0  -1.0  -1.0    0      0      0      cl
+
+        m1 = Source(src_latitude, src_longitude, source_depth_in_m,
+                    m_tp=-1.0)
+        m2 = Source(src_latitude, src_longitude, source_depth_in_m,
+                    m_tt=1.0, m_pp=-1.0)
+        m3 = Source(src_latitude, src_longitude, source_depth_in_m,
+                    m_rp=-1.0)
+        m4 = Source(src_latitude, src_longitude, source_depth_in_m,
+                    m_rt=1.0)
+        m6 = Source(src_latitude, src_longitude, source_depth_in_m,
+                    m_rr=1.0, m_tt=1.0, m_pp=1.0)
+        cl = Source(src_latitude, src_longitude, source_depth_in_m,
+                    m_rr=2.0, m_tt=-1.0, m_pp=-1.0)
+
+        receiver = Receiver(rec_latitude, rec_longitude)
+
+        # same kwarguments for many callse
+        args = {'receiver': receiver,
+                'dt': dt,
+                'kernelwidth': kernelwidth,
+                'return_obspy_stream': False}
+
+        # Collect data arrays a dictionary.
+        data = {}
+        # on first call extract mu as well
+        tmp_dict = self.get_seismograms(
+            source=m1, components='T', **args)
+        data['mu'] = tmp_dict['mu']
+        data['TSS'] = tmp_dict['T']
+
+        data['ZSS'] = self.get_seismograms(
+            source=m2, components='Z', **args)['Z']
+        data['RSS'] = -1. * self.get_seismograms(
+            source=m2, components='R', **args)['R']
+
+        data['TDS'] = self.get_seismograms(
+            source=m3, components='T', **args)['T']
+
+        data['ZDS'] = self.get_seismograms(
+            source=m4, components='Z', **args)['Z']
+        data['RDS'] = -1. * self.get_seismograms(
+            source=m4, components='R', **args)['R']
+
+        data['ZDD'] = self.get_seismograms(
+            source=cl, components='Z', **args)['Z']
+        data['RDD'] = -1. * self.get_seismograms(
+            source=cl, components='R', **args)['R']
+
+        data['ZEP'] = self.get_seismograms(
+            source=m6, components='Z', **args)['Z']
+        data['REP'] = -1. * self.get_seismograms(
+            source=m6, components='R', **args)['R']
+
+        if return_obspy_stream:
+            if dt is None:
+                dt_out = self.info.dt
+            else:
+                dt_out = dt
+            components = data.keys()
+            components.remove('mu')
+            return self._convert_to_stream(
+                receiver=receiver, components=components,
+                data=data, dt_out=dt_out, starttime=UTCDateTime(0),
+                add_band_code=False)
+        else:
+            return data
+
     def get_seismograms(self, source, receiver, components=("Z", "N", "E"),
                         kind='displacement', remove_source_shift=True,
                         reconvolve_stf=False, return_obspy_stream=True,
@@ -191,19 +308,22 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
             return data
 
     @staticmethod
-    def _convert_to_stream(receiver, components, data, dt_out, starttime):
+    def _convert_to_stream(receiver, components, data, dt_out, starttime,
+                           add_band_code=True):
         # Convert to an ObsPy Stream object.
         st = Stream()
         band_code = get_band_code(dt_out)
         instaseis_header = AttribDict(mu=data["mu"])
+
         for comp in components:
-            tr = Trace(data=data[comp],
-                       header={"delta": dt_out,
-                               "starttime": starttime,
-                               "station": receiver.station,
-                               "network": receiver.network,
-                               "channel": "%sX%s" % (band_code, comp),
-                               "instaseis": instaseis_header})
+            tr = Trace(
+                data=data[comp],
+                header={"delta": dt_out,
+                        "starttime": starttime,
+                        "station": receiver.station,
+                        "network": receiver.network,
+                        "channel": add_band_code * (band_code + 'X') + comp,
+                        "instaseis": instaseis_header})
             st += tr
         return st
 
@@ -330,6 +450,37 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
                                "channel": "%sX%s" % (band_code, comp)})
             st += tr
         return st
+
+    def _get_greens_seiscomp_sanity_checks(self, epicentral_distance_degree,
+                                           source_depth_in_m, kind):
+        """
+        Common sanity checks for the get_greens_seiscomp method.
+
+        :param epicentral_distance_degree: The epicentral distance in degree.
+        :type epicentral_distance_degree: float
+        :param source_depth_in_m: The source depth in m below the surface.
+        :type source_depth_in_m: float
+        :param kind: The desired units of the seismogram:
+            ``"displacement"``, ``"velocity"``, or ``"acceleration"``.
+        :type kind: str
+        """
+        if kind not in ['displacement', 'velocity', 'acceleration']:
+            raise ValueError('unknown kind %s' % (kind,))
+
+        if not self.info.is_reciprocal:
+            raise ValueError('forward DB cannot be used with '
+                             'get_greens_seiscomp()')
+
+        if not self.info.components == 'vertical and horizontal':
+            raise ValueError('get_greens_seiscomp() needs a DB with both '
+                             'vertical and horizontal components')
+
+        if not 0. <= epicentral_distance_degree <= 180.:
+            raise ValueError(
+                'epicentral_distance_degree should be in [0, 180]')
+
+        if source_depth_in_m <= 0.:
+            raise ValueError('source_depth_in_m should be positive')
 
     def _get_seismograms_sanity_checks(self, source, receiver, components,
                                        kind):
