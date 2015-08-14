@@ -306,6 +306,8 @@ class GreensHandler(InstaseisRequestHandler):
             # just add it.
             if isinstance(args.starttime, obspy.UTCDateTime):
                 args.endtime = args.starttime + args.endtime
+            # Otherwise the start time has to be a phase relative time and
+            # is dealt with later.
             else:
                 assert isinstance(args.starttime, obspy.core.AttribDict)
 
