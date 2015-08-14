@@ -35,8 +35,9 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
     Base class for all Instaseis database classes defining the user interface.
     """
     def get_greens_seiscomp(self, epicentral_distance_degree,
-                            source_depth_in_m, kind='displacement',
-                            return_obspy_stream=True, dt=None, kernelwidth=12):
+                            source_depth_in_m, origin_time=UTCDateTime(0),
+                            kind='displacement', return_obspy_stream=True,
+                            dt=None, kernelwidth=12):
         """
         Extract Green's function from the Green's function database in the
         format assumed by Seiscomp, i.e. the components TSS, ZSS, RSS, TDS,
@@ -50,6 +51,8 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
         :type epicentral_distance_degree: float
         :param source_depth_in_m: The source depth in m below the surface.
         :type source_depth_in_m: float
+        :param origin_time: Origin time of the source.
+        :type origin_time: :class:`obspy.core.utcdatetime.UTCDateTime`
         :param kind: The desired units of the seismogram:
             ``"displacement"``, ``"velocity"``, or ``"acceleration"``.
         :type kind: str, optional
@@ -86,17 +89,17 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
         #  2.0  -1.0  -1.0    0      0      0      cl
 
         m1 = Source(src_latitude, src_longitude, source_depth_in_m,
-                    m_tp=-1.0)
+                    m_tp=-1.0, origin_time=origin_time)
         m2 = Source(src_latitude, src_longitude, source_depth_in_m,
-                    m_tt=1.0, m_pp=-1.0)
+                    m_tt=1.0, m_pp=-1.0, origin_time=origin_time)
         m3 = Source(src_latitude, src_longitude, source_depth_in_m,
-                    m_rp=-1.0)
+                    m_rp=-1.0, origin_time=origin_time)
         m4 = Source(src_latitude, src_longitude, source_depth_in_m,
-                    m_rt=1.0)
+                    m_rt=1.0, origin_time=origin_time)
         m6 = Source(src_latitude, src_longitude, source_depth_in_m,
-                    m_rr=1.0, m_tt=1.0, m_pp=1.0)
+                    m_rr=1.0, m_tt=1.0, m_pp=1.0, origin_time=origin_time)
         cl = Source(src_latitude, src_longitude, source_depth_in_m,
-                    m_rr=2.0, m_tt=-1.0, m_pp=-1.0)
+                    m_rr=2.0, m_tt=-1.0, m_pp=-1.0, origin_time=origin_time)
 
         receiver = Receiver(rec_latitude, rec_longitude)
 
