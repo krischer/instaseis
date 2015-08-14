@@ -19,7 +19,7 @@ import tornado.web
 from ... import Source, Receiver
 from ...base_instaseis_db import _get_seismogram_times
 from ..util import run_async, IOQueue, _validtimesetting
-from ..instaseis_request import InstaseisRequestHandler
+from ..instaseis_request import InstaseisTimeSeriesHandler
 from ...helpers import geocentric_to_wgs84_latitude
 
 
@@ -119,9 +119,9 @@ def _get_greens(db, epicentral_distance_degree, source_depth_in_m, units, dt,
         callback(byte_strings)
 
 
-class GreensHandler(InstaseisRequestHandler):
+class GreensHandler(InstaseisTimeSeriesHandler):
     # Define the arguments for the Greens endpoint.
-    greens_arguments = {
+    arguments = {
         "units": {"type": str, "default": "displacement"},
         "dt": {"type": float},
         "kernelwidth": {"type": int, "default": 12},
@@ -143,72 +143,14 @@ class GreensHandler(InstaseisRequestHandler):
 
     def __init__(self, *args, **kwargs):
         self.__connection_closed = False
-        InstaseisRequestHandler.__init__(self, *args, **kwargs)
-
-    def parse_arguments(self):
-        # Make sure that no additional arguments are passed.
-        unknown_arguments = set(self.request.arguments.keys()).difference(set(
-            self.greens_arguments.keys()))
-        if unknown_arguments:
-            msg = "The following unknown parameters have been passed: %s" % (
-                ", ".join("'%s'" % _i for _i in sorted(unknown_arguments)))
-            raise tornado.web.HTTPError(400, log_message=msg,
-                                        reason=msg)
-
-        # Check for duplicates.
-        duplicates = []
-        for key, value in self.request.arguments.items():
-            if len(value) == 1:
-                continue
-            else:
-                duplicates.append(key)
-        if duplicates:
-            msg = "Duplicate parameters: %s" % (
-                ", ".join("'%s'" % _i for _i in sorted(duplicates)))
-            raise tornado.web.HTTPError(400, log_message=msg,
-                                        reason=msg)
-
-        args = obspy.core.AttribDict()
-        for name, properties in self.greens_arguments.items():
-            if "required" in properties:
-                try:
-                    value = self.get_argument(name)
-                except:
-                    msg = "Required parameter '%s' not given." % name
-                    raise tornado.web.HTTPError(400, log_message=msg,
-                                                reason=msg)
-            else:
-                if "default" in properties:
-                    default = properties["default"]
-                else:
-                    default = None
-                value = self.get_argument(name, default=default)
-            if value is not None:
-                try:
-                    value = properties["type"](value)
-                except:
-                    if "format" in properties:
-                        msg = "Parameter '%s' must be formatted as: '%s'" % (
-                            name, properties["format"])
-                    else:
-                        msg = ("Parameter '%s' could not be converted to "
-                               "'%s'.") % (
-                            name, str(properties["type"].__name__))
-                    raise tornado.web.HTTPError(400, log_message=msg,
-                                                reason=msg)
-            setattr(args, name, value)
-
-        # Validate some of them right here.
-        self.validate_parameters(args)
-
-        return args
+        InstaseisTimeSeriesHandler.__init__(self, *args, **kwargs)
 
     def on_connection_close(self):
         """
         Called when the client cancels the connection. Then the loop
         requesting seismograms will stop.
         """
-        InstaseisRequestHandler.on_connection_close(self)
+        InstaseisTimeSeriesHandler.on_connection_close(self)
         self.__connection_closed = True
 
     def validate_parameters(self, args):

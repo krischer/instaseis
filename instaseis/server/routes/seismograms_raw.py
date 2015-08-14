@@ -14,12 +14,12 @@ import obspy
 import tornado.web
 
 from ... import Source, ForceSource, Receiver
-from ..instaseis_request import InstaseisRequestHandler
+from ..instaseis_request import InstaseisTimeSeriesHandler
 
 
-class RawSeismogramsHandler(InstaseisRequestHandler):
+class RawSeismogramsHandler(InstaseisTimeSeriesHandler):
     # Define the arguments for the seismogram endpoint.
-    seismogram_arguments = {
+    arguments = {
         "components": {"type": str, "default": "ZNE"},
         # Source parameters.
         "sourcelatitude": {"type": float, "required": True},
@@ -52,58 +52,6 @@ class RawSeismogramsHandler(InstaseisRequestHandler):
         "stationcode": {"type": str}
     }
 
-    def parse_arguments(self):
-        # Make sure that no additional arguments are passed.
-        unknown_arguments = set(self.request.arguments.keys()).difference(set(
-            self.seismogram_arguments.keys()))
-        if unknown_arguments:
-            msg = "The following unknown parameters have been passed: %s" % (
-                ", ".join("'%s'" % _i for _i in sorted(unknown_arguments)))
-            raise tornado.web.HTTPError(400, log_message=msg,
-                                        reason=msg)
-
-        # Check for duplicates.
-        duplicates = []
-        for key, value in self.request.arguments.items():
-            if len(value) == 1:
-                continue
-            elif len(value) == 0:
-                # This should not happen.
-                raise NotImplementedError
-            else:
-                duplicates.append(key)
-        if duplicates:
-            msg = "Duplicate parameters: %s" % (
-                ", ".join("'%s'" % _i for _i in sorted(duplicates)))
-            raise tornado.web.HTTPError(400, log_message=msg,
-                                        reason=msg)
-
-        args = obspy.core.AttribDict()
-
-        for name, properties in self.seismogram_arguments.items():
-            if "required" in properties:
-                try:
-                    value = self.get_argument(name)
-                except:
-                    msg = "Required parameter '%s' not given." % name
-                    raise tornado.web.HTTPError(400, log_message=msg,
-                                                reason=msg)
-            else:
-                if "default" in properties:
-                    default = properties["default"]
-                else:
-                    default = None
-                value = self.get_argument(name, default=default)
-            if value is not None:
-                try:
-                    value = properties["type"](value)
-                except:
-                    msg = "Parameter '%s' could not be converted to '%s'." % (
-                        name, str(properties["type"]))
-                    raise tornado.web.HTTPError(400, log_message=msg,
-                                                reason=msg)
-            setattr(args, name, value)
-        return args
 
     def get(self):
         args = self.parse_arguments()
