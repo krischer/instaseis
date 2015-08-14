@@ -531,7 +531,7 @@ def test_get_greens_vs_get_seismogram():
                                uz, rtol=1E-3, atol=1E-10)
 
     # it seems the definition of 'radial' is different between Minson & Dreger
-    # and Issue 8 by a sign!
+    # and Issue 8 by a sign! Probably related to the definition of z - up
     np.testing.assert_allclose(st_ref.select(component="R")[0].data,
                                -ur, rtol=1E-3, atol=1E-10)
 

@@ -48,6 +48,15 @@ def _assemble_url_raw(**kwargs):
     return url
 
 
+def _assemble_url_greens(**kwargs):
+    """
+    Helper function.
+    """
+    url = "/greens?"
+    url += "&".join("%s=%s" % (key, value) for key, value in kwargs.items())
+    return url
+
+
 def test_root_route(all_clients):
     """
     Shows very basic information and the version of the client. Test is run
@@ -100,6 +109,87 @@ def test_info_route(all_clients):
     # Same for slip and sliprate.
     np.testing.assert_allclose(client_slip, db_slip)
     np.testing.assert_allclose(client_sliprate, db_sliprate)
+
+
+def test_greens_error_handling(all_clients):
+    """
+    Tests error handling of the /greens route. Very basic for now
+    """
+    client = all_clients
+
+    basic_parameters = {
+        "sourcedepthinmeters": client.source_depth,
+        "sourcedistanceindegree": 20}
+
+    # get_greens_seiscomp() only works with reciprocal DBs. So make sure we get
+    # the error, but then do the other tests only for reciprocal DBs
+    if not client.is_reciprocal:
+        params = copy.deepcopy(basic_parameters)
+        request = client.fetch(_assemble_url_greens(**params))
+        assert request.code == 400
+        assert "the database is not reciprocal" in request.reason.lower()
+        return
+
+    # Remove the sourcedistanceindegree, required parameter.
+    params = copy.deepcopy(basic_parameters)
+    del params["sourcedistanceindegree"]
+    request = client.fetch(_assemble_url_greens(**params))
+    assert request.code == 400
+    assert request.reason == \
+        "Required parameter 'sourcedistanceindegree' not given."
+
+    # Remove the sourcedepthinmeters, required parameter.
+    params = copy.deepcopy(basic_parameters)
+    del params["sourcedepthinmeters"]
+    request = client.fetch(_assemble_url_greens(**params))
+    assert request.code == 400
+    assert request.reason == \
+        "Required parameter 'sourcedepthinmeters' not given."
+
+
+def test_greens_retrieval(all_clients):
+    """
+    Tests if the greens functions requested from the server are identical to
+    the one requested with the local instaseis client.
+    """
+    client = all_clients
+
+    db = instaseis.open_db(client.filepath)
+
+    # get_greens_seiscomp() only works with reciprocal DBs.
+    if not client.is_reciprocal:
+        return
+
+    basic_parameters = {
+        "sourcedepthinmeters": 1e3,
+        "sourcedistanceindegree": 20,
+        "format": "miniseed"}
+
+    time = obspy.UTCDateTime(2010, 1, 2, 3, 4, 5)
+
+    # default parameters
+    params = copy.deepcopy(basic_parameters)
+    request = client.fetch(_assemble_url_greens(**params))
+    st_server = obspy.read(request.buffer)
+
+    st_db = db.get_greens_seiscomp(
+        epicentral_distance_degree=params['sourcedistanceindegree'],
+        source_depth_in_m=params['sourcedepthinmeters'], origin_time=time)
+
+    for tr_server, tr_db in zip(st_server, st_db):
+        # Remove the additional stats from both.
+        del tr_server.stats.mseed
+        del tr_server.stats._format
+        del tr_db.stats.instaseis
+        # Sample spacing is very similar but not equal due to floating point
+        # accuracy.
+        np.testing.assert_allclose(tr_server.stats.delta, tr_db.stats.delta)
+        tr_server.stats.delta = tr_db.stats.delta
+        assert tr_server.stats == tr_db.stats
+        # Relative tolerance not particularly useful when testing super
+        # small values.
+        np.testing.assert_allclose(tr_server.data, tr_db.data,
+                                   atol=1E-10 * tr_server.data.ptp())
 
 
 def test_raw_seismograms_error_handling(all_clients):
