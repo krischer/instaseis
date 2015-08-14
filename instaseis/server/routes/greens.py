@@ -9,7 +9,6 @@
     (http://www.gnu.org/copyleft/lgpl.html)
 """
 import io
-import re
 import zipfile
 
 import numpy as np
@@ -19,12 +18,9 @@ import tornado.web
 
 from ... import Source, Receiver
 from ...base_instaseis_db import _get_seismogram_times
-from ..util import run_async
+from ..util import run_async, IOQueue, _validtimesetting
 from ..instaseis_request import InstaseisRequestHandler
 from ...helpers import geocentric_to_wgs84_latitude
-
-# Valid phase offset pattern including capture groups.
-PHASE_OFFSET_PATTERN = re.compile(r"(^[A-Za-z0-9^]+)([\+-])([\deE\.\-\+]+$)")
 
 
 @run_async
@@ -121,63 +117,6 @@ def _get_greens(db, epicentral_distance_degree, source_depth_in_m, units, dt,
                 filename = "%s%s.sac" % (label, tr.id)
                 byte_strings.append((filename, temp.read()))
         callback(byte_strings)
-
-
-class IOQueue(object):
-    """
-    Object passed to the zipfile constructor which acts as a file-like object.
-
-    Iterating over the object yields the data pieces written to it since it
-    has last been iterated over DELETING those pieces at the end of each
-    loop. This enables the server to send unbounded zipfiles without running
-    into memory issues.
-    """
-    def __init__(self):
-        self.count = 0
-        self.data = []
-
-    def flush(self):
-        pass
-
-    def tell(self):
-        return self.count
-
-    def write(self, data):
-        self.data.append(data)
-        self.count += len(data)
-
-    def __iter__(self):
-        for _i in self.data:
-            yield _i
-        self.data = []
-        raise StopIteration
-
-
-def _validtimesetting(value):
-    try:
-        return obspy.UTCDateTime(value)
-    except:
-        pass
-
-    try:
-        return float(value)
-    except:
-        pass
-
-    m = PHASE_OFFSET_PATTERN.match(value)
-    if m is None:
-        raise ValueError
-
-    operator = m.group(2)
-    if operator == "+":
-        offset = float(m.group(3))
-    else:
-        offset = -float(m.group(3))
-
-    return {
-        "phase": m.group(1),
-        "offset": offset
-    }
 
 
 class GreensHandler(InstaseisRequestHandler):
