@@ -145,7 +145,7 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
                 dt_out = self.info.dt
             else:
                 dt_out = dt
-            components = data.keys()
+            components = list(data.keys())
             components.remove('mu')
             return self._convert_to_stream(
                 receiver=receiver, components=components,
