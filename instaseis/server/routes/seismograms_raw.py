@@ -52,7 +52,6 @@ class RawSeismogramsHandler(InstaseisTimeSeriesHandler):
         "stationcode": {"type": str}
     }
 
-
     def get(self):
         args = self.parse_arguments()
 
