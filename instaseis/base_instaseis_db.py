@@ -34,7 +34,7 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
     """
     Base class for all Instaseis database classes defining the user interface.
     """
-    def get_greens_seiscomp(self, epicentral_distance_degree,
+    def get_greens_seiscomp(self, epicentral_distance_in_degree,
                             source_depth_in_m, origin_time=UTCDateTime(0),
                             kind='displacement', return_obspy_stream=True,
                             dt=None, kernelwidth=12):
@@ -47,8 +47,9 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
         Complete Moment Tensors.” Geophysical Journal International 174 (2):
         585–592.  doi:10.1111/j.1365-246X.2008.03797.x.
 
-        :param epicentral_distance_degree: The epicentral distance in degree.
-        :type epicentral_distance_degree: float
+        :param epicentral_distance_in_degree: The epicentral distance in
+            degree.
+        :type epicentral_distance_in_degree: float
         :param source_depth_in_m: The source depth in m below the surface.
         :type source_depth_in_m: float
         :param origin_time: Origin time of the source.
@@ -68,11 +69,11 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
         :rtype: A :class:`obspy.core.stream.Stream` object or a dictionary
             with NumPy arrays as values.
         """
-        self._get_greens_seiscomp_sanity_checks(epicentral_distance_degree,
+        self._get_greens_seiscomp_sanity_checks(epicentral_distance_in_degree,
                                                 source_depth_in_m, kind)
 
         src_latitude, src_longitude = 90., 0.
-        rec_latitude, rec_longitude = 90. - epicentral_distance_degree, 0.
+        rec_latitude, rec_longitude = 90. - epicentral_distance_in_degree, 0.
 
         # sources according to https://github.com/krischer/instaseis/issues/8
         # transformed to r, theta, phi

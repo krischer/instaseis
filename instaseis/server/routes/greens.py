@@ -50,7 +50,7 @@ def _get_greens(db, epicentral_distance_degree, source_depth_in_m, units, dt,
 
     try:
         st = db.get_greens_seiscomp(
-            epicentral_distance_degree=epicentral_distance_degree,
+            epicentral_distance_in_degree=epicentral_distance_degree,
             source_depth_in_m=source_depth_in_m, origin_time=origintime,
             kind=units, return_obspy_stream=True, dt=dt,
             kernelwidth=kernelwidth)
@@ -101,8 +101,8 @@ def _get_greens(db, epicentral_distance_degree, source_depth_in_m, units, dt,
             tr.stats.sac.stlo = 0.0
             tr.stats.sac.stdp = 0.0
             tr.stats.sac.stel = 0.0
-            tr.stats.sac.evla = geocentric_to_wgs84_latitude(90.)
-            tr.stats.sac.evlo = 90.
+            tr.stats.sac.evla = 90.0
+            tr.stats.sac.evlo = 90.0
             tr.stats.sac.evdp = source_depth_in_m
             # Thats what SPECFEM uses for a moment magnitude....
             tr.stats.sac.imagtyp = 55
@@ -127,7 +127,7 @@ class GreensHandler(InstaseisTimeSeriesHandler):
         "label": {"type": str},
 
         # Source parameters.
-        "sourcedistanceindegree": {"type": float, "required": True},
+        "sourcedistanceindegrees": {"type": float, "required": True},
         "sourcedepthinmeters": {"type": float, "required": True},
 
         # Time parameters.
@@ -158,8 +158,8 @@ class GreensHandler(InstaseisTimeSeriesHandler):
 
         # Make sure, epicentral disance and source depth are in reasonable
         # ranges
-        if args.sourcedistanceindegree is not None and \
-                not 0.0 <= args.sourcedistanceindegree <= 180.0:
+        if args.sourcedistanceindegrees is not None and \
+                not 0.0 <= args.sourcedistanceindegrees <= 180.0:
             msg = ("Epicentral distance should be in [0, 180].")
             raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
         if args.sourcedepthinmeters is not None and \
@@ -220,7 +220,7 @@ class GreensHandler(InstaseisTimeSeriesHandler):
         # generating source and receiver as in the get_greens routine of the
         # base_instaseis class
         src_latitude, src_longitude = 90., 0.
-        rec_latitude, rec_longitude = 90. - args.sourcedistanceindegree, 0.
+        rec_latitude, rec_longitude = 90. - args.sourcedistanceindegrees, 0.
         source = Source(src_latitude, src_longitude, args.sourcedepthinmeters)
         receivers = [Receiver(rec_latitude, rec_longitude)]
 
@@ -285,7 +285,7 @@ class GreensHandler(InstaseisTimeSeriesHandler):
             response = yield tornado.gen.Task(
                 _get_greens,
                 db=self.application.db,
-                epicentral_distance_degree=args.sourcedistanceindegree,
+                epicentral_distance_degree=args.sourcedistanceindegrees,
                 source_depth_in_m=args.sourcedepthinmeters, units=args.units,
                 dt=args.dt, kernelwidth=args.kernelwidth,
                 origintime=args.origintime, starttime=starttime,

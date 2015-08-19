@@ -101,7 +101,7 @@ def test_greens_error_handling(all_clients):
 
     basic_parameters = {
         "sourcedepthinmeters": client.source_depth,
-        "sourcedistanceindegree": 20}
+        "sourcedistanceindegrees": 20}
 
     # get_greens_seiscomp() only works with reciprocal DBs. So make sure we get
     # the error, but then do the other tests only for reciprocal DBs
@@ -112,13 +112,13 @@ def test_greens_error_handling(all_clients):
         assert "the database is not reciprocal" in request.reason.lower()
         return
 
-    # Remove the sourcedistanceindegree, required parameter.
+    # Remove the sourcedistanceindegrees, required parameter.
     params = copy.deepcopy(basic_parameters)
-    del params["sourcedistanceindegree"]
+    del params["sourcedistanceindegrees"]
     request = client.fetch(_assemble_url('greens', **params))
     assert request.code == 400
     assert request.reason == \
-        "Required parameter 'sourcedistanceindegree' not given."
+        "Required parameter 'sourcedistanceindegrees' not given."
 
     # Remove the sourcedepthinmeters, required parameter.
     params = copy.deepcopy(basic_parameters)
@@ -144,7 +144,7 @@ def test_greens_retrieval(all_clients):
 
     basic_parameters = {
         "sourcedepthinmeters": 1e3,
-        "sourcedistanceindegree": 20,
+        "sourcedistanceindegrees": 20,
         "format": "saczip"}
 
     time = obspy.UTCDateTime(2010, 1, 2, 3, 4, 5)
@@ -162,7 +162,7 @@ def test_greens_retrieval(all_clients):
         assert tr.stats._format == "SAC"
 
     st_db = db.get_greens_seiscomp(
-        epicentral_distance_degree=params['sourcedistanceindegree'],
+        epicentral_distance_in_degree=params['sourcedistanceindegrees'],
         source_depth_in_m=params['sourcedepthinmeters'], origin_time=time)
 
     for tr_server, tr_db in zip(st_server, st_db):
@@ -187,7 +187,7 @@ def test_greens_retrieval(all_clients):
     st_server = obspy.read(request.buffer)
 
     st_db = db.get_greens_seiscomp(
-        epicentral_distance_degree=params['sourcedistanceindegree'],
+        epicentral_distance_in_degree=params['sourcedistanceindegrees'],
         source_depth_in_m=params['sourcedepthinmeters'], origin_time=time)
 
     for tr_server, tr_db in zip(st_server, st_db):
