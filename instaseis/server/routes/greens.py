@@ -164,9 +164,13 @@ class GreensFunctionHandler(InstaseisTimeSeriesHandler):
                 not 0.0 <= args.sourcedistanceindegrees <= 180.0:
             msg = ("Epicentral distance should be in [0, 180].")
             raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+
+        min_depth = info.planet_radius - info.max_radius
+        max_depth = info.planet_radius - info.min_radius
         if args.sourcedepthinmeters is not None and \
-                not 0.0 <= args.sourcedepthinmeters <= info.planet_radius:
-            msg = ("Source depth should be in [0, planet radius].")
+                not min_depth <= args.sourcedepthinmeters <= max_depth:
+            msg = ("Source depth should be in [%.1f, %.1f]." % (
+                   min_depth, max_depth))
             raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
     @tornado.web.asynchronous

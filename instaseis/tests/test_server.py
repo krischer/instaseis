@@ -128,6 +128,34 @@ def test_greens_function_error_handling(all_clients):
     assert request.reason == \
         "Required parameter 'sourcedepthinmeters' not given."
 
+    # Negative source distance
+    request = client.fetch(_assemble_url(
+        "greens_function",
+        sourcedepthinmeters=20, sourcedistanceindegrees=-30))
+    assert request.code == 400
+    assert request.reason == "Epicentral distance should be in [0, 180]."
+
+    # Too far source distances.
+    request = client.fetch(_assemble_url(
+        "greens_function",
+        sourcedepthinmeters=20, sourcedistanceindegrees=200))
+    assert request.code == 400
+    assert request.reason == "Epicentral distance should be in [0, 180]."
+
+    # Negative source depth.
+    request = client.fetch(_assemble_url(
+        "greens_function",
+        sourcedepthinmeters=-20, sourcedistanceindegrees=20))
+    assert request.code == 400
+    assert request.reason == "Source depth should be in [0.0, 371000.0]."
+
+    # Too large source depth.
+    request = client.fetch(_assemble_url(
+        "greens_function",
+        sourcedepthinmeters=2E6, sourcedistanceindegrees=20))
+    assert request.code == 400
+    assert request.reason == "Source depth should be in [0.0, 371000.0]."
+
 
 def test_greens_function_retrieval(all_clients):
     """
@@ -152,6 +180,7 @@ def test_greens_function_retrieval(all_clients):
     # default parameters
     params = copy.deepcopy(basic_parameters)
     request = client.fetch(_assemble_url('greens_function', **params))
+    assert request.code == 200
     # ObsPy needs the filename to be able to directly unpack zip files. We
     # don't have a filename here so we unpack manually.
     st_server = obspy.Stream()
@@ -185,7 +214,11 @@ def test_greens_function_retrieval(all_clients):
     params = copy.deepcopy(basic_parameters)
     params["format"] = "miniseed"
     request = client.fetch(_assemble_url('greens_function', **params))
+    assert request.code == 200
     st_server = obspy.read(request.buffer)
+
+    for tr in st_server:
+        assert tr.stats._format == "MSEED"
 
     st_db = db.get_greens_function(
         epicentral_distance_in_degree=params['sourcedistanceindegrees'],
@@ -206,6 +239,279 @@ def test_greens_function_retrieval(all_clients):
         # small values.
         np.testing.assert_allclose(tr_server.data, tr_db.data,
                                    atol=1E-10 * tr_server.data.ptp())
+
+    # One with a label.
+    params = copy.deepcopy(basic_parameters)
+    params["format"] = "miniseed"
+    params["label"] = "random_things"
+    request = client.fetch(_assemble_url('greens_function', **params))
+    assert request.code == 200
+
+    cd = request.headers["Content-Disposition"]
+    assert cd.startswith("attachment; filename=random_things_")
+    assert cd.endswith(".mseed")
+
+    # One more with resampling parameters and different units.
+    params = copy.deepcopy(basic_parameters)
+    params["format"] = "miniseed"
+    params["dt"] = 0.1
+    params["kernelwidth"] = 2
+    params["units"] = "acceleration"
+    request = client.fetch(_assemble_url('greens_function', **params))
+    assert request.code == 200
+    st_server = obspy.read(request.buffer)
+
+    st_db = db.get_greens_function(
+        epicentral_distance_in_degree=params['sourcedistanceindegrees'],
+        source_depth_in_m=params['sourcedepthinmeters'], origin_time=time,
+        definition="seiscomp", dt=0.1, kernelwidth=2, kind="acceleration")
+
+    for tr_server, tr_db in zip(st_server, st_db):
+        # Remove the additional stats from both.
+        del tr_server.stats.mseed
+        del tr_server.stats._format
+        del tr_db.stats.instaseis
+        # Sample spacing is very similar but not equal due to floating point
+        # accuracy.
+        np.testing.assert_allclose(tr_server.stats.delta, tr_db.stats.delta)
+        tr_server.stats.delta = tr_db.stats.delta
+        assert tr_server.stats == tr_db.stats
+        # Relative tolerance not particularly useful when testing super
+        # small values.
+        np.testing.assert_allclose(tr_server.data, tr_db.data,
+                                   atol=1E-10 * tr_server.data.ptp())
+
+    # One simulating a crash in the underlying function.
+    params = copy.deepcopy(basic_parameters)
+    params["format"] = "miniseed"
+
+    with mock.patch("instaseis.base_instaseis_db.BaseInstaseisDB"
+                    ".get_greens_function") as p:
+        def raise_err():
+            raise ValueError("random crash")
+
+        p.side_effect = raise_err
+        request = client.fetch(_assemble_url('greens_function', **params))
+
+    assert request.code == 400
+    assert request.reason == ("Could not extract Green's function. Make "
+                              "sure, the parameters are valid, and the depth "
+                              "settings are correct.")
+
+    # Two more simulating logic erros that should not be able to happen.
+    params = copy.deepcopy(basic_parameters)
+    params["format"] = "miniseed"
+
+    with mock.patch("instaseis.base_instaseis_db.BaseInstaseisDB"
+                    ".get_greens_function") as p:
+        st = obspy.read()
+        for tr in st:
+            tr.stats.starttime = obspy.UTCDateTime(1E5)
+
+        p.return_value = st
+        request = client.fetch(_assemble_url('greens_function', **params))
+
+    assert request.code == 500
+    assert request.reason == ("Starttime more than one hour before the "
+                              "starttime of the seismograms.")
+
+    params = copy.deepcopy(basic_parameters)
+    params["format"] = "miniseed"
+
+    with mock.patch("instaseis.base_instaseis_db.BaseInstaseisDB"
+                    ".get_greens_function") as p:
+        st = obspy.read()
+        for tr in st:
+            tr.stats.starttime = obspy.UTCDateTime(0)
+            tr.stats.delta = 0.0001
+
+        p.return_value = st
+        request = client.fetch(_assemble_url('greens_function', **params))
+
+    assert request.code == 500
+    assert request.reason.startswith("Endtime larger then the extracted "
+                                     "endtime")
+
+
+def test_phase_relative_offsets_but_no_ttimes_callback_greens_function(
+        all_clients):
+    client = all_clients
+
+    # get_greens_function() only works with reciprocal DBs.
+    if not client.is_reciprocal:
+        return
+
+    params = {
+        "sourcedepthinmeters": 1e3,
+        "sourcedistanceindegrees": 20,
+        "format": "miniseed"}
+
+    # Test for starttime.
+    p = copy.deepcopy(params)
+    p["starttime"] = "P%2D10"
+    request = client.fetch(_assemble_url('greens_function', **p))
+    assert request.code == 404
+    assert request.reason == (
+        "Server does not support travel time calculations.")
+
+    # Test for endtime.
+    p = copy.deepcopy(params)
+    p["endtime"] = "P%2D10"
+    request = client.fetch(_assemble_url('greens_function', **p))
+    assert request.code == 404
+    assert request.reason == (
+        "Server does not support travel time calculations.")
+
+    # Test for both.
+    p = copy.deepcopy(params)
+    p["starttime"] = "P%2D10"
+    p["endtime"] = "S%2B10"
+    request = client.fetch(_assemble_url('greens_function', **p))
+    assert request.code == 404
+    assert request.reason == (
+        "Server does not support travel time calculations.")
+
+
+def test_phase_relative_offset_failures_greens_function(
+        all_clients_ttimes_callback):
+    """
+    Tests some common failures for the phase relative offsets with the
+    greens function route.
+    """
+    client = all_clients_ttimes_callback
+
+    # get_greens_function() only works with reciprocal DBs.
+    if not client.is_reciprocal:
+        return
+
+    params = {
+        "sourcedepthinmeters": 1e3,
+        "sourcedistanceindegrees": 20,
+        "format": "miniseed"}
+
+    # Illegal phase.
+    p = copy.deepcopy(params)
+    p["starttime"] = "bogus%2D10"
+    request = client.fetch(_assemble_url('greens_function', **p))
+    assert request.code == 400
+    assert request.reason == "Invalid phase name: bogus"
+
+    # Phase not available at that distance.
+    p = copy.deepcopy(params)
+    p["starttime"] = "Pdiff%2D10"
+    request = client.fetch(_assemble_url('greens_function', **p))
+    assert request.code == 400
+    assert request.reason == (
+        "No Green's function extracted for the given phase relative offsets. "
+        "This could either be due to the chosen phase not existing for the "
+        "specific source-receiver geometry or arriving too late/with too "
+        "large offsets if the database is not long enough.")
+
+
+def test_phase_relative_offsets_greens_function(all_clients_ttimes_callback):
+    """
+    Test phase relative offsets with the green's function route.
+
+    + must be encoded with %2B
+    - must be encoded with %2D
+    """
+    client = all_clients_ttimes_callback
+
+    # Only for reciprocal databases.
+    if not client.is_reciprocal:
+        return
+
+    # At a distance of 50 degrees and with a source depth of 300 km:
+    # P: 504.357 seconds
+    # PP: 622.559 seconds
+    # sPKiKP: 1090.081 seconds
+    params = {
+        "sourcedepthinmeters": 300000,
+        "sourcedistanceindegrees": 50,
+        "format": "miniseed", "dt": 0.1}
+
+    # Normal seismogram.
+    p = copy.deepcopy(params)
+    request = client.fetch(_assemble_url('greens_function', **p))
+    assert request.code == 200
+    tr = obspy.read(request.buffer)[0]
+    starttime, endtime = tr.stats.starttime, tr.stats.endtime
+
+    # Start 10 seconds before the P arrival.
+    p = copy.deepcopy(params)
+    p["starttime"] = "P%2D10"
+    request = client.fetch(_assemble_url('greens_function', **p))
+    assert request.code == 200
+    tr = obspy.read(request.buffer)[0]
+
+    assert abs((tr.stats.starttime) - (starttime + 504.357 - 10)) < 0.1
+    assert tr.stats.endtime == endtime
+
+    # Starts 10 seconds after the P arrival
+    p = copy.deepcopy(params)
+    p["starttime"] = "P%2B10"
+    request = client.fetch(_assemble_url('greens_function', **p))
+    assert request.code == 200
+    tr = obspy.read(request.buffer)[0]
+
+    assert abs((tr.stats.starttime) - (starttime + 504.357 + 10)) < 0.1
+    assert tr.stats.endtime == endtime
+
+    # Ends 15 seconds before the PP arrival
+    p = copy.deepcopy(params)
+    p["endtime"] = "PP%2D15"
+    request = client.fetch(_assemble_url('greens_function', **p))
+    assert request.code == 200
+    tr = obspy.read(request.buffer)[0]
+
+    assert tr.stats.starttime == starttime
+    assert abs((tr.stats.endtime) - (starttime + 622.559 - 15)) < 0.1
+
+    # Ends 15 seconds after the PP arrival
+    p = copy.deepcopy(params)
+    p["endtime"] = "PP%2B15"
+    request = client.fetch(_assemble_url('greens_function', **p))
+    assert request.code == 200
+    tr = obspy.read(request.buffer)[0]
+
+    assert tr.stats.starttime == starttime
+    assert abs((tr.stats.endtime) - (starttime + 622.559 + 15)) < 0.1
+
+    # Starts 5 seconds before the PP and ends 2 seconds after the sPKiKP phase.
+    p = copy.deepcopy(params)
+    p["starttime"] = "PP%2D5"
+    p["endtime"] = "sPKiKP%2B2"
+    request = client.fetch(_assemble_url('greens_function', **p))
+    assert request.code == 200
+    tr = obspy.read(request.buffer)[0]
+
+    assert abs((tr.stats.starttime) - (starttime + 622.559 - 5)) < 0.1
+    assert abs((tr.stats.endtime) - (starttime + 1090.081 + 2)) < 0.1
+
+    # Combinations with relative end times are also possible. Relative start
+    # times are always relative to the origin time so it does not matter in
+    # that case.
+    p = copy.deepcopy(params)
+    p["starttime"] = "PP%2D5"
+    p["endtime"] = 10.0
+    request = client.fetch(_assemble_url('greens_function', **p))
+    assert request.code == 200
+    tr = obspy.read(request.buffer)[0]
+
+    assert abs((tr.stats.starttime) - (starttime + 622.559 - 5)) < 0.1
+    assert abs((tr.stats.endtime) - (starttime + 622.559 - 5 + 10)) < 0.1
+
+    # Nonetheless, also test the other combination of relative start time
+    # and phase relative endtime.
+    p = copy.deepcopy(params)
+    p["starttime"] = "10"
+    p["endtime"] = "PP%2B15"
+    request = client.fetch(_assemble_url('greens_function', **p))
+    assert request.code == 200
+    tr = obspy.read(request.buffer)[0]
+
+    assert tr.stats.starttime == starttime + 10
+    assert abs((tr.stats.endtime) - (starttime + 622.559 + 15)) < 0.1
 
 
 def test_raw_seismograms_error_handling(all_clients):
