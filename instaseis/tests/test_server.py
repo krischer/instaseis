@@ -152,7 +152,14 @@ def test_greens_retrieval(all_clients):
     # default parameters
     params = copy.deepcopy(basic_parameters)
     request = client.fetch(_assemble_url('greens', **params))
-    st_server = obspy.read(request.buffer)
+    # ObsPy needs the filename to be able to directly unpack zip files. We
+    # don't have a filename here so we unpack manually.
+    st_server = obspy.Stream()
+    zip_obj = zipfile.ZipFile(request.buffer)
+    for name in zip_obj.namelist():
+        st_server += obspy.read(io.BytesIO(zip_obj.read(name)))
+    for tr in st_server:
+        assert tr.stats._format == "SAC"
 
     st_db = db.get_greens_seiscomp(
         epicentral_distance_degree=params['sourcedistanceindegree'],
