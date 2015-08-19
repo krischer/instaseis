@@ -145,12 +145,37 @@ def test_greens_retrieval(all_clients):
     basic_parameters = {
         "sourcedepthinmeters": 1e3,
         "sourcedistanceindegree": 20,
-        "format": "miniseed"}
+        "format": "saczip"}
 
     time = obspy.UTCDateTime(2010, 1, 2, 3, 4, 5)
 
     # default parameters
     params = copy.deepcopy(basic_parameters)
+    request = client.fetch(_assemble_url('greens', **params))
+    st_server = obspy.read(request.buffer)
+
+    st_db = db.get_greens_seiscomp(
+        epicentral_distance_degree=params['sourcedistanceindegree'],
+        source_depth_in_m=params['sourcedepthinmeters'], origin_time=time)
+
+    for tr_server, tr_db in zip(st_server, st_db):
+        # Remove the additional stats from both.
+        del tr_server.stats.sac
+        del tr_server.stats._format
+        del tr_db.stats.instaseis
+        # Sample spacing is very similar but not equal due to floating point
+        # accuracy.
+        np.testing.assert_allclose(tr_server.stats.delta, tr_db.stats.delta)
+        tr_server.stats.delta = tr_db.stats.delta
+        assert tr_server.stats == tr_db.stats
+        # Relative tolerance not particularly useful when testing super
+        # small values.
+        np.testing.assert_allclose(tr_server.data, tr_db.data,
+                                   atol=1E-10 * tr_server.data.ptp())
+
+    # miniseed
+    params = copy.deepcopy(basic_parameters)
+    params["format"] = "miniseed"
     request = client.fetch(_assemble_url('greens', **params))
     st_server = obspy.read(request.buffer)
 

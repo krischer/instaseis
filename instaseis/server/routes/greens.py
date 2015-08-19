@@ -90,7 +90,7 @@ def _get_greens(db, epicentral_distance_degree, source_depth_in_m, units, dt,
             binary_data = fh.read()
         callback(binary_data)
     # Write a number of SAC files into an archive.
-    elif format == "sac":
+    elif format == "saczip":
         byte_strings = []
         for tr in st:
             # Write SAC headers.
