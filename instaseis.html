@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Main Instaseis Classes &mdash; instaseis 0.0.1a-327-g426e documentation</title>
+    <title>Main Instaseis Classes &mdash; instaseis 0.0.1a-332-g57bc documentation</title>
     
     <link rel="stylesheet" href="_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.0.1a-327-g426e',
+        VERSION:     '0.0.1a-332-g57bc',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -31,7 +31,7 @@
     <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="_static/bootstrap-3.3.4/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.0.1a-327-g426e documentation" href="index.html" />
+    <link rel="top" title="instaseis 0.0.1a-332-g57bc documentation" href="index.html" />
     <link rel="next" title="Sources and Receivers" href="source.html" />
     <link rel="prev" title="Instaseis: Instant Global Seismograms Based on a Broadband Waveform Database" href="index.html" />
 <meta charset='utf-8'>
@@ -53,7 +53,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-327-g426e</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-332-g57bc</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -180,29 +180,44 @@ search the child directories for the  necessary files and open them.</p>
 <em class="property">class </em><code class="descclassname">instaseis.base_instaseis_db.</code><code class="descname">BaseInstaseisDB</code><a class="reference internal" href="_modules/instaseis/base_instaseis_db.html#BaseInstaseisDB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.base_instaseis_db.BaseInstaseisDB" title="Permalink to this definition">¶</a></dt>
 <dd><p>Base class for all Instaseis database classes defining the user interface.</p>
 <dl class="method">
-<dt id="instaseis.base_instaseis_db.BaseInstaseisDB.get_greens_seiscomp">
-<code class="descname">get_greens_seiscomp</code><span class="sig-paren">(</span><em>epicentral_distance_degree</em>, <em>source_depth_in_m</em>, <em>origin_time=UTCDateTime(1970</em>, <em>1</em>, <em>1</em>, <em>0</em>, <em>0)</em>, <em>kind=u'displacement'</em>, <em>return_obspy_stream=True</em>, <em>dt=None</em>, <em>kernelwidth=12</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/base_instaseis_db.html#BaseInstaseisDB.get_greens_seiscomp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.base_instaseis_db.BaseInstaseisDB.get_greens_seiscomp" title="Permalink to this definition">¶</a></dt>
-<dd><p>Extract Green&#8217;s function from the Green&#8217;s function database in the
-format assumed by Seiscomp, i.e. the components TSS, ZSS, RSS, TDS,
-ZDS, RDS, ZDD, RDD, ZEP, REP as defined in</p>
-<p>Minson, Sarah E., and Douglas S. Dreger. 2008. “Stable Inversions for
-Complete Moment Tensors.” Geophysical Journal International 174 (2):
-585–592.  doi:10.1111/j.1365-246X.2008.03797.x.</p>
+<dt id="instaseis.base_instaseis_db.BaseInstaseisDB.get_greens_function">
+<code class="descname">get_greens_function</code><span class="sig-paren">(</span><em>epicentral_distance_in_degree</em>, <em>source_depth_in_m</em>, <em>origin_time=UTCDateTime(1970</em>, <em>1</em>, <em>1</em>, <em>0</em>, <em>0)</em>, <em>kind=u'displacement'</em>, <em>return_obspy_stream=True</em>, <em>dt=None</em>, <em>kernelwidth=12</em>, <em>definition=u'seiscomp'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/base_instaseis_db.html#BaseInstaseisDB.get_greens_function"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.base_instaseis_db.BaseInstaseisDB.get_greens_function" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract Green&#8217;s function from the Green&#8217;s function database.</p>
+<p>Currently only one definition is implemented: the one assumed by
+Seiscomp, i.e. the components <code class="docutils literal"><span class="pre">TSS</span></code>, <code class="docutils literal"><span class="pre">ZSS</span></code>, <code class="docutils literal"><span class="pre">RSS</span></code>, <code class="docutils literal"><span class="pre">TDS</span></code>,
+<code class="docutils literal"><span class="pre">ZDS</span></code>, <code class="docutils literal"><span class="pre">RDS</span></code>, <code class="docutils literal"><span class="pre">ZDD</span></code>, <code class="docutils literal"><span class="pre">RDD</span></code>, <code class="docutils literal"><span class="pre">ZEP</span></code>, <code class="docutils literal"><span class="pre">REP</span></code> as defined in</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="100%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">Minson, Sarah E., and Douglas S. Dreger (2008)</div>
+<div class="line"><strong>Stable Inversions for Complete Moment Tensors.</strong></div>
+<div class="line"><em>Geophysical Journal International</em> 174 (2): 585–592.</div>
+<div class="line"><a class="reference external" href="http://dx.doi.org/10.1111/j.1365-246X.2008.03797.x">http://dx.doi.org/10.1111/j.1365-246X.2008.03797.x</a></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>epicentral_distance_degree</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; The epicentral distance in degree.</li>
+<li><strong>epicentral_distance_in_degree</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; The epicentral distance in
+degree.</li>
 <li><strong>source_depth_in_m</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; The source depth in m below the surface.</li>
 <li><strong>origin_time</strong> (<a class="reference external" href="http://docs.obspy.org/packages/autogen/obspy.core.utcdatetime.UTCDateTime.html#obspy.core.utcdatetime.UTCDateTime" title="(in ObsPy Documentation (0.10.2) v0.10)"><code class="xref py py-class docutils literal"><span class="pre">obspy.core.utcdatetime.UTCDateTime</span></code></a>) &#8211; Origin time of the source.</li>
-<li><strong>kind</strong> (<em>str, optional</em>) &#8211; The desired units of the seismogram:
+<li><strong>kind</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; The desired units of the seismogram:
 <code class="docutils literal"><span class="pre">&quot;displacement&quot;</span></code>, <code class="docutils literal"><span class="pre">&quot;velocity&quot;</span></code>, or <code class="docutils literal"><span class="pre">&quot;acceleration&quot;</span></code>.</li>
-<li><strong>dt</strong> (<em>float, optional</em>) &#8211; Desired sampling rate of the Green&#8217;s functions. Resampling
+<li><strong>dt</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; Desired sampling rate of the Green&#8217;s functions. Resampling
 is done using a Lanczos kernel.</li>
-<li><strong>kernelwidth</strong> (<em>int, optional</em>) &#8211; The width of the sinc kernel used for resampling in
+<li><strong>kernelwidth</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; The width of the sinc kernel used for resampling in
 terms of the original sampling interval. Best choose something
 between 10 and 20.</li>
+<li><strong>definition</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; The desired Green&#8217;s function definition.</li>
 </ul>
 </td>
 </tr>

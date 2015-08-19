@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>GET /seismograms &mdash; instaseis 0.0.1a-332-g57bc documentation</title>
+    <title>GET /greens_function &mdash; instaseis 0.0.1a-332-g57bc documentation</title>
     
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -33,8 +33,8 @@
     <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
     <link rel="top" title="instaseis 0.0.1a-332-g57bc documentation" href="../index.html" />
     <link rel="up" title="Instaseis Server" href="../server.html" />
-    <link rel="next" title="GET /greens_function" href="greens_function.html" />
-    <link rel="prev" title="GET /seismograms_raw" href="seismograms_raw.html" />
+    <link rel="next" title="Advanced Server Configuration" href="../advanced_server_configuration.html" />
+    <link rel="prev" title="GET /seismograms" href="seismograms.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
@@ -108,8 +108,8 @@
   <div class="row">
     <div class="col-md-12">
       
-  <div class="section" id="get-seismograms">
-<h1>GET /seismograms<a class="headerlink" href="#get-seismograms" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="get-greens-function">
+<h1>GET /greens_function<a class="headerlink" href="#get-greens-function" title="Permalink to this headline">¶</a></h1>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">Some parts of this route require an advanced server setup. Please view the
@@ -118,9 +118,26 @@ will keep working even with a normal configuration.</p>
 </div>
 <dl class="docutils">
 <dt>Description</dt>
-<dd>Returns Instaseis seismograms. In addition to the functionality of the
-<code class="docutils literal"><span class="pre">/seismograms_raw</span></code> route this one has quite a couple of convenience
-function and is suitable to be queried by any program able to use HTTP</dd>
+<dd><p class="first">Returns Instaseis Greens&#8217;s function, that is seimograms for contraction with the
+decomposition of the Momenttensor as in Minson &amp; Dreger (2008). Several convenience
+function of the <code class="docutils literal"><span class="pre">/seismograms</span></code> route are replicated here to make it suitable to be
+queried by any program able to use HTTP.</p>
+<table border="1" class="last docutils">
+<colgroup>
+<col width="100%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">Minson, Sarah E., and Douglas S. Dreger (2008)</div>
+<div class="line"><strong>Stable Inversions for Complete Moment Tensors.</strong></div>
+<div class="line"><em>Geophysical Journal International</em> 174 (2): 585–592.</div>
+<div class="line"><a class="reference external" href="http://dx.doi.org/10.1111/j.1365-246X.2008.03797.x">http://dx.doi.org/10.1111/j.1365-246X.2008.03797.x</a></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</dd>
 <dt>Content-Type</dt>
 <dd><ul class="first last simple">
 <li><code class="docutils literal"><span class="pre">application/zip</span></code> (if zipped SAC data is requested)</li>
@@ -148,27 +165,35 @@ encoding format 4 (IEEE floating point).</dd>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td colspan="5"><strong>Output parameters</strong></td>
+<tr class="row-even"><td colspan="5"><strong>Source/Receiver Parameters</strong></td>
 </tr>
-<tr class="row-odd"><td><code class="docutils literal"><span class="pre">format</span></code></td>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">sourcedepthinmeters</span></code></td>
+<td>Float</td>
+<td>True</td>
+<td>&nbsp;</td>
+<td>The source depth in meters.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">sourcedistanceindegree</span></code></td>
+<td>Float</td>
+<td>True</td>
+<td>&nbsp;</td>
+<td>The epicentral disctance of source - receiver in degrees (computed on the surface
+of a sphere).</td>
+</tr>
+<tr class="row-odd"><td colspan="5"><strong>Output parameters</strong></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">format</span></code></td>
 <td>String</td>
 <td>False</td>
 <td>saczip</td>
 <td>Specify output file to be either MiniSEED or a ZIP archive of SAC files, either
 <code class="docutils literal"><span class="pre">miniseed</span></code> or <code class="docutils literal"><span class="pre">saczip</span></code>.</td>
 </tr>
-<tr class="row-even"><td><code class="docutils literal"><span class="pre">label</span></code></td>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">label</span></code></td>
 <td>String</td>
 <td>False</td>
 <td>&nbsp;</td>
 <td>Specify a label to be included in file names and HTTP file name suggestions.</td>
-</tr>
-<tr class="row-odd"><td><code class="docutils literal"><span class="pre">components</span></code></td>
-<td>String</td>
-<td>False</td>
-<td>ZNE</td>
-<td>Specify the orientation of the synthetic seismograms as a list of any combination of
-<code class="docutils literal"><span class="pre">Z</span></code> (vertical), <code class="docutils literal"><span class="pre">N</span></code> (north), <code class="docutils literal"><span class="pre">E</span></code> (east), <code class="docutils literal"><span class="pre">R</span></code> (radial), <code class="docutils literal"><span class="pre">T</span></code> (transverse).</td>
 </tr>
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">units</span></code></td>
 <td>String</td>
@@ -233,118 +258,6 @@ If the value is in the form <code class="docutils literal"><span class="pre">pha
 phase-relative time, for example <code class="docutils literal"><span class="pre">P-10</span></code> (meaning P-wave arrival time minus 10
 seconds). If the value is a numerical value it is interpreted as an offset, in
 seconds, from the start time.</p>
-</td>
-</tr>
-<tr class="row-odd"><td colspan="5"><strong>Receiver Parameters</strong></td>
-</tr>
-<tr class="row-even"><td colspan="5">Directly specify coordinates and network/station codes ...</td>
-</tr>
-<tr class="row-odd"><td><code class="docutils literal"><span class="pre">receiverlatitude</span></code></td>
-<td>Float</td>
-<td>True</td>
-<td>&nbsp;</td>
-<td>The geocentric latitude of the receiver.</td>
-</tr>
-<tr class="row-even"><td><code class="docutils literal"><span class="pre">receiverlongitude</span></code></td>
-<td>Float</td>
-<td>True</td>
-<td>&nbsp;</td>
-<td>The longitude of the receiver.</td>
-</tr>
-<tr class="row-odd"><td><code class="docutils literal"><span class="pre">receiverdepthinmeters</span></code></td>
-<td>Float</td>
-<td>False</td>
-<td>0.0</td>
-<td>The depth of the receiver in meter.</td>
-</tr>
-<tr class="row-even"><td><code class="docutils literal"><span class="pre">networkcode</span></code></td>
-<td>String</td>
-<td>False</td>
-<td>XX</td>
-<td>Specify the network code of the final seismograms. Maximum of two letters.</td>
-</tr>
-<tr class="row-odd"><td><code class="docutils literal"><span class="pre">stationcode</span></code></td>
-<td>String</td>
-<td>False</td>
-<td>SYN</td>
-<td>Specify the station code of the final seismograms. Maximum of five letters.</td>
-</tr>
-<tr class="row-even"><td colspan="5">... or use wildcard searches over network and station codes. Potentially returns multiple stations.</td>
-</tr>
-<tr class="row-odd"><td><code class="docutils literal"><span class="pre">network</span></code></td>
-<td>String</td>
-<td>False</td>
-<td>&nbsp;</td>
-<td>Wildcarded network codes, e.g. <code class="docutils literal"><span class="pre">I*,B?,AU</span></code>.</td>
-</tr>
-<tr class="row-even"><td><code class="docutils literal"><span class="pre">station</span></code></td>
-<td>String</td>
-<td>False</td>
-<td>&nbsp;</td>
-<td>Wildcarded station codes, e.g. <code class="docutils literal"><span class="pre">A*,ANMO</span></code>.</td>
-</tr>
-<tr class="row-odd"><td colspan="5"><strong>Receiver Parameters</strong></td>
-</tr>
-<tr class="row-even"><td colspan="5">The source can by set by specifying an event id if the server has been set-up for this ...</td>
-</tr>
-<tr class="row-odd"><td><code class="docutils literal"><span class="pre">event_id</span></code></td>
-<td>String</td>
-<td>False</td>
-<td>&nbsp;</td>
-<td>The id of the event to use.</td>
-</tr>
-<tr class="row-even"><td colspan="5">... or by specify the source parameters in a variety of ways.</td>
-</tr>
-<tr class="row-odd"><td><code class="docutils literal"><span class="pre">sourcelatitude</span></code></td>
-<td>Float</td>
-<td>True</td>
-<td>&nbsp;</td>
-<td>The geocentric latitude of the source.</td>
-</tr>
-<tr class="row-even"><td><code class="docutils literal"><span class="pre">sourcelongitude</span></code></td>
-<td>Float</td>
-<td>True</td>
-<td>&nbsp;</td>
-<td>The longitude of the source.</td>
-</tr>
-<tr class="row-odd"><td><code class="docutils literal"><span class="pre">sourcedepthinmeters</span></code></td>
-<td>Float</td>
-<td>False</td>
-<td>0.0</td>
-<td>The depth of the source in meter.</td>
-</tr>
-<tr class="row-even"><td colspan="5"><strong>Source mechanism as a moment tensor</strong></td>
-</tr>
-<tr class="row-odd"><td><code class="docutils literal"><span class="pre">sourcemomenttensor</span></code></td>
-<td>List</td>
-<td>False</td>
-<td>&nbsp;</td>
-<td><p class="first">Specify a source in moment tensor components as a list: <code class="docutils literal"><span class="pre">Mrr,Mtt,Mpp,Mrt,Mrp,Mtp</span></code>
-with values in Newton meters (Nm).</p>
-<p class="last">Example: <code class="docutils literal"><span class="pre">1.04e22,-0.039e22,-1e22,0.304e22,-1.52e22,-0.119e22</span></code></p>
-</td>
-</tr>
-<tr class="row-even"><td colspan="5"><strong>Source mechanism as a double couple</strong></td>
-</tr>
-<tr class="row-odd"><td><code class="docutils literal"><span class="pre">sourcedoublecouple</span></code></td>
-<td>List</td>
-<td>False</td>
-<td>&nbsp;</td>
-<td><p class="first">Specify a source as a double couple. The list of values are <code class="docutils literal"><span class="pre">strike,dip,rake[,M0]</span></code>,
-where strike, dip and rake are in degrees and M0 is the scalar seismic moment in
-Newton meters (Nm). If not specified, a value of <em>1e19</em> will be used as the scalar
-moment.</p>
-<p class="last">example: <code class="docutils literal"><span class="pre">19,18,116,1e19</span></code></p>
-</td>
-</tr>
-<tr class="row-even"><td colspan="5"><strong>Source mechanism as forces</strong></td>
-</tr>
-<tr class="row-odd"><td><code class="docutils literal"><span class="pre">sourceforce</span></code></td>
-<td>List</td>
-<td>False</td>
-<td>&nbsp;</td>
-<td><p class="first">Specify a force source as a list of <code class="docutils literal"><span class="pre">Fr,Ft,Fp</span></code> in units of Newtons (N).</p>
-<p class="last">example: <code class="docutils literal"><span class="pre">1e22,1e22,1e22</span></code></p>
 </td>
 </tr>
 </tbody>
