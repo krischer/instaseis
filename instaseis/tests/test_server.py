@@ -103,8 +103,8 @@ def test_greens_error_handling(all_clients):
         "sourcedepthinmeters": client.source_depth,
         "sourcedistanceindegrees": 20}
 
-    # get_greens_seiscomp() only works with reciprocal DBs. So make sure we get
-    # the error, but then do the other tests only for reciprocal DBs
+    # get_greens_function() only works with reciprocal DBs. So make sure we
+    # get the error, but then do the other tests only for reciprocal DBs
     if not client.is_reciprocal:
         params = copy.deepcopy(basic_parameters)
         request = client.fetch(_assemble_url('greens', **params))
@@ -138,7 +138,7 @@ def test_greens_retrieval(all_clients):
 
     db = instaseis.open_db(client.filepath)
 
-    # get_greens_seiscomp() only works with reciprocal DBs.
+    # get_greens_function() only works with reciprocal DBs.
     if not client.is_reciprocal:
         return
 
@@ -161,9 +161,10 @@ def test_greens_retrieval(all_clients):
     for tr in st_server:
         assert tr.stats._format == "SAC"
 
-    st_db = db.get_greens_seiscomp(
+    st_db = db.get_greens_function(
         epicentral_distance_in_degree=params['sourcedistanceindegrees'],
-        source_depth_in_m=params['sourcedepthinmeters'], origin_time=time)
+        source_depth_in_m=params['sourcedepthinmeters'], origin_time=time,
+        definition="seiscomp")
 
     for tr_server, tr_db in zip(st_server, st_db):
         # Remove the additional stats from both.
@@ -186,9 +187,10 @@ def test_greens_retrieval(all_clients):
     request = client.fetch(_assemble_url('greens', **params))
     st_server = obspy.read(request.buffer)
 
-    st_db = db.get_greens_seiscomp(
+    st_db = db.get_greens_function(
         epicentral_distance_in_degree=params['sourcedistanceindegrees'],
-        source_depth_in_m=params['sourcedepthinmeters'], origin_time=time)
+        source_depth_in_m=params['sourcedepthinmeters'], origin_time=time,
+        definition="seiscomp")
 
     for tr_server, tr_db in zip(st_server, st_db):
         # Remove the additional stats from both.

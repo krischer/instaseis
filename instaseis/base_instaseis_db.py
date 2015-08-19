@@ -34,18 +34,23 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
     """
     Base class for all Instaseis database classes defining the user interface.
     """
-    def get_greens_seiscomp(self, epicentral_distance_in_degree,
+    def get_greens_function(self, epicentral_distance_in_degree,
                             source_depth_in_m, origin_time=UTCDateTime(0),
                             kind='displacement', return_obspy_stream=True,
-                            dt=None, kernelwidth=12):
+                            dt=None, kernelwidth=12, definition='seiscomp'):
         """
-        Extract Green's function from the Green's function database in the
-        format assumed by Seiscomp, i.e. the components TSS, ZSS, RSS, TDS,
-        ZDS, RDS, ZDD, RDD, ZEP, REP as defined in
+        Extract Green's function from the Green's function database.
 
-        Minson, Sarah E., and Douglas S. Dreger. 2008. “Stable Inversions for
-        Complete Moment Tensors.” Geophysical Journal International 174 (2):
-        585–592.  doi:10.1111/j.1365-246X.2008.03797.x.
+        Currently only one definition is implemented: the one assumed by
+        Seiscomp, i.e. the components ``TSS``, ``ZSS``, ``RSS``, ``TDS``,
+        ``ZDS``, ``RDS``, ``ZDD``, ``RDD``, ``ZEP``, ``REP`` as defined in
+
+        .. list-table::
+
+            * - | Minson, Sarah E., and Douglas S. Dreger (2008)
+                | **Stable Inversions for Complete Moment Tensors.**
+                | *Geophysical Journal International* 174 (2): 585–592.
+                | http://dx.doi.org/10.1111/j.1365-246X.2008.03797.x
 
         :param epicentral_distance_in_degree: The epicentral distance in
             degree.
@@ -56,19 +61,26 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
         :type origin_time: :class:`obspy.core.utcdatetime.UTCDateTime`
         :param kind: The desired units of the seismogram:
             ``"displacement"``, ``"velocity"``, or ``"acceleration"``.
-        :type kind: str, optional
+        :type kind: str
         :param dt: Desired sampling rate of the Green's functions. Resampling
             is done using a Lanczos kernel.
-        :type dt: float, optional
+        :type dt: float
         :param kernelwidth: The width of the sinc kernel used for resampling in
             terms of the original sampling interval. Best choose something
             between 10 and 20.
-        :type kernelwidth: int, optional
+        :type kernelwidth: int
+        :param definition: The desired Green's function definition.
+        :type definition: str
 
         :returns: Multi component seismograms.
         :rtype: A :class:`obspy.core.stream.Stream` object or a dictionary
             with NumPy arrays as values.
         """
+        # Currently only the seiscomp definition is implemented. Other
+        # implementations will require a refactoring of this method.
+        if definition.lower() != "seiscomp":
+            raise NotImplementedError
+
         self._get_greens_seiscomp_sanity_checks(epicentral_distance_in_degree,
                                                 source_depth_in_m, kind)
 

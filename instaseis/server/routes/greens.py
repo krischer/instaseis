@@ -49,11 +49,11 @@ def _get_greens(db, epicentral_distance_degree, source_depth_in_m, units, dt,
         label += "_"
 
     try:
-        st = db.get_greens_seiscomp(
+        st = db.get_greens_function(
             epicentral_distance_in_degree=epicentral_distance_degree,
             source_depth_in_m=source_depth_in_m, origin_time=origintime,
             kind=units, return_obspy_stream=True, dt=dt,
-            kernelwidth=kernelwidth)
+            kernelwidth=kernelwidth, definition="seiscomp")
     except Exception:
         msg = ("Could not extract Green's function. Make sure, the parameters "
                "are valid, and the depth settings are correct.")

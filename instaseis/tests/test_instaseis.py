@@ -469,7 +469,7 @@ def test_incremental_bwd_force_source():
 
 def test_get_greens_vs_get_seismogram():
     """
-    Test get_greens_seiscomp() against default get_seismograms()
+    Test get_greens_function() against default get_seismograms()
     """
     db = InstaseisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
 
@@ -490,7 +490,8 @@ def test_get_greens_vs_get_seismogram():
 
     st_ref = db.get_seismograms(source, receiver, components=('Z', 'R', 'T'))
 
-    st_greens = db.get_greens_seiscomp(epicentral_distance_degree, depth_in_m)
+    st_greens = db.get_greens_function(epicentral_distance_degree,
+                                       depth_in_m, definition="seiscomp")
 
     TSS = st_greens.select(channel="TSS")[0].data
     ZSS = st_greens.select(channel="ZSS")[0].data

@@ -11,11 +11,14 @@ Description
     Returns Instaseis Greens's function, that is seimograms for contraction with the
     decomposition of the Momenttensor as in Minson & Dreger (2008). Several convenience
     function of the ``/seismograms`` route are replicated here to make it suitable to be
-    queried by any program able to use HTTP
+    queried by any program able to use HTTP.
 
-    Minson, Sarah E., and Douglas S. Dreger. 2008. “Stable Inversions for Complete Moment
-    Tensors.” Geophysical Journal International 174 (2): 585–592.
-    doi:10.1111/j.1365-246X.2008.03797.x.
+    .. list-table::
+
+        * - | Minson, Sarah E., and Douglas S. Dreger (2008)
+            | **Stable Inversions for Complete Moment Tensors.**
+            | *Geophysical Journal International* 174 (2): 585–592.
+            | http://dx.doi.org/10.1111/j.1365-246X.2008.03797.x
 
 Content-Type
     * ``application/zip`` (if zipped SAC data is requested)
