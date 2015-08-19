@@ -187,6 +187,8 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
         "format": {"type": str, "default": "saczip"}
     }
 
+    default_label = "instaseis_seismogram"
+
     def __init__(self, *args, **kwargs):
         super(InstaseisTimeSeriesHandler, self).__init__(*args, **kwargs)
 
@@ -195,47 +197,6 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
         Function attempting to validate that the passed parameters are
         valid. Does not need to check the types as that has already been done.
         """
-        # Make sure the unit arguments is valid.
-        args.units = args.units.lower()
-        if args.units not in ["displacement", "velocity", "acceleration"]:
-            msg = ("Unit must be one of 'displacement', 'velocity', "
-                   "or 'acceleration'")
-            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
-
-        # Make sure the output format is valid.
-        args.format = args.format.lower()
-        if args.format not in ("miniseed", "saczip"):
-            msg = ("Format must either be 'miniseed' or 'saczip'.")
-            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
-
-        # If its essentially equal to the internal sampling rate just set it
-        # to equal to ease the following comparisons.
-        if args.dt and \
-                abs(args.dt - self.application.db.info.dt) / args.dt < 1E-7:
-            args.dt = self.application.db.info.dt
-
-        # Make sure that dt, if given is larger then 0.01. This should still
-        # be plenty for any use case but prevents the server from having to
-        # send massive amounts of data in the case of user errors.
-        if args.dt is not None and args.dt < 0.01:
-            msg = ("The smallest possible dt is 0.01. Please choose a "
-                   "smaller value and resample locally if needed.")
-            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
-
-        # Also make sure it does not downsample.
-        if args.dt is not None and args.dt > self.application.db.info.dt:
-            msg = ("Cannot downsample. The sampling interval of the database "
-                   "is %.5f seconds. Make sure to choose a smaller or equal "
-                   "one." % self.application.db.info.dt)
-            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
-
-        # Make sure the interpolation kernel width is sensible. Don't allow
-        # values smaller than 1 or larger than 20.
-        if not (1 <= args.kernelwidth <= 20):
-            msg = ("`kernelwidth` must not be smaller than 1 or larger than "
-                   "20.")
-            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
-
         # The networkcode and stationcode parameters have a maximum number
         # of letters.
         if args.stationcode and len(args.stationcode) > 5:
@@ -331,14 +292,6 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
             msg = ("Server does not support station coordinates and thus no "
                    "station queries.")
             raise tornado.web.HTTPError(404, log_message=msg, reason=msg)
-
-        if len(args.components) > 5:
-            msg = "A maximum of 5 components can be requested."
-            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
-
-        if not args.components:
-            msg = "A request with no components will not return anything..."
-            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
     def get_source(self, args, __event):
         # Source can be either directly specified or by passing an event id.
@@ -492,7 +445,7 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
             __event = None
 
         min_starttime, max_endtime = self.parse_time_settings(args)
-        self.set_headers("instaseis_seismogram", args)
+        self.set_headers(args)
 
         source = self.get_source(args, __event)
 
@@ -528,32 +481,12 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
 
             # Check if start- or end time are phase relative. If yes
             # calculate the new start- and/or end time.
-            if isinstance(args.starttime, obspy.core.AttribDict):
-                tt = self.get_ttime(source=source, receiver=receiver,
-                                    phase=args.starttime["phase"])
-                if tt is None:
-                    continue
-                starttime = args.origintime + tt + args.starttime["offset"]
-            else:
-                starttime = args.starttime
-
-            if starttime < min_starttime - 3600.0:
+            time_values = self.get_phase_relative_times(
+                args=args, source=source, receiver=receiver,
+                min_starttime=min_starttime, max_endtime=max_endtime)
+            if time_values is None:
                 continue
-
-            if isinstance(args.endtime, obspy.core.AttribDict):
-                tt = self.get_ttime(source=source, receiver=receiver,
-                                    phase=args.endtime["phase"])
-                if tt is None:
-                    continue
-                endtime = args.origintime + tt + args.endtime["offset"]
-            # Endtime relative to phase relative starttime.
-            elif isinstance(args.endtime, float):
-                endtime = starttime + args.endtime
-            else:
-                endtime = args.endtime
-
-            if endtime > max_endtime:
-                continue
+            starttime, endtime = time_values
 
             # Validate the source-receiver geometry.
             self.validate_geometry(source=source, receiver=receiver)

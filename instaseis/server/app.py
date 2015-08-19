@@ -24,7 +24,7 @@ from .routes.index import IndexHandler
 from .routes.info import InfoHandler
 from .routes.seismograms import SeismogramsHandler
 from .routes.seismograms_raw import RawSeismogramsHandler
-from .routes.greens import GreensHandler
+from .routes.greens import GreensFunctionHandler
 
 
 def get_application():
@@ -37,7 +37,7 @@ def get_application():
     return tornado.web.Application([
         (r"/seismograms", SeismogramsHandler),
         (r"/seismograms_raw", RawSeismogramsHandler),
-        (r"/greens", GreensHandler),
+        (r"/greens_function", GreensFunctionHandler),
         (r"/info", InfoHandler),
         (r"/", IndexHandler),
         (r"/coordinates", CoordinatesHandler),

@@ -190,4 +190,4 @@ with currently eight endpoints only supporting GET.
     routes/ttimes
     routes/seismograms_raw
     routes/seismograms
-    routes/greens
+    routes/greens_function

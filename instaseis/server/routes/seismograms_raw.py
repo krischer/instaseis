@@ -51,6 +51,10 @@ class RawSeismogramsHandler(InstaseisTimeSeriesHandler):
         "networkcode": {"type": str},
         "stationcode": {"type": str}
     }
+    default_label = "instaseis_seismogram"
+
+    def validate_parameters(self, args):
+        pass
 
     def get(self):
         args = self.parse_arguments()
@@ -62,14 +66,6 @@ class RawSeismogramsHandler(InstaseisTimeSeriesHandler):
             "strike_dip_rake": set(["strike", "dip", "rake", "M0"]),
             "force_source": set(["fr", "ft", "fp"])
         }
-
-        if len(args.components) > 5:
-            msg = "A maximum of 5 components can be requested."
-            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
-
-        if not args.components:
-            msg = "A request with no components will not return anything..."
-            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
         components = list(args.components)
         for src_type, params in src_params.items():
@@ -169,14 +165,9 @@ class RawSeismogramsHandler(InstaseisTimeSeriesHandler):
             fh.seek(0, 0)
             binary_data = fh.read()
 
-        filename = "instaseis_seismogram_%s.mseed" % \
-                   str(obspy.UTCDateTime()).replace(":", "_")
-
-        self.write(binary_data)
-
-        self.set_header("Content-Type", "application/octet-stream")
-        self.set_header("Content-Disposition",
-                        "attachment; filename=%s" % filename)
+        self.set_headers(args)
         # Passing mu in the HTTP header...not sure how well this plays with
         # proxies...
         self.set_header("Instaseis-Mu", "%f" % st[0].stats.instaseis.mu)
+
+        self.write(binary_data)

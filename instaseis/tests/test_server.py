@@ -93,9 +93,9 @@ def test_info_route(all_clients):
     np.testing.assert_allclose(client_sliprate, db_sliprate)
 
 
-def test_greens_error_handling(all_clients):
+def test_greens_function_error_handling(all_clients):
     """
-    Tests error handling of the /greens route. Very basic for now
+    Tests error handling of the /greens_function route. Very basic for now
     """
     client = all_clients
 
@@ -107,7 +107,7 @@ def test_greens_error_handling(all_clients):
     # get the error, but then do the other tests only for reciprocal DBs
     if not client.is_reciprocal:
         params = copy.deepcopy(basic_parameters)
-        request = client.fetch(_assemble_url('greens', **params))
+        request = client.fetch(_assemble_url('greens_function', **params))
         assert request.code == 400
         assert "the database is not reciprocal" in request.reason.lower()
         return
@@ -115,7 +115,7 @@ def test_greens_error_handling(all_clients):
     # Remove the sourcedistanceindegrees, required parameter.
     params = copy.deepcopy(basic_parameters)
     del params["sourcedistanceindegrees"]
-    request = client.fetch(_assemble_url('greens', **params))
+    request = client.fetch(_assemble_url('greens_function', **params))
     assert request.code == 400
     assert request.reason == \
         "Required parameter 'sourcedistanceindegrees' not given."
@@ -123,13 +123,13 @@ def test_greens_error_handling(all_clients):
     # Remove the sourcedepthinmeters, required parameter.
     params = copy.deepcopy(basic_parameters)
     del params["sourcedepthinmeters"]
-    request = client.fetch(_assemble_url('greens', **params))
+    request = client.fetch(_assemble_url('greens_function', **params))
     assert request.code == 400
     assert request.reason == \
         "Required parameter 'sourcedepthinmeters' not given."
 
 
-def test_greens_retrieval(all_clients):
+def test_greens_function_retrieval(all_clients):
     """
     Tests if the greens functions requested from the server are identical to
     the one requested with the local instaseis client.
@@ -151,7 +151,7 @@ def test_greens_retrieval(all_clients):
 
     # default parameters
     params = copy.deepcopy(basic_parameters)
-    request = client.fetch(_assemble_url('greens', **params))
+    request = client.fetch(_assemble_url('greens_function', **params))
     # ObsPy needs the filename to be able to directly unpack zip files. We
     # don't have a filename here so we unpack manually.
     st_server = obspy.Stream()
@@ -184,7 +184,7 @@ def test_greens_retrieval(all_clients):
     # miniseed
     params = copy.deepcopy(basic_parameters)
     params["format"] = "miniseed"
-    request = client.fetch(_assemble_url('greens', **params))
+    request = client.fetch(_assemble_url('greens_function', **params))
     st_server = obspy.read(request.buffer)
 
     st_db = db.get_greens_function(

@@ -9,7 +9,9 @@ Base Instaseis Request handler currently only settings default headers.
     GNU Lesser General Public License, Version 3 [non-commercial/academic use]
     (http://www.gnu.org/copyleft/lgpl.html)
 """
-from abc import abstractmethod
+from future.utils import with_metaclass
+
+from abc import ABCMeta, abstractmethod
 import obspy
 import tornado
 from ..base_instaseis_db import _get_seismogram_times
@@ -23,9 +25,11 @@ class InstaseisRequestHandler(tornado.web.RequestHandler):
         self.set_header("Server", "InstaseisServer/%s" % __version__)
 
 
-class InstaseisTimeSeriesHandler(InstaseisRequestHandler):
+class InstaseisTimeSeriesHandler(with_metaclass(ABCMeta,
+                                                InstaseisRequestHandler)):
     arguments = None
     connection_closed = False
+    default_label = ""
 
     def __init__(self, *args, **kwargs):
         super(InstaseisTimeSeriesHandler, self).__init__(*args, **kwargs)
@@ -92,12 +96,78 @@ class InstaseisTimeSeriesHandler(InstaseisRequestHandler):
             setattr(args, name, value)
 
         # Validate some of them right here.
+        self.validate_common_parameters(args)
         self.validate_parameters(args)
 
         return args
 
+    def validate_common_parameters(self, args):
+        """
+        Also ensures some consistency across the routes.
+        """
+        info = self.application.db.info
+
+        if "components" in self.arguments:
+            if len(args.components) > 5:
+                msg = "A maximum of 5 components can be requested."
+                raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+
+            if not args.components:
+                msg = ("A request with no components will not return "
+                       "anything...")
+                raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+
+        # Make sure the unit arguments is valid.
+        if "units" in self.arguments:
+            args.units = args.units.lower()
+            if args.units not in ["displacement", "velocity", "acceleration"]:
+                msg = ("Unit must be one of 'displacement', 'velocity', "
+                       "or 'acceleration'")
+                raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+
+        # Make sure the output format is valid.
+        if "format" in self.arguments:
+            args.format = args.format.lower()
+            if args.format not in ("miniseed", "saczip"):
+                msg = ("Format must either be 'miniseed' or 'saczip'.")
+                raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+
+        # If its essentially equal to the internal sampling rate just set it
+        # to equal to ease the following comparisons.
+        if "dt" in self.arguments:
+            if args.dt and abs(args.dt - info.dt) / args.dt < 1E-7:
+                args.dt = info.dt
+
+            # Make sure that dt, if given is larger then 0.01. This should
+            # still be plenty for any use case but prevents the server from
+            # having to send massive amounts of data in the case of user
+            # errors.
+            if args.dt is not None and args.dt < 0.01:
+                msg = ("The smallest possible dt is 0.01. Please choose a "
+                       "smaller value and resample locally if needed.")
+                raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+
+            # Also make sure it does not downsample.
+            if args.dt is not None and args.dt > info.dt:
+                msg = ("Cannot downsample. The sampling interval of the "
+                       "database is %.5f seconds. Make sure to choose a "
+                       "smaller or equal one." % info.dt)
+                raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+
+        if "kernelwidth" in self.arguments:
+            # Make sure the interpolation kernel width is sensible. Don't allow
+            # values smaller than 1 or larger than 20.
+            if not (1 <= args.kernelwidth <= 20):
+                msg = ("`kernelwidth` must not be smaller than 1 or larger "
+                       "than 20.")
+                raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+
     @abstractmethod
     def validate_parameters(self, args):
+        """
+        Implement this function to make checks not already performed in
+        validate_common_parameters().
+        """
         pass
 
     def parse_time_settings(self, args):
@@ -169,10 +239,15 @@ class InstaseisTimeSeriesHandler(InstaseisRequestHandler):
 
         return ti["starttime"], ti["endtime"]
 
-    def set_headers(self, default_label, args):
-        if args.format == "miniseed":
+    def set_headers(self, args):
+        if "format" not in args:
+            format = "miniseed"
+        else:
+            format = args.format
+
+        if format == "miniseed":
             content_type = "application/octet-stream"
-        elif args.format == "saczip":
+        elif format == "saczip":
             content_type = "application/zip"
         self.set_header("Content-Type", content_type)
 
@@ -180,15 +255,15 @@ class InstaseisTimeSeriesHandler(InstaseisRequestHandler):
             "miniseed": "mseed",
             "saczip": "zip"}
 
-        if args.label:
+        if "label" in args and args.label:
             label = args.label
         else:
-            label = default_label
+            label = self.default_label
 
         filename = "%s_%s.%s" % (
             label,
             str(obspy.UTCDateTime()).replace(":", "_"),
-            FILE_ENDINGS_MAP[args.format])
+            FILE_ENDINGS_MAP[format])
 
         self.set_header("Content-Disposition",
                         "attachment; filename=%s" % filename)
@@ -248,3 +323,41 @@ class InstaseisTimeSeriesHandler(InstaseisRequestHandler):
                     msg = "Source depth must be: %.1f km" % info.source_depth
                     raise tornado.web.HTTPError(400, log_message=msg,
                                                 reason=msg)
+
+    def get_phase_relative_times(self, args, source, receiver, min_starttime,
+                                 max_endtime):
+        """
+        Helper function getting the times for each receiver for
+        phase-relative offsets.
+
+        Returns None in case there either is no phase at the
+        requested distance or it arrives too late, early for other settings.
+        """
+        if isinstance(args.starttime, obspy.core.AttribDict):
+            tt = self.get_ttime(source=source, receiver=receiver,
+                                phase=args.starttime["phase"])
+            if tt is None:
+                return
+            starttime = args.origintime + tt + args.starttime["offset"]
+        else:
+            starttime = args.starttime
+
+        if starttime < min_starttime - 3600.0:
+            return
+
+        if isinstance(args.endtime, obspy.core.AttribDict):
+            tt = self.get_ttime(source=source, receiver=receiver,
+                                phase=args.endtime["phase"])
+            if tt is None:
+                return
+            endtime = args.origintime + tt + args.endtime["offset"]
+        # Endtime relative to phase relative starttime.
+        elif isinstance(args.endtime, float):
+            endtime = starttime + args.endtime
+        else:
+            endtime = args.endtime
+
+        if endtime > max_endtime:
+            return
+
+        return starttime, endtime

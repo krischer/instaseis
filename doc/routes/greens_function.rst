@@ -1,5 +1,5 @@
-GET /greens
-^^^^^^^^^^^^^^^^
+GET /greens_function
+^^^^^^^^^^^^^^^^^^^^
 
 .. note::
 
