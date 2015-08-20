@@ -467,6 +467,79 @@ def test_incremental_bwd_force_source():
                                BWD_FORCE_TEST_DATA["T"], rtol=1E-7, atol=1E-12)
 
 
+def test_get_greens_vs_get_seismogram():
+    """
+    Test get_greens_function() against default get_seismograms()
+    """
+    db = InstaseisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
+
+    depth_in_m = 1000
+    epicentral_distance_degree = 20
+    azimuth = 177.
+
+    # some 'random' moment tensor
+    Mxx, Myy, Mzz, Mxz, Myz, Mxy = 1e20, 0.5e20, 0.3e20, 0.7e20, 0.4e20, 0.6e20
+
+    # in Minson & Dreger, 2008, z is up, so we have
+    # Mtt = Mxx, Mpp = Myy, Mrr = Mzz
+    # Mrp = Myz, Mrt = Mxz, Mtp = Mxy
+    source = Source(latitude=90., longitude=0., depth_in_m=depth_in_m,
+                    m_tt=Mxx, m_pp=Myy, m_rr=Mzz, m_rt=Mxz, m_rp=Myz, m_tp=Mxy)
+    receiver = Receiver(latitude=90. - epicentral_distance_degree,
+                        longitude=azimuth)
+
+    st_ref = db.get_seismograms(source, receiver, components=('Z', 'R', 'T'))
+
+    st_greens = db.get_greens_function(epicentral_distance_degree,
+                                       depth_in_m, definition="seiscomp")
+
+    TSS = st_greens.select(channel="TSS")[0].data
+    ZSS = st_greens.select(channel="ZSS")[0].data
+    RSS = st_greens.select(channel="RSS")[0].data
+    TDS = st_greens.select(channel="TDS")[0].data
+    ZDS = st_greens.select(channel="ZDS")[0].data
+    RDS = st_greens.select(channel="RDS")[0].data
+    ZDD = st_greens.select(channel="ZDD")[0].data
+    RDD = st_greens.select(channel="RDD")[0].data
+    ZEP = st_greens.select(channel="ZEP")[0].data
+    REP = st_greens.select(channel="REP")[0].data
+
+    az = np.deg2rad(azimuth)
+    # eq (6) in Minson & Dreger, 2008
+    uz = Mxx * (ZSS / 2. * np.cos(2 * az) - ZDD / 6. + ZEP / 3.) \
+        + Myy * (-ZSS / 2. * np.cos(2 * az) - ZDD / 6. + ZEP / 3.) \
+        + Mzz * (ZDD / 3. + ZEP / 3.) \
+        + Mxy * ZSS * np.sin(2 * az) \
+        + Mxz * ZDS * np.cos(az) \
+        + Myz * ZDS * np.sin(az)
+
+    # eq (7) in Minson & Dreger, 2008
+    ur = Mxx * (RSS / 2. * np.cos(2 * az) - RDD / 6. + REP / 3.) \
+        + Myy * (-RSS / 2. * np.cos(2 * az) - RDD / 6. + REP / 3.) \
+        + Mzz * (RDD / 3. + REP / 3.) \
+        + Mxy * RSS * np.sin(2 * az) \
+        + Mxz * RDS * np.cos(az) \
+        + Myz * RDS * np.sin(az)
+
+    # eq (8) in Minson & Dreger, 2008
+    ut = Mxx * TSS / 2. * np.sin(2 * az) \
+        - Myy * TSS / 2. * np.sin(2 * az) \
+        - Mxy * TSS * np.cos(2 * az) \
+        + Mxz * TDS * np.sin(az) \
+        - Myz * TDS * np.cos(az)
+
+    np.testing.assert_allclose(st_ref.select(component="Z")[0].data,
+                               uz, rtol=1E-3, atol=1E-10)
+
+    # it seems the definition of 'radial' is different between Minson & Dreger
+    # and Issue 8 by a sign! Probably related to the definition of z - up
+    np.testing.assert_allclose(st_ref.select(component="R")[0].data,
+                               -ur, rtol=1E-3, atol=1E-10)
+
+    np.testing.assert_allclose(st_ref.select(component="T")[0].data,
+                               ut, rtol=1E-3, atol=1E-10)
+
+
 def test_finite_source():
     """
     incremental tests of bwd mode with source force

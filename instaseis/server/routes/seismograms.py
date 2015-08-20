@@ -8,7 +8,6 @@
     (http://www.gnu.org/copyleft/lgpl.html)
 """
 import io
-import re
 import zipfile
 
 import numpy as np
@@ -17,13 +16,9 @@ import tornado.gen
 import tornado.web
 
 from ... import Source, ForceSource, Receiver
-from ...base_instaseis_db import _get_seismogram_times
-from ..util import run_async
-from ..instaseis_request import InstaseisRequestHandler
+from ..util import run_async, IOQueue, _validtimesetting
+from ..instaseis_request import InstaseisTimeSeriesHandler
 from ...helpers import geocentric_to_wgs84_latitude
-
-# Valid phase offset pattern including capture groups.
-PHASE_OFFSET_PATTERN = re.compile(r"(^[A-Za-z0-9^]+)([\+-])([\deE\.\-\+]+$)")
 
 
 @run_async
@@ -124,36 +119,6 @@ def _get_seismogram(db, source, receiver, components, units, dt, kernelwidth,
         callback(byte_strings)
 
 
-class IOQueue(object):
-    """
-    Object passed to the zipfile constructor which acts as a file-like object.
-
-    Iterating over the object yields the data pieces written to it since it
-    has last been iterated over DELETING those pieces at the end of each
-    loop. This enables the server to send unbounded zipfiles without running
-    into memory issues.
-    """
-    def __init__(self):
-        self.count = 0
-        self.data = []
-
-    def flush(self):
-        pass
-
-    def tell(self):
-        return self.count
-
-    def write(self, data):
-        self.data.append(data)
-        self.count += len(data)
-
-    def __iter__(self):
-        for _i in self.data:
-            yield _i
-        self.data = []
-        raise StopIteration
-
-
 def _tolist(value, count):
     value = [float(i) for i in value.split(",")]
     if len(value) not in count:
@@ -173,36 +138,9 @@ def _forcesource(value):
     return _tolist(value, (3,))
 
 
-def _validtimesetting(value):
-    try:
-        return obspy.UTCDateTime(value)
-    except:
-        pass
-
-    try:
-        return float(value)
-    except:
-        pass
-
-    m = PHASE_OFFSET_PATTERN.match(value)
-    if m is None:
-        raise ValueError
-
-    operator = m.group(2)
-    if operator == "+":
-        offset = float(m.group(3))
-    else:
-        offset = -float(m.group(3))
-
-    return {
-        "phase": m.group(1),
-        "offset": offset
-    }
-
-
-class SeismogramsHandler(InstaseisRequestHandler):
+class SeismogramsHandler(InstaseisTimeSeriesHandler):
     # Define the arguments for the seismogram endpoint.
-    seismogram_arguments = {
+    arguments = {
         "components": {"type": str, "default": "ZNE"},
         "units": {"type": str, "default": "displacement"},
         "dt": {"type": float},
@@ -249,114 +187,16 @@ class SeismogramsHandler(InstaseisRequestHandler):
         "format": {"type": str, "default": "saczip"}
     }
 
+    default_label = "instaseis_seismogram"
+
     def __init__(self, *args, **kwargs):
-        self.__connection_closed = False
-        InstaseisRequestHandler.__init__(self, *args, **kwargs)
-
-    def parse_arguments(self):
-        # Make sure that no additional arguments are passed.
-        unknown_arguments = set(self.request.arguments.keys()).difference(set(
-            self.seismogram_arguments.keys()))
-        if unknown_arguments:
-            msg = "The following unknown parameters have been passed: %s" % (
-                ", ".join("'%s'" % _i for _i in sorted(unknown_arguments)))
-            raise tornado.web.HTTPError(400, log_message=msg,
-                                        reason=msg)
-
-        # Check for duplicates.
-        duplicates = []
-        for key, value in self.request.arguments.items():
-            if len(value) == 1:
-                continue
-            else:
-                duplicates.append(key)
-        if duplicates:
-            msg = "Duplicate parameters: %s" % (
-                ", ".join("'%s'" % _i for _i in sorted(duplicates)))
-            raise tornado.web.HTTPError(400, log_message=msg,
-                                        reason=msg)
-
-        args = obspy.core.AttribDict()
-        for name, properties in self.seismogram_arguments.items():
-            if "default" in properties:
-                default = properties["default"]
-            else:
-                default = None
-            value = self.get_argument(name, default=default)
-            if value is not None:
-                try:
-                    value = properties["type"](value)
-                except:
-                    if "format" in properties:
-                        msg = "Parameter '%s' must be formatted as: '%s'" % (
-                            name, properties["format"])
-                    else:
-                        msg = ("Parameter '%s' could not be converted to "
-                               "'%s'.") % (
-                            name, str(properties["type"].__name__))
-                    raise tornado.web.HTTPError(400, log_message=msg,
-                                                reason=msg)
-            setattr(args, name, value)
-
-        # Validate some of them right here.
-        self.validate_parameters(args)
-
-        return args
-
-    def on_connection_close(self):
-        """
-        Called when the client cancels the connection. Then the loop
-        requesting seismograms will stop.
-        """
-        InstaseisRequestHandler.on_connection_close(self)
-        self.__connection_closed = True
+        super(InstaseisTimeSeriesHandler, self).__init__(*args, **kwargs)
 
     def validate_parameters(self, args):
         """
         Function attempting to validate that the passed parameters are
         valid. Does not need to check the types as that has already been done.
         """
-        # Make sure the unit arguments is valid.
-        args.units = args.units.lower()
-        if args.units not in ["displacement", "velocity", "acceleration"]:
-            msg = ("Unit must be one of 'displacement', 'velocity', "
-                   "or 'acceleration'")
-            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
-
-        # Make sure the output format is valid.
-        args.format = args.format.lower()
-        if args.format not in ("miniseed", "saczip"):
-            msg = ("Format must either be 'miniseed' or 'saczip'.")
-            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
-
-        # If its essentially equal to the internal sampling rate just set it
-        # to equal to ease the following comparisons.
-        if args.dt and \
-                abs(args.dt - self.application.db.info.dt) / args.dt < 1E-7:
-            args.dt = self.application.db.info.dt
-
-        # Make sure that dt, if given is larger then 0.01. This should still
-        # be plenty for any use case but prevents the server from having to
-        # send massive amounts of data in the case of user errors.
-        if args.dt is not None and args.dt < 0.01:
-            msg = ("The smallest possible dt is 0.01. Please choose a "
-                   "smaller value and resample locally if needed.")
-            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
-
-        # Also make sure it does not downsample.
-        if args.dt is not None and args.dt > self.application.db.info.dt:
-            msg = ("Cannot downsample. The sampling interval of the database "
-                   "is %.5f seconds. Make sure to choose a smaller or equal "
-                   "one." % self.application.db.info.dt)
-            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
-
-        # Make sure the interpolation kernel width is sensible. Don't allow
-        # values smaller than 1 or larger than 20.
-        if not (1 <= args.kernelwidth <= 20):
-            msg = ("`kernelwidth` must not be smaller than 1 or larger than "
-                   "20.")
-            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
-
         # The networkcode and stationcode parameters have a maximum number
         # of letters.
         if args.stationcode and len(args.stationcode) > 5:
@@ -452,14 +292,6 @@ class SeismogramsHandler(InstaseisRequestHandler):
             msg = ("Server does not support station coordinates and thus no "
                    "station queries.")
             raise tornado.web.HTTPError(404, log_message=msg, reason=msg)
-
-        if len(args.components) > 5:
-            msg = "A maximum of 5 components can be requested."
-            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
-
-        if not args.components:
-            msg = "A request with no components will not return anything..."
-            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
     def get_source(self, args, __event):
         # Source can be either directly specified or by passing an event id.
@@ -580,155 +412,6 @@ class SeismogramsHandler(InstaseisRequestHandler):
                                                 reason=msg)
         return receivers
 
-    def parse_time_settings(self, args):
-        """
-        Attempt to figure out the time settings.
-
-        This is pretty messy unfortunately. After this method has been
-        called, args.origintime will always be set to an absolute time.
-
-        args.starttime and args.endtime will either be set to absolute times
-        or dictionaries describing phase relative offsets.
-
-        Returns the minium possible start- and the maximum possible endtime.
-        """
-        if args.origintime is None:
-            args.origintime = obspy.UTCDateTime(0)
-
-        # The origin time will be always set. If the starttime is not set,
-        # set it to the origin time.
-        if args.starttime is None:
-            args.starttime = args.origintime
-
-        # Now it becomes a bit ugly. If the starttime is a float, treat it
-        # relative to the origin time.
-        if isinstance(args.starttime, float):
-            args.starttime = args.origintime + args.starttime
-
-        # Now deal with the endtime.
-        if isinstance(args.endtime, float):
-            # If the start time is already known as an absolute time,
-            # just add it.
-            if isinstance(args.starttime, obspy.UTCDateTime):
-                args.endtime = args.starttime + args.endtime
-            # Otherwise the start time has to be a phase relative time and
-            # is dealt with later.
-            else:
-                assert isinstance(args.starttime, obspy.core.AttribDict)
-
-        # Figure out the maximum temporal range of the seismograms.
-        ti = _get_seismogram_times(
-            info=self.application.db.info, origin_time=args.origintime,
-            dt=args.dt, kernelwidth=args.kernelwidth,
-            remove_source_shift=False, reconvolve_stf=False)
-
-        # If the endtime is not set, do it here.
-        if args.endtime is None:
-            args.endtime = ti["endtime"]
-
-        # Do a couple of sanity checks here.
-        if isinstance(args.starttime, obspy.UTCDateTime):
-            # The desired seismogram start time must be before the end time of
-            # the seismograms.
-            if args.starttime >= ti["endtime"]:
-                msg = ("The `starttime` must be before the seismogram ends.")
-                raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
-            # Arbitrary limit: The starttime can be at max one hour before the
-            # origin time.
-            if args.starttime < (ti["starttime"] - 3600):
-                msg = ("The seismogram can start at the maximum one hour "
-                       "before the origin time.")
-                raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
-
-        if isinstance(args.endtime, obspy.UTCDateTime):
-            # The endtime must be within the seismogram window
-            if not (ti["starttime"] <= args.endtime <= ti["endtime"]):
-                msg = ("The end time of the seismograms lies outside the "
-                       "allowed range.")
-                raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
-
-        return ti["starttime"], ti["endtime"]
-
-    def set_headers(self, args):
-        if args.format == "miniseed":
-            content_type = "application/octet-stream"
-        elif args.format == "saczip":
-            content_type = "application/zip"
-        self.set_header("Content-Type", content_type)
-
-        FILE_ENDINGS_MAP = {
-            "miniseed": "mseed",
-            "saczip": "zip"}
-
-        if args.label:
-            label = args.label
-        else:
-            label = "instaseis_seismogram"
-
-        filename = "%s_%s.%s" % (
-            label,
-            str(obspy.UTCDateTime()).replace(":", "_"),
-            FILE_ENDINGS_MAP[args.format])
-
-        self.set_header("Content-Disposition",
-                        "attachment; filename=%s" % filename)
-
-    def get_ttime(self, source, receiver, phase):
-        if self.application.travel_time_callback is None:
-            msg = "Server does not support travel time calculations."
-            raise tornado.web.HTTPError(
-                404, log_message=msg, reason=msg)
-        try:
-            tt = self.application.travel_time_callback(
-                sourcelatitude=source.latitude,
-                sourcelongitude=source.longitude,
-                sourcedepthinmeters=source.depth_in_m,
-                receiverlatitude=receiver.latitude,
-                receiverlongitude=receiver.longitude,
-                receiverdepthinmeters=receiver.depth_in_m,
-                phase_name=phase)
-        except ValueError as e:
-            err_msg = str(e)
-            if err_msg.lower().startswith("invalid phase name"):
-                msg = "Invalid phase name: %s" % phase
-            else:
-                msg = "Failed to calculate travel time due to: %s" % err_msg
-            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
-        return tt
-
-    def validate_geometry(self, source, receiver):
-        """
-        Validate the source-receiver geometry.
-        """
-        info = self.application.db.info
-
-        # XXX: Will have to be changed once we have a database recorded for
-        # example on the ocean bottom.
-        if info.is_reciprocal:
-            # Receiver must be at the surface.
-            if receiver.depth_in_m is not None:
-                if receiver.depth_in_m != 0.0:
-                    msg = "Receiver must be at the surface for reciprocal " \
-                          "databases."
-                    raise tornado.web.HTTPError(400, log_message=msg,
-                                                reason=msg)
-            # Source depth must be within the allowed range.
-            if not ((info.planet_radius - info.max_radius) <=
-                    source.depth_in_m <=
-                    (info.planet_radius - info.min_radius)):
-                msg = ("Source depth must be within the database range: %.1f "
-                       "- %.1f meters.") % (
-                        info.planet_radius - info.max_radius,
-                        info.planet_radius - info.min_radius)
-                raise tornado.web.HTTPError(400, log_message=msg,
-                                            reason=msg)
-        else:
-            # The source depth must coincide with the one in the database.
-            if source.depth_in_m != info.source_depth * 1000:
-                    msg = "Source depth must be: %.1f km" % info.source_depth
-                    raise tornado.web.HTTPError(400, log_message=msg,
-                                                reason=msg)
-
     @tornado.web.asynchronous
     @tornado.gen.coroutine
     def get(self):
@@ -786,44 +469,24 @@ class SeismogramsHandler(InstaseisRequestHandler):
         # user.
         for receiver in receivers:
 
-            # Check if the connection is still open. The __connection_closed
+            # Check if the connection is still open. The connection_closed
             # flag is set by the on_connection_close() method. This is
             # pretty manual right now. Maybe there is a better way? This
             # enables to server to stop serving if the connection has been
             # cancelled on the client side.
-            if self.__connection_closed:
+            if self.connection_closed:
                 self.flush()
                 self.finish()
                 return
 
             # Check if start- or end time are phase relative. If yes
             # calculate the new start- and/or end time.
-            if isinstance(args.starttime, obspy.core.AttribDict):
-                tt = self.get_ttime(source=source, receiver=receiver,
-                                    phase=args.starttime["phase"])
-                if tt is None:
-                    continue
-                starttime = args.origintime + tt + args.starttime["offset"]
-            else:
-                starttime = args.starttime
-
-            if starttime < min_starttime - 3600.0:
+            time_values = self.get_phase_relative_times(
+                args=args, source=source, receiver=receiver,
+                min_starttime=min_starttime, max_endtime=max_endtime)
+            if time_values is None:
                 continue
-
-            if isinstance(args.endtime, obspy.core.AttribDict):
-                tt = self.get_ttime(source=source, receiver=receiver,
-                                    phase=args.endtime["phase"])
-                if tt is None:
-                    continue
-                endtime = args.origintime + tt + args.endtime["offset"]
-            # Endtime relative to phase relative starttime.
-            elif isinstance(args.endtime, float):
-                endtime = starttime + args.endtime
-            else:
-                endtime = args.endtime
-
-            if endtime > max_endtime:
-                continue
+            starttime, endtime = time_values
 
             # Validate the source-receiver geometry.
             self.validate_geometry(source=source, receiver=receiver)

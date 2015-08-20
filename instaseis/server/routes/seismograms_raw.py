@@ -14,12 +14,58 @@ import obspy
 import tornado.web
 
 from ... import Source, ForceSource, Receiver
-from ..instaseis_request import InstaseisRequestHandler
+from ..instaseis_request import InstaseisTimeSeriesHandler
+from ..util import run_async
 
 
-class RawSeismogramsHandler(InstaseisRequestHandler):
+@run_async
+def _get_seismogram(db, source, receiver, components, callback):
+    """
+    Extract a seismogram from the passed db and write it either to a MiniSEED
+    or a SACZIP file.
+
+    :param db: An open instaseis database.
+    :param source: An instaseis source.
+    :param receiver: An instaseis receiver.
+    :param components: The components.
+    :param callback: callback function of the coroutine.
+    """
+    # Get the most barebones seismograms possible.
+    try:
+        db._get_seismograms_sanity_checks(
+            source=source, receiver=receiver, components=components,
+            kind="displacement")
+        data = db._get_seismograms(
+            source=source, receiver=receiver, components=components)
+    except Exception:
+        msg = ("Could not extract seismogram. Make sure, the components "
+               "are valid, and the depth settings are correct.")
+        callback(tornado.web.HTTPError(400, log_message=msg, reason=msg))
+        return
+
+    try:
+        st = db._convert_to_stream(
+            receiver=receiver, components=components,
+            data=data, dt_out=db.info.dt, starttime=source.origin_time)
+    except Exception:
+        msg = ("Could not convert seismogram to a Stream object.")
+        callback(tornado.web.HTTPError(500, log_message=msg, reason=msg))
+        return
+
+    # Half the filesize but definitely sufficiently accurate.
+    for tr in st:
+        tr.data = np.require(tr.data, dtype=np.float32)
+
+    with io.BytesIO() as fh:
+        st.write(fh, format="mseed")
+        fh.seek(0, 0)
+        binary_data = fh.read()
+    callback((binary_data, st[0].stats.instaseis.mu))
+
+
+class RawSeismogramsHandler(InstaseisTimeSeriesHandler):
     # Define the arguments for the seismogram endpoint.
-    seismogram_arguments = {
+    arguments = {
         "components": {"type": str, "default": "ZNE"},
         # Source parameters.
         "sourcelatitude": {"type": float, "required": True},
@@ -51,60 +97,13 @@ class RawSeismogramsHandler(InstaseisRequestHandler):
         "networkcode": {"type": str},
         "stationcode": {"type": str}
     }
+    default_label = "instaseis_seismogram"
 
-    def parse_arguments(self):
-        # Make sure that no additional arguments are passed.
-        unknown_arguments = set(self.request.arguments.keys()).difference(set(
-            self.seismogram_arguments.keys()))
-        if unknown_arguments:
-            msg = "The following unknown parameters have been passed: %s" % (
-                ", ".join("'%s'" % _i for _i in sorted(unknown_arguments)))
-            raise tornado.web.HTTPError(400, log_message=msg,
-                                        reason=msg)
+    def validate_parameters(self, args):
+        pass
 
-        # Check for duplicates.
-        duplicates = []
-        for key, value in self.request.arguments.items():
-            if len(value) == 1:
-                continue
-            elif len(value) == 0:
-                # This should not happen.
-                raise NotImplementedError
-            else:
-                duplicates.append(key)
-        if duplicates:
-            msg = "Duplicate parameters: %s" % (
-                ", ".join("'%s'" % _i for _i in sorted(duplicates)))
-            raise tornado.web.HTTPError(400, log_message=msg,
-                                        reason=msg)
-
-        args = obspy.core.AttribDict()
-
-        for name, properties in self.seismogram_arguments.items():
-            if "required" in properties:
-                try:
-                    value = self.get_argument(name)
-                except:
-                    msg = "Required parameter '%s' not given." % name
-                    raise tornado.web.HTTPError(400, log_message=msg,
-                                                reason=msg)
-            else:
-                if "default" in properties:
-                    default = properties["default"]
-                else:
-                    default = None
-                value = self.get_argument(name, default=default)
-            if value is not None:
-                try:
-                    value = properties["type"](value)
-                except:
-                    msg = "Parameter '%s' could not be converted to '%s'." % (
-                        name, str(properties["type"]))
-                    raise tornado.web.HTTPError(400, log_message=msg,
-                                                reason=msg)
-            setattr(args, name, value)
-        return args
-
+    @tornado.web.asynchronous
+    @tornado.gen.coroutine
     def get(self):
         args = self.parse_arguments()
 
@@ -115,14 +114,6 @@ class RawSeismogramsHandler(InstaseisRequestHandler):
             "strike_dip_rake": set(["strike", "dip", "rake", "M0"]),
             "force_source": set(["fr", "ft", "fp"])
         }
-
-        if len(args.components) > 5:
-            msg = "A maximum of 5 components can be requested."
-            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
-
-        if not args.components:
-            msg = "A request with no components will not return anything..."
-            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
         components = list(args.components)
         for src_type, params in src_params.items():
@@ -192,44 +183,18 @@ class RawSeismogramsHandler(InstaseisRequestHandler):
                    "Check parameters for sanity.")
             raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
-        # Get the most barebones seismograms possible.
-        try:
-            self.application.db._get_seismograms_sanity_checks(
-                source=source, receiver=receiver, components=components,
-                kind="displacement")
-            data = self.application.db._get_seismograms(
-                source=source, receiver=receiver, components=components)
-        except Exception:
-            msg = ("Could not extract seismogram. Make sure, the components "
-                   "are valid, and the depth settings are correct.")
-            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+        response = yield tornado.gen.Task(
+            _get_seismogram, db=self.application.db, source=source,
+            receiver=receiver, components=components)
 
-        try:
-            st = self.application.db._convert_to_stream(
-                receiver=receiver, components=components,
-                data=data, dt_out=self.application.db.info.dt,
-                starttime=args.origintime)
-        except Exception:
-            msg = ("Could not convert seismogram to a Stream object.")
-            raise tornado.web.HTTPError(500, log_message=msg, reason=msg)
+        # If an exception is returned from the task, re-raise it here.
+        if isinstance(response, Exception):
+            raise response
 
-        # Half the filesize but definitely sufficiently accurate.
-        for tr in st:
-            tr.data = np.require(tr.data, dtype=np.float32)
-
-        with io.BytesIO() as fh:
-            st.write(fh, format="mseed")
-            fh.seek(0, 0)
-            binary_data = fh.read()
-
-        filename = "instaseis_seismogram_%s.mseed" % \
-                   str(obspy.UTCDateTime()).replace(":", "_")
-
-        self.write(binary_data)
-
-        self.set_header("Content-Type", "application/octet-stream")
-        self.set_header("Content-Disposition",
-                        "attachment; filename=%s" % filename)
+        self.set_headers(args)
         # Passing mu in the HTTP header...not sure how well this plays with
         # proxies...
-        self.set_header("Instaseis-Mu", "%f" % st[0].stats.instaseis.mu)
+        self.set_header("Instaseis-Mu", "%f" % response[1])
+
+        self.write(response[0])
+        self.finish()
