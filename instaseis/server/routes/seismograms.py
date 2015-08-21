@@ -15,6 +15,7 @@ import obspy
 import tornado.gen
 import tornado.web
 
+from ... import __version__
 from ... import Source, ForceSource, Receiver
 from ..util import run_async, IOQueue, _validtimesetting
 from ..instaseis_request import InstaseisTimeSeriesHandler
@@ -110,6 +111,10 @@ def _get_seismogram(db, source, receiver, components, units, dt, kernelwidth,
             # The event origin time relative to the reference which I'll
             # just assume to be the starttime here?
             tr.stats.sac.o = source.origin_time - starttime
+            # Some provenance.
+            tr.stats.sac.kuser0 = "InstSeis"
+            tr.stats.sac.kuser1 = __version__[:8]
+            tr.stats.sac.kuser2 = db.info.velocity_model[:8]
 
             with io.BytesIO() as temp:
                 tr.write(temp, format="sac")
