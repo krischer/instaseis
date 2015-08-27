@@ -20,7 +20,7 @@ import obspy
 import numpy as np
 from .tornado_testing_fixtures import *  # NOQA
 
-from instaseis.helpers import geocentric_to_wgs84_latitude
+from instaseis.helpers import geocentric_to_elliptic_latitude
 
 # Conditionally import mock either from the stdlib or as a separate library.
 import sys
@@ -4299,12 +4299,14 @@ def test_sac_headers(all_clients):
         assert tr.stats._format == "SAC"
         # Instaseis will write SAC coordinates in WGS84!
         # Assert the station headers.
-        assert abs(tr.stats.sac.stla - geocentric_to_wgs84_latitude(22)) < 1E-6
+        assert abs(tr.stats.sac.stla -
+                   geocentric_to_elliptic_latitude(22)) < 1E-6
         assert abs(tr.stats.sac.stlo - 44) < 1E-6
         assert abs(tr.stats.sac.stdp - 0.0) < 1E-6
         assert abs(tr.stats.sac.stel - 0.0) < 1E-6
         # Assert the event parameters.
-        assert abs(tr.stats.sac.evla - geocentric_to_wgs84_latitude(1)) < 1E-6
+        assert abs(tr.stats.sac.evla -
+                   geocentric_to_elliptic_latitude(1)) < 1E-6
         assert abs(tr.stats.sac.evlo - 12) < 1E-6
         assert abs(tr.stats.sac.evdp - client.source_depth) < 1E-6
         assert abs(tr.stats.sac.mag - 4.22) < 1E-2

@@ -16,7 +16,7 @@ import os
 import numpy as np
 
 from instaseis import Source, FiniteSource
-from instaseis.helpers import wgs84_to_geocentric_latitude
+from instaseis.helpers import elliptic_to_geocentric_latitude
 from instaseis.source import moment2magnitude, magnitude2moment
 from instaseis.source import fault_vectors_lmn, strike_dip_rake_from_ln
 
@@ -58,7 +58,7 @@ def test_parse_CMTSOLUTIONS_file(tmpdir):
     # Latitude will have assumed to be WGS84 and converted to geocentric
     # latitude.
     np.testing.assert_allclose(src_params, np.array(
-        (wgs84_to_geocentric_latitude(37.91), -77.93, 12000, 4.71E17,
+        (elliptic_to_geocentric_latitude(37.91), -77.93, 12000, 4.71E17,
          3.81E15, -4.74E17, 3.99E16, -8.05E16,
          -1.23E17), dtype="float64"))
     assert src.origin_time == origin_time
@@ -87,7 +87,7 @@ def _assert_src(src):
     # Latitude will have been assumed to be WGS84 and converted to geocentric!
     assert (src.latitude, src.longitude, src.depth_in_m, src.m_rr, src.m_tt,
             src.m_pp, src.m_rt, src.m_rp, src.m_tp) == \
-           (wgs84_to_geocentric_latitude(36.97), -3.54, 609800.0, -2.16E18,
+           (elliptic_to_geocentric_latitude(36.97), -3.54, 609800.0, -2.16E18,
             5.36E17, 1.62E18, 1.3E16, 3.23E18, 1.75E18)
 
     # Also check the time!

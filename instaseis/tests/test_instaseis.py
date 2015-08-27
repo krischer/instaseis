@@ -23,8 +23,8 @@ import shutil
 from instaseis.instaseis_db import InstaseisDB
 from instaseis.base_instaseis_db import _get_seismogram_times
 from instaseis import Source, Receiver, ForceSource
-from instaseis.helpers import (get_band_code, wgs84_to_geocentric_latitude,
-                               geocentric_to_wgs84_latitude)
+from instaseis.helpers import (get_band_code, elliptic_to_geocentric_latitude,
+                               geocentric_to_elliptic_latitude)
 
 from .testdata import BWD_TEST_DATA, FWD_TEST_DATA
 from .testdata import BWD_STRAIN_ONLY_TEST_DATA, BWD_FORCE_TEST_DATA
@@ -675,7 +675,7 @@ def test_higher_level_event_and_receiver_parsing():
     # Convert everything to WGS84 values. Instaseis will assume them to be
     # wgs84 and convert it to geocentric.
 
-    org.latitude = geocentric_to_wgs84_latitude(89.91)
+    org.latitude = geocentric_to_elliptic_latitude(89.91)
     org.longitude = 0.0
     org.depth = 12000
     org.time = obspy.UTCDateTime(2014, 1, 5)
@@ -688,7 +688,7 @@ def test_higher_level_event_and_receiver_parsing():
 
     # Same with the receiver objects.
     inv = obspy.read_inventory(os.path.join(DATA, "TA.Q56A..BH.xml"))
-    inv[0][0].latitude = geocentric_to_wgs84_latitude(42.6390)
+    inv[0][0].latitude = geocentric_to_elliptic_latitude(42.6390)
     inv[0][0].longitude = 74.4940
     inv[0][0].elevation = 0.0
     inv[0][0].channels = []
@@ -1240,56 +1240,56 @@ def test_wgs84_to_geocentric():
     """
     Tests the utility function.
     """
-    assert wgs84_to_geocentric_latitude(0.0) == 0.0
-    assert wgs84_to_geocentric_latitude(90.0) == 90.0
-    assert wgs84_to_geocentric_latitude(-90.0) == -90.0
+    assert elliptic_to_geocentric_latitude(0.0) == 0.0
+    assert elliptic_to_geocentric_latitude(90.0) == 90.0
+    assert elliptic_to_geocentric_latitude(-90.0) == -90.0
 
     # Difference minimal close to the poles and the equator.
-    assert abs(wgs84_to_geocentric_latitude(0.1) - 0.1) < 1E-3
-    assert abs(wgs84_to_geocentric_latitude(-0.1) + 0.1) < 1E-3
-    assert abs(wgs84_to_geocentric_latitude(89.9) - 89.9) < 1E-3
-    assert abs(wgs84_to_geocentric_latitude(-89.9) + 89.9) < 1E-3
+    assert abs(elliptic_to_geocentric_latitude(0.1) - 0.1) < 1E-3
+    assert abs(elliptic_to_geocentric_latitude(-0.1) + 0.1) < 1E-3
+    assert abs(elliptic_to_geocentric_latitude(89.9) - 89.9) < 1E-3
+    assert abs(elliptic_to_geocentric_latitude(-89.9) + 89.9) < 1E-3
 
     # The geographic latitude is larger then the geocentric on the northern
     # hemisphere.
     for _i in range(1, 90):
-        assert _i > wgs84_to_geocentric_latitude(_i)
+        assert _i > elliptic_to_geocentric_latitude(_i)
 
     # The opposite is true on the southern hemisphere.
     for _i in range(-1, -90, -1):
-        assert _i < wgs84_to_geocentric_latitude(_i)
+        assert _i < elliptic_to_geocentric_latitude(_i)
 
     # Small check to test the approximate ranges.
-    assert 0.19 < 45.0 - wgs84_to_geocentric_latitude(45.0) < 0.2
-    assert -0.19 > -45 - wgs84_to_geocentric_latitude(-45.0) > -0.2
+    assert 0.19 < 45.0 - elliptic_to_geocentric_latitude(45.0) < 0.2
+    assert -0.19 > -45 - elliptic_to_geocentric_latitude(-45.0) > -0.2
 
 
 def test_geocentric_to_wgs84():
     """
     Tests the utility function.
     """
-    assert geocentric_to_wgs84_latitude(0.0) == 0.0
-    assert geocentric_to_wgs84_latitude(90.0) == 90.0
-    assert geocentric_to_wgs84_latitude(-90.0) == -90.0
+    assert geocentric_to_elliptic_latitude(0.0) == 0.0
+    assert geocentric_to_elliptic_latitude(90.0) == 90.0
+    assert geocentric_to_elliptic_latitude(-90.0) == -90.0
 
     # Difference minimal close to the poles and the equator.
-    assert abs(geocentric_to_wgs84_latitude(0.1) - 0.1) < 1E-3
-    assert abs(geocentric_to_wgs84_latitude(-0.1) + 0.1) < 1E-3
-    assert abs(geocentric_to_wgs84_latitude(89.9) - 89.9) < 1E-3
-    assert abs(geocentric_to_wgs84_latitude(-89.9) + 89.9) < 1E-3
+    assert abs(geocentric_to_elliptic_latitude(0.1) - 0.1) < 1E-3
+    assert abs(geocentric_to_elliptic_latitude(-0.1) + 0.1) < 1E-3
+    assert abs(geocentric_to_elliptic_latitude(89.9) - 89.9) < 1E-3
+    assert abs(geocentric_to_elliptic_latitude(-89.9) + 89.9) < 1E-3
 
     # The geographic latitude is larger then the geocentric on the northern
     # hemisphere.
     for _i in range(1, 90):
-        assert _i < geocentric_to_wgs84_latitude(_i)
+        assert _i < geocentric_to_elliptic_latitude(_i)
 
     # The opposite is true on the southern hemisphere.
     for _i in range(-1, -90, -1):
-        assert _i > geocentric_to_wgs84_latitude(_i)
+        assert _i > geocentric_to_elliptic_latitude(_i)
 
     # Small check to test the approximate ranges.
-    assert -0.19 > 45.0 - geocentric_to_wgs84_latitude(45.0) > -0.2
-    assert 0.19 < -45 - geocentric_to_wgs84_latitude(-45.0) < 0.2
+    assert -0.19 > 45.0 - geocentric_to_elliptic_latitude(45.0) > -0.2
+    assert 0.19 < -45 - geocentric_to_elliptic_latitude(-45.0) < 0.2
 
 
 def test_coordinate_conversions_round_trips():
@@ -1299,10 +1299,10 @@ def test_coordinate_conversions_round_trips():
     values = np.linspace(-90, 90, 100)
     for value in values:
         value = float(value)
-        there = wgs84_to_geocentric_latitude(value)
-        back = geocentric_to_wgs84_latitude(there)
+        there = elliptic_to_geocentric_latitude(value)
+        back = geocentric_to_elliptic_latitude(there)
         assert abs(back - value) < 1E-12
 
-        there = geocentric_to_wgs84_latitude(value)
-        back = wgs84_to_geocentric_latitude(there)
+        there = geocentric_to_elliptic_latitude(value)
+        back = elliptic_to_geocentric_latitude(there)
         assert abs(back - value) < 1E-12

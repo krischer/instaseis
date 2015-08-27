@@ -27,7 +27,8 @@ import warnings
 
 from . import ReceiverParseError, SourceParseError
 from . import rotations
-from .helpers import wgs84_to_geocentric_latitude, geocentric_to_wgs84_latitude
+from .helpers import (elliptic_to_geocentric_latitude,
+                      geocentric_to_elliptic_latitude)
 
 DEFAULT_MU = 32e9
 
@@ -372,7 +373,7 @@ class Source(SourceOrReceiver):
                 raise SourceParseError("Event must contain a moment tensor.")
             t = fm.moment_tensor.tensor
             return Source(
-                latitude=wgs84_to_geocentric_latitude(org.latitude),
+                latitude=elliptic_to_geocentric_latitude(org.latitude),
                 longitude=org.longitude,
                 depth_in_m=org.depth,
                 origin_time=org.time,
@@ -436,7 +437,7 @@ class Source(SourceOrReceiver):
             m_rp = float(f.readline().strip().split()[-1]) / 1e7
             m_tp = float(f.readline().strip().split()[-1]) / 1e7
 
-        return self(wgs84_to_geocentric_latitude(latitude), longitude,
+        return self(elliptic_to_geocentric_latitude(latitude), longitude,
                     depth_in_m, m_rr, m_tt, m_pp, m_rt, m_rp, m_tp, time_shift,
                     origin_time=origin_time)
 
@@ -542,7 +543,7 @@ class Source(SourceOrReceiver):
                         self.origin_time.minute,
                         self.origin_time.second +
                         self.origin_time.microsecond / 1E6,
-                        geocentric_to_wgs84_latitude(self.latitude),
+                        geocentric_to_elliptic_latitude(self.latitude),
                         self.longitude,
                         self.depth_in_m / 1e3,
                         # Just write the moment magnitude twice...we don't
@@ -556,7 +557,7 @@ class Source(SourceOrReceiver):
             f.write('half duration:  0.0\n')
             # Convert latitude to WGS84.
             f.write('latitude:       %7.4f\n' % (
-                geocentric_to_wgs84_latitude(self.latitude),))
+                geocentric_to_elliptic_latitude(self.latitude),))
             f.write('longitude:      %7.4f\n' % (self.longitude,))
             f.write('depth:          %7.4f\n' % (self.depth_in_m / 1e3,))
 
@@ -843,7 +844,7 @@ class Receiver(SourceOrReceiver):
             # If there are no channels, use the station coordinates.
             if not filename_or_obj.channels:
                 return [Receiver(
-                    latitude=wgs84_to_geocentric_latitude(
+                    latitude=elliptic_to_geocentric_latitude(
                         filename_or_obj.latitude),
                     longitude=filename_or_obj.longitude,
                     network=network_code, station=filename_or_obj.code)]
@@ -861,7 +862,7 @@ class Receiver(SourceOrReceiver):
                                                 filename_or_obj.code))
                 coords = coords.pop()
                 return [Receiver(
-                    latitude=wgs84_to_geocentric_latitude(coords[0]),
+                    latitude=elliptic_to_geocentric_latitude(coords[0]),
                     longitude=coords[1],
                     network=network_code,
                     station=filename_or_obj.code)]
@@ -880,10 +881,11 @@ class Receiver(SourceOrReceiver):
                 raise ReceiverParseError(
                     "SAC file does not contain coordinates for channel '%s'" %
                     filename_or_obj.id)
-            return [Receiver(latitude=wgs84_to_geocentric_latitude(coords[0]),
-                             longitude=coords[1],
-                             network=filename_or_obj.stats.network,
-                             station=filename_or_obj.stats.station)]
+            return [Receiver(
+                latitude=elliptic_to_geocentric_latitude(coords[0]),
+                longitude=coords[1],
+                network=filename_or_obj.stats.network,
+                station=filename_or_obj.stats.station)]
         elif isinstance(filename_or_obj, obspy.xseed.parser.Parser):
             inv = filename_or_obj.getInventory()
             stations = collections.defaultdict(list)
@@ -897,7 +899,7 @@ class Receiver(SourceOrReceiver):
                         "The coordinates of the channels of station '%s.%s' "
                         "are not identical" % key)
                 receivers.append(Receiver(
-                    latitude=wgs84_to_geocentric_latitude(value[0][0]),
+                    latitude=elliptic_to_geocentric_latitude(value[0][0]),
                     longitude=value[0][1],
                     network=key[0],
                     station=key[1]))
@@ -954,7 +956,7 @@ class Receiver(SourceOrReceiver):
 
             for line in f:
                 station, network, lat, lon, _, _ = line.split()
-                lat = wgs84_to_geocentric_latitude(float(lat))
+                lat = elliptic_to_geocentric_latitude(float(lat))
                 lon = float(lon)
                 receivers.append(Receiver(lat, lon, network, station))
 
@@ -1064,7 +1066,7 @@ class FiniteSource(object):
                     map(float, f.readline().split())
 
                 # Convert latitude to a geocentric latitude.
-                lat = wgs84_to_geocentric_latitude(lat)
+                lat = elliptic_to_geocentric_latitude(lat)
 
                 rake, slip1, nt1, slip2, nt2, slip3, nt3 = \
                     map(float, f.readline().split())
@@ -1180,7 +1182,7 @@ class FiniteSource(object):
                         M0) = map(float, line.split())
 
                     # Convert latitude to a geocentric latitude.
-                    lat = wgs84_to_geocentric_latitude(lat)
+                    lat = elliptic_to_geocentric_latitude(lat)
 
                     dep *= 1e3    # km > m
                     slip *= 1e-2  # cm > m

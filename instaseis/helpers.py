@@ -24,13 +24,6 @@ LIB_DIR = os.path.join(os.path.dirname(os.path.abspath(
 
 cache = []
 
-WGS_A = 6378137.0
-WGS_B = 6356752.314245
-
-
-_f = (WGS_A - WGS_B) / WGS_A
-E_2 = 2 * _f - _f ** 2
-
 
 def load_lib():
     if cache:
@@ -66,21 +59,31 @@ def get_band_code(dt):
     return band_code
 
 
-def wgs84_to_geocentric_latitude(lat):
+def elliptic_to_geocentric_latitude(lat, axis_a=6378137.0,
+                                    axis_b=6356752.314245):
     """
-    Convert a latitude defined on the WGS84 ellipsoid to a geocentric one.
+    Convert a latitude defined on an ellipsoid to a geocentric one.
 
-    >>> wgs84_to_geocentric_latitude(0.0)
+    :param lat: The latitude to convert.
+    :param axis_a: The length of the major axis of the planet. Defaults to
+        the value of the WGS84 ellipsoid.
+    :param axis_b: The length of the minor axis of the planet. Defaults to
+        the value of the WGS84 ellipsoid.
+
+    >>> elliptic_to_geocentric_latitude(0.0)
     0.0
-    >>> wgs84_to_geocentric_latitude(90.0)
+    >>> elliptic_to_geocentric_latitude(90.0)
     90.0
-    >>> wgs84_to_geocentric_latitude(-90.0)
+    >>> elliptic_to_geocentric_latitude(-90.0)
     -90.0
-    >>> wgs84_to_geocentric_latitude(45.0)
+    >>> elliptic_to_geocentric_latitude(45.0)
     44.80757678401642
-    >>> wgs84_to_geocentric_latitude(-45.0)
+    >>> elliptic_to_geocentric_latitude(-45.0)
     -44.80757678401642
     """
+    _f = (axis_a - axis_b) / axis_a
+    E_2 = 2 * _f - _f ** 2
+
     # Singularities close to the pole and the equator. Just return the value
     # in that case.
     if abs(lat) < 1E-6 or abs(lat - 90) < 1E-6 or \
@@ -90,21 +93,31 @@ def wgs84_to_geocentric_latitude(lat):
     return math.degrees(math.atan((1 - E_2) * math.tan(math.radians(lat))))
 
 
-def geocentric_to_wgs84_latitude(lat):
+def geocentric_to_elliptic_latitude(lat, axis_a=6378137.0,
+                                    axis_b=6356752.314245):
     """
-    Convert a geocentric latitude to one defined on the WGS84 ellipsoid.
+    Convert a geocentric latitude to one defined on an ellipsoid.
 
-    >>> geocentric_to_wgs84_latitude(0.0)
+    :param lat: The latitude to convert.
+    :param axis_a: The length of the major axis of the planet. Defaults to
+        the value of the WGS84 ellipsoid.
+    :param axis_b: The length of the minor axis of the planet. Defaults to
+        the value of the WGS84 ellipsoid.
+
+    >>> geocentric_to_elliptic_latitude(0.0)
     0.0
-    >>> geocentric_to_wgs84_latitude(90.0)
+    >>> geocentric_to_elliptic_latitude(90.0)
     90.0
-    >>> geocentric_to_wgs84_latitude(-90.0)
+    >>> geocentric_to_elliptic_latitude(-90.0)
     -90.0
-    >>> geocentric_to_wgs84_latitude(45.0)
+    >>> geocentric_to_elliptic_latitude(45.0)
     45.19242321598358
-    >>> geocentric_to_wgs84_latitude(-45.0)
+    >>> geocentric_to_elliptic_latitude(-45.0)
     -45.19242321598358
     """
+    _f = (axis_a - axis_b) / axis_a
+    E_2 = 2 * _f - _f ** 2
+
     # Singularities close to the pole and the equator. Just return the value
     # in that case.
     if abs(lat) < 1E-6 or abs(lat - 90) < 1E-6 or \
