@@ -19,7 +19,7 @@ import tornado.web
 from ... import Source, Receiver
 from ..util import run_async, _validtimesetting
 from ..instaseis_request import InstaseisTimeSeriesHandler
-from ...helpers import geocentric_to_wgs84_latitude
+from ...helpers import geocentric_to_elliptic_latitude
 
 
 @run_async
@@ -96,7 +96,7 @@ def _get_greens(db, epicentral_distance_degree, source_depth_in_m, units, dt,
             # Write SAC headers.
             tr.stats.sac = obspy.core.AttribDict()
             # Write WGS84 coordinates to the SAC files.
-            tr.stats.sac.stla = geocentric_to_wgs84_latitude(
+            tr.stats.sac.stla = geocentric_to_elliptic_latitude(
                 90.0 - epicentral_distance_degree)
             tr.stats.sac.stlo = 0.0
             tr.stats.sac.stdp = 0.0

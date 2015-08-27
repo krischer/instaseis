@@ -65,7 +65,7 @@ import csv
 import io
 import sqlite3
 
-from instaseis.helpers import wgs84_to_geocentric_latitude
+from instaseis.helpers import elliptic_to_geocentric_latitude
 
 
 def parse_station_file(filename):
@@ -147,7 +147,7 @@ def get_coordinates(cursor, networks=(), stations=(), debug=False):
 
     # Convert to geocentric coordinates.
     return [{"network": i[0], "station": i[1],
-             "latitude": wgs84_to_geocentric_latitude(i[2]), "longitude": i[3]}
+             "latitude": elliptic_to_geocentric_latitude(i[2]), "longitude": i[3]}
             for i in cursor.execute(query).fetchall()]
 
 

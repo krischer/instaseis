@@ -16,7 +16,7 @@ import os
 import pytest
 
 from instaseis import Receiver, ReceiverParseError
-from instaseis.helpers import wgs84_to_geocentric_latitude
+from instaseis.helpers import elliptic_to_geocentric_latitude
 
 DATA = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
@@ -39,11 +39,11 @@ def test_parse_STATIONS_file(tmpdir):
 
     rec = receivers[0]
     assert (rec.latitude, rec.longitude, rec.network, rec.station) == \
-           (wgs84_to_geocentric_latitude(10.0), 20.0, "II", "AAK")
+           (elliptic_to_geocentric_latitude(10.0), 20.0, "II", "AAK")
 
     rec = receivers[1]
     assert (rec.latitude, rec.longitude, rec.network, rec.station) == \
-           (wgs84_to_geocentric_latitude(20.0), 30.0, "AA", "BBK")
+           (elliptic_to_geocentric_latitude(20.0), 30.0, "AA", "BBK")
 
 
 def test_parse_StationXML():
@@ -54,7 +54,7 @@ def test_parse_StationXML():
     rec = receivers[0]
 
     assert (rec.latitude, rec.longitude, rec.network, rec.station) == \
-        (wgs84_to_geocentric_latitude(39.041), -79.1871, "TA", "Q56A")
+        (elliptic_to_geocentric_latitude(39.041), -79.1871, "TA", "Q56A")
 
 
 def test_parse_obspy_objects():
@@ -65,19 +65,19 @@ def test_parse_obspy_objects():
     assert len(receivers) == 1
     rec = receivers[0]
     assert (rec.latitude, rec.longitude, rec.network, rec.station) == \
-           (wgs84_to_geocentric_latitude(39.041), -79.1871, "TA", "Q56A")
+           (elliptic_to_geocentric_latitude(39.041), -79.1871, "TA", "Q56A")
 
     receivers = Receiver.parse(inv[0])
     assert len(receivers) == 1
     rec = receivers[0]
     assert (rec.latitude, rec.longitude, rec.network, rec.station) == \
-           (wgs84_to_geocentric_latitude(39.041), -79.1871, "TA", "Q56A")
+           (elliptic_to_geocentric_latitude(39.041), -79.1871, "TA", "Q56A")
 
     receivers = Receiver.parse(inv[0][0], network_code="TA")
     assert len(receivers) == 1
     rec = receivers[0]
     assert (rec.latitude, rec.longitude, rec.network, rec.station) == \
-           (wgs84_to_geocentric_latitude(39.041), -79.1871, "TA", "Q56A")
+           (elliptic_to_geocentric_latitude(39.041), -79.1871, "TA", "Q56A")
 
 
 def test_parse_sac_files():
@@ -88,7 +88,7 @@ def test_parse_sac_files():
     rec = receivers[0]
     assert (round(rec.latitude, 3), round(rec.longitude, 3),
             rec.network, rec.station) == \
-        (round(wgs84_to_geocentric_latitude(34.94598), 3),
+        (round(elliptic_to_geocentric_latitude(34.94598), 3),
          round(-106.45713, 3), 'IU', 'ANMO')
 
 
@@ -112,7 +112,7 @@ def test_parse_obspy_waveform_objects():
     # Coordinates are assumed to be WGS84 and will be converted to geocentric.
     assert (round(rec.latitude, 3), round(rec.longitude, 3),
             rec.network, rec.station) == \
-           (round(wgs84_to_geocentric_latitude(34.94598), 3),
+           (round(elliptic_to_geocentric_latitude(34.94598), 3),
             round(-106.45713, 3), 'IU', 'ANMO')
 
     # From trace.
@@ -121,7 +121,7 @@ def test_parse_obspy_waveform_objects():
     rec = receivers[0]
     assert (round(rec.latitude, 3), round(rec.longitude, 3),
             rec.network, rec.station) == \
-           (round(wgs84_to_geocentric_latitude(34.94598), 3),
+           (round(elliptic_to_geocentric_latitude(34.94598), 3),
             round(-106.45713, 3), 'IU', 'ANMO')
 
 
@@ -141,7 +141,7 @@ def test_duplicate_receivers():
     # Coordinates are assumed to be WGS84 and will be converted to geocentric.
     assert (round(rec.latitude, 3), round(rec.longitude, 3),
             rec.network, rec.station) == \
-           (round(wgs84_to_geocentric_latitude(34.94598), 3),
+           (round(elliptic_to_geocentric_latitude(34.94598), 3),
             round(-106.45713, 3), 'IU', 'ANMO')
 
 
@@ -153,7 +153,7 @@ def test_dataless_seed_files():
     # Coordinates are assumed to be WGS84 and will be converted to geocentric.
     assert (round(rec.latitude, 3), round(rec.longitude, 3),
             rec.network, rec.station) == \
-           (round(wgs84_to_geocentric_latitude(48.162899), 3),
+           (round(elliptic_to_geocentric_latitude(48.162899), 3),
             round(11.2752, 3), 'BW', 'FURT')
 
 
