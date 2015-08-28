@@ -2025,33 +2025,36 @@ def test_coordinates_route_with_stations_coordinates_callback(
     # Single station.
     request = client.fetch("/coordinates?network=IU&station=ANMO")
     assert request.code == 200
+    # Assert the GeoJSON content-type.
+    assert request.headers["Content-Type"] == "application/vnd.geo+json"
     stations = json.loads(str(request.body.decode("utf8")))
 
     assert stations == {
-        "count": 1,
-        "stations": [{
-            "latitude": 34.94591,
-            "longitude": -106.4572,
-            "network": "IU",
-            "station": "ANMO"}]}
+        'features': [
+            {'geometry': {'coordinates': [-106.4572, 34.94591],
+                          'type': 'Point'},
+             'properties': {'network_code': 'IU', 'station_code': 'ANMO'},
+             'type': 'Feature'}
+        ],
+        'type': 'FeatureCollection'}
 
     # Multiple stations with wildcard searches.
     request = client.fetch("/coordinates?network=IU,B*&station=ANT*,ANM?")
     assert request.code == 200
+    # Assert the GeoJSON content-type.
+    assert request.headers["Content-Type"] == "application/vnd.geo+json"
     stations = json.loads(str(request.body.decode("utf8")))
 
     assert stations == {
-        "count": 2,
-        "stations": [{
-            "latitude": 39.868,
-            "longitude": 32.7934,
-            "network": "IU",
-            "station": "ANTO"
-        }, {
-            "latitude": 34.94591,
-            "longitude": -106.4572,
-            "network": "IU",
-            "station": "ANMO"}]}
+        'features': [
+            {'geometry': {'coordinates': [32.7934, 39.868], 'type': 'Point'},
+             'properties': {'network_code': 'IU', 'station_code': 'ANTO'},
+             'type': 'Feature'},
+            {'geometry': {'coordinates': [-106.4572, 34.94591],
+                          'type': 'Point'},
+             'properties': {'network_code': 'IU', 'station_code': 'ANMO'},
+             'type': 'Feature'}],
+        'type': 'FeatureCollection'}
 
 
 def test_cors_headers(all_clients_all_callbacks):

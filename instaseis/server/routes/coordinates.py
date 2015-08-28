@@ -38,4 +38,23 @@ class CoordinatesHandler(InstaseisRequestHandler):
             raise tornado.web.HTTPError(
                 404, log_message=msg, reason=msg)
 
-        self.write({"count": len(coordinates), "stations": coordinates})
+        features = []
+        for station in coordinates:
+            features.append(
+                {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [station["longitude"],
+                                        station["latitude"]]
+                    },
+                    "properties": {
+                        "network_code": station["network"],
+                        "station_code": station["station"]
+                    }
+                }
+            )
+
+        geojson = {"type": "FeatureCollection", "features": features}
+        self.write(geojson)
+        self.set_header("Content-Type", "application/vnd.geo+json")
