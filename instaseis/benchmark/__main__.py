@@ -37,13 +37,13 @@ def plot_gnuplot(times):
     try:
         gnuplot = subprocess.Popen(["gnuplot"],
                                    stdin=subprocess.PIPE)
-        gnuplot.stdin.write("set term dumb 79 15\n")
-        gnuplot.stdin.write("set xlabel 'Seismogram Number'\n")
+        gnuplot.stdin.write("set term dumb 79 15\n".encode())
+        gnuplot.stdin.write("set xlabel 'Seismogram Number'\n".encode())
         gnuplot.stdin.write("plot '-' using 1:2 title 'time per sm' with "
-                            "linespoints \n")
+                            "linespoints \n".encode())
         for i, j in zip(np.arange(len(times)), times):
-            gnuplot.stdin.write("%f %f\n" % (i, j))
-        gnuplot.stdin.write("e\n")
+            gnuplot.stdin.write(("%f %f\n" % (i, j)).encode())
+        gnuplot.stdin.write("e\n".encode())
         gnuplot.stdin.flush()
         sys.stdout.flush()
     except OSError:
@@ -218,6 +218,7 @@ class Buffered2DegreeLatLngDepthScatter(InstaseisBenchmark):
     def setup(self):
         self.db = open_db(self.path, read_on_demand=False,
                           buffer_size_in_mb=250)
+        self.max_depth = self.db.info.max_radius - self.db.info.min_radius
 
     def iterate(self):
         rec = Receiver(latitude=20, longitude=20)
@@ -225,7 +226,7 @@ class Buffered2DegreeLatLngDepthScatter(InstaseisBenchmark):
         lat += 44
         lng = random.random() * 2
         lng += 44
-        depth_in_m = random.random() * 200000
+        depth_in_m = random.random() * min(200000, self.max_depth)
         src = Source(latitude=lat, longitude=lng, depth_in_m=depth_in_m)
         self.db.get_seismograms(source=src, receiver=rec)
 
@@ -258,6 +259,7 @@ class BufferedFullyRandom(InstaseisBenchmark):
     def setup(self):
         self.db = open_db(self.path, read_on_demand=False,
                           buffer_size_in_mb=250)
+        self.max_depth = self.db.info.max_radius - self.db.info.min_radius
 
     def iterate(self):
         # Random points on a sphere.
@@ -267,7 +269,7 @@ class BufferedFullyRandom(InstaseisBenchmark):
 
         lat = np.rad2deg(np.arcsin(2 * random.random() - 1))
         lng = random.random() * 360.0 - 180.0
-        depth_in_m = random.random() * 300000
+        depth_in_m = random.random() * self.max_depth
         src = Source(latitude=lat, longitude=lng, depth_in_m=depth_in_m)
 
         self.db.get_seismograms(source=src, receiver=rec)
@@ -281,6 +283,7 @@ class UnbufferedFullyRandom(InstaseisBenchmark):
     def setup(self):
         self.db = open_db(self.path, read_on_demand=False,
                           buffer_size_in_mb=0)
+        self.max_depth = self.db.info.max_radius - self.db.info.min_radius
 
     def iterate(self):
         # Random points on a sphere.
@@ -290,7 +293,7 @@ class UnbufferedFullyRandom(InstaseisBenchmark):
 
         lat = np.rad2deg(np.arcsin(2 * random.random() - 1))
         lng = random.random() * 360.0 - 180.0
-        depth_in_m = random.random() * 300000
+        depth_in_m = random.random() * self.max_depth
         src = Source(latitude=lat, longitude=lng, depth_in_m=depth_in_m)
 
         self.db.get_seismograms(source=src, receiver=rec)
@@ -304,6 +307,7 @@ class UnbufferedAndRandomReadOnDemandTrue(InstaseisBenchmark):
     def setup(self):
         self.db = open_db(self.path, read_on_demand=True,
                           buffer_size_in_mb=0)
+        self.max_depth = self.db.info.max_radius - self.db.info.min_radius
 
     def iterate(self):
         # Random points on a sphere.
@@ -313,7 +317,7 @@ class UnbufferedAndRandomReadOnDemandTrue(InstaseisBenchmark):
 
         lat = np.rad2deg(np.arcsin(2 * random.random() - 1))
         lng = random.random() * 360.0 - 180.0
-        depth_in_m = random.random() * 300000
+        depth_in_m = random.random() * self.max_depth
         src = Source(latitude=lat, longitude=lng, depth_in_m=depth_in_m)
 
         self.db.get_seismograms(source=src, receiver=rec)
