@@ -511,6 +511,12 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
                 endtime=endtime, format=args.format,
                 label=args.label)
 
+            # Check connection once again.
+            if self.connection_closed:
+                self.flush()
+                self.finish()
+                return
+
             # If an exception is returned from the task, re-raise it here.
             if isinstance(response, Exception):
                 raise response
