@@ -4295,6 +4295,7 @@ def test_sac_headers(all_clients):
         "sourcelatitude": 1, "sourcelongitude": 12,
         "sourcedepthinmeters": client.source_depth,
         "sourcemomenttensor": "1E15,1E15,1E15,1E15,1E15,1E15",
+        "origintime": obspy.UTCDateTime(0),
         "dt": 0.1, "starttime": "-1.5", "receiverlatitude": 22,
         "receiverlongitude": 44, "format": "saczip"}
     request = client.fetch(_assemble_url('seismograms', **params))
