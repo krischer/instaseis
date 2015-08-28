@@ -1114,7 +1114,7 @@ def test_object_creation_for_seismogram_route(all_clients):
             as p:
         _st = obspy.read()
         for tr in _st:
-            tr.stats.starttime = obspy.UTCDateTime(0) - 7 * dt
+            tr.stats.starttime = obspy.UTCDateTime(1900, 1, 1) - 7 * dt
             tr.stats.delta = dt
         p.return_value = _st
 
@@ -1130,6 +1130,7 @@ def test_object_creation_for_seismogram_route(all_clients):
             latitude=basic_parameters["sourcelatitude"],
             longitude=basic_parameters["sourcelongitude"],
             depth_in_m=client.source_depth,
+            origin_time=obspy.UTCDateTime(1900, 1, 1),
             **dict((key[0] + "_" + key[1:], float(value))
                    for (key, value) in mt.items()))
         assert p.call_args[1]["receiver"] == instaseis.Receiver(
@@ -1192,7 +1193,7 @@ def test_object_creation_for_seismogram_route(all_clients):
         p.reset_mock()
         _st.traces = obspy.read().traces
         for tr in _st:
-            tr.stats.starttime = obspy.UTCDateTime(0) - 7 * dt
+            tr.stats.starttime = obspy.UTCDateTime(1900, 1, 1) - 7 * dt
             tr.stats.delta = dt
 
         params = copy.deepcopy(basic_parameters)
@@ -1207,6 +1208,7 @@ def test_object_creation_for_seismogram_route(all_clients):
                 latitude=basic_parameters["sourcelatitude"],
                 longitude=basic_parameters["sourcelongitude"],
                 depth_in_m=basic_parameters["sourcedepthinmeters"],
+                origin_time=obspy.UTCDateTime(1900, 1, 1),
                 **dict((key, float(value)) for (key, value) in sdr.items()))
         assert p.call_args[1]["receiver"] == instaseis.Receiver(
             latitude=basic_parameters["receiverlatitude"],
@@ -1265,7 +1267,7 @@ def test_object_creation_for_seismogram_route(all_clients):
         p.reset_mock()
         _st.traces = obspy.read().traces
         for tr in _st:
-            tr.stats.starttime = obspy.UTCDateTime(0) - 7 * dt
+            tr.stats.starttime = obspy.UTCDateTime(1900, 1, 1) - 7 * dt
             tr.stats.delta = dt
 
         params = copy.deepcopy(basic_parameters)
@@ -1280,6 +1282,7 @@ def test_object_creation_for_seismogram_route(all_clients):
                 latitude=basic_parameters["sourcelatitude"],
                 longitude=basic_parameters["sourcelongitude"],
                 depth_in_m=basic_parameters["sourcedepthinmeters"],
+                origin_time=obspy.UTCDateTime(1900, 1, 1),
                 strike=10, dip=10, rake=10, M0=1E19)
         assert p.call_args[1]["receiver"] == instaseis.Receiver(
             latitude=basic_parameters["receiverlatitude"],
@@ -1297,7 +1300,7 @@ def test_object_creation_for_seismogram_route(all_clients):
             p.reset_mock()
             _st.traces = obspy.read().traces
             for tr in _st:
-                tr.stats.starttime = obspy.UTCDateTime(0) - 7 * dt
+                tr.stats.starttime = obspy.UTCDateTime(1900, 1, 1) - 7 * dt
                 tr.stats.delta = dt
 
             params = copy.deepcopy(basic_parameters)
@@ -1310,7 +1313,7 @@ def test_object_creation_for_seismogram_route(all_clients):
             assert p.call_args[1]["source"] == instaseis.ForceSource(
                 latitude=basic_parameters["sourcelatitude"],
                 longitude=basic_parameters["sourcelongitude"],
-                depth_in_m=0.0,
+                depth_in_m=0.0, origin_time=obspy.UTCDateTime(1900, 1, 1),
                 **dict(("_".join(key), float(value))
                        for (key, value) in fs.items()))
             assert p.call_args[1]["receiver"] == instaseis.Receiver(
@@ -1364,7 +1367,7 @@ def test_object_creation_for_seismogram_route(all_clients):
 
         _st.traces = obspy.read().traces
         for tr in _st:
-            tr.stats.starttime = obspy.UTCDateTime(0) - 7 * dt
+            tr.stats.starttime = obspy.UTCDateTime(1900, 1, 1) - 7 * dt
             tr.stats.delta = dt
 
         params = copy.deepcopy(basic_parameters)
@@ -1446,7 +1449,7 @@ def test_object_creation_for_seismogram_route(all_clients):
         p.reset_mock()
         _st.traces = obspy.read().traces
         for tr in _st:
-            tr.stats.starttime = obspy.UTCDateTime(0) - 7 * dt
+            tr.stats.starttime = obspy.UTCDateTime(1900, 1, 1) - 7 * dt
             tr.stats.delta = dt
         params = copy.deepcopy(basic_parameters)
         params["sourcemomenttensor"] = mt_param
@@ -1503,7 +1506,7 @@ def test_seismograms_retrieval(all_clients):
     source = instaseis.Source(
         latitude=basic_parameters["sourcelatitude"],
         longitude=basic_parameters["sourcelongitude"],
-        depth_in_m=0.0,
+        depth_in_m=0.0, origin_time=obspy.UTCDateTime(1900, 1, 1),
         **dict((key[0] + "_" + key[1:], float(value))
                for (key, value) in mt.items()))
     receiver = instaseis.Receiver(
@@ -1579,7 +1582,7 @@ def test_seismograms_retrieval(all_clients):
     source = instaseis.Source.from_strike_dip_rake(
         latitude=basic_parameters["sourcelatitude"],
         longitude=basic_parameters["sourcelongitude"],
-        depth_in_m=0.0,
+        depth_in_m=0.0, origin_time=obspy.UTCDateTime(1900, 1, 1),
         **dict((key, float(value)) for (key, value) in sdr.items()))
     receiver = instaseis.Receiver(
         latitude=basic_parameters["receiverlatitude"],
@@ -1655,7 +1658,7 @@ def test_seismograms_retrieval(all_clients):
         source = instaseis.ForceSource(
             latitude=basic_parameters["sourcelatitude"],
             longitude=basic_parameters["sourcelongitude"],
-            depth_in_m=0.0,
+            depth_in_m=0.0, origin_time=obspy.UTCDateTime(1900, 1, 1),
             **dict(("_".join(key), float(value))
                    for (key, value) in fs.items()))
         receiver = instaseis.Receiver(
@@ -1727,7 +1730,7 @@ def test_seismograms_retrieval(all_clients):
     source = instaseis.Source(
         latitude=basic_parameters["sourcelatitude"],
         longitude=basic_parameters["sourcelongitude"],
-        depth_in_m=0.0,
+        depth_in_m=0.0, origin_time=obspy.UTCDateTime(1900, 1, 1),
         **dict((key[0] + "_" + key[1:], float(value))
                for (key, value) in mt.items()))
     receiver = instaseis.Receiver(
@@ -2202,6 +2205,7 @@ def test_multiple_seismograms_retrieval_no_format_given(
         latitude=basic_parameters["sourcelatitude"],
         longitude=basic_parameters["sourcelongitude"],
         depth_in_m=0.0,
+        origin_time=obspy.UTCDateTime(1900, 1, 1),
         **dict((key[0] + "_" + key[1:], float(value))
                for (key, value) in mt.items()))
     receivers = [
@@ -2315,7 +2319,7 @@ def test_multiple_seismograms_retrieval_no_format_given(
         source = instaseis.ForceSource(
             latitude=basic_parameters["sourcelatitude"],
             longitude=basic_parameters["sourcelongitude"],
-            depth_in_m=0.0,
+            depth_in_m=0.0, origin_time=obspy.UTCDateTime(1900, 1, 1),
             **dict(("_".join(key), float(value))
                    for (key, value) in fs.items()))
         receivers = [
@@ -2397,6 +2401,7 @@ def test_multiple_seismograms_retrieval_no_format_given_single_station(
         latitude=basic_parameters["sourcelatitude"],
         longitude=basic_parameters["sourcelongitude"],
         depth_in_m=0.0,
+        origin_time=obspy.UTCDateTime(1900, 1, 1),
         **dict((key[0] + "_" + key[1:], float(value))
                for (key, value) in mt.items()))
     receivers = [
@@ -2508,7 +2513,7 @@ def test_multiple_seismograms_retrieval_no_format_given_single_station(
         source = instaseis.ForceSource(
             latitude=basic_parameters["sourcelatitude"],
             longitude=basic_parameters["sourcelongitude"],
-            depth_in_m=0.0,
+            depth_in_m=0.0, origin_time=obspy.UTCDateTime(1900, 1, 1),
             **dict(("_".join(key), float(value))
                    for (key, value) in fs.items()))
         receivers = [
@@ -2582,7 +2587,7 @@ def test_multiple_seismograms_retrieval_mseed_format(
     source = instaseis.Source(
         latitude=basic_parameters["sourcelatitude"],
         longitude=basic_parameters["sourcelongitude"],
-        depth_in_m=0.0,
+        depth_in_m=0.0, origin_time=obspy.UTCDateTime(1900, 1, 1),
         **dict((key[0] + "_" + key[1:], float(value))
                for (key, value) in mt.items()))
     receivers = [
@@ -2694,7 +2699,7 @@ def test_multiple_seismograms_retrieval_mseed_format(
         source = instaseis.ForceSource(
             latitude=basic_parameters["sourcelatitude"],
             longitude=basic_parameters["sourcelongitude"],
-            depth_in_m=0.0,
+            depth_in_m=0.0, origin_time=obspy.UTCDateTime(1900, 1, 1),
             **dict(("_".join(key), float(value))
                    for (key, value) in fs.items()))
         receivers = [
@@ -2780,7 +2785,7 @@ def test_multiple_seismograms_retrieval_saczip_format(
     source = instaseis.Source(
         latitude=basic_parameters["sourcelatitude"],
         longitude=basic_parameters["sourcelongitude"],
-        depth_in_m=0.0,
+        depth_in_m=0.0, origin_time=obspy.UTCDateTime(1900, 1, 1),
         **dict((key[0] + "_" + key[1:], float(value))
                for (key, value) in mt.items()))
     receivers = [
@@ -2905,7 +2910,7 @@ def test_multiple_seismograms_retrieval_saczip_format(
         source = instaseis.ForceSource(
             latitude=basic_parameters["sourcelatitude"],
             longitude=basic_parameters["sourcelongitude"],
-            depth_in_m=0.0,
+            depth_in_m=0.0, origin_time=obspy.UTCDateTime(1900, 1, 1),
             **dict(("_".join(key), float(value))
                    for (key, value) in fs.items()))
         receivers = [

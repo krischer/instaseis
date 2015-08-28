@@ -30,6 +30,7 @@ class InstaseisTimeSeriesHandler(with_metaclass(ABCMeta,
     arguments = None
     connection_closed = False
     default_label = ""
+    default_origin_time = obspy.UTCDateTime(0)
 
     def __init__(self, *args, **kwargs):
         super(InstaseisTimeSeriesHandler, self).__init__(*args, **kwargs)
@@ -183,7 +184,7 @@ class InstaseisTimeSeriesHandler(with_metaclass(ABCMeta,
         Returns the minium possible start- and the maximum possible endtime.
         """
         if args.origintime is None:
-            args.origintime = obspy.UTCDateTime(0)
+            args.origintime = self.default_origin_time
 
         # The origin time will be always set. If the starttime is not set,
         # set it to the origin time.

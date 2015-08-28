@@ -195,6 +195,9 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
     }
 
     default_label = "instaseis_seismogram"
+    # Done here as the time parsing is fairly complex and cannot be done
+    # with normal default values.
+    default_origin_time = obspy.UTCDateTime(1900, 1, 1)
 
     def __init__(self, *args, **kwargs):
         super(InstaseisTimeSeriesHandler, self).__init__(*args, **kwargs)
