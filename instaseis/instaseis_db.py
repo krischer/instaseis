@@ -237,11 +237,19 @@ class InstaseisDB(BaseInstaseisDB):
                         self.parsed_mesh.mesh_Z[corner_point_ids]
                 else:
                     corner_point_ids = mesh.variables["fem_mesh"][idx][:4]
+
+                    # When reading from a netcdf file, the indices must be
+                    # sorted for newer netcdf versions. The double argsort()
+                    # gives the indices in the sorted array to restore the
+                    # original order.
+                    order = corner_point_ids.argsort().argsort()
+                    corner_point_ids.sort()
+
                     eltype = mesh.variables["eltype"][idx]
                     corner_points[:, 0] = \
-                        mesh.variables["mesh_S"][corner_point_ids]
+                        mesh.variables["mesh_S"][corner_point_ids][order]
                     corner_points[:, 1] = \
-                        mesh.variables["mesh_Z"][corner_point_ids]
+                        mesh.variables["mesh_Z"][corner_point_ids][order]
 
                 isin, xi, eta = finite_elem_mapping.inside_element(
                     rotmesh_s, rotmesh_z, corner_points, eltype,
