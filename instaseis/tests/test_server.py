@@ -4317,6 +4317,10 @@ def test_sac_headers(all_clients):
         assert tr.stats.sac.imagtyp == 55
         # Assume the reference time is the starttime.
         assert abs(tr.stats.sac.o - 1.5) < 1E-6
+        # Test the provenance.
+        assert tr.stats.sac.kuser0 == "InstSeis"
+        assert tr.stats.sac.kuser1 == instaseis.__version__[:8]
+        assert tr.stats.sac.kuser2 == "prem_iso"
 
 
 def test_dt_settings(all_clients):

@@ -16,7 +16,7 @@ import obspy
 import tornado.gen
 import tornado.web
 
-from ... import Source, Receiver
+from ... import Source, Receiver, __version__
 from ..util import run_async, _validtimesetting
 from ..instaseis_request import InstaseisTimeSeriesHandler
 from ...helpers import geocentric_to_elliptic_latitude
@@ -109,6 +109,10 @@ def _get_greens(db, epicentral_distance_degree, source_depth_in_m, units, dt,
             # The event origin time relative to the reference which I'll
             # just assume to be the starttime here?
             tr.stats.sac.o = origintime - starttime
+            # Some provenance.
+            tr.stats.sac.kuser0 = "InstSeis"
+            tr.stats.sac.kuser1 = __version__[:8]
+            tr.stats.sac.kuser2 = db.info.velocity_model[:8]
 
             with io.BytesIO() as temp:
                 tr.write(temp, format="sac")
