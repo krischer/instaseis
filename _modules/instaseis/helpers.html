@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>instaseis.helpers &mdash; instaseis 0.0.1a-345-gf9f0 documentation</title>
+    <title>instaseis.helpers &mdash; instaseis 0.0.1a-335-g98ce documentation</title>
     
     <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.0.1a-345-gf9f0',
+        VERSION:     '0.0.1a-335-g98ce',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -31,7 +31,7 @@
     <script type="text/javascript" src="../../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../../_static/bootstrap-3.3.4/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../../_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.0.1a-345-gf9f0 documentation" href="../../index.html" />
+    <link rel="top" title="instaseis 0.0.1a-335-g98ce documentation" href="../../index.html" />
     <link rel="up" title="instaseis" href="../instaseis.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-345-gf9f0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-335-g98ce</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -133,6 +133,13 @@
 
 <span class="n">cache</span> <span class="o">=</span> <span class="p">[]</span>
 
+<span class="n">WGS_A</span> <span class="o">=</span> <span class="mf">6378137.0</span>
+<span class="n">WGS_B</span> <span class="o">=</span> <span class="mf">6356752.314245</span>
+
+
+<span class="n">_f</span> <span class="o">=</span> <span class="p">(</span><span class="n">WGS_A</span> <span class="o">-</span> <span class="n">WGS_B</span><span class="p">)</span> <span class="o">/</span> <span class="n">WGS_A</span>
+<span class="n">E_2</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">_f</span> <span class="o">-</span> <span class="n">_f</span> <span class="o">**</span> <span class="mi">2</span>
+
 
 <span class="k">def</span> <span class="nf">load_lib</span><span class="p">():</span>
     <span class="k">if</span> <span class="n">cache</span><span class="p">:</span>
@@ -168,31 +175,21 @@
     <span class="k">return</span> <span class="n">band_code</span>
 
 
-<div class="viewcode-block" id="elliptic_to_geocentric_latitude"><a class="viewcode-back" href="../../helpers.html#instaseis.helpers.elliptic_to_geocentric_latitude">[docs]</a><span class="k">def</span> <span class="nf">elliptic_to_geocentric_latitude</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">axis_a</span><span class="o">=</span><span class="mf">6378137.0</span><span class="p">,</span>
-                                    <span class="n">axis_b</span><span class="o">=</span><span class="mf">6356752.314245</span><span class="p">):</span>
+<div class="viewcode-block" id="wgs84_to_geocentric_latitude"><a class="viewcode-back" href="../../helpers.html#instaseis.helpers.wgs84_to_geocentric_latitude">[docs]</a><span class="k">def</span> <span class="nf">wgs84_to_geocentric_latitude</span><span class="p">(</span><span class="n">lat</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Convert a latitude defined on an ellipsoid to a geocentric one.</span>
+<span class="sd">    Convert a latitude defined on the WGS84 ellipsoid to a geocentric one.</span>
 
-<span class="sd">    :param lat: The latitude to convert.</span>
-<span class="sd">    :param axis_a: The length of the major axis of the planet. Defaults to</span>
-<span class="sd">        the value of the WGS84 ellipsoid.</span>
-<span class="sd">    :param axis_b: The length of the minor axis of the planet. Defaults to</span>
-<span class="sd">        the value of the WGS84 ellipsoid.</span>
-
-<span class="sd">    &gt;&gt;&gt; elliptic_to_geocentric_latitude(0.0)</span>
+<span class="sd">    &gt;&gt;&gt; wgs84_to_geocentric_latitude(0.0)</span>
 <span class="sd">    0.0</span>
-<span class="sd">    &gt;&gt;&gt; elliptic_to_geocentric_latitude(90.0)</span>
+<span class="sd">    &gt;&gt;&gt; wgs84_to_geocentric_latitude(90.0)</span>
 <span class="sd">    90.0</span>
-<span class="sd">    &gt;&gt;&gt; elliptic_to_geocentric_latitude(-90.0)</span>
+<span class="sd">    &gt;&gt;&gt; wgs84_to_geocentric_latitude(-90.0)</span>
 <span class="sd">    -90.0</span>
-<span class="sd">    &gt;&gt;&gt; elliptic_to_geocentric_latitude(45.0)</span>
+<span class="sd">    &gt;&gt;&gt; wgs84_to_geocentric_latitude(45.0)</span>
 <span class="sd">    44.80757678401642</span>
-<span class="sd">    &gt;&gt;&gt; elliptic_to_geocentric_latitude(-45.0)</span>
+<span class="sd">    &gt;&gt;&gt; wgs84_to_geocentric_latitude(-45.0)</span>
 <span class="sd">    -44.80757678401642</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">_f</span> <span class="o">=</span> <span class="p">(</span><span class="n">axis_a</span> <span class="o">-</span> <span class="n">axis_b</span><span class="p">)</span> <span class="o">/</span> <span class="n">axis_a</span>
-    <span class="n">E_2</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">_f</span> <span class="o">-</span> <span class="n">_f</span> <span class="o">**</span> <span class="mi">2</span>
-
     <span class="c"># Singularities close to the pole and the equator. Just return the value</span>
     <span class="c"># in that case.</span>
     <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1E-6</span> <span class="ow">or</span> <span class="nb">abs</span><span class="p">(</span><span class="n">lat</span> <span class="o">-</span> <span class="mi">90</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1E-6</span> <span class="ow">or</span> \
@@ -202,31 +199,21 @@
     <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">atan</span><span class="p">((</span><span class="mi">1</span> <span class="o">-</span> <span class="n">E_2</span><span class="p">)</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">tan</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">lat</span><span class="p">))))</span>
 
 </div>
-<div class="viewcode-block" id="geocentric_to_elliptic_latitude"><a class="viewcode-back" href="../../helpers.html#instaseis.helpers.geocentric_to_elliptic_latitude">[docs]</a><span class="k">def</span> <span class="nf">geocentric_to_elliptic_latitude</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">axis_a</span><span class="o">=</span><span class="mf">6378137.0</span><span class="p">,</span>
-                                    <span class="n">axis_b</span><span class="o">=</span><span class="mf">6356752.314245</span><span class="p">):</span>
+<div class="viewcode-block" id="geocentric_to_wgs84_latitude"><a class="viewcode-back" href="../../helpers.html#instaseis.helpers.geocentric_to_wgs84_latitude">[docs]</a><span class="k">def</span> <span class="nf">geocentric_to_wgs84_latitude</span><span class="p">(</span><span class="n">lat</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Convert a geocentric latitude to one defined on an ellipsoid.</span>
+<span class="sd">    Convert a geocentric latitude to one defined on the WGS84 ellipsoid.</span>
 
-<span class="sd">    :param lat: The latitude to convert.</span>
-<span class="sd">    :param axis_a: The length of the major axis of the planet. Defaults to</span>
-<span class="sd">        the value of the WGS84 ellipsoid.</span>
-<span class="sd">    :param axis_b: The length of the minor axis of the planet. Defaults to</span>
-<span class="sd">        the value of the WGS84 ellipsoid.</span>
-
-<span class="sd">    &gt;&gt;&gt; geocentric_to_elliptic_latitude(0.0)</span>
+<span class="sd">    &gt;&gt;&gt; geocentric_to_wgs84_latitude(0.0)</span>
 <span class="sd">    0.0</span>
-<span class="sd">    &gt;&gt;&gt; geocentric_to_elliptic_latitude(90.0)</span>
+<span class="sd">    &gt;&gt;&gt; geocentric_to_wgs84_latitude(90.0)</span>
 <span class="sd">    90.0</span>
-<span class="sd">    &gt;&gt;&gt; geocentric_to_elliptic_latitude(-90.0)</span>
+<span class="sd">    &gt;&gt;&gt; geocentric_to_wgs84_latitude(-90.0)</span>
 <span class="sd">    -90.0</span>
-<span class="sd">    &gt;&gt;&gt; geocentric_to_elliptic_latitude(45.0)</span>
+<span class="sd">    &gt;&gt;&gt; geocentric_to_wgs84_latitude(45.0)</span>
 <span class="sd">    45.19242321598358</span>
-<span class="sd">    &gt;&gt;&gt; geocentric_to_elliptic_latitude(-45.0)</span>
+<span class="sd">    &gt;&gt;&gt; geocentric_to_wgs84_latitude(-45.0)</span>
 <span class="sd">    -45.19242321598358</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">_f</span> <span class="o">=</span> <span class="p">(</span><span class="n">axis_a</span> <span class="o">-</span> <span class="n">axis_b</span><span class="p">)</span> <span class="o">/</span> <span class="n">axis_a</span>
-    <span class="n">E_2</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">_f</span> <span class="o">-</span> <span class="n">_f</span> <span class="o">**</span> <span class="mi">2</span>
-
     <span class="c"># Singularities close to the pole and the equator. Just return the value</span>
     <span class="c"># in that case.</span>
     <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1E-6</span> <span class="ow">or</span> <span class="nb">abs</span><span class="p">(</span><span class="n">lat</span> <span class="o">-</span> <span class="mi">90</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1E-6</span> <span class="ow">or</span> \
