@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Utility Functions &mdash; instaseis 0.0.1a-335-g98ce documentation</title>
+    <title>Utility Functions &mdash; instaseis 0.0.1a-346-gf634 documentation</title>
     
     <link rel="stylesheet" href="_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.0.1a-335-g98ce',
+        VERSION:     '0.0.1a-346-gf634',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -31,7 +31,7 @@
     <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="_static/bootstrap-3.3.4/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.0.1a-335-g98ce documentation" href="index.html" />
+    <link rel="top" title="instaseis 0.0.1a-346-gf634 documentation" href="index.html" />
     <link rel="next" title="Instaseis Server" href="server.html" />
     <link rel="prev" title="Sources and Receivers" href="source.html" />
 <meta charset='utf-8'>
@@ -53,7 +53,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-335-g98ce</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-346-gf634</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -110,36 +110,66 @@
   <div class="section" id="utility-functions">
 <h1>Utility Functions<a class="headerlink" href="#utility-functions" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
-<dt id="instaseis.helpers.wgs84_to_geocentric_latitude">
-<code class="descclassname">instaseis.helpers.</code><code class="descname">wgs84_to_geocentric_latitude</code><span class="sig-paren">(</span><em>lat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/helpers.html#wgs84_to_geocentric_latitude"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.helpers.wgs84_to_geocentric_latitude" title="Permalink to this definition">¶</a></dt>
-<dd><p>Convert a latitude defined on the WGS84 ellipsoid to a geocentric one.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">wgs84_to_geocentric_latitude</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+<dt id="instaseis.helpers.elliptic_to_geocentric_latitude">
+<code class="descclassname">instaseis.helpers.</code><code class="descname">elliptic_to_geocentric_latitude</code><span class="sig-paren">(</span><em>lat</em>, <em>axis_a=6378137.0</em>, <em>axis_b=6356752.314245</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/helpers.html#elliptic_to_geocentric_latitude"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.helpers.elliptic_to_geocentric_latitude" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a latitude defined on an ellipsoid to a geocentric one.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>lat</strong> &#8211; The latitude to convert.</li>
+<li><strong>axis_a</strong> &#8211; The length of the major axis of the planet. Defaults to
+the value of the WGS84 ellipsoid.</li>
+<li><strong>axis_b</strong> &#8211; The length of the minor axis of the planet. Defaults to
+the value of the WGS84 ellipsoid.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">elliptic_to_geocentric_latitude</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
 <span class="go">0.0</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">wgs84_to_geocentric_latitude</span><span class="p">(</span><span class="mf">90.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">elliptic_to_geocentric_latitude</span><span class="p">(</span><span class="mf">90.0</span><span class="p">)</span>
 <span class="go">90.0</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">wgs84_to_geocentric_latitude</span><span class="p">(</span><span class="o">-</span><span class="mf">90.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">elliptic_to_geocentric_latitude</span><span class="p">(</span><span class="o">-</span><span class="mf">90.0</span><span class="p">)</span>
 <span class="go">-90.0</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">wgs84_to_geocentric_latitude</span><span class="p">(</span><span class="mf">45.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">elliptic_to_geocentric_latitude</span><span class="p">(</span><span class="mf">45.0</span><span class="p">)</span>
 <span class="go">44.80757678401642</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">wgs84_to_geocentric_latitude</span><span class="p">(</span><span class="o">-</span><span class="mf">45.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">elliptic_to_geocentric_latitude</span><span class="p">(</span><span class="o">-</span><span class="mf">45.0</span><span class="p">)</span>
 <span class="go">-44.80757678401642</span>
 </pre></div>
 </div>
 </dd></dl>
 
 <dl class="function">
-<dt id="instaseis.helpers.geocentric_to_wgs84_latitude">
-<code class="descclassname">instaseis.helpers.</code><code class="descname">geocentric_to_wgs84_latitude</code><span class="sig-paren">(</span><em>lat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/helpers.html#geocentric_to_wgs84_latitude"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.helpers.geocentric_to_wgs84_latitude" title="Permalink to this definition">¶</a></dt>
-<dd><p>Convert a geocentric latitude to one defined on the WGS84 ellipsoid.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">geocentric_to_wgs84_latitude</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+<dt id="instaseis.helpers.geocentric_to_elliptic_latitude">
+<code class="descclassname">instaseis.helpers.</code><code class="descname">geocentric_to_elliptic_latitude</code><span class="sig-paren">(</span><em>lat</em>, <em>axis_a=6378137.0</em>, <em>axis_b=6356752.314245</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/helpers.html#geocentric_to_elliptic_latitude"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.helpers.geocentric_to_elliptic_latitude" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a geocentric latitude to one defined on an ellipsoid.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>lat</strong> &#8211; The latitude to convert.</li>
+<li><strong>axis_a</strong> &#8211; The length of the major axis of the planet. Defaults to
+the value of the WGS84 ellipsoid.</li>
+<li><strong>axis_b</strong> &#8211; The length of the minor axis of the planet. Defaults to
+the value of the WGS84 ellipsoid.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">geocentric_to_elliptic_latitude</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
 <span class="go">0.0</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">geocentric_to_wgs84_latitude</span><span class="p">(</span><span class="mf">90.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">geocentric_to_elliptic_latitude</span><span class="p">(</span><span class="mf">90.0</span><span class="p">)</span>
 <span class="go">90.0</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">geocentric_to_wgs84_latitude</span><span class="p">(</span><span class="o">-</span><span class="mf">90.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">geocentric_to_elliptic_latitude</span><span class="p">(</span><span class="o">-</span><span class="mf">90.0</span><span class="p">)</span>
 <span class="go">-90.0</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">geocentric_to_wgs84_latitude</span><span class="p">(</span><span class="mf">45.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">geocentric_to_elliptic_latitude</span><span class="p">(</span><span class="mf">45.0</span><span class="p">)</span>
 <span class="go">45.19242321598358</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">geocentric_to_wgs84_latitude</span><span class="p">(</span><span class="o">-</span><span class="mf">45.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">geocentric_to_elliptic_latitude</span><span class="p">(</span><span class="o">-</span><span class="mf">45.0</span><span class="p">)</span>
 <span class="go">-45.19242321598358</span>
 </pre></div>
 </div>

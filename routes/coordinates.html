@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>GET /coordinates &mdash; instaseis 0.0.1a-335-g98ce documentation</title>
+    <title>GET /coordinates &mdash; instaseis 0.0.1a-346-gf634 documentation</title>
     
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.0.1a-335-g98ce',
+        VERSION:     '0.0.1a-346-gf634',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -31,7 +31,7 @@
     <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-3.3.4/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.0.1a-335-g98ce documentation" href="../index.html" />
+    <link rel="top" title="instaseis 0.0.1a-346-gf634 documentation" href="../index.html" />
     <link rel="up" title="Instaseis Server" href="../server.html" />
     <link rel="next" title="GET /event" href="event.html" />
     <link rel="prev" title="GET /info" href="info.html" />
@@ -54,7 +54,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-335-g98ce</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-346-gf634</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -117,26 +117,43 @@
 </div>
 <dl class="docutils">
 <dt>Description</dt>
-<dd>Station coordinates if the server has been configured to serve them.</dd>
+<dd>Station coordinates if the server has been configured to serve them.
+Returns a GeoJSON file to simplify further usage.</dd>
 <dt>Content-Type</dt>
-<dd>application/json; charset=UTF-8</dd>
+<dd>application/vnd.geo+json</dd>
 <dt>Example Response</dt>
 <dd><div class="first last highlight-json"><div class="highlight"><pre><span class="p">{</span>
-    <span class="nt">&quot;count&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
-    <span class="nt">&quot;stations&quot;</span><span class="p">:</span> <span class="p">[</span>
-        <span class="p">{</span>
-            <span class="nt">&quot;latitude&quot;</span><span class="p">:</span> <span class="mf">39.868</span><span class="p">,</span>
-            <span class="nt">&quot;longitude&quot;</span><span class="p">:</span> <span class="mf">32.7934</span><span class="p">,</span>
-            <span class="nt">&quot;network&quot;</span><span class="p">:</span> <span class="s2">&quot;IU&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;station&quot;</span><span class="p">:</span> <span class="s2">&quot;ANTO&quot;</span>
-        <span class="p">},</span>
-        <span class="p">{</span>
-            <span class="nt">&quot;latitude&quot;</span><span class="p">:</span> <span class="mf">34.94591</span><span class="p">,</span>
-            <span class="nt">&quot;longitude&quot;</span><span class="p">:</span> <span class="mf">-106.4572</span><span class="p">,</span>
-            <span class="nt">&quot;network&quot;</span><span class="p">:</span> <span class="s2">&quot;IU&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;station&quot;</span><span class="p">:</span> <span class="s2">&quot;ANMO&quot;</span>
-        <span class="p">}</span>
-    <span class="p">]</span>
+  <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;FeatureCollection&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;features&quot;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="p">{</span>
+      <span class="nt">&quot;geometry&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;coordinates&quot;</span><span class="p">:</span> <span class="p">[</span>
+          <span class="mf">-106.4572</span><span class="p">,</span>
+          <span class="mf">34.765424215322156</span>
+        <span class="p">],</span>
+        <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;Point&quot;</span>
+      <span class="p">},</span>
+      <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;Feature&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;station_code&quot;</span><span class="p">:</span> <span class="s2">&quot;ANMO&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;network_code&quot;</span><span class="p">:</span> <span class="s2">&quot;IU&quot;</span>
+      <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+      <span class="nt">&quot;geometry&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;coordinates&quot;</span><span class="p">:</span> <span class="p">[</span>
+          <span class="mf">32.7934</span><span class="p">,</span>
+          <span class="mf">39.678769312230145</span>
+        <span class="p">],</span>
+        <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;Point&quot;</span>
+      <span class="p">},</span>
+      <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;Feature&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;station_code&quot;</span><span class="p">:</span> <span class="s2">&quot;ANTO&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;network_code&quot;</span><span class="p">:</span> <span class="s2">&quot;IU&quot;</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">]</span>
 <span class="p">}</span>
 </pre></div>
 </div>

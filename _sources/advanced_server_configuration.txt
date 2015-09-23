@@ -38,7 +38,7 @@ This callback function is used for the ``/coordinates`` route, as well as
 resolves network and station code searches to actual coordinates. How the
 coordinates are resolved is up to the users but make sure it is fast. Also make
 sure the coordinates are geocentric. Instaseis has a helper function to aid
-with that: :func:`instaseis.helpers.wgs84_to_geocentric_latitude`
+with that: :func:`instaseis.helpers.elliptic_to_geocentric_latitude`
 
 **Affected routes:**
 
@@ -101,7 +101,7 @@ event parameters. Users could choose to call an external web service within
 that function or query a local database. It is used for the ``/event`` route as
 well as event identifier based queries in the ``/seismograms`` route. Make sure
 the coordinates are geocentric. Instaseis has a helper function to aid with
-that: :func:`instaseis.helpers.wgs84_to_geocentric_latitude`
+that: :func:`instaseis.helpers.elliptic_to_geocentric_latitude`
 
 **Affected routes:**
 
