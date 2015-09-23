@@ -35,7 +35,7 @@ Filetype
 +-----------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
 | ``sourcedepthinmeters``     | Float    | True     |                             | The source depth in meters.                                                          |
 +-----------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
-| ``sourcedistanceindegree``  | Float    | True     |                             | The epicentral disctance of source - receiver in degrees (computed on the surface    |
+| ``sourcedistanceindegrees`` | Float    | True     |                             | The epicentral disctance of source - receiver in degrees (computed on the surface    |
 |                             |          |          |                             | of a sphere).                                                                        |
 +-----------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
 | **Output parameters**                                                                                                                                                  |
