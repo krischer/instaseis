@@ -27,6 +27,12 @@ from .routes.seismograms_raw import RawSeismogramsHandler
 from .routes.greens import GreensFunctionHandler
 
 
+# Bit of a hack: Add geojson to the content-types supported for gzipping.
+# The tests will catch if this no longer works with newer tornado versions.
+tornado.web.GZipContentEncoding.CONTENT_TYPES.add(
+    "application/vnd.geo+json")
+
+
 def get_application():
     """
     Return the tornado application.
@@ -43,7 +49,7 @@ def get_application():
         (r"/coordinates", CoordinatesHandler),
         (r"/event", EventHandler),
         (r"/ttimes", TravelTimeHandler)
-    ])
+    ], compress_response=True)
 
 
 def launch_io_loop(db_path, port, buffer_size_in_mb, quiet, log_level,

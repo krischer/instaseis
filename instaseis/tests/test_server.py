@@ -2160,6 +2160,93 @@ def test_cors_headers_failing_requests(all_clients_all_callbacks):
     assert request.headers["Access-Control-Allow-Origin"] == "*"
 
 
+def test_gzipped_responses(all_clients_all_callbacks):
+    """
+    The JSON responses should all be gzipped if requests.
+    """
+    client = all_clients_all_callbacks
+
+    request = client.fetch("/")
+    assert request.code == 200
+    # Special tornado header meaning it originally was gzipped..in this case
+    # not as it has not been requested.
+    assert "X-Consumed-Content-Encoding" not in request.headers
+
+    # Now with compression.
+    request = client.fetch("/", use_gzip=True)
+    assert request.code == 200
+    # Special tornado header meaning it originally was gzipped..in this case
+    # not as it has not been requested.
+    assert request.headers["X-Consumed-Content-Encoding"] == "gzip"
+
+    request = client.fetch("/info")
+    assert request.code == 200
+    assert "X-Consumed-Content-Encoding" not in request.headers
+    request = client.fetch("/info", use_gzip=True)
+    assert request.code == 200
+    assert request.headers["X-Consumed-Content-Encoding"] == "gzip"
+
+    request = client.fetch("/coordinates?network=IU&station=ANMO")
+    assert request.code == 200
+    assert "X-Consumed-Content-Encoding" not in request.headers
+    request = client.fetch("/coordinates?network=IU&station=ANMO",
+                           use_gzip=True)
+    assert request.code == 200
+    assert request.headers["X-Consumed-Content-Encoding"] == "gzip"
+
+    request = client.fetch("/event?id=B071791B")
+    assert request.code == 200
+    assert "X-Consumed-Content-Encoding" not in request.headers
+    request = client.fetch("/event?id=B071791B", use_gzip=True)
+    assert request.code == 200
+    assert request.headers["X-Consumed-Content-Encoding"] == "gzip"
+
+    request = client.fetch(
+        "/ttimes?sourcelatitude=50&sourcelongitude=10&"
+        "sourcedepthinmeters=%i&receiverlatitude=40&receiverlongitude=90&"
+        "receiverdepthinmeters=0&phase=P" % client.source_depth)
+    assert request.code == 200
+    assert "X-Consumed-Content-Encoding" not in request.headers
+
+    # raw seismograms route
+    params = {
+        "sourcelatitude": 10,
+        "sourcelongitude": 10,
+        "receiverlatitude": -10,
+        "receiverlongitude": -10,
+        "mtt": "100000",
+        "mpp": "100000",
+        "mrr": "100000",
+        "mrt": "100000",
+        "mrp": "100000",
+        "mtp": "100000"}
+    request = client.fetch(_assemble_url('seismograms_raw', **params))
+    assert request.code == 200
+    assert "X-Consumed-Content-Encoding" not in request.headers
+    # Gzipping should not return gzipped data as its a binary format.
+    request = client.fetch(_assemble_url('seismograms_raw', **params),
+                           use_gzip=True)
+    assert request.code == 200
+    assert "X-Consumed-Content-Encoding" not in request.headers
+
+    # standard seismograms route
+    params = {
+        "sourcelatitude": 10,
+        "sourcelongitude": 10,
+        "sourcedepthinmeters": client.source_depth,
+        "receiverlatitude": -10,
+        "receiverlongitude": -10,
+        "sourcemomenttensor": "100000,100000,100000,100000,100000,100000"}
+    request = client.fetch(_assemble_url('seismograms', **params))
+    assert request.code == 200
+    assert "X-Consumed-Content-Encoding" not in request.headers
+    # Binary format, no gzipping.
+    request = client.fetch(_assemble_url('seismograms', **params),
+                           use_gzip=True)
+    assert request.code == 200
+    assert "X-Consumed-Content-Encoding" not in request.headers
+
+
 def test_multiple_seismograms_retrieval_no_format_given(
         all_clients_station_coordinates_callback):
     """
