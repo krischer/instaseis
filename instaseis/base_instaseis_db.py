@@ -132,7 +132,7 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
 
         data['ZSS'] = self.get_seismograms(
             source=m2, components='Z', **args)['Z']
-        data['RSS'] = -1. * self.get_seismograms(
+        data['RSS'] = self.get_seismograms(
             source=m2, components='R', **args)['R']
 
         data['TDS'] = self.get_seismograms(
@@ -140,17 +140,17 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
 
         data['ZDS'] = self.get_seismograms(
             source=m4, components='Z', **args)['Z']
-        data['RDS'] = -1. * self.get_seismograms(
+        data['RDS'] = self.get_seismograms(
             source=m4, components='R', **args)['R']
 
         data['ZDD'] = self.get_seismograms(
             source=cl, components='Z', **args)['Z']
-        data['RDD'] = -1. * self.get_seismograms(
+        data['RDD'] = self.get_seismograms(
             source=cl, components='R', **args)['R']
 
         data['ZEP'] = self.get_seismograms(
             source=m6, components='Z', **args)['Z']
-        data['REP'] = -1. * self.get_seismograms(
+        data['REP'] = self.get_seismograms(
             source=m6, components='R', **args)['R']
 
         if return_obspy_stream:
