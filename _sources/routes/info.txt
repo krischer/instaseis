@@ -30,7 +30,7 @@ Example Response
             "min_d": 0,
             "min_radius": 5671,
             "nfft": 16384,
-            "npts": 7591
+            "npts": 7591,
             "period": 2,
             "planet_radius": 6371000,
             "slip": [ "..." ],
