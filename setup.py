@@ -141,7 +141,7 @@ INSTALL_REQUIRES = ["netCDF4 >= 1.1",
                     "obspy >= 0.10.2",
                     "future",
                     "requests",
-                    "tornado",
+                    "tornado>=4.0.0",
                     "flake8>=2",
                     "pytest",
                     "responses"]

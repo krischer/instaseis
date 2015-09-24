@@ -53,11 +53,12 @@ class AsyncClient(object):
         self.httpserver = httpserver
         self.httpclient = httpclient
 
-    def fetch(self, path, **kwargs):
+    def fetch(self, path, use_gzip=False, **kwargs):
         # This seems a bit fragile. How else to get the dynamic port number?
         port = list(self.httpserver._sockets.values())[0].getsockname()[1]
         url = u'%s://localhost:%s%s' % ('http', port, path)
-        self.httpclient.fetch(url, self.stop, **kwargs)
+        self.httpclient.fetch(url, self.stop, decompress_response=use_gzip,
+                              **kwargs)
         return self.wait()
 
     @property
