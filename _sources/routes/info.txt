@@ -44,4 +44,5 @@ Example Response
             "time_scheme": "symplec4",
             "user": "di29kub on login05",
             "velocity_model": "ak135f",
+            "external_model_name": ""
         }
