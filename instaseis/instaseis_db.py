@@ -668,6 +668,7 @@ class InstaseisDB(BaseInstaseisDB):
             source_depth=float(self.parsed_mesh.source_depth)
             if self._is_reciprocal is False else None,
             velocity_model=self.parsed_mesh.background_model,
+            external_model_name=self.parsed_mesh.external_model_name,
             attenuation=self.parsed_mesh.attenuation,
             period=float(self.parsed_mesh.dominant_period),
             dump_type=self.parsed_mesh.dump_type,

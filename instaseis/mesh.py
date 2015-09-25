@@ -168,10 +168,13 @@ class Mesh(object):
                 .filters()["complevel"]
 
         self.background_model = getattr(self.f, "background model")
-        if file_version >= 8:
+        if self.file_version >= 8:
             self.external_model_name = getattr(self.f, "external model name")
         else:
-            self.external_model_name = 'unknown'
+            if self.background_model == 'external':
+                self.external_model_name = 'unknown'
+            else:
+                self.external_model_name = ''
         self.attenuation = bool(getattr(self.f, "attenuation"))
         self.planet_radius = getattr(self.f, "planet radius") * 1e3
         self.dominant_period = getattr(self.f, "dominant source period")

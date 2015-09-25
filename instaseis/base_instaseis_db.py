@@ -353,8 +353,8 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
         Must return a dictionary with the following keys:
 
         ``"is_reciprocal"``, ``"components"``, ``"source_depth"``,
-        ``"velocity_model"``, ``"attenuation"``, ``"period"``,
-        ``"dump_type"``, ``"excitation_type"``, ``"dt"``,
+        ``"velocity_model"``, ``"external_model_name"``, ``"attenuation"``,
+        ``"period"``, ``"dump_type"``, ``"excitation_type"``, ``"dt"``,
         ``"sampling_rate"``, ``"npts"``, ``"nnft"``, ``"length"``, ``"stf"``,
         ``"slip"``, ``"sliprate"``, ``"src_shift"``, ``"src_shift_samples"``,
         ``"spatial_order"``, ``"min_radius"``, ``"max_radius"``,
