@@ -15,7 +15,7 @@ from abc import ABCMeta, abstractmethod
 import obspy
 import tornado
 from ..base_instaseis_db import _get_seismogram_times
-from .. import Receiver
+from .. import Receiver, FiniteSource
 
 from .. import __version__
 
@@ -276,16 +276,16 @@ class InstaseisTimeSeriesHandler(with_metaclass(ABCMeta,
             raise tornado.web.HTTPError(
                 404, log_message=msg, reason=msg)
 
-        # Any single...
-        if hasattr(source, "latitude"):
-            src_latitude = source.latitude
-            src_longitude = source.longitude
-            src_depth_in_m = source.depth_in_m
-        # Or a finite source...
-        else:
+        # Finite sources will perform these calculations with the hypocenter.
+        if isinstance(source, FiniteSource):
             src_latitude = source.hypocenter_latitude
             src_longitude = source.hypocenter_longitude
             src_depth_in_m = source.hypocenter_depth_in_m
+        # or any single source.
+        else:
+            src_latitude = source.latitude
+            src_longitude = source.longitude
+            src_depth_in_m = source.depth_in_m
 
         try:
             tt = self.application.travel_time_callback(

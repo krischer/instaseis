@@ -16,7 +16,7 @@ import numpy as np
 import obspy
 import tornado.web
 
-from .. import ForceSource
+from .. import ForceSource, FiniteSource
 from ..helpers import geocentric_to_elliptic_latitude
 from .. import __version__
 
@@ -142,13 +142,22 @@ def _validate_and_write_waveforms(st, callback, starttime, endtime, source,
             tr.stats.sac.stlo = receiver.longitude
             tr.stats.sac.stdp = receiver.depth_in_m
             tr.stats.sac.stel = 0.0
-            tr.stats.sac.evla = geocentric_to_elliptic_latitude(
-                source.latitude)
-            tr.stats.sac.evlo = source.longitude
-            tr.stats.sac.evdp = source.depth_in_m
-            # Force source has no magnitude.
-            if not isinstance(source, ForceSource):
-                tr.stats.sac.mag = source.moment_magnitude
+            if isinstance(source, FiniteSource):
+                tr.stats.sac.evla = geocentric_to_elliptic_latitude(
+                    source.hypocenter_latitude)
+                tr.stats.sac.evlo = source.hypocenter_longitude
+                tr.stats.sac.evdp = source.hypocenter_depth_in_m
+                # Force source has no magnitude.
+                if not isinstance(source, ForceSource):
+                    tr.stats.sac.mag = source.moment_magnitude
+            else:
+                tr.stats.sac.evla = geocentric_to_elliptic_latitude(
+                    source.latitude)
+                tr.stats.sac.evlo = source.longitude
+                tr.stats.sac.evdp = source.depth_in_m
+                # Force source has no magnitude.
+                if not isinstance(source, ForceSource):
+                    tr.stats.sac.mag = source.moment_magnitude
             # Thats what SPECFEM uses for a moment magnitude....
             tr.stats.sac.imagtyp = 55
             # The event origin time relative to the reference which I'll

@@ -10,22 +10,20 @@
 import io
 import zipfile
 
-import numpy as np
 import obspy
 import tornado.gen
 import tornado.web
 
-from ... import __version__
 from ... import FiniteSource
-from ..util import run_async, IOQueue, _validtimesetting
+from ..util import run_async, IOQueue, _validtimesetting, \
+    _validate_and_write_waveforms
 from ..instaseis_request import InstaseisTimeSeriesHandler
-from ...helpers import geocentric_to_elliptic_latitude
 
 
 @run_async
 def _get_finite_source(db, finite_source, receiver, components, units, dt,
                        kernelwidth, starttime, endtime, format, label,
-                       callback):
+                       origin_time, callback):
     """
     Extract a seismogram from the passed db and write it either to a MiniSEED
     or a SACZIP file.
@@ -42,13 +40,9 @@ def _get_finite_source(db, finite_source, receiver, components, units, dt,
     :param endtime: The desired end time of the seismogram.
     :param format: The output format. Either "miniseed" or "saczip".
     :param label: Prefix for the filename within the SAC zip file.
+    :param origin_time: The time of the first sample.
     :param callback: callback function of the coroutine.
     """
-    if not label:
-        label = ""
-    else:
-        label += "_"
-
     try:
         st = db.get_seismograms_finite_source(
             sources=finite_source, receiver=receiver, components=components,
@@ -61,70 +55,14 @@ def _get_finite_source(db, finite_source, receiver, components, units, dt,
         return
 
     for tr in st:
-        # Half the filesize but definitely sufficiently accurate.
-        tr.data = np.require(tr.data, dtype=np.float32)
+        tr.stats.starttime = origin_time
 
-    # XXX: Reenable once figured out!
-    # Sanity checks. Raise internal server errors in case something fails.
-    # This should not happen and should have been caught before.
-    # if endtime > st[0].stats.endtime:
-    #     msg = ("Endtime larger then the extracted endtime: endtime=%s, "
-    #            "largest db endtime=%s" % (endtime, st[0].stats.endtime))
-    #     callback(tornado.web.HTTPError(500, log_message=msg, reason=msg))
-    #     return
-    # if starttime < st[0].stats.starttime - 3600.0:
-    #     msg = ("Starttime more than one hour before the starttime of the "
-    #            "seismograms.")
-    #     callback(tornado.web.HTTPError(500, log_message=msg, reason=msg))
-    #     return
-    #
-    # # Trim, potentially pad with zeroes.
-    # st.trim(starttime, endtime, pad=True, fill_value=0.0,
-    #         nearest_sample=False)
+    finite_source.origin_time = origin_time
 
-    # Checked in another function and just a sanity check.
-    assert format in ("miniseed", "saczip")
-
-    if format == "miniseed":
-        with io.BytesIO() as fh:
-            st.write(fh, format="mseed")
-            fh.seek(0, 0)
-            binary_data = fh.read()
-        callback(binary_data)
-    # Write a number of SAC files into an archive.
-    elif format == "saczip":
-        byte_strings = []
-        for tr in st:
-            # Write SAC headers.
-            tr.stats.sac = obspy.core.AttribDict()
-            # Write WGS84 coordinates to the SAC files.
-            tr.stats.sac.stla = geocentric_to_elliptic_latitude(
-                receiver.latitude)
-            tr.stats.sac.stlo = receiver.longitude
-            tr.stats.sac.stdp = receiver.depth_in_m
-            tr.stats.sac.stel = 0.0
-            tr.stats.sac.evla = geocentric_to_elliptic_latitude(
-                finite_source.hypocenter_latitude)
-            tr.stats.sac.evlo = finite_source.hypocenter_longitude
-            tr.stats.sac.evdp = finite_source.hypocenter_depth_in_m
-            tr.stats.sac.mag = finite_source.moment_magnitude
-            # Thats what SPECFEM uses for a moment magnitude....
-            tr.stats.sac.imagtyp = 55
-            # The event origin time relative to the reference which I'll
-            # just assume to be the starttime here?
-            # XXX: Reenable once figured out!
-            # tr.stats.sac.o = source.origin_time - starttime
-            # Some provenance.
-            tr.stats.sac.kuser0 = "InstSeis"
-            tr.stats.sac.kuser1 = __version__[:8]
-            tr.stats.sac.kuser2 = db.info.velocity_model[:8]
-
-            with io.BytesIO() as temp:
-                tr.write(temp, format="sac")
-                temp.seek(0, 0)
-                filename = "%s%s.sac" % (label, tr.id)
-                byte_strings.append((filename, temp.read()))
-        callback(byte_strings)
+    _validate_and_write_waveforms(st=st, callback=callback,
+                                  starttime=starttime, endtime=endtime,
+                                  source=finite_source, receiver=receiver,
+                                  db=db, label=label, format=format)
 
 
 class FiniteSourceSeismogramsHandler(InstaseisTimeSeriesHandler):
@@ -179,6 +117,8 @@ class FiniteSourceSeismogramsHandler(InstaseisTimeSeriesHandler):
         # Parse the arguments. This will also perform a number of sanity
         # checks.
         args = self.parse_arguments()
+        self.set_headers(args)
+        min_starttime, max_endtime = self.parse_time_settings(args)
 
         try:
             with io.BytesIO(self.request.body) as buf:
@@ -202,9 +142,6 @@ class FiniteSourceSeismogramsHandler(InstaseisTimeSeriesHandler):
         # finally resample to the sampling as the database
         finite_source.resample_sliprate(dt=self.application.db.info.dt,
                                         nsamp=self.application.db.info.npts)
-
-        min_starttime, max_endtime = self.parse_time_settings(args)
-        self.set_headers(args)
 
         # Generating even 100'000 receivers only takes ~150ms so its totally
         # ok to generate them all at once here. The time to generate and
@@ -256,7 +193,7 @@ class FiniteSourceSeismogramsHandler(InstaseisTimeSeriesHandler):
                 receiver=receiver, components=list(args.components),
                 units=args.units, dt=args.dt, kernelwidth=args.kernelwidth,
                 starttime=starttime, endtime=endtime, format=args.format,
-                label=args.label)
+                label=args.label, origin_time=args.origintime)
 
             # Check connection once again.
             if self.connection_closed:
