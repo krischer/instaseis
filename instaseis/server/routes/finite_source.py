@@ -65,6 +65,34 @@ def _get_finite_source(db, finite_source, receiver, components, units, dt,
                                   db=db, label=label, format=format)
 
 
+@run_async
+def _parse_and_resample_finite_source(request, db_info, callback):
+    try:
+        with io.BytesIO(request.body) as buf:
+            finite_source = FiniteSource.from_usgs_param_file(buf)
+    except:
+        msg = ("Could not parse the body contents. Incorrect USGS param "
+               "file?")
+        callback(tornado.web.HTTPError(400, log_message=msg, reason=msg))
+        return
+
+    finite_source.find_hypocenter()
+
+    # prepare the source time functions to be at the same sampling as the
+    # database first use enough samples such that the lowpassed stf will
+    # still be correctly represented
+    dominant_period = db_info.period
+
+    nsamp = int(dominant_period / finite_source[0].dt) * 50
+    finite_source.resample_sliprate(dt=finite_source[0].dt, nsamp=nsamp)
+    # lowpass to avoid aliasing
+    finite_source.lp_sliprate(freq=1.0 / dominant_period)
+    # finally resample to the sampling as the database
+    finite_source.resample_sliprate(dt=db_info.dt, nsamp=db_info.npts)
+
+    callback(finite_source)
+
+
 class FiniteSourceSeismogramsHandler(InstaseisTimeSeriesHandler):
     # Define the arguments for the seismogram endpoint.
     arguments = {
@@ -120,28 +148,15 @@ class FiniteSourceSeismogramsHandler(InstaseisTimeSeriesHandler):
         self.set_headers(args)
         min_starttime, max_endtime = self.parse_time_settings(args)
 
-        try:
-            with io.BytesIO(self.request.body) as buf:
-                finite_source = FiniteSource.from_usgs_param_file(buf)
-        except:
-            msg = ("Could not parse the body contents. Incorrect USGS param "
-                   "file?")
-            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+        response = yield tornado.gen.Task(
+            _parse_and_resample_finite_source,
+            request=self.request, db_info=self.application.db.info)
 
-        finite_source.find_hypocenter()
+        # If an exception is returned from the task, re-raise it here.
+        if isinstance(response, Exception):
+            raise response
 
-        # prepare the source time functions to be at the same sampling as the
-        # database first use enough samples such that the lowpassed stf will
-        # still be correctly represented
-        dominant_period = self.application.db.info.period
-
-        nsamp = int(dominant_period / finite_source[0].dt) * 50
-        finite_source.resample_sliprate(dt=finite_source[0].dt, nsamp=nsamp)
-        # lowpass to avoid aliasing
-        finite_source.lp_sliprate(freq=1.0 / dominant_period)
-        # finally resample to the sampling as the database
-        finite_source.resample_sliprate(dt=self.application.db.info.dt,
-                                        nsamp=self.application.db.info.npts)
+        finite_source = response
 
         # Generating even 100'000 receivers only takes ~150ms so its totally
         # ok to generate them all at once here. The time to generate and
