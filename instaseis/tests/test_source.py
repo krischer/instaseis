@@ -11,6 +11,7 @@ Tests for source handling.
 """
 from __future__ import absolute_import
 
+import io
 import obspy
 import os
 import numpy as np
@@ -142,11 +143,44 @@ def test_parse_usgs_param_file():
     finitesource = FiniteSource.from_usgs_param_file(USGS_PARAM_FILE1)
     np.testing.assert_almost_equal(finitesource.moment_magnitude,
                                    7.9374427577095901)
+    assert finitesource.npointsources == 121
 
     # multi segment file
     finitesource = FiniteSource.from_usgs_param_file(USGS_PARAM_FILE2)
     np.testing.assert_almost_equal(finitesource.moment_magnitude,
                                    8.26413197488)
+    assert finitesource.npointsources == 400
+
+
+def test_parse_usgs_param_file_from_bytes_io_and_open_files():
+    """
+    Tests parsing a USGS file from a BytesIO stream and open files..
+    """
+    with io.open(USGS_PARAM_FILE1, "rb") as fh:
+        finitesource = FiniteSource.from_usgs_param_file(fh)
+    np.testing.assert_almost_equal(finitesource.moment_magnitude,
+                                   7.9374427577095901)
+    assert finitesource.npointsources == 121
+
+    with io.open(USGS_PARAM_FILE1, "rb") as fh:
+        with io.BytesIO(fh.read()) as buf:
+            finitesource = FiniteSource.from_usgs_param_file(buf)
+    np.testing.assert_almost_equal(finitesource.moment_magnitude,
+                                   7.9374427577095901)
+    assert finitesource.npointsources == 121
+
+    with io.open(USGS_PARAM_FILE2, "rb") as fh:
+        finitesource = FiniteSource.from_usgs_param_file(fh)
+    np.testing.assert_almost_equal(finitesource.moment_magnitude,
+                                   8.26413197488)
+    assert finitesource.npointsources == 400
+
+    with io.open(USGS_PARAM_FILE2, "rb") as fh:
+        with io.BytesIO(fh.read()) as buf:
+            finitesource = FiniteSource.from_usgs_param_file(buf)
+    np.testing.assert_almost_equal(finitesource.moment_magnitude,
+                                   8.26413197488)
+    assert finitesource.npointsources == 400
 
 
 def test_Haskell():
@@ -294,7 +328,6 @@ def test_strike_dip_rake_from_ln():
     """
     for strike, dip, rake in zip((42., 180., -140.), (22., 0., 90.),
                                  (17., 32., 120.)):
-        print(strike)
         l, m, n = fault_vectors_lmn(strike, dip, rake)
         s, d, r = strike_dip_rake_from_ln(l, n)
 

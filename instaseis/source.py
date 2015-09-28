@@ -15,6 +15,7 @@ from __future__ import (absolute_import, division, print_function,
 
 import collections
 import functools
+import io
 import numpy as np
 import obspy
 from obspy.core.util.geodetics.flinnengdahl import FlinnEngdahl
@@ -1115,7 +1116,8 @@ class FiniteSource(object):
             return self(pointsources=sources)
 
     @classmethod
-    def from_usgs_param_file(self, filename, npts=10000, dt=0.1, trise_min=1.):
+    def from_usgs_param_file(cls, filename_or_obj, npts=10000, dt=0.1,
+                             trise_min=1.):
         """
         Initialize a finite source object from a (.param) file available from
         the USGS website
@@ -1123,21 +1125,20 @@ class FiniteSource(object):
         Coordinates are assumed to be defined on the WGS84 ellipsoid and
         will be converted to geocentric coordinates.
 
-        :param filename: path to the .param file
-        :type filename: str
+        :param filename_or_obj: path to the .param file
+        :type filename_or_obj: str
         :param npts: number of samples for the source time functions. Should be
-                     enough to accomodate long rise times plus optional filter
-                     responses.
-        :type npts: int, optional
+            enough to accommodate long rise times plus optional filter
+            responses.
+        :type npts: int
         :param dt: sample interval for the source time functions. Needs to be
-                   small enough to sample short rise times and can then be low
-                   pass filtered and downsampled before extracting seismograms.
-        :type dt: float, optional
+            small enough to sample short rise times and can then be low pass
+            filtered and downsampled before extracting seismograms.
+        :type dt: float
         :param trise_min: minimum rise time. If rise time or fall time is
-                          smaller than this value, it is replaced by the
-                          minimum value. Mostly meant to handle zero rise times
-                          in some USGS files.
-        :type trise_min: float, optional
+            smaller than this value, it is replaced by the minimum value.
+            Mostly meant to handle zero rise times in some USGS files.
+        :type trise_min: float
 
         >>> import instaseis
         >>> source = instaseis.FiniteSource.from_srf_file("filename.param")
@@ -1158,49 +1159,66 @@ class FiniteSource(object):
             max longitude        : -145.7 deg
             hypocenter longitude : -145.7 deg
         """
-        with open(filename, "rt") as f:
-            # number of segments
-            line = f.readline()
-            nseg = int(line.split()[-1])
-            sources = []
+        if hasattr(filename_or_obj, "readline"):
+            return cls._from_usgs_param_file(
+                fh=filename_or_obj, npts=npts, dt=dt, trise_min=trise_min)
 
-            # parse all segments
-            for _ in range(nseg):
+        with io.open(filename_or_obj, "rb") as fh:
+            return cls._from_usgs_param_file(fh=fh, npts=npts, dt=dt,
+                                             trise_min=trise_min)
 
-                # got to point source segment
-                for line in f:
-                    if '#Lat. Lon. depth' in line:
-                        break
+    @classmethod
+    def _from_usgs_param_file(cls, fh, npts, dt, trise_min):
+        """
+        Internal function actually reading a USGS param file from any open
+        binary buffer.
+        """
+        # number of segments
+        line = fh.readline().decode().strip()
+        if not line.startswith("#Total number of fault_segments"):
+            raise ValueError("Not a valid USGS param file.")
+        nseg = int(line.split()[-1])
+        sources = []
 
-                # read all point sources until reaching next segment
-                for line in f:
-                    if '#Fault_segment' in line:
-                        break
+        # parse all segments
+        for _ in range(nseg):
 
-                    # Lat. Lon. depth slip rake strike dip t_rup t_ris t_fal mo
-                    (lat, lon, dep, slip, rake, stk, dip, tinit, trise, tfall,
-                        M0) = map(float, line.split())
+            # got to point source segment
+            for line in fh:
+                line = line.decode()
+                if '#Lat. Lon. depth' in line:
+                    break
 
-                    # Convert latitude to a geocentric latitude.
-                    lat = elliptic_to_geocentric_latitude(lat)
+            # read all point sources until reaching next segment
+            for line in fh:
+                line = line.decode()
+                if '#Fault_segment' in line:
+                    break
 
-                    dep *= 1e3    # km > m
-                    slip *= 1e-2  # cm > m
-                    M0 *= 1e-7    # dyn / cm > N * m
+                # Lat. Lon. depth slip rake strike dip t_rup t_ris t_fal mo
+                (lat, lon, dep, slip, rake, stk, dip, tinit, trise, tfall,
+                    M0) = map(float, line.split())
 
-                    if trise < trise_min:
-                        trise = trise_min
+                # Convert latitude to a geocentric latitude.
+                lat = elliptic_to_geocentric_latitude(lat)
 
-                    if tfall < trise_min:
-                        tfall = trise_min
+                dep *= 1e3    # km > m
+                slip *= 1e-2  # cm > m
+                M0 *= 1e-7    # dyn / cm > N * m
 
-                    stf = asymmetric_cosine(trise, tfall, npts, dt)
-                    sources.append(
-                        Source.from_strike_dip_rake(
-                            lat, lon, dep, stk, dip, rake, M0,
-                            time_shift=tinit, sliprate=stf, dt=dt))
+                if trise < trise_min:
+                    trise = trise_min
 
-            return self(pointsources=sources)
+                if tfall < trise_min:
+                    tfall = trise_min
+
+                stf = asymmetric_cosine(trise, tfall, npts, dt)
+                sources.append(
+                    Source.from_strike_dip_rake(
+                        lat, lon, dep, stk, dip, rake, M0,
+                        time_shift=tinit, sliprate=stf, dt=dt))
+
+        return cls(pointsources=sources)
 
     @classmethod
     def from_Haskell(self, latitude, longitude, depth_in_m, strike, dip, rake,

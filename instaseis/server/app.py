@@ -25,6 +25,7 @@ from .routes.info import InfoHandler
 from .routes.seismograms import SeismogramsHandler
 from .routes.seismograms_raw import RawSeismogramsHandler
 from .routes.greens import GreensFunctionHandler
+from .routes.finite_source import FiniteSourceSeismogramsHandler
 
 
 # Bit of a hack: Add geojson to the content-types supported for gzipping.
@@ -43,6 +44,7 @@ def get_application():
     return tornado.web.Application([
         (r"/seismograms", SeismogramsHandler),
         (r"/seismograms_raw", RawSeismogramsHandler),
+        (r"/finite_source", FiniteSourceSeismogramsHandler),
         (r"/greens_function", GreensFunctionHandler),
         (r"/info", InfoHandler),
         (r"/", IndexHandler),
