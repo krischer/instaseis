@@ -4587,9 +4587,9 @@ def test_scale_parameter(all_clients):
     request = client.fetch(_assemble_url('seismograms', **params))
     st_server = obspy.read(request.buffer)
 
-    for tr_s, tr_db in zip(st_server, st_db):
-        tr_server = tr_s.copy()
-        tr_server.data *= 3.5
+    for tr_server, tr_database in zip(st_server, st_db):
+        tr_db = tr_database.copy()
+        tr_db.data *= 3.5
         # Remove the additional stats from both.
         del tr_server.stats.mseed
         del tr_server.stats._format
@@ -4610,9 +4610,9 @@ def test_scale_parameter(all_clients):
     request = client.fetch(_assemble_url('seismograms', **params))
     st_server = obspy.read(request.buffer)
 
-    for tr_s, tr_db in zip(st_server, st_db):
-        tr_server = tr_s.copy()
-        tr_server.data *= -2.5
+    for tr_server, tr_database in zip(st_server, st_db):
+        tr_db = tr_database.copy()
+        tr_db.data *= -2.5
         # Remove the additional stats from both.
         del tr_server.stats.mseed
         del tr_server.stats._format
@@ -4625,3 +4625,13 @@ def test_scale_parameter(all_clients):
         # small values.
         np.testing.assert_allclose(tr_server.data, tr_db.data,
                                    atol=1E-10 * tr_server.data.ptp())
+
+    # Scale of 0 should raise.
+    params = copy.deepcopy(basic_parameters)
+    params["sourcemomenttensor"] = mt_param
+    params["scale"] = 0.0
+    request = client.fetch(_assemble_url('seismograms', **params))
+    assert request.code == 400
+    assert request.reason == (
+        "A scale of zero means all seismograms have an amplitude "
+        "of zero. No need to get it in the first place.")

@@ -103,8 +103,8 @@ def _format_utc_datetime(dt):
     return dt.datetime.isoformat() + "Z"
 
 
-def _validate_and_write_waveforms(st, callback, starttime, endtime, source,
-                                  receiver, db, label, format):
+def _validate_and_write_waveforms(st, callback, starttime, endtime, scale,
+                                  source, receiver, db, label, format):
     if not label:
         label = ""
     else:
@@ -113,6 +113,11 @@ def _validate_and_write_waveforms(st, callback, starttime, endtime, source,
     for tr in st:
         # Half the filesize but definitely sufficiently accurate.
         tr.data = np.require(tr.data, dtype=np.float32)
+
+    if scale != 1.0:
+        for tr in st:
+            tr.data *= scale
+
     # Sanity checks. Raise internal server errors in case something fails.
     # This should not happen and should have been caught before.
     if endtime > st[0].stats.endtime:

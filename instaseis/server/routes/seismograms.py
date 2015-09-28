@@ -21,7 +21,7 @@ from ..instaseis_request import InstaseisTimeSeriesHandler
 
 @run_async
 def _get_seismogram(db, source, receiver, components, units, dt, kernelwidth,
-                    starttime, endtime, format, label, callback):
+                    starttime, endtime, scale, format, label, callback):
     """
     Extract a seismogram from the passed db and write it either to a MiniSEED
     or a SACZIP file.
@@ -36,6 +36,8 @@ def _get_seismogram(db, source, receiver, components, units, dt, kernelwidth,
     :param kernelwidth: Width of the interpolation kernel.
     :param starttime: The desired start time of the seismogram.
     :param endtime: The desired end time of the seismogram.
+    :param scale: A scalar factor which the seismograms will be multiplied
+        with.
     :param format: The output format. Either "miniseed" or "saczip".
     :param label: Prefix for the filename within the SAC zip file.
     :param callback: callback function of the coroutine.
@@ -51,11 +53,12 @@ def _get_seismogram(db, source, receiver, components, units, dt, kernelwidth,
                "are valid, and the depth settings are correct.")
         callback(tornado.web.HTTPError(400, log_message=msg, reason=msg))
         return
+
     _validate_and_write_waveforms(st=st, callback=callback,
                                   starttime=starttime, endtime=endtime,
-                                  source=source, receiver=receiver, db=db,
-                                  label=label, format=format)
-
+                                  scale=scale, source=source,
+                                  receiver=receiver, db=db, label=label,
+                                  format=format)
 
 def _tolist(value, count):
     value = [float(i) for i in value.split(",")]
@@ -100,6 +103,9 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
         "sourceforce": {"type": _forcesource,
                         "format": "Fr,Ft,Fp"},
 
+        # Scale parameter.
+        "scale": {"type": float, "default": 1.0},
+
         # Or last but not least by specifying an event id.
         "eventid": {"type": str},
 
@@ -139,6 +145,11 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
         Function attempting to validate that the passed parameters are
         valid. Does not need to check the types as that has already been done.
         """
+        if args.scale == 0.0:
+            msg = ("A scale of zero means all seismograms have an amplitude "
+                   "of zero. No need to get it in the first place.")
+            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+
         self.validate_receiver_parameters(args)
         self.validate_source_parameters(args)
 
@@ -409,7 +420,7 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
                 db=self.application.db, source=source, receiver=receiver,
                 components=list(args.components), units=args.units, dt=args.dt,
                 kernelwidth=args.kernelwidth, starttime=starttime,
-                endtime=endtime, format=args.format,
+                endtime=endtime, scale=args.scale, format=args.format,
                 label=args.label)
 
             # Check connection once again.
