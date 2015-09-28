@@ -1117,7 +1117,7 @@ class FiniteSource(object):
 
     @classmethod
     def from_usgs_param_file(cls, filename_or_obj, npts=10000, dt=0.1,
-                             trise_min=1.):
+                             trise_min=1.0):
         """
         Initialize a finite source object from a (.param) file available from
         the USGS website

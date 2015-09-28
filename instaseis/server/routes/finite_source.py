@@ -69,25 +69,31 @@ def _get_finite_source(db, finite_source, receiver, components, units, dt,
 def _parse_and_resample_finite_source(request, db_info, callback):
     try:
         with io.BytesIO(request.body) as buf:
-            finite_source = FiniteSource.from_usgs_param_file(buf)
+            # We get 10.000 samples for each source sampled at 10 Hz. This is
+            # more than enough to capture a minimal possible rise time of 1
+            # second. The maximum possible time shift for any source is
+            # therefore 1000 second which should be enough for any real fault.
+            # Might need some more thought.
+            finite_source = FiniteSource.from_usgs_param_file(
+                buf, npts=10000, dt=0.1, trise_min=1.0)
     except:
         msg = ("Could not parse the body contents. Incorrect USGS param "
                "file?")
         callback(tornado.web.HTTPError(400, log_message=msg, reason=msg))
         return
 
+    # Will set the hypocentral coordinates.
     finite_source.find_hypocenter()
 
-    # prepare the source time functions to be at the same sampling as the
-    # database first use enough samples such that the lowpassed stf will
-    # still be correctly represented
     dominant_period = db_info.period
 
-    nsamp = int(dominant_period / finite_source[0].dt) * 50
-    finite_source.resample_sliprate(dt=finite_source[0].dt, nsamp=nsamp)
-    # lowpass to avoid aliasing
-    finite_source.lp_sliprate(freq=1.0 / dominant_period)
-    # finally resample to the sampling as the database
+    # A lowpass filter is needed to avoid aliasing - I guess using a
+    # zerophase filter is a bit questionable as it has some potentially
+    # acausal effects but it does not shift the times.
+    finite_source.lp_sliprate(freq=1.0 / dominant_period, zerophase=True)
+
+    # Last step is to resample to the sampling rate of the database for the
+    # final convolution.
     finite_source.resample_sliprate(dt=db_info.dt, nsamp=db_info.npts)
 
     callback(finite_source)
