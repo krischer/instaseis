@@ -274,11 +274,23 @@ class InstaseisTimeSeriesHandler(with_metaclass(ABCMeta,
             msg = "Server does not support travel time calculations."
             raise tornado.web.HTTPError(
                 404, log_message=msg, reason=msg)
+
+        # Any single...
+        if hasattr(source, "latitude"):
+            src_latitude = source.latitude
+            src_longitude = source.longitude
+            src_depth_in_m = source.depth_in_m
+        # Or a finite source...
+        else:
+            src_latitude = source.hypocenter_latitude
+            src_longitude = source.hypocenter_longitude
+            src_depth_in_m = source.hypocenter_depth_in_m
+
         try:
             tt = self.application.travel_time_callback(
-                sourcelatitude=source.latitude,
-                sourcelongitude=source.longitude,
-                sourcedepthinmeters=source.depth_in_m,
+                sourcelatitude=src_latitude,
+                sourcelongitude=src_longitude,
+                sourcedepthinmeters=src_depth_in_m,
                 receiverlatitude=receiver.latitude,
                 receiverlongitude=receiver.longitude,
                 receiverdepthinmeters=receiver.depth_in_m,
@@ -298,6 +310,17 @@ class InstaseisTimeSeriesHandler(with_metaclass(ABCMeta,
         """
         info = self.application.db.info
 
+        # Any single...
+        if hasattr(source, "latitude"):
+            src_latitude = source.latitude
+            src_longitude = source.longitude
+            src_depth_in_m = source.depth_in_m
+        # Or a finite source...
+        else:
+            src_latitude = source.hypocenter_latitude
+            src_longitude = source.hypocenter_longitude
+            src_depth_in_m = source.hypocenter_depth_in_m
+
         # XXX: Will have to be changed once we have a database recorded for
         # example on the ocean bottom.
         if info.is_reciprocal:
@@ -310,7 +333,7 @@ class InstaseisTimeSeriesHandler(with_metaclass(ABCMeta,
                                                 reason=msg)
             # Source depth must be within the allowed range.
             if not ((info.planet_radius - info.max_radius) <=
-                    source.depth_in_m <=
+                    src_depth_in_m <=
                     (info.planet_radius - info.min_radius)):
                 msg = ("Source depth must be within the database range: %.1f "
                        "- %.1f meters.") % (
@@ -320,7 +343,7 @@ class InstaseisTimeSeriesHandler(with_metaclass(ABCMeta,
                                             reason=msg)
         else:
             # The source depth must coincide with the one in the database.
-            if source.depth_in_m != info.source_depth * 1000:
+            if src_depth_in_m != info.source_depth * 1000:
                     msg = "Source depth must be: %.1f km" % info.source_depth
                     raise tornado.web.HTTPError(400, log_message=msg,
                                                 reason=msg)
