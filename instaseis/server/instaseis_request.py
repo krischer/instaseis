@@ -247,7 +247,7 @@ class InstaseisTimeSeriesHandler(with_metaclass(ABCMeta,
             format = args.format
 
         if format == "miniseed":
-            content_type = "application/octet-stream"
+            content_type = "application/vnd.fdsn.mseed"
         elif format == "saczip":
             content_type = "application/zip"
         self.set_header("Content-Type", content_type)

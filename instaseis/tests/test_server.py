@@ -782,7 +782,7 @@ def test_mu_is_passed_as_header_value(all_clients):
     assert "Instaseis-Mu" in request.headers
     assert isinstance(float(request.headers["Instaseis-Mu"]), float)
 
-    assert request.headers["Content-Type"] == "application/octet-stream"
+    assert request.headers["Content-Type"] == "application/vnd.fdsn.mseed"
     cd = request.headers["Content-Disposition"]
     assert "attachment; filename=" in cd
     assert "instaseis_seismogram" in cd
@@ -2666,7 +2666,7 @@ def test_multiple_seismograms_retrieval_mseed_format(
     # Default format is MiniSEED>
     request = client.fetch(_assemble_url('seismograms', **params))
     assert request.code == 200
-    assert request.headers["Content-Type"] == "application/octet-stream"
+    assert request.headers["Content-Type"] == "application/vnd.fdsn.mseed"
     st_server = obspy.read(request.buffer)
     st_server.sort()
 
@@ -2724,7 +2724,7 @@ def test_multiple_seismograms_retrieval_mseed_format(
     # Default format is MiniSEED>
     request = client.fetch(_assemble_url('seismograms', **params))
     assert request.code == 200
-    assert request.headers["Content-Type"] == "application/octet-stream"
+    assert request.headers["Content-Type"] == "application/vnd.fdsn.mseed"
     st_server = obspy.read(request.buffer)
     st_server.sort()
 
@@ -2778,7 +2778,7 @@ def test_multiple_seismograms_retrieval_mseed_format(
         # Default format is MiniSEED>
         request = client.fetch(_assemble_url('seismograms', **params))
         assert request.code == 200
-        assert request.headers["Content-Type"] == "application/octet-stream"
+        assert request.headers["Content-Type"] == "application/vnd.fdsn.mseed"
         st_server = obspy.read(request.buffer)
         st_server.sort()
 

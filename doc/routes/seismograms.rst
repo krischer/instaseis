@@ -14,7 +14,7 @@ Description
 
 Content-Type
     * ``application/zip`` (if zipped SAC data is requested)
-    * ``application/octet-stream`` (if MiniSEED data is requested)
+    * ``application/vnd.fdsn.mseed`` (if MiniSEED data is requested)
 
 Filetype
     Returns a ZIP archive with SAC files or MiniSEED files encoded with
