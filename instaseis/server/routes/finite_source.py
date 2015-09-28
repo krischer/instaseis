@@ -16,7 +16,7 @@ import tornado.gen
 import tornado.web
 
 from ... import __version__
-from ... import FiniteSource, Receiver
+from ... import FiniteSource
 from ..util import run_async, IOQueue, _validtimesetting
 from ..instaseis_request import InstaseisTimeSeriesHandler
 from ...helpers import geocentric_to_elliptic_latitude
@@ -79,7 +79,8 @@ def _get_finite_source(db, finite_source, receiver, components, units, dt,
     #     return
     #
     # # Trim, potentially pad with zeroes.
-    # st.trim(starttime, endtime, pad=True, fill_value=0.0, nearest_sample=False)
+    # st.trim(starttime, endtime, pad=True, fill_value=0.0,
+    #         nearest_sample=False)
 
     # Checked in another function and just a sanity check.
     assert format in ("miniseed", "saczip")
@@ -126,25 +127,6 @@ def _get_finite_source(db, finite_source, receiver, components, units, dt,
         callback(byte_strings)
 
 
-def _tolist(value, count):
-    value = [float(i) for i in value.split(",")]
-    if len(value) not in count:
-        raise ValueError
-    return value
-
-
-def _momenttensor(value):
-    return _tolist(value, (6,))
-
-
-def _doublecouple(value):
-    return _tolist(value, (3, 4))
-
-
-def _forcesource(value):
-    return _tolist(value, (3,))
-
-
 class FiniteSourceSeismogramsHandler(InstaseisTimeSeriesHandler):
     # Define the arguments for the seismogram endpoint.
     arguments = {
@@ -189,90 +171,7 @@ class FiniteSourceSeismogramsHandler(InstaseisTimeSeriesHandler):
         Function attempting to validate that the passed parameters are
         valid. Does not need to check the types as that has already been done.
         """
-        # The networkcode and stationcode parameters have a maximum number
-        # of letters.
-        if args.stationcode and len(args.stationcode) > 5:
-            msg = "'stationcode' must have 5 or fewer letters."
-            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
-
-        if args.networkcode and len(args.networkcode) > 2:
-            msg = "'networkcode' must have 2 or fewer letters."
-            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
-
-        # Figure out how the station coordinates are specified.
-        direct_receiver_settings = [
-            i is not None
-            for i in (args.receiverlatitude, args.receiverlongitude)]
-        query_receivers = [i is not None for i in (args.network, args.station)]
-        if any(direct_receiver_settings) and any(query_receivers):
-            msg = ("Receiver coordinates can either be specified by passing "
-                   "the coordinates, or by specifying query parameters, "
-                   "but not both.")
-            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
-        elif not(all(direct_receiver_settings) or all(query_receivers)):
-            msg = ("Must specify a full set of coordinates or a full set of "
-                   "receiver parameters.")
-            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
-
-        # Should not happen.
-        assert not (all(direct_receiver_settings) and all(query_receivers))
-
-        # Make sure that the station coordinates callback is available if
-        # needed. Otherwise raise a 404.
-        if all(query_receivers) and \
-                not self.application.station_coordinates_callback:
-            msg = ("Server does not support station coordinates and thus no "
-                   "station queries.")
-            raise tornado.web.HTTPError(404, log_message=msg, reason=msg)
-
-    def get_receivers(self, args):
-        # Already checked before - just make sure the settings are valid.
-        assert (args.receiverlatitude is not None and
-                args.receiverlongitude is not None) or \
-           (args.network and args.station)
-
-        receivers = []
-
-        # Construct either a single receiver object.
-        if args.receiverlatitude is not None:
-            try:
-                receiver = Receiver(latitude=args.receiverlatitude,
-                                    longitude=args.receiverlongitude,
-                                    network=args.networkcode,
-                                    station=args.stationcode,
-                                    depth_in_m=args.receiverdepthinmeters)
-            except:
-                msg = ("Could not construct receiver with passed parameters. "
-                       "Check parameters for sanity.")
-                raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
-            receivers.append(receiver)
-        # Or a list of receivers.
-        elif args.network is not None and args.station is not None:
-            networks = args.network.split(",")
-            stations = args.station.split(",")
-
-            coordinates = self.application.station_coordinates_callback(
-                networks=networks, stations=stations)
-
-            if not coordinates:
-                msg = "No coordinates found satisfying the query."
-                raise tornado.web.HTTPError(
-                    404, log_message=msg, reason=msg)
-
-            for station in coordinates:
-                try:
-                    receivers.append(Receiver(
-                        latitude=station["latitude"],
-                        longitude=station["longitude"],
-                        network=station["network"],
-                        station=station["station"],
-                        depth_in_m=0))
-                except:
-                    msg = ("Could not construct receiver with passed "
-                           "parameters. Check parameters for sanity.")
-                    raise tornado.web.HTTPError(400, log_message=msg,
-                                                reason=msg)
-        return receivers
+        self.validate_receiver_parameters(args)
 
     @tornado.web.asynchronous
     @tornado.gen.coroutine
@@ -303,7 +202,6 @@ class FiniteSourceSeismogramsHandler(InstaseisTimeSeriesHandler):
         # finally resample to the sampling as the database
         finite_source.resample_sliprate(dt=self.application.db.info.dt,
                                         nsamp=self.application.db.info.npts)
-
 
         min_starttime, max_endtime = self.parse_time_settings(args)
         self.set_headers(args)

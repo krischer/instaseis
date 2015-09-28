@@ -7,10 +7,18 @@
     GNU Lesser General Public License, Version 3 [non-commercial/academic use]
     (http://www.gnu.org/copyleft/lgpl.html)
 """
+import io
 import re
 import functools
 import threading
+
+import numpy as np
 import obspy
+import tornado.web
+
+from .. import ForceSource
+from ..helpers import geocentric_to_elliptic_latitude
+from .. import __version__
 
 # Valid phase offset pattern including capture groups.
 PHASE_OFFSET_PATTERN = re.compile(r"(^[A-Za-z0-9^]+)([\+-])([\deE\.\-\+]+$)")
@@ -85,3 +93,75 @@ def _validtimesetting(value):
         "phase": m.group(1),
         "offset": offset
     }
+
+
+def _validate_and_write_waveforms(st, callback, starttime, endtime, source,
+                                  receiver, db, label, format):
+    if not label:
+        label = ""
+    else:
+        label += "_"
+
+    for tr in st:
+        # Half the filesize but definitely sufficiently accurate.
+        tr.data = np.require(tr.data, dtype=np.float32)
+    # Sanity checks. Raise internal server errors in case something fails.
+    # This should not happen and should have been caught before.
+    if endtime > st[0].stats.endtime:
+        msg = ("Endtime larger then the extracted endtime: endtime=%s, "
+               "largest db endtime=%s" % (endtime, st[0].stats.endtime))
+        callback(tornado.web.HTTPError(500, log_message=msg, reason=msg))
+        return
+    if starttime < st[0].stats.starttime - 3600.0:
+        msg = ("Starttime more than one hour before the starttime of the "
+               "seismograms.")
+        callback(tornado.web.HTTPError(500, log_message=msg, reason=msg))
+        return
+
+    # Trim, potentially pad with zeroes.
+    st.trim(starttime, endtime, pad=True, fill_value=0.0, nearest_sample=False)
+
+    # Checked in another function and just a sanity check.
+    assert format in ("miniseed", "saczip")
+
+    if format == "miniseed":
+        with io.BytesIO() as fh:
+            st.write(fh, format="mseed")
+            fh.seek(0, 0)
+            binary_data = fh.read()
+        callback(binary_data)
+    # Write a number of SAC files into an archive.
+    elif format == "saczip":
+        byte_strings = []
+        for tr in st:
+            # Write SAC headers.
+            tr.stats.sac = obspy.core.AttribDict()
+            # Write WGS84 coordinates to the SAC files.
+            tr.stats.sac.stla = geocentric_to_elliptic_latitude(
+                receiver.latitude)
+            tr.stats.sac.stlo = receiver.longitude
+            tr.stats.sac.stdp = receiver.depth_in_m
+            tr.stats.sac.stel = 0.0
+            tr.stats.sac.evla = geocentric_to_elliptic_latitude(
+                source.latitude)
+            tr.stats.sac.evlo = source.longitude
+            tr.stats.sac.evdp = source.depth_in_m
+            # Force source has no magnitude.
+            if not isinstance(source, ForceSource):
+                tr.stats.sac.mag = source.moment_magnitude
+            # Thats what SPECFEM uses for a moment magnitude....
+            tr.stats.sac.imagtyp = 55
+            # The event origin time relative to the reference which I'll
+            # just assume to be the starttime here?
+            tr.stats.sac.o = source.origin_time - starttime
+            # Some provenance.
+            tr.stats.sac.kuser0 = "InstSeis"
+            tr.stats.sac.kuser1 = __version__[:8]
+            tr.stats.sac.kuser2 = db.info.velocity_model[:8]
+
+            with io.BytesIO() as temp:
+                tr.write(temp, format="sac")
+                temp.seek(0, 0)
+                filename = "%s%s.sac" % (label, tr.id)
+                byte_strings.append((filename, temp.read()))
+        callback(byte_strings)

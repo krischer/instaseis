@@ -7,19 +7,16 @@
     GNU Lesser General Public License, Version 3 [non-commercial/academic use]
     (http://www.gnu.org/copyleft/lgpl.html)
 """
-import io
 import zipfile
 
-import numpy as np
 import obspy
 import tornado.gen
 import tornado.web
 
-from ... import __version__
-from ... import Source, ForceSource, Receiver
-from ..util import run_async, IOQueue, _validtimesetting
+from ... import Source, ForceSource
+from ..util import run_async, IOQueue, _validtimesetting, \
+    _validate_and_write_waveforms
 from ..instaseis_request import InstaseisTimeSeriesHandler
-from ...helpers import geocentric_to_elliptic_latitude
 
 
 @run_async
@@ -43,11 +40,6 @@ def _get_seismogram(db, source, receiver, components, units, dt, kernelwidth,
     :param label: Prefix for the filename within the SAC zip file.
     :param callback: callback function of the coroutine.
     """
-    if not label:
-        label = ""
-    else:
-        label += "_"
-
     try:
         st = db.get_seismograms(
             source=source, receiver=receiver, components=components,
@@ -59,71 +51,10 @@ def _get_seismogram(db, source, receiver, components, units, dt, kernelwidth,
                "are valid, and the depth settings are correct.")
         callback(tornado.web.HTTPError(400, log_message=msg, reason=msg))
         return
-
-    for tr in st:
-        # Half the filesize but definitely sufficiently accurate.
-        tr.data = np.require(tr.data, dtype=np.float32)
-
-    # Sanity checks. Raise internal server errors in case something fails.
-    # This should not happen and should have been caught before.
-    if endtime > st[0].stats.endtime:
-        msg = ("Endtime larger then the extracted endtime: endtime=%s, "
-               "largest db endtime=%s" % (endtime, st[0].stats.endtime))
-        callback(tornado.web.HTTPError(500, log_message=msg, reason=msg))
-        return
-    if starttime < st[0].stats.starttime - 3600.0:
-        msg = ("Starttime more than one hour before the starttime of the "
-               "seismograms.")
-        callback(tornado.web.HTTPError(500, log_message=msg, reason=msg))
-        return
-
-    # Trim, potentially pad with zeroes.
-    st.trim(starttime, endtime, pad=True, fill_value=0.0, nearest_sample=False)
-
-    # Checked in another function and just a sanity check.
-    assert format in ("miniseed", "saczip")
-
-    if format == "miniseed":
-        with io.BytesIO() as fh:
-            st.write(fh, format="mseed")
-            fh.seek(0, 0)
-            binary_data = fh.read()
-        callback(binary_data)
-    # Write a number of SAC files into an archive.
-    elif format == "saczip":
-        byte_strings = []
-        for tr in st:
-            # Write SAC headers.
-            tr.stats.sac = obspy.core.AttribDict()
-            # Write WGS84 coordinates to the SAC files.
-            tr.stats.sac.stla = geocentric_to_elliptic_latitude(
-                receiver.latitude)
-            tr.stats.sac.stlo = receiver.longitude
-            tr.stats.sac.stdp = receiver.depth_in_m
-            tr.stats.sac.stel = 0.0
-            tr.stats.sac.evla = geocentric_to_elliptic_latitude(
-                source.latitude)
-            tr.stats.sac.evlo = source.longitude
-            tr.stats.sac.evdp = source.depth_in_m
-            # Force source has no magnitude.
-            if not isinstance(source, ForceSource):
-                tr.stats.sac.mag = source.moment_magnitude
-            # Thats what SPECFEM uses for a moment magnitude....
-            tr.stats.sac.imagtyp = 55
-            # The event origin time relative to the reference which I'll
-            # just assume to be the starttime here?
-            tr.stats.sac.o = source.origin_time - starttime
-            # Some provenance.
-            tr.stats.sac.kuser0 = "InstSeis"
-            tr.stats.sac.kuser1 = __version__[:8]
-            tr.stats.sac.kuser2 = db.info.velocity_model[:8]
-
-            with io.BytesIO() as temp:
-                tr.write(temp, format="sac")
-                temp.seek(0, 0)
-                filename = "%s%s.sac" % (label, tr.id)
-                byte_strings.append((filename, temp.read()))
-        callback(byte_strings)
+    _validate_and_write_waveforms(st=st, callback=callback,
+                                  starttime=starttime, endtime=endtime,
+                                  source=source, receiver=receiver, db=db,
+                                  label=label, format=format)
 
 
 def _tolist(value, count):
@@ -202,21 +133,7 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
     def __init__(self, *args, **kwargs):
         super(InstaseisTimeSeriesHandler, self).__init__(*args, **kwargs)
 
-    def validate_parameters(self, args):
-        """
-        Function attempting to validate that the passed parameters are
-        valid. Does not need to check the types as that has already been done.
-        """
-        # The networkcode and stationcode parameters have a maximum number
-        # of letters.
-        if args.stationcode and len(args.stationcode) > 5:
-            msg = "'stationcode' must have 5 or fewer letters."
-            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
-
-        if args.networkcode and len(args.networkcode) > 2:
-            msg = "'networkcode' must have 2 or fewer letters."
-            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
-
+    def validate_source_parameters(self, args):
         all_src_params = set(["sourcemomenttensor", "sourcedoublecouple",
                               "sourceforce", "sourcelatitude",
                               "sourcelongitude", "sourcedepthinmeters"])
@@ -266,42 +183,24 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
             if len(has_parameters) > 1:
                 msg = "Only one of these parameters can be given " \
                       "simultaneously: %s" % (
-                        ", ".join("'%s'" % _i
-                                  for _i in sorted(has_parameters)))
+                          ", ".join("'%s'" % _i
+                                    for _i in sorted(has_parameters)))
                 raise tornado.web.HTTPError(
                     400, log_message=msg, reason=msg)
             elif not has_parameters:
                 msg = "One of the following has to be given: %s" % (
-                          ", ".join("'%s'" % _i
-                                    for _i in sorted(one_off)))
+                    ", ".join("'%s'" % _i
+                              for _i in sorted(one_off)))
                 raise tornado.web.HTTPError(
                     400, log_message=msg, reason=msg)
 
-        # Figure out who the station coordinates are specified.
-        direct_receiver_settings = [
-            i is not None
-            for i in (args.receiverlatitude, args.receiverlongitude)]
-        query_receivers = [i is not None for i in (args.network, args.station)]
-        if any(direct_receiver_settings) and any(query_receivers):
-            msg = ("Receiver coordinates can either be specified by passing "
-                   "the coordinates, or by specifying query parameters, "
-                   "but not both.")
-            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
-        elif not(all(direct_receiver_settings) or all(query_receivers)):
-            msg = ("Must specify a full set of coordinates or a full set of "
-                   "receiver parameters.")
-            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
-
-        # Should not happen.
-        assert not (all(direct_receiver_settings) and all(query_receivers))
-
-        # Make sure that the station coordinates callback is available if
-        # needed. Otherwise raise a 404.
-        if all(query_receivers) and \
-                not self.application.station_coordinates_callback:
-            msg = ("Server does not support station coordinates and thus no "
-                   "station queries.")
-            raise tornado.web.HTTPError(404, log_message=msg, reason=msg)
+    def validate_parameters(self, args):
+        """
+        Function attempting to validate that the passed parameters are
+        valid. Does not need to check the types as that has already been done.
+        """
+        self.validate_receiver_parameters(args)
+        self.validate_source_parameters(args)
 
     def get_source(self, args, __event):
         # Source can be either directly specified or by passing an event id.
@@ -372,55 +271,6 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
                     raise tornado.web.HTTPError(400, log_message=msg,
                                                 reason=msg)
         return source
-
-    def get_receivers(self, args):
-        # Already checked before - just make sure the settings are valid.
-        assert (args.receiverlatitude is not None and
-                args.receiverlongitude is not None) or \
-           (args.network and args.station)
-
-        receivers = []
-
-        # Construct either a single receiver object.
-        if args.receiverlatitude is not None:
-            try:
-                receiver = Receiver(latitude=args.receiverlatitude,
-                                    longitude=args.receiverlongitude,
-                                    network=args.networkcode,
-                                    station=args.stationcode,
-                                    depth_in_m=args.receiverdepthinmeters)
-            except:
-                msg = ("Could not construct receiver with passed parameters. "
-                       "Check parameters for sanity.")
-                raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
-            receivers.append(receiver)
-        # Or a list of receivers.
-        elif args.network is not None and args.station is not None:
-            networks = args.network.split(",")
-            stations = args.station.split(",")
-
-            coordinates = self.application.station_coordinates_callback(
-                networks=networks, stations=stations)
-
-            if not coordinates:
-                msg = "No coordinates found satisfying the query."
-                raise tornado.web.HTTPError(
-                    404, log_message=msg, reason=msg)
-
-            for station in coordinates:
-                try:
-                    receivers.append(Receiver(
-                        latitude=station["latitude"],
-                        longitude=station["longitude"],
-                        network=station["network"],
-                        station=station["station"],
-                        depth_in_m=0))
-                except:
-                    msg = ("Could not construct receiver with passed "
-                           "parameters. Check parameters for sanity.")
-                    raise tornado.web.HTTPError(400, log_message=msg,
-                                                reason=msg)
-        return receivers
 
     @tornado.web.asynchronous
     @tornado.gen.coroutine

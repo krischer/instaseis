@@ -11,15 +11,13 @@
 import io
 import zipfile
 
-import numpy as np
 import obspy
 import tornado.gen
 import tornado.web
 
-from ... import Source, Receiver, __version__
-from ..util import run_async, _validtimesetting
+from ... import Source, Receiver, ForceSource
+from ..util import run_async, _validtimesetting, _validate_and_write_waveforms
 from ..instaseis_request import InstaseisTimeSeriesHandler
-from ...helpers import geocentric_to_elliptic_latitude
 
 
 @run_async
@@ -43,11 +41,6 @@ def _get_greens(db, epicentral_distance_degree, source_depth_in_m, units, dt,
     :param label: Prefix for the filename within the SAC zip file.
     :param callback: callback function of the coroutine.
     """
-    if not label:
-        label = ""
-    else:
-        label += "_"
-
     try:
         st = db.get_greens_function(
             epicentral_distance_in_degree=epicentral_distance_degree,
@@ -60,66 +53,18 @@ def _get_greens(db, epicentral_distance_degree, source_depth_in_m, units, dt,
         callback(tornado.web.HTTPError(400, log_message=msg, reason=msg))
         return
 
-    for tr in st:
-        # Half the filesize but definitely sufficiently accurate.
-        tr.data = np.require(tr.data, dtype=np.float32)
+    # Fake source and receiver to be able to reuse the generic waveform
+    # serializer.
+    source = ForceSource(latitude=90.0, longitude=90.0,
+                         depth_in_m=source_depth_in_m,
+                         origin_time=origintime)
+    receiver = Receiver(latitude=90.0 - epicentral_distance_degree,
+                        longitude=0.0, depth_in_m=0.0)
 
-    # Sanity checks. Raise internal server errors in case something fails.
-    # This should not happen and should have been caught before.
-    if endtime > st[0].stats.endtime:
-        msg = ("Endtime larger then the extracted endtime: endtime=%s, "
-               "largest db endtime=%s" % (endtime, st[0].stats.endtime))
-        callback(tornado.web.HTTPError(500, log_message=msg, reason=msg))
-        return
-    if starttime < st[0].stats.starttime - 3600.0:
-        msg = ("Starttime more than one hour before the starttime of the "
-               "seismograms.")
-        callback(tornado.web.HTTPError(500, log_message=msg, reason=msg))
-        return
-
-    # Trim, potentially pad with zeroes.
-    st.trim(starttime, endtime, pad=True, fill_value=0.0, nearest_sample=False)
-
-    # Checked in another function and just a sanity check.
-    assert format in ("miniseed", "saczip")
-
-    if format == "miniseed":
-        with io.BytesIO() as fh:
-            st.write(fh, format="mseed")
-            fh.seek(0, 0)
-            binary_data = fh.read()
-        callback(binary_data)
-    # Write a number of SAC files into an archive.
-    elif format == "saczip":
-        byte_strings = []
-        for tr in st:
-            # Write SAC headers.
-            tr.stats.sac = obspy.core.AttribDict()
-            # Write WGS84 coordinates to the SAC files.
-            tr.stats.sac.stla = geocentric_to_elliptic_latitude(
-                90.0 - epicentral_distance_degree)
-            tr.stats.sac.stlo = 0.0
-            tr.stats.sac.stdp = 0.0
-            tr.stats.sac.stel = 0.0
-            tr.stats.sac.evla = 90.0
-            tr.stats.sac.evlo = 90.0
-            tr.stats.sac.evdp = source_depth_in_m
-            # Thats what SPECFEM uses for a moment magnitude....
-            tr.stats.sac.imagtyp = 55
-            # The event origin time relative to the reference which I'll
-            # just assume to be the starttime here?
-            tr.stats.sac.o = origintime - starttime
-            # Some provenance.
-            tr.stats.sac.kuser0 = "InstSeis"
-            tr.stats.sac.kuser1 = __version__[:8]
-            tr.stats.sac.kuser2 = db.info.velocity_model[:8]
-
-            with io.BytesIO() as temp:
-                tr.write(temp, format="sac")
-                temp.seek(0, 0)
-                filename = "%s%s.sac" % (label, tr.id)
-                byte_strings.append((filename, temp.read()))
-        callback(byte_strings)
+    _validate_and_write_waveforms(st=st, callback=callback,
+                                  starttime=starttime, endtime=endtime,
+                                  source=source, receiver=receiver, db=db,
+                                  label=label, format=format)
 
 
 class GreensFunctionHandler(InstaseisTimeSeriesHandler):
@@ -162,7 +107,7 @@ class GreensFunctionHandler(InstaseisTimeSeriesHandler):
                    "so Green's functions can't be computed.")
             raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
-        # Make sure thaat epicentral disance and source depth are in reasonable
+        # Make sure that epicentral disance and source depth are in reasonable
         # ranges
         if args.sourcedistanceindegrees is not None and \
                 not 0.0 <= args.sourcedistanceindegrees <= 180.0:
