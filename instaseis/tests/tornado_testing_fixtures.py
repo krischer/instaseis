@@ -41,6 +41,15 @@ DATA = os.path.join(os.path.dirname(os.path.abspath(
 MODEL = TauPyModel("ak135")
 
 
+def _assemble_url(route, **kwargs):
+    """
+    Helper function.
+    """
+    url = "/%s?" % route
+    url += "&".join("%s=%s" % (key, value) for key, value in kwargs.items())
+    return url
+
+
 class AsyncClient(object):
     """
     A port of parts of AsyncTestCase. See tornado.testing.py:275
@@ -53,9 +62,12 @@ class AsyncClient(object):
         self.httpserver = httpserver
         self.httpclient = httpclient
 
-    def fetch(self, path, use_gzip=False, **kwargs):
+    def _get_port(self):
         # This seems a bit fragile. How else to get the dynamic port number?
-        port = list(self.httpserver._sockets.values())[0].getsockname()[1]
+        return list(self.httpserver._sockets.values())[0].getsockname()[1]
+
+    def fetch(self, path, use_gzip=False, **kwargs):
+        port = self._get_port()
         url = u'%s://localhost:%s%s' % ('http', port, path)
         self.httpclient.fetch(url, self.stop, decompress_response=use_gzip,
                               **kwargs)

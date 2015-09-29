@@ -19,6 +19,7 @@ import zipfile
 import obspy
 import numpy as np
 from .tornado_testing_fixtures import *  # NOQA
+from .tornado_testing_fixtures import _assemble_url
 
 from instaseis.helpers import geocentric_to_elliptic_latitude
 
@@ -28,15 +29,6 @@ if sys.version_info[0] == 2:
     import mock
 else:
     import unittest.mock as mock
-
-
-def _assemble_url(route, **kwargs):
-    """
-    Helper function.
-    """
-    url = "/%s?" % route
-    url += "&".join("%s=%s" % (key, value) for key, value in kwargs.items())
-    return url
 
 
 def test_root_route(all_clients):

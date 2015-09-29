@@ -48,6 +48,11 @@ class InstaseisTimeSeriesHandler(with_metaclass(ABCMeta,
         # Make sure that no additional arguments are passed.
         unknown_arguments = set(self.request.arguments.keys()).difference(set(
             self.arguments.keys()))
+
+        # Remove the body arguments as they don't count.
+        unknown_arguments = unknown_arguments.difference(set(
+            self.request.body_arguments.keys()))
+
         if unknown_arguments:
             msg = "The following unknown parameters have been passed: %s" % (
                 ", ".join("'%s'" % _i for _i in sorted(unknown_arguments)))
@@ -391,6 +396,11 @@ class InstaseisTimeSeriesHandler(with_metaclass(ABCMeta,
 
         receivers = []
 
+        if "receiverdepthinmeters" in args:
+            rec_depth = args.receiverdepthinmeters
+        else:
+            rec_depth = 0.0
+
         # Construct either a single receiver object.
         if args.receiverlatitude is not None:
             try:
@@ -398,7 +408,7 @@ class InstaseisTimeSeriesHandler(with_metaclass(ABCMeta,
                                     longitude=args.receiverlongitude,
                                     network=args.networkcode,
                                     station=args.stationcode,
-                                    depth_in_m=args.receiverdepthinmeters)
+                                    depth_in_m=rec_depth)
             except:
                 msg = ("Could not construct receiver with passed parameters. "
                        "Check parameters for sanity.")

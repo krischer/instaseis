@@ -108,7 +108,7 @@ def _validate_and_write_waveforms(st, callback, starttime, endtime, source,
     # Sanity checks. Raise internal server errors in case something fails.
     # This should not happen and should have been caught before.
     if endtime > st[0].stats.endtime:
-        msg = ("Endtime larger then the extracted endtime: endtime=%s, "
+        msg = ("Endtime larger than the extracted endtime: endtime=%s, "
                "largest db endtime=%s" % (endtime, st[0].stats.endtime))
         callback(tornado.web.HTTPError(500, log_message=msg, reason=msg))
         return

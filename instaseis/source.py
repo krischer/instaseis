@@ -1199,6 +1199,20 @@ class FiniteSource(object):
                 (lat, lon, dep, slip, rake, stk, dip, tinit, trise, tfall,
                     M0) = map(float, line.split())
 
+                # Negative rupture times are not supported with the current
+                # logic.
+                if tinit < 0:
+                    raise ValueError("File contains a negative rupture time "
+                                     "which Instaseis cannot currently deal "
+                                     "with.")
+
+                # Calculate the end time.
+                endtime = trise + tfall
+                if endtime > (npts - 1) * dt:
+                    raise ValueError("Rise + fall time are longer than the "
+                                     "total length of calculated slip. "
+                                     "Please use more samples.")
+
                 # Convert latitude to a geocentric latitude.
                 lat = elliptic_to_geocentric_latitude(lat)
 

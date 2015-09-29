@@ -8,6 +8,8 @@
     (http://www.gnu.org/copyleft/lgpl.html)
 """
 import io
+import math
+import numpy as np
 import zipfile
 
 import obspy
@@ -22,8 +24,9 @@ from ..instaseis_request import InstaseisTimeSeriesHandler
 
 @run_async
 def _get_finite_source(db, finite_source, receiver, components, units, dt,
-                       kernelwidth, starttime, endtime, format, label,
-                       origin_time, callback):
+                       kernelwidth, starttime, endtime,
+                       time_of_first_sample, format, label,
+                       callback):
     """
     Extract a seismogram from the passed db and write it either to a MiniSEED
     or a SACZIP file.
@@ -38,9 +41,9 @@ def _get_finite_source(db, finite_source, receiver, components, units, dt,
     :param kernelwidth: Width of the interpolation kernel.
     :param starttime: The desired start time of the seismogram.
     :param endtime: The desired end time of the seismogram.
+    :param time_of_first_sample: The time of the first sample.
     :param format: The output format. Either "miniseed" or "saczip".
     :param label: Prefix for the filename within the SAC zip file.
-    :param origin_time: The time of the first sample.
     :param callback: callback function of the coroutine.
     """
     try:
@@ -55,9 +58,10 @@ def _get_finite_source(db, finite_source, receiver, components, units, dt,
         return
 
     for tr in st:
-        tr.stats.starttime = origin_time
+        tr.stats.starttime = time_of_first_sample
 
-    finite_source.origin_time = origin_time
+    finite_source.origin_time = time_of_first_sample + \
+        finite_source.additional_time_shift
 
     _validate_and_write_waveforms(st=st, callback=callback,
                                   starttime=starttime, endtime=endtime,
@@ -82,10 +86,19 @@ def _parse_and_resample_finite_source(request, db_info, callback):
         callback(tornado.web.HTTPError(400, log_message=msg, reason=msg))
         return
 
-    # Will set the hypocentral coordinates.
-    finite_source.find_hypocenter()
-
     dominant_period = db_info.period
+
+    # Here comes the magic. This is really messy but unfortunately very hard
+    # to do.
+    # 1. Add two periods of samples at the beginning end the end.
+    samples = int(math.ceil((2 * dominant_period / db_info.dt))) + 1
+    zeros = np.zeros(samples)
+    shift = (samples - 1) * db_info.dt
+    for source in finite_source.pointsources:
+        source.sliprate = np.concatenate([zeros, source.sliprate, zeros])
+        source.time_shift += shift
+
+    finite_source.additional_time_shift = shift
 
     # A lowpass filter is needed to avoid aliasing - I guess using a
     # zerophase filter is a bit questionable as it has some potentially
@@ -94,7 +107,11 @@ def _parse_and_resample_finite_source(request, db_info, callback):
 
     # Last step is to resample to the sampling rate of the database for the
     # final convolution.
-    finite_source.resample_sliprate(dt=db_info.dt, nsamp=db_info.npts)
+    finite_source.resample_sliprate(dt=db_info.dt,
+                                    nsamp=db_info.npts + samples)
+
+    # Will set the hypocentral coordinates.
+    finite_source.find_hypocenter()
 
     callback(finite_source)
 
@@ -119,7 +136,6 @@ class FiniteSourceSeismogramsHandler(InstaseisTimeSeriesHandler):
         # In that case one can assign a network and station code.
         "receiverlatitude": {"type": float},
         "receiverlongitude": {"type": float},
-        "receiverdepthinmeters": {"type": float, "default": 0.0},
         "networkcode": {"type": str, "default": "XX"},
         "stationcode": {"type": str, "default": "SYN"},
 
@@ -145,6 +161,79 @@ class FiniteSourceSeismogramsHandler(InstaseisTimeSeriesHandler):
         """
         self.validate_receiver_parameters(args)
 
+    def parse_time_settings(self, args, finite_source):
+        """
+        Has to be overwritten as the finite source is a bit too different.
+        """
+        if args.origintime is None:
+            args.origintime = self.default_origin_time
+
+        # The origin time will be always set. If the starttime is not set,
+        # set it to the origin time.
+        if args.starttime is None:
+            args.starttime = args.origintime
+
+        # Now it becomes a bit ugly. If the starttime is a float, treat it
+        # relative to the origin time.
+        if isinstance(args.starttime, float):
+            args.starttime = args.origintime + args.starttime
+
+        # Now deal with the endtime.
+        if isinstance(args.endtime, float):
+            # If the start time is already known as an absolute time,
+            # just add it.
+            if isinstance(args.starttime, obspy.UTCDateTime):
+                args.endtime = args.starttime + args.endtime
+            # Otherwise the start time has to be a phase relative time and
+            # is dealt with later.
+            else:
+                assert isinstance(args.starttime, obspy.core.AttribDict)
+
+        # This is now a bit of a modified clone of _get_seismogram_times()
+        # of the base instaseis database object. It is modified as the
+        # finite sources are a bit different.
+        db = self.application.db
+
+        time_of_first_sample = args.origintime - finite_source.time_shift
+        print(time_of_first_sample, args.origintime, finite_source.time_shift)
+
+        # This is guaranteed to be exactly on a sample due to the previous
+        # calculations.
+        earliest_starttime = time_of_first_sample + \
+            finite_source.additional_time_shift
+        latest_endtime = time_of_first_sample + db.info.length
+
+        if args.dt is not None and round(args.dt / db.info.dt, 6) != 0:
+            affected_area = args.kernelwidth * db.info.dt
+            latest_endtime -= affected_area
+
+        # If the endtime is not set, do it here.
+        if args.endtime is None:
+            args.endtime = latest_endtime
+
+        # Do a couple of sanity checks here.
+        if isinstance(args.starttime, obspy.UTCDateTime):
+            # The desired seismogram start time must be before the end time of
+            # the seismograms.
+            if args.starttime >= latest_endtime:
+                msg = ("The `starttime` must be before the seismogram ends.")
+                raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+            # Arbitrary limit: The starttime can be at max one hour before the
+            # origin time.
+            if args.starttime < (earliest_starttime - 3600):
+                msg = ("The seismogram can start at the maximum one hour "
+                       "before the origin time.")
+                raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+
+        if isinstance(args.endtime, obspy.UTCDateTime):
+            # The endtime must be within the seismogram window
+            if not (earliest_starttime <= args.endtime <= latest_endtime):
+                msg = ("The end time of the seismograms lies outside the "
+                       "allowed range.")
+                raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+
+        return time_of_first_sample, earliest_starttime, latest_endtime
+
     @tornado.web.asynchronous
     @tornado.gen.coroutine
     def post(self):
@@ -152,8 +241,8 @@ class FiniteSourceSeismogramsHandler(InstaseisTimeSeriesHandler):
         # checks.
         args = self.parse_arguments()
         self.set_headers(args)
-        min_starttime, max_endtime = self.parse_time_settings(args)
 
+        # Coroutine + thread as potentially pretty expensive.
         response = yield tornado.gen.Task(
             _parse_and_resample_finite_source,
             request=self.request, db_info=self.application.db.info)
@@ -163,6 +252,9 @@ class FiniteSourceSeismogramsHandler(InstaseisTimeSeriesHandler):
             raise response
 
         finite_source = response
+
+        time_of_first_sample, min_starttime, max_endtime = \
+            self.parse_time_settings(args, finite_source=finite_source)
 
         # Generating even 100'000 receivers only takes ~150ms so its totally
         # ok to generate them all at once here. The time to generate and
@@ -213,8 +305,9 @@ class FiniteSourceSeismogramsHandler(InstaseisTimeSeriesHandler):
                 db=self.application.db, finite_source=finite_source,
                 receiver=receiver, components=list(args.components),
                 units=args.units, dt=args.dt, kernelwidth=args.kernelwidth,
-                starttime=starttime, endtime=endtime, format=args.format,
-                label=args.label, origin_time=args.origintime)
+                starttime=starttime, endtime=endtime,
+                time_of_first_sample=time_of_first_sample, format=args.format,
+                label=args.label)
 
             # Check connection once again.
             if self.connection_closed:
