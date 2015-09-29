@@ -14,7 +14,7 @@ Description
 
 Content-Type
     * ``application/zip`` (if zipped SAC data is requested)
-    * ``application/vnd.fdsn.mseed`` (if MiniSEED data is requested)
+    * ``application/octet-stream`` (if MiniSEED data is requested)
 
 Filetype
     Returns a ZIP archive with SAC files or MiniSEED files encoded with
@@ -36,6 +36,8 @@ Filetype
 | ``units``                   | String   | False    | displacement                | Specify either ``displacement``, ``velocity`` or ``acceleration`` for the synthetics.|
 +-----------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
 | ``dt``                      | Float    | False    |                             | If given, seismograms will be resampled to the desired sample spacing.               |
++-----------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
+| ``scale``                   | Float    | False    | 1.0                         | Scalar factor to multiply the seismograms with.                                      |
 +-----------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
 | ``kernelwidth``             | Integer  | False    | 12                          | Specify the width of the sinc kernel used for resampling to requested sample         |
 |                             |          |          |                             | interval in terms of the original sampling interval.                                 |
