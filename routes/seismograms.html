@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>GET /seismograms &mdash; instaseis 0.0.1a-357-g676f documentation</title>
+    <title>GET /seismograms &mdash; instaseis 0.0.1a-356-gcb99 documentation</title>
     
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.0.1a-357-g676f',
+        VERSION:     '0.0.1a-356-gcb99',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -31,7 +31,7 @@
     <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-3.3.4/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.0.1a-357-g676f documentation" href="../index.html" />
+    <link rel="top" title="instaseis 0.0.1a-356-gcb99 documentation" href="../index.html" />
     <link rel="up" title="Instaseis Server" href="../server.html" />
     <link rel="next" title="GET /greens_function" href="greens_function.html" />
     <link rel="prev" title="GET /seismograms_raw" href="seismograms_raw.html" />
@@ -54,7 +54,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-357-g676f</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-356-gcb99</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -124,7 +124,7 @@ function and is suitable to be queried by any program able to use HTTP</dd>
 <dt>Content-Type</dt>
 <dd><ul class="first last simple">
 <li><tt class="docutils literal"><span class="pre">application/zip</span></tt> (if zipped SAC data is requested)</li>
-<li><tt class="docutils literal"><span class="pre">application/octet-stream</span></tt> (if MiniSEED data is requested)</li>
+<li><tt class="docutils literal"><span class="pre">application/vnd.fdsn.mseed</span></tt> (if MiniSEED data is requested)</li>
 </ul>
 </dd>
 <dt>Filetype</dt>
@@ -182,22 +182,16 @@ encoding format 4 (IEEE floating point).</dd>
 <td>&nbsp;</td>
 <td>If given, seismograms will be resampled to the desired sample spacing.</td>
 </tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">scale</span></tt></td>
-<td>Float</td>
-<td>False</td>
-<td>1.0</td>
-<td>Scalar factor to multiply the seismograms with.</td>
-</tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">kernelwidth</span></tt></td>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">kernelwidth</span></tt></td>
 <td>Integer</td>
 <td>False</td>
 <td>12</td>
 <td>Specify the width of the sinc kernel used for resampling to requested sample
 interval in terms of the original sampling interval.</td>
 </tr>
-<tr class="row-even"><td colspan="5"><strong>Time Parameters</strong></td>
+<tr class="row-odd"><td colspan="5"><strong>Time Parameters</strong></td>
 </tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">origintime</span></tt></td>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">origintime</span></tt></td>
 <td>Datetime</td>
 <td>False</td>
 <td>1900-01-01T00:00:00.000000Z</td>
@@ -205,7 +199,7 @@ interval in terms of the original sampling interval.</td>
 absolute date and time. This time coincides with the peak of the
 source time function.</td>
 </tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">starttime</span></tt></td>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">starttime</span></tt></td>
 <td>Datetime</td>
 <td>False</td>
 <td>&nbsp;</td>
@@ -223,7 +217,7 @@ seconds). If the value is a numerical value it is interpreted as an offset, in
 seconds, from the origin time.</p>
 </td>
 </tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">endtime</span></tt></td>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">endtime</span></tt></td>
 <td>Datetime</td>
 <td>False</td>
 <td>&nbsp;</td>
@@ -241,87 +235,87 @@ seconds). If the value is a numerical value it is interpreted as an offset, in
 seconds, from the start time.</p>
 </td>
 </tr>
-<tr class="row-even"><td colspan="5"><strong>Receiver Parameters</strong></td>
+<tr class="row-odd"><td colspan="5"><strong>Receiver Parameters</strong></td>
 </tr>
-<tr class="row-odd"><td colspan="5">Directly specify coordinates and network/station codes ...</td>
+<tr class="row-even"><td colspan="5">Directly specify coordinates and network/station codes ...</td>
 </tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">receiverlatitude</span></tt></td>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">receiverlatitude</span></tt></td>
 <td>Float</td>
 <td>True</td>
 <td>&nbsp;</td>
 <td>The geocentric latitude of the receiver.</td>
 </tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">receiverlongitude</span></tt></td>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">receiverlongitude</span></tt></td>
 <td>Float</td>
 <td>True</td>
 <td>&nbsp;</td>
 <td>The longitude of the receiver.</td>
 </tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">receiverdepthinmeters</span></tt></td>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">receiverdepthinmeters</span></tt></td>
 <td>Float</td>
 <td>False</td>
 <td>0.0</td>
 <td>The depth of the receiver in meter.</td>
 </tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">networkcode</span></tt></td>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">networkcode</span></tt></td>
 <td>String</td>
 <td>False</td>
 <td>XX</td>
 <td>Specify the network code of the final seismograms. Maximum of two letters.</td>
 </tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">stationcode</span></tt></td>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">stationcode</span></tt></td>
 <td>String</td>
 <td>False</td>
 <td>SYN</td>
 <td>Specify the station code of the final seismograms. Maximum of five letters.</td>
 </tr>
-<tr class="row-odd"><td colspan="5">... or use wildcard searches over network and station codes. Potentially returns multiple stations.</td>
+<tr class="row-even"><td colspan="5">... or use wildcard searches over network and station codes. Potentially returns multiple stations.</td>
 </tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">network</span></tt></td>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">network</span></tt></td>
 <td>String</td>
 <td>False</td>
 <td>&nbsp;</td>
 <td>Wildcarded network codes, e.g. <tt class="docutils literal"><span class="pre">I*,B?,AU</span></tt>.</td>
 </tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">station</span></tt></td>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">station</span></tt></td>
 <td>String</td>
 <td>False</td>
 <td>&nbsp;</td>
 <td>Wildcarded station codes, e.g. <tt class="docutils literal"><span class="pre">A*,ANMO</span></tt>.</td>
 </tr>
-<tr class="row-even"><td colspan="5"><strong>Receiver Parameters</strong></td>
+<tr class="row-odd"><td colspan="5"><strong>Receiver Parameters</strong></td>
 </tr>
-<tr class="row-odd"><td colspan="5">The source can by set by specifying an event id if the server has been set-up for this ...</td>
+<tr class="row-even"><td colspan="5">The source can by set by specifying an event id if the server has been set-up for this ...</td>
 </tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">event_id</span></tt></td>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">event_id</span></tt></td>
 <td>String</td>
 <td>False</td>
 <td>&nbsp;</td>
 <td>The id of the event to use.</td>
 </tr>
-<tr class="row-odd"><td colspan="5">... or by specify the source parameters in a variety of ways.</td>
+<tr class="row-even"><td colspan="5">... or by specify the source parameters in a variety of ways.</td>
 </tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">sourcelatitude</span></tt></td>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">sourcelatitude</span></tt></td>
 <td>Float</td>
 <td>True</td>
 <td>&nbsp;</td>
 <td>The geocentric latitude of the source.</td>
 </tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">sourcelongitude</span></tt></td>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">sourcelongitude</span></tt></td>
 <td>Float</td>
 <td>True</td>
 <td>&nbsp;</td>
 <td>The longitude of the source.</td>
 </tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">sourcedepthinmeters</span></tt></td>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">sourcedepthinmeters</span></tt></td>
 <td>Float</td>
 <td>False</td>
 <td>0.0</td>
 <td>The depth of the source in meter.</td>
 </tr>
-<tr class="row-odd"><td colspan="5"><strong>Source mechanism as a moment tensor</strong></td>
+<tr class="row-even"><td colspan="5"><strong>Source mechanism as a moment tensor</strong></td>
 </tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">sourcemomenttensor</span></tt></td>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">sourcemomenttensor</span></tt></td>
 <td>List</td>
 <td>False</td>
 <td>&nbsp;</td>
@@ -330,9 +324,9 @@ with values in Newton meters (Nm).</p>
 <p class="last">Example: <tt class="docutils literal"><span class="pre">1.04e22,-0.039e22,-1e22,0.304e22,-1.52e22,-0.119e22</span></tt></p>
 </td>
 </tr>
-<tr class="row-odd"><td colspan="5"><strong>Source mechanism as a double couple</strong></td>
+<tr class="row-even"><td colspan="5"><strong>Source mechanism as a double couple</strong></td>
 </tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">sourcedoublecouple</span></tt></td>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">sourcedoublecouple</span></tt></td>
 <td>List</td>
 <td>False</td>
 <td>&nbsp;</td>
@@ -343,9 +337,9 @@ moment.</p>
 <p class="last">example: <tt class="docutils literal"><span class="pre">19,18,116,1e19</span></tt></p>
 </td>
 </tr>
-<tr class="row-odd"><td colspan="5"><strong>Source mechanism as forces</strong></td>
+<tr class="row-even"><td colspan="5"><strong>Source mechanism as forces</strong></td>
 </tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">sourceforce</span></tt></td>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">sourceforce</span></tt></td>
 <td>List</td>
 <td>False</td>
 <td>&nbsp;</td>
@@ -362,6 +356,7 @@ moment.</p>
       
   </div>
 </div>
+
 <footer class="footer">
   <div class="container">
     <p class="pull-right">
@@ -374,5 +369,16 @@ moment.</p>
     </p>
   </div>
 </footer>
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-44800463-2', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
   </body>
 </html>
