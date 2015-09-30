@@ -90,10 +90,11 @@ def _parse_and_resample_finite_source(request, db_info, callback):
 
     # Here comes the magic. This is really messy but unfortunately very hard
     # to do.
-    # 1. Add two periods of samples at the beginning end the end.
+    # Add two periods of samples at the beginning end the end to avoid
+    # boundary effects at the ends.
     samples = int(math.ceil((2 * dominant_period / db_info.dt))) + 1
     zeros = np.zeros(samples)
-    shift = (samples - 1) * db_info.dt
+    shift = samples * db_info.dt
     for source in finite_source.pointsources:
         source.sliprate = np.concatenate([zeros, source.sliprate, zeros])
         source.time_shift += shift
@@ -108,7 +109,7 @@ def _parse_and_resample_finite_source(request, db_info, callback):
     # Last step is to resample to the sampling rate of the database for the
     # final convolution.
     finite_source.resample_sliprate(dt=db_info.dt,
-                                    nsamp=db_info.npts + samples)
+                                    nsamp=db_info.npts + 2 * samples)
 
     # Will set the hypocentral coordinates.
     finite_source.find_hypocenter()

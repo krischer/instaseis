@@ -35,7 +35,7 @@ USGS_PARAM_FILE1 = os.path.join(DATA, "nepal.param")
 USGS_PARAM_FILE2 = os.path.join(DATA, "chile.param")
 
 
-def _parse_finite_source(filename, db_info):
+def _parse_finite_source(filename):
     """
     Helper function parsing a finite source exactly how it is parsed in the
     finite source server route.
@@ -43,10 +43,21 @@ def _parse_finite_source(filename, db_info):
     fs = instaseis.FiniteSource.from_usgs_param_file(
         filename, npts=10000, dt=0.1, trise_min=1.0)
 
-    fs.find_hypocenter()
-    dominant_period = db_info.period
+    # All test databases are the same.
+    dominant_period = 100.0
+    dt = 24.724845445855724
+    npts = 73
+
+    # Things are now on purpose a bit different than in the actual
+    # implementation to actually test something....
+    for src in fs.pointsources:
+        src.sliprate = np.concatenate(
+            [np.zeros(10), src.sliprate, np.zeros(10)])
+        src.time_shift += 10 * dt
+
     fs.lp_sliprate(freq=1.0 / dominant_period, zerophase=True)
-    fs.resample_sliprate(dt=db_info.dt, nsamp=db_info.npts)
+    fs.resample_sliprate(dt=dt, nsamp=npts + 20)
+
     return fs
 
 
@@ -65,8 +76,8 @@ def test_finite_source_retrieval(all_clients):
         return
 
     basic_parameters = {
-        "receiverlongitude": 10,
-        "receiverlatitude": 20,
+        "receiverlongitude": 11,
+        "receiverlatitude": 22,
         "format": "miniseed"}
 
     with io.open(USGS_PARAM_FILE1, "rb") as fh:
@@ -82,17 +93,27 @@ def test_finite_source_retrieval(all_clients):
         assert tr.stats._format == "MSEED"
 
     # Parse the finite source.
-    fs = _parse_finite_source(USGS_PARAM_FILE1, db.info)
-    rec = instaseis.Receiver(latitude=10, longitude=20, network="XX",
+    fs = _parse_finite_source(USGS_PARAM_FILE1)
+    rec = instaseis.Receiver(latitude=22, longitude=11, network="XX",
                              station="SYN")
 
     st_db = db.get_seismograms_finite_source(sources=fs, receiver=rec)
     # The origin time is the time of the first sample in the route.
     for tr in st_db:
+        # Cut away the first ten samples as they have been previously added.
+        tr.data = tr.data[10:]
         tr.stats.starttime = obspy.UTCDateTime(1900, 1, 1)
 
-    print(st_server)
-    print(st_db)
+    for tr_db, tr_server in zip(st_db, st_server):
+        # Sample spacing is very similar but not equal due to floating point
+        # accuracy.
+        np.testing.assert_allclose(tr_server.stats.delta, tr_db.stats.delta)
+        tr_server.stats.delta = tr_db.stats.delta
+        del tr_server.stats._format
+        del tr_server.stats.mseed
+
+        assert tr_db.stats == tr_server.stats
+        np.testing.assert_allclose(tr_db.data, tr_server.data)
 
     return
 
