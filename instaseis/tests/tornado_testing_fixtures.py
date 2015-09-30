@@ -259,6 +259,15 @@ def all_clients(request):
                                station_coordinates_callback=None)
 
 
+@pytest.fixture(params=[_i for _i in list(DBS.values()) if "db_bwd" in _i])
+def reciprocal_clients(request):
+    """
+    Fixture returning all reciprocal clients!
+    """
+    return create_async_client(request.param,
+                               station_coordinates_callback=None)
+
+
 @pytest.fixture(params=list(DBS.values()))
 def all_clients_station_coordinates_callback(request):
     """

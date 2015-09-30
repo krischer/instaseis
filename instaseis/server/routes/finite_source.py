@@ -50,8 +50,7 @@ def _get_finite_source(db, finite_source, receiver, components, units, dt,
         st = db.get_seismograms_finite_source(
             sources=finite_source, receiver=receiver, components=components,
             kind=units, dt=dt, kernelwidth=kernelwidth)
-    except Exception as e:
-        print(e)
+    except Exception:
         msg = ("Could not extract seismogram. Make sure, the components "
                "are valid, and the depth settings are correct.")
         callback(tornado.web.HTTPError(400, log_message=msg, reason=msg))
@@ -196,7 +195,6 @@ class FiniteSourceSeismogramsHandler(InstaseisTimeSeriesHandler):
         db = self.application.db
 
         time_of_first_sample = args.origintime - finite_source.time_shift
-        print(time_of_first_sample, args.origintime, finite_source.time_shift)
 
         # This is guaranteed to be exactly on a sample due to the previous
         # calculations.

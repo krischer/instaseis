@@ -61,19 +61,35 @@ def _parse_finite_source(filename):
     return fs
 
 
-def test_finite_source_retrieval(all_clients):
+def test_sending_non_USGS_file(reciprocal_clients):
+    """
+    Tests error if a non-USGS file is sent.
+    """
+    client = reciprocal_clients
+
+    with io.open(__file__) as fh:
+        body = fh.read()
+
+    # default parameters
+    params = {
+        "receiverlongitude": 11,
+        "receiverlatitude": 22}
+    request = client.fetch(_assemble_url('finite_source', **params),
+                           method="POST", body=body)
+    assert request.code == 400
+    assert request.reason == "Could not parse the body contents. Incorrect " \
+                             "USGS param file?"
+
+
+def test_finite_source_retrieval(reciprocal_clients):
     """
     Tests if the finite sources requested from the server are identical to
     the one requested with the local instaseis client with some required
     tweaks.
     """
-    client = all_clients
+    client = reciprocal_clients
 
     db = instaseis.open_db(client.filepath)
-
-    # Finite sources only work with reciprocal databases.
-    if not client.is_reciprocal:
-        return
 
     basic_parameters = {
         "receiverlongitude": 11,
@@ -115,10 +131,12 @@ def test_finite_source_retrieval(all_clients):
         assert tr_db.stats == tr_server.stats
         np.testing.assert_allclose(tr_db.data, tr_server.data)
 
-    return
-
-    # ObsPy needs the filename to be able to directly unpack zip files. We
-    # don't have a filename here so we unpack manually.
+    # Once again but this time request a SAC file.
+    params = copy.deepcopy(basic_parameters)
+    params["format"] = "saczip"
+    request = client.fetch(_assemble_url('finite_source', **params),
+                           method="POST", body=body)
+    assert request.code == 200
     st_server = obspy.Stream()
     zip_obj = zipfile.ZipFile(request.buffer)
     for name in zip_obj.namelist():
@@ -126,40 +144,18 @@ def test_finite_source_retrieval(all_clients):
     for tr in st_server:
         assert tr.stats._format == "SAC"
 
-    st_db = db.get_greens_function(
-        epicentral_distance_in_degree=params['sourcedistanceindegrees'],
-        source_depth_in_m=params['sourcedepthinmeters'], origin_time=time,
-        definition="seiscomp")
-
-    for tr_server, tr_db in zip(st_server, st_db):
-        # Remove the additional stats from both.
-        del tr_server.stats.sac
-        del tr_server.stats._format
-        del tr_db.stats.instaseis
+    for tr_db, tr_server in zip(st_db, st_server):
         # Sample spacing is very similar but not equal due to floating point
         # accuracy.
         np.testing.assert_allclose(tr_server.stats.delta, tr_db.stats.delta)
         tr_server.stats.delta = tr_db.stats.delta
-        assert tr_server.stats == tr_db.stats
-        # Relative tolerance not particularly useful when testing super
-        # small values.
-        np.testing.assert_allclose(tr_server.data, tr_db.data,
-                                   atol=1E-10 * tr_server.data.ptp())
+        del tr_server.stats._format
+        del tr_server.stats.sac
 
-    # miniseed
-    params = copy.deepcopy(basic_parameters)
-    params["format"] = "miniseed"
-    request = client.fetch(_assemble_url('greens_function', **params))
-    assert request.code == 200
-    st_server = obspy.read(request.buffer)
+        assert tr_db.stats == tr_server.stats
+        np.testing.assert_allclose(tr_db.data, tr_server.data)
 
-    for tr in st_server:
-        assert tr.stats._format == "MSEED"
-
-    st_db = db.get_greens_function(
-        epicentral_distance_in_degree=params['sourcedistanceindegrees'],
-        source_depth_in_m=params['sourcedepthinmeters'], origin_time=time,
-        definition="seiscomp")
+    return
 
     for tr_server, tr_db in zip(st_server, st_db):
         # Remove the additional stats from both.
