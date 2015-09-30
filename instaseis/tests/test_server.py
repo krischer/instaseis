@@ -321,7 +321,7 @@ def test_greens_function_retrieval(all_clients):
         request = client.fetch(_assemble_url('greens_function', **params))
 
     assert request.code == 500
-    assert request.reason.startswith("Endtime larger then the extracted "
+    assert request.reason.startswith("Endtime larger than the extracted "
                                      "endtime")
 
 
