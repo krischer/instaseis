@@ -155,111 +155,93 @@ def test_finite_source_retrieval(reciprocal_clients):
         assert tr_db.stats == tr_server.stats
         np.testing.assert_allclose(tr_db.data, tr_server.data)
 
-    return
-
-    for tr_server, tr_db in zip(st_server, st_db):
-        # Remove the additional stats from both.
-        del tr_server.stats.mseed
-        del tr_server.stats._format
-        del tr_db.stats.instaseis
-        # Sample spacing is very similar but not equal due to floating point
-        # accuracy.
-        np.testing.assert_allclose(tr_server.stats.delta, tr_db.stats.delta)
-        tr_server.stats.delta = tr_db.stats.delta
-        assert tr_server.stats == tr_db.stats
-        # Relative tolerance not particularly useful when testing super
-        # small values.
-        np.testing.assert_allclose(tr_server.data, tr_db.data,
-                                   atol=1E-10 * tr_server.data.ptp())
-
     # One with a label.
     params = copy.deepcopy(basic_parameters)
-    params["format"] = "miniseed"
     params["label"] = "random_things"
-    request = client.fetch(_assemble_url('greens_function', **params))
+    request = client.fetch(_assemble_url('finite_source', **params),
+                           method="POST", body=body)
     assert request.code == 200
 
     cd = request.headers["Content-Disposition"]
     assert cd.startswith("attachment; filename=random_things_")
     assert cd.endswith(".mseed")
 
-    # One more with resampling parameters and different units.
-    params = copy.deepcopy(basic_parameters)
-    params["format"] = "miniseed"
-    params["dt"] = 0.1
-    params["kernelwidth"] = 2
-    params["units"] = "acceleration"
-    request = client.fetch(_assemble_url('greens_function', **params))
-    assert request.code == 200
-    st_server = obspy.read(request.buffer)
-
-    st_db = db.get_greens_function(
-        epicentral_distance_in_degree=params['sourcedistanceindegrees'],
-        source_depth_in_m=params['sourcedepthinmeters'], origin_time=time,
-        definition="seiscomp", dt=0.1, kernelwidth=2, kind="acceleration")
-
-    for tr_server, tr_db in zip(st_server, st_db):
-        # Remove the additional stats from both.
-        del tr_server.stats.mseed
-        del tr_server.stats._format
-        del tr_db.stats.instaseis
-        # Sample spacing is very similar but not equal due to floating point
-        # accuracy.
-        np.testing.assert_allclose(tr_server.stats.delta, tr_db.stats.delta)
-        tr_server.stats.delta = tr_db.stats.delta
-        assert tr_server.stats == tr_db.stats
-        # Relative tolerance not particularly useful when testing super
-        # small values.
-        np.testing.assert_allclose(tr_server.data, tr_db.data,
-                                   atol=1E-10 * tr_server.data.ptp())
-
     # One simulating a crash in the underlying function.
     params = copy.deepcopy(basic_parameters)
-    params["format"] = "miniseed"
 
     with mock.patch("instaseis.base_instaseis_db.BaseInstaseisDB"
-                    ".get_greens_function") as p:
+                    ".get_seismograms_finite_source") as p:
         def raise_err():
             raise ValueError("random crash")
 
         p.side_effect = raise_err
-        request = client.fetch(_assemble_url('greens_function', **params))
+        request = client.fetch(_assemble_url('finite_source', **params),
+                               method="POST", body=body)
 
     assert request.code == 400
-    assert request.reason == ("Could not extract Green's function. Make "
-                              "sure, the parameters are valid, and the depth "
-                              "settings are correct.")
+    assert request.reason == ("Could not extract finite source seismograms. "
+                              "Make sure, the parameters are valid, and the "
+                              "depth settings are correct.")
 
-    # Two more simulating logic erros that should not be able to happen.
+    # Simulating a logic error that should not be able to happen.
     params = copy.deepcopy(basic_parameters)
-    params["format"] = "miniseed"
-
     with mock.patch("instaseis.base_instaseis_db.BaseInstaseisDB"
-                    ".get_greens_function") as p:
+                    ".get_seismograms_finite_source") as p:
+        # Longer than the database returned stream thus the endtime is out
+        # of bounds.
         st = obspy.read()
-        for tr in st:
-            tr.stats.starttime = obspy.UTCDateTime(1E5)
 
         p.return_value = st
-        request = client.fetch(_assemble_url('greens_function', **params))
+        request = client.fetch(_assemble_url('finite_source', **params),
+                               method="POST", body=body)
 
     assert request.code == 500
-    assert request.reason == ("Starttime more than one hour before the "
-                              "starttime of the seismograms.")
-
-    params = copy.deepcopy(basic_parameters)
-    params["format"] = "miniseed"
-
-    with mock.patch("instaseis.base_instaseis_db.BaseInstaseisDB"
-                    ".get_greens_function") as p:
-        st = obspy.read()
-        for tr in st:
-            tr.stats.starttime = obspy.UTCDateTime(0)
-            tr.stats.delta = 0.0001
-
-        p.return_value = st
-        request = client.fetch(_assemble_url('greens_function', **params))
-
-    assert request.code == 500
-    assert request.reason.startswith("Endtime larger then the extracted "
+    assert request.reason.startswith("Endtime larger than the extracted "
                                      "endtime")
+
+    # One more with resampling parameters and different units.
+    params = copy.deepcopy(basic_parameters)
+    # We must have a sampling rate that cleanly fits in the existing one,
+    # otherwise we cannot fake the cutting.
+    dt_new = 24.724845445855724 / 10
+    params["dt"] = dt_new
+    params["kernelwidth"] = 2
+    params["units"] = "acceleration"
+
+    st_db = db.get_seismograms_finite_source(sources=fs, receiver=rec,
+                                             dt=dt_new, kernelwidth=2,
+                                             kind="acceleration")
+    # The origin time is the time of the first sample in the route.
+    for tr in st_db:
+        # Cut away the first ten samples as they have been previously added.
+        tr.data = tr.data[100:]
+        tr.stats.starttime = obspy.UTCDateTime(1900, 1, 1)
+
+    request = client.fetch(_assemble_url('finite_source', **params),
+                           method="POST", body=body)
+    assert request.code == 200
+    st_server = obspy.read(request.buffer)
+
+    # Cut some parts in the middle to avoid any potential boundary effects.
+    st_db.trim(obspy.UTCDateTime(1900, 1, 1, 0, 4),
+               obspy.UTCDateTime(1900, 1, 1, 0, 14))
+    st_server.trim(obspy.UTCDateTime(1900, 1, 1, 0, 4),
+                   obspy.UTCDateTime(1900, 1, 1, 0, 14))
+
+    for tr_db, tr_server in zip(st_db, st_server):
+        # Sample spacing and times are very similar but not identical due to
+        # floating point inaccuracies in the arithmetics.
+        np.testing.assert_allclose(tr_server.stats.delta, tr_db.stats.delta)
+        np.testing.assert_allclose(tr_server.stats.starttime.timestamp,
+                                   tr_db.stats.starttime.timestamp)
+        tr_server.stats.delta = tr_db.stats.delta
+        tr_server.stats.starttime = tr_db.stats.starttime
+        del tr_server.stats._format
+        del tr_server.stats.mseed
+        del tr_server.stats.processing
+        del tr_db.stats.processing
+
+        np.testing.assert_allclose(tr_server.stats.delta, tr_db.stats.delta)
+
+        assert tr_db.stats == tr_server.stats
+        np.testing.assert_allclose(tr_db.data, tr_server.data)

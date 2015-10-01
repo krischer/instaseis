@@ -20,6 +20,7 @@ from ... import FiniteSource
 from ..util import run_async, IOQueue, _validtimesetting, \
     _validate_and_write_waveforms
 from ..instaseis_request import InstaseisTimeSeriesHandler
+from ...lanczos import interpolate_trace
 
 
 @run_async
@@ -49,10 +50,10 @@ def _get_finite_source(db, finite_source, receiver, components, units, dt,
     try:
         st = db.get_seismograms_finite_source(
             sources=finite_source, receiver=receiver, components=components,
-            kind=units, dt=dt, kernelwidth=kernelwidth)
+            kind=units)
     except Exception:
-        msg = ("Could not extract seismogram. Make sure, the components "
-               "are valid, and the depth settings are correct.")
+        msg = ("Could not extract finite source seismograms. Make sure, "
+               "the parameters are valid, and the depth settings are correct.")
         callback(tornado.web.HTTPError(400, log_message=msg, reason=msg))
         return
 
@@ -61,6 +62,15 @@ def _get_finite_source(db, finite_source, receiver, components, units, dt,
 
     finite_source.origin_time = time_of_first_sample + \
         finite_source.additional_time_shift
+
+    # Manually interpolate to get the times consistent.
+    if dt:
+        offset = round(finite_source.additional_time_shift % dt, 6)
+
+        for tr in st:
+            interpolate_trace(tr, sampling_rate=1.0 / dt, a=kernelwidth,
+                              window="blackman",
+                              starttime=time_of_first_sample + offset)
 
     _validate_and_write_waveforms(st=st, callback=callback,
                                   starttime=starttime, endtime=endtime,
