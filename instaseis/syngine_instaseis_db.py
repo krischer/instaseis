@@ -15,10 +15,12 @@ from __future__ import (absolute_import, division, print_function,
 import io
 import numpy as np
 import obspy
+import platform
 import requests
 import warnings
 
-from . import InstaseisError, InstaseisWarning, Source, ForceSource
+from . import (InstaseisError, InstaseisWarning, Source, ForceSource,
+               __version__)
 from .base_instaseis_db import BaseInstaseisDB, DEFAULT_MU
 
 from .helpers import geocentric_to_elliptic_latitude
@@ -26,6 +28,12 @@ from .helpers import geocentric_to_elliptic_latitude
 from future import standard_library
 with standard_library.hooks():
     from urllib.parse import urlencode
+
+
+USER_AGENT = "Instaseis %s (%s, Python %s)" % (__version__,
+                                               platform.platform(),
+                                               platform.python_version())
+HEADERS = {"User-Agent": USER_AGENT}
 
 
 class SyngineInstaseisDB(BaseInstaseisDB):
@@ -114,7 +122,7 @@ class SyngineInstaseisDB(BaseInstaseisDB):
         if self.debug:
             print("Downloading '%s' ..." % url)
 
-        r = requests.get(url)
+        r = requests.get(url, headers=HEADERS)
 
         if self.debug:
             print("Downloaded '%s' with status code %i." % (url,
@@ -166,7 +174,7 @@ class SyngineInstaseisDB(BaseInstaseisDB):
         """
         if self.debug:
             print("Downloading '%s' ..." % url)
-        r = requests.get(url)
+        r = requests.get(url, headers=HEADERS)
         if self.debug:
             print("Downloaded '%s' with status code %i." % (url,
                                                             r.status_code))
