@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>instaseis.syngine_instaseis_db &mdash; instaseis 0.0.1a-362-ge900 documentation</title>
+    <title>instaseis.syngine_instaseis_db &mdash; instaseis 0.0.1a-363-geb19 documentation</title>
     
     <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.0.1a-362-ge900',
+        VERSION:     '0.0.1a-363-geb19',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -31,7 +31,7 @@
     <script type="text/javascript" src="../../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../../_static/bootstrap-3.3.4/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../../_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.0.1a-362-ge900 documentation" href="../../index.html" />
+    <link rel="top" title="instaseis 0.0.1a-363-geb19 documentation" href="../../index.html" />
     <link rel="up" title="instaseis" href="../instaseis.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-362-ge900</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-363-geb19</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -124,10 +124,12 @@
 <span class="kn">import</span> <span class="nn">io</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">obspy</span>
+<span class="kn">import</span> <span class="nn">platform</span>
 <span class="kn">import</span> <span class="nn">requests</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">InstaseisError</span><span class="p">,</span> <span class="n">InstaseisWarning</span><span class="p">,</span> <span class="n">Source</span><span class="p">,</span> <span class="n">ForceSource</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="p">(</span><span class="n">InstaseisError</span><span class="p">,</span> <span class="n">InstaseisWarning</span><span class="p">,</span> <span class="n">Source</span><span class="p">,</span> <span class="n">ForceSource</span><span class="p">,</span>
+               <span class="n">__version__</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.base_instaseis_db</span> <span class="kn">import</span> <span class="n">BaseInstaseisDB</span><span class="p">,</span> <span class="n">DEFAULT_MU</span>
 
 <span class="kn">from</span> <span class="nn">.helpers</span> <span class="kn">import</span> <span class="n">geocentric_to_elliptic_latitude</span>
@@ -135,6 +137,12 @@
 <span class="kn">from</span> <span class="nn">future</span> <span class="kn">import</span> <span class="n">standard_library</span>
 <span class="k">with</span> <span class="n">standard_library</span><span class="o">.</span><span class="n">hooks</span><span class="p">():</span>
     <span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">urlencode</span>
+
+
+<span class="n">USER_AGENT</span> <span class="o">=</span> <span class="s">&quot;Instaseis </span><span class="si">%s</span><span class="s"> (</span><span class="si">%s</span><span class="s">, Python </span><span class="si">%s</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">__version__</span><span class="p">,</span>
+                                               <span class="n">platform</span><span class="o">.</span><span class="n">platform</span><span class="p">(),</span>
+                                               <span class="n">platform</span><span class="o">.</span><span class="n">python_version</span><span class="p">())</span>
+<span class="n">HEADERS</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;User-Agent&quot;</span><span class="p">:</span> <span class="n">USER_AGENT</span><span class="p">}</span>
 
 
 <div class="viewcode-block" id="SyngineInstaseisDB"><a class="viewcode-back" href="../../instaseis.html#instaseis.syngine_instaseis_db.SyngineInstaseisDB">[docs]</a><span class="k">class</span> <span class="nc">SyngineInstaseisDB</span><span class="p">(</span><span class="n">BaseInstaseisDB</span><span class="p">):</span>
@@ -223,7 +231,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
             <span class="k">print</span><span class="p">(</span><span class="s">&quot;Downloading &#39;</span><span class="si">%s</span><span class="s">&#39; ...&quot;</span> <span class="o">%</span> <span class="n">url</span><span class="p">)</span>
 
-        <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">HEADERS</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
             <span class="k">print</span><span class="p">(</span><span class="s">&quot;Downloaded &#39;</span><span class="si">%s</span><span class="s">&#39; with status code </span><span class="si">%i</span><span class="s">.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">url</span><span class="p">,</span>
@@ -275,7 +283,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
             <span class="k">print</span><span class="p">(</span><span class="s">&quot;Downloading &#39;</span><span class="si">%s</span><span class="s">&#39; ...&quot;</span> <span class="o">%</span> <span class="n">url</span><span class="p">)</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">HEADERS</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
             <span class="k">print</span><span class="p">(</span><span class="s">&quot;Downloaded &#39;</span><span class="si">%s</span><span class="s">&#39; with status code </span><span class="si">%i</span><span class="s">.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">url</span><span class="p">,</span>
                                                             <span class="n">r</span><span class="o">.</span><span class="n">status_code</span><span class="p">))</span>
