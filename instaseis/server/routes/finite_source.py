@@ -299,7 +299,7 @@ class FiniteSourceSeismogramsHandler(InstaseisTimeSeriesHandler):
             # pretty manual right now. Maybe there is a better way? This
             # enables to server to stop serving if the connection has been
             # cancelled on the client side.
-            if self.connection_closed:
+            if self.connection_closed:  # pragma: no cover
                 self.flush()
                 self.finish()
                 return
@@ -328,7 +328,7 @@ class FiniteSourceSeismogramsHandler(InstaseisTimeSeriesHandler):
                 label=args.label)
 
             # Check connection once again.
-            if self.connection_closed:
+            if self.connection_closed:  # pragma: no cover
                 self.flush()
                 self.finish()
                 return
