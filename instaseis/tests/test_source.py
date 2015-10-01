@@ -20,7 +20,8 @@ import pytest
 from instaseis import Source, FiniteSource
 from instaseis.helpers import elliptic_to_geocentric_latitude
 from instaseis.source import moment2magnitude, magnitude2moment
-from instaseis.source import fault_vectors_lmn, strike_dip_rake_from_ln
+from instaseis.source import (fault_vectors_lmn, strike_dip_rake_from_ln,
+                              USGSParamFileParsingException)
 
 DATA = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 EVENT_FILE = os.path.join(DATA, "GCMT_event_STRAIT_OF_GIBRALTAR.xml")
@@ -141,7 +142,7 @@ def test_parsing_empty_usgs_file():
     """
     Parsing an empty USGS file should fail.
     """
-    with pytest.raises(ValueError) as e:
+    with pytest.raises(USGSParamFileParsingException) as e:
         FiniteSource.from_usgs_param_file(USGS_PARAM_FILE_EMPTY)
 
     assert e.value.args[0] == 'No point sources found in the file.'
