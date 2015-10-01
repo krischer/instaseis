@@ -18,15 +18,14 @@ import obspy
 import requests
 import warnings
 
-from . import InstaseisError, InstaseisWarning, Source, ForceSource, \
-    __version__
+from . import InstaseisError, InstaseisWarning, Source, ForceSource
 from .base_instaseis_db import BaseInstaseisDB, DEFAULT_MU
 
 from .helpers import geocentric_to_elliptic_latitude
 
 from future import standard_library
 with standard_library.hooks():
-    from urllib.parse import urlencode, urlparse
+    from urllib.parse import urlencode
 
 
 class SyngineInstaseisDB(BaseInstaseisDB):
@@ -127,7 +126,7 @@ class SyngineInstaseisDB(BaseInstaseisDB):
             reason = r.content.decode().strip().split("\n")[0]
             raise InstaseisError(
                 "Status code %i when downloading '%s'. Reason: '%s'" % (
-                r.status_code, url, reason))
+                    r.status_code, url, reason))
 
         if "Instaseis-Mu" not in r.headers:
             warnings.warn("Mu is not passed via the HTTP headers. Maybe some "
@@ -210,4 +209,3 @@ class SyngineInstaseisDB(BaseInstaseisDB):
         base.insert(2, "Syngine service version:  %s" %
                     self.syngine_service_version)
         return "\n".join(base)
-
