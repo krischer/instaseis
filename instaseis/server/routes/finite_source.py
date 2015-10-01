@@ -105,7 +105,12 @@ def _parse_and_resample_finite_source(request, db_info, callback):
     zeros = np.zeros(samples)
 
     shift = samples * db_info.dt
+
     # We cheat a bit and set the rupture time of the first slipping patch to 0.
+    # This makes aligning samples that much easier and also results in an
+    # increase in maximum length of the seismograms. This has no downside
+    # considering we define the origin time to the be the onset time of the
+    # first slipping point source.
     first_slip = finite_source.time_shift
 
     for source in finite_source.pointsources:

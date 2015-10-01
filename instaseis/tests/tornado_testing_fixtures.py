@@ -298,6 +298,16 @@ def all_clients_ttimes_callback(request):
         travel_time_callback=get_travel_time)
 
 
+@pytest.fixture(params=[_i for _i in list(DBS.values()) if "db_bwd" in _i])
+def reciprocal_clients_ttimes_callback(request):
+    """
+    Fixture returning all clients with a travel time callback.
+    """
+    return create_async_client(
+        request.param,
+        travel_time_callback=get_travel_time)
+
+
 @pytest.fixture(params=list(DBS.values()))
 def all_clients_all_callbacks(request):
     """

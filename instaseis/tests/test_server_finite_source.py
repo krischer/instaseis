@@ -248,3 +248,93 @@ def test_finite_source_retrieval(reciprocal_clients, usgs_param):
 
         assert tr_db.stats == tr_server.stats
         np.testing.assert_allclose(tr_db.data, tr_server.data)
+
+
+@pytest.mark.parametrize("usgs_param", [USGS_PARAM_FILE_1, USGS_PARAM_FILE_2])
+def test_more_complex_queries(reciprocal_clients_ttimes_callback,
+                              usgs_param):
+    """
+    These are not exhaustive tests but test that the queries do something.
+    Elsewhere they are tested in more details.
+
+    Test phase relative offsets.
+
+    + must be encoded with %2B
+    - must be encoded with %2D
+    """
+    client = reciprocal_clients_ttimes_callback
+
+    basic_parameters = {
+        "receiverlongitude": 11,
+        "receiverlatitude": 22,
+        "components": "Z",
+        "format": "miniseed"}
+
+    with io.open(usgs_param, "rb") as fh:
+        body = fh.read()
+
+    # default parameters
+    params = copy.deepcopy(basic_parameters)
+    params["dt"] = 2
+    request = client.fetch(_assemble_url('finite_source', **params),
+                           method="POST", body=body)
+    assert request.code == 200
+    st = obspy.read(request.buffer)
+
+    # Now request one starting ten seconds later.
+    params = copy.deepcopy(basic_parameters)
+    params["starttime"] = 10
+    params["dt"] = 2
+    request = client.fetch(_assemble_url('finite_source', **params),
+                           method="POST", body=body)
+    assert request.code == 200
+    st_2 = obspy.read(request.buffer)
+
+    assert st[0].stats.starttime + 10 == st_2[0].stats.starttime
+
+    # The rest of data should still be identical.
+    np.testing.assert_allclose(st.slice(starttime=10)[0].data, st_2[0].data)
+
+    # Try with the endtime.
+    params = copy.deepcopy(basic_parameters)
+    params["endtime"] = 20
+    params["dt"] = 2
+    request = client.fetch(_assemble_url('finite_source', **params),
+                           method="POST", body=body)
+    assert request.code == 200
+    st_2 = obspy.read(request.buffer)
+
+    assert st_2[0].stats.endtime == st[0].stats.starttime + 20
+
+    # The rest of data should still be identical.
+    np.testing.assert_allclose(
+        st.slice(endtime=st[0].stats.starttime + 20)[0].data,
+        st_2[0].data)
+
+    # Phase relative start and endtimes.
+    params = copy.deepcopy(basic_parameters)
+    params["starttime"] = "P%2D5"
+    params["endtime"] = "P%2B5"
+    params["dt"] = 2
+    request = client.fetch(_assemble_url('finite_source', **params),
+                           method="POST", body=body)
+    assert request.code == 200
+    st_2 = obspy.read(request.buffer)
+
+    # Just make sure they actually do something.
+    assert st_2[0].stats.starttime > st[0].stats.starttime
+    assert st_2[0].stats.endtime < st[0].stats.endtime
+
+    # Mixing things
+    params = copy.deepcopy(basic_parameters)
+    params["starttime"] = "P%2D5"
+    params["endtime"] = "50"
+    params["dt"] = 2
+    request = client.fetch(_assemble_url('finite_source', **params),
+                           method="POST", body=body)
+    assert request.code == 200
+    st_2 = obspy.read(request.buffer)
+
+    # Just make sure they actually do something.
+    assert st_2[0].stats.starttime > st[0].stats.starttime
+    assert st_2[0].stats.endtime < st[0].stats.endtime
