@@ -35,6 +35,8 @@ DATA = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 USGS_PARAM_FILE_1 = os.path.join(DATA, "nepal.param")
 USGS_PARAM_FILE_2 = os.path.join(DATA, "chile.param")
 USGS_PARAM_FILE_EMPTY = os.path.join(DATA, "empty.param")
+USGS_PARAM_FILE_DEEP = os.path.join(DATA, "deep.param")
+USGS_PARAM_FILE_AIR = os.path.join(DATA, "airquakes.param")
 
 
 def _parse_finite_source(filename):
@@ -415,7 +417,7 @@ def test_various_failure_conditions(reciprocal_clients_all_callbacks,
 
 def test_uploading_empty_usgs_file(reciprocal_clients):
     """
-    Tests some failure conditions.
+    Tests uploading an empty usgs file.
     """
     client = reciprocal_clients
 
@@ -434,3 +436,54 @@ def test_uploading_empty_usgs_file(reciprocal_clients):
     assert request.code == 400
     assert request.reason == ("Could not parse the body contents. Incorrect "
                               "USGS param file?")
+
+
+def test_uploading_deep_usgs_file(reciprocal_clients):
+    """
+    Tests uploading a usgs file that has sources that are too deep for the
+    database.
+    """
+    client = reciprocal_clients
+
+    params = {
+        "receiverlongitude": 11,
+        "receiverlatitude": 22,
+        "components": "Z",
+        "format": "miniseed"}
+
+    with io.open(USGS_PARAM_FILE_DEEP, "rb") as fh:
+        body = fh.read()
+
+    # Starttime too large.
+    request = client.fetch(_assemble_url('finite_source', **params),
+                           method="POST", body=body)
+    assert request.code == 400
+    assert request.reason == ("The deepest point source in the given finite "
+                              "source is 1000.9 km deep. The database only "
+                              "has a depth range from 0.0 km to 371.0 km.")
+
+
+def test_uploading_usgs_file_with_airquakes(reciprocal_clients):
+    """
+    Tests uploading a usgs file that has sources that are above the planet
+    radius.
+    """
+    client = reciprocal_clients
+
+    params = {
+        "receiverlongitude": 11,
+        "receiverlatitude": 22,
+        "components": "Z",
+        "format": "miniseed"}
+
+    with io.open(USGS_PARAM_FILE_AIR, "rb") as fh:
+        body = fh.read()
+
+    # Starttime too large.
+    request = client.fetch(_assemble_url('finite_source', **params),
+                           method="POST", body=body)
+    assert request.code == 400
+    assert request.reason == ("The shallowest point source in the given "
+                              "finite source is -0.9 km deep. The database "
+                              "only has a depth range from 0.0 km to "
+                              "371.0 km.")

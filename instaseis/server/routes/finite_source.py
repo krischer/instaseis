@@ -89,9 +89,36 @@ def _parse_and_resample_finite_source(request, db_info, callback):
             # Might need some more thought.
             finite_source = FiniteSource.from_usgs_param_file(
                 buf, npts=10000, dt=0.1, trise_min=1.0)
-    except:
+    except Exception:
         msg = ("Could not parse the body contents. Incorrect USGS param "
                "file?")
+        callback(tornado.web.HTTPError(400, log_message=msg, reason=msg))
+        return
+
+    # Check the bounds of the finite source and make sure they can be
+    # calculated with the current database.
+    # XXX: Also needs checks for latitude/longitude bounds if we ever
+    # implement regional databases.
+    min_depth = min(_i.depth_in_m for _i in finite_source.pointsources)
+    max_depth = max(_i.depth_in_m for _i in finite_source.pointsources)
+
+    db_min_depth = db_info.planet_radius - db_info.max_radius
+    db_max_depth = db_info.planet_radius - db_info.min_radius
+
+    if not (db_min_depth <= min_depth <= db_max_depth):
+        msg = ("The shallowest point source in the given finite source is "
+               "%.1f km deep. The database only has a depth range "
+               "from %.1f km to %.1f km." % (
+                min_depth / 1000.0, db_min_depth / 1000.0,
+                db_max_depth / 1000.0))
+        callback(tornado.web.HTTPError(400, log_message=msg, reason=msg))
+        return
+
+    if not (db_min_depth <= max_depth <= db_max_depth):
+        msg = ("The deepest point source in the given finite source is %.1f "
+               "km deep. The database only has a depth range from %.1f km to "
+               "%.1f km." % (max_depth / 1000.0, db_min_depth / 1000.0,
+                             db_max_depth / 1000.0))
         callback(tornado.web.HTTPError(400, log_message=msg, reason=msg))
         return
 
