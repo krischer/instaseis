@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Main Instaseis Classes &mdash; instaseis 0.0.1a-363-geb19 documentation</title>
+    <title>Main Instaseis Classes &mdash; instaseis 0.0.1a-362-g990c documentation</title>
     
     <link rel="stylesheet" href="_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.0.1a-363-geb19',
+        VERSION:     '0.0.1a-362-g990c',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -31,7 +31,7 @@
     <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="_static/bootstrap-3.3.4/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.0.1a-363-geb19 documentation" href="index.html" />
+    <link rel="top" title="instaseis 0.0.1a-362-g990c documentation" href="index.html" />
     <link rel="next" title="Sources and Receivers" href="source.html" />
     <link rel="prev" title="Instaseis: Instant Global Seismograms Based on a Broadband Waveform Database" href="index.html" />
 <meta charset='utf-8'>
@@ -53,7 +53,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-363-geb19</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-362-g990c</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -118,7 +118,6 @@ function to open a connection to an Instaseis database.</p>
 <li><a class="reference internal" href="#baseinstaseisdb" id="id2">BaseInstaseisDB</a></li>
 <li><a class="reference internal" href="#instaseisdb" id="id3">InstaseisDB</a></li>
 <li><a class="reference internal" href="#remoteinstaseisdb" id="id4">RemoteInstaseisDB</a></li>
-<li><a class="reference internal" href="#syngineinstaseisdb" id="id5">SyngineInstaseisDB</a></li>
 </ul>
 </div>
 <div class="section" id="open-db-function">
@@ -158,17 +157,6 @@ file path or a HTTP URL and delegate to the corresponding class.</td>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">instaseis</span><span class="o">.</span><span class="n">open_db</span><span class="p">(</span><span class="s">&quot;http://webadress.com:8765&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
 <span class="go">RemoteInstaseisDB reciprocal Green&#39;s function Database (v7) generated ...</span>
-<span class="go">    components           : vertical and horizontal</span>
-<span class="go">    velocity model       : ak135f</span>
-</pre></div>
-</div>
-<p>The special syntax <tt class="docutils literal"><span class="pre">syngine://MODEL_NAME</span></tt> will connect to the IRIS
-syngine web service for the specified model.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">instaseis</span><span class="o">.</span><span class="n">open_db</span><span class="p">(</span><span class="s">&quot;syngine://ak135f&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
-<span class="go">SyngineInstaseisDB reciprocal Green&#39;s function Database (v7) ...</span>
-<span class="go">Syngine model name:      &#39;ak135f&#39;</span>
-<span class="go">Syngine service version:  0.0.2</span>
 <span class="go">    components           : vertical and horizontal</span>
 <span class="go">    velocity model       : ak135f</span>
 </pre></div>
@@ -383,37 +371,6 @@ useful e.g. for finite sources, default).</li>
 </table>
 </dd></dl>
 
-</div>
-<hr class="docutils" />
-<div class="section" id="syngineinstaseisdb">
-<h2><a class="toc-backref" href="#id5">SyngineInstaseisDB</a><a class="headerlink" href="#syngineinstaseisdb" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="instaseis.syngine_instaseis_db.SyngineInstaseisDB">
-<em class="property">class </em><tt class="descclassname">instaseis.syngine_instaseis_db.</tt><tt class="descname">SyngineInstaseisDB</tt><big>(</big><em>model</em>, <em>base_url=u'http://service.iris.edu/irisws/syngine/1'</em>, <em>debug=False</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/instaseis/syngine_instaseis_db.html#SyngineInstaseisDB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.syngine_instaseis_db.SyngineInstaseisDB" title="Permalink to this definition">¶</a></dt>
-<dd><p>Remote Instaseis interface connecting with IRIS&#8217; syngine service.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>model</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; The model to use.</li>
-<li><strong>base_url</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; URL to the root of the syngine service.</li>
-<li><strong>debug</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; Debug messages on/off.</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">members:</th><td class="field-body"></td>
-</tr>
-</tbody>
-</table>
 </div>
 </div>
 

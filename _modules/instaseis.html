@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>instaseis &mdash; instaseis 0.0.1a-363-geb19 documentation</title>
+    <title>instaseis &mdash; instaseis 0.0.1a-362-g990c documentation</title>
     
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.0.1a-363-geb19',
+        VERSION:     '0.0.1a-362-g990c',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -31,7 +31,7 @@
     <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-3.3.4/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.0.1a-363-geb19 documentation" href="../index.html" />
+    <link rel="top" title="instaseis 0.0.1a-362-g990c documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-363-geb19</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-362-g990c</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -170,17 +170,6 @@
 <span class="sd">        components           : vertical and horizontal</span>
 <span class="sd">        velocity model       : ak135f</span>
 
-<span class="sd">    The special syntax ``syngine://MODEL_NAME`` will connect to the IRIS</span>
-<span class="sd">    syngine web service for the specified model.</span>
-
-<span class="sd">    &gt;&gt;&gt; db = instaseis.open_db(&quot;syngine://ak135f&quot;)</span>
-<span class="sd">    &gt;&gt;&gt; print(db)</span>
-<span class="sd">    SyngineInstaseisDB reciprocal Green&#39;s function Database (v7) ...</span>
-<span class="sd">    Syngine model name:      &#39;ak135f&#39;</span>
-<span class="sd">    Syngine service version:  0.0.2</span>
-<span class="sd">        components           : vertical and horizontal</span>
-<span class="sd">        velocity model       : ak135f</span>
-
 <span class="sd">    .. note::</span>
 
 <span class="sd">        If opening a local database and the ``ordered_output.nc4`` files are</span>
@@ -189,12 +178,7 @@
 <span class="sd">        :func:`~instaseis.open_db` function. Instaseis will recursively</span>
 <span class="sd">        search the child directories for the  necessary files and open them.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;syngine://&quot;</span><span class="p">):</span>
-        <span class="n">model</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s">&quot;syngine://&quot;</span><span class="p">)</span>
-        <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">syngine_instaseis_db</span>
-        <span class="k">return</span> <span class="n">syngine_instaseis_db</span><span class="o">.</span><span class="n">SyngineInstaseisDB</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span>
-                                                       <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="s">&quot;://&quot;</span> <span class="ow">in</span> <span class="n">path</span><span class="p">:</span>
+    <span class="k">if</span> <span class="s">&quot;://&quot;</span> <span class="ow">in</span> <span class="n">path</span><span class="p">:</span>
         <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">remote_instaseis_db</span>
         <span class="k">return</span> <span class="n">remote_instaseis_db</span><span class="o">.</span><span class="n">RemoteInstaseisDB</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>

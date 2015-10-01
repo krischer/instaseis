@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>instaseis.base_instaseis_db &mdash; instaseis 0.0.1a-363-geb19 documentation</title>
+    <title>instaseis.base_instaseis_db &mdash; instaseis 0.0.1a-362-g990c documentation</title>
     
     <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.0.1a-363-geb19',
+        VERSION:     '0.0.1a-362-g990c',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -31,7 +31,7 @@
     <script type="text/javascript" src="../../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../../_static/bootstrap-3.3.4/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../../_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.0.1a-363-geb19 documentation" href="../../index.html" />
+    <link rel="top" title="instaseis 0.0.1a-362-g990c documentation" href="../../index.html" />
     <link rel="up" title="instaseis" href="../instaseis.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-363-geb19</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-362-g990c</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -447,6 +447,7 @@
                         <span class="s">&quot;starttime&quot;</span><span class="p">:</span> <span class="n">starttime</span><span class="p">,</span>
                         <span class="s">&quot;station&quot;</span><span class="p">:</span> <span class="n">receiver</span><span class="o">.</span><span class="n">station</span><span class="p">,</span>
                         <span class="s">&quot;network&quot;</span><span class="p">:</span> <span class="n">receiver</span><span class="o">.</span><span class="n">network</span><span class="p">,</span>
+                        <span class="s">&quot;location&quot;</span><span class="p">:</span> <span class="n">receiver</span><span class="o">.</span><span class="n">location</span><span class="p">,</span>
                         <span class="s">&quot;channel&quot;</span><span class="p">:</span> <span class="n">add_band_code</span> <span class="o">*</span> <span class="p">(</span><span class="n">band_code</span> <span class="o">+</span> <span class="s">&#39;X&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">comp</span><span class="p">,</span>
                         <span class="s">&quot;instaseis&quot;</span><span class="p">:</span> <span class="n">instaseis_header</span><span class="p">})</span>
             <span class="n">st</span> <span class="o">+=</span> <span class="n">tr</span>
@@ -572,6 +573,7 @@
                        <span class="n">header</span><span class="o">=</span><span class="p">{</span><span class="s">&quot;delta&quot;</span><span class="p">:</span> <span class="n">dt</span><span class="p">,</span>
                                <span class="s">&quot;station&quot;</span><span class="p">:</span> <span class="n">receiver</span><span class="o">.</span><span class="n">station</span><span class="p">,</span>
                                <span class="s">&quot;network&quot;</span><span class="p">:</span> <span class="n">receiver</span><span class="o">.</span><span class="n">network</span><span class="p">,</span>
+                               <span class="s">&quot;location&quot;</span><span class="p">:</span> <span class="n">receiver</span><span class="o">.</span><span class="n">location</span><span class="p">,</span>
                                <span class="s">&quot;channel&quot;</span><span class="p">:</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">X</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">band_code</span><span class="p">,</span> <span class="n">comp</span><span class="p">)})</span>
             <span class="n">st</span> <span class="o">+=</span> <span class="n">tr</span>
         <span class="k">return</span> <span class="n">st</span>
@@ -671,9 +673,6 @@
             <span class="k">pass</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__cached_info</span> <span class="o">=</span> <span class="n">AttribDict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_info</span><span class="p">())</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_info</span>
-
-    <span class="k">def</span> <span class="nf">_repr_pretty_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">cycle</span><span class="p">):</span>
-        <span class="n">p</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span>
