@@ -64,7 +64,7 @@ def open_db(path, *args, **kwargs):
     The special syntax ``syngine://MODEL_NAME`` will connect to the IRIS
     syngine web service for the specified model.
 
-    >>> db = instaseis.open_db("syngine://prem")
+    >>> db = instaseis.open_db("syngine://ak135f")
     >>> print(db)
     SyngineInstaseisDB reciprocal Green's function Database (v7) ...
     Syngine model name:      'ak135f'
