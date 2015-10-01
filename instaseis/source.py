@@ -492,6 +492,10 @@ class Source(SourceOrReceiver):
             Mrp              :   8.47e+16 Nm
             Mtp              :   1.29e+16 Nm
         """
+        assert M0 >= 0
+        if dt is not None:
+            assert dt > 0
+
         # formulas in Udias (17.24) are in geographic system North, East,
         # Down, which # transforms to the geocentric as:
         # Mtt =  Mxx, Mpp = Myy, Mrr =  Mzz
@@ -1229,6 +1233,7 @@ class FiniteSource(object):
                 slip *= 1e-2  # cm > m
                 M0 *= 1e-7    # dyn / cm > N * m
 
+                # These checks also take care of negative times.
                 if trise < trise_min:
                     trise = trise_min
 
