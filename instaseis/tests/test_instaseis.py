@@ -591,6 +591,30 @@ def test_finite_source():
                                st_ref.select(component='T')[0].data,
                                rtol=1E-7, atol=1E-12)
 
+    # Test receiver settings in finite source route.
+    receiver = Receiver(latitude=10.0, longitude=20.0)
+    st = instaseis_bwd.get_seismograms_finite_source(
+        sources=[source], receiver=receiver, components=('Z'))
+    assert len(st) == 1
+    tr = st[0]
+    assert tr.stats.network == ""
+    assert tr.stats.station == ""
+    assert tr.stats.location == ""
+    assert tr.stats.channel[-1] == "Z"
+
+    # Receiver with everything.
+    receiver = Receiver(latitude=10.0, longitude=20.0, network="BW",
+                        station="ALTM", location="SY")
+    st = instaseis_bwd.get_seismograms_finite_source(
+        sources=[source], receiver=receiver, components=('Z'))
+
+    assert len(st) == 1
+    tr = st[0]
+    assert tr.stats.network == "BW"
+    assert tr.stats.station == "ALTM"
+    assert tr.stats.location == "SY"
+    assert tr.stats.channel[-1] == "Z"
+
 
 def test_get_band_code_method():
     """
@@ -1304,3 +1328,36 @@ def test_coordinate_conversions_round_trips():
         there = geocentric_to_elliptic_latitude(value)
         back = elliptic_to_geocentric_latitude(there)
         assert abs(back - value) < 1E-12
+
+
+def test_receiver_settings():
+    db = InstaseisDB(os.path.join(DATA, "100s_db_fwd"))
+
+    source = Source(latitude=4., longitude=3.0, depth_in_m=None,
+                    m_rr=4.71e+17, m_tt=3.81e+17, m_pp=-4.74e+17,
+                    m_rt=3.99e+17, m_rp=-8.05e+17, m_tp=-1.23e+17)
+
+    # Receiver with neither network, nor station, nor receiver code.
+    receiver = Receiver(latitude=10.0, longitude=20.0)
+
+    st = db.get_seismograms(source=source, receiver=receiver,
+                            components=["Z"])
+    assert len(st) == 1
+    tr = st[0]
+    assert tr.stats.network == ""
+    assert tr.stats.station == ""
+    assert tr.stats.location == ""
+    assert tr.stats.channel[-1] == "Z"
+
+    # Receiver with everything.
+    receiver = Receiver(latitude=10.0, longitude=20.0, network="BW",
+                        station="ALTM", location="SY")
+
+    st = db.get_seismograms(source=source, receiver=receiver,
+                            components=["Z"])
+    assert len(st) == 1
+    tr = st[0]
+    assert tr.stats.network == "BW"
+    assert tr.stats.station == "ALTM"
+    assert tr.stats.location == "SY"
+    assert tr.stats.channel[-1] == "Z"
