@@ -18,6 +18,7 @@ import zipfile
 
 import obspy
 import numpy as np
+import pytest
 from .tornado_testing_fixtures import *  # NOQA
 from .tornado_testing_fixtures import _assemble_url
 
@@ -31,7 +32,8 @@ else:
     import unittest.mock as mock
 
 DATA = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
-USGS_PARAM_FILE = os.path.join(DATA, "nepal.param")
+USGS_PARAM_FILE_1 = os.path.join(DATA, "nepal.param")
+USGS_PARAM_FILE_2 = os.path.join(DATA, "chile.param")
 
 
 def _parse_finite_source(filename):
@@ -81,7 +83,8 @@ def test_sending_non_USGS_file(reciprocal_clients):
                              "USGS param file?"
 
 
-def test_finite_source_retrieval(reciprocal_clients):
+@pytest.mark.parametrize("usgs_param", [USGS_PARAM_FILE_1, USGS_PARAM_FILE_2])
+def test_finite_source_retrieval(reciprocal_clients, usgs_param):
     """
     Tests if the finite sources requested from the server are identical to
     the one requested with the local instaseis client with some required
@@ -96,7 +99,7 @@ def test_finite_source_retrieval(reciprocal_clients):
         "receiverlatitude": 22,
         "format": "miniseed"}
 
-    with io.open(USGS_PARAM_FILE, "rb") as fh:
+    with io.open(usgs_param, "rb") as fh:
         body = fh.read()
 
     # default parameters
@@ -109,7 +112,7 @@ def test_finite_source_retrieval(reciprocal_clients):
         assert tr.stats._format == "MSEED"
 
     # Parse the finite source.
-    fs = _parse_finite_source(USGS_PARAM_FILE)
+    fs = _parse_finite_source(usgs_param)
     rec = instaseis.Receiver(latitude=22, longitude=11, network="XX",
                              station="SYN")
 
