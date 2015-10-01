@@ -242,6 +242,12 @@ similar command line interface to the default Instaseis server:
                             help='Server port.')
         parser.add_argument('--buffer_size_in_mb', type=int,
                             default=0, help='Size of the buffer in MB')
+        parser.add_argument('--max_size_of_finite_sources', type=int,
+                            default=1000,
+                            help='The maximum allowed number of point sources in '
+                                 'a single finite source for the /finite_source '
+                                 'route.')
+
         parser.add_argument('db_path', type=str,
                             help='Database path')
         parser.add_argument(
@@ -258,6 +264,7 @@ similar command line interface to the default Instaseis server:
         launch_io_loop(db_path=db_path, port=args.port,
                        buffer_size_in_mb=args.buffer_size_in_mb,
                        quiet=args.quiet, log_level=args.log_level,
+                       max_size_of_finite_sources=args.max_size_of_finite_sources,
                        station_coordinates_callback=get_station_coordinates,
                        event_info_callback=get_event,
                        travel_time_callback=get_travel_time)

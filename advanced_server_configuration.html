@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Advanced Server Configuration &mdash; instaseis 0.0.1a-356-gcb99 documentation</title>
+    <title>Advanced Server Configuration &mdash; instaseis 0.0.1a-381-ga213 documentation</title>
     
     <link rel="stylesheet" href="_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.0.1a-356-gcb99',
+        VERSION:     '0.0.1a-381-ga213',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -31,8 +31,8 @@
     <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="_static/bootstrap-3.3.4/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.0.1a-356-gcb99 documentation" href="index.html" />
-    <link rel="prev" title="GET /greens_function" href="routes/greens_function.html" />
+    <link rel="top" title="instaseis 0.0.1a-381-ga213 documentation" href="index.html" />
+    <link rel="prev" title="POST /finite_source" href="routes/finite_source.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-356-gcb99</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-381-ga213</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -312,6 +312,12 @@ similar command line interface to the default Instaseis server:</p>
                         <span class="n">help</span><span class="o">=</span><span class="s">&#39;Server port.&#39;</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&#39;--buffer_size_in_mb&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
                         <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">&#39;Size of the buffer in MB&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&#39;--max_size_of_finite_sources&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
+                        <span class="n">default</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s">&#39;The maximum allowed number of point sources in &#39;</span>
+                             <span class="s">&#39;a single finite source for the /finite_source &#39;</span>
+                             <span class="s">&#39;route.&#39;</span><span class="p">)</span>
+
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&#39;db_path&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
                         <span class="n">help</span><span class="o">=</span><span class="s">&#39;Database path&#39;</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
@@ -328,6 +334,7 @@ similar command line interface to the default Instaseis server:</p>
     <span class="n">launch_io_loop</span><span class="p">(</span><span class="n">db_path</span><span class="o">=</span><span class="n">db_path</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">port</span><span class="p">,</span>
                    <span class="n">buffer_size_in_mb</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">buffer_size_in_mb</span><span class="p">,</span>
                    <span class="n">quiet</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">quiet</span><span class="p">,</span> <span class="n">log_level</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">log_level</span><span class="p">,</span>
+                   <span class="n">max_size_of_finite_sources</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">max_size_of_finite_sources</span><span class="p">,</span>
                    <span class="n">station_coordinates_callback</span><span class="o">=</span><span class="n">get_station_coordinates</span><span class="p">,</span>
                    <span class="n">event_info_callback</span><span class="o">=</span><span class="n">get_event</span><span class="p">,</span>
                    <span class="n">travel_time_callback</span><span class="o">=</span><span class="n">get_travel_time</span><span class="p">)</span>
@@ -341,7 +348,6 @@ similar command line interface to the default Instaseis server:</p>
       
   </div>
 </div>
-
 <footer class="footer">
   <div class="container">
     <p class="pull-right">
@@ -354,16 +360,5 @@ similar command line interface to the default Instaseis server:</p>
     </p>
   </div>
 </footer>
-<script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-  ga('create', 'UA-44800463-2', 'auto');
-  ga('send', 'pageview');
-
-</script>
-
   </body>
 </html>

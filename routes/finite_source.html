@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>GET /greens_function &mdash; instaseis 0.0.1a-381-ga213 documentation</title>
+    <title>POST /finite_source &mdash; instaseis 0.0.1a-381-ga213 documentation</title>
     
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -33,8 +33,8 @@
     <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
     <link rel="top" title="instaseis 0.0.1a-381-ga213 documentation" href="../index.html" />
     <link rel="up" title="Instaseis Server" href="../server.html" />
-    <link rel="next" title="POST /finite_source" href="finite_source.html" />
-    <link rel="prev" title="GET /seismograms" href="seismograms.html" />
+    <link rel="next" title="Advanced Server Configuration" href="../advanced_server_configuration.html" />
+    <link rel="prev" title="GET /greens_function" href="greens_function.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
@@ -108,35 +108,41 @@
   <div class="row">
     <div class="col-md-12">
       
-  <div class="section" id="get-greens-function">
-<h1>GET /greens_function<a class="headerlink" href="#get-greens-function" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="post-finite-source">
+<h1>POST /finite_source<a class="headerlink" href="#post-finite-source" title="Permalink to this headline">¶</a></h1>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">Some parts of this route require an advanced server setup. Please view the
+<p>Some parts of this route require an advanced server setup. Please view the
 <a class="reference internal" href="../advanced_server_configuration.html"><em>Advanced Server Configuration</em></a> for details. The parts that don&#8217;t
 will keep working even with a normal configuration.</p>
+<p class="last">Per default this route allows at most 1000 point sources for a single
+finite source. This limit can be changed when starting the server.</p>
 </div>
 <dl class="docutils">
 <dt>Description</dt>
-<dd><p class="first">Returns Instaseis Greens&#8217;s function, that is seimograms for contraction with the
-decomposition of the Momenttensor as in Minson &amp; Dreger (2008). Several convenience
-function of the <tt class="docutils literal"><span class="pre">/seismograms</span></tt> route are replicated here to make it suitable to be
-queried by any program able to use HTTP.</p>
-<table border="1" class="last docutils">
-<colgroup>
-<col width="100%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><div class="first last line-block">
-<div class="line">Minson, Sarah E., and Douglas S. Dreger (2008)</div>
-<div class="line"><strong>Stable Inversions for Complete Moment Tensors.</strong></div>
-<div class="line"><em>Geophysical Journal International</em> 174 (2): 585–592.</div>
-<div class="line"><a class="reference external" href="http://dx.doi.org/10.1111/j.1365-246X.2008.03797.x">http://dx.doi.org/10.1111/j.1365-246X.2008.03797.x</a></div>
-</div>
-</td>
-</tr>
-</tbody>
-</table>
+<dd>Returns seismograms for finite sources defined in the USGS param file
+format. Just POST the file and set additional parameters in the URL.</dd>
+<dt>What is Actually Happening</dt>
+<dd><p class="first">Some of the calculations performed in this endpoint are not immediatly
+obvious and some choices have to be made so we&#8217;ll elaborate a bit here.</p>
+<ol class="last arabic simple">
+<li>The sliprate of each point source is defined as an asymmetric cosine
+with a certain rupture, rise, and fall time. We sample it at 10 Hz for
+a thousand seconds - this limits the maximum rise and fall times. Rise
+and fall times smaller than one second will be set to one second to
+make sure it can be accurately sampled.</li>
+<li>Each sampled sliprate is zero padded with a number of samples at the
+beginning and the end (the additional time shift is later accounted
+for). This is done to avoid running into boundary issues with the
+following filter.</li>
+<li>A fourth order Butterworth filter is applied twice (forwards and
+backwards) resulting in a zero phase filter. The corner frequency is
+the dominant frequency of the database. This makes sure we don&#8217;t
+introduce frequencies in the convolution that we cannot propagate in
+the numerical simulation.</li>
+<li>The seismograms for all point sources are calculated, time-shifted,
+convolved, and stacked.</li>
+</ol>
 </dd>
 <dt>Content-Type</dt>
 <dd><ul class="first last simple">
@@ -165,35 +171,27 @@ encoding format 4 (IEEE floating point).</dd>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td colspan="5"><strong>Source/Receiver Parameters</strong></td>
+<tr class="row-even"><td colspan="5"><strong>Output parameters</strong></td>
 </tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">sourcedepthinmeters</span></tt></td>
-<td>Float</td>
-<td>True</td>
-<td>&nbsp;</td>
-<td>The source depth in meters.</td>
-</tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">sourcedistanceindegrees</span></tt></td>
-<td>Float</td>
-<td>True</td>
-<td>&nbsp;</td>
-<td>The epicentral disctance of source - receiver in degrees (computed on the surface
-of a sphere).</td>
-</tr>
-<tr class="row-odd"><td colspan="5"><strong>Output parameters</strong></td>
-</tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">format</span></tt></td>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">format</span></tt></td>
 <td>String</td>
 <td>False</td>
 <td>saczip</td>
 <td>Specify output file to be either MiniSEED or a ZIP archive of SAC files, either
 <tt class="docutils literal"><span class="pre">miniseed</span></tt> or <tt class="docutils literal"><span class="pre">saczip</span></tt>.</td>
 </tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">label</span></tt></td>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">label</span></tt></td>
 <td>String</td>
 <td>False</td>
 <td>&nbsp;</td>
 <td>Specify a label to be included in file names and HTTP file name suggestions.</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">components</span></tt></td>
+<td>String</td>
+<td>False</td>
+<td>ZNE</td>
+<td>Specify the orientation of the synthetic seismograms as a list of any combination of
+<tt class="docutils literal"><span class="pre">Z</span></tt> (vertical), <tt class="docutils literal"><span class="pre">N</span></tt> (north), <tt class="docutils literal"><span class="pre">E</span></tt> (east), <tt class="docutils literal"><span class="pre">R</span></tt> (radial), <tt class="docutils literal"><span class="pre">T</span></tt> (transverse).</td>
 </tr>
 <tr class="row-even"><td><tt class="docutils literal"><span class="pre">units</span></tt></td>
 <td>String</td>
@@ -219,10 +217,10 @@ interval in terms of the original sampling interval.</td>
 <tr class="row-even"><td><tt class="docutils literal"><span class="pre">origintime</span></tt></td>
 <td>Datetime</td>
 <td>False</td>
-<td>1970-01-01T00:00:00.000000Z</td>
+<td>1900-01-01T00:00:00.000000Z</td>
 <td>Specify the source origin time. This must be specified as an
-absolute date and time. This time coincides with the peak of the
-source time function.</td>
+absolute date and time. <strong>This time conincides will be the onset time of the</strong>
+<strong>first slipping point source.</strong> USGS param files don&#8217;t have absolute time values.</td>
 </tr>
 <tr class="row-odd"><td><tt class="docutils literal"><span class="pre">starttime</span></tt></td>
 <td>Datetime</td>
@@ -239,7 +237,7 @@ as either:</p>
 If the value is in the form <tt class="docutils literal"><span class="pre">phase[+-]offset</span></tt> it is interpreted as a
 phase-relative time, for example <tt class="docutils literal"><span class="pre">P-10</span></tt> (meaning P-wave arrival time minus 10
 seconds). If the value is a numerical value it is interpreted as an offset, in
-seconds, from the origin time.</p>
+seconds, from the origin time. Arrival times are always relative to the origin time.</p>
 </td>
 </tr>
 <tr class="row-even"><td><tt class="docutils literal"><span class="pre">endtime</span></tt></td>
@@ -257,8 +255,50 @@ as either:</p>
 If the value is in the form <tt class="docutils literal"><span class="pre">phase[+-]offset</span></tt> it is interpreted as a
 phase-relative time, for example <tt class="docutils literal"><span class="pre">P-10</span></tt> (meaning P-wave arrival time minus 10
 seconds). If the value is a numerical value it is interpreted as an offset, in
-seconds, from the start time.</p>
+seconds, from the start time. Arrival times are always relative to the origin time.</p>
 </td>
+</tr>
+<tr class="row-odd"><td colspan="5"><strong>Receiver Parameters</strong></td>
+</tr>
+<tr class="row-even"><td colspan="5">Directly specify coordinates and network/station codes ...</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">receiverlatitude</span></tt></td>
+<td>Float</td>
+<td>True</td>
+<td>&nbsp;</td>
+<td>The geocentric latitude of the receiver.</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">receiverlongitude</span></tt></td>
+<td>Float</td>
+<td>True</td>
+<td>&nbsp;</td>
+<td>The longitude of the receiver.</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">networkcode</span></tt></td>
+<td>String</td>
+<td>False</td>
+<td>XX</td>
+<td>Specify the network code of the final seismograms. Maximum of two letters.</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">stationcode</span></tt></td>
+<td>String</td>
+<td>False</td>
+<td>SYN</td>
+<td>Specify the station code of the final seismograms. Maximum of five letters.</td>
+</tr>
+<tr class="row-odd"><td colspan="5">... or use wildcard searches over network and station codes. Potentially returns multiple stations.</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">network</span></tt></td>
+<td>String</td>
+<td>False</td>
+<td>&nbsp;</td>
+<td>Wildcarded network codes, e.g. <tt class="docutils literal"><span class="pre">I*,B?,AU</span></tt>.</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">station</span></tt></td>
+<td>String</td>
+<td>False</td>
+<td>&nbsp;</td>
+<td>Wildcarded station codes, e.g. <tt class="docutils literal"><span class="pre">A*,ANMO</span></tt>.</td>
 </tr>
 </tbody>
 </table>
