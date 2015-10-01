@@ -51,7 +51,7 @@ dl > dt {
 }
 
 .table {
-    margin-bottom: -10px
+    margin-bottom: 20px
 }
 
 @media all and ( min-width: 680px ) {
