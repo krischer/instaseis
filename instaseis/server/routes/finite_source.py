@@ -80,7 +80,7 @@ def _get_finite_source(db, finite_source, receiver, components, units, dt,
 
 
 @run_async
-def _parse_and_resample_finite_source(request, db_info, callback):
+def _parse_and_resample_finite_source(request, db_info, max_size, callback):
     try:
         with io.BytesIO(request.body) as buf:
             # We get 10.000 samples for each source sampled at 10 Hz. This is
@@ -100,6 +100,13 @@ def _parse_and_resample_finite_source(request, db_info, callback):
     except Exception:
         msg = ("Could not parse the body contents. Incorrect USGS param "
                "file?")
+        callback(tornado.web.HTTPError(400, log_message=msg, reason=msg))
+        return
+
+    if max_size is not None and finite_source.npointsources > max_size:
+        msg = ("The server only allows finite sources with at most %i points "
+               "sources. The source in question has %i points." % (
+                max_size, finite_source.npointsources))
         callback(tornado.web.HTTPError(400, log_message=msg, reason=msg))
         return
 
@@ -298,7 +305,9 @@ class FiniteSourceSeismogramsHandler(InstaseisTimeSeriesHandler):
         # Coroutine + thread as potentially pretty expensive.
         response = yield tornado.gen.Task(
             _parse_and_resample_finite_source,
-            request=self.request, db_info=self.application.db.info)
+            request=self.request,
+            max_size=self.application.max_size_of_finite_sources,
+            db_info=self.application.db.info)
 
         # If an exception is returned from the task, re-raise it here.
         if isinstance(response, Exception):

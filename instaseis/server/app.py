@@ -55,6 +55,7 @@ def get_application():
 
 
 def launch_io_loop(db_path, port, buffer_size_in_mb, quiet, log_level,
+                   max_size_of_finite_sources=1000,
                    station_coordinates_callback=None,
                    event_info_callback=None,
                    travel_time_callback=None):
@@ -70,6 +71,8 @@ def launch_io_loop(db_path, port, buffer_size_in_mb, quiet, log_level,
     :param quiet: Do not log.
     :param log_level: The log level, one of CRITICAL, ERROR, WARNING, INFO,
         DEBUG, NOTSET
+    :param max_size_of_finite_sources: The maximum allowed number of point
+        sources in a single finite source for the /finite_source route.
     :param station_coordinates_callback: A callback function for station
         coordinates. If not given, certain requests will not be available.
     :param event_info_callback: A callback function returning event
@@ -87,6 +90,11 @@ def launch_io_loop(db_path, port, buffer_size_in_mb, quiet, log_level,
     # the 1D model so we need a way to specify the actually used model. Also
     # gives the option to use other travel time calculation codes.
     application.travel_time_callback = travel_time_callback
+
+    # Maximum number of allowed point sources in the finite source route.
+    # Set to None to allow arbitrarily sized finite sources. The calculation
+    # might take very long then so be aware!
+    application.max_size_of_finite_sources = int(max_size_of_finite_sources)
 
     if not quiet:
         # Get all tornado loggers.

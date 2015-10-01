@@ -232,11 +232,13 @@ def create_async_client(path, station_coordinates_callback=None,
     application.station_coordinates_callback = station_coordinates_callback
     application.event_info_callback = event_info_callback
     application.travel_time_callback = travel_time_callback
+    application.max_size_of_finite_sources = 1000
     # Build server as in testing:311
     sock, port = bind_unused_port()
     server = HTTPServer(application, io_loop=IOLoop.instance())
     server.add_sockets([sock])
     client = AsyncClient(server, AsyncHTTPClient())
+    client.application = application
     client.filepath = path
     client.port = port
     # Flag to help deal with forward/backwards databases.

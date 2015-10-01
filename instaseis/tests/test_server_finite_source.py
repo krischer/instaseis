@@ -544,3 +544,30 @@ def test_uploading_usgs_file_with_long_rise_or_fall_times(reciprocal_clients):
                               "USGS param file due to: Rise + fall time are "
                               "longer than the total length of calculated "
                               "slip. Please use more samples.")
+
+
+def test_uploading_file_with_too_many_sources(reciprocal_clients):
+    """
+    Tests uploading a file with too many point sources.
+    """
+    client = reciprocal_clients
+
+    # Artificially limit the number of allowed sources.
+    client.application.max_size_of_finite_sources = 17
+
+    params = {
+        "receiverlongitude": 11,
+        "receiverlatitude": 22,
+        "components": "Z",
+        "format": "miniseed"}
+
+    with io.open(USGS_PARAM_FILE_1, "rb") as fh:
+        body = fh.read()
+
+    # Starttime too large.
+    request = client.fetch(_assemble_url('finite_source', **params),
+                           method="POST", body=body)
+    assert request.code == 400
+    assert request.reason == ("The server only allows finite sources with at "
+                              "most 17 points sources. The source in question "
+                              "has 121 points.")
