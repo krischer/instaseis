@@ -30,6 +30,16 @@ available. The rest will keep on working just fine.
     :local:
 
 
+Finite Source Size Setting
+--------------------------
+
+Per default the ``\finite_source`` route (:doc:`routes/finite_source`) allows
+at most 1000 point sources for a single finite source. This limit can be
+changed with the ``max_size_of_finite_sources`` parameter passed to the server
+launching script either on the command line or in the script.
+
+
+
 Station Coordinates Callback
 ----------------------------
 
