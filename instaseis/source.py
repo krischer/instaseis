@@ -761,23 +761,35 @@ class Receiver(SourceOrReceiver):
     :param network: The network id of the receiver.
     :type station: str, optional
     :param station: The station id of the receiver.
+    :type location: str
+    :param location: The location code of the receiver.
 
     >>> from instaseis import Receiver
     >>> rec = Receiver(latitude=12.34, longitude=56.78, network="AB",
-    ...                station="CDE")
+    ...                station="CDE", location="SY")
     >>> print(rec)
     Instaseis Receiver:
     longitude :   56.8 deg
     latitude  :   12.3 deg
     network   : AB
     station   : CDE
+    location  : SY
     """
     def __init__(self, latitude, longitude, network=None, station=None,
-                 depth_in_m=None):
+                 location=None, depth_in_m=None):
         super(Receiver, self).__init__(latitude, longitude,
                                        depth_in_m=depth_in_m)
         self.network = network or ""
+        self.network = self.network.strip()
+        assert len(self.network) <= 2
+
         self.station = station or ""
+        self.station = self.station.strip()
+        assert len(self.station) <= 5
+
+        self.location = location or ""
+        self.location = self.location.strip()
+        assert len(self.location) <= 2
 
     def __str__(self):
         return_str = 'Instaseis Receiver:\n'
@@ -785,6 +797,7 @@ class Receiver(SourceOrReceiver):
         return_str += '\tlatitude  : %6.1f deg\n' % (self.latitude)
         return_str += '\tnetwork   : %s\n' % (self.network)
         return_str += '\tstation   : %s\n' % (self.station)
+        return_str += '\tlocation  : %s\n' % (self.location)
 
         return return_str
 
