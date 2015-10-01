@@ -1141,7 +1141,7 @@ def test_object_creation_for_seismogram_route(all_clients):
         assert p.call_args[1]["receiver"] == instaseis.Receiver(
             latitude=basic_parameters["receiverlatitude"],
             longitude=basic_parameters["receiverlongitude"],
-            depth_in_m=0.0, network="XX", station="SYN", location="SY")
+            depth_in_m=0.0, network="XX", station="SYN", location="SE")
         assert p.call_args[1]["kind"] == "displacement"
         # Remove source shift is always False.
         assert p.call_args[1]["remove_source_shift"] is False
@@ -1219,7 +1219,7 @@ def test_object_creation_for_seismogram_route(all_clients):
         assert p.call_args[1]["receiver"] == instaseis.Receiver(
             latitude=basic_parameters["receiverlatitude"],
             longitude=basic_parameters["receiverlongitude"],
-            depth_in_m=0.0, network="XX", station="SYN", location="SY")
+            depth_in_m=0.0, network="XX", station="SYN", location="SE")
         assert p.call_args[1]["kind"] == "displacement"
         # Remove source shift is always False
         assert p.call_args[1]["remove_source_shift"] is False
@@ -1294,7 +1294,7 @@ def test_object_creation_for_seismogram_route(all_clients):
         assert p.call_args[1]["receiver"] == instaseis.Receiver(
             latitude=basic_parameters["receiverlatitude"],
             longitude=basic_parameters["receiverlongitude"],
-            depth_in_m=0.0, network="XX", station="SYN", location="SY")
+            depth_in_m=0.0, network="XX", station="SYN", location="SE")
         assert p.call_args[1]["kind"] == "displacement"
         # Remove source shift is always False
         assert p.call_args[1]["remove_source_shift"] is False
@@ -1326,7 +1326,7 @@ def test_object_creation_for_seismogram_route(all_clients):
             assert p.call_args[1]["receiver"] == instaseis.Receiver(
                 latitude=basic_parameters["receiverlatitude"],
                 longitude=basic_parameters["receiverlongitude"],
-                depth_in_m=0.0, network="XX", station="SYN", location="SY")
+                depth_in_m=0.0, network="XX", station="SYN", location="SE")
             assert p.call_args[1]["kind"] == "displacement"
             # Remove source shift is always False
             assert p.call_args[1]["remove_source_shift"] is False
@@ -1521,7 +1521,7 @@ def test_seismograms_retrieval(all_clients):
     receiver = instaseis.Receiver(
         latitude=basic_parameters["receiverlatitude"],
         longitude=basic_parameters["receiverlongitude"],
-        depth_in_m=0.0, network="XX", station="SYN", location="SY")
+        depth_in_m=0.0, network="XX", station="SYN", location="SE")
     st_db = db.get_seismograms(source=source, receiver=receiver,
                                components=components)
 
@@ -1597,7 +1597,7 @@ def test_seismograms_retrieval(all_clients):
     receiver = instaseis.Receiver(
         latitude=basic_parameters["receiverlatitude"],
         longitude=basic_parameters["receiverlongitude"], depth_in_m=0.0,
-        network="XX", station="SYN", location="SY")
+        network="XX", station="SYN", location="SE")
     st_db = db.get_seismograms(source=source, receiver=receiver,
                                components=components)
     for tr_server, tr_db in zip(st_server, st_db):
@@ -1675,7 +1675,7 @@ def test_seismograms_retrieval(all_clients):
         receiver = instaseis.Receiver(
             latitude=basic_parameters["receiverlatitude"],
             longitude=basic_parameters["receiverlongitude"],
-            depth_in_m=0.0, network="XX", station="SYN", location="SY")
+            depth_in_m=0.0, network="XX", station="SYN", location="SE")
         st_db = db.get_seismograms(source=source, receiver=receiver,
                                    components=components)
         for tr_server, tr_db in zip(st_server, st_db):
@@ -1748,7 +1748,7 @@ def test_seismograms_retrieval(all_clients):
     receiver = instaseis.Receiver(
         latitude=basic_parameters["receiverlatitude"],
         longitude=basic_parameters["receiverlongitude"],
-        depth_in_m=0.0, network="XX", station="SYN", location="SY")
+        depth_in_m=0.0, network="XX", station="SYN", location="SE")
 
     # Now test other the other parameters.
     params = copy.deepcopy(basic_parameters)
@@ -3510,7 +3510,7 @@ def test_event_parameters_by_querying(all_clients_event_callback):
         m_tt=78100000000000000,
         origin_time=obspy.UTCDateTime("1991-07-17T16:41:33.100000Z"))
     receiver = instaseis.Receiver(latitude=10, longitude=10, depth_in_m=0.0,
-                                  network="XX", station="SYN", location="SY")
+                                  network="XX", station="SYN", location="SE")
 
     st_db = db.get_seismograms(source=source, receiver=receiver)
 
@@ -3598,7 +3598,7 @@ def test_label_parameter(all_clients):
     zip_obj.close()
 
     assert sorted(names) == sorted(
-        ["XX.SYN.SY.LXZ.sac", "XX.SYN.SY.LXN.sac", "XX.SYN.SY.LXE.sac"])
+        ["XX.SYN.SE.LXZ.sac", "XX.SYN.SE.LXN.sac", "XX.SYN.SE.LXE.sac"])
 
     # Now pass one. It will replace the filename prefix.
     p = copy.deepcopy(params)
@@ -3634,9 +3634,9 @@ def test_label_parameter(all_clients):
     zip_obj.close()
 
     assert sorted(names) == sorted([
-        "Tohoku_XX.SYN.SY.LXZ.sac",
-        "Tohoku_XX.SYN.SY.LXN.sac",
-        "Tohoku_XX.SYN.SY.LXE.sac"])
+        "Tohoku_XX.SYN.SE.LXZ.sac",
+        "Tohoku_XX.SYN.SE.LXN.sac",
+        "Tohoku_XX.SYN.SE.LXE.sac"])
 
 
 def test_ttimes_route_no_callback(all_clients):
@@ -3761,7 +3761,7 @@ def test_network_and_station_code_settings(all_clients):
     for tr in obspy.read(request.buffer):
         assert tr.stats.network == "BW"
         assert tr.stats.station == "SYN"
-        assert tr.stats.location == "SY"
+        assert tr.stats.location == "SE"
 
     # Set only the station code.
     p = copy.deepcopy(params)
@@ -3771,7 +3771,7 @@ def test_network_and_station_code_settings(all_clients):
     for tr in obspy.read(request.buffer):
         assert tr.stats.network == "XX"
         assert tr.stats.station == "INS"
-        assert tr.stats.location == "SY"
+        assert tr.stats.location == "SE"
 
     # Set both.
     p = copy.deepcopy(params)
@@ -3782,7 +3782,7 @@ def test_network_and_station_code_settings(all_clients):
     for tr in obspy.read(request.buffer):
         assert tr.stats.network == "BW"
         assert tr.stats.station == "INS"
-        assert tr.stats.location == "SY"
+        assert tr.stats.location == "SE"
 
     # Set only the location code.
     p = copy.deepcopy(params)

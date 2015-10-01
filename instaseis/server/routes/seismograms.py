@@ -186,7 +186,7 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
         "receiverdepthinmeters": {"type": float, "default": 0.0},
         "networkcode": {"type": str, "default": "XX"},
         "stationcode": {"type": str, "default": "SYN"},
-        "locationcode": {"type": str, "default": "SY"},
+        "locationcode": {"type": str, "default": "SE"},
 
         # Or by querying a database.
         "network": {"type": str},
