@@ -34,6 +34,7 @@ else:
 DATA = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 USGS_PARAM_FILE_1 = os.path.join(DATA, "nepal.param")
 USGS_PARAM_FILE_2 = os.path.join(DATA, "chile.param")
+USGS_PARAM_FILE_EMPTY = os.path.join(DATA, "empty.param")
 
 
 def _parse_finite_source(filename):
@@ -410,3 +411,26 @@ def test_various_failure_conditions(reciprocal_clients_all_callbacks,
                               "source-receiver geometry or arriving too "
                               "late/with too large offsets if the database is "
                               "not long enough.")
+
+
+def test_uploading_empty_usgs_file(reciprocal_clients):
+    """
+    Tests some failure conditions.
+    """
+    client = reciprocal_clients
+
+    params = {
+        "receiverlongitude": 11,
+        "receiverlatitude": 22,
+        "components": "Z",
+        "format": "miniseed"}
+
+    with io.open(USGS_PARAM_FILE_EMPTY, "rb") as fh:
+        body = fh.read()
+
+    # Starttime too large.
+    request = client.fetch(_assemble_url('finite_source', **params),
+                           method="POST", body=body)
+    assert request.code == 400
+    assert request.reason == ("Could not parse the body contents. Incorrect "
+                              "USGS param file?")
