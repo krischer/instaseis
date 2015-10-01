@@ -251,7 +251,7 @@ def test_finite_source_retrieval(reciprocal_clients, usgs_param):
 
 
 @pytest.mark.parametrize("usgs_param", [USGS_PARAM_FILE_1, USGS_PARAM_FILE_2])
-def test_more_complex_queries(reciprocal_clients_ttimes_callback,
+def test_more_complex_queries(reciprocal_clients_all_callbacks,
                               usgs_param):
     """
     These are not exhaustive tests but test that the queries do something.
@@ -262,7 +262,7 @@ def test_more_complex_queries(reciprocal_clients_ttimes_callback,
     + must be encoded with %2B
     - must be encoded with %2D
     """
-    client = reciprocal_clients_ttimes_callback
+    client = reciprocal_clients_all_callbacks
 
     basic_parameters = {
         "receiverlongitude": 11,
@@ -338,3 +338,75 @@ def test_more_complex_queries(reciprocal_clients_ttimes_callback,
     # Just make sure they actually do something.
     assert st_2[0].stats.starttime > st[0].stats.starttime
     assert st_2[0].stats.endtime < st[0].stats.endtime
+
+    # Network and station searches.
+    params = {
+        "network": "IU,B*",
+        "station": "ANT*,ANM?",
+        "components": "Z",
+        "format": "miniseed"}
+    request = client.fetch(_assemble_url('finite_source', **params),
+                           method="POST", body=body)
+    assert request.code == 200
+    st_2 = obspy.read(request.buffer)
+
+    assert sorted(tr.id for tr in st_2) == ["IU.ANMO..LXZ", "IU.ANTO..LXZ"]
+
+
+@pytest.mark.parametrize("usgs_param", [USGS_PARAM_FILE_1, USGS_PARAM_FILE_2])
+def test_various_failure_conditions(reciprocal_clients_all_callbacks,
+                                    usgs_param):
+    """
+    Tests some failure conditions.
+    """
+    client = reciprocal_clients_all_callbacks
+
+    basic_parameters = {
+        "receiverlongitude": 11,
+        "receiverlatitude": 22,
+        "components": "Z",
+        "format": "miniseed"}
+
+    with io.open(usgs_param, "rb") as fh:
+        body = fh.read()
+
+    # Starttime too large.
+    params = copy.deepcopy(basic_parameters)
+    params["starttime"] = 200000
+    request = client.fetch(_assemble_url('finite_source', **params),
+                           method="POST", body=body)
+    assert request.code == 400
+    assert request.reason == ("The `starttime` must be before the seismogram "
+                              "ends.")
+
+    # Starttime too early.
+    params = copy.deepcopy(basic_parameters)
+    params["starttime"] = -10000
+    request = client.fetch(_assemble_url('finite_source', **params),
+                           method="POST", body=body)
+    assert request.code == 400
+    assert request.reason == ("The seismogram can start at the maximum one "
+                              "hour before the origin time.")
+
+    # Endtime too small.
+    params = copy.deepcopy(basic_parameters)
+    params["endtime"] = -200000
+    request = client.fetch(_assemble_url('finite_source', **params),
+                           method="POST", body=body)
+    assert request.code == 400
+    assert request.reason == ("The end time of the seismograms lies outside "
+                              "the allowed range.")
+
+    # Useless phase relative times. pdiff does not exist at the epicentral
+    # range of the example files.
+    params = copy.deepcopy(basic_parameters)
+    params["starttime"] = "Pdiff%2D5"
+    request = client.fetch(_assemble_url('finite_source', **params),
+                           method="POST", body=body)
+    assert request.code == 400
+    assert request.reason == ("No seismograms found for the given phase "
+                              "relative offsets. This could either be due to "
+                              "the chosen phase not existing for the specific "
+                              "source-receiver geometry or arriving too "
+                              "late/with too large offsets if the database is "
+                              "not long enough.")
