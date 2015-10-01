@@ -7,6 +7,9 @@ POST /finite_source
     :doc:`../advanced_server_configuration` for details. The parts that don't
     will keep working even with a normal configuration.
 
+    Per default this route allows at most 1000 point sources for a single
+    finite source. This limit can be changed when starting the server.
+
 Description
     Returns seismograms for finite sources defined in the USGS param file
     format. Just POST the file and set additional parameters in the URL.
