@@ -15,6 +15,7 @@ import io
 import obspy
 import os
 import numpy as np
+import pytest
 
 from instaseis import Source, FiniteSource
 from instaseis.helpers import elliptic_to_geocentric_latitude
@@ -26,6 +27,7 @@ EVENT_FILE = os.path.join(DATA, "GCMT_event_STRAIT_OF_GIBRALTAR.xml")
 SRF_FILE = os.path.join(DATA, "strike_slip_eq_10pts.srf")
 USGS_PARAM_FILE1 = os.path.join(DATA, "nepal.param")
 USGS_PARAM_FILE2 = os.path.join(DATA, "chile.param")
+USGS_PARAM_FILE_EMPTY = os.path.join(DATA, "empty.param")
 
 
 def test_parse_CMTSOLUTIONS_file(tmpdir):
@@ -133,6 +135,16 @@ def test_parse_srf_file():
             -3.91886976e+03, 3.91886976e+03, -1.19980783e-13, 1.95943488e+03,
             3.20000000e+19])
         np.testing.assert_allclose(src_params, src_params_ref)
+
+
+def test_parsing_empty_usgs_file():
+    """
+    Parsing an empty USGS file should fail.
+    """
+    with pytest.raises(ValueError) as e:
+        FiniteSource.from_usgs_param_file(USGS_PARAM_FILE_EMPTY)
+
+    assert e.value.args[0] == 'No point sources found in the file.'
 
 
 def test_parse_usgs_param_file():

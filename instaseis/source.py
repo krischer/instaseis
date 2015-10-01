@@ -1232,6 +1232,9 @@ class FiniteSource(object):
                         lat, lon, dep, stk, dip, rake, M0,
                         time_shift=tinit, sliprate=stf, dt=dt))
 
+        if not sources:
+            raise ValueError("No point sources found in the file.")
+
         return cls(pointsources=sources)
 
     @classmethod
