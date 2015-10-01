@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>GET /seismograms_raw &mdash; instaseis 0.0.1a-362-g990c documentation</title>
+    <title>GET /seismograms_raw &mdash; instaseis 0.0.1a-363-g3403 documentation</title>
     
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.0.1a-362-g990c',
+        VERSION:     '0.0.1a-363-g3403',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -31,7 +31,7 @@
     <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-3.3.4/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.0.1a-362-g990c documentation" href="../index.html" />
+    <link rel="top" title="instaseis 0.0.1a-363-g3403 documentation" href="../index.html" />
     <link rel="up" title="Instaseis Server" href="../server.html" />
     <link rel="next" title="GET /seismograms" href="seismograms.html" />
     <link rel="prev" title="GET /ttimes" href="ttimes.html" />
@@ -54,7 +54,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-362-g990c</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-363-g3403</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -188,105 +188,111 @@ point).</dd>
 <td>&nbsp;</td>
 <td>The station code of the final seismogram.</td>
 </tr>
-<tr class="row-even"><td colspan="5">Source Parameters</td>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">locationcode</span></tt></td>
+<td>String</td>
+<td>False</td>
+<td>&nbsp;</td>
+<td>Specify the location code of the final seismograms.</td>
 </tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">sourcelatitude</span></tt></td>
+<tr class="row-odd"><td colspan="5">Source Parameters</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">sourcelatitude</span></tt></td>
 <td>Float</td>
 <td>True</td>
 <td>&nbsp;</td>
 <td>The latitude of the source.</td>
 </tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">sourcelongitude</span></tt></td>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">sourcelongitude</span></tt></td>
 <td>Float</td>
 <td>True</td>
 <td>&nbsp;</td>
 <td>The longitude of the source.</td>
 </tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">sourcedepthinm</span></tt></td>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">sourcedepthinm</span></tt></td>
 <td>Float</td>
 <td>False</td>
 <td>0.0</td>
 <td>The depth of the source in meter.</td>
 </tr>
-<tr class="row-even"><td colspan="5">Source can be given as the moment tensor components...</td>
+<tr class="row-odd"><td colspan="5">Source can be given as the moment tensor components...</td>
 </tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">mrr</span></tt></td>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">mrr</span></tt></td>
 <td>Float</td>
 <td>False</td>
 <td>&nbsp;</td>
 <td>A moment tensor component in Nm.</td>
 </tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">mtt</span></tt></td>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">mtt</span></tt></td>
 <td>Float</td>
 <td>False</td>
 <td>&nbsp;</td>
 <td>A moment tensor componentin Nm.</td>
 </tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">mpp</span></tt></td>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">mpp</span></tt></td>
 <td>Float</td>
 <td>False</td>
 <td>&nbsp;</td>
 <td>A moment tensor componentin Nm.</td>
 </tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">mrt</span></tt></td>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">mrt</span></tt></td>
 <td>Float</td>
 <td>False</td>
 <td>&nbsp;</td>
 <td>A moment tensor componentin Nm.</td>
 </tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">mrp</span></tt></td>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">mrp</span></tt></td>
 <td>Float</td>
 <td>False</td>
 <td>&nbsp;</td>
 <td>A moment tensor componentin Nm.</td>
 </tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">mtp</span></tt></td>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">mtp</span></tt></td>
 <td>Float</td>
 <td>False</td>
 <td>&nbsp;</td>
 <td>A moment tensor componentin Nm.</td>
 </tr>
-<tr class="row-odd"><td colspan="5">...as a double couple...</td>
+<tr class="row-even"><td colspan="5">...as a double couple...</td>
 </tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">strike</span></tt></td>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">strike</span></tt></td>
 <td>Float</td>
 <td>False</td>
 <td>&nbsp;</td>
 <td>Strike of a double couple source in degree.</td>
 </tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">dip</span></tt></td>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">dip</span></tt></td>
 <td>Float</td>
 <td>False</td>
 <td>&nbsp;</td>
 <td>Dip of a double couple source in degree.</td>
 </tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">rake</span></tt></td>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">rake</span></tt></td>
 <td>Float</td>
 <td>False</td>
 <td>&nbsp;</td>
 <td>Rake of a double couple source in degree.</td>
 </tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">M0</span></tt></td>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">M0</span></tt></td>
 <td>Float</td>
 <td>False</td>
 <td>&nbsp;</td>
 <td>Scalar seismic moment in Nm.</td>
 </tr>
-<tr class="row-even"><td colspan="5">...or as a force source.</td>
+<tr class="row-odd"><td colspan="5">...or as a force source.</td>
 </tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">fr</span></tt></td>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">fr</span></tt></td>
 <td>Float</td>
 <td>False</td>
 <td>&nbsp;</td>
 <td>A force source component in N.</td>
 </tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">ft</span></tt></td>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">ft</span></tt></td>
 <td>Float</td>
 <td>False</td>
 <td>&nbsp;</td>
 <td>A force source component in N.</td>
 </tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">fp</span></tt></td>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">fp</span></tt></td>
 <td>Float</td>
 <td>False</td>
 <td>&nbsp;</td>
