@@ -9,7 +9,7 @@ Description
     with other programs, please use the ``/seismograms`` route.
 
 Content-Type
-    application/octet-stream
+    ``application/vnd.fdsn.mseed``
 
 Special Response Headers
     ``Instaseis-Mu``: This transports the mu of the model for the given
