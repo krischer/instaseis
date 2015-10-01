@@ -196,6 +196,12 @@ class SyngineInstaseisDB(BaseInstaseisDB):
         info["slip"] = np.array(info["slip"], dtype=np.float64)
         info["sliprate"] = np.array(info["sliprate"], dtype=np.float64)
 
+        # Syngine currently appears to use an outdated instaseis version or
+        # they cached their /info routes.
+        if info["max_radius"] > 10000:
+            info["max_radius"] /= 1E3
+            info["min_radius"] /= 1E3
+
         return info
 
     def __str__(self):
