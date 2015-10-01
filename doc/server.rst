@@ -179,7 +179,7 @@ REST-like API Documentation
 
 If you wish to use the Instaseis Server without the Python client this
 documentation might be helpful. The Instaseis server offers a REST-like API
-with currently eight endpoints only supporting GET.
+with currently nine endpoints.
 
 .. toctree::
 
@@ -191,3 +191,4 @@ with currently eight endpoints only supporting GET.
     routes/seismograms_raw
     routes/seismograms
     routes/greens_function
+    routes/finite_source
