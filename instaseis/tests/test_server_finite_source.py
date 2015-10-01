@@ -31,8 +31,7 @@ else:
     import unittest.mock as mock
 
 DATA = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
-USGS_PARAM_FILE1 = os.path.join(DATA, "nepal.param")
-USGS_PARAM_FILE2 = os.path.join(DATA, "chile.param")
+USGS_PARAM_FILE = os.path.join(DATA, "nepal.param")
 
 
 def _parse_finite_source(filename):
@@ -50,10 +49,11 @@ def _parse_finite_source(filename):
 
     # Things are now on purpose a bit different than in the actual
     # implementation to actually test something....
+    shift = fs.time_shift
     for src in fs.pointsources:
         src.sliprate = np.concatenate(
             [np.zeros(10), src.sliprate, np.zeros(10)])
-        src.time_shift += 10 * dt
+        src.time_shift += 10 * dt - shift
 
     fs.lp_sliprate(freq=1.0 / dominant_period, zerophase=True)
     fs.resample_sliprate(dt=dt, nsamp=npts + 20)
@@ -96,7 +96,7 @@ def test_finite_source_retrieval(reciprocal_clients):
         "receiverlatitude": 22,
         "format": "miniseed"}
 
-    with io.open(USGS_PARAM_FILE1, "rb") as fh:
+    with io.open(USGS_PARAM_FILE, "rb") as fh:
         body = fh.read()
 
     # default parameters
@@ -109,7 +109,7 @@ def test_finite_source_retrieval(reciprocal_clients):
         assert tr.stats._format == "MSEED"
 
     # Parse the finite source.
-    fs = _parse_finite_source(USGS_PARAM_FILE1)
+    fs = _parse_finite_source(USGS_PARAM_FILE)
     rec = instaseis.Receiver(latitude=22, longitude=11, network="XX",
                              station="SYN")
 

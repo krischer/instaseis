@@ -103,10 +103,14 @@ def _parse_and_resample_finite_source(request, db_info, callback):
     # boundary effects at the ends.
     samples = int(math.ceil((2 * dominant_period / db_info.dt))) + 1
     zeros = np.zeros(samples)
+
     shift = samples * db_info.dt
+    # We cheat a bit and set the rupture time of the first slipping patch to 0.
+    first_slip = finite_source.time_shift
+
     for source in finite_source.pointsources:
         source.sliprate = np.concatenate([zeros, source.sliprate, zeros])
-        source.time_shift += shift
+        source.time_shift += shift - first_slip
 
     finite_source.additional_time_shift = shift
 
