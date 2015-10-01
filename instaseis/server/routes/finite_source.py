@@ -23,6 +23,9 @@ from ..instaseis_request import InstaseisTimeSeriesHandler
 from ...lanczos import interpolate_trace
 from ...source import USGSParamFileParsingException
 
+from ...base_instaseis_db import (KIND_MAP, STF_MAP, INV_KIND_MAP,
+                                  _diff_and_integrate)
+
 
 @run_async
 def _get_finite_source(db, finite_source, receiver, components, units, dt,
@@ -51,7 +54,9 @@ def _get_finite_source(db, finite_source, receiver, components, units, dt,
     try:
         st = db.get_seismograms_finite_source(
             sources=finite_source, receiver=receiver, components=components,
-            kind=units)
+            # Effectively results in nothing happening so we can perform the
+            # differentiation here.
+            kind=INV_KIND_MAP[STF_MAP[db.info.stf]])
     except Exception:
         msg = ("Could not extract finite source seismograms. Make sure, "
                "the parameters are valid, and the depth settings are correct.")
@@ -72,6 +77,18 @@ def _get_finite_source(db, finite_source, receiver, components, units, dt,
             interpolate_trace(tr, sampling_rate=1.0 / dt, a=kernelwidth,
                               window="blackman",
                               starttime=time_of_first_sample + offset)
+
+    # Integrate/differentiate here. No need to do it for every single
+    # seismogram and stack the errors.
+    n_derivative = KIND_MAP[units] - STF_MAP[db.info.stf]
+    if n_derivative:
+        for tr in st:
+            data_summed = {}
+            data_summed["A"] = tr.data
+            _diff_and_integrate(n_derivative=n_derivative,
+                                data=data_summed, comp="A",
+                                dt_out=tr.stats.delta)
+            tr.data = data_summed["A"]
 
     _validate_and_write_waveforms(st=st, callback=callback,
                                   starttime=starttime, endtime=endtime,
