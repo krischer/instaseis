@@ -283,7 +283,7 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
                 raise tornado.web.HTTPError(
                     400, log_message=msg, reason=msg)
 
-        # Figure out who the station coordinates are specified.
+        # Figure out how the station coordinates are specified.
         direct_receiver_settings = [
             i is not None
             for i in (args.receiverlatitude, args.receiverlongitude)]
