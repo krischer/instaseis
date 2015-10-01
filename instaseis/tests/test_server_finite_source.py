@@ -280,7 +280,8 @@ def test_finite_source_retrieval(reciprocal_clients, usgs_param):
         np.testing.assert_allclose(tr_server.stats.delta, tr_db.stats.delta)
 
         assert tr_db.stats == tr_server.stats
-        np.testing.assert_allclose(tr_db.data, tr_server.data)
+        np.testing.assert_allclose(tr_db.data, tr_server.data,
+                                   rtol=1E-7, atol=tr_db.data.ptp() * 1E-7)
 
 
 @pytest.mark.parametrize("usgs_param", [USGS_PARAM_FILE_1, USGS_PARAM_FILE_2])

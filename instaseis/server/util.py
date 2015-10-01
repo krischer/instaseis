@@ -95,6 +95,14 @@ def _validtimesetting(value):
     }
 
 
+def _format_utc_datetime(dt):
+    """
+    Python 2's datetime class cannot format dates before 1900. Thus we do it
+    like this which yields the same result.
+    """
+    return dt.datetime.isoformat() + "Z"
+
+
 def _validate_and_write_waveforms(st, callback, starttime, endtime, source,
                                   receiver, db, label, format):
     if not label:
@@ -109,7 +117,9 @@ def _validate_and_write_waveforms(st, callback, starttime, endtime, source,
     # This should not happen and should have been caught before.
     if endtime > st[0].stats.endtime:
         msg = ("Endtime larger than the extracted endtime: endtime=%s, "
-               "largest db endtime=%s" % (endtime, st[0].stats.endtime))
+               "largest db endtime=%s" % (
+                _format_utc_datetime(endtime),
+                _format_utc_datetime(st[0].stats.endtime)))
         callback(tornado.web.HTTPError(500, log_message=msg, reason=msg))
         return
     if starttime < st[0].stats.starttime - 3600.0:
