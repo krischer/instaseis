@@ -186,6 +186,7 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
         "receiverdepthinmeters": {"type": float, "default": 0.0},
         "networkcode": {"type": str, "default": "XX"},
         "stationcode": {"type": str, "default": "SYN"},
+        "locationcode": {"type": str, "default": "SY"},
 
         # Or by querying a database.
         "network": {"type": str},
@@ -215,6 +216,11 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
 
         if args.networkcode and len(args.networkcode) > 2:
             msg = "'networkcode' must have 2 or fewer letters."
+            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+
+        # The location code as well.
+        if args.locationcode and len(args.locationcode) > 2:
+            msg = "'locationcode' must have 2 or fewer letters."
             raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
         all_src_params = set(["sourcemomenttensor", "sourcedoublecouple",
@@ -388,6 +394,7 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
                                     longitude=args.receiverlongitude,
                                     network=args.networkcode,
                                     station=args.stationcode,
+                                    location=args.locationcode,
                                     depth_in_m=args.receiverdepthinmeters)
             except:
                 msg = ("Could not construct receiver with passed parameters. "
