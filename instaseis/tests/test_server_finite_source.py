@@ -37,6 +37,7 @@ USGS_PARAM_FILE_2 = os.path.join(DATA, "chile.param")
 USGS_PARAM_FILE_EMPTY = os.path.join(DATA, "empty.param")
 USGS_PARAM_FILE_DEEP = os.path.join(DATA, "deep.param")
 USGS_PARAM_FILE_AIR = os.path.join(DATA, "airquakes.param")
+USGS_PARAM_FILE_LONG = os.path.join(DATA, "long_source.param")
 
 
 def _parse_finite_source(filename):
@@ -517,3 +518,29 @@ def test_uploading_usgs_file_with_airquakes(reciprocal_clients):
                               "finite source is -0.9 km deep. The database "
                               "only has a depth range from 0.0 km to "
                               "371.0 km.")
+
+
+def test_uploading_usgs_file_with_long_rise_or_fall_times(reciprocal_clients):
+    """
+    Tests uploading a usgs file that has too long rise or fall times.
+    radius.
+    """
+    client = reciprocal_clients
+
+    params = {
+        "receiverlongitude": 11,
+        "receiverlatitude": 22,
+        "components": "Z",
+        "format": "miniseed"}
+
+    with io.open(USGS_PARAM_FILE_LONG, "rb") as fh:
+        body = fh.read()
+
+    # Starttime too large.
+    request = client.fetch(_assemble_url('finite_source', **params),
+                           method="POST", body=body)
+    assert request.code == 400
+    assert request.reason == ("The body contents could not be parsed as an "
+                              "USGS param file due to: Rise + fall time are "
+                              "longer than the total length of calculated "
+                              "slip. Please use more samples.")
