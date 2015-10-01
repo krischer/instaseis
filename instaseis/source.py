@@ -34,6 +34,13 @@ from .helpers import (elliptic_to_geocentric_latitude,
 DEFAULT_MU = 32e9
 
 
+class USGSParamFileParsingException(Exception):
+    """
+    Custom exception for nice and hopefully save exception passing.
+    """
+    pass
+
+
 def _purge_duplicates(f):
     """
     Simple decorator removing duplicates in the returned list. Preserves the
@@ -1176,7 +1183,7 @@ class FiniteSource(object):
         # number of segments
         line = fh.readline().decode().strip()
         if not line.startswith("#Total number of fault_segments"):
-            raise ValueError("Not a valid USGS param file.")
+            raise USGSParamFileParsingException("Not a valid USGS param file.")
         nseg = int(line.split()[-1])
         sources = []
 
@@ -1202,16 +1209,18 @@ class FiniteSource(object):
                 # Negative rupture times are not supported with the current
                 # logic.
                 if tinit < 0:
-                    raise ValueError("File contains a negative rupture time "
-                                     "which Instaseis cannot currently deal "
-                                     "with.")
+                    raise USGSParamFileParsingException(
+                        "File contains a negative rupture time "
+                        "which Instaseis cannot currently deal "
+                        "with.")
 
                 # Calculate the end time.
                 endtime = trise + tfall
                 if endtime > (npts - 1) * dt:
-                    raise ValueError("Rise + fall time are longer than the "
-                                     "total length of calculated slip. "
-                                     "Please use more samples.")
+                    raise USGSParamFileParsingException(
+                        "Rise + fall time are longer than the "
+                        "total length of calculated slip. "
+                        "Please use more samples.")
 
                 # Convert latitude to a geocentric latitude.
                 lat = elliptic_to_geocentric_latitude(lat)
@@ -1233,7 +1242,8 @@ class FiniteSource(object):
                         time_shift=tinit, sliprate=stf, dt=dt))
 
         if not sources:
-            raise ValueError("No point sources found in the file.")
+            raise USGSParamFileParsingException(
+                "No point sources found in the file.")
 
         return cls(pointsources=sources)
 

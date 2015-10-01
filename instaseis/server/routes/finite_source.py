@@ -21,6 +21,7 @@ from ..util import run_async, IOQueue, _validtimesetting, \
     _validate_and_write_waveforms
 from ..instaseis_request import InstaseisTimeSeriesHandler
 from ...lanczos import interpolate_trace
+from ...source import USGSParamFileParsingException
 
 
 @run_async
@@ -89,6 +90,13 @@ def _parse_and_resample_finite_source(request, db_info, callback):
             # Might need some more thought.
             finite_source = FiniteSource.from_usgs_param_file(
                 buf, npts=10000, dt=0.1, trise_min=1.0)
+    except USGSParamFileParsingException as e:
+        msg = ("The body contents could not be parsed as an USGS param file "
+               "due to: %s" % str(e))
+        callback(tornado.web.HTTPError(400, log_message=msg, reason=msg))
+        return
+    # Don't forward the exception message as it might be anything and could
+    # thus compromise security.
     except Exception:
         msg = ("Could not parse the body contents. Incorrect USGS param "
                "file?")

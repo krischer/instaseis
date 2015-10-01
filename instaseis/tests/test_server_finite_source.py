@@ -66,6 +66,34 @@ def _parse_finite_source(filename):
     return fs
 
 
+def test_triggering_random_error_during_parsing(reciprocal_clients):
+    """
+    Tests triggering a random error during the USGS param file parsing.
+    """
+    client = reciprocal_clients
+
+    with io.open(__file__) as fh:
+        body = fh.read()
+
+    # default parameters
+    params = {
+        "receiverlongitude": 11,
+        "receiverlatitude": 22}
+
+    with mock.patch("instaseis.source.FiniteSource"
+                    ".from_usgs_param_file") as p:
+        def raise_err():
+            raise ValueError("random crash")
+
+        p.side_effect = raise_err
+        request = client.fetch(_assemble_url('finite_source', **params),
+                               method="POST", body=body)
+
+    assert request.code == 400
+    assert request.reason == ("Could not parse the body contents. "
+                              "Incorrect USGS param file?")
+
+
 def test_sending_non_USGS_file(reciprocal_clients):
     """
     Tests error if a non-USGS file is sent.
@@ -82,8 +110,9 @@ def test_sending_non_USGS_file(reciprocal_clients):
     request = client.fetch(_assemble_url('finite_source', **params),
                            method="POST", body=body)
     assert request.code == 400
-    assert request.reason == "Could not parse the body contents. Incorrect " \
-                             "USGS param file?"
+    assert request.reason == ("The body contents could not be parsed as an "
+                              "USGS param file due to: "
+                              "Not a valid USGS param file.")
 
 
 @pytest.mark.parametrize("usgs_param", [USGS_PARAM_FILE_1, USGS_PARAM_FILE_2])
@@ -434,8 +463,9 @@ def test_uploading_empty_usgs_file(reciprocal_clients):
     request = client.fetch(_assemble_url('finite_source', **params),
                            method="POST", body=body)
     assert request.code == 400
-    assert request.reason == ("Could not parse the body contents. Incorrect "
-                              "USGS param file?")
+    assert request.reason == (
+        "The body contents could not be parsed as an USGS param file due to: "
+        "No point sources found in the file.")
 
 
 def test_uploading_deep_usgs_file(reciprocal_clients):
