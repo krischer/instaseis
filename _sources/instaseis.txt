@@ -37,3 +37,11 @@ RemoteInstaseisDB
 
 .. autoclass:: instaseis.remote_instaseis_db.RemoteInstaseisDB
     :members:
+
+....
+
+SyngineInstaseisDB
+------------------
+
+.. autoclass:: instaseis.syngine_instaseis_db.SyngineInstaseisDB
+:members:
