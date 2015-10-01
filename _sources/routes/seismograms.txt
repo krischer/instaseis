@@ -86,7 +86,7 @@ Filetype
 +-----------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
 | ``stationcode``             | String   | False    | SYN                         | Specify the station code of the final seismograms. Maximum of five letters.          |
 +-----------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
-| ``locationcode``            | String   | False    | SY                          | Specify the location code of the final seismograms. Maximum of two letters.          |
+| ``locationcode``            | String   | False    | SE                          | Specify the location code of the final seismograms. Maximum of two letters.          |
 +-----------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
 | ... or use wildcard searches over network and station codes. Potentially returns multiple stations.                                                                    |
 +-----------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
