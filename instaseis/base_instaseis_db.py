@@ -594,6 +594,9 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
         self.__cached_info = AttribDict(self._get_info())
         return self.__cached_info
 
+    def _repr_pretty_(self, p, cycle):
+        p.text(str(self))
+
     def __str__(self):
         info = self.info
 

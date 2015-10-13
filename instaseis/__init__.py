@@ -61,6 +61,17 @@ def open_db(path, *args, **kwargs):
         components           : vertical and horizontal
         velocity model       : ak135f
 
+    The special syntax ``syngine://MODEL_NAME`` will connect to the IRIS
+    syngine web service for the specified model.
+
+    >>> db = instaseis.open_db("syngine://ak135f")
+    >>> print(db)
+    SyngineInstaseisDB reciprocal Green's function Database (v7) ...
+    Syngine model name:      'ak135f'
+    Syngine service version:  0.0.2
+        components           : vertical and horizontal
+        velocity model       : ak135f
+
     .. note::
 
         If opening a local database and the ``ordered_output.nc4`` files are
@@ -69,7 +80,12 @@ def open_db(path, *args, **kwargs):
         :func:`~instaseis.open_db` function. Instaseis will recursively
         search the child directories for the  necessary files and open them.
     """
-    if "://" in path:
+    if path.startswith("syngine://"):
+        model = path.lstrip("syngine://")
+        from . import syngine_instaseis_db
+        return syngine_instaseis_db.SyngineInstaseisDB(model=model, *args,
+                                                       **kwargs)
+    elif "://" in path:
         from . import remote_instaseis_db
         return remote_instaseis_db.RemoteInstaseisDB(path, *args, **kwargs)
     else:

@@ -110,7 +110,7 @@ class RemoteInstaseisDB(BaseInstaseisDB):
         r = requests.get(url)
         if "Instaseis-Mu" not in r.headers:
             warnings.warn("Mu is not passed via the HTTP headers. Maybe some "
-                          "proxy removed it? Mu is now always the default me.",
+                          "proxy removed it? Mu is now always the default mu.",
                           InstaseisWarning)
             mu = DEFAULT_MU
         else:
