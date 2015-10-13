@@ -30,6 +30,33 @@ from .helpers import get_band_code
 DEFAULT_MU = 32e9
 
 
+KIND_MAP = {
+    'displacement': 0,
+    'velocity': 1,
+    'acceleration': 2}
+
+
+INV_KIND_MAP = dict((j, i) for i, j in KIND_MAP.items())
+
+
+STF_MAP = {
+    'errorf': 0,
+    'quheavi': 0,
+    'dirac_0': 1,
+    'gauss_0': 1,
+    'gauss_1': 2,
+    'gauss_2': 3}
+
+
+def _diff_and_integrate(n_derivative, data, comp, dt_out):
+    for _ in np.arange(n_derivative):
+        data[comp] = np.gradient(data[comp], [dt_out])
+
+    for _ in np.arange(-n_derivative):
+        # adding a zero at the beginning to avoid phase shift
+        data[comp] = cumtrapz(data[comp], dx=dt_out, initial=0.0)
+
+
 class BaseInstaseisDB(with_metaclass(ABCMeta)):
     """
     Base class for all Instaseis database classes defining the user interface.
@@ -119,6 +146,7 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
         # same kwarguments for many callse
         args = {'receiver': receiver,
                 'dt': dt,
+                'kind': kind,
                 'kernelwidth': kernelwidth,
                 'return_obspy_stream': False}
 
@@ -222,24 +250,11 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
         else:
             dt_out = dt
 
-        kind_map = {
-            'displacement': 0,
-            'velocity': 1,
-            'acceleration': 2}
-
-        stf_map = {
-            'errorf': 0,
-            'quheavi': 0,
-            'dirac_0': 1,
-            'gauss_0': 1,
-            'gauss_1': 2,
-            'gauss_2': 3}
-
         stf_deconv_map = {
             0: self.info.sliprate,
             1: self.info.slip}
 
-        n_derivative = kind_map[kind] - stf_map[self.info.stf]
+        n_derivative = KIND_MAP[kind] - STF_MAP[self.info.stf]
 
         # not 100% sure why, but this way we get correct seismograms for
         # impacts when using ForceSource:
@@ -266,13 +281,13 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
                 if source.dt is None or source.sliprate is None:
                     raise ValueError("source has no source time function")
 
-                if stf_map[self.info.stf] not in [0, 1]:
+                if STF_MAP[self.info.stf] not in [0, 1]:
                     raise NotImplementedError(
                         'deconvolution not implemented for stf %s'
                         % (self.info.stf))
 
                 stf_deconv_f = np.fft.rfft(
-                    stf_deconv_map[stf_map[self.info.stf]],
+                    stf_deconv_map[STF_MAP[self.info.stf]],
                     n=self.info.nfft)
 
                 if abs((source.dt - self.info.dt) / self.info.dt) > 1e-7:
@@ -304,12 +319,11 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
 
             # Integrate/differentiate before removing the source shift in
             # order to reduce boundary effects at the start of the signal.
-            for _ in np.arange(n_derivative):
-                data[comp] = np.gradient(data[comp], [dt_out])
-
-            for _ in np.arange(-n_derivative):
-                # adding a zero at the beginning to avoid phase shift
-                data[comp] = cumtrapz(data[comp], dx=dt_out, initial=0.0)
+            #
+            # NEVER to this before the resampling! The error can be really big.
+            if n_derivative:
+                _diff_and_integrate(n_derivative=n_derivative, data=data,
+                                    comp=comp, dt_out=dt_out)
 
             # If desired, remove the samples before the peak of the source
             # time function.
@@ -411,8 +425,12 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
         data_summed = {}
         count = len(sources)
         for _i, source in enumerate(sources):
+            # Don't perform the diff/integration here, but after the
+            # resampling later on.
             data = self.get_seismograms(
                 source, receiver, components, reconvolve_stf=True,
+                # Effectively results in nothing happening.
+                kind=INV_KIND_MAP[STF_MAP[self.info.stf]],
                 return_obspy_stream=False, remove_source_shift=False)
 
             if correct_mu:
@@ -454,14 +472,25 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
                     data_summed[comp] = \
                         data_summed[comp][:-int(np.ceil(affected_area / dt))]
 
+        if dt is None:
+            dt_out = self.info.dt
+        else:
+            dt_out = dt
+
+        # Integrate/differentiate here. No need to do it for every single
+        # seismogram and stack the errors.
+        n_derivative = KIND_MAP[kind] - STF_MAP[self.info.stf]
+        if n_derivative:
+            for comp in data_summed.keys():
+                _diff_and_integrate(n_derivative=n_derivative,
+                                    data=data_summed, comp=comp, dt_out=dt_out)
+
         # Convert to an ObsPy Stream object.
         st = Stream()
-        if dt is None:
-            dt = self.info.dt
-        band_code = get_band_code(dt)
+        band_code = get_band_code(dt_out)
         for comp in components:
             tr = Trace(data=data_summed[comp],
-                       header={"delta": dt,
+                       header={"delta": dt_out,
                                "station": receiver.station,
                                "network": receiver.network,
                                "location": receiver.location,

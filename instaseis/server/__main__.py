@@ -25,6 +25,12 @@ if __name__ == "__main__":
                         help='Server port.')
     parser.add_argument('--buffer_size_in_mb', type=int,
                         default=100, help='Size of the buffer in MB')
+    parser.add_argument('--max_size_of_finite_sources', type=int,
+                        default=1000,
+                        help='The maximum allowed number of point sources in '
+                             'a single finite source for the /finite_source '
+                             'route.')
+
     parser.add_argument('db_path', type=str,
                         help='Database path')
     parser.add_argument(
@@ -40,4 +46,5 @@ if __name__ == "__main__":
 
     launch_io_loop(db_path=db_path, port=args.port,
                    buffer_size_in_mb=args.buffer_size_in_mb,
+                   max_size_of_finite_sources=args.max_size_of_finite_sources,
                    quiet=args.quiet, log_level=args.log_level)

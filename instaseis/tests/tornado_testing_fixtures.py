@@ -41,6 +41,15 @@ DATA = os.path.join(os.path.dirname(os.path.abspath(
 MODEL = TauPyModel("ak135")
 
 
+def _assemble_url(route, **kwargs):
+    """
+    Helper function.
+    """
+    url = "/%s?" % route
+    url += "&".join("%s=%s" % (key, value) for key, value in kwargs.items())
+    return url
+
+
 class AsyncClient(object):
     """
     A port of parts of AsyncTestCase. See tornado.testing.py:275
@@ -53,9 +62,12 @@ class AsyncClient(object):
         self.httpserver = httpserver
         self.httpclient = httpclient
 
-    def fetch(self, path, use_gzip=False, **kwargs):
+    def _get_port(self):
         # This seems a bit fragile. How else to get the dynamic port number?
-        port = list(self.httpserver._sockets.values())[0].getsockname()[1]
+        return list(self.httpserver._sockets.values())[0].getsockname()[1]
+
+    def fetch(self, path, use_gzip=False, **kwargs):
+        port = self._get_port()
         url = u'%s://localhost:%s%s' % ('http', port, path)
         self.httpclient.fetch(url, self.stop, decompress_response=use_gzip,
                               **kwargs)
@@ -220,11 +232,13 @@ def create_async_client(path, station_coordinates_callback=None,
     application.station_coordinates_callback = station_coordinates_callback
     application.event_info_callback = event_info_callback
     application.travel_time_callback = travel_time_callback
+    application.max_size_of_finite_sources = 1000
     # Build server as in testing:311
     sock, port = bind_unused_port()
     server = HTTPServer(application, io_loop=IOLoop.instance())
     server.add_sockets([sock])
     client = AsyncClient(server, AsyncHTTPClient())
+    client.application = application
     client.filepath = path
     client.port = port
     # Flag to help deal with forward/backwards databases.
@@ -242,6 +256,15 @@ def create_async_client(path, station_coordinates_callback=None,
 def all_clients(request):
     """
     Fixture returning all clients!
+    """
+    return create_async_client(request.param,
+                               station_coordinates_callback=None)
+
+
+@pytest.fixture(params=[_i for _i in list(DBS.values()) if "db_bwd" in _i])
+def reciprocal_clients(request):
+    """
+    Fixture returning all reciprocal clients!
     """
     return create_async_client(request.param,
                                station_coordinates_callback=None)
@@ -274,6 +297,18 @@ def all_clients_ttimes_callback(request):
     """
     return create_async_client(
         request.param,
+        travel_time_callback=get_travel_time)
+
+
+@pytest.fixture(params=[_i for _i in list(DBS.values()) if "db_bwd" in _i])
+def reciprocal_clients_all_callbacks(request):
+    """
+    Fixture returning reciprocal clients with all callbacks.
+    """
+    return create_async_client(
+        request.param,
+        station_coordinates_callback=station_coordinates_mock_callback,
+        event_info_callback=event_info_mock_callback,
         travel_time_callback=get_travel_time)
 
 

@@ -11,20 +11,24 @@ Tests for source handling.
 """
 from __future__ import absolute_import
 
+import io
 import obspy
 import os
 import numpy as np
+import pytest
 
 from instaseis import Source, FiniteSource
 from instaseis.helpers import elliptic_to_geocentric_latitude
 from instaseis.source import moment2magnitude, magnitude2moment
-from instaseis.source import fault_vectors_lmn, strike_dip_rake_from_ln
+from instaseis.source import (fault_vectors_lmn, strike_dip_rake_from_ln,
+                              USGSParamFileParsingException)
 
 DATA = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 EVENT_FILE = os.path.join(DATA, "GCMT_event_STRAIT_OF_GIBRALTAR.xml")
 SRF_FILE = os.path.join(DATA, "strike_slip_eq_10pts.srf")
 USGS_PARAM_FILE1 = os.path.join(DATA, "nepal.param")
 USGS_PARAM_FILE2 = os.path.join(DATA, "chile.param")
+USGS_PARAM_FILE_EMPTY = os.path.join(DATA, "empty.param")
 
 
 def test_parse_CMTSOLUTIONS_file(tmpdir):
@@ -134,6 +138,16 @@ def test_parse_srf_file():
         np.testing.assert_allclose(src_params, src_params_ref)
 
 
+def test_parsing_empty_usgs_file():
+    """
+    Parsing an empty USGS file should fail.
+    """
+    with pytest.raises(USGSParamFileParsingException) as e:
+        FiniteSource.from_usgs_param_file(USGS_PARAM_FILE_EMPTY)
+
+    assert e.value.args[0] == 'No point sources found in the file.'
+
+
 def test_parse_usgs_param_file():
     """
     Tests parsing from a .param file.
@@ -142,11 +156,44 @@ def test_parse_usgs_param_file():
     finitesource = FiniteSource.from_usgs_param_file(USGS_PARAM_FILE1)
     np.testing.assert_almost_equal(finitesource.moment_magnitude,
                                    7.9374427577095901)
+    assert finitesource.npointsources == 121
 
     # multi segment file
     finitesource = FiniteSource.from_usgs_param_file(USGS_PARAM_FILE2)
     np.testing.assert_almost_equal(finitesource.moment_magnitude,
                                    8.26413197488)
+    assert finitesource.npointsources == 400
+
+
+def test_parse_usgs_param_file_from_bytes_io_and_open_files():
+    """
+    Tests parsing a USGS file from a BytesIO stream and open files..
+    """
+    with io.open(USGS_PARAM_FILE1, "rb") as fh:
+        finitesource = FiniteSource.from_usgs_param_file(fh)
+    np.testing.assert_almost_equal(finitesource.moment_magnitude,
+                                   7.9374427577095901)
+    assert finitesource.npointsources == 121
+
+    with io.open(USGS_PARAM_FILE1, "rb") as fh:
+        with io.BytesIO(fh.read()) as buf:
+            finitesource = FiniteSource.from_usgs_param_file(buf)
+    np.testing.assert_almost_equal(finitesource.moment_magnitude,
+                                   7.9374427577095901)
+    assert finitesource.npointsources == 121
+
+    with io.open(USGS_PARAM_FILE2, "rb") as fh:
+        finitesource = FiniteSource.from_usgs_param_file(fh)
+    np.testing.assert_almost_equal(finitesource.moment_magnitude,
+                                   8.26413197488)
+    assert finitesource.npointsources == 400
+
+    with io.open(USGS_PARAM_FILE2, "rb") as fh:
+        with io.BytesIO(fh.read()) as buf:
+            finitesource = FiniteSource.from_usgs_param_file(buf)
+    np.testing.assert_almost_equal(finitesource.moment_magnitude,
+                                   8.26413197488)
+    assert finitesource.npointsources == 400
 
 
 def test_Haskell():
@@ -294,7 +341,6 @@ def test_strike_dip_rake_from_ln():
     """
     for strike, dip, rake in zip((42., 180., -140.), (22., 0., 90.),
                                  (17., 32., 120.)):
-        print(strike)
         l, m, n = fault_vectors_lmn(strike, dip, rake)
         s, d, r = strike_dip_rake_from_ln(l, n)
 
