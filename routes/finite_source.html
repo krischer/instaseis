@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>POST /finite_source &mdash; instaseis 0.0.1a-383-gfba5 documentation</title>
+    <title>POST /finite_source &mdash; instaseis 0.0.1a-396-g0e04 documentation</title>
     
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.0.1a-383-gfba5',
+        VERSION:     '0.0.1a-396-g0e04',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -31,7 +31,7 @@
     <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-3.3.4/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.0.1a-383-gfba5 documentation" href="../index.html" />
+    <link rel="top" title="instaseis 0.0.1a-396-g0e04 documentation" href="../index.html" />
     <link rel="up" title="Instaseis Server" href="../server.html" />
     <link rel="next" title="Advanced Server Configuration" href="../advanced_server_configuration.html" />
     <link rel="prev" title="GET /greens_function" href="greens_function.html" />
@@ -54,7 +54,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-383-gfba5</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-396-g0e04</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -286,15 +286,21 @@ seconds, from the start time. Arrival times are always relative to the origin ti
 <td>SYN</td>
 <td>Specify the station code of the final seismograms. Maximum of five letters.</td>
 </tr>
-<tr class="row-odd"><td colspan="5">... or use wildcard searches over network and station codes. Potentially returns multiple stations.</td>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">locationcode</span></tt></td>
+<td>String</td>
+<td>False</td>
+<td>SE</td>
+<td>Specify the location code of the final seismograms. Maximum of two letters.</td>
 </tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">network</span></tt></td>
+<tr class="row-even"><td colspan="5">... or use wildcard searches over network and station codes. Potentially returns multiple stations.</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">network</span></tt></td>
 <td>String</td>
 <td>False</td>
 <td>&nbsp;</td>
 <td>Wildcarded network codes, e.g. <tt class="docutils literal"><span class="pre">I*,B?,AU</span></tt>.</td>
 </tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">station</span></tt></td>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">station</span></tt></td>
 <td>String</td>
 <td>False</td>
 <td>&nbsp;</td>
@@ -309,6 +315,7 @@ seconds, from the start time. Arrival times are always relative to the origin ti
       
   </div>
 </div>
+
 <footer class="footer">
   <div class="container">
     <p class="pull-right">
@@ -321,5 +328,16 @@ seconds, from the start time. Arrival times are always relative to the origin ti
     </p>
   </div>
 </footer>
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-44800463-2', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
   </body>
 </html>

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>instaseis.source &mdash; instaseis 0.0.1a-365-ge58f documentation</title>
+    <title>instaseis.source &mdash; instaseis 0.0.1a-396-g0e04 documentation</title>
     
     <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.0.1a-365-ge58f',
+        VERSION:     '0.0.1a-396-g0e04',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -31,7 +31,7 @@
     <script type="text/javascript" src="../../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../../_static/bootstrap-3.3.4/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../../_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.0.1a-365-ge58f documentation" href="../../index.html" />
+    <link rel="top" title="instaseis 0.0.1a-396-g0e04 documentation" href="../../index.html" />
     <link rel="up" title="instaseis" href="../instaseis.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-365-ge58f</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-396-g0e04</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -124,6 +124,7 @@
 
 <span class="kn">import</span> <span class="nn">collections</span>
 <span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">import</span> <span class="nn">io</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">obspy</span>
 <span class="kn">from</span> <span class="nn">obspy.core.util.geodetics.flinnengdahl</span> <span class="kn">import</span> <span class="n">FlinnEngdahl</span>
@@ -140,6 +141,13 @@
                       <span class="n">geocentric_to_elliptic_latitude</span><span class="p">)</span>
 
 <span class="n">DEFAULT_MU</span> <span class="o">=</span> <span class="mf">32e9</span>
+
+
+<span class="k">class</span> <span class="nc">USGSParamFileParsingException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Custom exception for nice and hopefully save exception passing.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span>
 
 
 <span class="k">def</span> <span class="nf">_purge_duplicates</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
@@ -593,6 +601,10 @@
 <span class="sd">            Mrp              :   8.47e+16 Nm</span>
 <span class="sd">            Mtp              :   1.29e+16 Nm</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">M0</span> <span class="o">&gt;=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="n">dt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">dt</span> <span class="o">&gt;</span> <span class="mi">0</span>
+
         <span class="c"># formulas in Udias (17.24) are in geographic system North, East,</span>
         <span class="c"># Down, which # transforms to the geocentric as:</span>
         <span class="c"># Mtt =  Mxx, Mpp = Myy, Mrr =  Mzz</span>
@@ -1237,7 +1249,8 @@
             <span class="k">return</span> <span class="bp">self</span><span class="p">(</span><span class="n">pointsources</span><span class="o">=</span><span class="n">sources</span><span class="p">)</span>
 </div>
     <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="FiniteSource.from_usgs_param_file"><a class="viewcode-back" href="../../source.html#instaseis.source.FiniteSource.from_usgs_param_file">[docs]</a>    <span class="k">def</span> <span class="nf">from_usgs_param_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">npts</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">trise_min</span><span class="o">=</span><span class="mf">1.</span><span class="p">):</span>
+<div class="viewcode-block" id="FiniteSource.from_usgs_param_file"><a class="viewcode-back" href="../../source.html#instaseis.source.FiniteSource.from_usgs_param_file">[docs]</a>    <span class="k">def</span> <span class="nf">from_usgs_param_file</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">filename_or_obj</span><span class="p">,</span> <span class="n">npts</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+                             <span class="n">trise_min</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize a finite source object from a (.param) file available from</span>
 <span class="sd">        the USGS website</span>
@@ -1245,21 +1258,20 @@
 <span class="sd">        Coordinates are assumed to be defined on the WGS84 ellipsoid and</span>
 <span class="sd">        will be converted to geocentric coordinates.</span>
 
-<span class="sd">        :param filename: path to the .param file</span>
-<span class="sd">        :type filename: str</span>
+<span class="sd">        :param filename_or_obj: path to the .param file</span>
+<span class="sd">        :type filename_or_obj: str</span>
 <span class="sd">        :param npts: number of samples for the source time functions. Should be</span>
-<span class="sd">                     enough to accomodate long rise times plus optional filter</span>
-<span class="sd">                     responses.</span>
-<span class="sd">        :type npts: int, optional</span>
+<span class="sd">            enough to accommodate long rise times plus optional filter</span>
+<span class="sd">            responses.</span>
+<span class="sd">        :type npts: int</span>
 <span class="sd">        :param dt: sample interval for the source time functions. Needs to be</span>
-<span class="sd">                   small enough to sample short rise times and can then be low</span>
-<span class="sd">                   pass filtered and downsampled before extracting seismograms.</span>
-<span class="sd">        :type dt: float, optional</span>
+<span class="sd">            small enough to sample short rise times and can then be low pass</span>
+<span class="sd">            filtered and downsampled before extracting seismograms.</span>
+<span class="sd">        :type dt: float</span>
 <span class="sd">        :param trise_min: minimum rise time. If rise time or fall time is</span>
-<span class="sd">                          smaller than this value, it is replaced by the</span>
-<span class="sd">                          minimum value. Mostly meant to handle zero rise times</span>
-<span class="sd">                          in some USGS files.</span>
-<span class="sd">        :type trise_min: float, optional</span>
+<span class="sd">            smaller than this value, it is replaced by the minimum value.</span>
+<span class="sd">            Mostly meant to handle zero rise times in some USGS files.</span>
+<span class="sd">        :type trise_min: float</span>
 
 <span class="sd">        &gt;&gt;&gt; import instaseis</span>
 <span class="sd">        &gt;&gt;&gt; source = instaseis.FiniteSource.from_srf_file(&quot;filename.param&quot;)</span>
@@ -1280,50 +1292,88 @@
 <span class="sd">            max longitude        : -145.7 deg</span>
 <span class="sd">            hypocenter longitude : -145.7 deg</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&quot;rt&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="c"># number of segments</span>
-            <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
-            <span class="n">nseg</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-            <span class="n">sources</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">filename_or_obj</span><span class="p">,</span> <span class="s">&quot;readline&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">_from_usgs_param_file</span><span class="p">(</span>
+                <span class="n">fh</span><span class="o">=</span><span class="n">filename_or_obj</span><span class="p">,</span> <span class="n">npts</span><span class="o">=</span><span class="n">npts</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span> <span class="n">trise_min</span><span class="o">=</span><span class="n">trise_min</span><span class="p">)</span>
 
-            <span class="c"># parse all segments</span>
-            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nseg</span><span class="p">):</span>
-
-                <span class="c"># got to point source segment</span>
-                <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="s">&#39;#Lat. Lon. depth&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
-                        <span class="k">break</span>
-
-                <span class="c"># read all point sources until reaching next segment</span>
-                <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="s">&#39;#Fault_segment&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
-                        <span class="k">break</span>
-
-                    <span class="c"># Lat. Lon. depth slip rake strike dip t_rup t_ris t_fal mo</span>
-                    <span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">dep</span><span class="p">,</span> <span class="n">slip</span><span class="p">,</span> <span class="n">rake</span><span class="p">,</span> <span class="n">stk</span><span class="p">,</span> <span class="n">dip</span><span class="p">,</span> <span class="n">tinit</span><span class="p">,</span> <span class="n">trise</span><span class="p">,</span> <span class="n">tfall</span><span class="p">,</span>
-                        <span class="n">M0</span><span class="p">)</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
-
-                    <span class="c"># Convert latitude to a geocentric latitude.</span>
-                    <span class="n">lat</span> <span class="o">=</span> <span class="n">elliptic_to_geocentric_latitude</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span>
-
-                    <span class="n">dep</span> <span class="o">*=</span> <span class="mf">1e3</span>    <span class="c"># km &gt; m</span>
-                    <span class="n">slip</span> <span class="o">*=</span> <span class="mf">1e-2</span>  <span class="c"># cm &gt; m</span>
-                    <span class="n">M0</span> <span class="o">*=</span> <span class="mf">1e-7</span>    <span class="c"># dyn / cm &gt; N * m</span>
-
-                    <span class="k">if</span> <span class="n">trise</span> <span class="o">&lt;</span> <span class="n">trise_min</span><span class="p">:</span>
-                        <span class="n">trise</span> <span class="o">=</span> <span class="n">trise_min</span>
-
-                    <span class="k">if</span> <span class="n">tfall</span> <span class="o">&lt;</span> <span class="n">trise_min</span><span class="p">:</span>
-                        <span class="n">tfall</span> <span class="o">=</span> <span class="n">trise_min</span>
-
-                    <span class="n">stf</span> <span class="o">=</span> <span class="n">asymmetric_cosine</span><span class="p">(</span><span class="n">trise</span><span class="p">,</span> <span class="n">tfall</span><span class="p">,</span> <span class="n">npts</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
-                    <span class="n">sources</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                        <span class="n">Source</span><span class="o">.</span><span class="n">from_strike_dip_rake</span><span class="p">(</span>
-                            <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">dep</span><span class="p">,</span> <span class="n">stk</span><span class="p">,</span> <span class="n">dip</span><span class="p">,</span> <span class="n">rake</span><span class="p">,</span> <span class="n">M0</span><span class="p">,</span>
-                            <span class="n">time_shift</span><span class="o">=</span><span class="n">tinit</span><span class="p">,</span> <span class="n">sliprate</span><span class="o">=</span><span class="n">stf</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">))</span>
-
-            <span class="k">return</span> <span class="bp">self</span><span class="p">(</span><span class="n">pointsources</span><span class="o">=</span><span class="n">sources</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">io</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">filename_or_obj</span><span class="p">,</span> <span class="s">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">_from_usgs_param_file</span><span class="p">(</span><span class="n">fh</span><span class="o">=</span><span class="n">fh</span><span class="p">,</span> <span class="n">npts</span><span class="o">=</span><span class="n">npts</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span>
+                                             <span class="n">trise_min</span><span class="o">=</span><span class="n">trise_min</span><span class="p">)</span>
 </div>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_from_usgs_param_file</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">fh</span><span class="p">,</span> <span class="n">npts</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">trise_min</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Internal function actually reading a USGS param file from any open</span>
+<span class="sd">        binary buffer.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># number of segments</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">fh</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;#Total number of fault_segments&quot;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">USGSParamFileParsingException</span><span class="p">(</span><span class="s">&quot;Not a valid USGS param file.&quot;</span><span class="p">)</span>
+        <span class="n">nseg</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">sources</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c"># parse all segments</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nseg</span><span class="p">):</span>
+
+            <span class="c"># got to point source segment</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">fh</span><span class="p">:</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+                <span class="k">if</span> <span class="s">&#39;#Lat. Lon. depth&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                    <span class="k">break</span>
+
+            <span class="c"># read all point sources until reaching next segment</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">fh</span><span class="p">:</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+                <span class="k">if</span> <span class="s">&#39;#Fault_segment&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                    <span class="k">break</span>
+
+                <span class="c"># Lat. Lon. depth slip rake strike dip t_rup t_ris t_fal mo</span>
+                <span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">dep</span><span class="p">,</span> <span class="n">slip</span><span class="p">,</span> <span class="n">rake</span><span class="p">,</span> <span class="n">stk</span><span class="p">,</span> <span class="n">dip</span><span class="p">,</span> <span class="n">tinit</span><span class="p">,</span> <span class="n">trise</span><span class="p">,</span> <span class="n">tfall</span><span class="p">,</span>
+                    <span class="n">M0</span><span class="p">)</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+
+                <span class="c"># Negative rupture times are not supported with the current</span>
+                <span class="c"># logic.</span>
+                <span class="k">if</span> <span class="n">tinit</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">USGSParamFileParsingException</span><span class="p">(</span>
+                        <span class="s">&quot;File contains a negative rupture time &quot;</span>
+                        <span class="s">&quot;which Instaseis cannot currently deal &quot;</span>
+                        <span class="s">&quot;with.&quot;</span><span class="p">)</span>
+
+                <span class="c"># Calculate the end time.</span>
+                <span class="n">endtime</span> <span class="o">=</span> <span class="n">trise</span> <span class="o">+</span> <span class="n">tfall</span>
+                <span class="k">if</span> <span class="n">endtime</span> <span class="o">&gt;</span> <span class="p">(</span><span class="n">npts</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">dt</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">USGSParamFileParsingException</span><span class="p">(</span>
+                        <span class="s">&quot;Rise + fall time are longer than the &quot;</span>
+                        <span class="s">&quot;total length of calculated slip. &quot;</span>
+                        <span class="s">&quot;Please use more samples.&quot;</span><span class="p">)</span>
+
+                <span class="c"># Convert latitude to a geocentric latitude.</span>
+                <span class="n">lat</span> <span class="o">=</span> <span class="n">elliptic_to_geocentric_latitude</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span>
+
+                <span class="n">dep</span> <span class="o">*=</span> <span class="mf">1e3</span>    <span class="c"># km &gt; m</span>
+                <span class="n">slip</span> <span class="o">*=</span> <span class="mf">1e-2</span>  <span class="c"># cm &gt; m</span>
+                <span class="n">M0</span> <span class="o">*=</span> <span class="mf">1e-7</span>    <span class="c"># dyn / cm &gt; N * m</span>
+
+                <span class="c"># These checks also take care of negative times.</span>
+                <span class="k">if</span> <span class="n">trise</span> <span class="o">&lt;</span> <span class="n">trise_min</span><span class="p">:</span>
+                    <span class="n">trise</span> <span class="o">=</span> <span class="n">trise_min</span>
+
+                <span class="k">if</span> <span class="n">tfall</span> <span class="o">&lt;</span> <span class="n">trise_min</span><span class="p">:</span>
+                    <span class="n">tfall</span> <span class="o">=</span> <span class="n">trise_min</span>
+
+                <span class="n">stf</span> <span class="o">=</span> <span class="n">asymmetric_cosine</span><span class="p">(</span><span class="n">trise</span><span class="p">,</span> <span class="n">tfall</span><span class="p">,</span> <span class="n">npts</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+                <span class="n">sources</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">Source</span><span class="o">.</span><span class="n">from_strike_dip_rake</span><span class="p">(</span>
+                        <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">dep</span><span class="p">,</span> <span class="n">stk</span><span class="p">,</span> <span class="n">dip</span><span class="p">,</span> <span class="n">rake</span><span class="p">,</span> <span class="n">M0</span><span class="p">,</span>
+                        <span class="n">time_shift</span><span class="o">=</span><span class="n">tinit</span><span class="p">,</span> <span class="n">sliprate</span><span class="o">=</span><span class="n">stf</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">sources</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">USGSParamFileParsingException</span><span class="p">(</span>
+                <span class="s">&quot;No point sources found in the file.&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">cls</span><span class="p">(</span><span class="n">pointsources</span><span class="o">=</span><span class="n">sources</span><span class="p">)</span>
+
     <span class="nd">@classmethod</span>
 <div class="viewcode-block" id="FiniteSource.from_Haskell"><a class="viewcode-back" href="../../source.html#instaseis.source.FiniteSource.from_Haskell">[docs]</a>    <span class="k">def</span> <span class="nf">from_Haskell</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="p">,</span> <span class="n">depth_in_m</span><span class="p">,</span> <span class="n">strike</span><span class="p">,</span> <span class="n">dip</span><span class="p">,</span> <span class="n">rake</span><span class="p">,</span>
                      <span class="n">M0</span><span class="p">,</span> <span class="n">fault_length</span><span class="p">,</span> <span class="n">fault_width</span><span class="p">,</span> <span class="n">rupture_velocity</span><span class="p">,</span> <span class="n">nl</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Sources and Receivers &mdash; instaseis 0.0.1a-365-ge58f documentation</title>
+    <title>Sources and Receivers &mdash; instaseis 0.0.1a-396-g0e04 documentation</title>
     
     <link rel="stylesheet" href="_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.0.1a-365-ge58f',
+        VERSION:     '0.0.1a-396-g0e04',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -31,7 +31,7 @@
     <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="_static/bootstrap-3.3.4/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.0.1a-365-ge58f documentation" href="index.html" />
+    <link rel="top" title="instaseis 0.0.1a-396-g0e04 documentation" href="index.html" />
     <link rel="next" title="Utility Functions" href="helpers.html" />
     <link rel="prev" title="Main Instaseis Classes" href="instaseis.html" />
 <meta charset='utf-8'>
@@ -53,7 +53,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-365-ge58f</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-396-g0e04</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -700,7 +700,7 @@ will be converted to geocentric coordinates.</p>
 
 <dl class="classmethod">
 <dt id="instaseis.source.FiniteSource.from_usgs_param_file">
-<em class="property">classmethod </em><tt class="descname">from_usgs_param_file</tt><big>(</big><em>filename</em>, <em>npts=10000</em>, <em>dt=0.1</em>, <em>trise_min=1.0</em><big>)</big><a class="reference internal" href="_modules/instaseis/source.html#FiniteSource.from_usgs_param_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.FiniteSource.from_usgs_param_file" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><tt class="descname">from_usgs_param_file</tt><big>(</big><em>filename_or_obj</em>, <em>npts=10000</em>, <em>dt=0.1</em>, <em>trise_min=1.0</em><big>)</big><a class="reference internal" href="_modules/instaseis/source.html#FiniteSource.from_usgs_param_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.FiniteSource.from_usgs_param_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize a finite source object from a (.param) file available from
 the USGS website</p>
 <p>Coordinates are assumed to be defined on the WGS84 ellipsoid and
@@ -710,17 +710,16 @@ will be converted to geocentric coordinates.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>filename</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; path to the .param file</li>
-<li><strong>npts</strong> (<em>int, optional</em>) &#8211; number of samples for the source time functions. Should be
-enough to accomodate long rise times plus optional filter
+<li><strong>filename_or_obj</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; path to the .param file</li>
+<li><strong>npts</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; number of samples for the source time functions. Should be
+enough to accommodate long rise times plus optional filter
 responses.</li>
-<li><strong>dt</strong> (<em>float, optional</em>) &#8211; sample interval for the source time functions. Needs to be
-small enough to sample short rise times and can then be low
-pass filtered and downsampled before extracting seismograms.</li>
-<li><strong>trise_min</strong> (<em>float, optional</em>) &#8211; minimum rise time. If rise time or fall time is
-smaller than this value, it is replaced by the
-minimum value. Mostly meant to handle zero rise times
-in some USGS files.</li>
+<li><strong>dt</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; sample interval for the source time functions. Needs to be
+small enough to sample short rise times and can then be low pass
+filtered and downsampled before extracting seismograms.</li>
+<li><strong>trise_min</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; minimum rise time. If rise time or fall time is
+smaller than this value, it is replaced by the minimum value.
+Mostly meant to handle zero rise times in some USGS files.</li>
 </ul>
 </td>
 </tr>
