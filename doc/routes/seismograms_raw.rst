@@ -9,7 +9,7 @@ Description
     with other programs, please use the ``/seismograms`` route.
 
 Content-Type
-    application/octet-stream
+    ``application/vnd.fdsn.mseed``
 
 Special Response Headers
     ``Instaseis-Mu``: This transports the mu of the model for the given
@@ -38,6 +38,8 @@ Filetype
 | ``networkcode``         | String   | False    |                             | The network code of the final seismogram.                            |
 +-------------------------+----------+----------+-----------------------------+----------------------------------------------------------------------+
 | ``stationcode``         | String   | False    |                             | The station code of the final seismogram.                            |
++-------------------------+----------+----------+-----------------------------+----------------------------------------------------------------------+
+| ``locationcode``        | String   | False    |                             | Specify the location code of the final seismograms.                  |
 +-------------------------+----------+----------+-----------------------------+----------------------------------------------------------------------+
 | Source Parameters                                                                                                                                  |
 +-------------------------+----------+----------+-----------------------------+----------------------------------------------------------------------+

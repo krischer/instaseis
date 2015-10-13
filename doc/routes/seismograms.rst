@@ -14,7 +14,7 @@ Description
 
 Content-Type
     * ``application/zip`` (if zipped SAC data is requested)
-    * ``application/octet-stream`` (if MiniSEED data is requested)
+    * ``application/vnd.fdsn.mseed`` (if MiniSEED data is requested)
 
 Filetype
     Returns a ZIP archive with SAC files or MiniSEED files encoded with
@@ -86,13 +86,15 @@ Filetype
 +-----------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
 | ``stationcode``             | String   | False    | SYN                         | Specify the station code of the final seismograms. Maximum of five letters.          |
 +-----------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
+| ``locationcode``            | String   | False    | SE                          | Specify the location code of the final seismograms. Maximum of two letters.          |
++-----------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
 | ... or use wildcard searches over network and station codes. Potentially returns multiple stations.                                                                    |
 +-----------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
 | ``network``                 | String   | False    |                             | Wildcarded network codes, e.g. ``I*,B?,AU``.                                         |
 +-----------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
 | ``station``                 | String   | False    |                             | Wildcarded station codes, e.g. ``A*,ANMO``.                                          |
 +-----------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
-| **Receiver Parameters**                                                                                                                                                |
+| **Source Parameters**                                                                                                                                                  |
 +-----------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
 | The source can by set by specifying an event id if the server has been set-up for this ...                                                                             |
 +-----------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+

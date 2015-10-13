@@ -216,6 +216,7 @@ class FiniteSourceSeismogramsHandler(InstaseisTimeSeriesHandler):
         "receiverlongitude": {"type": float},
         "networkcode": {"type": str, "default": "XX"},
         "stationcode": {"type": str, "default": "SYN"},
+        "locationcode": {"type": str, "default": "SE"},
 
         # Or by querying a database.
         "network": {"type": str},

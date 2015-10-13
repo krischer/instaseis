@@ -13,7 +13,7 @@ import obspy
 import tornado.gen
 import tornado.web
 
-from ... import Source, ForceSource
+from ... import Source, ForceSource, Receiver
 from ..util import run_async, IOQueue, _validtimesetting, \
     _validate_and_write_waveforms
 from ..instaseis_request import InstaseisTimeSeriesHandler
@@ -117,6 +117,7 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
         "receiverdepthinmeters": {"type": float, "default": 0.0},
         "networkcode": {"type": str, "default": "XX"},
         "stationcode": {"type": str, "default": "SYN"},
+        "locationcode": {"type": str, "default": "SE"},
 
         # Or by querying a database.
         "network": {"type": str},
@@ -132,6 +133,14 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
 
     def __init__(self, *args, **kwargs):
         super(InstaseisTimeSeriesHandler, self).__init__(*args, **kwargs)
+
+    def validate_parameters(self, args):
+        """
+        Function attempting to validate that the passed parameters are
+        valid. Does not need to check the types as that has already been done.
+        """
+        self.validate_receiver_parameters(args)
+        self.validate_source_parameters(args)
 
     def validate_source_parameters(self, args):
         all_src_params = set(["sourcemomenttensor", "sourcedoublecouple",
@@ -193,14 +202,6 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
                               for _i in sorted(one_off)))
                 raise tornado.web.HTTPError(
                     400, log_message=msg, reason=msg)
-
-    def validate_parameters(self, args):
-        """
-        Function attempting to validate that the passed parameters are
-        valid. Does not need to check the types as that has already been done.
-        """
-        self.validate_receiver_parameters(args)
-        self.validate_source_parameters(args)
 
     def get_source(self, args, __event):
         # Source can be either directly specified or by passing an event id.
@@ -271,6 +272,56 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
                     raise tornado.web.HTTPError(400, log_message=msg,
                                                 reason=msg)
         return source
+
+    def get_receivers(self, args):
+        # Already checked before - just make sure the settings are valid.
+        assert (args.receiverlatitude is not None and
+                args.receiverlongitude is not None) or \
+           (args.network and args.station)
+
+        receivers = []
+
+        # Construct either a single receiver object.
+        if args.receiverlatitude is not None:
+            try:
+                receiver = Receiver(latitude=args.receiverlatitude,
+                                    longitude=args.receiverlongitude,
+                                    network=args.networkcode,
+                                    station=args.stationcode,
+                                    location=args.locationcode,
+                                    depth_in_m=args.receiverdepthinmeters)
+            except:
+                msg = ("Could not construct receiver with passed parameters. "
+                       "Check parameters for sanity.")
+                raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+            receivers.append(receiver)
+        # Or a list of receivers.
+        elif args.network is not None and args.station is not None:
+            networks = args.network.split(",")
+            stations = args.station.split(",")
+
+            coordinates = self.application.station_coordinates_callback(
+                networks=networks, stations=stations)
+
+            if not coordinates:
+                msg = "No coordinates found satisfying the query."
+                raise tornado.web.HTTPError(
+                    404, log_message=msg, reason=msg)
+
+            for station in coordinates:
+                try:
+                    receivers.append(Receiver(
+                        latitude=station["latitude"],
+                        longitude=station["longitude"],
+                        network=station["network"],
+                        station=station["station"],
+                        depth_in_m=0))
+                except:
+                    msg = ("Could not construct receiver with passed "
+                           "parameters. Check parameters for sanity.")
+                    raise tornado.web.HTTPError(400, log_message=msg,
+                                                reason=msg)
+        return receivers
 
     @tornado.web.asynchronous
     @tornado.gen.coroutine

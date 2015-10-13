@@ -253,7 +253,7 @@ class InstaseisTimeSeriesHandler(with_metaclass(ABCMeta,
             format = args.format
 
         if format == "miniseed":
-            content_type = "application/octet-stream"
+            content_type = "application/vnd.fdsn.mseed"
         elif format == "saczip":
             content_type = "application/zip"
         self.set_header("Content-Type", content_type)
@@ -454,6 +454,11 @@ class InstaseisTimeSeriesHandler(with_metaclass(ABCMeta,
 
         if args.networkcode and len(args.networkcode) > 2:
             msg = "'networkcode' must have 2 or fewer letters."
+            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+
+        # The location code as well.
+        if args.locationcode and len(args.locationcode) > 2:
+            msg = "'locationcode' must have 2 or fewer letters."
             raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
         # Figure out who the station coordinates are specified.

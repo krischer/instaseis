@@ -95,7 +95,8 @@ class RawSeismogramsHandler(InstaseisTimeSeriesHandler):
         "receiverlongitude": {"type": float, "required": True},
         "receiverdepthinm": {"type": float, "default": 0.0},
         "networkcode": {"type": str},
-        "stationcode": {"type": str}
+        "stationcode": {"type": str},
+        "locationcode": {"type": str}
     }
     default_label = "instaseis_seismogram"
 
@@ -177,6 +178,7 @@ class RawSeismogramsHandler(InstaseisTimeSeriesHandler):
                                 longitude=args.receiverlongitude,
                                 network=args.networkcode,
                                 station=args.stationcode,
+                                location=args.locationcode,
                                 depth_in_m=args.receiverdepthinm)
         except:
             msg = ("Could not construct receiver with passed parameters. "

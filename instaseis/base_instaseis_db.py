@@ -352,6 +352,7 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
                         "starttime": starttime,
                         "station": receiver.station,
                         "network": receiver.network,
+                        "location": receiver.location,
                         "channel": add_band_code * (band_code + 'X') + comp,
                         "instaseis": instaseis_header})
             st += tr
@@ -492,6 +493,7 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
                        header={"delta": dt_out,
                                "station": receiver.station,
                                "network": receiver.network,
+                               "location": receiver.location,
                                "channel": "%sX%s" % (band_code, comp)})
             st += tr
         return st
