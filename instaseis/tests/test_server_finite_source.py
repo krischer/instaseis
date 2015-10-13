@@ -147,7 +147,7 @@ def test_finite_source_retrieval(reciprocal_clients, usgs_param):
     # Parse the finite source.
     fs = _parse_finite_source(usgs_param)
     rec = instaseis.Receiver(latitude=22, longitude=11, network="XX",
-                             station="SYN")
+                             station="SYN", location="SE")
 
     st_db = db.get_seismograms_finite_source(sources=fs, receiver=rec)
     # The origin time is the time of the first sample in the route.
@@ -282,6 +282,44 @@ def test_finite_source_retrieval(reciprocal_clients, usgs_param):
         assert tr_db.stats == tr_server.stats
         np.testing.assert_allclose(tr_db.data, tr_server.data,
                                    rtol=1E-7, atol=tr_db.data.ptp() * 1E-7)
+
+    # Testing network and station code parameters.
+    # Default values.
+    params = copy.deepcopy(basic_parameters)
+    request = client.fetch(_assemble_url('finite_source', **params),
+                           method="POST", body=body)
+    assert request.code == 200
+    st_server = obspy.read(request.buffer)
+    for tr in st_server:
+        assert tr.stats.network == "XX"
+        assert tr.stats.station == "SYN"
+        assert tr.stats.location == "SE"
+
+    # Setting all three.
+    params = copy.deepcopy(basic_parameters)
+    params["networkcode"] = "AA"
+    params["stationcode"] = "BB"
+    params["locationcode"] = "CC"
+    request = client.fetch(_assemble_url('finite_source', **params),
+                           method="POST", body=body)
+    assert request.code == 200
+    st_server = obspy.read(request.buffer)
+    for tr in st_server:
+        assert tr.stats.network == "AA"
+        assert tr.stats.station == "BB"
+        assert tr.stats.location == "CC"
+
+    # Setting only the location code.
+    params = copy.deepcopy(basic_parameters)
+    params["locationcode"] = "AA"
+    request = client.fetch(_assemble_url('finite_source', **params),
+                           method="POST", body=body)
+    assert request.code == 200
+    st_server = obspy.read(request.buffer)
+    for tr in st_server:
+        assert tr.stats.network == "XX"
+        assert tr.stats.station == "SYN"
+        assert tr.stats.location == "AA"
 
 
 @pytest.mark.parametrize("usgs_param", [USGS_PARAM_FILE_1, USGS_PARAM_FILE_2])

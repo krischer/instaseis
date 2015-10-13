@@ -408,6 +408,7 @@ class InstaseisTimeSeriesHandler(with_metaclass(ABCMeta,
                                     longitude=args.receiverlongitude,
                                     network=args.networkcode,
                                     station=args.stationcode,
+                                    location=args.locationcode,
                                     depth_in_m=rec_depth)
             except:
                 msg = ("Could not construct receiver with passed parameters. "
