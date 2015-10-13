@@ -321,6 +321,42 @@ def test_finite_source_retrieval(reciprocal_clients, usgs_param):
         assert tr.stats.station == "SYN"
         assert tr.stats.location == "AA"
 
+    # Test the scale parameter.
+    params = copy.deepcopy(basic_parameters)
+    params["scale"] = 33.33
+    request = client.fetch(_assemble_url('finite_source', **params),
+                           method="POST", body=body)
+    assert request.code == 200
+    st_server = obspy.read(request.buffer)
+    for tr in st_server:
+        assert tr.stats._format == "MSEED"
+
+    # Parse the finite source.
+    fs = _parse_finite_source(usgs_param)
+    rec = instaseis.Receiver(latitude=22, longitude=11, network="XX",
+                             station="SYN", location="SE")
+
+    st_db = db.get_seismograms_finite_source(sources=fs, receiver=rec)
+    # The origin time is the time of the first sample in the route.
+    for tr in st_db:
+        # Multiply with scale parameter.
+        tr.data *= 33.33
+        # Cut away the first ten samples as they have been previously added.
+        tr.data = tr.data[10:]
+        tr.stats.starttime = obspy.UTCDateTime(1900, 1, 1)
+
+    for tr_db, tr_server in zip(st_db, st_server):
+        # Sample spacing is very similar but not equal due to floating point
+        # accuracy.
+        np.testing.assert_allclose(tr_server.stats.delta, tr_db.stats.delta)
+        tr_server.stats.delta = tr_db.stats.delta
+        del tr_server.stats._format
+        del tr_server.stats.mseed
+
+        assert tr_db.stats == tr_server.stats
+        np.testing.assert_allclose(tr_db.data, tr_server.data,
+                                   atol=1E-6 * tr_db.data.ptp())
+
 
 @pytest.mark.parametrize("usgs_param", [USGS_PARAM_FILE_1, USGS_PARAM_FILE_2])
 def test_more_complex_queries(reciprocal_clients_all_callbacks,
