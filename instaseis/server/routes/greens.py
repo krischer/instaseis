@@ -63,8 +63,8 @@ def _get_greens(db, epicentral_distance_degree, source_depth_in_m, units, dt,
 
     _validate_and_write_waveforms(st=st, callback=callback,
                                   starttime=starttime, endtime=endtime,
-                                  source=source, receiver=receiver, db=db,
-                                  label=label, format=format)
+                                  scale=1.0, source=source, receiver=receiver,
+                                  db=db, label=label, format=format)
 
 
 class GreensFunctionHandler(InstaseisTimeSeriesHandler):

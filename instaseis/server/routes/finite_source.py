@@ -29,7 +29,7 @@ from ...base_instaseis_db import (KIND_MAP, STF_MAP, INV_KIND_MAP,
 
 @run_async
 def _get_finite_source(db, finite_source, receiver, components, units, dt,
-                       kernelwidth, starttime, endtime,
+                       kernelwidth, scale, starttime, endtime,
                        time_of_first_sample, format, label,
                        callback):
     """
@@ -90,7 +90,7 @@ def _get_finite_source(db, finite_source, receiver, components, units, dt,
                                 dt_out=tr.stats.delta)
             tr.data = data_summed["A"]
 
-    _validate_and_write_waveforms(st=st, callback=callback,
+    _validate_and_write_waveforms(st=st, callback=callback, scale=scale,
                                   starttime=starttime, endtime=endtime,
                                   source=finite_source, receiver=receiver,
                                   db=db, label=label, format=format)
@@ -210,6 +210,9 @@ class FiniteSourceSeismogramsHandler(InstaseisTimeSeriesHandler):
         "endtime": {"type": _validtimesetting,
                     "format": "Datetime String/Float/Phase+-Offset"},
 
+        # Scale parameter.
+        "scale": {"type": float, "default": 1.0},
+
         # Receivers can be specified either directly via their coordinates.
         # In that case one can assign a network and station code.
         "receiverlatitude": {"type": float},
@@ -238,6 +241,11 @@ class FiniteSourceSeismogramsHandler(InstaseisTimeSeriesHandler):
         Function attempting to validate that the passed parameters are
         valid. Does not need to check the types as that has already been done.
         """
+        if args.scale == 0.0:
+            msg = ("A scale of zero means all seismograms have an amplitude "
+                   "of zero. No need to get it in the first place.")
+            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+
         self.validate_receiver_parameters(args)
 
     def parse_time_settings(self, args, finite_source):
@@ -385,7 +393,7 @@ class FiniteSourceSeismogramsHandler(InstaseisTimeSeriesHandler):
                 db=self.application.db, finite_source=finite_source,
                 receiver=receiver, components=list(args.components),
                 units=args.units, dt=args.dt, kernelwidth=args.kernelwidth,
-                starttime=starttime, endtime=endtime,
+                scale=args.scale, starttime=starttime, endtime=endtime,
                 time_of_first_sample=time_of_first_sample, format=args.format,
                 label=args.label)
 
