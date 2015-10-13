@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>POST /finite_source &mdash; instaseis 0.0.1a-404-g3212 documentation</title>
+    <title>POST /finite_source &mdash; instaseis 0.0.1a-404-g84ae documentation</title>
     
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.0.1a-404-g3212',
+        VERSION:     '0.0.1a-404-g84ae',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -31,7 +31,7 @@
     <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-3.3.4/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.0.1a-404-g3212 documentation" href="../index.html" />
+    <link rel="top" title="instaseis 0.0.1a-404-g84ae documentation" href="../index.html" />
     <link rel="up" title="Instaseis Server" href="../server.html" />
     <link rel="next" title="Advanced Server Configuration" href="../advanced_server_configuration.html" />
     <link rel="prev" title="GET /greens_function" href="greens_function.html" />
@@ -54,7 +54,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-404-g3212</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-404-g84ae</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -205,22 +205,16 @@ encoding format 4 (IEEE floating point).</dd>
 <td>&nbsp;</td>
 <td>If given, seismograms will be resampled to the desired sample spacing.</td>
 </tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">scale</span></tt></td>
-<td>Float</td>
-<td>False</td>
-<td>1.0</td>
-<td>Scalar factor to multiply the seismograms with.</td>
-</tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">kernelwidth</span></tt></td>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">kernelwidth</span></tt></td>
 <td>Integer</td>
 <td>False</td>
 <td>12</td>
 <td>Specify the width of the sinc kernel used for resampling to requested sample
 interval in terms of the original sampling interval.</td>
 </tr>
-<tr class="row-even"><td colspan="5"><strong>Time Parameters</strong></td>
+<tr class="row-odd"><td colspan="5"><strong>Time Parameters</strong></td>
 </tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">origintime</span></tt></td>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">origintime</span></tt></td>
 <td>Datetime</td>
 <td>False</td>
 <td>1900-01-01T00:00:00.000000Z</td>
@@ -228,7 +222,7 @@ interval in terms of the original sampling interval.</td>
 absolute date and time. <strong>This time conincides will be the onset time of the</strong>
 <strong>first slipping point source.</strong> USGS param files don&#8217;t have absolute time values.</td>
 </tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">starttime</span></tt></td>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">starttime</span></tt></td>
 <td>Datetime</td>
 <td>False</td>
 <td>&nbsp;</td>
@@ -246,7 +240,7 @@ seconds). If the value is a numerical value it is interpreted as an offset, in
 seconds, from the origin time. Arrival times are always relative to the origin time.</p>
 </td>
 </tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">endtime</span></tt></td>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">endtime</span></tt></td>
 <td>Datetime</td>
 <td>False</td>
 <td>&nbsp;</td>
@@ -264,49 +258,49 @@ seconds). If the value is a numerical value it is interpreted as an offset, in
 seconds, from the start time. Arrival times are always relative to the origin time.</p>
 </td>
 </tr>
-<tr class="row-even"><td colspan="5"><strong>Receiver Parameters</strong></td>
+<tr class="row-odd"><td colspan="5"><strong>Receiver Parameters</strong></td>
 </tr>
-<tr class="row-odd"><td colspan="5">Directly specify coordinates and network/station codes ...</td>
+<tr class="row-even"><td colspan="5">Directly specify coordinates and network/station codes ...</td>
 </tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">receiverlatitude</span></tt></td>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">receiverlatitude</span></tt></td>
 <td>Float</td>
 <td>True</td>
 <td>&nbsp;</td>
 <td>The geocentric latitude of the receiver.</td>
 </tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">receiverlongitude</span></tt></td>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">receiverlongitude</span></tt></td>
 <td>Float</td>
 <td>True</td>
 <td>&nbsp;</td>
 <td>The longitude of the receiver.</td>
 </tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">networkcode</span></tt></td>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">networkcode</span></tt></td>
 <td>String</td>
 <td>False</td>
 <td>XX</td>
 <td>Specify the network code of the final seismograms. Maximum of two letters.</td>
 </tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">stationcode</span></tt></td>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">stationcode</span></tt></td>
 <td>String</td>
 <td>False</td>
 <td>SYN</td>
 <td>Specify the station code of the final seismograms. Maximum of five letters.</td>
 </tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">locationcode</span></tt></td>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">locationcode</span></tt></td>
 <td>String</td>
 <td>False</td>
 <td>SE</td>
 <td>Specify the location code of the final seismograms. Maximum of two letters.</td>
 </tr>
-<tr class="row-odd"><td colspan="5">... or use wildcard searches over network and station codes. Potentially returns multiple stations.</td>
+<tr class="row-even"><td colspan="5">... or use wildcard searches over network and station codes. Potentially returns multiple stations.</td>
 </tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">network</span></tt></td>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">network</span></tt></td>
 <td>String</td>
 <td>False</td>
 <td>&nbsp;</td>
 <td>Wildcarded network codes, e.g. <tt class="docutils literal"><span class="pre">I*,B?,AU</span></tt>.</td>
 </tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">station</span></tt></td>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">station</span></tt></td>
 <td>String</td>
 <td>False</td>
 <td>&nbsp;</td>
