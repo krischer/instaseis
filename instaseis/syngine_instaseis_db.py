@@ -21,7 +21,8 @@ import warnings
 
 from . import (InstaseisError, InstaseisWarning, Source, ForceSource,
                __version__)
-from .base_instaseis_db import BaseInstaseisDB, DEFAULT_MU
+from .base_instaseis_db import BaseInstaseisDB, DEFAULT_MU, STF_MAP, \
+    INV_KIND_MAP
 
 from .helpers import geocentric_to_elliptic_latitude
 
@@ -80,7 +81,9 @@ class SyngineInstaseisDB(BaseInstaseisDB):
         params["model"] = self.model
         params["format"] = "miniseed"
 
-        params["units"] = "velocity"
+        # Always request in the original units.
+        params["units"] = INV_KIND_MAP[STF_MAP[self.info.stf]]
+
         # No resampling!
         params["dt"] = self.info.dt
 
@@ -88,7 +91,9 @@ class SyngineInstaseisDB(BaseInstaseisDB):
         # awkward and we essentially have to undo what the /seismograms
         # route is doing...
         params["origintime"] = str(obspy.UTCDateTime(0))
-        params["starttime"] = str(obspy.UTCDateTime(-(self.info.src_shift)))
+        params["starttime"] = str(obspy.UTCDateTime(-(self.info.dt * (
+            self.info.src_shift_samples
+        ))))
 
         # Start with the receiver.
         # syngine uses WGS84 coordinates - we assume geocentric ones. Thus
@@ -96,7 +101,7 @@ class SyngineInstaseisDB(BaseInstaseisDB):
         params["receiverlatitude"] = geocentric_to_elliptic_latitude(
             receiver.latitude)
         params["receiverlongitude"] = receiver.longitude
-        if receiver.depth_in_m:
+        if receiver.depth_in_m:  # pragma: no cover
             warnings.warn("The syngine service only services reciprocal "
                           "databases thus the receiver depth cannot be "
                           "changed.", UserWarning)
@@ -108,8 +113,10 @@ class SyngineInstaseisDB(BaseInstaseisDB):
         if source.depth_in_m is not None:
             params["sourcedepthinmeters"] = source.depth_in_m
         if isinstance(source, ForceSource):
-            params["sourceforce"] = ",".join([params["fr"], params["ft"],
-                                              params["fp"]])
+            raise ValueError("The Syngine Instaseis client does currently not "
+                             "support force sources. You can still download "
+                             "data from the Syngine service for force "
+                             "sources manually.")
         elif isinstance(source, Source):
             params["sourcemomenttensor"] = ",".join(map(str, [
                 source.m_rr, source.m_tt, source.m_pp, source.m_rt,
@@ -119,16 +126,16 @@ class SyngineInstaseisDB(BaseInstaseisDB):
 
         url = self._get_url(path="query", **params)
 
-        if self.debug:
+        if self.debug:  # pragma: no cover
             print("Downloading '%s' ..." % url)
 
         r = requests.get(url, headers=HEADERS)
 
-        if self.debug:
+        if self.debug:  # pragma: no cover
             print("Downloaded '%s' with status code %i." % (url,
                                                             r.status_code))
 
-        if r.status_code != 200:
+        if r.status_code != 200:  # pragma: no cover
             # Right now one has to parse the body of the response to get the
             # message.
             reason = r.content.decode().strip().split("\n")[0]
@@ -141,7 +148,7 @@ class SyngineInstaseisDB(BaseInstaseisDB):
                           "proxy removed it? Mu is now always the default mu.",
                           InstaseisWarning)
             mu = DEFAULT_MU
-        else:
+        else:  # pragma: no cover
             mu = float(r.headers["Instaseis-Mu"])
 
         with io.BytesIO(r.content) as fh:
@@ -172,16 +179,16 @@ class SyngineInstaseisDB(BaseInstaseisDB):
         """
         Helper function downloading data from a URL.
         """
-        if self.debug:
+        if self.debug:  # pragma: no cover
             print("Downloading '%s' ..." % url)
         r = requests.get(url, headers=HEADERS)
-        if self.debug:
+        if self.debug:  # pragma: no cover
             print("Downloaded '%s' with status code %i." % (url,
                                                             r.status_code))
-        if r.status_code == 400:
+        if r.status_code == 400:  # pragma: no cover
             raise InstaseisError("Model '%s' not available on the syngine "
                                  "service?" % self.model)
-        elif r.status_code != 200:
+        elif r.status_code != 200:  # pragma: no cover
             raise InstaseisError("Status code %i when downloading '%s'" % (
                 r.status_code, url))
         if unpack_json is True:
@@ -202,12 +209,6 @@ class SyngineInstaseisDB(BaseInstaseisDB):
         info["datetime"] = obspy.UTCDateTime(info["datetime"])
         info["slip"] = np.array(info["slip"], dtype=np.float64)
         info["sliprate"] = np.array(info["sliprate"], dtype=np.float64)
-
-        # Syngine currently appears to use an outdated instaseis version or
-        # they cached their /info routes.
-        if info["max_radius"] > 10000:
-            info["max_radius"] /= 1E3
-            info["min_radius"] /= 1E3
 
         return info
 
