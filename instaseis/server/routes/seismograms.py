@@ -60,6 +60,7 @@ def _get_seismogram(db, source, receiver, components, units, dt, kernelwidth,
                                   receiver=receiver, db=db, label=label,
                                   format=format)
 
+
 def _tolist(value, count):
     value = [float(i) for i in value.split(",")]
     if len(value) not in count:

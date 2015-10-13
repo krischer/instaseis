@@ -4534,7 +4534,7 @@ def test_scale_parameter(all_clients):
     receiver = instaseis.Receiver(
         latitude=basic_parameters["receiverlatitude"],
         longitude=basic_parameters["receiverlongitude"],
-        depth_in_m=0.0, network="XX", station="SYN")
+        depth_in_m=0.0, network="XX", station="SYN", location="SE")
     st_db = db.get_seismograms(source=source, receiver=receiver,
                                components=components)
 
