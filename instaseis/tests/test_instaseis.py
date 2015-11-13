@@ -453,7 +453,8 @@ def test_incremental_bwd_force_source():
         f_p=1.73E10)
 
     st_bwd = instaseis_bwd.get_seismograms(
-        source=source, receiver=receiver, components=('Z', 'N', 'E', 'R', 'T'))
+        source=source, receiver=receiver, components=('Z', 'N', 'E', 'R', 'T'),
+        kind='velocity')
 
     np.testing.assert_allclose(st_bwd.select(component='Z')[0].data,
                                BWD_FORCE_TEST_DATA["Z"], rtol=1E-7, atol=1E-12)

@@ -256,10 +256,8 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
 
         n_derivative = KIND_MAP[kind] - STF_MAP[self.info.stf]
 
-        # not 100% sure why, but this way we get correct seismograms for
-        # impacts when using ForceSource:
         if isinstance(source, ForceSource):
-            n_derivative += 2
+            n_derivative += 1
 
         if reconvolve_stf and remove_source_shift:
             raise ValueError("'remove_source_shift' argument not "
