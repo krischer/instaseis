@@ -16,6 +16,11 @@ Content-Type
     * ``application/zip`` (if zipped SAC data is requested)
     * ``application/vnd.fdsn.mseed`` (if MiniSEED data is requested)
 
+Special Response Headers
+    ``Instaseis-Mu``: This transports the mu of the model for the given
+    seismogram which is needed for some finite source calculations. Please make
+    sure your proxy does not filter it.
+
 Filetype
     Returns a ZIP archive with SAC files or MiniSEED files encoded with
     encoding format 4 (IEEE floating point).
