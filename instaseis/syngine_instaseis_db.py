@@ -34,7 +34,7 @@ with standard_library.hooks():
 USER_AGENT = "Instaseis %s (%s, Python %s)" % (__version__,
                                                platform.platform(),
                                                platform.python_version())
-HEADERS = {"User-Agent": USER_AGENT}
+HEADERS = {"User-Agent": USER_AGENT, "Accept-Encoding": "gzip,deflate"}
 
 
 class SyngineInstaseisDB(BaseInstaseisDB):
