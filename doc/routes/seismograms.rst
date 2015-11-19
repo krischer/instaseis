@@ -20,6 +20,13 @@ Filetype
     Returns a ZIP archive with SAC files or MiniSEED files encoded with
     encoding format 4 (IEEE floating point).
 
+    SAC files will have the following user defined variables set:
+
+    * ``KUSER0``: "InstSeis"
+    * ``KUSER1``: The first eight letters of the Instaseis version used to generate the waveforms.
+    * ``KUSER2``: The first eight letters of the velocity model name.
+    * ``USER0``: The scale factor used to generate the waveforms.
+
 +-----------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
 | Parameter                   | Type     | Required | Default Value               | Description                                                                          |
 +=============================+==========+==========+=============================+======================================================================================+
