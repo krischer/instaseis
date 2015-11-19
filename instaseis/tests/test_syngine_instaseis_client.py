@@ -13,6 +13,8 @@ service changes.
 from __future__ import absolute_import
 
 import copy
+import re
+
 import numpy as np
 import pytest
 
@@ -142,14 +144,16 @@ def test_seismogram_extraction(syngine_client):
 
 def test_str_method(syngine_client):
     str_repr = str(syngine_client)
+
     # Replace version number string to not be dependent on a certain version.
-    str_repr = str_repr.replace("Syngine service version:  0.0.2", "XXX")
+    str_repr = re.sub(r"Syngine service version:\s+\d\.\d\.\d",
+                      "Syngine service version:  XXX", str_repr)
 
     assert str_repr.startswith(
         "SyngineInstaseisDB reciprocal Green's function Database (v7) "
         "generated with these parameters:\n"
         "Syngine model name:      'test'\n"
-        "XXX\n"
+        "Syngine service version:  XXX\n"
         "\tcomponents           : vertical and horizontal\n"
         "\tvelocity model       : prem_iso_light\n"
         "\tattenuation          : False\n")
