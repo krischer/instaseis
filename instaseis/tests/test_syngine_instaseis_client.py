@@ -61,11 +61,6 @@ def _compare_streams(s_db, l_db, kwargs):
     assert len(s_st) == len(l_st)
 
     for s_tr, l_tr in zip(s_st, l_st):
-        # XXX: Delete the mu for now. Once implemented on the instaseis
-        # server and forwarded by IRIS we will use it here.
-        del s_tr.stats.instaseis
-        del l_tr.stats.instaseis
-
         assert s_tr.stats.__dict__ == l_tr.stats.__dict__
         # Very small values have issues with floating point accuracy. 7
         # orders of magnitude should be more than accurate enough.

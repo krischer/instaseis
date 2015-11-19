@@ -143,13 +143,13 @@ class SyngineInstaseisDB(BaseInstaseisDB):
                 "Status code %i when downloading '%s'. Reason: '%s'" % (
                     r.status_code, url, reason))
 
-        if "Instaseis-Mu" not in r.headers:
+        if "instaseis-mu" not in r.headers:
             warnings.warn("Mu is not passed via the HTTP headers. Maybe some "
                           "proxy removed it? Mu is now always the default mu.",
                           InstaseisWarning)
             mu = DEFAULT_MU
         else:  # pragma: no cover
-            mu = float(r.headers["Instaseis-Mu"])
+            mu = float(r.headers["instaseis-mu"])
 
         with io.BytesIO(r.content) as fh:
             fh.seek(0, 0)
