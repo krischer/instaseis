@@ -3588,7 +3588,7 @@ def test_mu_parameter_for_seismograms_and_greens_function_route(
     assert "Instaseis-Mu" in request.headers
     assert isinstance(float(request.headers["Instaseis-Mu"]), float)
 
-    # It is not passed along for requests that might return multiple stations.
+    # Multiple stations. mu is source dependent and thus the same.
     p = copy.deepcopy(params)
     del p["receiverlatitude"]
     del p["receiverlongitude"]
@@ -3599,8 +3599,9 @@ def test_mu_parameter_for_seismograms_and_greens_function_route(
     request = client.fetch(_assemble_url('seismograms', **p))
     assert request.code == 200
 
-    # Now it does not exists as more than one station is returned.
-    assert "Instaseis-Mu" not in request.headers
+    # Make sure the mu header exists and the value can be converted to a float.
+    assert "Instaseis-Mu" in request.headers
+    assert isinstance(float(request.headers["Instaseis-Mu"]), float)
 
     # get_greens_function() only works with reciprocal DBs.
     if not client.is_reciprocal:

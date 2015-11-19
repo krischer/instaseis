@@ -431,8 +431,8 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
                 self.finish()
                 return
 
-            # Set the mu header if only a single receiver is set.
-            if len(receivers) == 1 and not isinstance(response, Exception):
+            # Set mu just from the first station.
+            if count == 0 and not isinstance(response, Exception):
                 self.set_header("Instaseis-Mu", "%f" % mu)
 
             # If an exception is returned from the task, re-raise it here.
