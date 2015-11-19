@@ -51,7 +51,8 @@ def _get_seismogram(db, source, receiver, components, units, dt, kernelwidth,
     except Exception:
         msg = ("Could not extract seismogram. Make sure, the components "
                "are valid, and the depth settings are correct.")
-        callback(tornado.web.HTTPError(400, log_message=msg, reason=msg))
+        callback((tornado.web.HTTPError(400, log_message=msg, reason=msg),
+                  None))
         return
 
     _validate_and_write_waveforms(st=st, callback=callback,
@@ -416,7 +417,7 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
 
             # Yield from the task. This enables a context switch and thus
             # async behaviour.
-            response = yield tornado.gen.Task(
+            response, mu = yield tornado.gen.Task(
                 _get_seismogram,
                 db=self.application.db, source=source, receiver=receiver,
                 components=list(args.components), units=args.units, dt=args.dt,
@@ -429,6 +430,10 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
                 self.flush()
                 self.finish()
                 return
+
+            # Set the mu header if only a single receiver is set.
+            if len(receivers) == 1 and not isinstance(response, Exception):
+                self.set_header("Instaseis-Mu", "%f" % mu)
 
             # If an exception is returned from the task, re-raise it here.
             if isinstance(response, Exception):

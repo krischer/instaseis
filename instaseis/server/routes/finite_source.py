@@ -60,7 +60,8 @@ def _get_finite_source(db, finite_source, receiver, components, units, dt,
     except Exception:
         msg = ("Could not extract finite source seismograms. Make sure, "
                "the parameters are valid, and the depth settings are correct.")
-        callback(tornado.web.HTTPError(400, log_message=msg, reason=msg))
+        callback((tornado.web.HTTPError(400, log_message=msg, reason=msg),
+                  None))
         return
 
     for tr in st:
@@ -388,7 +389,7 @@ class FiniteSourceSeismogramsHandler(InstaseisTimeSeriesHandler):
 
             # Yield from the task. This enables a context switch and thus
             # async behaviour.
-            response = yield tornado.gen.Task(
+            response, _ = yield tornado.gen.Task(
                 _get_finite_source,
                 db=self.application.db, finite_source=finite_source,
                 receiver=receiver, components=list(args.components),

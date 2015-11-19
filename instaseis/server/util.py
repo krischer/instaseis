@@ -125,13 +125,20 @@ def _validate_and_write_waveforms(st, callback, starttime, endtime, scale,
                "largest db endtime=%s" % (
                 _format_utc_datetime(endtime),
                 _format_utc_datetime(st[0].stats.endtime)))
-        callback(tornado.web.HTTPError(500, log_message=msg, reason=msg))
+        callback((tornado.web.HTTPError(500, log_message=msg, reason=msg),
+                  None))
         return
     if starttime < st[0].stats.starttime - 3600.0:
         msg = ("Starttime more than one hour before the starttime of the "
                "seismograms.")
-        callback(tornado.web.HTTPError(500, log_message=msg, reason=msg))
+        callback((tornado.web.HTTPError(500, log_message=msg, reason=msg),
+                  None))
         return
+
+    if isinstance(source, FiniteSource):
+        mu = None
+    else:
+        mu = st[0].stats.instaseis.mu
 
     # Trim, potentially pad with zeroes.
     st.trim(starttime, endtime, pad=True, fill_value=0.0, nearest_sample=False)
@@ -144,7 +151,7 @@ def _validate_and_write_waveforms(st, callback, starttime, endtime, scale,
             st.write(fh, format="mseed")
             fh.seek(0, 0)
             binary_data = fh.read()
-        callback(binary_data)
+        callback((binary_data, mu))
     # Write a number of SAC files into an archive.
     elif format == "saczip":
         byte_strings = []
@@ -189,4 +196,4 @@ def _validate_and_write_waveforms(st, callback, starttime, endtime, scale,
                 temp.seek(0, 0)
                 filename = "%s%s.sac" % (label, tr.id)
                 byte_strings.append((filename, temp.read()))
-        callback(byte_strings)
+        callback((byte_strings, mu))

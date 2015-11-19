@@ -806,6 +806,8 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
             as p:
         _st = obspy.read()
         for tr in _st:
+            tr.stats.instaseis = obspy.core.AttribDict()
+            tr.stats.instaseis.mu = 1.234
             tr.stats.starttime = obspy.UTCDateTime(0)
         data = {}
         data["mu"] = 1.0
@@ -1111,6 +1113,8 @@ def test_object_creation_for_seismogram_route(all_clients):
             as p:
         _st = obspy.read()
         for tr in _st:
+            tr.stats.instaseis = obspy.core.AttribDict()
+            tr.stats.instaseis.mu = 1.234
             tr.stats.starttime = obspy.UTCDateTime(1900, 1, 1) - 7 * dt
             tr.stats.delta = dt
         p.return_value = _st
@@ -1160,6 +1164,8 @@ def test_object_creation_for_seismogram_route(all_clients):
         # We need to adjust the time values for the mock here.
         _st.traces = obspy.read().traces
         for tr in _st:
+            tr.stats.instaseis = obspy.core.AttribDict()
+            tr.stats.instaseis.mu = 1.234
             tr.stats.starttime = time - 1 - 7 * dt
             tr.stats.delta = dt
 
@@ -1191,6 +1197,8 @@ def test_object_creation_for_seismogram_route(all_clients):
         p.reset_mock()
         _st.traces = obspy.read().traces
         for tr in _st:
+            tr.stats.instaseis = obspy.core.AttribDict()
+            tr.stats.instaseis.mu = 1.234
             tr.stats.starttime = obspy.UTCDateTime(1900, 1, 1) - 7 * dt
             tr.stats.delta = dt
 
@@ -1223,6 +1231,8 @@ def test_object_creation_for_seismogram_route(all_clients):
         p.reset_mock()
         _st.traces = obspy.read().traces
         for tr in _st:
+            tr.stats.instaseis = obspy.core.AttribDict()
+            tr.stats.instaseis.mu = 1.234
             tr.stats.starttime = time - 1 - 7 * dt
             tr.stats.delta = dt
 
@@ -1266,6 +1276,8 @@ def test_object_creation_for_seismogram_route(all_clients):
         p.reset_mock()
         _st.traces = obspy.read().traces
         for tr in _st:
+            tr.stats.instaseis = obspy.core.AttribDict()
+            tr.stats.instaseis.mu = 1.234
             tr.stats.starttime = obspy.UTCDateTime(1900, 1, 1) - 7 * dt
             tr.stats.delta = dt
 
@@ -1299,6 +1311,8 @@ def test_object_creation_for_seismogram_route(all_clients):
             p.reset_mock()
             _st.traces = obspy.read().traces
             for tr in _st:
+                tr.stats.instaseis = obspy.core.AttribDict()
+                tr.stats.instaseis.mu = 1.234
                 tr.stats.starttime = obspy.UTCDateTime(1900, 1, 1) - 7 * dt
                 tr.stats.delta = dt
 
@@ -1330,6 +1344,8 @@ def test_object_creation_for_seismogram_route(all_clients):
             p.reset_mock()
             _st.traces = obspy.read().traces
             for tr in _st:
+                tr.stats.instaseis = obspy.core.AttribDict()
+                tr.stats.instaseis.mu = 1.234
                 tr.stats.starttime = time - 1 - 7 * dt
                 tr.stats.delta = dt
 
@@ -1368,6 +1384,8 @@ def test_object_creation_for_seismogram_route(all_clients):
 
         _st.traces = obspy.read().traces
         for tr in _st:
+            tr.stats.instaseis = obspy.core.AttribDict()
+            tr.stats.instaseis.mu = 1.234
             tr.stats.starttime = obspy.UTCDateTime(1900, 1, 1) - 7 * dt
             tr.stats.delta = dt
 
@@ -1450,6 +1468,8 @@ def test_object_creation_for_seismogram_route(all_clients):
         p.reset_mock()
         _st.traces = obspy.read().traces
         for tr in _st:
+            tr.stats.instaseis = obspy.core.AttribDict()
+            tr.stats.instaseis.mu = 1.234
             tr.stats.starttime = obspy.UTCDateTime(1900, 1, 1) - 7 * dt
             tr.stats.delta = dt
         params = copy.deepcopy(basic_parameters)
@@ -3522,6 +3542,8 @@ def test_event_parameters_by_querying(all_clients_event_callback):
             as patch:
         _st = obspy.read()
         for tr in _st:
+            tr.stats.instaseis = obspy.core.AttribDict()
+            tr.stats.instaseis.mu = 1.234
             tr.stats.starttime = source.origin_time - 0.01
             tr.stats.delta = 10.0
         patch.return_value = _st
@@ -3542,6 +3564,60 @@ def test_event_query_seismogram_non_existent_event(all_clients_event_callback):
     request = client.fetch(_assemble_url('seismograms', **params))
     assert request.code == 404
     assert request.reason == "Event not found."
+
+
+def test_mu_parameter_for_seismograms_and_greens_function_route(
+        all_clients_station_coordinates_callback):
+    """
+    Test that the mu parameter is passed on for seismograms anf the greens
+    function route.
+    """
+    client = all_clients_station_coordinates_callback
+
+    params = {
+        "sourcelatitude": 10, "sourcelongitude": 10,
+        "sourcedepthinmeters": client.source_depth,
+        "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
+        "receiverlatitude": 20, "receiverlongitude": 20, "format": "miniseed"}
+
+    p = copy.deepcopy(params)
+    request = client.fetch(_assemble_url('seismograms', **p))
+    assert request.code == 200
+
+    # Make sure the mu header exists and the value can be converted to a float.
+    assert "Instaseis-Mu" in request.headers
+    assert isinstance(float(request.headers["Instaseis-Mu"]), float)
+
+    # It is not passed along for requests that might return multiple stations.
+    p = copy.deepcopy(params)
+    del p["receiverlatitude"]
+    del p["receiverlongitude"]
+    # This will return two stations.
+    p["network"] = "IU,B*"
+    p["station"] = "ANT*,ANM?"
+
+    request = client.fetch(_assemble_url('seismograms', **p))
+    assert request.code == 200
+
+    # Now it does not exists as more than one station is returned.
+    assert "Instaseis-Mu" not in request.headers
+
+    # get_greens_function() only works with reciprocal DBs.
+    if not client.is_reciprocal:
+        return
+
+    parameters = {
+        "sourcedepthinmeters": 1e3,
+        "sourcedistanceindegrees": 20,
+        "format": "saczip"}
+
+    # default parameters
+    request = client.fetch(_assemble_url('greens_function', **parameters))
+    assert request.code == 200
+
+    # Make sure the mu header exists and the value can be converted to a float.
+    assert "Instaseis-Mu" in request.headers
+    assert isinstance(float(request.headers["Instaseis-Mu"]), float)
 
 
 def test_label_parameter(all_clients):

@@ -50,7 +50,8 @@ def _get_greens(db, epicentral_distance_degree, source_depth_in_m, units, dt,
     except Exception:
         msg = ("Could not extract Green's function. Make sure, the parameters "
                "are valid, and the depth settings are correct.")
-        callback(tornado.web.HTTPError(400, log_message=msg, reason=msg))
+        callback((tornado.web.HTTPError(400, log_message=msg, reason=msg),
+                  None))
         return
 
     # Fake source and receiver to be able to reuse the generic waveform
@@ -160,7 +161,7 @@ class GreensFunctionHandler(InstaseisTimeSeriesHandler):
 
         # Yield from the task. This enables a context switch and thus
         # async behaviour.
-        response = yield tornado.gen.Task(
+        response, mu = yield tornado.gen.Task(
             _get_greens,
             db=self.application.db,
             epicentral_distance_degree=args.sourcedistanceindegrees,
@@ -172,6 +173,9 @@ class GreensFunctionHandler(InstaseisTimeSeriesHandler):
         # If an exception is returned from the task, re-raise it here.
         if isinstance(response, Exception):
             raise response
+
+        # Set and thus send the mu header.
+        self.set_header("Instaseis-Mu", "%f" % mu)
 
         if args.format == "miniseed":
             self.write(response)
