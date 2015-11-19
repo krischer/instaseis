@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>GET /seismograms_raw &mdash; instaseis 0.0.1a-412-g29c3d0 documentation</title>
+    <title>GET /seismograms_raw &mdash; instaseis 0.0.1a-418-ge884 documentation</title>
     
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.0.1a-412-g29c3d0',
+        VERSION:     '0.0.1a-418-ge884',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -26,12 +26,12 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-3.3.4/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.0.1a-412-g29c3d0 documentation" href="../index.html" />
+    <link rel="top" title="instaseis 0.0.1a-418-ge884 documentation" href="../index.html" />
     <link rel="up" title="Instaseis Server" href="../server.html" />
     <link rel="next" title="GET /seismograms" href="seismograms.html" />
     <link rel="prev" title="GET /ttimes" href="ttimes.html" />
@@ -41,7 +41,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 
   </head>
-  <body>
+  <body role="document">
 
   <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
     <div class="container">
@@ -54,7 +54,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-412-g29c3d0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-418-ge884</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -106,7 +106,7 @@
 
 <div class="container">
   <div class="row">
-    <div class="col-md-12">
+    <div class="col-md-12 content">
       
   <div class="section" id="get-seismograms-raw">
 <h1>GET /seismograms_raw<a class="headerlink" href="#get-seismograms-raw" title="Permalink to this headline">¶</a></h1>
@@ -116,11 +116,11 @@
 No further post-processing like STF reconvolution or resampling is
 performed. This is mostly useful for using the Instaseis client in
 remote mode. If you only want to get seismograms and continue your work
-with other programs, please use the <tt class="docutils literal"><span class="pre">/seismograms</span></tt> route.</dd>
+with other programs, please use the <code class="docutils literal"><span class="pre">/seismograms</span></code> route.</dd>
 <dt>Content-Type</dt>
-<dd><tt class="docutils literal"><span class="pre">application/vnd.fdsn.mseed</span></tt></dd>
+<dd><code class="docutils literal"><span class="pre">application/vnd.fdsn.mseed</span></code></dd>
 <dt>Special Response Headers</dt>
-<dd><tt class="docutils literal"><span class="pre">Instaseis-Mu</span></tt>: This transports the mu of the model for the given
+<dd><code class="docutils literal"><span class="pre">Instaseis-Mu</span></code>: This transports the mu of the model for the given
 seismogram which is needed for some finite source calculations. Please make
 sure your proxy does not filter it.</dd>
 <dt>Filetype</dt>
@@ -144,13 +144,13 @@ point).</dd>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">components</span></tt></td>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">components</span></code></td>
 <td>String</td>
 <td>False</td>
 <td>ZNE</td>
 <td>The desired seismogram components. Any combination of Z, N, E, R, T.</td>
 </tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">origintime</span></tt></td>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">origintime</span></code></td>
 <td>Datetime</td>
 <td>False</td>
 <td>1970-01-01T00:00:00.000000Z</td>
@@ -158,37 +158,37 @@ point).</dd>
 </tr>
 <tr class="row-even"><td colspan="5">Receiver Parameters</td>
 </tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">receiverlatitude</span></tt></td>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">receiverlatitude</span></code></td>
 <td>Float</td>
 <td>True</td>
 <td>&nbsp;</td>
 <td>The latitude of the receiver.</td>
 </tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">receiverlongitude</span></tt></td>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">receiverlongitude</span></code></td>
 <td>Float</td>
 <td>True</td>
 <td>&nbsp;</td>
 <td>The longitude of the receiver.</td>
 </tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">receiverdepthinm</span></tt></td>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">receiverdepthinm</span></code></td>
 <td>Float</td>
 <td>False</td>
 <td>0.0</td>
 <td>The depth of the receiver in meter.</td>
 </tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">networkcode</span></tt></td>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">networkcode</span></code></td>
 <td>String</td>
 <td>False</td>
 <td>&nbsp;</td>
 <td>The network code of the final seismogram.</td>
 </tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">stationcode</span></tt></td>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">stationcode</span></code></td>
 <td>String</td>
 <td>False</td>
 <td>&nbsp;</td>
 <td>The station code of the final seismogram.</td>
 </tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">locationcode</span></tt></td>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">locationcode</span></code></td>
 <td>String</td>
 <td>False</td>
 <td>&nbsp;</td>
@@ -196,19 +196,19 @@ point).</dd>
 </tr>
 <tr class="row-odd"><td colspan="5">Source Parameters</td>
 </tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">sourcelatitude</span></tt></td>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">sourcelatitude</span></code></td>
 <td>Float</td>
 <td>True</td>
 <td>&nbsp;</td>
 <td>The latitude of the source.</td>
 </tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">sourcelongitude</span></tt></td>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">sourcelongitude</span></code></td>
 <td>Float</td>
 <td>True</td>
 <td>&nbsp;</td>
 <td>The longitude of the source.</td>
 </tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">sourcedepthinm</span></tt></td>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">sourcedepthinm</span></code></td>
 <td>Float</td>
 <td>False</td>
 <td>0.0</td>
@@ -216,37 +216,37 @@ point).</dd>
 </tr>
 <tr class="row-odd"><td colspan="5">Source can be given as the moment tensor components...</td>
 </tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">mrr</span></tt></td>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">mrr</span></code></td>
 <td>Float</td>
 <td>False</td>
 <td>&nbsp;</td>
 <td>A moment tensor component in Nm.</td>
 </tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">mtt</span></tt></td>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">mtt</span></code></td>
 <td>Float</td>
 <td>False</td>
 <td>&nbsp;</td>
 <td>A moment tensor componentin Nm.</td>
 </tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">mpp</span></tt></td>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">mpp</span></code></td>
 <td>Float</td>
 <td>False</td>
 <td>&nbsp;</td>
 <td>A moment tensor componentin Nm.</td>
 </tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">mrt</span></tt></td>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">mrt</span></code></td>
 <td>Float</td>
 <td>False</td>
 <td>&nbsp;</td>
 <td>A moment tensor componentin Nm.</td>
 </tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">mrp</span></tt></td>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">mrp</span></code></td>
 <td>Float</td>
 <td>False</td>
 <td>&nbsp;</td>
 <td>A moment tensor componentin Nm.</td>
 </tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">mtp</span></tt></td>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">mtp</span></code></td>
 <td>Float</td>
 <td>False</td>
 <td>&nbsp;</td>
@@ -254,25 +254,25 @@ point).</dd>
 </tr>
 <tr class="row-even"><td colspan="5">...as a double couple...</td>
 </tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">strike</span></tt></td>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">strike</span></code></td>
 <td>Float</td>
 <td>False</td>
 <td>&nbsp;</td>
 <td>Strike of a double couple source in degree.</td>
 </tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">dip</span></tt></td>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">dip</span></code></td>
 <td>Float</td>
 <td>False</td>
 <td>&nbsp;</td>
 <td>Dip of a double couple source in degree.</td>
 </tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">rake</span></tt></td>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">rake</span></code></td>
 <td>Float</td>
 <td>False</td>
 <td>&nbsp;</td>
 <td>Rake of a double couple source in degree.</td>
 </tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">M0</span></tt></td>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">M0</span></code></td>
 <td>Float</td>
 <td>False</td>
 <td>&nbsp;</td>
@@ -280,19 +280,19 @@ point).</dd>
 </tr>
 <tr class="row-odd"><td colspan="5">...or as a force source.</td>
 </tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">fr</span></tt></td>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">fr</span></code></td>
 <td>Float</td>
 <td>False</td>
 <td>&nbsp;</td>
 <td>A force source component in N.</td>
 </tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">ft</span></tt></td>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">ft</span></code></td>
 <td>Float</td>
 <td>False</td>
 <td>&nbsp;</td>
 <td>A force source component in N.</td>
 </tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">fp</span></tt></td>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">fp</span></code></td>
 <td>Float</td>
 <td>False</td>
 <td>&nbsp;</td>
@@ -316,7 +316,7 @@ point).</dd>
     </p>
     <p>
         &copy; Copyright 2014-2015, Lion Krischer and Martin van Driel.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.<br/>
     </p>
   </div>
 </footer>
