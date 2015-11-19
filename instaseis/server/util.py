@@ -182,6 +182,7 @@ def _validate_and_write_waveforms(st, callback, starttime, endtime, scale,
             tr.stats.sac.kuser0 = "InstSeis"
             tr.stats.sac.kuser1 = __version__[:8]
             tr.stats.sac.kuser2 = db.info.velocity_model[:8]
+            tr.stats.sac.user0 = scale
 
             with io.BytesIO() as temp:
                 tr.write(temp, format="sac")
