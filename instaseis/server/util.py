@@ -185,11 +185,14 @@ def _validate_and_write_waveforms(st, callback, starttime, endtime, scale,
             # The event origin time relative to the reference which I'll
             # just assume to be the starttime here?
             tr.stats.sac.o = source.origin_time - starttime
+
             # Some provenance.
             tr.stats.sac.kuser0 = "InstSeis"
-            tr.stats.sac.kuser1 = __version__[:8]
-            tr.stats.sac.kuser2 = db.info.velocity_model[:8]
+            tr.stats.sac.kuser1 = db.info.velocity_model[:8]
             tr.stats.sac.user0 = scale
+            # Prefix version numbers to identify them at a glance.
+            tr.stats.sac.kt7 = "A" + db.info.axisem_version[:7]
+            tr.stats.sac.kt8 = "I" + __version__[:7]
 
             with io.BytesIO() as temp:
                 tr.write(temp, format="sac")

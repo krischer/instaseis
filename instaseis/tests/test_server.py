@@ -4511,10 +4511,13 @@ def test_sac_headers(all_clients):
         assert tr.stats.sac.imagtyp == 55
         # Assume the reference time is the starttime.
         assert abs(tr.stats.sac.o - 1.5) < 1E-6
-        # Test the provenance.
+
+        # Test the "provenance".
         assert tr.stats.sac.kuser0 == "InstSeis"
-        assert tr.stats.sac.kuser1 == instaseis.__version__[:8]
-        assert tr.stats.sac.kuser2 == "prem_iso"
+        assert tr.stats.sac.kuser1 == "prem_iso"
+        # Two test databases.
+        assert tr.stats.sac.kt7 in ("A60945ec", "A0400524")
+        assert tr.stats.sac.kt8 == "I" + instaseis.__version__[:7]
         assert tr.stats.sac.user0 == 0.5
 
 
