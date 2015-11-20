@@ -46,8 +46,9 @@ Filetype
     SAC files will have the following user defined variables set:
 
     * ``KUSER0``: "InstSeis"
-    * ``KUSER1``: The first eight letters of the Instaseis version used to generate the waveforms.
-    * ``KUSER2``: The first eight letters of the velocity model name.
+    * ``KUSER1``: The first eight letters of the used velocity model.
+    * ``KT7``: The first seven letters of the AxiSEM version number used to generate the model. Prefixed with ``A``.
+    * ``KT8``: The first seven letters of the Instaseis version number used to generate the seismogram. Prefixed with ``I``.
     * ``USER0``: The scale factor used to generate the waveforms.
 
 +-----------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>POST /finite_source &mdash; instaseis 0.0.1a-425-g049b documentation</title>
+    <title>POST /finite_source &mdash; instaseis 0.0.1a-427-g646a documentation</title>
     
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.0.1a-425-g049b',
+        VERSION:     '0.0.1a-427-g646a',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -31,7 +31,7 @@
     <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-3.3.4/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.0.1a-425-g049b documentation" href="../index.html" />
+    <link rel="top" title="instaseis 0.0.1a-427-g646a documentation" href="../index.html" />
     <link rel="up" title="Instaseis Server" href="../server.html" />
     <link rel="next" title="Advanced Server Configuration" href="../advanced_server_configuration.html" />
     <link rel="prev" title="GET /greens_function" href="greens_function.html" />
@@ -54,7 +54,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-425-g049b</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.1a-427-g646a</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -156,8 +156,9 @@ encoding format 4 (IEEE floating point).</p>
 <p>SAC files will have the following user defined variables set:</p>
 <ul class="last simple">
 <li><code class="docutils literal"><span class="pre">KUSER0</span></code>: &#8220;InstSeis&#8221;</li>
-<li><code class="docutils literal"><span class="pre">KUSER1</span></code>: The first eight letters of the Instaseis version used to generate the waveforms.</li>
-<li><code class="docutils literal"><span class="pre">KUSER2</span></code>: The first eight letters of the velocity model name.</li>
+<li><code class="docutils literal"><span class="pre">KUSER1</span></code>: The first eight letters of the used velocity model.</li>
+<li><code class="docutils literal"><span class="pre">KT7</span></code>: The first seven letters of the AxiSEM version number used to generate the model. Prefixed with <code class="docutils literal"><span class="pre">A</span></code>.</li>
+<li><code class="docutils literal"><span class="pre">KT8</span></code>: The first seven letters of the Instaseis version number used to generate the seismogram. Prefixed with <code class="docutils literal"><span class="pre">I</span></code>.</li>
 <li><code class="docutils literal"><span class="pre">USER0</span></code>: The scale factor used to generate the waveforms.</li>
 </ul>
 </dd>
