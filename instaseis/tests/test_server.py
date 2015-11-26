@@ -2187,41 +2187,16 @@ def test_cors_headers_failing_requests(all_clients_all_callbacks):
 def test_gzipped_responses(all_clients_all_callbacks):
     """
     The JSON responses should all be gzipped if requests.
+
+    Starting with tornado 4.3 responses smaller than 1000 bytes do no longer
+    get compressed. Thus we can also test some responses here.
     """
     client = all_clients_all_callbacks
-
-    request = client.fetch("/")
-    assert request.code == 200
-    # Special tornado header meaning it originally was gzipped..in this case
-    # not as it has not been requested.
-    assert "X-Consumed-Content-Encoding" not in request.headers
-
-    # Now with compression.
-    request = client.fetch("/", use_gzip=True)
-    assert request.code == 200
-    # Special tornado header meaning it originally was gzipped..in this case
-    # not as it has not been requested.
-    assert request.headers["X-Consumed-Content-Encoding"] == "gzip"
 
     request = client.fetch("/info")
     assert request.code == 200
     assert "X-Consumed-Content-Encoding" not in request.headers
     request = client.fetch("/info", use_gzip=True)
-    assert request.code == 200
-    assert request.headers["X-Consumed-Content-Encoding"] == "gzip"
-
-    request = client.fetch("/coordinates?network=IU&station=ANMO")
-    assert request.code == 200
-    assert "X-Consumed-Content-Encoding" not in request.headers
-    request = client.fetch("/coordinates?network=IU&station=ANMO",
-                           use_gzip=True)
-    assert request.code == 200
-    assert request.headers["X-Consumed-Content-Encoding"] == "gzip"
-
-    request = client.fetch("/event?id=B071791B")
-    assert request.code == 200
-    assert "X-Consumed-Content-Encoding" not in request.headers
-    request = client.fetch("/event?id=B071791B", use_gzip=True)
     assert request.code == 200
     assert request.headers["X-Consumed-Content-Encoding"] == "gzip"
 
