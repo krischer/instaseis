@@ -20,7 +20,7 @@ import obspy
 import tornado.gen
 import tornado.web
 
-from ... import Source, ForceSource, Receiver
+from ... import Source, ForceSource, Receiver, lanczos
 from ..util import run_async, IOQueue, _validtimesetting, \
     _validate_and_write_waveforms
 from ..instaseis_request import InstaseisTimeSeriesHandler
@@ -56,13 +56,18 @@ def _get_seismogram(db, source, receiver, components, units, dt, kernelwidth,
     :param label: Prefix for the filename within the SAC zip file.
     :param callback: callback function of the coroutine.
     """
+    if source.sliprate is not None:
+        reconvolve_stf = True
+    else:
+        reconvolve_stf = False
+
     try:
         st = db.get_seismograms(
             source=source, receiver=receiver, components=components,
             kind=units, remove_source_shift=False,
-            reconvolve_stf=False, return_obspy_stream=True, dt=dt,
+            reconvolve_stf=reconvolve_stf, return_obspy_stream=True, dt=dt,
             kernelwidth=kernelwidth)
-    except Exception:
+    except Exception as e:
         msg = ("Could not extract seismogram. Make sure, the components "
                "are valid, and the depth settings are correct.")
         callback((tornado.web.HTTPError(400, log_message=msg, reason=msg),
@@ -110,6 +115,49 @@ def _parse_validate_and_resample_stf(request, db_info, callback):
 
     # Convert to numpy array.
     j["data"] = np.array(j["data"], np.float64)
+
+    # A couple more custom validations.
+    # The data must begin and end with zero. The user is responsible for the
+    # tapering.
+    message = None
+    if j["data"][0] != 0.0 or j["data"][-1] != 0.0:
+        message = "Must begin and end with zero."
+
+    if message:
+        msg = "STF Data did not validate: %s" % message
+        callback(tornado.web.HTTPError(400, log_message=msg, reason=msg))
+        return
+
+    missing_length = db_info.length - (
+        len(j["data"]) - 1) * j["sample_spacing_in_sec"]
+    missing_samples = int(missing_length / j["sample_spacing_in_sec"]) + 1
+    if missing_samples < 0:
+        missing_samples = 1
+
+    # Add a buffer of 20 samples at the beginning and at the end.
+    data = np.concatenate([
+        np.zeros(20), j["data"], np.zeros(missing_samples + 20)])
+
+    # Resample it using sinc reconstruction.
+    data = lanczos.lanczos_interpolation(
+        data,
+        # Account for the additional samples at the beginning.
+        old_start=-20 * j["sample_spacing_in_sec"],
+        old_dt=j["sample_spacing_in_sec"],
+        new_start=0.0,
+        new_dt=db_info.dt,
+        new_npts=db_info.npts,
+        # The large a is okay because we add zeros at the beginning and the
+        # end.
+        a=12, window="blackman")
+
+    # There is potentially some numerical noise on the first sample.
+    assert data[0] < 1E-10 * np.abs(data.ptp())
+    data[0] = 0.0
+
+    # Normalize the integral to one.
+    data /= np.trapz(np.abs(data), dx=db_info.dt)
+    j["data"] = data
 
     callback(j)
 
@@ -274,7 +322,7 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
                 raise tornado.web.HTTPError(
                     400, log_message=msg, reason=msg)
 
-    def get_source(self, args, __event):
+    def get_source(self, args, __event, custom_stf=None):
         # Source can be either directly specified or by passing an event id.
         if args.eventid is not None:
             # Use previously extracted event information.
@@ -342,6 +390,12 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
                            "parameters. Check parameters for sanity.")
                     raise tornado.web.HTTPError(400, log_message=msg,
                                                 reason=msg)
+
+        # Add the resampled custom STF to the source object.
+        if custom_stf:
+            source.sliprate = custom_stf["data"]
+            source.dt = self.application.db.info.dt
+
         return source
 
     def get_receivers(self, args):
@@ -446,7 +500,7 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
         min_starttime, max_endtime = self.parse_time_settings(args)
         self.set_headers(args)
 
-        source = self.get_source(args, __event)
+        source = self.get_source(args, __event, custom_stf=custom_stf)
 
         # Generating even 100'000 receivers only takes ~150ms so its totally
         # ok to generate them all at once here. The time to generate and

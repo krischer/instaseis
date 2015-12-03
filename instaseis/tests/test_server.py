@@ -4785,8 +4785,8 @@ def test_error_handling_custom_stf(all_clients):
     valid_json = {
         "units": "moment_rate",
         "relative_origin_time_in_sec": 15.23,
-        "sample_spacing_in_sec": 0.1,
-        "data": [0.2, 4, 25, 5.6, 2.4, 5.7]
+        "sample_spacing_in_sec": 50.0,
+        "data": [0.0, 4, 25, 5.6, 2.4, 0.0]
     }
 
     # Couple more wrong ones.
@@ -4795,7 +4795,6 @@ def test_error_handling_custom_stf(all_clients):
     request = client.fetch(_assemble_url('seismograms'),
                            method="POST", body=json.dumps(body))
     assert request.code == 400
-    # This file has many problems thus the error might vary.
     assert request.reason == (
         "Validation Error in JSON file: 'random' is not one of "
         "['moment_rate', 'moment']")
@@ -4805,7 +4804,6 @@ def test_error_handling_custom_stf(all_clients):
     request = client.fetch(_assemble_url('seismograms'),
                            method="POST", body=json.dumps(body))
     assert request.code == 400
-    # This file has many problems thus the error might vary.
     assert request.reason == (
         "Validation Error in JSON file: -0.1 is less than the minimum of "
         "1e-05")
@@ -4815,6 +4813,45 @@ def test_error_handling_custom_stf(all_clients):
     request = client.fetch(_assemble_url('seismograms'),
                            method="POST", body=json.dumps(body))
     assert request.code == 400
-    # This file has many problems thus the error might vary.
     assert request.reason == (
         "Validation Error in JSON file: 'hello' is not of type 'number'")
+
+    # Does not start and end with zero.
+    body = copy.deepcopy(valid_json)
+    body["data"][0] = 0.3
+    request = client.fetch(_assemble_url('seismograms'),
+                           method="POST", body=json.dumps(body))
+    assert request.code == 400
+    assert request.reason == (
+        "STF Data did not validate: Must begin and end with zero.")
+
+
+def test_custom_stf(all_clients):
+    """
+    Test the custom STF.
+    """
+    client = all_clients
+
+    valid_json = {
+        "units": "moment_rate",
+        "relative_origin_time_in_sec": 15.23,
+        "sample_spacing_in_sec": 50.0,
+        "data": [0.0, 4, 25, 5.6, 2.4, 0.0]
+    }
+
+    basic_parameters = {
+        "sourcelatitude": 10,
+        "sourcelongitude": 10,
+        "sourcedepthinmeters": client.source_depth,
+        "receiverlatitude": -10,
+        "receiverlongitude": -10,
+        "format": "miniseed",
+        "dt": 0.01,
+        "sourcemomenttensor": "100000,200000,300000,400000,500000,600000"}
+
+    # Moment tensor source.
+    body = copy.deepcopy(valid_json)
+    request = client.fetch(_assemble_url('seismograms', **basic_parameters),
+                           method="POST", body=json.dumps(body))
+    assert request.code == 200
+    st_server = obspy.read(request.buffer)
