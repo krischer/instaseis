@@ -7,8 +7,14 @@
     GNU Lesser General Public License, Version 3 [non-commercial/academic use]
     (http://www.gnu.org/copyleft/lgpl.html)
 """
+import inspect
+import io
+import json
+import os
 import zipfile
 
+from jsonschema import validate as json_validate
+from jsonschema import ValidationError as JSONValidationError
 import obspy
 import tornado.gen
 import tornado.web
@@ -17,6 +23,13 @@ from ... import Source, ForceSource, Receiver
 from ..util import run_async, IOQueue, _validtimesetting, \
     _validate_and_write_waveforms
 from ..instaseis_request import InstaseisTimeSeriesHandler
+
+
+# Load the JSON schema once.
+DATA = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(
+    inspect.getfile(inspect.currentframe())))), "data")
+with io.open(os.path.join(DATA, "finite_source_schema.json"), "rt") as fh:
+    _json_schema = json.load(fh)
 
 
 @run_async
@@ -60,6 +73,43 @@ def _get_seismogram(db, source, receiver, components, units, dt, kernelwidth,
                                   scale=scale, source=source,
                                   receiver=receiver, db=db, label=label,
                                   format=format)
+
+
+@run_async
+def _parse_validate_and_resample_stf(request, db_info, callback):
+    """
+    Parses the JSON based STF, validates it, and resamples it.
+
+    :param request: The request.
+    :param db_info: Information about the current database.
+    :param callback: The coroutine's callback.
+    """
+    if not request.body:
+        msg = "The source time function must be given in the body of the " \
+              "POST request."
+        callback(tornado.web.HTTPError(400, log_message=msg, reason=msg))
+        return
+
+    # Try to parse it as a JSON file.
+    with io.BytesIO(request.body) as buf:
+        try:
+            j = json.loads(buf.read().decode())
+        except Exception as e:
+            msg = "The body of the POST request is not a valid JSON file."
+            callback(tornado.web.HTTPError(400, log_message=msg, reason=msg))
+            return
+
+    # Validate it.
+    try:
+        json_validate(j, _json_schema)
+    except JSONValidationError as e:
+        msg = "Validation Error in JSON file: " + e.message
+        callback(tornado.web.HTTPError(400, log_message=msg, reason=msg))
+        return
+
+    print(dir(request))
+    print(request.body)
+    print(bool(request.body))
 
 
 def _tolist(value, count):
@@ -341,6 +391,19 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
                     raise tornado.web.HTTPError(400, log_message=msg,
                                                 reason=msg)
         return receivers
+
+    @tornado.web.asynchronous
+    @tornado.gen.coroutine
+    def post(self):
+        # Coroutine + thread as potentially pretty expensive.
+        response = yield tornado.gen.Task(
+            _parse_validate_and_resample_stf,
+            request=self.request,
+            db_info=self.application.db.info)
+
+        if isinstance(response, Exception):
+            raise response
+
 
     @tornado.web.asynchronous
     @tornado.gen.coroutine

@@ -4748,3 +4748,73 @@ def test_scale_parameter(all_clients):
     assert request.reason == (
         "A scale of zero means all seismograms have an amplitude "
         "of zero. No need to get it in the first place.")
+
+
+def test_error_handling_custom_stf(all_clients):
+    """
+    Tests the error handling when passing a custom STF for the /seismograms
+    service.
+    """
+    client = all_clients
+
+    # The source time function file parsing happens first so we don't need
+    # to worry about the other parameters for now.
+
+    # Empty request.
+    request = client.fetch(_assemble_url('seismograms'),
+                           method="POST", body=b'')
+    assert request.code == 400
+    assert request.reason == ("The source time function must be given in the "
+                              "body of the POST request.")
+
+    # Not a valid json file.
+    request = client.fetch(_assemble_url('seismograms'),
+                           method="POST", body=b'abcdefg')
+    assert request.code == 400
+    assert request.reason == ("The body of the POST request is not a valid "
+                              "JSON file.")
+
+    # Not a json file that's valid according to the schema.
+    body = {"random": "things"}
+    request = client.fetch(_assemble_url('seismograms'),
+                           method="POST", body=json.dumps(body))
+    assert request.code == 400
+    # This file has many problems thus the error might vary.
+    assert request.reason.startswith("Validation Error in JSON file: ")
+
+    valid_json = {
+        "units": "moment_rate",
+        "relative_origin_time_in_sec": 15.23,
+        "sample_spacing_in_sec": 0.1,
+        "data": [0.2, 4, 25, 5.6, 2.4, 5.7]
+    }
+
+    # Couple more wrong ones.
+    body = copy.copy(valid_json)
+    body["units"] = "random"
+    request = client.fetch(_assemble_url('seismograms'),
+                           method="POST", body=json.dumps(body))
+    assert request.code == 400
+    # This file has many problems thus the error might vary.
+    assert request.reason == (
+        "Validation Error in JSON file: 'random' is not one of "
+        "['moment_rate', 'moment']")
+
+    body = copy.copy(valid_json)
+    body["sample_spacing_in_sec"] = -0.1
+    request = client.fetch(_assemble_url('seismograms'),
+                           method="POST", body=json.dumps(body))
+    assert request.code == 400
+    # This file has many problems thus the error might vary.
+    assert request.reason == (
+        "Validation Error in JSON file: -0.1 is less than the minimum of "
+        "1e-05")
+
+    body = copy.copy(valid_json)
+    body["data"].append("hello")
+    request = client.fetch(_assemble_url('seismograms'),
+                           method="POST", body=json.dumps(body))
+    assert request.code == 400
+    # This file has many problems thus the error might vary.
+    assert request.reason == (
+        "Validation Error in JSON file: 'hello' is not of type 'number'")

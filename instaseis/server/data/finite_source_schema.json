@@ -1,0 +1,39 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "http://instaseis.net/source_time_function/1.0",
+  "type": "object",
+  "properties": {
+    "units": {
+      "id": "http://instaseis.net/source_time_function/1.0/units",
+      "type": "string",
+      "enum": ["moment_rate", "moment"]
+    },
+    "relative_origin_time_in_sec": {
+      "id": "http://instaseis.net/source_time_function/1.0/relative_origin_time_in_sec",
+      "type": "number"
+    },
+    "sample_spacing_in_sec": {
+      "id": "http://instaseis.net/source_time_function/1.0/sample_spacing_in_sec",
+      "type": "number",
+      "minimum": 0.00001,
+      "maximum": 200,
+      "exclusiveMaximum": false,
+      "exclusiveMinimum": false
+    },
+    "data": {
+      "id": "http://instaseis.net/source_time_function/1.0/data",
+      "type": "array",
+      "items": {
+        "id": "http://instaseis.net/source_time_function/1.0/data/values",
+        "type": "number"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "units",
+    "relative_origin_time_in_sec",
+    "sample_spacing_in_sec",
+    "data"
+  ]
+}
