@@ -15,6 +15,7 @@ import zipfile
 
 from jsonschema import validate as json_validate
 from jsonschema import ValidationError as JSONValidationError
+import numpy as np
 import obspy
 import tornado.gen
 import tornado.web
@@ -107,9 +108,10 @@ def _parse_validate_and_resample_stf(request, db_info, callback):
         callback(tornado.web.HTTPError(400, log_message=msg, reason=msg))
         return
 
-    print(dir(request))
-    print(request.body)
-    print(bool(request.body))
+    # Convert to numpy array.
+    j["data"] = np.array(j["data"], np.float64)
+
+    callback(j)
 
 
 def _tolist(value, count):
@@ -404,10 +406,14 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
         if isinstance(response, Exception):
             raise response
 
+        yield tornado.gen.Task(
+            self.get,
+            custom_stf=response
+        )
 
     @tornado.web.asynchronous
     @tornado.gen.coroutine
-    def get(self):
+    def get(self, custom_stf=None):
         # Parse the arguments. This will also perform a number of sanity
         # checks.
         args = self.parse_arguments()

@@ -4790,7 +4790,7 @@ def test_error_handling_custom_stf(all_clients):
     }
 
     # Couple more wrong ones.
-    body = copy.copy(valid_json)
+    body = copy.deepcopy(valid_json)
     body["units"] = "random"
     request = client.fetch(_assemble_url('seismograms'),
                            method="POST", body=json.dumps(body))
@@ -4800,7 +4800,7 @@ def test_error_handling_custom_stf(all_clients):
         "Validation Error in JSON file: 'random' is not one of "
         "['moment_rate', 'moment']")
 
-    body = copy.copy(valid_json)
+    body = copy.deepcopy(valid_json)
     body["sample_spacing_in_sec"] = -0.1
     request = client.fetch(_assemble_url('seismograms'),
                            method="POST", body=json.dumps(body))
@@ -4810,7 +4810,7 @@ def test_error_handling_custom_stf(all_clients):
         "Validation Error in JSON file: -0.1 is less than the minimum of "
         "1e-05")
 
-    body = copy.copy(valid_json)
+    body = copy.deepcopy(valid_json)
     body["data"].append("hello")
     request = client.fetch(_assemble_url('seismograms'),
                            method="POST", body=json.dumps(body))
