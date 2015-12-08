@@ -150,7 +150,7 @@ class Mesh(object):
         self.source_shift_samp = getattr(
             self.f, "source shift factor for deltat_coarse")
 
-        possible_stf_groups = ["Surface", "Snapshot"]
+        possible_stf_groups = ["Surface", "Snapshots"]
         found_stf = False
         for g in possible_stf_groups:
             if g not in self.f.groups:
