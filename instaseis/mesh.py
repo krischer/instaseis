@@ -150,8 +150,35 @@ class Mesh(object):
         self.source_shift_samp = getattr(
             self.f, "source shift factor for deltat_coarse")
 
-        self.stf_d = self.f.groups["Surface"].variables["stf_d_dump"][:]
-        self.stf = self.f.groups["Surface"].variables["stf_dump"][:]
+        possible_stf_groups = ["Surface", "Snapshot"]
+        found_stf = False
+        for g in possible_stf_groups:
+            if g not in self.f.groups:
+                continue
+            group = self.f.groups[g]
+
+            if "stf_d_dump" not in group.variables or \
+                    "stf_dump" not in group.variables:
+                continue
+
+            stf_d_dump = group.variables["stf_d_dump"][:]
+            stf_dump = group.variables["stf_dump"][:]
+
+            if np.ma.is_masked(stf_d_dump) or \
+                    np.ma.is_masked(stf_dump) or \
+                    np.isnan(np.sum(stf_d_dump)) or \
+                    np.isnan(np.sum(stf_dump)):
+                continue
+
+            found_stf = True
+            break
+
+        if found_stf is False:
+            raise ValueError("Could not extract valid slip and sliprates "
+                             "from the netcdf files.")
+
+        self.stf_d = stf_d_dump
+        self.stf = stf_dump
 
         self.stf_d_norm = self.stf_d / self.amplitude
         self.stf_norm = self.stf / self.amplitude
