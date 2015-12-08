@@ -105,6 +105,8 @@ class SyngineInstaseisDB(BaseInstaseisDB):
             warnings.warn("The syngine service only services reciprocal "
                           "databases thus the receiver depth cannot be "
                           "changed.", UserWarning)
+        # The syngine services requires a station code.
+        params["stationcode"] = "SYN"
 
         # Do the source.
         params["sourcelatitude"] = geocentric_to_elliptic_latitude(
