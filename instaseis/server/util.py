@@ -14,6 +14,7 @@ import threading
 
 import numpy as np
 import obspy
+from obspy.core.util import degrees2kilometers, locations2degrees
 import tornado.web
 
 from .. import ForceSource, FiniteSource
@@ -185,6 +186,12 @@ def _validate_and_write_waveforms(st, callback, starttime, endtime, scale,
             # The event origin time relative to the reference which I'll
             # just assume to be the starttime here?
             tr.stats.sac.o = source.origin_time - starttime
+
+            tr.stats.sac.dist = degrees2kilometers(locations2degrees(
+                lat1=tr.stats.sac.evla,
+                long1=tr.stats.sac.evlo,
+                lat2=tr.stats.sac.stla,
+                long2=tr.stats.sac.stlo))
 
             # Some provenance.
             tr.stats.sac.kuser0 = "InstSeis"
