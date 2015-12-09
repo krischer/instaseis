@@ -14,7 +14,7 @@ import threading
 
 import numpy as np
 import obspy
-from obspy.core.util import degrees2kilometers, locations2degrees
+from obspy.core.util import gps2DistAzimuth, locations2degrees
 import tornado.web
 
 from .. import ForceSource, FiniteSource
@@ -173,6 +173,8 @@ def _validate_and_write_waveforms(st, callback, starttime, endtime, scale,
                 # Force source has no magnitude.
                 if not isinstance(source, ForceSource):
                     tr.stats.sac.mag = source.moment_magnitude
+                src_lat = source.hypocenter_latitude
+                src_lng = source.hypocenter_longitude
             else:
                 tr.stats.sac.evla = geocentric_to_elliptic_latitude(
                     source.latitude)
@@ -181,17 +183,33 @@ def _validate_and_write_waveforms(st, callback, starttime, endtime, scale,
                 # Force source has no magnitude.
                 if not isinstance(source, ForceSource):
                     tr.stats.sac.mag = source.moment_magnitude
+                src_lat = source.latitude
+                src_lng = source.longitude
             # Thats what SPECFEM uses for a moment magnitude....
             tr.stats.sac.imagtyp = 55
             # The event origin time relative to the reference which I'll
             # just assume to be the starttime here?
             tr.stats.sac.o = source.origin_time - starttime
 
-            tr.stats.sac.dist = degrees2kilometers(locations2degrees(
+            # Sac coordinates are elliptical thus it only makes sense to
+            # have elliptical distances.
+            dist_in_m, az, baz = gps2DistAzimuth(
                 lat1=tr.stats.sac.evla,
-                long1=tr.stats.sac.evlo,
+                lon1=tr.stats.sac.evlo,
                 lat2=tr.stats.sac.stla,
-                long2=tr.stats.sac.stlo), radius=db.info.max_radius / 1000.0)
+                lon2=tr.stats.sac.stlo)
+
+            tr.stats.sac.dist = dist_in_m / 1000.0
+            tr.stats.sac.az = az
+            tr.stats.sac.baz = baz
+
+            # XXX: Is this correct? Maybe better use some function in
+            # geographiclib?
+            tr.stats.sac.gcarc = locations2degrees(
+                lat1=src_lat,
+                long1=src_lng,
+                lat2=receiver.latitude,
+                long2=receiver.longitude)
 
             # Some provenance.
             tr.stats.sac.kuser0 = "InstSeis"

@@ -4487,8 +4487,11 @@ def test_sac_headers(all_clients):
         # Assume the reference time is the starttime.
         assert abs(tr.stats.sac.o - 1.5) < 1E-6
 
-        # Distance
-        assert (tr.stats.sac.dist - 4183.4302) < 1E-6
+        # Distances, az and baz
+        assert (tr.stats.sac.dist - 4183.4302) < 1E-5
+        assert (tr.stats.sac.az - 53.691647) < 1E-5
+        assert (tr.stats.sac.baz - 240.38969) < 1E-5
+        assert (tr.stats.sac.gcarc - 37.560081) < 1E-5
 
         # Test the "provenance".
         assert tr.stats.sac.kuser0 == "InstSeis"
