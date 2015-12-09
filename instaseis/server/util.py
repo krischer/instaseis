@@ -191,7 +191,7 @@ def _validate_and_write_waveforms(st, callback, starttime, endtime, scale,
                 lat1=tr.stats.sac.evla,
                 long1=tr.stats.sac.evlo,
                 lat2=tr.stats.sac.stla,
-                long2=tr.stats.sac.stlo))
+                long2=tr.stats.sac.stlo), radius=db.info.max_radius / 1000.0)
 
             # Some provenance.
             tr.stats.sac.kuser0 = "InstSeis"
