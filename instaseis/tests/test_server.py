@@ -4498,7 +4498,7 @@ def test_sac_headers(all_clients):
         assert tr.stats.sac.kuser1 == "prem_iso"
         # Two test databases.
         assert tr.stats.sac.kt7 in ("A60945ec", "A0400524")
-        assert tr.stats.sac.kt8 == "I" + instaseis.__version__[:7]
+        assert tr.stats.sac.kt8.strip() == "I" + instaseis.__version__[:7]
         assert tr.stats.sac.user0 == 0.5
 
 
