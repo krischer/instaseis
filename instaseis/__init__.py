@@ -81,7 +81,7 @@ def open_db(path, *args, **kwargs):
         search the child directories for the  necessary files and open them.
     """
     if path.startswith("syngine://"):
-        model = path.lstrip("syngine://")
+        model = re.sub("syngine://", "", path).strip()
         from . import syngine_instaseis_db
         return syngine_instaseis_db.SyngineInstaseisDB(model=model, *args,
                                                        **kwargs)
