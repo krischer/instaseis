@@ -44,7 +44,8 @@ class TravelTimeHandler(InstaseisRequestHandler):
                     self.get_argument("receiverlongitude")),
                 receiverdepthinmeters=float(
                     self.get_argument("receiverdepthinmeters")),
-                phase_name=self.get_argument("phase"))
+                phase_name=self.get_argument("phase"),
+                db_info=self.application.db.info)
         except ValueError as e:
             err_msg = str(e)
             if err_msg.lower().startswith("invalid phase name"):

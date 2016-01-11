@@ -300,7 +300,8 @@ class InstaseisTimeSeriesHandler(with_metaclass(ABCMeta,
                 receiverlatitude=receiver.latitude,
                 receiverlongitude=receiver.longitude,
                 receiverdepthinmeters=receiver.depth_in_m,
-                phase_name=phase)
+                phase_name=phase,
+                db_info=self.application.db.info)
         except ValueError as e:
             err_msg = str(e)
             if err_msg.lower().startswith("invalid phase name"):
