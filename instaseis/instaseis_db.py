@@ -57,6 +57,7 @@ class InstaseisDB(BaseInstaseisDB):
             useful e.g. for finite sources, default).
         :type read_on_demand: bool, optional
         """
+
         self.db_path = db_path
         self.buffer_size_in_mb = buffer_size_in_mb
         self.read_on_demand = read_on_demand
@@ -223,7 +224,7 @@ class InstaseisDB(BaseInstaseisDB):
             [rotmesh_s, rotmesh_z], k=k_map[self.info.dump_type])
 
         # Find the element containing the point of interest.
-        mesh = self.parsed_mesh.f.groups["Mesh"]
+        mesh = self.parsed_mesh.f["Mesh"]
         if self.info.dump_type == 'displ_only':
             for idx in nextpoints[1]:
                 corner_points = np.empty((4, 2), dtype="float64")
@@ -236,7 +237,7 @@ class InstaseisDB(BaseInstaseisDB):
                     corner_points[:, 1] = \
                         self.parsed_mesh.mesh_Z[corner_point_ids]
                 else:
-                    corner_point_ids = mesh.variables["fem_mesh"][idx][:4]
+                    corner_point_ids = mesh["fem_mesh"][idx][:4]
 
                     # When reading from a netcdf file, the indices must be
                     # sorted for newer netcdf versions. The double argsort()
@@ -245,11 +246,11 @@ class InstaseisDB(BaseInstaseisDB):
                     order = corner_point_ids.argsort().argsort()
                     corner_point_ids.sort()
 
-                    eltype = mesh.variables["eltype"][idx]
+                    eltype = mesh["eltype"][idx]
                     corner_points[:, 0] = \
-                        mesh.variables["mesh_S"][corner_point_ids][order]
+                        mesh["mesh_S"][corner_point_ids][order]
                     corner_points[:, 1] = \
-                        mesh.variables["mesh_Z"][corner_point_ids][order]
+                        mesh["mesh_Z"][corner_point_ids][order]
 
                 isin, xi, eta = finite_elem_mapping.inside_element(
                     rotmesh_s, rotmesh_z, corner_points, eltype,
@@ -264,8 +265,8 @@ class InstaseisDB(BaseInstaseisDB):
                 gll_point_ids = self.parsed_mesh.sem_mesh[id_elem]
                 axis = bool(self.parsed_mesh.axis[id_elem])
             else:
-                gll_point_ids = mesh.variables["sem_mesh"][id_elem]
-                axis = bool(mesh.variables["axis"][id_elem])
+                gll_point_ids = mesh["sem_mesh"][id_elem]
+                axis = bool(mesh["axis"][id_elem])
 
             if axis:
                 col_points_xi = self.parsed_mesh.glj_points
@@ -283,7 +284,7 @@ class InstaseisDB(BaseInstaseisDB):
         if not self.read_on_demand:
             mesh_mu = self.parsed_mesh.mesh_mu
         else:
-            mesh_mu = mesh.variables["mesh_mu"]
+            mesh_mu = mesh["mesh_mu"]
         if self.info.dump_type == "displ_only":
             npol = self.info.spatial_order
             mu = mesh_mu[gll_point_ids[npol // 2, npol // 2]]
@@ -530,7 +531,7 @@ class InstaseisDB(BaseInstaseisDB):
             utemp = np.zeros((mesh.ndumps, mesh.npol + 1, mesh.npol + 1, 3),
                              dtype=np.float64, order="F")
 
-            mesh_dict = mesh.f.groups["Snapshots"].variables
+            mesh_dict = mesh.f["Snapshots"]
 
             # Load displacement from all GLL points.
             for i, var in enumerate(["disp_s", "disp_p", "disp_z"]):
@@ -579,7 +580,7 @@ class InstaseisDB(BaseInstaseisDB):
         if id_elem not in mesh.strain_buffer:
             strain_temp = np.zeros((self.info.npts, 6), order="F")
 
-            mesh_dict = mesh.f.groups["Snapshots"].variables
+            mesh_dict = mesh.f["Snapshots"]
 
             for i, var in enumerate([
                     'strain_dsus', 'strain_dsuz', 'strain_dpup',
@@ -610,7 +611,7 @@ class InstaseisDB(BaseInstaseisDB):
             utemp = np.zeros((mesh.ndumps, mesh.npol + 1, mesh.npol + 1, 3),
                              dtype=np.float64, order="F")
 
-            mesh_dict = mesh.f.groups["Snapshots"].variables
+            mesh_dict = mesh.f["Snapshots"]
 
             # Load displacement from all GLL points.
             for i, var in enumerate(["disp_s", "disp_p", "disp_z"]):
