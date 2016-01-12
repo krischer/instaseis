@@ -3,6 +3,17 @@
 """
 Mesh object also taking care of opening and closing the netCDF files.
 
+Please note that this module actually uses h5py instead of the Python
+netcdf4 library to read the files. This enables us to skip one layer of
+software. E.g.
+
+* HDF5 -> C netCDF -> Python netcdf
+
+instead of
+
+* HDF5 -> h5py
+
+
 :copyright:
     Lion Krischer (krischer@geophysik.uni-muenchen.de), 2014
     Martin van Driel (Martin@vanDriel.de), 2014
