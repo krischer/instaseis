@@ -109,12 +109,18 @@ class Mesh(object):
         self.f = h5py.File(filename, "r")
         self.filename = filename
         self.read_on_demand = read_on_demand
-        self._create_memmaps()
+        self._create_mesh_dict()
         self._parse(full_parse=full_parse)
         self.strain_buffer = Buffer(strain_buffer_size_in_mb)
         self.displ_buffer = Buffer(displ_buffer_size_in_mb)
 
-    def _create_memmaps(self):
+    def _create_mesh_dict(self):
+        """
+        Creates a dictionary of the required data.
+
+        Either creates memory maps if possible with the data or just points
+        towards the HDF5 groups.
+        """
         mesh_dict = {}
 
         for key, value in self.f["Snapshots"].items():
