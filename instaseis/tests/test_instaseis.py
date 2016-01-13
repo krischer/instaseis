@@ -35,7 +35,8 @@ DATA = os.path.join(os.path.dirname(os.path.abspath(
     inspect.getfile(inspect.currentframe()))), "data")
 
 DBS = [os.path.join(DATA, "100s_db_fwd"),
-       os.path.join(DATA, "100s_db_bwd_displ_only")]
+       os.path.join(DATA, "100s_db_bwd_displ_only"),
+       os.path.join(DATA, "100s_db_bwd_displ_only_uncompressed")]
 
 
 def test_fwd_vs_bwd():
