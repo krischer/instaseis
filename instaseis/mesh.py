@@ -109,9 +109,25 @@ class Mesh(object):
         self.f = h5py.File(filename, "r")
         self.filename = filename
         self.read_on_demand = read_on_demand
+        self._create_memmaps()
         self._parse(full_parse=full_parse)
         self.strain_buffer = Buffer(strain_buffer_size_in_mb)
         self.displ_buffer = Buffer(displ_buffer_size_in_mb)
+
+    def _create_memmaps(self):
+        mesh_dict = {}
+
+        for key, value in self.f["Snapshots"].items():
+            offset = value.id.get_offset()
+            if value.chunks is None and value.compression is None and \
+                    offset is not None:
+                mesh_dict[key] = \
+                    np.memmap(self.filename, mode='r', shape=value.shape,
+                              offset=offset, dtype=value.dtype, order="C")
+            else:
+                mesh_dict[key] = value
+
+        self.mesh_dict = mesh_dict
 
     def _parse(self, full_parse=False):
         # Cheap sanity check. No need to parse the rest.

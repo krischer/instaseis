@@ -531,11 +531,9 @@ class InstaseisDB(BaseInstaseisDB):
             utemp = np.zeros((mesh.ndumps, mesh.npol + 1, mesh.npol + 1, 3),
                              dtype=np.float64, order="F")
 
-            mesh_dict = mesh.f["Snapshots"]
-
             # Load displacement from all GLL points.
             for i, var in enumerate(["disp_s", "disp_p", "disp_z"]):
-                if var not in mesh_dict:
+                if var not in mesh.mesh_dict:
                     continue
 
                 # The netCDF Python wrappers starting with version 1.1.6
@@ -544,7 +542,7 @@ class InstaseisDB(BaseInstaseisDB):
                 # The list of ids we have is unique but not sorted.
                 ids = gll_point_ids.flatten()
                 s_ids = np.sort(ids)
-                temp = mesh_dict[var][:, s_ids]
+                temp = mesh.mesh_dict[var][:, s_ids]
                 for ipol in range(mesh.npol + 1):
                     for jpol in range(mesh.npol + 1):
                         idx = ipol * 5 + jpol
@@ -580,14 +578,12 @@ class InstaseisDB(BaseInstaseisDB):
         if id_elem not in mesh.strain_buffer:
             strain_temp = np.zeros((self.info.npts, 6), order="F")
 
-            mesh_dict = mesh.f["Snapshots"]
-
             for i, var in enumerate([
                     'strain_dsus', 'strain_dsuz', 'strain_dpup',
                     'strain_dsup', 'strain_dzup', 'straintrace']):
-                if var not in mesh_dict:
+                if var not in mesh.mesh_dict:
                     continue
-                strain_temp[:, i] = mesh_dict[var][:, id_elem]
+                strain_temp[:, i] = mesh.mesh_dict[var][:, id_elem]
 
             # transform strain to voigt mapping
             # dsus, dpup, dzuz, dzup, dsuz, dsup
@@ -611,11 +607,9 @@ class InstaseisDB(BaseInstaseisDB):
             utemp = np.zeros((mesh.ndumps, mesh.npol + 1, mesh.npol + 1, 3),
                              dtype=np.float64, order="F")
 
-            mesh_dict = mesh.f["Snapshots"]
-
             # Load displacement from all GLL points.
             for i, var in enumerate(["disp_s", "disp_p", "disp_z"]):
-                if var not in mesh_dict:
+                if var not in mesh.mesh_dict:
                     continue
                 # The netCDF Python wrappers starting with version 1.1.6
                 # disallow duplicate and unordered indices while slicing. So
@@ -623,7 +617,7 @@ class InstaseisDB(BaseInstaseisDB):
                 # The list of ids we have is unique but not sorted.
                 ids = gll_point_ids.flatten()
                 s_ids = np.sort(ids)
-                temp = mesh_dict[var][:, s_ids]
+                temp = mesh.mesh_dict[var][:, s_ids]
                 for ipol in range(mesh.npol + 1):
                     for jpol in range(mesh.npol + 1):
                         idx = ipol * 5 + jpol
