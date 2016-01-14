@@ -22,6 +22,7 @@ import os
 from . import InstaseisError, InstaseisNotFoundError
 from .base_instaseis_db import BaseInstaseisDB
 from . import finite_elem_mapping
+from . import helpers
 from . import mesh
 from . import rotations
 from . import sem_derivatives
@@ -536,18 +537,61 @@ class InstaseisDB(BaseInstaseisDB):
                 if var not in mesh.mesh_dict:
                     continue
 
-                # The netCDF Python wrappers starting with version 1.1.6
-                # disallow duplicate and unordered indices while slicing. So
-                # we need to do it manually.
-                # The list of ids we have is unique but not sorted.
-                ids = gll_point_ids.flatten()
-                s_ids = np.sort(ids)
-                temp = mesh.mesh_dict[var][:, s_ids]
-                for ipol in range(mesh.npol + 1):
-                    for jpol in range(mesh.npol + 1):
-                        idx = ipol * 5 + jpol
-                        utemp[:, jpol, ipol, i] = \
-                            temp[:, np.argwhere(s_ids == ids[idx])[0][0]]
+                # Two cases - this might seem like over-optimization but
+                # actually makes a big difference.
+                #
+                # The memory mapped approach does not benefit from I/O
+                # chunking. Might be due to internal optimization - it
+                # actually gets slower with it as it results in more array
+                # access operations.
+                #
+                # The normal h5py way benefits quite drastically from I/O
+                # chunking.
+                if isinstance(mesh.mesh_dict[var], np.memmap):
+                    # Simplest case is the fastest - maybe due to internal
+                    # optimizations?
+                    ids = gll_point_ids.flatten()
+                    _temp = np.array(mesh.mesh_dict[var][ids, :])
+
+                    for ipol in range(mesh.npol + 1):
+                        for jpol in range(mesh.npol + 1):
+                            idx = ipol * 5 + jpol
+                            utemp[:, jpol, ipol, i] = _temp[idx, :]
+                else:
+                    # The list of ids we have is unique but not sorted.
+                    ids = gll_point_ids.flatten()
+                    s_ids = np.sort(ids)
+
+                    # Request successive indices in one go.
+                    chunks = helpers.io_chunker(s_ids)
+                    _temp = []
+                    for _c in chunks:
+                        if isinstance(_c, list):
+                            _temp.append(mesh.mesh_dict[var][:, _c[0]:_c[1]])
+                        else:
+                            _temp.append(mesh.mesh_dict[var][:, _c])
+
+                    _t = np.empty((_temp[0].shape[0], 25),
+                                  dtype=_temp[0].dtype)
+
+                    k = 0
+                    for _i in _temp:
+                        if len(_i.shape) == 1:
+                            _t[:, k] = _i
+                            k += 1
+                        else:
+                            for _j in range(_i.shape[1]):
+                                _t[:, k + _j] = _i[:, _j]
+
+                            k += _j + 1
+
+                    _temp = _t
+
+                    for ipol in range(mesh.npol + 1):
+                        for jpol in range(mesh.npol + 1):
+                            idx = ipol * 5 + jpol
+                            utemp[:, jpol, ipol, i] = \
+                                _temp[:, np.argwhere(s_ids == ids[idx])[0][0]]
 
             strain_fct_map = {
                 "monopole": sem_derivatives.strain_monopole_td,
