@@ -109,10 +109,10 @@ class Mesh(object):
         self.f = h5py.File(filename, "r")
         self.filename = filename
         self.read_on_demand = read_on_demand
-        self._create_mesh_dict()
         self._parse(full_parse=full_parse)
         self.strain_buffer = Buffer(strain_buffer_size_in_mb)
         self.displ_buffer = Buffer(displ_buffer_size_in_mb)
+        self._create_mesh_dict()
 
     def _create_mesh_dict(self):
         """
@@ -123,14 +123,35 @@ class Mesh(object):
         """
         mesh_dict = {}
 
+        def get_time_axis(ds):
+            """Helper function to determine the time axis of the mesh."""
+            if ds.shape[0] == ds.shape[1]:
+                raise NotImplementedError("Both dimensions in the dataset "
+                                          "are identical. This is currently "
+                                          "not supported.")
+            elif ds.shape[0] == self.ndumps:
+                return 0
+            elif ds.shape[1] == self.ndumps:
+                return 1
+            else:
+                raise ValueError("Could not determine the time axis in the "
+                                 "2D array. It has an incompatible shape.")
+
         for key, value in self.f["Snapshots"].items():
             offset = value.id.get_offset()
+            time_axis = get_time_axis(value)
             if value.chunks is None and value.compression is None and \
                     offset is not None:
                 mesh_dict[key] = \
                     np.memmap(self.filename, mode='r', shape=value.shape,
                               offset=offset, dtype=value.dtype, order="C")
+                mesh_dict[key].time_axis = time_axis
             else:
+                if time_axis != 0:
+                    raise NotImplementedError(
+                        "The current implementation requires chunked "
+                        "netCDF files to have the time as the first axis and "
+                        "the gll points as the second.")
                 mesh_dict[key] = value
 
         self.mesh_dict = mesh_dict

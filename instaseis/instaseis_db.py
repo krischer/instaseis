@@ -547,16 +547,26 @@ class InstaseisDB(BaseInstaseisDB):
                 #
                 # The normal h5py way benefits quite drastically from I/O
                 # chunking.
-                if isinstance(mesh.mesh_dict[var], np.memmap):
+                m = mesh.mesh_dict[var]
+                if isinstance(m, np.memmap):
                     # Simplest case is the fastest - maybe due to internal
                     # optimizations?
                     ids = gll_point_ids.flatten()
-                    _temp = np.array(mesh.mesh_dict[var][ids, :])
 
-                    for ipol in range(mesh.npol + 1):
-                        for jpol in range(mesh.npol + 1):
-                            idx = ipol * 5 + jpol
-                            utemp[:, jpol, ipol, i] = _temp[idx, :]
+                    if m.time_axis == 0:
+                        _temp = np.array(m[:, ids])
+                        for ipol in range(mesh.npol + 1):
+                            for jpol in range(mesh.npol + 1):
+                                idx = ipol * 5 + jpol
+                                utemp[:, jpol, ipol, i] = _temp[:, idx]
+                    elif m.time_axis == 1:
+                        _temp = np.array(m[ids, :])
+                        for ipol in range(mesh.npol + 1):
+                            for jpol in range(mesh.npol + 1):
+                                idx = ipol * 5 + jpol
+                                utemp[:, jpol, ipol, i] = _temp[idx, :]
+                    else:
+                        raise NotImplementedError
                 else:
                     # The list of ids we have is unique but not sorted.
                     ids = gll_point_ids.flatten()
@@ -567,9 +577,9 @@ class InstaseisDB(BaseInstaseisDB):
                     _temp = []
                     for _c in chunks:
                         if isinstance(_c, list):
-                            _temp.append(mesh.mesh_dict[var][:, _c[0]:_c[1]])
+                            _temp.append(m[:, _c[0]:_c[1]])
                         else:
-                            _temp.append(mesh.mesh_dict[var][:, _c])
+                            _temp.append(m[:, _c])
 
                     _t = np.empty((_temp[0].shape[0], 25),
                                   dtype=_temp[0].dtype)
