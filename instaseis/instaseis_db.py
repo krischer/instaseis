@@ -545,7 +545,7 @@ class InstaseisDB(BaseInstaseisDB):
                 # actually gets slower with it as it results in more array
                 # access operations.
                 #
-                # The normal h5py way benefits quite drastically from I/O
+                # The normal h5py way benefits quite a lot from I/O
                 # chunking.
                 m = mesh.mesh_dict[var]
                 if isinstance(m, np.memmap):
