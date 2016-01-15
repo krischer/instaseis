@@ -121,6 +121,20 @@ class Mesh(object):
         Either creates memory maps if possible with the data or just points
         towards the HDF5 groups.
         """
+        if "unrolled_snapshots" in self.f:
+            ds = self.f["unrolled_snapshots"]
+            offset = ds.id.get_offset()
+            if ds.chunks is None and ds.compression is None and \
+                    offset is not None:
+                self.mesh_dict = {}
+                self.mesh_dict["unrolled_snapshots"] = \
+                    np.memmap(self.filename, mode='r', shape=ds.shape,
+                              offset=offset, dtype=ds.dtype, order="C")
+            else:
+                raise NotImplementedError("Unrolled snapshots must not be "
+                                          "chunked in the netCDF file.")
+            return
+
         mesh_dict = {}
 
         def get_time_axis(ds):

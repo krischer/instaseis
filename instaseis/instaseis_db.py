@@ -526,82 +526,98 @@ class InstaseisDB(BaseInstaseisDB):
                             col_points_xi, col_points_eta, corner_points,
                             eltype, axis, xi, eta):
         if id_elem not in mesh.strain_buffer:
+
             # Single precision in the NetCDF files but the later interpolation
             # routines require double precision. Assignment to this array will
             # force a cast.
             utemp = np.zeros((mesh.ndumps, mesh.npol + 1, mesh.npol + 1, 3),
                              dtype=np.float64, order="F")
 
-            # Load displacement from all GLL points.
-            for i, var in enumerate(["disp_s", "disp_p", "disp_z"]):
-                if var not in mesh.mesh_dict:
-                    continue
-
-                # Two cases - this might seem like over-optimization but
-                # actually makes a big difference.
-                #
-                # The memory mapped approach does not benefit from I/O
-                # chunking. Might be due to internal optimization - it
-                # actually gets slower with it as it results in more array
-                # access operations.
-                #
-                # The normal h5py way benefits quite a lot from I/O
-                # chunking.
-                m = mesh.mesh_dict[var]
-                if isinstance(m, np.memmap):
-                    # Simplest case is the fastest - maybe due to internal
-                    # optimizations?
-                    ids = gll_point_ids.flatten()
-
-                    if m.time_axis == 0:
-                        _temp = np.array(m[:, ids])
-                        for ipol in range(mesh.npol + 1):
-                            for jpol in range(mesh.npol + 1):
-                                idx = ipol * 5 + jpol
-                                utemp[:, jpol, ipol, i] = _temp[:, idx]
-                    elif m.time_axis == 1:
-                        _temp = np.array(m[ids, :])
-                        for ipol in range(mesh.npol + 1):
-                            for jpol in range(mesh.npol + 1):
-                                idx = ipol * 5 + jpol
-                                utemp[:, jpol, ipol, i] = _temp[idx, :]
-                    else:
-                        raise NotImplementedError
+            if "unrolled_snapshots" in mesh.mesh_dict:
+                _t = mesh.mesh_dict["unrolled_snapshots"][id_elem]
+                # Potentially have to unpack only two into a three array
+                # last dimension.
+                if _t.shape[-1] == 3:
+                    utemp[:] = _t
+                elif _t.shape[-1] == 2:
+                    utemp[:, :, :, 0] = _t[:, :, :, 0]
+                    utemp[:, :, :, 2] = _t[:, :, :, 1]
                 else:
-                    # The list of ids we have is unique but not sorted.
-                    ids = gll_point_ids.flatten()
-                    s_ids = np.sort(ids)
+                    # Should not happen.
+                    raise NotImplementedError
 
-                    # Request successive indices in one go.
-                    chunks = helpers.io_chunker(s_ids)
-                    _temp = []
-                    for _c in chunks:
-                        if isinstance(_c, list):
-                            _temp.append(m[:, _c[0]:_c[1]])
+            else:
+                # Load displacement from all GLL points.
+                for i, var in enumerate(["disp_s", "disp_p", "disp_z"]):
+                    if var not in mesh.mesh_dict:
+                        continue
+
+                    # Two cases - this might seem like over-optimization but
+                    # actually makes a big difference.
+                    #
+                    # The memory mapped approach does not benefit from I/O
+                    # chunking. Might be due to internal optimization - it
+                    # actually gets slower with it as it results in more array
+                    # access operations.
+                    #
+                    # The normal h5py way benefits quite a lot from I/O
+                    # chunking.
+                    m = mesh.mesh_dict[var]
+                    if isinstance(m, np.memmap):
+                        # Simplest case is the fastest - maybe due to internal
+                        # optimizations?
+                        ids = gll_point_ids.flatten()
+
+                        if m.time_axis == 0:
+                            _temp = np.array(m[:, ids])
+                            for ipol in range(mesh.npol + 1):
+                                for jpol in range(mesh.npol + 1):
+                                    idx = ipol * 5 + jpol
+                                    utemp[:, jpol, ipol, i] = _temp[:, idx]
+                        elif m.time_axis == 1:
+                            _temp = np.array(m[ids, :])
+                            for ipol in range(mesh.npol + 1):
+                                for jpol in range(mesh.npol + 1):
+                                    idx = ipol * 5 + jpol
+                                    utemp[:, jpol, ipol, i] = _temp[idx, :]
                         else:
-                            _temp.append(m[:, _c])
+                            raise NotImplementedError
+                    else:
+                        # The list of ids we have is unique but not sorted.
+                        ids = gll_point_ids.flatten()
+                        s_ids = np.sort(ids)
 
-                    _t = np.empty((_temp[0].shape[0], 25),
-                                  dtype=_temp[0].dtype)
+                        # Request successive indices in one go.
+                        chunks = helpers.io_chunker(s_ids)
+                        _temp = []
+                        for _c in chunks:
+                            if isinstance(_c, list):
+                                _temp.append(m[:, _c[0]:_c[1]])
+                            else:
+                                _temp.append(m[:, _c])
 
-                    k = 0
-                    for _i in _temp:
-                        if len(_i.shape) == 1:
-                            _t[:, k] = _i
-                            k += 1
-                        else:
-                            for _j in range(_i.shape[1]):
-                                _t[:, k + _j] = _i[:, _j]
+                        _t = np.empty((_temp[0].shape[0], 25),
+                                      dtype=_temp[0].dtype)
 
-                            k += _j + 1
+                        k = 0
+                        for _i in _temp:
+                            if len(_i.shape) == 1:
+                                _t[:, k] = _i
+                                k += 1
+                            else:
+                                for _j in range(_i.shape[1]):
+                                    _t[:, k + _j] = _i[:, _j]
 
-                    _temp = _t
+                                k += _j + 1
 
-                    for ipol in range(mesh.npol + 1):
-                        for jpol in range(mesh.npol + 1):
-                            idx = ipol * 5 + jpol
-                            utemp[:, jpol, ipol, i] = \
-                                _temp[:, np.argwhere(s_ids == ids[idx])[0][0]]
+                        _temp = _t
+
+                        for ipol in range(mesh.npol + 1):
+                            for jpol in range(mesh.npol + 1):
+                                idx = ipol * 5 + jpol
+                                utemp[:, jpol, ipol, i] = \
+                                    _temp[:, np.argwhere(
+                                        s_ids == ids[idx])[0][0]]
 
             strain_fct_map = {
                 "monopole": sem_derivatives.strain_monopole_td,
