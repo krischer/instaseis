@@ -134,6 +134,19 @@ class Mesh(object):
                 raise NotImplementedError("Unrolled snapshots must not be "
                                           "chunked in the netCDF file.")
             return
+        elif "merged_snapshots" in self.f:
+            ds = self.f["merged_snapshots"]
+            offset = ds.id.get_offset()
+            if ds.chunks is None and ds.compression is None and \
+                            offset is not None:
+                self.mesh_dict = {}
+                self.mesh_dict["merged_snapshots"] = \
+                    np.memmap(self.filename, mode='r', shape=ds.shape,
+                              offset=offset, dtype=ds.dtype, order="C")
+            else:
+                raise NotImplementedError("Merged snapshots must not be "
+                                          "chunked in the netCDF file.")
+            return
 
         mesh_dict = {}
 

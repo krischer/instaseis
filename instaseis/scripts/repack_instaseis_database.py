@@ -200,7 +200,7 @@ def unroll_and_merge(filenames, output_folder):
         dtype = meshes[0].dtype
 
         ds_o = f_out.create_dataset(
-            "unrolled_snapshots",
+            "merged_snapshots",
             shape=(number_of_elements, npts, npol + 1, npol + 1, 5),
             dtype=dtype, chunks=None, compression=None)
 
