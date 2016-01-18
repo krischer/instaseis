@@ -592,6 +592,9 @@ class InstaseisDB(BaseInstaseisDB):
                 strain_x = mesh.strain_buffer.get(buffer_id_x)
                 strain_z = mesh.strain_buffer.get(buffer_id_z)
 
+            strain_x = np.require(strain_x, requirements="F")
+            strain_z = np.require(strain_z, requirements="F")
+
             final_strain_x = np.empty((strain_x.shape[0], 6), order="F")
             final_strain_z = np.empty((strain_z.shape[0], 6), order="F")
 

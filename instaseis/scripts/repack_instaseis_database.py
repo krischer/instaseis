@@ -151,7 +151,7 @@ def unroll_and_merge(filenames, output_folder):
     assert len(filenames) == 2
     filenames = [os.path.normpath(_i) for _i in filenames]
     px = [_i for _i in filenames if "PX" in _i]
-    pz = [_i for _i in filenames if "PX" in _i]
+    pz = [_i for _i in filenames if "PZ" in _i]
     assert len(px) == 1
     assert len(pz) == 1
     px = px[0]
@@ -170,25 +170,25 @@ def unroll_and_merge(filenames, output_folder):
         f_out = h5py.File(output_filename, libver="latest")
 
         # Copy attributes from the vertical file.
-        for key, value in f_in_z.attrs.items():
+        for key, value in f_in_x.attrs.items():
             f_out.attrs[key] = value
 
         # Same from simple groups.
-        for group in f_in_z.keys():
+        for group in f_in_x.keys():
             # Special cased later on.
             if group == "Snapshots":
                 continue
             click.echo(click.style("\tCopying group '%s'..." % group,
                                    fg="blue"))
-            f_out.copy(f_in_z[group], group)
+            f_out.copy(f_in_x[group], group)
 
         # Create a new array but this time in 5D. The first dimension
         # is the element number, the second and third are the GLL
         # points in both directions, the fourth is the time axis, and the
         # last the displacement axis.
-        npts = f_in_z.attrs["number of strain dumps"][0]
-        number_of_elements = f_in_z.attrs["nelem_kwf_global"][0]
-        npol = f_in_z.attrs["npol"][0]
+        npts = f_in_x.attrs["number of strain dumps"][0]
+        number_of_elements = f_in_x.attrs["nelem_kwf_global"][0]
+        npol = f_in_x.attrs["npol"][0]
 
         # Get datasets and the dtype.
         meshes = [
