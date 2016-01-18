@@ -127,9 +127,12 @@ class Mesh(object):
             if ds.chunks is None and ds.compression is None and \
                     offset is not None:
                 self.mesh_dict = {}
-                self.mesh_dict["unrolled_snapshots"] = \
-                    np.memmap(self.filename, mode='r', shape=ds.shape,
-                              offset=offset, dtype=ds.dtype, order="C")
+                try:
+                    self.mesh_dict["unrolled_snapshots"] = \
+                        np.memmap(self.filename, mode='r', shape=ds.shape,
+                                  offset=offset, dtype=ds.dtype, order="C")
+                except:
+                    self.mesh_dict["unrolled_snapshots"] = ds
             else:
                 raise NotImplementedError("Unrolled snapshots must not be "
                                           "chunked in the netCDF file.")
@@ -140,9 +143,12 @@ class Mesh(object):
             if ds.chunks is None and ds.compression is None and \
                             offset is not None:
                 self.mesh_dict = {}
-                self.mesh_dict["merged_snapshots"] = \
-                    np.memmap(self.filename, mode='r', shape=ds.shape,
-                              offset=offset, dtype=ds.dtype, order="C")
+                try:
+                    self.mesh_dict["merged_snapshots"] = \
+                        np.memmap(self.filename, mode='r', shape=ds.shape,
+                                  offset=offset, dtype=ds.dtype, order="C")
+                except:
+                    self.mesh_dict["merged_snapshots"] = ds
             else:
                 raise NotImplementedError("Merged snapshots must not be "
                                           "chunked in the netCDF file.")
@@ -169,10 +175,12 @@ class Mesh(object):
             time_axis = get_time_axis(value)
             if value.chunks is None and value.compression is None and \
                     offset is not None:
-                mesh_dict[key] = \
-                    np.memmap(self.filename, mode='r', shape=value.shape,
-                              offset=offset, dtype=value.dtype, order="C")
-                mesh_dict[key].time_axis = time_axis
+                try:
+                    mesh_dict[key] = \
+                        np.memmap(self.filename, mode='r', shape=value.shape,
+                                  offset=offset, dtype=value.dtype, order="C")
+                except:
+                    mesh_dict[key] = value
             else:
                 if time_axis != 0:
                     raise NotImplementedError(
@@ -180,6 +188,8 @@ class Mesh(object):
                         "netCDF files to have the time as the first axis and "
                         "the gll points as the second.")
                 mesh_dict[key] = value
+
+            mesh_dict[key].time_axis = time_axis
 
         self.mesh_dict = mesh_dict
 
