@@ -45,7 +45,7 @@ tau_model = TauPyModel(model="ak135")
 
 def get_travel_time(sourcelatitude, sourcelongitude, sourcedepthinmeters,
                     receiverlatitude, receiverlongitude,
-                    receiverdepthinmeters, phase_name):
+                    receiverdepthinmeters, phase_name, db_info):
     if receiverdepthinmeters:
         raise ValueError("This travel time implementation cannot calculate "
                          "buried receivers.")

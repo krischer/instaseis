@@ -168,7 +168,8 @@ and receiver coordinates as well as a phase name and is supposed to return the
 travel time from source to receiver for that particular phase in seconds. The
 coordinates can be assumed to be geocentric and the calculations should happen
 in a spherical planet. Make sure to perform the calculations in the same model
-that has been used to calculate the databases.
+that has been used to calculate the databases. Please note that this callback
+function also receives the ``info`` attribute dictionary of the database.
 
 **Affected routes:**
 
@@ -182,9 +183,10 @@ that has been used to calculate the databases.
 
     def get_travel_time(sourcelatitude, sourcelongitude, sourcedepthinmeters,
                         receiverlatitude, receiverlongitude,
-                        receiverdepthinmeters, phase_name):
+                        receiverdepthinmeters, phase_name, db_info):
         ...
         return ttime
+
 
 **Parameters:**
 
@@ -202,6 +204,9 @@ that has been used to calculate the databases.
 
 * ``phase_name``: [*str*], case-sensitive phase name
 
+* ``db_info``: The ``info`` attribute dictionary of the used database. Useful
+  to calculate travel times for different models depending on the database.
+
 
 **Return Values:**
 
@@ -213,13 +218,13 @@ that has been used to calculate the databases.
 
 .. code-block:: python
 
-    >>> get_travel_time(0.0, 50.0, 300000, 0.0, 0.0, 0.0, "P")
+    >>> get_travel_time(0.0, 50.0, 300000, 0.0, 0.0, 0.0, "P", {})
     504.357
 
-    >>> get_travel_time(0.0, 50.0, 300000, 0.0, 0.0, 0.0, "Pdiff")
+    >>> get_travel_time(0.0, 50.0, 300000, 0.0, 0.0, 0.0, "Pdiff", {})
     None
 
-    >>> get_travel_time(0.0, 50.0, 300000, 0.0, 0.0, 0.0, "bogus")
+    >>> get_travel_time(0.0, 50.0, 300000, 0.0, 0.0, 0.0, "bogus", {})
     ValueError: Invalid phase name.
 
 

@@ -198,7 +198,7 @@ def station_coordinates_mock_callback(networks, stations):
 
 def get_travel_time(sourcelatitude, sourcelongitude, sourcedepthinmeters,
                     receiverlatitude, receiverlongitude,
-                    receiverdepthinmeters, phase_name):
+                    receiverdepthinmeters, phase_name, db_info):
     """
     Fully working travel time callback implementation.
     """
