@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Advanced Server Configuration &mdash; instaseis 0.1.1-4-ge667 documentation</title>
+    <title>Advanced Server Configuration &mdash; instaseis 0.1.1-5-g544d documentation</title>
     
     <link rel="stylesheet" href="_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.1.1-4-ge667',
+        VERSION:     '0.1.1-5-g544d',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -31,7 +31,7 @@
     <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="_static/bootstrap-3.3.4/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.1.1-4-ge667 documentation" href="index.html" />
+    <link rel="top" title="instaseis 0.1.1-5-g544d documentation" href="index.html" />
     <link rel="prev" title="POST /finite_source" href="routes/finite_source.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.1.1-4-ge667</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.1.1-5-g544d</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -177,13 +177,13 @@ has the following keys: <code class="docutils literal"><span class="pre">&quot;n
 <li>Raise a <code class="docutils literal"><span class="pre">ValueError</span></code> for other cases.</li>
 </ul>
 <p><strong>Examples:</strong></p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">get_station_coordinates</span><span class="p">(</span><span class="n">networks</span><span class="o">=</span><span class="p">[</span><span class="s">&quot;IU&quot;</span><span class="p">],</span> <span class="n">stations</span><span class="p">[</span><span class="s">&quot;ANMO&quot;</span><span class="p">])</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">get_station_coordinates</span><span class="p">(</span><span class="n">networks</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;IU&quot;</span><span class="p">],</span> <span class="n">stations</span><span class="p">[</span><span class="s2">&quot;ANMO&quot;</span><span class="p">])</span>
 <span class="go">[{&quot;latitude&quot;: 34.94591,</span>
 <span class="go">   &quot;longitude&quot;: -106.4572,</span>
 <span class="go">   &quot;network&quot;: &quot;IU&quot;,</span>
 <span class="go">   &quot;station&quot;: &quot;ANMO&quot;}]</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">get_station_coordinates</span><span class="p">(</span><span class="n">networks</span><span class="o">=</span><span class="p">[</span><span class="s">&quot;IU&quot;</span><span class="p">,</span> <span class="s">&quot;B*&quot;</span><span class="p">],</span> <span class="n">stations</span><span class="p">[</span><span class="s">&quot;ANT*&quot;</span><span class="p">,</span> <span class="s">&quot;ANM?&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_station_coordinates</span><span class="p">(</span><span class="n">networks</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;IU&quot;</span><span class="p">,</span> <span class="s2">&quot;B*&quot;</span><span class="p">],</span> <span class="n">stations</span><span class="p">[</span><span class="s2">&quot;ANT*&quot;</span><span class="p">,</span> <span class="s2">&quot;ANM?&quot;</span><span class="p">])</span>
 <span class="go">[{&quot;latitude&quot;: 39.868,</span>
 <span class="go">  &quot;longitude&quot;: 32.7934,</span>
 <span class="go">  &quot;network&quot;: &quot;IU&quot;,</span>
@@ -194,7 +194,7 @@ has the following keys: <code class="docutils literal"><span class="pre">&quot;n
 <span class="go">  &quot;network&quot;: &quot;IU&quot;,</span>
 <span class="go">  &quot;station&quot;: &quot;ANMO&quot;}]</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">get_station_coordinates</span><span class="p">(</span><span class="n">networks</span><span class="o">=</span><span class="p">[</span><span class="s">&quot;AA&quot;</span><span class="p">,</span> <span class="s">&quot;BB&quot;</span><span class="p">],</span> <span class="n">stations</span><span class="p">[</span><span class="s">&quot;CC&quot;</span><span class="p">,</span> <span class="s">&quot;DD&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_station_coordinates</span><span class="p">(</span><span class="n">networks</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;AA&quot;</span><span class="p">,</span> <span class="s2">&quot;BB&quot;</span><span class="p">],</span> <span class="n">stations</span><span class="p">[</span><span class="s2">&quot;CC&quot;</span><span class="p">,</span> <span class="s2">&quot;DD&quot;</span><span class="p">])</span>
 <span class="go">[]</span>
 </pre></div>
 </div>
@@ -231,7 +231,7 @@ have to be in <em>Nm</em>.</li>
 <li>A <code class="docutils literal"><span class="pre">ValueError</span></code> will be always be interpreted as a not found event.</li>
 </ul>
 <p><strong>Examples:</strong></p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">get_event</span><span class="p">(</span><span class="s">&quot;B071791B&quot;</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">get_event</span><span class="p">(</span><span class="s2">&quot;B071791B&quot;</span><span class="p">)</span>
 <span class="go">{&quot;m_rr&quot;: -58000000000000000,</span>
 <span class="go"> &quot;m_tt&quot;: 78100000000000000,</span>
 <span class="go"> &quot;m_pp&quot;: -20100000000000000,</span>
@@ -243,7 +243,7 @@ have to be in <em>Nm</em>.</li>
 <span class="go"> &quot;depth_in_m&quot;: 0,</span>
 <span class="go"> &quot;origin_time&quot;: &quot;1991-07-17T16:41:33.100000Z&quot;}</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">get_event</span><span class="p">(</span><span class="s">&quot;random_things&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_event</span><span class="p">(</span><span class="s2">&quot;random_things&quot;</span><span class="p">)</span>
 <span class="go">ValueError: Event not found.</span>
 </pre></div>
 </div>
@@ -290,13 +290,13 @@ to calculate travel times for different models depending on the database.</li>
 <li>Raise a <code class="docutils literal"><span class="pre">ValueError</span></code> for other cases, e.g. unknown phase name, invalid source-receiver geometry, ...</li>
 </ul>
 <p><strong>Examples:</strong></p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">get_travel_time</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">50.0</span><span class="p">,</span> <span class="mi">300000</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s">&quot;P&quot;</span><span class="p">,</span> <span class="p">{})</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">get_travel_time</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">50.0</span><span class="p">,</span> <span class="mi">300000</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s2">&quot;P&quot;</span><span class="p">,</span> <span class="p">{})</span>
 <span class="go">504.357</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">get_travel_time</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">50.0</span><span class="p">,</span> <span class="mi">300000</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s">&quot;Pdiff&quot;</span><span class="p">,</span> <span class="p">{})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_travel_time</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">50.0</span><span class="p">,</span> <span class="mi">300000</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s2">&quot;Pdiff&quot;</span><span class="p">,</span> <span class="p">{})</span>
 <span class="go">None</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">get_travel_time</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">50.0</span><span class="p">,</span> <span class="mi">300000</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s">&quot;bogus&quot;</span><span class="p">,</span> <span class="p">{})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_travel_time</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">50.0</span><span class="p">,</span> <span class="mi">300000</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s2">&quot;bogus&quot;</span><span class="p">,</span> <span class="p">{})</span>
 <span class="go">ValueError: Invalid phase name.</span>
 </pre></div>
 </div>
@@ -314,30 +314,30 @@ similar command line interface to the default Instaseis server:</p>
 
 <span class="kn">from</span> <span class="nn">instaseis.server.app</span> <span class="kn">import</span> <span class="n">launch_io_loop</span>
 
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span>
-        <span class="n">prog</span><span class="o">=</span><span class="s">&quot;python -m instaseis.server&quot;</span><span class="p">,</span>
-        <span class="n">description</span><span class="o">=</span><span class="s">&#39;Launch an Instaseis server offering seismograms with a &#39;</span>
-                    <span class="s">&#39;REST API.&#39;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&#39;--port&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-                        <span class="n">help</span><span class="o">=</span><span class="s">&#39;Server port.&#39;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&#39;--buffer_size_in_mb&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
-                        <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">&#39;Size of the buffer in MB&#39;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&#39;--max_size_of_finite_sources&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
+        <span class="n">prog</span><span class="o">=</span><span class="s2">&quot;python -m instaseis.server&quot;</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Launch an Instaseis server offering seismograms with a &#39;</span>
+                    <span class="s1">&#39;REST API.&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--port&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Server port.&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--buffer_size_in_mb&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
+                        <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Size of the buffer in MB&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--max_size_of_finite_sources&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
                         <span class="n">default</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
-                        <span class="n">help</span><span class="o">=</span><span class="s">&#39;The maximum allowed number of point sources in &#39;</span>
-                             <span class="s">&#39;a single finite source for the /finite_source &#39;</span>
-                             <span class="s">&#39;route.&#39;</span><span class="p">)</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;The maximum allowed number of point sources in &#39;</span>
+                             <span class="s1">&#39;a single finite source for the /finite_source &#39;</span>
+                             <span class="s1">&#39;route.&#39;</span><span class="p">)</span>
 
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&#39;db_path&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
-                        <span class="n">help</span><span class="o">=</span><span class="s">&#39;Database path&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;db_path&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Database path&#39;</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s">&#39;--quiet&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s">&#39;store_true&#39;</span><span class="p">,</span>
-        <span class="n">help</span><span class="o">=</span><span class="s">&quot;Don&#39;t print any output. Overwrites the &#39;log_level` setting.&quot;</span><span class="p">)</span>
+        <span class="s1">&#39;--quiet&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Don&#39;t print any output. Overwrites the &#39;log_level` setting.&quot;</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s">&#39;--log-level&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s">&#39;INFO&#39;</span><span class="p">,</span>
-        <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;CRITICAL&#39;</span><span class="p">,</span> <span class="s">&#39;ERROR&#39;</span><span class="p">,</span> <span class="s">&#39;WARNING&#39;</span><span class="p">,</span> <span class="s">&#39;INFO&#39;</span><span class="p">,</span> <span class="s">&#39;DEBUG&#39;</span><span class="p">,</span> <span class="s">&#39;NOTSET&#39;</span><span class="p">],</span>
-        <span class="n">help</span><span class="o">=</span><span class="s">&#39;The log level for all Tornado loggers.&#39;</span><span class="p">)</span>
+        <span class="s1">&#39;--log-level&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;INFO&#39;</span><span class="p">,</span>
+        <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;CRITICAL&#39;</span><span class="p">,</span> <span class="s1">&#39;ERROR&#39;</span><span class="p">,</span> <span class="s1">&#39;WARNING&#39;</span><span class="p">,</span> <span class="s1">&#39;INFO&#39;</span><span class="p">,</span> <span class="s1">&#39;DEBUG&#39;</span><span class="p">,</span> <span class="s1">&#39;NOTSET&#39;</span><span class="p">],</span>
+        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;The log level for all Tornado loggers.&#39;</span><span class="p">)</span>
 
     <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
     <span class="n">db_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">db_path</span><span class="p">)</span>
@@ -368,7 +368,7 @@ similar command line interface to the default Instaseis server:</p>
     </p>
     <p>
         &copy; Copyright 2014-2015, Lion Krischer and Martin van Driel.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.<br/>
     </p>
   </div>
 </footer>

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>instaseis.base_instaseis_db &mdash; instaseis 0.1.1-4-ge667 documentation</title>
+    <title>instaseis.base_instaseis_db &mdash; instaseis 0.1.1-5-g544d documentation</title>
     
     <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.1.1-4-ge667',
+        VERSION:     '0.1.1-5-g544d',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -31,7 +31,7 @@
     <script type="text/javascript" src="../../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../../_static/bootstrap-3.3.4/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../../_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.1.1-4-ge667 documentation" href="../../index.html" />
+    <link rel="top" title="instaseis 0.1.1-5-g544d documentation" href="../../index.html" />
     <link rel="up" title="instaseis" href="../instaseis.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.1.1-4-ge667</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.1.1-5-g544d</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -107,8 +107,8 @@
     <div class="col-md-12 content">
       
   <h1>Source code for instaseis.base_instaseis_db</h1><div class="highlight"><pre>
-<span class="c">#!/usr/bin/env python</span>
-<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Abstract base class for all Instaseis database classes.</span>
 
@@ -140,21 +140,21 @@
 
 
 <span class="n">KIND_MAP</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s">&#39;displacement&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-    <span class="s">&#39;velocity&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-    <span class="s">&#39;acceleration&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}</span>
+    <span class="s1">&#39;displacement&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="s1">&#39;velocity&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s1">&#39;acceleration&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}</span>
 
 
 <span class="n">INV_KIND_MAP</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">((</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">KIND_MAP</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
 
 
 <span class="n">STF_MAP</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s">&#39;errorf&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-    <span class="s">&#39;quheavi&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-    <span class="s">&#39;dirac_0&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-    <span class="s">&#39;gauss_0&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-    <span class="s">&#39;gauss_1&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
-    <span class="s">&#39;gauss_2&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">}</span>
+    <span class="s1">&#39;errorf&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="s1">&#39;quheavi&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="s1">&#39;dirac_0&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s1">&#39;gauss_0&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s1">&#39;gauss_1&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="s1">&#39;gauss_2&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">}</span>
 
 
 <span class="k">def</span> <span class="nf">_diff_and_integrate</span><span class="p">(</span><span class="n">n_derivative</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">comp</span><span class="p">,</span> <span class="n">dt_out</span><span class="p">):</span>
@@ -162,7 +162,7 @@
         <span class="n">data</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">comp</span><span class="p">],</span> <span class="p">[</span><span class="n">dt_out</span><span class="p">])</span>
 
     <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="n">n_derivative</span><span class="p">):</span>
-        <span class="c"># adding a zero at the beginning to avoid phase shift</span>
+        <span class="c1"># adding a zero at the beginning to avoid phase shift</span>
         <span class="n">data</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">=</span> <span class="n">cumtrapz</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">comp</span><span class="p">],</span> <span class="n">dx</span><span class="o">=</span><span class="n">dt_out</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
 
 
@@ -172,8 +172,8 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 <div class="viewcode-block" id="BaseInstaseisDB.get_greens_function"><a class="viewcode-back" href="../../instaseis.html#instaseis.base_instaseis_db.BaseInstaseisDB.get_greens_function">[docs]</a>    <span class="k">def</span> <span class="nf">get_greens_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epicentral_distance_in_degree</span><span class="p">,</span>
                             <span class="n">source_depth_in_m</span><span class="p">,</span> <span class="n">origin_time</span><span class="o">=</span><span class="n">UTCDateTime</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
-                            <span class="n">kind</span><span class="o">=</span><span class="s">&#39;displacement&#39;</span><span class="p">,</span> <span class="n">return_obspy_stream</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-                            <span class="n">dt</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">kernelwidth</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">definition</span><span class="o">=</span><span class="s">&#39;seiscomp&#39;</span><span class="p">):</span>
+                            <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;displacement&#39;</span><span class="p">,</span> <span class="n">return_obspy_stream</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                            <span class="n">dt</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">kernelwidth</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">definition</span><span class="o">=</span><span class="s1">&#39;seiscomp&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Extract Green&#39;s function from the Green&#39;s function database.</span>
 
@@ -212,9 +212,9 @@
 <span class="sd">        :rtype: A :class:`obspy.core.stream.Stream` object or a dictionary</span>
 <span class="sd">            with NumPy arrays as values.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c"># Currently only the seiscomp definition is implemented. Other</span>
-        <span class="c"># implementations will require a refactoring of this method.</span>
-        <span class="k">if</span> <span class="n">definition</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">!=</span> <span class="s">&quot;seiscomp&quot;</span><span class="p">:</span>
+        <span class="c1"># Currently only the seiscomp definition is implemented. Other</span>
+        <span class="c1"># implementations will require a refactoring of this method.</span>
+        <span class="k">if</span> <span class="n">definition</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">&quot;seiscomp&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_get_greens_seiscomp_sanity_checks</span><span class="p">(</span><span class="n">epicentral_distance_in_degree</span><span class="p">,</span>
@@ -223,19 +223,19 @@
         <span class="n">src_latitude</span><span class="p">,</span> <span class="n">src_longitude</span> <span class="o">=</span> <span class="mf">90.</span><span class="p">,</span> <span class="mf">0.</span>
         <span class="n">rec_latitude</span><span class="p">,</span> <span class="n">rec_longitude</span> <span class="o">=</span> <span class="mf">90.</span> <span class="o">-</span> <span class="n">epicentral_distance_in_degree</span><span class="p">,</span> <span class="mf">0.</span>
 
-        <span class="c"># sources according to https://github.com/krischer/instaseis/issues/8</span>
-        <span class="c"># transformed to r, theta, phi</span>
-        <span class="c">#</span>
-        <span class="c"># Mtt =  Mxx, Mpp = Myy, Mrr =  Mzz</span>
-        <span class="c"># Mrp = -Myz, Mrt = Mxz, Mtp = -Mxy</span>
-        <span class="c">#</span>
-        <span class="c"># Mrr   Mtt   Mpp    Mrt    Mrp    Mtp</span>
-        <span class="c">#  0     0     0      0      0     -1.0    m1</span>
-        <span class="c">#  0     1.0  -1.0    0      0      0      m2</span>
-        <span class="c">#  0     0     0      0     -1.0    0      m3</span>
-        <span class="c">#  0     0     0      1.0    0      0      m4</span>
-        <span class="c">#  1.0   1.0   1.0    0      0      0      m6</span>
-        <span class="c">#  2.0  -1.0  -1.0    0      0      0      cl</span>
+        <span class="c1"># sources according to https://github.com/krischer/instaseis/issues/8</span>
+        <span class="c1"># transformed to r, theta, phi</span>
+        <span class="c1">#</span>
+        <span class="c1"># Mtt =  Mxx, Mpp = Myy, Mrr =  Mzz</span>
+        <span class="c1"># Mrp = -Myz, Mrt = Mxz, Mtp = -Mxy</span>
+        <span class="c1">#</span>
+        <span class="c1"># Mrr   Mtt   Mpp    Mrt    Mrp    Mtp</span>
+        <span class="c1">#  0     0     0      0      0     -1.0    m1</span>
+        <span class="c1">#  0     1.0  -1.0    0      0      0      m2</span>
+        <span class="c1">#  0     0     0      0     -1.0    0      m3</span>
+        <span class="c1">#  0     0     0      1.0    0      0      m4</span>
+        <span class="c1">#  1.0   1.0   1.0    0      0      0      m6</span>
+        <span class="c1">#  2.0  -1.0  -1.0    0      0      0      cl</span>
 
         <span class="n">m1</span> <span class="o">=</span> <span class="n">Source</span><span class="p">(</span><span class="n">src_latitude</span><span class="p">,</span> <span class="n">src_longitude</span><span class="p">,</span> <span class="n">source_depth_in_m</span><span class="p">,</span>
                     <span class="n">m_tp</span><span class="o">=-</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">origin_time</span><span class="o">=</span><span class="n">origin_time</span><span class="p">)</span>
@@ -252,43 +252,43 @@
 
         <span class="n">receiver</span> <span class="o">=</span> <span class="n">Receiver</span><span class="p">(</span><span class="n">rec_latitude</span><span class="p">,</span> <span class="n">rec_longitude</span><span class="p">)</span>
 
-        <span class="c"># same kwarguments for many callse</span>
-        <span class="n">args</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;receiver&#39;</span><span class="p">:</span> <span class="n">receiver</span><span class="p">,</span>
-                <span class="s">&#39;dt&#39;</span><span class="p">:</span> <span class="n">dt</span><span class="p">,</span>
-                <span class="s">&#39;kind&#39;</span><span class="p">:</span> <span class="n">kind</span><span class="p">,</span>
-                <span class="s">&#39;kernelwidth&#39;</span><span class="p">:</span> <span class="n">kernelwidth</span><span class="p">,</span>
-                <span class="s">&#39;return_obspy_stream&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">}</span>
+        <span class="c1"># same kwarguments for many callse</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;receiver&#39;</span><span class="p">:</span> <span class="n">receiver</span><span class="p">,</span>
+                <span class="s1">&#39;dt&#39;</span><span class="p">:</span> <span class="n">dt</span><span class="p">,</span>
+                <span class="s1">&#39;kind&#39;</span><span class="p">:</span> <span class="n">kind</span><span class="p">,</span>
+                <span class="s1">&#39;kernelwidth&#39;</span><span class="p">:</span> <span class="n">kernelwidth</span><span class="p">,</span>
+                <span class="s1">&#39;return_obspy_stream&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">}</span>
 
-        <span class="c"># Collect data arrays a dictionary.</span>
+        <span class="c1"># Collect data arrays a dictionary.</span>
         <span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="c"># on first call extract mu as well</span>
+        <span class="c1"># on first call extract mu as well</span>
         <span class="n">tmp_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_seismograms</span><span class="p">(</span>
-            <span class="n">source</span><span class="o">=</span><span class="n">m1</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="s">&#39;T&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">args</span><span class="p">)</span>
-        <span class="n">data</span><span class="p">[</span><span class="s">&#39;mu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp_dict</span><span class="p">[</span><span class="s">&#39;mu&#39;</span><span class="p">]</span>
-        <span class="n">data</span><span class="p">[</span><span class="s">&#39;TSS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp_dict</span><span class="p">[</span><span class="s">&#39;T&#39;</span><span class="p">]</span>
+            <span class="n">source</span><span class="o">=</span><span class="n">m1</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="s1">&#39;T&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">args</span><span class="p">)</span>
+        <span class="n">data</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp_dict</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">]</span>
+        <span class="n">data</span><span class="p">[</span><span class="s1">&#39;TSS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp_dict</span><span class="p">[</span><span class="s1">&#39;T&#39;</span><span class="p">]</span>
 
-        <span class="n">data</span><span class="p">[</span><span class="s">&#39;ZSS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_seismograms</span><span class="p">(</span>
-            <span class="n">source</span><span class="o">=</span><span class="n">m2</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="s">&#39;Z&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">args</span><span class="p">)[</span><span class="s">&#39;Z&#39;</span><span class="p">]</span>
-        <span class="n">data</span><span class="p">[</span><span class="s">&#39;RSS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_seismograms</span><span class="p">(</span>
-            <span class="n">source</span><span class="o">=</span><span class="n">m2</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="s">&#39;R&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">args</span><span class="p">)[</span><span class="s">&#39;R&#39;</span><span class="p">]</span>
+        <span class="n">data</span><span class="p">[</span><span class="s1">&#39;ZSS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_seismograms</span><span class="p">(</span>
+            <span class="n">source</span><span class="o">=</span><span class="n">m2</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="s1">&#39;Z&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">args</span><span class="p">)[</span><span class="s1">&#39;Z&#39;</span><span class="p">]</span>
+        <span class="n">data</span><span class="p">[</span><span class="s1">&#39;RSS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_seismograms</span><span class="p">(</span>
+            <span class="n">source</span><span class="o">=</span><span class="n">m2</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="s1">&#39;R&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">args</span><span class="p">)[</span><span class="s1">&#39;R&#39;</span><span class="p">]</span>
 
-        <span class="n">data</span><span class="p">[</span><span class="s">&#39;TDS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_seismograms</span><span class="p">(</span>
-            <span class="n">source</span><span class="o">=</span><span class="n">m3</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="s">&#39;T&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">args</span><span class="p">)[</span><span class="s">&#39;T&#39;</span><span class="p">]</span>
+        <span class="n">data</span><span class="p">[</span><span class="s1">&#39;TDS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_seismograms</span><span class="p">(</span>
+            <span class="n">source</span><span class="o">=</span><span class="n">m3</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="s1">&#39;T&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">args</span><span class="p">)[</span><span class="s1">&#39;T&#39;</span><span class="p">]</span>
 
-        <span class="n">data</span><span class="p">[</span><span class="s">&#39;ZDS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_seismograms</span><span class="p">(</span>
-            <span class="n">source</span><span class="o">=</span><span class="n">m4</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="s">&#39;Z&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">args</span><span class="p">)[</span><span class="s">&#39;Z&#39;</span><span class="p">]</span>
-        <span class="n">data</span><span class="p">[</span><span class="s">&#39;RDS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_seismograms</span><span class="p">(</span>
-            <span class="n">source</span><span class="o">=</span><span class="n">m4</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="s">&#39;R&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">args</span><span class="p">)[</span><span class="s">&#39;R&#39;</span><span class="p">]</span>
+        <span class="n">data</span><span class="p">[</span><span class="s1">&#39;ZDS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_seismograms</span><span class="p">(</span>
+            <span class="n">source</span><span class="o">=</span><span class="n">m4</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="s1">&#39;Z&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">args</span><span class="p">)[</span><span class="s1">&#39;Z&#39;</span><span class="p">]</span>
+        <span class="n">data</span><span class="p">[</span><span class="s1">&#39;RDS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_seismograms</span><span class="p">(</span>
+            <span class="n">source</span><span class="o">=</span><span class="n">m4</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="s1">&#39;R&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">args</span><span class="p">)[</span><span class="s1">&#39;R&#39;</span><span class="p">]</span>
 
-        <span class="n">data</span><span class="p">[</span><span class="s">&#39;ZDD&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_seismograms</span><span class="p">(</span>
-            <span class="n">source</span><span class="o">=</span><span class="n">cl</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="s">&#39;Z&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">args</span><span class="p">)[</span><span class="s">&#39;Z&#39;</span><span class="p">]</span>
-        <span class="n">data</span><span class="p">[</span><span class="s">&#39;RDD&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_seismograms</span><span class="p">(</span>
-            <span class="n">source</span><span class="o">=</span><span class="n">cl</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="s">&#39;R&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">args</span><span class="p">)[</span><span class="s">&#39;R&#39;</span><span class="p">]</span>
+        <span class="n">data</span><span class="p">[</span><span class="s1">&#39;ZDD&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_seismograms</span><span class="p">(</span>
+            <span class="n">source</span><span class="o">=</span><span class="n">cl</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="s1">&#39;Z&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">args</span><span class="p">)[</span><span class="s1">&#39;Z&#39;</span><span class="p">]</span>
+        <span class="n">data</span><span class="p">[</span><span class="s1">&#39;RDD&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_seismograms</span><span class="p">(</span>
+            <span class="n">source</span><span class="o">=</span><span class="n">cl</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="s1">&#39;R&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">args</span><span class="p">)[</span><span class="s1">&#39;R&#39;</span><span class="p">]</span>
 
-        <span class="n">data</span><span class="p">[</span><span class="s">&#39;ZEP&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_seismograms</span><span class="p">(</span>
-            <span class="n">source</span><span class="o">=</span><span class="n">m6</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="s">&#39;Z&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">args</span><span class="p">)[</span><span class="s">&#39;Z&#39;</span><span class="p">]</span>
-        <span class="n">data</span><span class="p">[</span><span class="s">&#39;REP&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_seismograms</span><span class="p">(</span>
-            <span class="n">source</span><span class="o">=</span><span class="n">m6</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="s">&#39;R&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">args</span><span class="p">)[</span><span class="s">&#39;R&#39;</span><span class="p">]</span>
+        <span class="n">data</span><span class="p">[</span><span class="s1">&#39;ZEP&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_seismograms</span><span class="p">(</span>
+            <span class="n">source</span><span class="o">=</span><span class="n">m6</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="s1">&#39;Z&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">args</span><span class="p">)[</span><span class="s1">&#39;Z&#39;</span><span class="p">]</span>
+        <span class="n">data</span><span class="p">[</span><span class="s1">&#39;REP&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_seismograms</span><span class="p">(</span>
+            <span class="n">source</span><span class="o">=</span><span class="n">m6</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="s1">&#39;R&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">args</span><span class="p">)[</span><span class="s1">&#39;R&#39;</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="n">return_obspy_stream</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">dt</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
@@ -296,16 +296,16 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">dt_out</span> <span class="o">=</span> <span class="n">dt</span>
             <span class="n">components</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-            <span class="n">components</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s">&#39;mu&#39;</span><span class="p">)</span>
+            <span class="n">components</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s1">&#39;mu&#39;</span><span class="p">)</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_to_stream</span><span class="p">(</span>
                 <span class="n">receiver</span><span class="o">=</span><span class="n">receiver</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="n">components</span><span class="p">,</span>
                 <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">dt_out</span><span class="o">=</span><span class="n">dt_out</span><span class="p">,</span> <span class="n">starttime</span><span class="o">=</span><span class="n">UTCDateTime</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
                 <span class="n">add_band_code</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">data</span>
-</div>
-<div class="viewcode-block" id="BaseInstaseisDB.get_seismograms"><a class="viewcode-back" href="../../instaseis.html#instaseis.base_instaseis_db.BaseInstaseisDB.get_seismograms">[docs]</a>    <span class="k">def</span> <span class="nf">get_seismograms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">receiver</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="p">(</span><span class="s">&quot;Z&quot;</span><span class="p">,</span> <span class="s">&quot;N&quot;</span><span class="p">,</span> <span class="s">&quot;E&quot;</span><span class="p">),</span>
-                        <span class="n">kind</span><span class="o">=</span><span class="s">&#39;displacement&#39;</span><span class="p">,</span> <span class="n">remove_source_shift</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+            <span class="k">return</span> <span class="n">data</span></div>
+
+<div class="viewcode-block" id="BaseInstaseisDB.get_seismograms"><a class="viewcode-back" href="../../instaseis.html#instaseis.base_instaseis_db.BaseInstaseisDB.get_seismograms">[docs]</a>    <span class="k">def</span> <span class="nf">get_seismograms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">receiver</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Z&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;E&quot;</span><span class="p">),</span>
+                        <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;displacement&#39;</span><span class="p">,</span> <span class="n">remove_source_shift</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
                         <span class="n">reconvolve_stf</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">return_obspy_stream</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
                         <span class="n">dt</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">kernelwidth</span><span class="o">=</span><span class="mi">12</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -350,7 +350,7 @@
         <span class="n">source</span><span class="p">,</span> <span class="n">receiver</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_seismograms_sanity_checks</span><span class="p">(</span>
             <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">receiver</span><span class="o">=</span><span class="n">receiver</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="n">components</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="n">kind</span><span class="p">)</span>
 
-        <span class="c"># Call the _get_seismograms() method of the respective implementation.</span>
+        <span class="c1"># Call the _get_seismograms() method of the respective implementation.</span>
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_seismograms</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">receiver</span><span class="o">=</span><span class="n">receiver</span><span class="p">,</span>
                                      <span class="n">components</span><span class="o">=</span><span class="n">components</span><span class="p">)</span>
 
@@ -369,15 +369,15 @@
             <span class="n">n_derivative</span> <span class="o">+=</span> <span class="mi">1</span>
 
         <span class="k">if</span> <span class="n">reconvolve_stf</span> <span class="ow">and</span> <span class="n">remove_source_shift</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;&#39;remove_source_shift&#39; argument not &quot;</span>
-                             <span class="s">&quot;compatible with &#39;reconvolve_stf&#39;.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;remove_source_shift&#39; argument not &quot;</span>
+                             <span class="s2">&quot;compatible with &#39;reconvolve_stf&#39;.&quot;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="s">&quot;origin_time&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="s2">&quot;origin_time&quot;</span><span class="p">):</span>
             <span class="n">origin_time</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">origin_time</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">origin_time</span> <span class="o">=</span> <span class="n">UTCDateTime</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
-        <span class="c"># Calculate the final time information about the seismograms.</span>
+        <span class="c1"># Calculate the final time information about the seismograms.</span>
         <span class="n">time_information</span> <span class="o">=</span> <span class="n">_get_seismogram_times</span><span class="p">(</span>
             <span class="n">info</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">,</span> <span class="n">origin_time</span><span class="o">=</span><span class="n">origin_time</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span>
             <span class="n">kernelwidth</span><span class="o">=</span><span class="n">kernelwidth</span><span class="p">,</span> <span class="n">remove_source_shift</span><span class="o">=</span><span class="n">remove_source_shift</span><span class="p">,</span>
@@ -386,11 +386,11 @@
         <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">components</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">reconvolve_stf</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">source</span><span class="o">.</span><span class="n">dt</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">source</span><span class="o">.</span><span class="n">sliprate</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;source has no source time function&quot;</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;source has no source time function&quot;</span><span class="p">)</span>
 
                 <span class="k">if</span> <span class="n">STF_MAP</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">stf</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]:</span>
                     <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-                        <span class="s">&#39;deconvolution not implemented for stf </span><span class="si">%s</span><span class="s">&#39;</span>
+                        <span class="s1">&#39;deconvolution not implemented for stf </span><span class="si">%s</span><span class="s1">&#39;</span>
                         <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">stf</span><span class="p">))</span>
 
                 <span class="n">stf_deconv_f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfft</span><span class="p">(</span>
@@ -398,7 +398,7 @@
                     <span class="n">n</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">nfft</span><span class="p">)</span>
 
                 <span class="k">if</span> <span class="nb">abs</span><span class="p">((</span><span class="n">source</span><span class="o">.</span><span class="n">dt</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1e-7</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;dt of the source not compatible&quot;</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;dt of the source not compatible&quot;</span><span class="p">)</span>
 
                 <span class="n">stf_conv_f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfft</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">sliprate</span><span class="p">,</span>
                                          <span class="n">n</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">nfft</span><span class="p">)</span>
@@ -408,8 +408,8 @@
                         <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span> <span class="mi">1j</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfftfreq</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">nfft</span><span class="p">)</span> <span class="o">*</span>
                                <span class="mf">2.</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">source</span><span class="o">.</span><span class="n">time_shift</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
 
-                <span class="c"># XXX: double check whether a taper is needed at the end of the</span>
-                <span class="c"># trace</span>
+                <span class="c1"># XXX: double check whether a taper is needed at the end of the</span>
+                <span class="c1"># trace</span>
                 <span class="n">dataf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfft</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">comp</span><span class="p">],</span> <span class="n">n</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">nfft</span><span class="p">)</span>
 
                 <span class="n">data</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">irfft</span><span class="p">(</span>
@@ -418,55 +418,55 @@
             <span class="k">if</span> <span class="n">dt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
                 <span class="n">data</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">=</span> <span class="n">lanczos</span><span class="o">.</span><span class="n">lanczos_interpolation</span><span class="p">(</span>
                     <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="n">comp</span><span class="p">],</span> <span class="n">old_start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">old_dt</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span>
-                    <span class="n">new_start</span><span class="o">=</span><span class="n">time_information</span><span class="p">[</span><span class="s">&quot;time_shift_at_beginning&quot;</span><span class="p">],</span>
+                    <span class="n">new_start</span><span class="o">=</span><span class="n">time_information</span><span class="p">[</span><span class="s2">&quot;time_shift_at_beginning&quot;</span><span class="p">],</span>
                     <span class="n">new_dt</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span>
-                    <span class="n">new_npts</span><span class="o">=</span><span class="n">time_information</span><span class="p">[</span><span class="s">&quot;npts_before_shift_removal&quot;</span><span class="p">],</span>
+                    <span class="n">new_npts</span><span class="o">=</span><span class="n">time_information</span><span class="p">[</span><span class="s2">&quot;npts_before_shift_removal&quot;</span><span class="p">],</span>
                     <span class="n">a</span><span class="o">=</span><span class="n">kernelwidth</span><span class="p">,</span>
-                    <span class="n">window</span><span class="o">=</span><span class="s">&quot;blackman&quot;</span><span class="p">)</span>
+                    <span class="n">window</span><span class="o">=</span><span class="s2">&quot;blackman&quot;</span><span class="p">)</span>
 
-            <span class="c"># Integrate/differentiate before removing the source shift in</span>
-            <span class="c"># order to reduce boundary effects at the start of the signal.</span>
-            <span class="c">#</span>
-            <span class="c"># NEVER to this before the resampling! The error can be really big.</span>
+            <span class="c1"># Integrate/differentiate before removing the source shift in</span>
+            <span class="c1"># order to reduce boundary effects at the start of the signal.</span>
+            <span class="c1">#</span>
+            <span class="c1"># NEVER to this before the resampling! The error can be really big.</span>
             <span class="k">if</span> <span class="n">n_derivative</span><span class="p">:</span>
                 <span class="n">_diff_and_integrate</span><span class="p">(</span><span class="n">n_derivative</span><span class="o">=</span><span class="n">n_derivative</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
                                     <span class="n">comp</span><span class="o">=</span><span class="n">comp</span><span class="p">,</span> <span class="n">dt_out</span><span class="o">=</span><span class="n">dt_out</span><span class="p">)</span>
 
-            <span class="c"># If desired, remove the samples before the peak of the source</span>
-            <span class="c"># time function.</span>
+            <span class="c1"># If desired, remove the samples before the peak of the source</span>
+            <span class="c1"># time function.</span>
             <span class="k">if</span> <span class="n">remove_source_shift</span><span class="p">:</span>
-                <span class="n">data</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">comp</span><span class="p">][</span><span class="n">time_information</span><span class="p">[</span><span class="s">&quot;ref_sample&quot;</span><span class="p">]:]</span>
+                <span class="n">data</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">comp</span><span class="p">][</span><span class="n">time_information</span><span class="p">[</span><span class="s2">&quot;ref_sample&quot;</span><span class="p">]:]</span>
 
         <span class="k">if</span> <span class="n">return_obspy_stream</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_to_stream</span><span class="p">(</span>
                 <span class="n">receiver</span><span class="o">=</span><span class="n">receiver</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="n">components</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
-                <span class="n">dt_out</span><span class="o">=</span><span class="n">dt_out</span><span class="p">,</span> <span class="n">starttime</span><span class="o">=</span><span class="n">time_information</span><span class="p">[</span><span class="s">&quot;starttime&quot;</span><span class="p">])</span>
+                <span class="n">dt_out</span><span class="o">=</span><span class="n">dt_out</span><span class="p">,</span> <span class="n">starttime</span><span class="o">=</span><span class="n">time_information</span><span class="p">[</span><span class="s2">&quot;starttime&quot;</span><span class="p">])</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">data</span>
-</div>
+            <span class="k">return</span> <span class="n">data</span></div>
+
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_convert_to_stream</span><span class="p">(</span><span class="n">receiver</span><span class="p">,</span> <span class="n">components</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">dt_out</span><span class="p">,</span> <span class="n">starttime</span><span class="p">,</span>
                            <span class="n">add_band_code</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
-        <span class="c"># Convert to an ObsPy Stream object.</span>
+        <span class="c1"># Convert to an ObsPy Stream object.</span>
         <span class="n">st</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
         <span class="n">band_code</span> <span class="o">=</span> <span class="n">get_band_code</span><span class="p">(</span><span class="n">dt_out</span><span class="p">)</span>
-        <span class="n">instaseis_header</span> <span class="o">=</span> <span class="n">AttribDict</span><span class="p">(</span><span class="n">mu</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s">&quot;mu&quot;</span><span class="p">])</span>
+        <span class="n">instaseis_header</span> <span class="o">=</span> <span class="n">AttribDict</span><span class="p">(</span><span class="n">mu</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;mu&quot;</span><span class="p">])</span>
 
         <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">components</span><span class="p">:</span>
             <span class="n">tr</span> <span class="o">=</span> <span class="n">Trace</span><span class="p">(</span>
                 <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="n">comp</span><span class="p">],</span>
-                <span class="n">header</span><span class="o">=</span><span class="p">{</span><span class="s">&quot;delta&quot;</span><span class="p">:</span> <span class="n">dt_out</span><span class="p">,</span>
-                        <span class="s">&quot;starttime&quot;</span><span class="p">:</span> <span class="n">starttime</span><span class="p">,</span>
-                        <span class="s">&quot;station&quot;</span><span class="p">:</span> <span class="n">receiver</span><span class="o">.</span><span class="n">station</span><span class="p">,</span>
-                        <span class="s">&quot;network&quot;</span><span class="p">:</span> <span class="n">receiver</span><span class="o">.</span><span class="n">network</span><span class="p">,</span>
-                        <span class="s">&quot;location&quot;</span><span class="p">:</span> <span class="n">receiver</span><span class="o">.</span><span class="n">location</span><span class="p">,</span>
-                        <span class="s">&quot;channel&quot;</span><span class="p">:</span> <span class="n">add_band_code</span> <span class="o">*</span> <span class="p">(</span><span class="n">band_code</span> <span class="o">+</span> <span class="s">&#39;X&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">comp</span><span class="p">,</span>
-                        <span class="s">&quot;instaseis&quot;</span><span class="p">:</span> <span class="n">instaseis_header</span><span class="p">})</span>
+                <span class="n">header</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;delta&quot;</span><span class="p">:</span> <span class="n">dt_out</span><span class="p">,</span>
+                        <span class="s2">&quot;starttime&quot;</span><span class="p">:</span> <span class="n">starttime</span><span class="p">,</span>
+                        <span class="s2">&quot;station&quot;</span><span class="p">:</span> <span class="n">receiver</span><span class="o">.</span><span class="n">station</span><span class="p">,</span>
+                        <span class="s2">&quot;network&quot;</span><span class="p">:</span> <span class="n">receiver</span><span class="o">.</span><span class="n">network</span><span class="p">,</span>
+                        <span class="s2">&quot;location&quot;</span><span class="p">:</span> <span class="n">receiver</span><span class="o">.</span><span class="n">location</span><span class="p">,</span>
+                        <span class="s2">&quot;channel&quot;</span><span class="p">:</span> <span class="n">add_band_code</span> <span class="o">*</span> <span class="p">(</span><span class="n">band_code</span> <span class="o">+</span> <span class="s1">&#39;X&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">comp</span><span class="p">,</span>
+                        <span class="s2">&quot;instaseis&quot;</span><span class="p">:</span> <span class="n">instaseis_header</span><span class="p">})</span>
             <span class="n">st</span> <span class="o">+=</span> <span class="n">tr</span>
         <span class="k">return</span> <span class="n">st</span>
 
     <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">_get_seismograms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">receiver</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="p">(</span><span class="s">&quot;Z&quot;</span><span class="p">,</span> <span class="s">&quot;N&quot;</span><span class="p">,</span> <span class="s">&quot;E&quot;</span><span class="p">)):</span>
+    <span class="k">def</span> <span class="nf">_get_seismograms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">receiver</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Z&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;E&quot;</span><span class="p">)):</span>
         <span class="k">pass</span>
 
     <span class="nd">@abstractmethod</span>
@@ -487,8 +487,8 @@
         <span class="k">pass</span>
 
 <div class="viewcode-block" id="BaseInstaseisDB.get_seismograms_finite_source"><a class="viewcode-back" href="../../instaseis.html#instaseis.base_instaseis_db.BaseInstaseisDB.get_seismograms_finite_source">[docs]</a>    <span class="k">def</span> <span class="nf">get_seismograms_finite_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sources</span><span class="p">,</span> <span class="n">receiver</span><span class="p">,</span>
-                                      <span class="n">components</span><span class="o">=</span><span class="p">(</span><span class="s">&quot;Z&quot;</span><span class="p">,</span> <span class="s">&quot;N&quot;</span><span class="p">,</span> <span class="s">&quot;E&quot;</span><span class="p">),</span>
-                                      <span class="n">kind</span><span class="o">=</span><span class="s">&#39;displacement&#39;</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                                      <span class="n">components</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Z&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;E&quot;</span><span class="p">),</span>
+                                      <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;displacement&#39;</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                                       <span class="n">kernelwidth</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">correct_mu</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
                                       <span class="n">progress_callback</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -532,16 +532,16 @@
         <span class="n">data_summed</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sources</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">_i</span><span class="p">,</span> <span class="n">source</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sources</span><span class="p">):</span>
-            <span class="c"># Don&#39;t perform the diff/integration here, but after the</span>
-            <span class="c"># resampling later on.</span>
+            <span class="c1"># Don&#39;t perform the diff/integration here, but after the</span>
+            <span class="c1"># resampling later on.</span>
             <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_seismograms</span><span class="p">(</span>
                 <span class="n">source</span><span class="p">,</span> <span class="n">receiver</span><span class="p">,</span> <span class="n">components</span><span class="p">,</span> <span class="n">reconvolve_stf</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-                <span class="c"># Effectively results in nothing happening.</span>
+                <span class="c1"># Effectively results in nothing happening.</span>
                 <span class="n">kind</span><span class="o">=</span><span class="n">INV_KIND_MAP</span><span class="p">[</span><span class="n">STF_MAP</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">stf</span><span class="p">]],</span>
                 <span class="n">return_obspy_stream</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">remove_source_shift</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">correct_mu</span><span class="p">:</span>
-                <span class="n">corr_fac</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s">&quot;mu&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">DEFAULT_MU</span><span class="p">,</span>
+                <span class="n">corr_fac</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;mu&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">DEFAULT_MU</span><span class="p">,</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">corr_fac</span> <span class="o">=</span> <span class="mi">1</span>
 
@@ -557,23 +557,23 @@
 
         <span class="k">if</span> <span class="n">dt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">components</span><span class="p">:</span>
-                <span class="c"># We don&#39;t need to align a sample to the peak of the source</span>
-                <span class="c"># time function here.</span>
+                <span class="c1"># We don&#39;t need to align a sample to the peak of the source</span>
+                <span class="c1"># time function here.</span>
                 <span class="n">new_npts</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span>
                     <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">comp</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">dt</span> <span class="o">/</span> <span class="n">dt</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
                 <span class="n">data_summed</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">=</span> <span class="n">lanczos</span><span class="o">.</span><span class="n">lanczos_interpolation</span><span class="p">(</span>
                     <span class="n">data</span><span class="o">=</span><span class="n">data_summed</span><span class="p">[</span><span class="n">comp</span><span class="p">],</span> <span class="n">old_start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">old_dt</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span>
                     <span class="n">new_start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">new_dt</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span> <span class="n">new_npts</span><span class="o">=</span><span class="n">new_npts</span><span class="p">,</span>
-                    <span class="n">a</span><span class="o">=</span><span class="n">kernelwidth</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="s">&quot;blackman&quot;</span><span class="p">)</span>
+                    <span class="n">a</span><span class="o">=</span><span class="n">kernelwidth</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="s2">&quot;blackman&quot;</span><span class="p">)</span>
 
-                <span class="c"># The resampling assumes zeros outside the data range. This</span>
-                <span class="c"># does not introduce any errors at the beginning as the data is</span>
-                <span class="c"># actually zero there but it does affect the end. We will</span>
-                <span class="c"># remove all samples that are affected by the boundary</span>
-                <span class="c"># conditions here.</span>
-                <span class="c">#</span>
-                <span class="c"># Also don&#39;t cut it for the &quot;identify&quot; interpolation which is</span>
-                <span class="c"># important for testing.</span>
+                <span class="c1"># The resampling assumes zeros outside the data range. This</span>
+                <span class="c1"># does not introduce any errors at the beginning as the data is</span>
+                <span class="c1"># actually zero there but it does affect the end. We will</span>
+                <span class="c1"># remove all samples that are affected by the boundary</span>
+                <span class="c1"># conditions here.</span>
+                <span class="c1">#</span>
+                <span class="c1"># Also don&#39;t cut it for the &quot;identify&quot; interpolation which is</span>
+                <span class="c1"># important for testing.</span>
                 <span class="k">if</span> <span class="nb">round</span><span class="p">(</span><span class="n">dt</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span> <span class="o">!=</span> <span class="mf">1.0</span><span class="p">:</span>
                     <span class="n">affected_area</span> <span class="o">=</span> <span class="n">kernelwidth</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">dt</span>
                     <span class="n">data_summed</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">=</span> \
@@ -584,27 +584,27 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">dt_out</span> <span class="o">=</span> <span class="n">dt</span>
 
-        <span class="c"># Integrate/differentiate here. No need to do it for every single</span>
-        <span class="c"># seismogram and stack the errors.</span>
+        <span class="c1"># Integrate/differentiate here. No need to do it for every single</span>
+        <span class="c1"># seismogram and stack the errors.</span>
         <span class="n">n_derivative</span> <span class="o">=</span> <span class="n">KIND_MAP</span><span class="p">[</span><span class="n">kind</span><span class="p">]</span> <span class="o">-</span> <span class="n">STF_MAP</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">stf</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">n_derivative</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">data_summed</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
                 <span class="n">_diff_and_integrate</span><span class="p">(</span><span class="n">n_derivative</span><span class="o">=</span><span class="n">n_derivative</span><span class="p">,</span>
                                     <span class="n">data</span><span class="o">=</span><span class="n">data_summed</span><span class="p">,</span> <span class="n">comp</span><span class="o">=</span><span class="n">comp</span><span class="p">,</span> <span class="n">dt_out</span><span class="o">=</span><span class="n">dt_out</span><span class="p">)</span>
 
-        <span class="c"># Convert to an ObsPy Stream object.</span>
+        <span class="c1"># Convert to an ObsPy Stream object.</span>
         <span class="n">st</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
         <span class="n">band_code</span> <span class="o">=</span> <span class="n">get_band_code</span><span class="p">(</span><span class="n">dt_out</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">components</span><span class="p">:</span>
             <span class="n">tr</span> <span class="o">=</span> <span class="n">Trace</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data_summed</span><span class="p">[</span><span class="n">comp</span><span class="p">],</span>
-                       <span class="n">header</span><span class="o">=</span><span class="p">{</span><span class="s">&quot;delta&quot;</span><span class="p">:</span> <span class="n">dt_out</span><span class="p">,</span>
-                               <span class="s">&quot;station&quot;</span><span class="p">:</span> <span class="n">receiver</span><span class="o">.</span><span class="n">station</span><span class="p">,</span>
-                               <span class="s">&quot;network&quot;</span><span class="p">:</span> <span class="n">receiver</span><span class="o">.</span><span class="n">network</span><span class="p">,</span>
-                               <span class="s">&quot;location&quot;</span><span class="p">:</span> <span class="n">receiver</span><span class="o">.</span><span class="n">location</span><span class="p">,</span>
-                               <span class="s">&quot;channel&quot;</span><span class="p">:</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">X</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">band_code</span><span class="p">,</span> <span class="n">comp</span><span class="p">)})</span>
+                       <span class="n">header</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;delta&quot;</span><span class="p">:</span> <span class="n">dt_out</span><span class="p">,</span>
+                               <span class="s2">&quot;station&quot;</span><span class="p">:</span> <span class="n">receiver</span><span class="o">.</span><span class="n">station</span><span class="p">,</span>
+                               <span class="s2">&quot;network&quot;</span><span class="p">:</span> <span class="n">receiver</span><span class="o">.</span><span class="n">network</span><span class="p">,</span>
+                               <span class="s2">&quot;location&quot;</span><span class="p">:</span> <span class="n">receiver</span><span class="o">.</span><span class="n">location</span><span class="p">,</span>
+                               <span class="s2">&quot;channel&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">X</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">band_code</span><span class="p">,</span> <span class="n">comp</span><span class="p">)})</span>
             <span class="n">st</span> <span class="o">+=</span> <span class="n">tr</span>
-        <span class="k">return</span> <span class="n">st</span>
-</div>
+        <span class="k">return</span> <span class="n">st</span></div>
+
     <span class="k">def</span> <span class="nf">_get_greens_seiscomp_sanity_checks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epicentral_distance_degree</span><span class="p">,</span>
                                            <span class="n">source_depth_in_m</span><span class="p">,</span> <span class="n">kind</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -618,23 +618,23 @@
 <span class="sd">            ``&quot;displacement&quot;``, ``&quot;velocity&quot;``, or ``&quot;acceleration&quot;``.</span>
 <span class="sd">        :type kind: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">kind</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;displacement&#39;</span><span class="p">,</span> <span class="s">&#39;velocity&#39;</span><span class="p">,</span> <span class="s">&#39;acceleration&#39;</span><span class="p">]:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;unknown kind </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">kind</span><span class="p">,))</span>
+        <span class="k">if</span> <span class="n">kind</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;displacement&#39;</span><span class="p">,</span> <span class="s1">&#39;velocity&#39;</span><span class="p">,</span> <span class="s1">&#39;acceleration&#39;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;unknown kind </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">kind</span><span class="p">,))</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">is_reciprocal</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;forward DB cannot be used with &#39;</span>
-                             <span class="s">&#39;get_greens_seiscomp()&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;forward DB cannot be used with &#39;</span>
+                             <span class="s1">&#39;get_greens_seiscomp()&#39;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">components</span> <span class="o">==</span> <span class="s">&#39;vertical and horizontal&#39;</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;get_greens_seiscomp() needs a DB with both &#39;</span>
-                             <span class="s">&#39;vertical and horizontal components&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">components</span> <span class="o">==</span> <span class="s1">&#39;vertical and horizontal&#39;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;get_greens_seiscomp() needs a DB with both &#39;</span>
+                             <span class="s1">&#39;vertical and horizontal components&#39;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="mf">0.</span> <span class="o">&lt;=</span> <span class="n">epicentral_distance_degree</span> <span class="o">&lt;=</span> <span class="mf">180.</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s">&#39;epicentral_distance_degree should be in [0, 180]&#39;</span><span class="p">)</span>
+                <span class="s1">&#39;epicentral_distance_degree should be in [0, 180]&#39;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">source_depth_in_m</span> <span class="o">&lt;=</span> <span class="mf">0.</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;source_depth_in_m should be positive&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;source_depth_in_m should be positive&#39;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_get_seismograms_sanity_checks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">receiver</span><span class="p">,</span> <span class="n">components</span><span class="p">,</span>
                                        <span class="n">kind</span><span class="p">):</span>
@@ -651,44 +651,44 @@
 <span class="sd">            strings ``&quot;Z&quot;``, ``&quot;N&quot;``, ``&quot;E&quot;``, ``&quot;R&quot;``, and ``&quot;T&quot;``</span>
 <span class="sd">        :param kind: &#39;displacement&#39;, &#39;velocity&#39; or &#39;acceleration&#39;</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c"># Attempt to parse them if the types are not correct.</span>
+        <span class="c1"># Attempt to parse them if the types are not correct.</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">Source</span><span class="p">)</span> <span class="ow">and</span> \
                 <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">ForceSource</span><span class="p">):</span>
             <span class="n">source</span> <span class="o">=</span> <span class="n">Source</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">receiver</span><span class="p">,</span> <span class="n">Receiver</span><span class="p">):</span>
-            <span class="c"># This only works in the special case of one station, otherwise</span>
-            <span class="c"># it has to be called more then once.</span>
+            <span class="c1"># This only works in the special case of one station, otherwise</span>
+            <span class="c1"># it has to be called more then once.</span>
             <span class="n">rec</span> <span class="o">=</span> <span class="n">Receiver</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">receiver</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rec</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Receiver object/file contains multiple &quot;</span>
-                                 <span class="s">&quot;stations. Please parse outside the &quot;</span>
-                                 <span class="s">&quot;get_seismograms() function and call in a &quot;</span>
-                                 <span class="s">&quot;loop.&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Receiver object/file contains multiple &quot;</span>
+                                 <span class="s2">&quot;stations. Please parse outside the &quot;</span>
+                                 <span class="s2">&quot;get_seismograms() function and call in a &quot;</span>
+                                 <span class="s2">&quot;loop.&quot;</span><span class="p">)</span>
             <span class="n">receiver</span> <span class="o">=</span> <span class="n">rec</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
-        <span class="k">if</span> <span class="n">kind</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;displacement&#39;</span><span class="p">,</span> <span class="s">&#39;velocity&#39;</span><span class="p">,</span> <span class="s">&#39;acceleration&#39;</span><span class="p">]:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;unknown kind </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">kind</span><span class="p">,))</span>
+        <span class="k">if</span> <span class="n">kind</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;displacement&#39;</span><span class="p">,</span> <span class="s1">&#39;velocity&#39;</span><span class="p">,</span> <span class="s1">&#39;acceleration&#39;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;unknown kind </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">kind</span><span class="p">,))</span>
 
         <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">components</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">comp</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&quot;N&quot;</span><span class="p">,</span> <span class="s">&quot;E&quot;</span><span class="p">,</span> <span class="s">&quot;Z&quot;</span><span class="p">,</span> <span class="s">&quot;R&quot;</span><span class="p">,</span> <span class="s">&quot;T&quot;</span><span class="p">]:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Invalid component: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">comp</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">comp</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;E&quot;</span><span class="p">,</span> <span class="s2">&quot;Z&quot;</span><span class="p">,</span> <span class="s2">&quot;R&quot;</span><span class="p">,</span> <span class="s2">&quot;T&quot;</span><span class="p">]:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid component: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">comp</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">is_reciprocal</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">receiver</span><span class="o">.</span><span class="n">depth_in_m</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&#39;Receiver depth cannot be changed when reading &#39;</span>
-                              <span class="s">&#39;from reciprocal DB. Using depth from the DB.&#39;</span><span class="p">)</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Receiver depth cannot be changed when reading &#39;</span>
+                              <span class="s1">&#39;from reciprocal DB. Using depth from the DB.&#39;</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">comp</span> <span class="ow">in</span> <span class="n">components</span> <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">,</span> <span class="s">&#39;E&#39;</span><span class="p">,</span> <span class="s">&#39;R&#39;</span><span class="p">,</span> <span class="s">&#39;T&#39;</span><span class="p">])</span> <span class="ow">and</span> \
-                    <span class="s">&quot;horizontal&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">components</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;vertical component only DB&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">comp</span> <span class="ow">in</span> <span class="n">components</span> <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;N&#39;</span><span class="p">,</span> <span class="s1">&#39;E&#39;</span><span class="p">,</span> <span class="s1">&#39;R&#39;</span><span class="p">,</span> <span class="s1">&#39;T&#39;</span><span class="p">])</span> <span class="ow">and</span> \
+                    <span class="s2">&quot;horizontal&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">components</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;vertical component only DB&quot;</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="s">&#39;Z&#39;</span> <span class="ow">in</span> <span class="n">components</span> <span class="ow">and</span> <span class="s">&quot;vertical&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">components</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;horizontal component only DB&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">&#39;Z&#39;</span> <span class="ow">in</span> <span class="n">components</span> <span class="ow">and</span> <span class="s2">&quot;vertical&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">components</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;horizontal component only DB&quot;</span><span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">source</span><span class="o">.</span><span class="n">depth_in_m</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&#39;Source depth cannot be changed when reading &#39;</span>
-                              <span class="s">&#39;from forward DB. Using depth from the DB.&#39;</span><span class="p">)</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Source depth cannot be changed when reading &#39;</span>
+                              <span class="s1">&#39;from forward DB. Using depth from the DB.&#39;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">source</span><span class="p">,</span> <span class="n">receiver</span>
 
@@ -708,38 +708,38 @@
         <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span>
 
         <span class="n">return_str</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="s">&quot;{db} {reciprocal} Green&#39;s function Database (v{&quot;</span>
-            <span class="s">&quot;format_version}) &quot;</span>
-            <span class="s">&quot;generated with these parameters:</span><span class="se">\n</span><span class="s">&quot;</span>
-            <span class="s">&quot;</span><span class="se">\t</span><span class="s">components           : {components}</span><span class="se">\n</span><span class="s">&quot;</span>
-            <span class="s">&quot;{source_depth}&quot;</span>
-            <span class="s">&quot;</span><span class="se">\t</span><span class="s">velocity model       : {velocity_model}</span><span class="se">\n</span><span class="s">&quot;</span>
-            <span class="s">&quot;</span><span class="se">\t</span><span class="s">attenuation          : {attenuation}</span><span class="se">\n</span><span class="s">&quot;</span>
-            <span class="s">&quot;</span><span class="se">\t</span><span class="s">dominant period      : {period:.3f} s</span><span class="se">\n</span><span class="s">&quot;</span>
-            <span class="s">&quot;</span><span class="se">\t</span><span class="s">dump type            : {dump_type}</span><span class="se">\n</span><span class="s">&quot;</span>
-            <span class="s">&quot;</span><span class="se">\t</span><span class="s">excitation type      : {excitation_type}</span><span class="se">\n</span><span class="s">&quot;</span>
-            <span class="s">&quot;</span><span class="se">\t</span><span class="s">time step            : {dt:.3f} s</span><span class="se">\n</span><span class="s">&quot;</span>
-            <span class="s">&quot;</span><span class="se">\t</span><span class="s">sampling rate        : {sampling_rate:.3f} Hz</span><span class="se">\n</span><span class="s">&quot;</span>
-            <span class="s">&quot;</span><span class="se">\t</span><span class="s">number of samples    : {npts}</span><span class="se">\n</span><span class="s">&quot;</span>
-            <span class="s">&quot;</span><span class="se">\t</span><span class="s">seismogram length    : {length:.1f} s</span><span class="se">\n</span><span class="s">&quot;</span>
-            <span class="s">&quot;</span><span class="se">\t</span><span class="s">source time function : {stf}</span><span class="se">\n</span><span class="s">&quot;</span>
-            <span class="s">&quot;</span><span class="se">\t</span><span class="s">source shift         : {src_shift:.3f} s</span><span class="se">\n</span><span class="s">&quot;</span>
-            <span class="s">&quot;</span><span class="se">\t</span><span class="s">spatial order        : {spatial_order}</span><span class="se">\n</span><span class="s">&quot;</span>
-            <span class="s">&quot;</span><span class="se">\t</span><span class="s">min/max radius       : {min_radius:.1f} - {max_radius:.1f} km</span><span class="se">\n</span><span class="s">&quot;</span>
-            <span class="s">&quot;</span><span class="se">\t</span><span class="s">Planet radius        : {planet_radius:.1f} km</span><span class="se">\n</span><span class="s">&quot;</span>
-            <span class="s">&quot;</span><span class="se">\t</span><span class="s">min/max distance     : {min_d:.1f} - {max_d:.1f} deg</span><span class="se">\n</span><span class="s">&quot;</span>
-            <span class="s">&quot;</span><span class="se">\t</span><span class="s">time stepping scheme : {time_scheme}</span><span class="se">\n</span><span class="s">&quot;</span>
-            <span class="s">&quot;</span><span class="se">\t</span><span class="s">compiler/user        : {compiler} by {user}</span><span class="se">\n</span><span class="s">&quot;</span>
-            <span class="s">&quot;</span><span class="se">\t</span><span class="s">directory/url        : {directory}</span><span class="se">\n</span><span class="s">&quot;</span>
-            <span class="s">&quot;</span><span class="se">\t</span><span class="s">size of netCDF files : {filesize}</span><span class="se">\n</span><span class="s">&quot;</span>
-            <span class="s">&quot;</span><span class="se">\t</span><span class="s">generated by AxiSEM version {axisem_version} at {datetime}</span><span class="se">\n</span><span class="s">&quot;</span>
+            <span class="s2">&quot;{db} {reciprocal} Green&#39;s function Database (v{&quot;</span>
+            <span class="s2">&quot;format_version}) &quot;</span>
+            <span class="s2">&quot;generated with these parameters:</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">components           : {components}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;{source_depth}&quot;</span>
+            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">velocity model       : {velocity_model}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">attenuation          : {attenuation}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">dominant period      : {period:.3f} s</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">dump type            : {dump_type}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">excitation type      : {excitation_type}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">time step            : {dt:.3f} s</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">sampling rate        : {sampling_rate:.3f} Hz</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">number of samples    : {npts}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">seismogram length    : {length:.1f} s</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">source time function : {stf}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">source shift         : {src_shift:.3f} s</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">spatial order        : {spatial_order}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">min/max radius       : {min_radius:.1f} - {max_radius:.1f} km</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Planet radius        : {planet_radius:.1f} km</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">min/max distance     : {min_d:.1f} - {max_d:.1f} deg</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">time stepping scheme : {time_scheme}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">compiler/user        : {compiler} by {user}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">directory/url        : {directory}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">size of netCDF files : {filesize}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">generated by AxiSEM version {axisem_version} at {datetime}</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
             <span class="n">db</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span>
-            <span class="n">reciprocal</span><span class="o">=</span><span class="s">&quot;reciprocal&quot;</span> <span class="k">if</span> <span class="n">info</span><span class="o">.</span><span class="n">is_reciprocal</span> <span class="k">else</span> <span class="s">&quot;forward&quot;</span><span class="p">,</span>
+            <span class="n">reciprocal</span><span class="o">=</span><span class="s2">&quot;reciprocal&quot;</span> <span class="k">if</span> <span class="n">info</span><span class="o">.</span><span class="n">is_reciprocal</span> <span class="k">else</span> <span class="s2">&quot;forward&quot;</span><span class="p">,</span>
             <span class="n">components</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">components</span><span class="p">,</span>
             <span class="n">source_depth</span><span class="o">=</span><span class="p">(</span>
-                <span class="s">&quot;</span><span class="se">\t</span><span class="s">source depth         : </span><span class="si">%.2f</span><span class="s"> km</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span>
-                <span class="n">info</span><span class="o">.</span><span class="n">source_depth</span><span class="p">)</span> <span class="k">if</span> <span class="n">info</span><span class="o">.</span><span class="n">source_depth</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="k">else</span> <span class="s">&quot;&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">source depth         : </span><span class="si">%.2f</span><span class="s2"> km</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span>
+                <span class="n">info</span><span class="o">.</span><span class="n">source_depth</span><span class="p">)</span> <span class="k">if</span> <span class="n">info</span><span class="o">.</span><span class="n">source_depth</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
             <span class="n">velocity_model</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">velocity_model</span><span class="p">,</span>
             <span class="n">attenuation</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">attenuation</span><span class="p">,</span>
             <span class="n">period</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">period</span><span class="p">,</span>
@@ -766,20 +766,20 @@
             <span class="n">axisem_version</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">axisem_version</span><span class="p">,</span>
             <span class="n">datetime</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">datetime</span>
         <span class="p">)</span>
-        <span class="k">return</span> <span class="n">return_str</span>
+        <span class="k">return</span> <span class="n">return_str</span></div>
 
-</div>
+
 <span class="k">def</span> <span class="nf">sizeof_fmt</span><span class="p">(</span><span class="n">num</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Handy formatting for human readable filesizes.</span>
 
 <span class="sd">    From http://stackoverflow.com/a/1094933/1657047</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&quot;bytes&quot;</span><span class="p">,</span> <span class="s">&quot;KB&quot;</span><span class="p">,</span> <span class="s">&quot;MB&quot;</span><span class="p">,</span> <span class="s">&quot;GB&quot;</span><span class="p">]:</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;bytes&quot;</span><span class="p">,</span> <span class="s2">&quot;KB&quot;</span><span class="p">,</span> <span class="s2">&quot;MB&quot;</span><span class="p">,</span> <span class="s2">&quot;GB&quot;</span><span class="p">]:</span>
         <span class="k">if</span> <span class="n">num</span> <span class="o">&lt;</span> <span class="mf">1024.0</span> <span class="ow">and</span> <span class="n">num</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mf">1024.0</span><span class="p">:</span>
-            <span class="k">return</span> <span class="s">&quot;</span><span class="si">%3.1f</span><span class="s"> </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">num</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+            <span class="k">return</span> <span class="s2">&quot;</span><span class="si">%3.1f</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">num</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
         <span class="n">num</span> <span class="o">/=</span> <span class="mf">1024.0</span>
-    <span class="k">return</span> <span class="s">&quot;</span><span class="si">%3.1f</span><span class="s"> </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">num</span><span class="p">,</span> <span class="s">&quot;TB&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="si">%3.1f</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">num</span><span class="p">,</span> <span class="s2">&quot;TB&quot;</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_get_seismogram_times</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="n">origin_time</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">kernelwidth</span><span class="p">,</span>
@@ -815,22 +815,22 @@
 <span class="sd">        source time shift has been removed.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">reconvolve_stf</span> <span class="ow">and</span> <span class="n">remove_source_shift</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;&#39;remove_source_shift&#39; argument not &quot;</span>
-                         <span class="s">&quot;compatible with &#39;reconvolve_stf&#39;.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;remove_source_shift&#39; argument not &quot;</span>
+                         <span class="s2">&quot;compatible with &#39;reconvolve_stf&#39;.&quot;</span><span class="p">)</span>
 
     <span class="n">dt_out</span> <span class="o">=</span> <span class="n">dt</span> <span class="ow">or</span> <span class="n">info</span><span class="o">.</span><span class="n">dt</span>
 
     <span class="n">ti</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="n">ti</span><span class="p">[</span><span class="s">&quot;samples_cut_at_end&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">ti</span><span class="p">[</span><span class="s2">&quot;samples_cut_at_end&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
 
     <span class="k">if</span> <span class="n">dt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">reconvolve_stf</span><span class="p">:</span>
-            <span class="c"># This is a bit tricky. We want to resample but we also want</span>
-            <span class="c"># to make sure that that the peak of the source time</span>
-            <span class="c"># function is exactly hit by a sample point.</span>
+            <span class="c1"># This is a bit tricky. We want to resample but we also want</span>
+            <span class="c1"># to make sure that that the peak of the source time</span>
+            <span class="c1"># function is exactly hit by a sample point.</span>
 
-            <span class="c"># If it cleanly divides within ten microseconds,</span>
-            <span class="c"># make integer based calculations.</span>
+            <span class="c1"># If it cleanly divides within ten microseconds,</span>
+            <span class="c1"># make integer based calculations.</span>
             <span class="k">if</span> <span class="nb">round</span><span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">src_shift</span> <span class="o">/</span> <span class="n">dt</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span> <span class="o">%</span> <span class="mf">1.0</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">ref_sample</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">src_shift</span> <span class="o">/</span> <span class="n">dt</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
                 <span class="n">shift</span> <span class="o">=</span> <span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">src_shift_samples</span> <span class="o">*</span> <span class="n">info</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span> <span class="o">-</span> \
@@ -845,45 +845,45 @@
                 <span class="n">ref_sample</span> <span class="o">=</span> \
                     <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="n">info</span><span class="o">.</span><span class="n">src_shift</span> <span class="o">-</span> <span class="n">shift</span><span class="p">)</span> <span class="o">/</span> <span class="n">dt</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
 
-            <span class="n">ti</span><span class="p">[</span><span class="s">&quot;time_shift_at_beginning&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">shift</span>
-            <span class="n">ti</span><span class="p">[</span><span class="s">&quot;npts_before_shift_removal&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_npts</span>
+            <span class="n">ti</span><span class="p">[</span><span class="s2">&quot;time_shift_at_beginning&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">shift</span>
+            <span class="n">ti</span><span class="p">[</span><span class="s2">&quot;npts_before_shift_removal&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_npts</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">ti</span><span class="p">[</span><span class="s">&quot;time_shift_at_beginning&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="n">ti</span><span class="p">[</span><span class="s">&quot;npts_before_shift_removal&quot;</span><span class="p">]</span> <span class="o">=</span> \
+            <span class="n">ti</span><span class="p">[</span><span class="s2">&quot;time_shift_at_beginning&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">ti</span><span class="p">[</span><span class="s2">&quot;npts_before_shift_removal&quot;</span><span class="p">]</span> <span class="o">=</span> \
                 <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="n">info</span><span class="o">.</span><span class="n">npts</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">info</span><span class="o">.</span><span class="n">dt</span> <span class="o">/</span> <span class="n">dt</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span>
             <span class="n">ref_sample</span> <span class="o">=</span> <span class="mi">0</span>
 
-        <span class="c"># The resampling assumes zeros outside the data range. This</span>
-        <span class="c"># does not introduce any errors at the beginning as the data is</span>
-        <span class="c"># actually zero there but it does affect the end. We will</span>
-        <span class="c"># remove all samples that are affected by the boundary</span>
-        <span class="c"># conditions here.</span>
-        <span class="c">#</span>
-        <span class="c"># Also don&#39;t cut it for the &quot;identify&quot; interpolation which is</span>
-        <span class="c"># important for testing.</span>
+        <span class="c1"># The resampling assumes zeros outside the data range. This</span>
+        <span class="c1"># does not introduce any errors at the beginning as the data is</span>
+        <span class="c1"># actually zero there but it does affect the end. We will</span>
+        <span class="c1"># remove all samples that are affected by the boundary</span>
+        <span class="c1"># conditions here.</span>
+        <span class="c1">#</span>
+        <span class="c1"># Also don&#39;t cut it for the &quot;identify&quot; interpolation which is</span>
+        <span class="c1"># important for testing.</span>
         <span class="k">if</span> <span class="nb">round</span><span class="p">(</span><span class="n">dt</span> <span class="o">/</span> <span class="n">info</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span> <span class="o">!=</span> <span class="mf">1.0</span><span class="p">:</span>
             <span class="n">affected_area</span> <span class="o">=</span> <span class="n">kernelwidth</span> <span class="o">*</span> <span class="n">info</span><span class="o">.</span><span class="n">dt</span>
-            <span class="n">ti</span><span class="p">[</span><span class="s">&quot;samples_cut_at_end&quot;</span><span class="p">]</span> <span class="o">=</span> \
+            <span class="n">ti</span><span class="p">[</span><span class="s2">&quot;samples_cut_at_end&quot;</span><span class="p">]</span> <span class="o">=</span> \
                 <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">affected_area</span> <span class="o">/</span> <span class="n">dt</span><span class="p">))</span>
-            <span class="n">ti</span><span class="p">[</span><span class="s">&quot;npts_before_shift_removal&quot;</span><span class="p">]</span> <span class="o">-=</span> <span class="n">ti</span><span class="p">[</span><span class="s">&quot;samples_cut_at_end&quot;</span><span class="p">]</span>
+            <span class="n">ti</span><span class="p">[</span><span class="s2">&quot;npts_before_shift_removal&quot;</span><span class="p">]</span> <span class="o">-=</span> <span class="n">ti</span><span class="p">[</span><span class="s2">&quot;samples_cut_at_end&quot;</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">reconvolve_stf</span><span class="p">:</span>
             <span class="n">ref_sample</span> <span class="o">=</span> <span class="n">info</span><span class="o">.</span><span class="n">src_shift_samples</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">ref_sample</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">ti</span><span class="p">[</span><span class="s">&quot;time_shift_at_beginning&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">ti</span><span class="p">[</span><span class="s">&quot;npts_before_shift_removal&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="o">.</span><span class="n">npts</span>
+        <span class="n">ti</span><span class="p">[</span><span class="s2">&quot;time_shift_at_beginning&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">ti</span><span class="p">[</span><span class="s2">&quot;npts_before_shift_removal&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="o">.</span><span class="n">npts</span>
 
-    <span class="c"># The reference sample, e.g. the sample at origin time.</span>
-    <span class="n">ti</span><span class="p">[</span><span class="s">&quot;ref_sample&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ref_sample</span>
+    <span class="c1"># The reference sample, e.g. the sample at origin time.</span>
+    <span class="n">ti</span><span class="p">[</span><span class="s2">&quot;ref_sample&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ref_sample</span>
 
     <span class="k">if</span> <span class="n">remove_source_shift</span><span class="p">:</span>
-        <span class="n">ti</span><span class="p">[</span><span class="s">&quot;starttime&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">origin_time</span>
-        <span class="n">ti</span><span class="p">[</span><span class="s">&quot;npts&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ti</span><span class="p">[</span><span class="s">&quot;npts_before_shift_removal&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">ti</span><span class="p">[</span><span class="s">&quot;ref_sample&quot;</span><span class="p">]</span>
+        <span class="n">ti</span><span class="p">[</span><span class="s2">&quot;starttime&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">origin_time</span>
+        <span class="n">ti</span><span class="p">[</span><span class="s2">&quot;npts&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ti</span><span class="p">[</span><span class="s2">&quot;npts_before_shift_removal&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">ti</span><span class="p">[</span><span class="s2">&quot;ref_sample&quot;</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">ti</span><span class="p">[</span><span class="s">&quot;starttime&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">origin_time</span> <span class="o">-</span> <span class="n">ti</span><span class="p">[</span><span class="s">&quot;ref_sample&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">dt_out</span>
-        <span class="n">ti</span><span class="p">[</span><span class="s">&quot;npts&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ti</span><span class="p">[</span><span class="s">&quot;npts_before_shift_removal&quot;</span><span class="p">]</span>
-    <span class="n">ti</span><span class="p">[</span><span class="s">&quot;endtime&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ti</span><span class="p">[</span><span class="s">&quot;starttime&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">ti</span><span class="p">[</span><span class="s">&quot;npts&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">dt_out</span>
+        <span class="n">ti</span><span class="p">[</span><span class="s2">&quot;starttime&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">origin_time</span> <span class="o">-</span> <span class="n">ti</span><span class="p">[</span><span class="s2">&quot;ref_sample&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">dt_out</span>
+        <span class="n">ti</span><span class="p">[</span><span class="s2">&quot;npts&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ti</span><span class="p">[</span><span class="s2">&quot;npts_before_shift_removal&quot;</span><span class="p">]</span>
+    <span class="n">ti</span><span class="p">[</span><span class="s2">&quot;endtime&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ti</span><span class="p">[</span><span class="s2">&quot;starttime&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">ti</span><span class="p">[</span><span class="s2">&quot;npts&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">dt_out</span>
 
     <span class="k">return</span> <span class="n">ti</span>
 </pre></div>
@@ -901,7 +901,7 @@
     </p>
     <p>
         &copy; Copyright 2014-2015, Lion Krischer and Martin van Driel.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.<br/>
     </p>
   </div>
 </footer>

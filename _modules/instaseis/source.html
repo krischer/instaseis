@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>instaseis.source &mdash; instaseis 0.1.1-4-ge667 documentation</title>
+    <title>instaseis.source &mdash; instaseis 0.1.1-5-g544d documentation</title>
     
     <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.1.1-4-ge667',
+        VERSION:     '0.1.1-5-g544d',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -31,7 +31,7 @@
     <script type="text/javascript" src="../../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../../_static/bootstrap-3.3.4/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../../_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.1.1-4-ge667 documentation" href="../../index.html" />
+    <link rel="top" title="instaseis 0.1.1-5-g544d documentation" href="../../index.html" />
     <link rel="up" title="instaseis" href="../instaseis.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.1.1-4-ge667</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.1.1-5-g544d</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -107,8 +107,8 @@
     <div class="col-md-12 content">
       
   <h1>Source code for instaseis.source</h1><div class="highlight"><pre>
-<span class="c">#!/usr/bin/env python</span>
-<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Source and Receiver classes of Instaseis.</span>
 
@@ -229,8 +229,8 @@
     <span class="n">n</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">delta</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span>
     <span class="n">n</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">delta</span><span class="p">)</span>
 
-    <span class="c"># Udias 16.99 - 16.104 is in geographic coordinates (North, East, Down),</span>
-    <span class="c"># here we use geocentric, i.e. t,p,r</span>
+    <span class="c1"># Udias 16.99 - 16.104 is in geographic coordinates (North, East, Down),</span>
+    <span class="c1"># here we use geocentric, i.e. t,p,r</span>
 
     <span class="n">transform</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.</span><span class="p">])</span>
     <span class="n">l</span> <span class="o">*=</span> <span class="n">transform</span>
@@ -254,8 +254,8 @@
     <span class="n">delta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">n_norm</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
     <span class="n">phi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">n_norm</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">n_norm</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 
-    <span class="c"># needs two different formulas, beqause the first is unstable for dip = 0</span>
-    <span class="c"># and the second for dip = 90</span>
+    <span class="c1"># needs two different formulas, beqause the first is unstable for dip = 0</span>
+    <span class="c1"># and the second for dip = 90</span>
     <span class="k">if</span> <span class="n">delta</span> <span class="o">&gt;</span> <span class="mf">0.1</span><span class="p">:</span>
         <span class="n">lambd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span>
             <span class="n">l_norm</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">delta</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="n">l_norm</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span> <span class="o">+</span>
@@ -286,21 +286,21 @@
 <span class="sd">    :param dt: sample interval</span>
 <span class="sd">    :type dt: float, optional</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c"># initialize</span>
+    <span class="c1"># initialize</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">tfall</span><span class="p">:</span>
         <span class="n">tfall</span> <span class="o">=</span> <span class="n">trise</span>
     <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">npts</span> <span class="o">*</span> <span class="n">dt</span><span class="p">,</span> <span class="n">npts</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
     <span class="n">asc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">npts</span><span class="p">)</span>
 
-    <span class="c"># build slices</span>
+    <span class="c1"># build slices</span>
     <span class="n">slrise</span> <span class="o">=</span> <span class="p">(</span><span class="n">t</span> <span class="o">&lt;=</span> <span class="n">trise</span><span class="p">)</span>
     <span class="n">slfall</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">t</span> <span class="o">&gt;</span> <span class="n">trise</span><span class="p">,</span> <span class="n">t</span> <span class="o">&lt;=</span> <span class="n">trise</span> <span class="o">+</span> <span class="n">tfall</span><span class="p">)</span>
 
-    <span class="c"># compute stf</span>
+    <span class="c1"># compute stf</span>
     <span class="n">asc</span><span class="p">[</span><span class="n">slrise</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">t</span><span class="p">[</span><span class="n">slrise</span><span class="p">]</span> <span class="o">/</span> <span class="n">trise</span><span class="p">))</span>
     <span class="n">asc</span><span class="p">[</span><span class="n">slfall</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="n">slfall</span><span class="p">]</span> <span class="o">-</span> <span class="n">trise</span> <span class="o">+</span> <span class="n">tfall</span><span class="p">)</span> <span class="o">/</span> <span class="n">tfall</span><span class="p">))</span>
 
-    <span class="c"># normalize</span>
+    <span class="c1"># normalize</span>
     <span class="n">asc</span> <span class="o">/=</span> <span class="n">trise</span> <span class="o">+</span> <span class="n">tfall</span>
 
     <span class="k">return</span> <span class="n">asc</span>
@@ -313,7 +313,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">depth_in_m</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">depth_in_m</span><span class="p">)</span> <span class="k">if</span> <span class="n">depth_in_m</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="k">else</span> <span class="bp">None</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="o">-</span><span class="mi">90</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latitude</span> <span class="o">&lt;=</span> <span class="mi">90</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Invalid Latitude Value&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid Latitude Value&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
@@ -457,37 +457,37 @@
 <span class="sd">            Mtp              :   1.75e+18 Nm</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">filename_or_obj</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)):</span>
-            <span class="c"># Anything ObsPy can read.</span>
+            <span class="c1"># Anything ObsPy can read.</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">src</span> <span class="o">=</span> <span class="n">obspy</span><span class="o">.</span><span class="n">readEvents</span><span class="p">(</span><span class="n">filename_or_obj</span><span class="p">)</span>
             <span class="k">except</span><span class="p">:</span>
                 <span class="k">pass</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">Source</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">src</span><span class="p">)</span>
-            <span class="c"># CMT solution file.</span>
+            <span class="c1"># CMT solution file.</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">Source</span><span class="o">.</span><span class="n">from_CMTSOLUTION_file</span><span class="p">(</span><span class="n">filename_or_obj</span><span class="p">)</span>
             <span class="k">except</span><span class="p">:</span>
                 <span class="k">pass</span>
-            <span class="k">raise</span> <span class="n">SourceParseError</span><span class="p">(</span><span class="s">&quot;Could not parse the given source.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">SourceParseError</span><span class="p">(</span><span class="s2">&quot;Could not parse the given source.&quot;</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">filename_or_obj</span><span class="p">,</span> <span class="n">obspy</span><span class="o">.</span><span class="n">Catalog</span><span class="p">):</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">filename_or_obj</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">SourceParseError</span><span class="p">(</span><span class="s">&quot;Event catalog contains zero events.&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">SourceParseError</span><span class="p">(</span><span class="s2">&quot;Event catalog contains zero events.&quot;</span><span class="p">)</span>
             <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">filename_or_obj</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">SourceParseError</span><span class="p">(</span>
-                    <span class="s">&quot;Event catalog contains </span><span class="si">%i</span><span class="s"> events. Only one is allowed. &quot;</span>
-                    <span class="s">&quot;Please parse seperately.&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">filename_or_obj</span><span class="p">))</span>
+                    <span class="s2">&quot;Event catalog contains </span><span class="si">%i</span><span class="s2"> events. Only one is allowed. &quot;</span>
+                    <span class="s2">&quot;Please parse seperately.&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">filename_or_obj</span><span class="p">))</span>
             <span class="k">return</span> <span class="n">Source</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">filename_or_obj</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">filename_or_obj</span><span class="p">,</span> <span class="n">obspy</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">):</span>
             <span class="n">ev</span> <span class="o">=</span> <span class="n">filename_or_obj</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">ev</span><span class="o">.</span><span class="n">origins</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">SourceParseError</span><span class="p">(</span><span class="s">&quot;Event must contain an origin.&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">SourceParseError</span><span class="p">(</span><span class="s2">&quot;Event must contain an origin.&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">ev</span><span class="o">.</span><span class="n">focal_mechanisms</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">SourceParseError</span><span class="p">(</span><span class="s">&quot;Event must contain a focal mechanism.&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">SourceParseError</span><span class="p">(</span><span class="s2">&quot;Event must contain a focal mechanism.&quot;</span><span class="p">)</span>
             <span class="n">org</span> <span class="o">=</span> <span class="n">ev</span><span class="o">.</span><span class="n">preferred_origin</span><span class="p">()</span> <span class="ow">or</span> <span class="n">ev</span><span class="o">.</span><span class="n">origins</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">fm</span> <span class="o">=</span> <span class="n">ev</span><span class="o">.</span><span class="n">preferred_focal_mechanism</span><span class="p">()</span> <span class="ow">or</span> <span class="n">ev</span><span class="o">.</span><span class="n">focal_mechanisms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">fm</span><span class="o">.</span><span class="n">moment_tensor</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">SourceParseError</span><span class="p">(</span><span class="s">&quot;Event must contain a moment tensor.&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">SourceParseError</span><span class="p">(</span><span class="s2">&quot;Event must contain a moment tensor.&quot;</span><span class="p">)</span>
             <span class="n">t</span> <span class="o">=</span> <span class="n">fm</span><span class="o">.</span><span class="n">moment_tensor</span><span class="o">.</span><span class="n">tensor</span>
             <span class="k">return</span> <span class="n">Source</span><span class="p">(</span>
                 <span class="n">latitude</span><span class="o">=</span><span class="n">elliptic_to_geocentric_latitude</span><span class="p">(</span><span class="n">org</span><span class="o">.</span><span class="n">latitude</span><span class="p">),</span>
@@ -501,8 +501,8 @@
                 <span class="n">m_rp</span><span class="o">=</span><span class="n">t</span><span class="o">.</span><span class="n">m_rp</span><span class="p">,</span>
                 <span class="n">m_tp</span><span class="o">=</span><span class="n">t</span><span class="o">.</span><span class="n">m_tp</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span>
-</div>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
     <span class="nd">@classmethod</span>
 <div class="viewcode-block" id="Source.from_CMTSOLUTION_file"><a class="viewcode-back" href="../../source.html#instaseis.source.Source.from_CMTSOLUTION_file">[docs]</a>    <span class="k">def</span> <span class="nf">from_CMTSOLUTION_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -529,7 +529,7 @@
 <span class="sd">            Mrp              :   4.52e+19 Nm</span>
 <span class="sd">            Mtp              :  -3.26e+19 Nm</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&quot;rt&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;rt&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
             <span class="n">origin_time</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">4</span><span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()[:</span><span class="mi">6</span><span class="p">]</span>
             <span class="n">values</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">origin_time</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span> <span class="o">+</span> \
@@ -537,7 +537,7 @@
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">origin_time</span> <span class="o">=</span> <span class="n">obspy</span><span class="o">.</span><span class="n">UTCDateTime</span><span class="p">(</span><span class="o">*</span><span class="n">values</span><span class="p">)</span>
             <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
-                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&quot;Could not determine origin time from line: </span><span class="si">%s</span><span class="s">&quot;</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Could not determine origin time from line: </span><span class="si">%s</span><span class="s2">&quot;</span>
                               <span class="o">%</span> <span class="n">line</span><span class="p">)</span>
                 <span class="n">origin_time</span> <span class="o">=</span> <span class="n">obspy</span><span class="o">.</span><span class="n">UTCDateTime</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
             <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
@@ -556,8 +556,8 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="p">(</span><span class="n">elliptic_to_geocentric_latitude</span><span class="p">(</span><span class="n">latitude</span><span class="p">),</span> <span class="n">longitude</span><span class="p">,</span>
                     <span class="n">depth_in_m</span><span class="p">,</span> <span class="n">m_rr</span><span class="p">,</span> <span class="n">m_tt</span><span class="p">,</span> <span class="n">m_pp</span><span class="p">,</span> <span class="n">m_rt</span><span class="p">,</span> <span class="n">m_rp</span><span class="p">,</span> <span class="n">m_tp</span><span class="p">,</span> <span class="n">time_shift</span><span class="p">,</span>
-                    <span class="n">origin_time</span><span class="o">=</span><span class="n">origin_time</span><span class="p">)</span>
-</div>
+                    <span class="n">origin_time</span><span class="o">=</span><span class="n">origin_time</span><span class="p">)</span></div>
+
     <span class="nd">@classmethod</span>
 <div class="viewcode-block" id="Source.from_strike_dip_rake"><a class="viewcode-back" href="../../source.html#instaseis.source.Source.from_strike_dip_rake">[docs]</a>    <span class="k">def</span> <span class="nf">from_strike_dip_rake</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="p">,</span> <span class="n">depth_in_m</span><span class="p">,</span> <span class="n">strike</span><span class="p">,</span>
                              <span class="n">dip</span><span class="p">,</span> <span class="n">rake</span><span class="p">,</span> <span class="n">M0</span><span class="p">,</span> <span class="n">time_shift</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">sliprate</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
@@ -605,11 +605,11 @@
         <span class="k">if</span> <span class="n">dt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="k">assert</span> <span class="n">dt</span> <span class="o">&gt;</span> <span class="mi">0</span>
 
-        <span class="c"># formulas in Udias (17.24) are in geographic system North, East,</span>
-        <span class="c"># Down, which # transforms to the geocentric as:</span>
-        <span class="c"># Mtt =  Mxx, Mpp = Myy, Mrr =  Mzz</span>
-        <span class="c"># Mrp = -Myz, Mrt = Mxz, Mtp = -Mxy</span>
-        <span class="c"># voigt in tpr: Mtt Mpp Mrr Mrp Mrt Mtp</span>
+        <span class="c1"># formulas in Udias (17.24) are in geographic system North, East,</span>
+        <span class="c1"># Down, which # transforms to the geocentric as:</span>
+        <span class="c1"># Mtt =  Mxx, Mpp = Myy, Mrr =  Mzz</span>
+        <span class="c1"># Mrp = -Myz, Mrt = Mxz, Mtp = -Mxy</span>
+        <span class="c1"># voigt in tpr: Mtt Mpp Mrr Mrp Mrt Mtp</span>
         <span class="n">phi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">strike</span><span class="p">)</span>
         <span class="n">delta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">dip</span><span class="p">)</span>
         <span class="n">lambd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">rake</span><span class="p">)</span>
@@ -636,13 +636,13 @@
                       <span class="n">m_rp</span><span class="p">,</span> <span class="n">m_tp</span><span class="p">,</span> <span class="n">time_shift</span><span class="p">,</span> <span class="n">sliprate</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span>
                       <span class="n">origin_time</span><span class="o">=</span><span class="n">origin_time</span><span class="p">)</span>
 
-        <span class="c"># storing strike, dip and rake for plotting purposes</span>
+        <span class="c1"># storing strike, dip and rake for plotting purposes</span>
         <span class="n">source</span><span class="o">.</span><span class="n">phi</span> <span class="o">=</span> <span class="n">phi</span>
         <span class="n">source</span><span class="o">.</span><span class="n">delta</span> <span class="o">=</span> <span class="n">delta</span>
         <span class="n">source</span><span class="o">.</span><span class="n">lambd</span> <span class="o">=</span> <span class="n">lambd</span>
 
-        <span class="k">return</span> <span class="n">source</span>
-</div>
+        <span class="k">return</span> <span class="n">source</span></div>
+
 <div class="viewcode-block" id="Source.write_CMTSOLUTION_file"><a class="viewcode-back" href="../../source.html#instaseis.source.Source.write_CMTSOLUTION_file">[docs]</a>    <span class="k">def</span> <span class="nf">write_CMTSOLUTION_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize a source object from a CMTSOLUTION file.</span>
@@ -652,11 +652,11 @@
 
 <span class="sd">        :param filename: path to the CMTSOLUTION file</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="c"># Reconstruct the first line as well as possible. All</span>
-            <span class="c"># hypocentral information is missing.</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;    </span><span class="si">%4i</span><span class="s"> </span><span class="si">%2i</span><span class="s"> </span><span class="si">%2i</span><span class="s"> </span><span class="si">%2i</span><span class="s"> </span><span class="si">%2i</span><span class="s"> </span><span class="si">%5.2f</span><span class="s"> </span><span class="si">%8.4f</span><span class="s"> </span><span class="si">%9.4f</span><span class="s"> </span><span class="si">%5.1f</span><span class="s"> </span><span class="si">%.1f</span><span class="s"> </span><span class="si">%.1f</span><span class="s">&#39;</span>
-                    <span class="s">&#39; </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="c1"># Reconstruct the first line as well as possible. All</span>
+            <span class="c1"># hypocentral information is missing.</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;    </span><span class="si">%4i</span><span class="s1"> </span><span class="si">%2i</span><span class="s1"> </span><span class="si">%2i</span><span class="s1"> </span><span class="si">%2i</span><span class="s1"> </span><span class="si">%2i</span><span class="s1"> </span><span class="si">%5.2f</span><span class="s1"> </span><span class="si">%8.4f</span><span class="s1"> </span><span class="si">%9.4f</span><span class="s1"> </span><span class="si">%5.1f</span><span class="s1"> </span><span class="si">%.1f</span><span class="s1"> </span><span class="si">%.1f</span><span class="s1">&#39;</span>
+                    <span class="s1">&#39; </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">origin_time</span><span class="o">.</span><span class="n">year</span><span class="p">,</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">origin_time</span><span class="o">.</span><span class="n">month</span><span class="p">,</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">origin_time</span><span class="o">.</span><span class="n">day</span><span class="p">,</span>
@@ -667,28 +667,28 @@
                         <span class="n">geocentric_to_elliptic_latitude</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">latitude</span><span class="p">),</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">longitude</span><span class="p">,</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">depth_in_m</span> <span class="o">/</span> <span class="mf">1e3</span><span class="p">,</span>
-                        <span class="c"># Just write the moment magnitude twice...we don&#39;t</span>
-                        <span class="c"># have any other.</span>
+                        <span class="c1"># Just write the moment magnitude twice...we don&#39;t</span>
+                        <span class="c1"># have any other.</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">moment_magnitude</span><span class="p">,</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">moment_magnitude</span><span class="p">,</span>
                         <span class="n">FlinnEngdahl</span><span class="p">()</span><span class="o">.</span><span class="n">get_region</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">longitude</span><span class="p">,</span>
                                                   <span class="bp">self</span><span class="o">.</span><span class="n">latitude</span><span class="p">)))</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;event name:  nn</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;time shift:     </span><span class="si">%5.2f</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time_shift</span><span class="p">,))</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;half duration:  0.0</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
-            <span class="c"># Convert latitude to WGS84.</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;latitude:       </span><span class="si">%7.4f</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;event name:  nn</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;time shift:     </span><span class="si">%5.2f</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time_shift</span><span class="p">,))</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;half duration:  0.0</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="c1"># Convert latitude to WGS84.</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;latitude:       </span><span class="si">%7.4f</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
                 <span class="n">geocentric_to_elliptic_latitude</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">latitude</span><span class="p">),))</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;longitude:      </span><span class="si">%7.4f</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">longitude</span><span class="p">,))</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;depth:          </span><span class="si">%7.4f</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">depth_in_m</span> <span class="o">/</span> <span class="mf">1e3</span><span class="p">,))</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;longitude:      </span><span class="si">%7.4f</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">longitude</span><span class="p">,))</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;depth:          </span><span class="si">%7.4f</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">depth_in_m</span> <span class="o">/</span> <span class="mf">1e3</span><span class="p">,))</span>
 
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;Mrr:            </span><span class="si">%7.4f</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m_rr</span> <span class="o">*</span> <span class="mf">1e7</span><span class="p">,))</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;Mtt:            </span><span class="si">%7.4f</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m_tt</span> <span class="o">*</span> <span class="mf">1e7</span><span class="p">,))</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;Mpp:            </span><span class="si">%7.4f</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m_pp</span> <span class="o">*</span> <span class="mf">1e7</span><span class="p">,))</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;Mrt:            </span><span class="si">%7.4f</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m_rt</span> <span class="o">*</span> <span class="mf">1e7</span><span class="p">,))</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;Mrp:            </span><span class="si">%7.4f</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m_rp</span> <span class="o">*</span> <span class="mf">1e7</span><span class="p">,))</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;Mtp:            </span><span class="si">%7.4f</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m_tp</span> <span class="o">*</span> <span class="mf">1e7</span><span class="p">,))</span>
-</div>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;Mrr:            </span><span class="si">%7.4f</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m_rr</span> <span class="o">*</span> <span class="mf">1e7</span><span class="p">,))</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;Mtt:            </span><span class="si">%7.4f</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m_tt</span> <span class="o">*</span> <span class="mf">1e7</span><span class="p">,))</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;Mpp:            </span><span class="si">%7.4f</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m_pp</span> <span class="o">*</span> <span class="mf">1e7</span><span class="p">,))</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;Mrt:            </span><span class="si">%7.4f</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m_rt</span> <span class="o">*</span> <span class="mf">1e7</span><span class="p">,))</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;Mrp:            </span><span class="si">%7.4f</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m_rp</span> <span class="o">*</span> <span class="mf">1e7</span><span class="p">,))</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;Mtp:            </span><span class="si">%7.4f</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m_tp</span> <span class="o">*</span> <span class="mf">1e7</span><span class="p">,))</span></div>
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">M0</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -737,8 +737,8 @@
         <span class="k">if</span> <span class="n">normalize</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">trapz</span><span class="p">(</span><span class="n">sliprate</span><span class="p">,</span> <span class="n">dx</span><span class="o">=</span><span class="n">dt</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="n">dt</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">time_shift</span> <span class="o">=</span> <span class="n">time_shift</span>
-</div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time_shift</span> <span class="o">=</span> <span class="n">time_shift</span></div>
+
 <div class="viewcode-block" id="Source.resample_sliprate"><a class="viewcode-back" href="../../source.html#instaseis.source.Source.resample_sliprate">[docs]</a>    <span class="k">def</span> <span class="nf">resample_sliprate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">nsamp</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        For convolution, the sliprate is needed at the sampling of the fields</span>
@@ -753,8 +753,8 @@
                             <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span><span class="p">),</span> <span class="n">endpoint</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span> <span class="o">=</span> <span class="n">interp</span><span class="p">(</span><span class="n">t_new</span><span class="p">,</span> <span class="n">t_old</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="n">dt</span>
-</div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="n">dt</span></div>
+
 <div class="viewcode-block" id="Source.set_sliprate_dirac"><a class="viewcode-back" href="../../source.html#instaseis.source.Source.set_sliprate_dirac">[docs]</a>    <span class="k">def</span> <span class="nf">set_sliprate_dirac</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">nsamp</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param dt: desired sampling</span>
@@ -762,8 +762,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nsamp</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">dt</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="n">dt</span>
-</div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="n">dt</span></div>
+
 <div class="viewcode-block" id="Source.set_sliprate_lp"><a class="viewcode-back" href="../../source.html#instaseis.source.Source.set_sliprate_lp">[docs]</a>    <span class="k">def</span> <span class="nf">set_sliprate_lp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">nsamp</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">corners</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">zerophase</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param dt: desired sampling</span>
@@ -772,38 +772,38 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nsamp</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">dt</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span> <span class="o">=</span> <span class="n">lowpass</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="mf">1.</span><span class="o">/</span><span class="n">dt</span><span class="p">,</span> <span class="n">corners</span><span class="p">,</span> <span class="n">zerophase</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="n">dt</span>
-</div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="n">dt</span></div>
+
 <div class="viewcode-block" id="Source.normalize_sliprate"><a class="viewcode-back" href="../../source.html#instaseis.source.Source.normalize_sliprate">[docs]</a>    <span class="k">def</span> <span class="nf">normalize_sliprate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        normalize the sliprate using trapezoidal rule</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">trapz</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span><span class="p">,</span> <span class="n">dx</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
-</div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">trapz</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span><span class="p">,</span> <span class="n">dx</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span></div>
+
     <span class="k">def</span> <span class="nf">lp_sliprate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">corners</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">zerophase</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span> <span class="o">=</span> <span class="n">lowpass</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="mf">1.</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span> <span class="n">corners</span><span class="p">,</span>
                                 <span class="n">zerophase</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">return_str</span> <span class="o">=</span> <span class="s">&#39;Instaseis Source:</span><span class="se">\n</span><span class="s">&#39;</span>
-        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">origin time      : </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">origin_time</span><span class="p">,)</span>
-        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">Longitude        : </span><span class="si">%6.1f</span><span class="s"> deg</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">longitude</span><span class="p">,)</span>
-        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">Latitude         : </span><span class="si">%6.1f</span><span class="s"> deg</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">latitude</span><span class="p">,)</span>
-        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">Depth            : </span><span class="si">%6.1e</span><span class="s"> km</span><span class="se">\n</span><span class="s">&#39;</span> \
+        <span class="n">return_str</span> <span class="o">=</span> <span class="s1">&#39;Instaseis Source:</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">origin time      : </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">origin_time</span><span class="p">,)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Longitude        : </span><span class="si">%6.1f</span><span class="s1"> deg</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">longitude</span><span class="p">,)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Latitude         : </span><span class="si">%6.1f</span><span class="s1"> deg</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">latitude</span><span class="p">,)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Depth            : </span><span class="si">%6.1e</span><span class="s1"> km</span><span class="se">\n</span><span class="s1">&#39;</span> \
                       <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">depth_in_m</span> <span class="o">/</span> <span class="mf">1e3</span><span class="p">,)</span>
-        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">Moment Magnitude :   </span><span class="si">%4.2f</span><span class="se">\n</span><span class="s">&#39;</span> \
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Moment Magnitude :   </span><span class="si">%4.2f</span><span class="se">\n</span><span class="s1">&#39;</span> \
                       <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">moment_magnitude</span><span class="p">,)</span>
-        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">Scalar Moment    : </span><span class="si">%10.2e</span><span class="s"> Nm</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">M0</span><span class="p">,)</span>
-        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">Mrr              : </span><span class="si">%10.2e</span><span class="s"> Nm</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m_rr</span><span class="p">,)</span>
-        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">Mtt              : </span><span class="si">%10.2e</span><span class="s"> Nm</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m_tt</span><span class="p">,)</span>
-        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">Mpp              : </span><span class="si">%10.2e</span><span class="s"> Nm</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m_pp</span><span class="p">,)</span>
-        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">Mrt              : </span><span class="si">%10.2e</span><span class="s"> Nm</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m_rt</span><span class="p">,)</span>
-        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">Mrp              : </span><span class="si">%10.2e</span><span class="s"> Nm</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m_rp</span><span class="p">,)</span>
-        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">Mtp              : </span><span class="si">%10.2e</span><span class="s"> Nm</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m_tp</span><span class="p">,)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Scalar Moment    : </span><span class="si">%10.2e</span><span class="s1"> Nm</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">M0</span><span class="p">,)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Mrr              : </span><span class="si">%10.2e</span><span class="s1"> Nm</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m_rr</span><span class="p">,)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Mtt              : </span><span class="si">%10.2e</span><span class="s1"> Nm</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m_tt</span><span class="p">,)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Mpp              : </span><span class="si">%10.2e</span><span class="s1"> Nm</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m_pp</span><span class="p">,)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Mrt              : </span><span class="si">%10.2e</span><span class="s1"> Nm</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m_rt</span><span class="p">,)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Mrp              : </span><span class="si">%10.2e</span><span class="s1"> Nm</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m_rp</span><span class="p">,)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Mtp              : </span><span class="si">%10.2e</span><span class="s1"> Nm</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m_tp</span><span class="p">,)</span>
 
-        <span class="k">return</span> <span class="n">return_str</span>
+        <span class="k">return</span> <span class="n">return_str</span></div>
 
-</div>
+
 <div class="viewcode-block" id="ForceSource"><a class="viewcode-back" href="../../source.html#instaseis.source.ForceSource">[docs]</a><span class="k">class</span> <span class="nc">ForceSource</span><span class="p">(</span><span class="n">SourceOrReceiver</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class to handle a seismic force source.</span>
@@ -857,17 +857,17 @@
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">f_t</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_r</span><span class="p">])</span>
 
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">return_str</span> <span class="o">=</span> <span class="s">&#39;Instaseis Force Source:</span><span class="se">\n</span><span class="s">&#39;</span>
-        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">origin time      : </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">origin_time</span><span class="p">,)</span>
-        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">longitude : </span><span class="si">%6.1f</span><span class="s"> deg</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">longitude</span><span class="p">)</span>
-        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">latitude  : </span><span class="si">%6.1f</span><span class="s"> deg</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">latitude</span><span class="p">)</span>
-        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">Fr        : </span><span class="si">%10.2e</span><span class="s"> N</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f_r</span><span class="p">)</span>
-        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">Ft        : </span><span class="si">%10.2e</span><span class="s"> N</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f_t</span><span class="p">)</span>
-        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">Fp        : </span><span class="si">%10.2e</span><span class="s"> N</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f_p</span><span class="p">)</span>
+        <span class="n">return_str</span> <span class="o">=</span> <span class="s1">&#39;Instaseis Force Source:</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">origin time      : </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">origin_time</span><span class="p">,)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">longitude : </span><span class="si">%6.1f</span><span class="s1"> deg</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">longitude</span><span class="p">)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">latitude  : </span><span class="si">%6.1f</span><span class="s1"> deg</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">latitude</span><span class="p">)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Fr        : </span><span class="si">%10.2e</span><span class="s1"> N</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f_r</span><span class="p">)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Ft        : </span><span class="si">%10.2e</span><span class="s1"> N</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f_t</span><span class="p">)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Fp        : </span><span class="si">%10.2e</span><span class="s1"> N</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f_p</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">return_str</span>
+        <span class="k">return</span> <span class="n">return_str</span></div>
 
-</div>
+
 <div class="viewcode-block" id="Receiver"><a class="viewcode-back" href="../../source.html#instaseis.source.Receiver">[docs]</a><span class="k">class</span> <span class="nc">Receiver</span><span class="p">(</span><span class="n">SourceOrReceiver</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class dealing with seismic receivers.</span>
@@ -900,25 +900,25 @@
                  <span class="n">location</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">depth_in_m</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">Receiver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="p">,</span>
                                        <span class="n">depth_in_m</span><span class="o">=</span><span class="n">depth_in_m</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">network</span> <span class="o">=</span> <span class="n">network</span> <span class="ow">or</span> <span class="s">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">network</span> <span class="o">=</span> <span class="n">network</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">network</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">2</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">station</span> <span class="o">=</span> <span class="n">station</span> <span class="ow">or</span> <span class="s">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">station</span> <span class="o">=</span> <span class="n">station</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">station</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">station</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">station</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">5</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">location</span> <span class="o">=</span> <span class="n">location</span> <span class="ow">or</span> <span class="s">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">location</span> <span class="o">=</span> <span class="n">location</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">location</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">2</span>
 
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">return_str</span> <span class="o">=</span> <span class="s">&#39;Instaseis Receiver:</span><span class="se">\n</span><span class="s">&#39;</span>
-        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">longitude : </span><span class="si">%6.1f</span><span class="s"> deg</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">longitude</span><span class="p">)</span>
-        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">latitude  : </span><span class="si">%6.1f</span><span class="s"> deg</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">latitude</span><span class="p">)</span>
-        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">network   : </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="p">)</span>
-        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">station   : </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">station</span><span class="p">)</span>
-        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">location  : </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="p">)</span>
+        <span class="n">return_str</span> <span class="o">=</span> <span class="s1">&#39;Instaseis Receiver:</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">longitude : </span><span class="si">%6.1f</span><span class="s1"> deg</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">longitude</span><span class="p">)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">latitude  : </span><span class="si">%6.1f</span><span class="s1"> deg</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">latitude</span><span class="p">)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">network   : </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="p">)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">station   : </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">station</span><span class="p">)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">location  : </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">return_str</span>
 
@@ -953,46 +953,46 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">receivers</span> <span class="o">=</span> <span class="p">[]</span>
 
-        <span class="c"># STATIONS file.</span>
+        <span class="c1"># STATIONS file.</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">filename_or_obj</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">))</span> <span class="ow">and</span> \
                 <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">filename_or_obj</span><span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">Receiver</span><span class="o">.</span><span class="n">_parse_stations_file</span><span class="p">(</span><span class="n">filename_or_obj</span><span class="p">)</span>
             <span class="k">except</span><span class="p">:</span>
                 <span class="k">pass</span>
-        <span class="c"># ObsPy inventory.</span>
+        <span class="c1"># ObsPy inventory.</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">filename_or_obj</span><span class="p">,</span> <span class="n">obspy</span><span class="o">.</span><span class="n">station</span><span class="o">.</span><span class="n">Inventory</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">network</span> <span class="ow">in</span> <span class="n">filename_or_obj</span><span class="p">:</span>
                 <span class="n">receivers</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">Receiver</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">network</span><span class="p">))</span>
             <span class="k">return</span> <span class="n">receivers</span>
-        <span class="c"># ObsPy network.</span>
+        <span class="c1"># ObsPy network.</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">filename_or_obj</span><span class="p">,</span> <span class="n">obspy</span><span class="o">.</span><span class="n">station</span><span class="o">.</span><span class="n">Network</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">station</span> <span class="ow">in</span> <span class="n">filename_or_obj</span><span class="p">:</span>
                 <span class="n">receivers</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">Receiver</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span>
                     <span class="n">station</span><span class="p">,</span> <span class="n">network_code</span><span class="o">=</span><span class="n">filename_or_obj</span><span class="o">.</span><span class="n">code</span><span class="p">))</span>
             <span class="k">return</span> <span class="n">receivers</span>
-        <span class="c"># ObsPy station.</span>
+        <span class="c1"># ObsPy station.</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">filename_or_obj</span><span class="p">,</span> <span class="n">obspy</span><span class="o">.</span><span class="n">station</span><span class="o">.</span><span class="n">Station</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">network_code</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">ReceiverParseError</span><span class="p">(</span><span class="s">&quot;network_code must be given.&quot;</span><span class="p">)</span>
-            <span class="c"># If there are no channels, use the station coordinates.</span>
+                <span class="k">raise</span> <span class="n">ReceiverParseError</span><span class="p">(</span><span class="s2">&quot;network_code must be given.&quot;</span><span class="p">)</span>
+            <span class="c1"># If there are no channels, use the station coordinates.</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">filename_or_obj</span><span class="o">.</span><span class="n">channels</span><span class="p">:</span>
                 <span class="k">return</span> <span class="p">[</span><span class="n">Receiver</span><span class="p">(</span>
                     <span class="n">latitude</span><span class="o">=</span><span class="n">elliptic_to_geocentric_latitude</span><span class="p">(</span>
                         <span class="n">filename_or_obj</span><span class="o">.</span><span class="n">latitude</span><span class="p">),</span>
                     <span class="n">longitude</span><span class="o">=</span><span class="n">filename_or_obj</span><span class="o">.</span><span class="n">longitude</span><span class="p">,</span>
                     <span class="n">network</span><span class="o">=</span><span class="n">network_code</span><span class="p">,</span> <span class="n">station</span><span class="o">=</span><span class="n">filename_or_obj</span><span class="o">.</span><span class="n">code</span><span class="p">)]</span>
-            <span class="c"># Otherwise use the channel information. Raise an error if the</span>
-            <span class="c"># coordinates are not identical for each channel. Only parse</span>
-            <span class="c"># latitude and longitude, as the DB currently cannot deal with</span>
-            <span class="c"># varying receiver heights.</span>
+            <span class="c1"># Otherwise use the channel information. Raise an error if the</span>
+            <span class="c1"># coordinates are not identical for each channel. Only parse</span>
+            <span class="c1"># latitude and longitude, as the DB currently cannot deal with</span>
+            <span class="c1"># varying receiver heights.</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">coords</span> <span class="o">=</span> <span class="nb">set</span><span class="p">((</span><span class="n">_i</span><span class="o">.</span><span class="n">latitude</span><span class="p">,</span> <span class="n">_i</span><span class="o">.</span><span class="n">longitude</span><span class="p">)</span> <span class="k">for</span> <span class="n">_i</span> <span class="ow">in</span>
                              <span class="n">filename_or_obj</span><span class="o">.</span><span class="n">channels</span><span class="p">)</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="n">ReceiverParseError</span><span class="p">(</span>
-                        <span class="s">&quot;The coordinates of the channels of station &#39;</span><span class="si">%s</span><span class="s">.</span><span class="si">%s</span><span class="s">&#39; &quot;</span>
-                        <span class="s">&quot;are not identical.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">network_code</span><span class="p">,</span>
+                        <span class="s2">&quot;The coordinates of the channels of station &#39;</span><span class="si">%s</span><span class="s2">.</span><span class="si">%s</span><span class="s2">&#39; &quot;</span>
+                        <span class="s2">&quot;are not identical.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">network_code</span><span class="p">,</span>
                                                 <span class="n">filename_or_obj</span><span class="o">.</span><span class="n">code</span><span class="p">))</span>
                 <span class="n">coords</span> <span class="o">=</span> <span class="n">coords</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
                 <span class="k">return</span> <span class="p">[</span><span class="n">Receiver</span><span class="p">(</span>
@@ -1000,20 +1000,20 @@
                     <span class="n">longitude</span><span class="o">=</span><span class="n">coords</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
                     <span class="n">network</span><span class="o">=</span><span class="n">network_code</span><span class="p">,</span>
                     <span class="n">station</span><span class="o">=</span><span class="n">filename_or_obj</span><span class="o">.</span><span class="n">code</span><span class="p">)]</span>
-        <span class="c"># ObsPy Stream (SAC files contain coordinates).</span>
+        <span class="c1"># ObsPy Stream (SAC files contain coordinates).</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">filename_or_obj</span><span class="p">,</span> <span class="n">obspy</span><span class="o">.</span><span class="n">Stream</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">tr</span> <span class="ow">in</span> <span class="n">filename_or_obj</span><span class="p">:</span>
                 <span class="n">receivers</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">Receiver</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">tr</span><span class="p">))</span>
             <span class="k">return</span> <span class="n">receivers</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">filename_or_obj</span><span class="p">,</span> <span class="n">obspy</span><span class="o">.</span><span class="n">Trace</span><span class="p">):</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">filename_or_obj</span><span class="o">.</span><span class="n">stats</span><span class="p">,</span> <span class="s">&quot;sac&quot;</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="n">ReceiverParseError</span><span class="p">(</span><span class="s">&quot;ObsPy Trace must have an sac &quot;</span>
-                                         <span class="s">&quot;attribute.&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">filename_or_obj</span><span class="o">.</span><span class="n">stats</span><span class="p">,</span> <span class="s2">&quot;sac&quot;</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">ReceiverParseError</span><span class="p">(</span><span class="s2">&quot;ObsPy Trace must have an sac &quot;</span>
+                                         <span class="s2">&quot;attribute.&quot;</span><span class="p">)</span>
             <span class="n">coords</span> <span class="o">=</span> <span class="p">(</span><span class="n">filename_or_obj</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">sac</span><span class="o">.</span><span class="n">stla</span><span class="p">,</span>
                       <span class="n">filename_or_obj</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">sac</span><span class="o">.</span><span class="n">stlo</span><span class="p">)</span>
             <span class="k">if</span> <span class="o">-</span><span class="mf">12345.0</span> <span class="ow">in</span> <span class="n">coords</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">ReceiverParseError</span><span class="p">(</span>
-                    <span class="s">&quot;SAC file does not contain coordinates for channel &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span>
+                    <span class="s2">&quot;SAC file does not contain coordinates for channel &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span>
                     <span class="n">filename_or_obj</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
             <span class="k">return</span> <span class="p">[</span><span class="n">Receiver</span><span class="p">(</span>
                 <span class="n">latitude</span><span class="o">=</span><span class="n">elliptic_to_geocentric_latitude</span><span class="p">(</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
@@ -1023,15 +1023,15 @@
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">filename_or_obj</span><span class="p">,</span> <span class="n">obspy</span><span class="o">.</span><span class="n">xseed</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">Parser</span><span class="p">):</span>
             <span class="n">inv</span> <span class="o">=</span> <span class="n">filename_or_obj</span><span class="o">.</span><span class="n">getInventory</span><span class="p">()</span>
             <span class="n">stations</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">chan</span> <span class="ow">in</span> <span class="n">inv</span><span class="p">[</span><span class="s">&quot;channels&quot;</span><span class="p">]:</span>
-                <span class="n">stat</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">chan</span><span class="p">[</span><span class="s">&quot;channel_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;.&quot;</span><span class="p">)[:</span><span class="mi">2</span><span class="p">])</span>
-                <span class="n">stations</span><span class="p">[</span><span class="n">stat</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">chan</span><span class="p">[</span><span class="s">&quot;latitude&quot;</span><span class="p">],</span> <span class="n">chan</span><span class="p">[</span><span class="s">&quot;longitude&quot;</span><span class="p">]))</span>
+            <span class="k">for</span> <span class="n">chan</span> <span class="ow">in</span> <span class="n">inv</span><span class="p">[</span><span class="s2">&quot;channels&quot;</span><span class="p">]:</span>
+                <span class="n">stat</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">chan</span><span class="p">[</span><span class="s2">&quot;channel_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[:</span><span class="mi">2</span><span class="p">])</span>
+                <span class="n">stations</span><span class="p">[</span><span class="n">stat</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">chan</span><span class="p">[</span><span class="s2">&quot;latitude&quot;</span><span class="p">],</span> <span class="n">chan</span><span class="p">[</span><span class="s2">&quot;longitude&quot;</span><span class="p">]))</span>
             <span class="n">receivers</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">stations</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">value</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="n">ReceiverParseError</span><span class="p">(</span>
-                        <span class="s">&quot;The coordinates of the channels of station &#39;</span><span class="si">%s</span><span class="s">.</span><span class="si">%s</span><span class="s">&#39; &quot;</span>
-                        <span class="s">&quot;are not identical&quot;</span> <span class="o">%</span> <span class="n">key</span><span class="p">)</span>
+                        <span class="s2">&quot;The coordinates of the channels of station &#39;</span><span class="si">%s</span><span class="s2">.</span><span class="si">%s</span><span class="s2">&#39; &quot;</span>
+                        <span class="s2">&quot;are not identical&quot;</span> <span class="o">%</span> <span class="n">key</span><span class="p">)</span>
                 <span class="n">receivers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Receiver</span><span class="p">(</span>
                     <span class="n">latitude</span><span class="o">=</span><span class="n">elliptic_to_geocentric_latitude</span><span class="p">(</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]),</span>
                     <span class="n">longitude</span><span class="o">=</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
@@ -1039,24 +1039,24 @@
                     <span class="n">station</span><span class="o">=</span><span class="n">key</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
             <span class="k">return</span> <span class="n">receivers</span>
 
-        <span class="c"># Check if its anything ObsPy can read and recurse.</span>
+        <span class="c1"># Check if its anything ObsPy can read and recurse.</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">Receiver</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">obspy</span><span class="o">.</span><span class="n">read_inventory</span><span class="p">(</span><span class="n">filename_or_obj</span><span class="p">))</span>
         <span class="k">except</span> <span class="n">ReceiverParseError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">e</span>
         <span class="k">except</span><span class="p">:</span>
             <span class="k">pass</span>
-        <span class="c"># Many StationXML files do not conform to the standard, thus the</span>
-        <span class="c"># ObsPy format detection fails. Catch those here.</span>
+        <span class="c1"># Many StationXML files do not conform to the standard, thus the</span>
+        <span class="c1"># ObsPy format detection fails. Catch those here.</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">Receiver</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">obspy</span><span class="o">.</span><span class="n">read_inventory</span><span class="p">(</span><span class="n">filename_or_obj</span><span class="p">,</span>
-                                                       <span class="n">format</span><span class="o">=</span><span class="s">&quot;stationxml&quot;</span><span class="p">))</span>
+                                                       <span class="n">format</span><span class="o">=</span><span class="s2">&quot;stationxml&quot;</span><span class="p">))</span>
         <span class="k">except</span> <span class="n">ReceiverParseError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">e</span>
         <span class="k">except</span><span class="p">:</span>
             <span class="k">pass</span>
 
-        <span class="c"># SAC files contain station coordinates.</span>
+        <span class="c1"># SAC files contain station coordinates.</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">Receiver</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">obspy</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">filename_or_obj</span><span class="p">))</span>
         <span class="k">except</span> <span class="n">ReceiverParseError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
@@ -1064,7 +1064,7 @@
         <span class="k">except</span><span class="p">:</span>
             <span class="k">pass</span>
 
-        <span class="c"># Last but not least try to parse it as a SEED file.</span>
+        <span class="c1"># Last but not least try to parse it as a SEED file.</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">Receiver</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">obspy</span><span class="o">.</span><span class="n">xseed</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">Parser</span><span class="p">(</span><span class="n">filename_or_obj</span><span class="p">))</span>
         <span class="k">except</span> <span class="n">ReceiverParseError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
@@ -1072,8 +1072,8 @@
         <span class="k">except</span><span class="p">:</span>
             <span class="k">pass</span>
 
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;&#39;</span><span class="si">%s</span><span class="s">&#39; could not be parsed.&quot;</span> <span class="o">%</span> <span class="nb">repr</span><span class="p">(</span><span class="n">filename_or_obj</span><span class="p">))</span>
-</div>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;</span><span class="si">%s</span><span class="s2">&#39; could not be parsed.&quot;</span> <span class="o">%</span> <span class="nb">repr</span><span class="p">(</span><span class="n">filename_or_obj</span><span class="p">))</span></div>
+
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_parse_stations_file</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1085,7 +1085,7 @@
 <span class="sd">        :param filename: Filename</span>
 <span class="sd">        :return: List of :class:`~instaseis.source.Receiver` objects.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&#39;rt&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;rt&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">receivers</span> <span class="o">=</span> <span class="p">[]</span>
 
             <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
@@ -1094,9 +1094,9 @@
                 <span class="n">lon</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">lon</span><span class="p">)</span>
                 <span class="n">receivers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Receiver</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">network</span><span class="p">,</span> <span class="n">station</span><span class="p">))</span>
 
-        <span class="k">return</span> <span class="n">receivers</span>
+        <span class="k">return</span> <span class="n">receivers</span></div>
 
-</div>
+
 <div class="viewcode-block" id="FiniteSource"><a class="viewcode-back" href="../../source.html#instaseis.source.FiniteSource">[docs]</a><span class="k">class</span> <span class="nc">FiniteSource</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A class to handle finite sources represented by a number of point sources.</span>
@@ -1138,11 +1138,11 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        For Py2K compat.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__next__</span><span class="p">()</span>
-</div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__next__</span><span class="p">()</span></div>
+
     <span class="k">def</span> <span class="nf">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pointsources</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;FiniteSource not Initialized&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;FiniteSource not Initialized&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">current</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointsources</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">current</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="k">raise</span> <span class="ne">StopIteration</span>
@@ -1186,10 +1186,10 @@
 <span class="sd">            max longitude        : -145.7 deg</span>
 <span class="sd">            hypocenter longitude : -145.7 deg</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&quot;rt&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="c"># go to POINTS block</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;rt&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="c1"># go to POINTS block</span>
             <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
-            <span class="k">while</span> <span class="s">&#39;POINTS&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="k">while</span> <span class="s1">&#39;POINTS&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
                 <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
 
             <span class="n">npoints</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span>
@@ -1199,17 +1199,17 @@
                 <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">dep</span><span class="p">,</span> <span class="n">stk</span><span class="p">,</span> <span class="n">dip</span><span class="p">,</span> <span class="n">area</span><span class="p">,</span> <span class="n">tinit</span><span class="p">,</span> <span class="n">dt</span> <span class="o">=</span> \
                     <span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
 
-                <span class="c"># Convert latitude to a geocentric latitude.</span>
+                <span class="c1"># Convert latitude to a geocentric latitude.</span>
                 <span class="n">lat</span> <span class="o">=</span> <span class="n">elliptic_to_geocentric_latitude</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span>
 
                 <span class="n">rake</span><span class="p">,</span> <span class="n">slip1</span><span class="p">,</span> <span class="n">nt1</span><span class="p">,</span> <span class="n">slip2</span><span class="p">,</span> <span class="n">nt2</span><span class="p">,</span> <span class="n">slip3</span><span class="p">,</span> <span class="n">nt3</span> <span class="o">=</span> \
                     <span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
 
-                <span class="n">dep</span> <span class="o">*=</span> <span class="mf">1e3</span>     <span class="c"># km   &gt; m</span>
-                <span class="n">area</span> <span class="o">*=</span> <span class="mf">1e-4</span>   <span class="c"># cm^2 &gt; m^2</span>
-                <span class="n">slip1</span> <span class="o">*=</span> <span class="mf">1e-2</span>  <span class="c"># cm   &gt; m</span>
-                <span class="n">slip2</span> <span class="o">*=</span> <span class="mf">1e-2</span>  <span class="c"># cm   &gt; m</span>
-                <span class="c"># slip3 *= 1e-2  # cm   &gt; m</span>
+                <span class="n">dep</span> <span class="o">*=</span> <span class="mf">1e3</span>     <span class="c1"># km   &gt; m</span>
+                <span class="n">area</span> <span class="o">*=</span> <span class="mf">1e-4</span>   <span class="c1"># cm^2 &gt; m^2</span>
+                <span class="n">slip1</span> <span class="o">*=</span> <span class="mf">1e-2</span>  <span class="c1"># cm   &gt; m</span>
+                <span class="n">slip2</span> <span class="o">*=</span> <span class="mf">1e-2</span>  <span class="c1"># cm   &gt; m</span>
+                <span class="c1"># slip3 *= 1e-2  # cm   &gt; m</span>
 
                 <span class="n">nt1</span><span class="p">,</span> <span class="n">nt2</span><span class="p">,</span> <span class="n">nt3</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="p">(</span><span class="n">nt1</span><span class="p">,</span> <span class="n">nt2</span><span class="p">,</span> <span class="n">nt3</span><span class="p">))</span>
 
@@ -1244,10 +1244,10 @@
                             <span class="n">time_shift</span><span class="o">=</span><span class="n">tinit</span><span class="p">,</span> <span class="n">sliprate</span><span class="o">=</span><span class="n">stf</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">))</span>
 
                 <span class="k">if</span> <span class="n">nt3</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&#39;Slip along u3 axis&#39;</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Slip along u3 axis&#39;</span><span class="p">)</span>
 
-            <span class="k">return</span> <span class="bp">self</span><span class="p">(</span><span class="n">pointsources</span><span class="o">=</span><span class="n">sources</span><span class="p">)</span>
-</div>
+            <span class="k">return</span> <span class="bp">self</span><span class="p">(</span><span class="n">pointsources</span><span class="o">=</span><span class="n">sources</span><span class="p">)</span></div>
+
     <span class="nd">@classmethod</span>
 <div class="viewcode-block" id="FiniteSource.from_usgs_param_file"><a class="viewcode-back" href="../../source.html#instaseis.source.FiniteSource.from_usgs_param_file">[docs]</a>    <span class="k">def</span> <span class="nf">from_usgs_param_file</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">filename_or_obj</span><span class="p">,</span> <span class="n">npts</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
                              <span class="n">trise_min</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
@@ -1292,70 +1292,70 @@
 <span class="sd">            max longitude        : -145.7 deg</span>
 <span class="sd">            hypocenter longitude : -145.7 deg</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">filename_or_obj</span><span class="p">,</span> <span class="s">&quot;readline&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">filename_or_obj</span><span class="p">,</span> <span class="s2">&quot;readline&quot;</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">_from_usgs_param_file</span><span class="p">(</span>
                 <span class="n">fh</span><span class="o">=</span><span class="n">filename_or_obj</span><span class="p">,</span> <span class="n">npts</span><span class="o">=</span><span class="n">npts</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span> <span class="n">trise_min</span><span class="o">=</span><span class="n">trise_min</span><span class="p">)</span>
 
-        <span class="k">with</span> <span class="n">io</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">filename_or_obj</span><span class="p">,</span> <span class="s">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">io</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">filename_or_obj</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">_from_usgs_param_file</span><span class="p">(</span><span class="n">fh</span><span class="o">=</span><span class="n">fh</span><span class="p">,</span> <span class="n">npts</span><span class="o">=</span><span class="n">npts</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span>
-                                             <span class="n">trise_min</span><span class="o">=</span><span class="n">trise_min</span><span class="p">)</span>
-</div>
+                                             <span class="n">trise_min</span><span class="o">=</span><span class="n">trise_min</span><span class="p">)</span></div>
+
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">_from_usgs_param_file</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">fh</span><span class="p">,</span> <span class="n">npts</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">trise_min</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Internal function actually reading a USGS param file from any open</span>
 <span class="sd">        binary buffer.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c"># number of segments</span>
+        <span class="c1"># number of segments</span>
         <span class="n">line</span> <span class="o">=</span> <span class="n">fh</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;#Total number of fault_segments&quot;</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="n">USGSParamFileParsingException</span><span class="p">(</span><span class="s">&quot;Not a valid USGS param file.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;#Total number of fault_segments&quot;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">USGSParamFileParsingException</span><span class="p">(</span><span class="s2">&quot;Not a valid USGS param file.&quot;</span><span class="p">)</span>
         <span class="n">nseg</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
         <span class="n">sources</span> <span class="o">=</span> <span class="p">[]</span>
 
-        <span class="c"># parse all segments</span>
+        <span class="c1"># parse all segments</span>
         <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nseg</span><span class="p">):</span>
 
-            <span class="c"># got to point source segment</span>
+            <span class="c1"># got to point source segment</span>
             <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">fh</span><span class="p">:</span>
                 <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
-                <span class="k">if</span> <span class="s">&#39;#Lat. Lon. depth&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s1">&#39;#Lat. Lon. depth&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
                     <span class="k">break</span>
 
-            <span class="c"># read all point sources until reaching next segment</span>
+            <span class="c1"># read all point sources until reaching next segment</span>
             <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">fh</span><span class="p">:</span>
                 <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
-                <span class="k">if</span> <span class="s">&#39;#Fault_segment&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s1">&#39;#Fault_segment&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
                     <span class="k">break</span>
 
-                <span class="c"># Lat. Lon. depth slip rake strike dip t_rup t_ris t_fal mo</span>
+                <span class="c1"># Lat. Lon. depth slip rake strike dip t_rup t_ris t_fal mo</span>
                 <span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">dep</span><span class="p">,</span> <span class="n">slip</span><span class="p">,</span> <span class="n">rake</span><span class="p">,</span> <span class="n">stk</span><span class="p">,</span> <span class="n">dip</span><span class="p">,</span> <span class="n">tinit</span><span class="p">,</span> <span class="n">trise</span><span class="p">,</span> <span class="n">tfall</span><span class="p">,</span>
                     <span class="n">M0</span><span class="p">)</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
 
-                <span class="c"># Negative rupture times are not supported with the current</span>
-                <span class="c"># logic.</span>
+                <span class="c1"># Negative rupture times are not supported with the current</span>
+                <span class="c1"># logic.</span>
                 <span class="k">if</span> <span class="n">tinit</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="n">USGSParamFileParsingException</span><span class="p">(</span>
-                        <span class="s">&quot;File contains a negative rupture time &quot;</span>
-                        <span class="s">&quot;which Instaseis cannot currently deal &quot;</span>
-                        <span class="s">&quot;with.&quot;</span><span class="p">)</span>
+                        <span class="s2">&quot;File contains a negative rupture time &quot;</span>
+                        <span class="s2">&quot;which Instaseis cannot currently deal &quot;</span>
+                        <span class="s2">&quot;with.&quot;</span><span class="p">)</span>
 
-                <span class="c"># Calculate the end time.</span>
+                <span class="c1"># Calculate the end time.</span>
                 <span class="n">endtime</span> <span class="o">=</span> <span class="n">trise</span> <span class="o">+</span> <span class="n">tfall</span>
                 <span class="k">if</span> <span class="n">endtime</span> <span class="o">&gt;</span> <span class="p">(</span><span class="n">npts</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">dt</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="n">USGSParamFileParsingException</span><span class="p">(</span>
-                        <span class="s">&quot;Rise + fall time are longer than the &quot;</span>
-                        <span class="s">&quot;total length of calculated slip. &quot;</span>
-                        <span class="s">&quot;Please use more samples.&quot;</span><span class="p">)</span>
+                        <span class="s2">&quot;Rise + fall time are longer than the &quot;</span>
+                        <span class="s2">&quot;total length of calculated slip. &quot;</span>
+                        <span class="s2">&quot;Please use more samples.&quot;</span><span class="p">)</span>
 
-                <span class="c"># Convert latitude to a geocentric latitude.</span>
+                <span class="c1"># Convert latitude to a geocentric latitude.</span>
                 <span class="n">lat</span> <span class="o">=</span> <span class="n">elliptic_to_geocentric_latitude</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span>
 
-                <span class="n">dep</span> <span class="o">*=</span> <span class="mf">1e3</span>    <span class="c"># km &gt; m</span>
-                <span class="n">slip</span> <span class="o">*=</span> <span class="mf">1e-2</span>  <span class="c"># cm &gt; m</span>
-                <span class="n">M0</span> <span class="o">*=</span> <span class="mf">1e-7</span>    <span class="c"># dyn / cm &gt; N * m</span>
+                <span class="n">dep</span> <span class="o">*=</span> <span class="mf">1e3</span>    <span class="c1"># km &gt; m</span>
+                <span class="n">slip</span> <span class="o">*=</span> <span class="mf">1e-2</span>  <span class="c1"># cm &gt; m</span>
+                <span class="n">M0</span> <span class="o">*=</span> <span class="mf">1e-7</span>    <span class="c1"># dyn / cm &gt; N * m</span>
 
-                <span class="c"># These checks also take care of negative times.</span>
+                <span class="c1"># These checks also take care of negative times.</span>
                 <span class="k">if</span> <span class="n">trise</span> <span class="o">&lt;</span> <span class="n">trise_min</span><span class="p">:</span>
                     <span class="n">trise</span> <span class="o">=</span> <span class="n">trise_min</span>
 
@@ -1370,7 +1370,7 @@
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">sources</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">USGSParamFileParsingException</span><span class="p">(</span>
-                <span class="s">&quot;No point sources found in the file.&quot;</span><span class="p">)</span>
+                <span class="s2">&quot;No point sources found in the file.&quot;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">cls</span><span class="p">(</span><span class="n">pointsources</span><span class="o">=</span><span class="n">sources</span><span class="p">)</span>
 
@@ -1402,21 +1402,21 @@
 <span class="sd">        :param planet_radius: radius of the planet, default to Earth.</span>
 <span class="sd">        :param origin_time: The origin time of the first patch breaking.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c"># raise NotImplementedError</span>
+        <span class="c1"># raise NotImplementedError</span>
 
         <span class="n">sources</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">nsources</span> <span class="o">=</span> <span class="n">nl</span> <span class="o">*</span> <span class="n">nw</span>
 
         <span class="n">colatitude</span> <span class="o">=</span> <span class="mf">90.</span> <span class="o">-</span> <span class="n">latitude</span>
         <span class="n">longitude_rad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">longitude</span><span class="p">)</span>
-        <span class="c"># latitude_rad = np.radians(latitude)</span>
+        <span class="c1"># latitude_rad = np.radians(latitude)</span>
         <span class="n">colatitude_rad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">colatitude</span><span class="p">)</span>
 
-        <span class="c"># centroid in global cartesian coordinates</span>
+        <span class="c1"># centroid in global cartesian coordinates</span>
         <span class="n">centroid_xyz</span> <span class="o">=</span> <span class="n">rotations</span><span class="o">.</span><span class="n">coord_transform_lat_lon_depth_to_xyz</span><span class="p">(</span>
             <span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="p">,</span> <span class="n">depth_in_m</span><span class="p">,</span> <span class="n">planet_radius</span><span class="p">)</span>
 
-        <span class="c"># compute fault vectors and transform to global cartesian system</span>
+        <span class="c1"># compute fault vectors and transform to global cartesian system</span>
         <span class="n">l_src</span><span class="p">,</span> <span class="n">m_src</span><span class="p">,</span> <span class="n">n_src</span> <span class="o">=</span> <span class="n">fault_vectors_lmn</span><span class="p">(</span><span class="n">strike</span><span class="p">,</span> <span class="n">dip</span><span class="p">,</span> <span class="n">rake</span><span class="p">)</span>
         <span class="n">l_xyz</span> <span class="o">=</span> <span class="n">rotations</span><span class="o">.</span><span class="n">rotate_vector_xyz_src_to_xyz_earth</span><span class="p">(</span>
             <span class="n">l_src</span><span class="p">,</span> <span class="n">longitude_rad</span><span class="p">,</span> <span class="n">colatitude_rad</span><span class="p">)</span>
@@ -1425,8 +1425,8 @@
         <span class="n">n_xyz</span> <span class="o">=</span> <span class="n">rotations</span><span class="o">.</span><span class="n">rotate_vector_xyz_src_to_xyz_earth</span><span class="p">(</span>
             <span class="n">n_src</span><span class="p">,</span> <span class="n">longitude_rad</span><span class="p">,</span> <span class="n">colatitude_rad</span><span class="p">)</span>
 
-        <span class="c"># make a mesh centered on patch centers, xi1 and xi2 as defined by Aki</span>
-        <span class="c"># and Richards, Fig 10.2</span>
+        <span class="c1"># make a mesh centered on patch centers, xi1 and xi2 as defined by Aki</span>
+        <span class="c1"># and Richards, Fig 10.2</span>
         <span class="n">xi1</span><span class="p">,</span> <span class="n">step</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-.</span><span class="mi">5</span> <span class="o">*</span> <span class="n">fault_length</span><span class="p">,</span> <span class="o">.</span><span class="mi">5</span> <span class="o">*</span> <span class="n">fault_length</span><span class="p">,</span> <span class="n">nl</span><span class="p">,</span>
                                 <span class="n">endpoint</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">retstep</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
         <span class="n">xi1</span> <span class="o">=</span> <span class="n">xi1</span> <span class="o">+</span> <span class="n">step</span> <span class="o">/</span> <span class="mf">2.</span>
@@ -1439,28 +1439,28 @@
         <span class="n">xi1_mesh</span> <span class="o">=</span> <span class="n">xi1_mesh</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
         <span class="n">xi2_mesh</span> <span class="o">=</span> <span class="n">xi2_mesh</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
 
-        <span class="c"># create point sources in cartesian coordinates</span>
+        <span class="c1"># create point sources in cartesian coordinates</span>
         <span class="n">src_xyz</span> <span class="o">=</span> <span class="n">centroid_xyz</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">nsources</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="n">nsources</span><span class="p">))</span> \
             <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">l_xyz</span><span class="p">,</span> <span class="n">xi1_mesh</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">m_xyz</span><span class="p">,</span> <span class="n">xi2_mesh</span><span class="p">)</span>
 
-        <span class="c"># transform to lat, lon, depth</span>
+        <span class="c1"># transform to lat, lon, depth</span>
         <span class="n">src_lat</span><span class="p">,</span> <span class="n">src_lon</span><span class="p">,</span> <span class="n">src_depth</span> <span class="o">=</span> \
             <span class="n">rotations</span><span class="o">.</span><span class="n">coord_transform_xyz_to_lat_lon_depth</span><span class="p">(</span>
                 <span class="n">src_xyz</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span> <span class="n">src_xyz</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:],</span> <span class="n">src_xyz</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="p">:],</span>
                 <span class="n">planet_radius</span><span class="o">=</span><span class="n">planet_radius</span><span class="p">)</span>
         <span class="n">src_colat</span> <span class="o">=</span> <span class="mf">90.</span> <span class="o">-</span> <span class="n">src_lat</span>
 
-        <span class="c"># make sure all points are inside the planet</span>
+        <span class="c1"># make sure all points are inside the planet</span>
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">src_depth</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;at least on source point outside planet, &#39;</span>
-                             <span class="s">&#39;maximum height in m: </span><span class="si">%f</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="o">-</span><span class="n">src_depth</span><span class="o">.</span><span class="n">min</span><span class="p">(),))</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;at least on source point outside planet, &#39;</span>
+                             <span class="s1">&#39;maximum height in m: </span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="o">-</span><span class="n">src_depth</span><span class="o">.</span><span class="n">min</span><span class="p">(),))</span>
 
-        <span class="c"># compute time shifts as distance along xi1</span>
+        <span class="c1"># compute time shifts as distance along xi1</span>
         <span class="n">time_shift</span> <span class="o">=</span> <span class="n">xi1_mesh</span> <span class="o">/</span> <span class="n">rupture_velocity</span>
-        <span class="c"># time shifts should be positive</span>
+        <span class="c1"># time shifts should be positive</span>
         <span class="n">time_shift</span> <span class="o">-=</span> <span class="n">time_shift</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
 
-        <span class="c"># generate source time function (same for all point sources)</span>
+        <span class="c1"># generate source time function (same for all point sources)</span>
         <span class="k">if</span> <span class="n">tfall</span><span class="p">:</span>
             <span class="n">npts</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">trise</span> <span class="o">+</span> <span class="n">tfall</span><span class="p">)</span> <span class="o">/</span> <span class="n">dt</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="k">else</span><span class="p">:</span>
@@ -1468,24 +1468,24 @@
         <span class="n">stf</span> <span class="o">=</span> <span class="n">asymmetric_cosine</span><span class="p">(</span><span class="n">trise</span><span class="p">,</span> <span class="n">tfall</span><span class="p">,</span> <span class="n">npts</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">nsources</span><span class="p">):</span>
-            <span class="c"># compute strike dip and rake in the coordinate system of each</span>
-            <span class="c"># source point</span>
+            <span class="c1"># compute strike dip and rake in the coordinate system of each</span>
+            <span class="c1"># source point</span>
             <span class="n">l_src</span> <span class="o">=</span> <span class="n">rotations</span><span class="o">.</span><span class="n">rotate_vector_xyz_earth_to_xyz_src</span><span class="p">(</span>
                 <span class="n">l_xyz</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">src_lon</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">src_colat</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
             <span class="n">n_src</span> <span class="o">=</span> <span class="n">rotations</span><span class="o">.</span><span class="n">rotate_vector_xyz_earth_to_xyz_src</span><span class="p">(</span>
                 <span class="n">n_xyz</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">src_lon</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">src_colat</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
             <span class="n">strik</span><span class="p">,</span> <span class="n">dip</span><span class="p">,</span> <span class="n">rake</span> <span class="o">=</span> <span class="n">strike_dip_rake_from_ln</span><span class="p">(</span><span class="n">l_src</span><span class="p">,</span> <span class="n">n_src</span><span class="p">)</span>
 
-            <span class="c"># initialize point source</span>
+            <span class="c1"># initialize point source</span>
             <span class="n">src</span> <span class="o">=</span> <span class="n">Source</span><span class="o">.</span><span class="n">from_strike_dip_rake</span><span class="p">(</span>
                 <span class="n">src_lat</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">src_lon</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">src_depth</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">strike</span><span class="p">,</span> <span class="n">dip</span><span class="p">,</span> <span class="n">rake</span><span class="p">,</span>
                 <span class="n">M0</span> <span class="o">/</span> <span class="n">nsources</span><span class="p">,</span> <span class="n">time_shift</span><span class="o">=</span><span class="n">time_shift</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
                 <span class="n">origin_time</span><span class="o">=</span><span class="n">origin_time</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span> <span class="n">sliprate</span><span class="o">=</span><span class="n">stf</span><span class="p">)</span>
             <span class="n">sources</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">src</span><span class="p">)</span>
 
-        <span class="c"># return as FiniteSource</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="p">(</span><span class="n">pointsources</span><span class="o">=</span><span class="n">sources</span><span class="p">)</span>
-</div>
+        <span class="c1"># return as FiniteSource</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">(</span><span class="n">pointsources</span><span class="o">=</span><span class="n">sources</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="FiniteSource.resample_sliprate"><a class="viewcode-back" href="../../source.html#instaseis.source.FiniteSource.resample_sliprate">[docs]</a>    <span class="k">def</span> <span class="nf">resample_sliprate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">nsamp</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        For convolution, the sliprate is needed at the sampling of the fields</span>
@@ -1496,31 +1496,31 @@
 <span class="sd">        :param nsamp: desired number of samples</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">ps</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pointsources</span><span class="p">:</span>
-            <span class="n">ps</span><span class="o">.</span><span class="n">resample_sliprate</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">nsamp</span><span class="p">)</span>
-</div>
+            <span class="n">ps</span><span class="o">.</span><span class="n">resample_sliprate</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">nsamp</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="FiniteSource.set_sliprate_dirac"><a class="viewcode-back" href="../../source.html#instaseis.source.FiniteSource.set_sliprate_dirac">[docs]</a>    <span class="k">def</span> <span class="nf">set_sliprate_dirac</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">nsamp</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param dt: desired sampling</span>
 <span class="sd">        :param nsamp: desired number of samples</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">ps</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pointsources</span><span class="p">:</span>
-            <span class="n">ps</span><span class="o">.</span><span class="n">set_sliprate_dirac</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">nsamp</span><span class="p">)</span>
-</div>
+            <span class="n">ps</span><span class="o">.</span><span class="n">set_sliprate_dirac</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">nsamp</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="FiniteSource.set_sliprate_lp"><a class="viewcode-back" href="../../source.html#instaseis.source.FiniteSource.set_sliprate_lp">[docs]</a>    <span class="k">def</span> <span class="nf">set_sliprate_lp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">nsamp</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">corners</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">zerophase</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param dt: desired sampling</span>
 <span class="sd">        :param nsamp: desired number of samples</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">ps</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pointsources</span><span class="p">:</span>
-            <span class="n">ps</span><span class="o">.</span><span class="n">set_sliprate_lp</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">nsamp</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">corners</span><span class="p">,</span> <span class="n">zerophase</span><span class="p">)</span>
-</div>
+            <span class="n">ps</span><span class="o">.</span><span class="n">set_sliprate_lp</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">nsamp</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">corners</span><span class="p">,</span> <span class="n">zerophase</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="FiniteSource.normalize_sliprate"><a class="viewcode-back" href="../../source.html#instaseis.source.FiniteSource.normalize_sliprate">[docs]</a>    <span class="k">def</span> <span class="nf">normalize_sliprate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        normalize the sliprate using trapezoidal rule</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">ps</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pointsources</span><span class="p">:</span>
-            <span class="n">ps</span><span class="o">.</span><span class="n">normalize_sliprate</span><span class="p">()</span>
-</div>
+            <span class="n">ps</span><span class="o">.</span><span class="n">normalize_sliprate</span><span class="p">()</span></div>
+
     <span class="k">def</span> <span class="nf">lp_sliprate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">corners</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">zerophase</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">ps</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pointsources</span><span class="p">:</span>
             <span class="n">ps</span><span class="o">.</span><span class="n">lp_sliprate</span><span class="p">(</span><span class="n">freq</span><span class="p">,</span> <span class="n">corners</span><span class="p">,</span> <span class="n">zerophase</span><span class="p">)</span>
@@ -1533,8 +1533,8 @@
         <span class="n">ps_hypo</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointsources</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">time_shift</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hypocenter_longitude</span> <span class="o">=</span> <span class="n">ps_hypo</span><span class="o">.</span><span class="n">longitude</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hypocenter_latitude</span> <span class="o">=</span> <span class="n">ps_hypo</span><span class="o">.</span><span class="n">latitude</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">hypocenter_depth_in_m</span> <span class="o">=</span> <span class="n">ps_hypo</span><span class="o">.</span><span class="n">depth_in_m</span>
-</div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hypocenter_depth_in_m</span> <span class="o">=</span> <span class="n">ps_hypo</span><span class="o">.</span><span class="n">depth_in_m</span></div>
+
 <div class="viewcode-block" id="FiniteSource.compute_centroid"><a class="viewcode-back" href="../../source.html#instaseis.source.FiniteSource.compute_centroid">[docs]</a>    <span class="k">def</span> <span class="nf">compute_centroid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">planet_radius</span><span class="o">=</span><span class="mf">6371e3</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">nsamp</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        computes the centroid moment tensor by summing over all pointsource</span>
@@ -1545,13 +1545,13 @@
         <span class="n">z</span> <span class="o">=</span> <span class="mf">0.0</span>
         <span class="n">finite_M0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">M0</span>
         <span class="n">finite_mij</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
-        <span class="n">finite_time_shift</span> <span class="o">=</span> <span class="mf">0.0</span>  <span class="c"># time shift is now included in the sliprate</span>
+        <span class="n">finite_time_shift</span> <span class="o">=</span> <span class="mf">0.0</span>  <span class="c1"># time shift is now included in the sliprate</span>
 
         <span class="k">if</span> <span class="n">dt</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">dt</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">dt</span>
 
-        <span class="c"># estimate the number of samples needed from the pointsource with</span>
-        <span class="c"># longest time_shift</span>
+        <span class="c1"># estimate the number of samples needed from the pointsource with</span>
+        <span class="c1"># longest time_shift</span>
         <span class="k">if</span> <span class="n">nsamp</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">ps_ts_max</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointsources</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">time_shift</span><span class="p">)</span>
             <span class="n">nsamp</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ps_ts_max</span><span class="o">.</span><span class="n">time_shift</span> <span class="o">/</span> <span class="n">dt</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">ps_ts_max</span><span class="o">.</span><span class="n">sliprate</span><span class="p">))</span>
@@ -1565,14 +1565,14 @@
             <span class="n">y</span> <span class="o">+=</span> <span class="n">ps</span><span class="o">.</span><span class="n">y</span><span class="p">(</span><span class="n">planet_radius</span><span class="p">)</span> <span class="o">*</span> <span class="n">ps</span><span class="o">.</span><span class="n">M0</span> <span class="o">/</span> <span class="n">finite_M0</span>
             <span class="n">z</span> <span class="o">+=</span> <span class="n">ps</span><span class="o">.</span><span class="n">z</span><span class="p">(</span><span class="n">planet_radius</span><span class="p">)</span> <span class="o">*</span> <span class="n">ps</span><span class="o">.</span><span class="n">M0</span> <span class="o">/</span> <span class="n">finite_M0</span>
 
-            <span class="c"># finite_time_shift += ps.time_shift * ps.M0 / finite_M0</span>
+            <span class="c1"># finite_time_shift += ps.time_shift * ps.M0 / finite_M0</span>
 
             <span class="n">mij</span> <span class="o">=</span> <span class="n">rotations</span><span class="o">.</span><span class="n">rotate_symm_tensor_voigt_xyz_src_to_xyz_earth</span><span class="p">(</span>
                 <span class="n">ps</span><span class="o">.</span><span class="n">tensor_voigt</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">ps</span><span class="o">.</span><span class="n">longitude</span><span class="p">),</span>
                 <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">ps</span><span class="o">.</span><span class="n">colatitude</span><span class="p">))</span>
             <span class="n">finite_mij</span> <span class="o">+=</span> <span class="n">mij</span>
 
-            <span class="c"># sum sliprates with time shift applied</span>
+            <span class="c1"># sum sliprates with time shift applied</span>
             <span class="n">sliprate_f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfft</span><span class="p">(</span><span class="n">ps</span><span class="o">.</span><span class="n">sliprate</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">nfft</span><span class="p">)</span>
             <span class="n">sliprate_f</span> <span class="o">*=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span> <span class="mi">1j</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfftfreq</span><span class="p">(</span><span class="n">nfft</span><span class="p">)</span> <span class="o">*</span>
                                  <span class="mf">2.</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">ps</span><span class="o">.</span><span class="n">time_shift</span> <span class="o">/</span> <span class="n">dt</span><span class="p">)</span>
@@ -1593,8 +1593,8 @@
                           <span class="n">m_tt</span><span class="o">=</span><span class="n">finite_mij</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">m_pp</span><span class="o">=</span><span class="n">finite_mij</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
                           <span class="n">m_rt</span><span class="o">=</span><span class="n">finite_mij</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">m_rp</span><span class="o">=</span><span class="n">finite_mij</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
                           <span class="n">m_tp</span><span class="o">=</span><span class="n">finite_mij</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">time_shift</span><span class="o">=</span><span class="n">finite_time_shift</span><span class="p">,</span>
-                          <span class="n">sliprate</span><span class="o">=</span><span class="n">finite_sliprate</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">)</span>
-</div>
+                          <span class="n">sliprate</span><span class="o">=</span><span class="n">finite_sliprate</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">)</span></div>
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">M0</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1660,37 +1660,37 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">hypocenter_longitude</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">find_hypocenter</span><span class="p">()</span>
 
-        <span class="n">return_str</span> <span class="o">=</span> <span class="s">&#39;Instaseis Finite Source:</span><span class="se">\n</span><span class="s">&#39;</span>
-        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">Moment Magnitude     : </span><span class="si">%4.2f</span><span class="se">\n</span><span class="s">&#39;</span> \
+        <span class="n">return_str</span> <span class="o">=</span> <span class="s1">&#39;Instaseis Finite Source:</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Moment Magnitude     : </span><span class="si">%4.2f</span><span class="se">\n</span><span class="s1">&#39;</span> \
                       <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">moment_magnitude</span><span class="p">)</span>
-        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">scalar Moment        : </span><span class="si">%10.2e</span><span class="s"> Nm</span><span class="se">\n</span><span class="s">&#39;</span> \
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">scalar Moment        : </span><span class="si">%10.2e</span><span class="s1"> Nm</span><span class="se">\n</span><span class="s1">&#39;</span> \
                       <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">M0</span><span class="p">)</span>
-        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">#point sources       : </span><span class="si">%d</span><span class="se">\n</span><span class="s">&#39;</span> \
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">#point sources       : </span><span class="si">%d</span><span class="se">\n</span><span class="s1">&#39;</span> \
                       <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">npointsources</span><span class="p">)</span>
-        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">rupture duration     : </span><span class="si">%6.1f</span><span class="s"> s</span><span class="se">\n</span><span class="s">&#39;</span> \
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">rupture duration     : </span><span class="si">%6.1f</span><span class="s1"> s</span><span class="se">\n</span><span class="s1">&#39;</span> \
                       <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rupture_duration</span><span class="p">)</span>
-        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">time shift           : </span><span class="si">%6.1f</span><span class="s"> s</span><span class="se">\n</span><span class="s">&#39;</span> \
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">time shift           : </span><span class="si">%6.1f</span><span class="s1"> s</span><span class="se">\n</span><span class="s1">&#39;</span> \
                       <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time_shift</span><span class="p">)</span>
 
-        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">min depth            : </span><span class="si">%6.1f</span><span class="s"> m</span><span class="se">\n</span><span class="s">&#39;</span> \
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">min depth            : </span><span class="si">%6.1f</span><span class="s1"> m</span><span class="se">\n</span><span class="s1">&#39;</span> \
                       <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">min_depth_in_m</span><span class="p">)</span>
-        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">max depth            : </span><span class="si">%6.1f</span><span class="s"> m</span><span class="se">\n</span><span class="s">&#39;</span> \
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">max depth            : </span><span class="si">%6.1f</span><span class="s1"> m</span><span class="se">\n</span><span class="s1">&#39;</span> \
                       <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_depth_in_m</span><span class="p">)</span>
-        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">hypocenter depth     : </span><span class="si">%6.1f</span><span class="s"> m</span><span class="se">\n</span><span class="s">&#39;</span> \
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">hypocenter depth     : </span><span class="si">%6.1f</span><span class="s1"> m</span><span class="se">\n</span><span class="s1">&#39;</span> \
                       <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_depth_in_m</span><span class="p">)</span>
 
-        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">min latitude         : </span><span class="si">%6.1f</span><span class="s"> deg</span><span class="se">\n</span><span class="s">&#39;</span> \
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">min latitude         : </span><span class="si">%6.1f</span><span class="s1"> deg</span><span class="se">\n</span><span class="s1">&#39;</span> \
                       <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">min_latitude</span><span class="p">)</span>
-        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">max latitude         : </span><span class="si">%6.1f</span><span class="s"> deg</span><span class="se">\n</span><span class="s">&#39;</span> \
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">max latitude         : </span><span class="si">%6.1f</span><span class="s1"> deg</span><span class="se">\n</span><span class="s1">&#39;</span> \
                       <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_latitude</span><span class="p">)</span>
-        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">hypocenter latitude  : </span><span class="si">%6.1f</span><span class="s"> deg</span><span class="se">\n</span><span class="s">&#39;</span> \
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">hypocenter latitude  : </span><span class="si">%6.1f</span><span class="s1"> deg</span><span class="se">\n</span><span class="s1">&#39;</span> \
                       <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hypocenter_latitude</span><span class="p">)</span>
 
-        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">min longitude        : </span><span class="si">%6.1f</span><span class="s"> deg</span><span class="se">\n</span><span class="s">&#39;</span> \
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">min longitude        : </span><span class="si">%6.1f</span><span class="s1"> deg</span><span class="se">\n</span><span class="s1">&#39;</span> \
                       <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">min_longitude</span><span class="p">)</span>
-        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">max longitude        : </span><span class="si">%6.1f</span><span class="s"> deg</span><span class="se">\n</span><span class="s">&#39;</span> \
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">max longitude        : </span><span class="si">%6.1f</span><span class="s1"> deg</span><span class="se">\n</span><span class="s1">&#39;</span> \
                       <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_longitude</span><span class="p">)</span>
-        <span class="n">return_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">hypocenter longitude : </span><span class="si">%6.1f</span><span class="s"> deg</span><span class="se">\n</span><span class="s">&#39;</span> \
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">hypocenter longitude : </span><span class="si">%6.1f</span><span class="s1"> deg</span><span class="se">\n</span><span class="s1">&#39;</span> \
                       <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hypocenter_longitude</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">return_str</span></div>
@@ -1709,7 +1709,7 @@
     </p>
     <p>
         &copy; Copyright 2014-2015, Lion Krischer and Martin van Driel.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.<br/>
     </p>
   </div>
 </footer>

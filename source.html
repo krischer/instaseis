@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Sources and Receivers &mdash; instaseis 0.1.1-4-ge667 documentation</title>
+    <title>Sources and Receivers &mdash; instaseis 0.1.1-5-g544d documentation</title>
     
     <link rel="stylesheet" href="_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.1.1-4-ge667',
+        VERSION:     '0.1.1-5-g544d',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -31,7 +31,7 @@
     <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="_static/bootstrap-3.3.4/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.1.1-4-ge667 documentation" href="index.html" />
+    <link rel="top" title="instaseis 0.1.1-5-g544d documentation" href="index.html" />
     <link rel="next" title="Utility Functions" href="helpers.html" />
     <link rel="prev" title="Main Instaseis Classes" href="instaseis.html" />
 <meta charset='utf-8'>
@@ -53,7 +53,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.1.1-4-ge667</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.1.1-5-g544d</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -162,8 +162,8 @@ source/receiver objects are again in geocentric coordinates.</li>
 </tbody>
 </table>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">instaseis</span> <span class="kn">import</span> <span class="n">Receiver</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">rec</span> <span class="o">=</span> <span class="n">Receiver</span><span class="p">(</span><span class="n">latitude</span><span class="o">=</span><span class="mf">12.34</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="mf">56.78</span><span class="p">,</span> <span class="n">network</span><span class="o">=</span><span class="s">&quot;AB&quot;</span><span class="p">,</span>
-<span class="gp">... </span>               <span class="n">station</span><span class="o">=</span><span class="s">&quot;CDE&quot;</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="s">&quot;SY&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rec</span> <span class="o">=</span> <span class="n">Receiver</span><span class="p">(</span><span class="n">latitude</span><span class="o">=</span><span class="mf">12.34</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="mf">56.78</span><span class="p">,</span> <span class="n">network</span><span class="o">=</span><span class="s2">&quot;AB&quot;</span><span class="p">,</span>
+<span class="gp">... </span>               <span class="n">station</span><span class="o">=</span><span class="s2">&quot;CDE&quot;</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="s2">&quot;SY&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">rec</span><span class="p">)</span>
 <span class="go">Instaseis Receiver:</span>
 <span class="go">longitude :   56.8 deg</span>
@@ -205,7 +205,7 @@ objects. Likely only needed for the recursive part of this method.</li>
 <p>The following example parses a StationXML file to a list of
 <a class="reference internal" href="#instaseis.source.Receiver" title="instaseis.source.Receiver"><code class="xref py py-class docutils literal"><span class="pre">Receiver</span></code></a> objects.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">instaseis</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">instaseis</span><span class="o">.</span><span class="n">Receiver</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s">&quot;TA.Q56A..BH.xml&quot;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">instaseis</span><span class="o">.</span><span class="n">Receiver</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s2">&quot;TA.Q56A..BH.xml&quot;</span><span class="p">))</span>
 <span class="go">[&lt;instaseis.source.Receiver object at 0x...&gt;]</span>
 </pre></div>
 </div>
@@ -292,7 +292,7 @@ will be converted to geocentric coordinates.</p>
 </tbody>
 </table>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">instaseis</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span> <span class="o">=</span> <span class="n">instaseis</span><span class="o">.</span><span class="n">Source</span><span class="o">.</span><span class="n">from_CMTSOLUTION_file</span><span class="p">(</span><span class="s">&#39;file.cmt&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span> <span class="o">=</span> <span class="n">instaseis</span><span class="o">.</span><span class="n">Source</span><span class="o">.</span><span class="n">from_CMTSOLUTION_file</span><span class="p">(</span><span class="s1">&#39;file.cmt&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
 <span class="go">Instaseis Source:</span>
 <span class="go">    Longitude        : -177.0 deg</span>
@@ -395,7 +395,7 @@ will be converted to geocentric coordinates.</p>
 <p>The following example will read a local QuakeML file and return a
 <a class="reference internal" href="#instaseis.source.Source" title="instaseis.source.Source"><code class="xref py py-class docutils literal"><span class="pre">Source</span></code></a> object.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">instaseis</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span> <span class="o">=</span> <span class="n">instaseis</span><span class="o">.</span><span class="n">Source</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s">&quot;quake.xml&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span> <span class="o">=</span> <span class="n">instaseis</span><span class="o">.</span><span class="n">Source</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s2">&quot;quake.xml&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
 <span class="go">Instaseis Source:</span>
 <span class="go">    Longitude        :   -3.5 deg</span>
@@ -677,7 +677,7 @@ will be converted to geocentric coordinates.</p>
 </tbody>
 </table>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">instaseis</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span> <span class="o">=</span> <span class="n">instaseis</span><span class="o">.</span><span class="n">FiniteSource</span><span class="o">.</span><span class="n">from_srf_file</span><span class="p">(</span><span class="s">&quot;filename.srf&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span> <span class="o">=</span> <span class="n">instaseis</span><span class="o">.</span><span class="n">FiniteSource</span><span class="o">.</span><span class="n">from_srf_file</span><span class="p">(</span><span class="s2">&quot;filename.srf&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
 <span class="go">Instaseis Finite Source:</span>
 <span class="go">    Moment Magnitude     : 7.09</span>
@@ -726,7 +726,7 @@ Mostly meant to handle zero rise times in some USGS files.</li>
 </tbody>
 </table>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">instaseis</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span> <span class="o">=</span> <span class="n">instaseis</span><span class="o">.</span><span class="n">FiniteSource</span><span class="o">.</span><span class="n">from_srf_file</span><span class="p">(</span><span class="s">&quot;filename.param&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span> <span class="o">=</span> <span class="n">instaseis</span><span class="o">.</span><span class="n">FiniteSource</span><span class="o">.</span><span class="n">from_srf_file</span><span class="p">(</span><span class="s2">&quot;filename.param&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
 <span class="go">Instaseis Finite Source:</span>
 <span class="go">    Moment Magnitude     : 7.09</span>
@@ -838,7 +838,7 @@ interpolation for all pointsources in the finite source.</p>
     </p>
     <p>
         &copy; Copyright 2014-2015, Lion Krischer and Martin van Driel.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.<br/>
     </p>
   </div>
 </footer>

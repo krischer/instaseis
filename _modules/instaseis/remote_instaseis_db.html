@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>instaseis.remote_instaseis_db &mdash; instaseis 0.1.1-4-ge667 documentation</title>
+    <title>instaseis.remote_instaseis_db &mdash; instaseis 0.1.1-5-g544d documentation</title>
     
     <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.1.1-4-ge667',
+        VERSION:     '0.1.1-5-g544d',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -31,7 +31,7 @@
     <script type="text/javascript" src="../../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../../_static/bootstrap-3.3.4/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../../_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.1.1-4-ge667 documentation" href="../../index.html" />
+    <link rel="top" title="instaseis 0.1.1-5-g544d documentation" href="../../index.html" />
     <link rel="up" title="instaseis" href="../instaseis.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.1.1-4-ge667</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.1.1-5-g544d</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -107,8 +107,8 @@
     <div class="col-md-12 content">
       
   <h1>Source code for instaseis.remote_instaseis_db</h1><div class="highlight"><pre>
-<span class="c">#!/usr/bin/env python</span>
-<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Instaseis database class for remote access over HTTP.</span>
 
@@ -147,29 +147,29 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">url</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_scheme</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_netloc</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">=</span> <span class="n">urlparse</span><span class="p">(</span><span class="n">url</span><span class="p">)[:</span><span class="mi">3</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s">&quot;/&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
 
-        <span class="c"># Parse the root message of the server.</span>
+        <span class="c1"># Parse the root message of the server.</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">root</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_download_url</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_url</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">),</span> <span class="n">unpack_json</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+            <span class="n">root</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_download_url</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_url</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">),</span> <span class="n">unpack_json</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">InstaseisError</span><span class="p">(</span><span class="s">&quot;Failed to connect to remote Instaseis &quot;</span>
-                                 <span class="s">&quot;server due to: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
+            <span class="k">raise</span> <span class="n">InstaseisError</span><span class="p">(</span><span class="s2">&quot;Failed to connect to remote Instaseis &quot;</span>
+                                 <span class="s2">&quot;server due to: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
 
-        <span class="c"># XXX: Add Instaseis version checks! Make sure server and client are</span>
-        <span class="c"># on the same version!</span>
-        <span class="k">if</span> <span class="s">&quot;type&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">root</span> <span class="ow">or</span> <span class="n">root</span><span class="p">[</span><span class="s">&quot;type&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&quot;Instaseis Remote Server&quot;</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">InstaseisError</span><span class="p">(</span><span class="s">&quot;Instaseis server responded with invalid &quot;</span>
-                                 <span class="s">&quot;response: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">root</span><span class="p">)))</span>
+        <span class="c1"># XXX: Add Instaseis version checks! Make sure server and client are</span>
+        <span class="c1"># on the same version!</span>
+        <span class="k">if</span> <span class="s2">&quot;type&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">root</span> <span class="ow">or</span> <span class="n">root</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;Instaseis Remote Server&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InstaseisError</span><span class="p">(</span><span class="s2">&quot;Instaseis server responded with invalid &quot;</span>
+                                 <span class="s2">&quot;response: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">root</span><span class="p">)))</span>
 
-        <span class="k">if</span> <span class="n">root</span><span class="p">[</span><span class="s">&quot;version&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">__version__</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s">&quot;Instaseis versions on server (</span><span class="si">%s</span><span class="s">) and on your local &quot;</span>
-                   <span class="s">&quot;client (</span><span class="si">%s</span><span class="s">) differ and thus things might not work as &quot;</span>
-                   <span class="s">&quot;expected.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">root</span><span class="p">[</span><span class="s">&quot;version&quot;</span><span class="p">],</span> <span class="n">__version__</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">root</span><span class="p">[</span><span class="s2">&quot;version&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">__version__</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Instaseis versions on server (</span><span class="si">%s</span><span class="s2">) and on your local &quot;</span>
+                   <span class="s2">&quot;client (</span><span class="si">%s</span><span class="s2">) differ and thus things might not work as &quot;</span>
+                   <span class="s2">&quot;expected.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">root</span><span class="p">[</span><span class="s2">&quot;version&quot;</span><span class="p">],</span> <span class="n">__version__</span><span class="p">))</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">InstaseisWarning</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_get_info</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">_get_seismograms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">receiver</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="p">(</span><span class="s">&quot;Z&quot;</span><span class="p">,</span> <span class="s">&quot;N&quot;</span><span class="p">,</span> <span class="s">&quot;E&quot;</span><span class="p">)):</span>
+    <span class="k">def</span> <span class="nf">_get_seismograms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">receiver</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Z&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;E&quot;</span><span class="p">)):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Extract seismograms for a moment tensor point source from the AxiSEM</span>
 <span class="sd">        database.</span>
@@ -182,58 +182,58 @@
 <span class="sd">        :param components: a tuple containing any combination of the</span>
 <span class="sd">            strings ``&quot;Z&quot;``, ``&quot;N&quot;``, ``&quot;E&quot;``, ``&quot;R&quot;``, and ``&quot;T&quot;``</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c"># Collect parameters.</span>
-        <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;components&quot;</span><span class="p">:</span> <span class="s">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">components</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()}</span>
+        <span class="c1"># Collect parameters.</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;components&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">components</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()}</span>
 
-        <span class="c"># Start with the receiver.</span>
-        <span class="n">params</span><span class="p">[</span><span class="s">&quot;receiverlatitude&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">receiver</span><span class="o">.</span><span class="n">latitude</span>
-        <span class="n">params</span><span class="p">[</span><span class="s">&quot;receiverlongitude&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">receiver</span><span class="o">.</span><span class="n">longitude</span>
+        <span class="c1"># Start with the receiver.</span>
+        <span class="n">params</span><span class="p">[</span><span class="s2">&quot;receiverlatitude&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">receiver</span><span class="o">.</span><span class="n">latitude</span>
+        <span class="n">params</span><span class="p">[</span><span class="s2">&quot;receiverlongitude&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">receiver</span><span class="o">.</span><span class="n">longitude</span>
         <span class="k">if</span> <span class="n">receiver</span><span class="o">.</span><span class="n">depth_in_m</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">params</span><span class="p">[</span><span class="s">&quot;receiverdepthinm&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">receiver</span><span class="o">.</span><span class="n">depth_in_m</span>
+            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;receiverdepthinm&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">receiver</span><span class="o">.</span><span class="n">depth_in_m</span>
         <span class="k">if</span> <span class="n">receiver</span><span class="o">.</span><span class="n">network</span><span class="p">:</span>
-            <span class="n">params</span><span class="p">[</span><span class="s">&quot;networkcode&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">receiver</span><span class="o">.</span><span class="n">network</span>
+            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;networkcode&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">receiver</span><span class="o">.</span><span class="n">network</span>
         <span class="k">if</span> <span class="n">receiver</span><span class="o">.</span><span class="n">station</span><span class="p">:</span>
-            <span class="n">params</span><span class="p">[</span><span class="s">&quot;stationcode&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">receiver</span><span class="o">.</span><span class="n">station</span>
+            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;stationcode&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">receiver</span><span class="o">.</span><span class="n">station</span>
 
-        <span class="c"># Do the source.</span>
-        <span class="n">params</span><span class="p">[</span><span class="s">&quot;sourcelatitude&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">latitude</span>
-        <span class="n">params</span><span class="p">[</span><span class="s">&quot;sourcelongitude&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">longitude</span>
+        <span class="c1"># Do the source.</span>
+        <span class="n">params</span><span class="p">[</span><span class="s2">&quot;sourcelatitude&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">latitude</span>
+        <span class="n">params</span><span class="p">[</span><span class="s2">&quot;sourcelongitude&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">longitude</span>
         <span class="k">if</span> <span class="n">source</span><span class="o">.</span><span class="n">depth_in_m</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">params</span><span class="p">[</span><span class="s">&quot;sourcedepthinm&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">depth_in_m</span>
+            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;sourcedepthinm&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">depth_in_m</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">ForceSource</span><span class="p">):</span>
-            <span class="n">params</span><span class="p">[</span><span class="s">&quot;fr&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">f_r</span>
-            <span class="n">params</span><span class="p">[</span><span class="s">&quot;ft&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">f_t</span>
-            <span class="n">params</span><span class="p">[</span><span class="s">&quot;fp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">f_p</span>
+            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;fr&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">f_r</span>
+            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;ft&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">f_t</span>
+            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;fp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">f_p</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">Source</span><span class="p">):</span>
-            <span class="n">params</span><span class="p">[</span><span class="s">&quot;mrr&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">m_rr</span>
-            <span class="n">params</span><span class="p">[</span><span class="s">&quot;mtt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">m_tt</span>
-            <span class="n">params</span><span class="p">[</span><span class="s">&quot;mpp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">m_pp</span>
-            <span class="n">params</span><span class="p">[</span><span class="s">&quot;mrt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">m_rt</span>
-            <span class="n">params</span><span class="p">[</span><span class="s">&quot;mrp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">m_rp</span>
-            <span class="n">params</span><span class="p">[</span><span class="s">&quot;mtp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">m_tp</span>
+            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;mrr&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">m_rr</span>
+            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;mtt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">m_tt</span>
+            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;mpp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">m_pp</span>
+            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;mrt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">m_rt</span>
+            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;mrp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">m_rp</span>
+            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;mtp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">m_tp</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 
-        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_url</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="s">&quot;seismograms_raw&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">)</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_url</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="s2">&quot;seismograms_raw&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">)</span>
 
         <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-        <span class="k">if</span> <span class="s">&quot;Instaseis-Mu&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">r</span><span class="o">.</span><span class="n">headers</span><span class="p">:</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&quot;Mu is not passed via the HTTP headers. Maybe some &quot;</span>
-                          <span class="s">&quot;proxy removed it? Mu is now always the default mu.&quot;</span><span class="p">,</span>
+        <span class="k">if</span> <span class="s2">&quot;Instaseis-Mu&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">r</span><span class="o">.</span><span class="n">headers</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Mu is not passed via the HTTP headers. Maybe some &quot;</span>
+                          <span class="s2">&quot;proxy removed it? Mu is now always the default mu.&quot;</span><span class="p">,</span>
                           <span class="n">InstaseisWarning</span><span class="p">)</span>
             <span class="n">mu</span> <span class="o">=</span> <span class="n">DEFAULT_MU</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">mu</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s">&quot;Instaseis-Mu&quot;</span><span class="p">])</span>
+            <span class="n">mu</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s2">&quot;Instaseis-Mu&quot;</span><span class="p">])</span>
 
         <span class="k">with</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
             <span class="n">fh</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
             <span class="n">st</span> <span class="o">=</span> <span class="n">obspy</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">fh</span><span class="p">)</span>
 
-        <span class="c"># Convert back to dictionary of numpy arrays...this is a bit</span>
-        <span class="c"># redundant but plays nice with the rest of Instaseis and still</span>
-        <span class="c"># enables a REST API that serves MiniSEED files.</span>
+        <span class="c1"># Convert back to dictionary of numpy arrays...this is a bit</span>
+        <span class="c1"># redundant but plays nice with the rest of Instaseis and still</span>
+        <span class="c1"># enables a REST API that serves MiniSEED files.</span>
         <span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s">&quot;mu&quot;</span><span class="p">:</span> <span class="n">mu</span>
+            <span class="s2">&quot;mu&quot;</span><span class="p">:</span> <span class="n">mu</span>
         <span class="p">}</span>
 
         <span class="k">for</span> <span class="n">tr</span> <span class="ow">in</span> <span class="n">st</span><span class="p">:</span>
@@ -243,13 +243,13 @@
 
     <span class="k">def</span> <span class="nf">_get_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">:</span>
-            <span class="n">path</span> <span class="o">=</span> <span class="s">&quot;/&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">+</span> <span class="s">&quot;/&quot;</span> <span class="o">+</span> <span class="n">path</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">path</span>
 
-        <span class="n">url</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">://</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_scheme</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_netloc</span><span class="p">)</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">://</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_scheme</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_netloc</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">path</span><span class="p">:</span>
-            <span class="n">url</span> <span class="o">+=</span> <span class="s">&quot;/</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">path</span>
+            <span class="n">url</span> <span class="o">+=</span> <span class="s2">&quot;/</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">path</span>
         <span class="k">if</span> <span class="n">kwargs</span><span class="p">:</span>
-            <span class="n">url</span> <span class="o">+=</span> <span class="s">&quot;?</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">urlencode</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">url</span> <span class="o">+=</span> <span class="s2">&quot;?</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">urlencode</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">url</span>
 
     <span class="k">def</span> <span class="nf">_download_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">unpack_json</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
@@ -258,7 +258,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">InstaseisError</span><span class="p">(</span><span class="s">&quot;Status code </span><span class="si">%i</span><span class="s"> when downloading &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span>
+            <span class="k">raise</span> <span class="n">InstaseisError</span><span class="p">(</span><span class="s2">&quot;Status code </span><span class="si">%i</span><span class="s2"> when downloading &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span>
                 <span class="n">r</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="n">url</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">unpack_json</span> <span class="ow">is</span> <span class="bp">True</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
@@ -270,12 +270,12 @@
 <span class="sd">        Returns a dictionary with information about the currently loaded</span>
 <span class="sd">        database.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_download_url</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_url</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="s">&quot;info&quot;</span><span class="p">),</span> <span class="n">unpack_json</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-        <span class="n">info</span><span class="p">[</span><span class="s">&quot;directory&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span>
-        <span class="c"># Convert types lost in the translation to JSON.</span>
-        <span class="n">info</span><span class="p">[</span><span class="s">&quot;datetime&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">obspy</span><span class="o">.</span><span class="n">UTCDateTime</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s">&quot;datetime&quot;</span><span class="p">])</span>
-        <span class="n">info</span><span class="p">[</span><span class="s">&quot;slip&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s">&quot;slip&quot;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
-        <span class="n">info</span><span class="p">[</span><span class="s">&quot;sliprate&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s">&quot;sliprate&quot;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_download_url</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_url</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="s2">&quot;info&quot;</span><span class="p">),</span> <span class="n">unpack_json</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">info</span><span class="p">[</span><span class="s2">&quot;directory&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span>
+        <span class="c1"># Convert types lost in the translation to JSON.</span>
+        <span class="n">info</span><span class="p">[</span><span class="s2">&quot;datetime&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">obspy</span><span class="o">.</span><span class="n">UTCDateTime</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;datetime&quot;</span><span class="p">])</span>
+        <span class="n">info</span><span class="p">[</span><span class="s2">&quot;slip&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;slip&quot;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="n">info</span><span class="p">[</span><span class="s2">&quot;sliprate&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;sliprate&quot;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">info</span></div>
 </pre></div>
@@ -293,7 +293,7 @@
     </p>
     <p>
         &copy; Copyright 2014-2015, Lion Krischer and Martin van Driel.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.<br/>
     </p>
   </div>
 </footer>

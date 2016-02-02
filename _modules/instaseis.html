@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>instaseis &mdash; instaseis 0.1.1-4-ge667 documentation</title>
+    <title>instaseis &mdash; instaseis 0.1.1-5-g544d documentation</title>
     
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.1.1-4-ge667',
+        VERSION:     '0.1.1-5-g544d',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -31,7 +31,7 @@
     <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-3.3.4/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.1.1-4-ge667 documentation" href="../index.html" />
+    <link rel="top" title="instaseis 0.1.1-5-g544d documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.1.1-4-ge667</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.1.1-5-g544d</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -107,7 +107,7 @@
     <div class="col-md-12 content">
       
   <h1>Source code for instaseis</h1><div class="highlight"><pre>
-<span class="c">#!/usr/bin/env python</span>
+<span class="ch">#!/usr/bin/env python</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="p">(</span><span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span>
                         <span class="n">unicode_literals</span><span class="p">)</span>
 
@@ -189,25 +189,25 @@
 <span class="sd">        :func:`~instaseis.open_db` function. Instaseis will recursively</span>
 <span class="sd">        search the child directories for the  necessary files and open them.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;syngine://&quot;</span><span class="p">):</span>
-        <span class="n">model</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s">&quot;syngine://&quot;</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;syngine://&quot;</span><span class="p">):</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">&quot;syngine://&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
         <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">syngine_instaseis_db</span>
         <span class="k">return</span> <span class="n">syngine_instaseis_db</span><span class="o">.</span><span class="n">SyngineInstaseisDB</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span>
                                                        <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="s">&quot;://&quot;</span> <span class="ow">in</span> <span class="n">path</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="s2">&quot;://&quot;</span> <span class="ow">in</span> <span class="n">path</span><span class="p">:</span>
         <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">remote_instaseis_db</span>
         <span class="k">return</span> <span class="n">remote_instaseis_db</span><span class="o">.</span><span class="n">RemoteInstaseisDB</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">instaseis_db</span>
-        <span class="k">return</span> <span class="n">instaseis_db</span><span class="o">.</span><span class="n">InstaseisDB</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">instaseis_db</span><span class="o">.</span><span class="n">InstaseisDB</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-</div>
+
 <span class="n">__version__</span> <span class="o">=</span> <span class="n">get_git_version</span><span class="p">()</span>
 
 
-<span class="k">if</span> <span class="n">__version__</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;0.0.0-tar/zipball&quot;</span><span class="p">):</span>
-    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&quot;Please don&#39;t install from a tarball. Use the proper pypi &quot;</span>
-                  <span class="s">&quot;release or install from git.&quot;</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">__version__</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;0.0.0-tar/zipball&quot;</span><span class="p">):</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Please don&#39;t install from a tarball. Use the proper pypi &quot;</span>
+                  <span class="s2">&quot;release or install from git.&quot;</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">__version_cmp</span><span class="p">(</span><span class="n">required_version</span><span class="p">,</span> <span class="n">version</span><span class="p">):</span>
@@ -215,25 +215,25 @@
 <span class="sd">    based on http://stackoverflow.com/a/1714190/1657047</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">normalize</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
-        <span class="c"># Strip any additional version specifiers.</span>
-        <span class="n">v</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;-&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s">&quot;-&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s">&quot;~&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s">r&#39;(\.0+)*$&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;.&quot;</span><span class="p">)]</span>
+        <span class="c1"># Strip any additional version specifiers.</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;~&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">r&#39;(\.0+)*$&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)]</span>
 
     <span class="k">if</span> <span class="n">normalize</span><span class="p">(</span><span class="n">version</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">normalize</span><span class="p">(</span><span class="n">required_version</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">False</span>
     <span class="k">return</span> <span class="bp">True</span>
 
 
-<span class="c"># There are some serious errors with older netCDF version when doing lots of</span>
-<span class="c"># I/O. Thus raise a warning and delegate responsibilities to the users.</span>
-<span class="k">if</span> <span class="ow">not</span> <span class="n">__version_cmp</span><span class="p">(</span><span class="s">&quot;4.3&quot;</span><span class="p">,</span> <span class="n">netCDF4</span><span class="o">.</span><span class="n">__netcdf4libversion__</span><span class="p">):</span>
-    <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s">&quot;There are some issues when using a netCDF version smaller &quot;</span>
-           <span class="s">&quot;than 4.3 (you are running version </span><span class="si">%s</span><span class="s">). Please update your netCDF &quot;</span>
-           <span class="s">&quot;installation.&quot;</span> <span class="o">%</span> <span class="n">netCDF4</span><span class="o">.</span><span class="n">__netcdf4libversion__</span><span class="p">)</span>
+<span class="c1"># There are some serious errors with older netCDF version when doing lots of</span>
+<span class="c1"># I/O. Thus raise a warning and delegate responsibilities to the users.</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">__version_cmp</span><span class="p">(</span><span class="s2">&quot;4.3&quot;</span><span class="p">,</span> <span class="n">netCDF4</span><span class="o">.</span><span class="n">__netcdf4libversion__</span><span class="p">):</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;There are some issues when using a netCDF version smaller &quot;</span>
+           <span class="s2">&quot;than 4.3 (you are running version </span><span class="si">%s</span><span class="s2">). Please update your netCDF &quot;</span>
+           <span class="s2">&quot;installation.&quot;</span> <span class="o">%</span> <span class="n">netCDF4</span><span class="o">.</span><span class="n">__netcdf4libversion__</span><span class="p">)</span>
     <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">InstaseisWarning</span><span class="p">)</span>
 
 
-<span class="kn">from</span> <span class="nn">.source</span> <span class="kn">import</span> <span class="n">Source</span><span class="p">,</span> <span class="n">Receiver</span><span class="p">,</span> <span class="n">ForceSource</span><span class="p">,</span> <span class="n">FiniteSource</span>  <span class="c"># NoQa</span>
+<span class="kn">from</span> <span class="nn">.source</span> <span class="kn">import</span> <span class="n">Source</span><span class="p">,</span> <span class="n">Receiver</span><span class="p">,</span> <span class="n">ForceSource</span><span class="p">,</span> <span class="n">FiniteSource</span>  <span class="c1"># NoQa</span>
 </pre></div>
 
     </div>
@@ -249,7 +249,7 @@
     </p>
     <p>
         &copy; Copyright 2014-2015, Lion Krischer and Martin van Driel.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.<br/>
     </p>
   </div>
 </footer>
