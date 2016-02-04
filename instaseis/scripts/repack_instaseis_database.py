@@ -54,6 +54,12 @@ def process_file(input_filename, output_filename, method):
 
                 ds_i = f_in["Snapshots"][group]
 
+                # Some versions of the databases contain the stf snapshots
+                # in that group.
+                if not group.startswith("disp_"):
+                    f_out.copy(ds_i, "Snapshots/%s" % group)
+                    continue
+
                 # Transpose and write non-chunked. This creates a continuous
                 # array in the file with the time axis being the fast axis.
                 ds_o = snapshots.create_dataset(
