@@ -188,6 +188,13 @@ def unroll_and_merge(filenames, output_folder):
                                    fg="blue"))
             f_out.copy(f_in_x[group], group)
 
+        # Attempt to copy other things.
+        sn = f_in_z["Snapshots"]
+        f_out.create_group("Snapshots")
+        for group in sn.keys():
+            if not group.startswith("disp_"):
+                f_out.copy(f_in_z["Snapshots"][group], "Snapshots/%s" % group)
+
         # Create a new array but this time in 5D. The first dimension
         # is the element number, the second and third are the GLL
         # points in both directions, the fourth is the time axis, and the
