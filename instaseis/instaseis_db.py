@@ -22,6 +22,7 @@ import os
 from . import InstaseisError, InstaseisNotFoundError
 from .base_instaseis_db import BaseInstaseisDB
 from . import finite_elem_mapping
+from . import helpers
 from . import mesh
 from . import rotations
 from . import sem_derivatives
@@ -30,6 +31,7 @@ from .source import Source, ForceSource
 
 
 MeshCollection_bwd = collections.namedtuple("MeshCollection_bwd", ["px", "pz"])
+MeshCollection_merged = collections.namedtuple("MeshCollection_bwd", ["mesh"])
 MeshCollection_fwd = collections.namedtuple("MeshCollection_fwd", ["m1", "m2",
                                                                    "m3", "m4"])
 
@@ -57,6 +59,7 @@ class InstaseisDB(BaseInstaseisDB):
             useful e.g. for finite sources, default).
         :type read_on_demand: bool, optional
         """
+
         self.db_path = db_path
         self.buffer_size_in_mb = buffer_size_in_mb
         self.read_on_demand = read_on_demand
@@ -67,6 +70,11 @@ class InstaseisDB(BaseInstaseisDB):
         Helper function walking the file tree below self.db_path and
         attempts to find the correct netCDF files.
         """
+        merged_file = os.path.join(self.db_path, "merged_instaseis_db.nc4")
+        if os.path.exists(merged_file):
+            self._parse_merged_mesh(merged_file)
+            return
+
         found_files = []
         for root, dirs, filenames in os.walk(self.db_path, followlinks=True):
             # Limit depth of filetree traversal
@@ -121,6 +129,16 @@ class InstaseisDB(BaseInstaseisDB):
                 "correct directory? E.g. if the 'ordered_output.nc4' files "
                 "are located in '/path/to/PZ/Data', please pass '/path/to/' "
                 "to Instaseis.")
+
+    def _parse_merged_mesh(self, filename):
+        _m = mesh.Mesh(
+            filename, full_parse=True,
+            strain_buffer_size_in_mb=self.buffer_size_in_mb,
+            displ_buffer_size_in_mb=self.buffer_size_in_mb,
+            read_on_demand=self.read_on_demand)
+        self.meshes = MeshCollection_merged(_m)
+        self._is_reciprocal = True
+        self.parsed_mesh = self.meshes.mesh
 
     def _parse_fs_meshes(self, files):
         if "PX" in files:
@@ -223,7 +241,7 @@ class InstaseisDB(BaseInstaseisDB):
             [rotmesh_s, rotmesh_z], k=k_map[self.info.dump_type])
 
         # Find the element containing the point of interest.
-        mesh = self.parsed_mesh.f.groups["Mesh"]
+        mesh = self.parsed_mesh.f["Mesh"]
         if self.info.dump_type == 'displ_only':
             for idx in nextpoints[1]:
                 corner_points = np.empty((4, 2), dtype="float64")
@@ -236,7 +254,7 @@ class InstaseisDB(BaseInstaseisDB):
                     corner_points[:, 1] = \
                         self.parsed_mesh.mesh_Z[corner_point_ids]
                 else:
-                    corner_point_ids = mesh.variables["fem_mesh"][idx][:4]
+                    corner_point_ids = mesh["fem_mesh"][idx][:4]
 
                     # When reading from a netcdf file, the indices must be
                     # sorted for newer netcdf versions. The double argsort()
@@ -245,11 +263,11 @@ class InstaseisDB(BaseInstaseisDB):
                     order = corner_point_ids.argsort().argsort()
                     corner_point_ids.sort()
 
-                    eltype = mesh.variables["eltype"][idx]
+                    eltype = mesh["eltype"][idx]
                     corner_points[:, 0] = \
-                        mesh.variables["mesh_S"][corner_point_ids][order]
+                        mesh["mesh_S"][corner_point_ids][order]
                     corner_points[:, 1] = \
-                        mesh.variables["mesh_Z"][corner_point_ids][order]
+                        mesh["mesh_Z"][corner_point_ids][order]
 
                 isin, xi, eta = finite_elem_mapping.inside_element(
                     rotmesh_s, rotmesh_z, corner_points, eltype,
@@ -264,8 +282,8 @@ class InstaseisDB(BaseInstaseisDB):
                 gll_point_ids = self.parsed_mesh.sem_mesh[id_elem]
                 axis = bool(self.parsed_mesh.axis[id_elem])
             else:
-                gll_point_ids = mesh.variables["sem_mesh"][id_elem]
-                axis = bool(mesh.variables["axis"][id_elem])
+                gll_point_ids = mesh["sem_mesh"][id_elem]
+                axis = bool(mesh["axis"][id_elem])
 
             if axis:
                 col_points_xi = self.parsed_mesh.glj_points
@@ -283,7 +301,7 @@ class InstaseisDB(BaseInstaseisDB):
         if not self.read_on_demand:
             mesh_mu = self.parsed_mesh.mesh_mu
         else:
-            mesh_mu = mesh.variables["mesh_mu"]
+            mesh_mu = mesh["mesh_mu"]
         if self.info.dump_type == "displ_only":
             npol = self.info.spatial_order
             mu = mesh_mu[gll_point_ids[npol // 2, npol // 2]]
@@ -311,26 +329,36 @@ class InstaseisDB(BaseInstaseisDB):
                 strain_x = None
                 strain_z = None
 
-                # Minor optimization: Only read if actually requested.
-                if "Z" in components:
-                    if self.info.dump_type == 'displ_only':
-                        strain_z = self.__get_strain_interp(
-                            self.meshes.pz, id_elem, gll_point_ids, G, GT,
+                if isinstance(self.meshes, MeshCollection_merged):
+                    assert self.info.dump_type == "displ_only"
+                    strain_x, strain_z = self.__get_strain_interp(
+                            self.meshes.mesh, id_elem, gll_point_ids, G, GT,
                             col_points_xi, col_points_eta, corner_points,
                             eltype, axis, xi, eta)
-                    elif (self.info.dump_type == 'fullfields' or
-                            self.info.dump_type == 'strain_only'):
-                        strain_z = self.__get_strain(self.meshes.pz, id_elem)
+                else:
+                    # Minor optimization: Only read if actually requested.
+                    if "Z" in components:
+                        if self.info.dump_type == 'displ_only':
+                            strain_z = self.__get_strain_interp(
+                                self.meshes.pz, id_elem, gll_point_ids, G, GT,
+                                col_points_xi, col_points_eta, corner_points,
+                                eltype, axis, xi, eta)
+                        elif (self.info.dump_type == 'fullfields' or
+                                self.info.dump_type == 'strain_only'):
+                            strain_z = self.__get_strain(self.meshes.pz,
+                                                         id_elem)
 
-                if any(comp in components for comp in ['N', 'E', 'R', 'T']):
-                    if self.info.dump_type == 'displ_only':
-                        strain_x = self.__get_strain_interp(
-                            self.meshes.px, id_elem, gll_point_ids, G, GT,
-                            col_points_xi, col_points_eta, corner_points,
-                            eltype, axis, xi, eta)
-                    elif (self.info.dump_type == 'fullfields' or
-                          self.info.dump_type == 'strain_only'):
-                        strain_x = self.__get_strain(self.meshes.px, id_elem)
+                    if any(comp in components for comp in ['N', 'E', 'R',
+                                                           'T']):
+                        if self.info.dump_type == 'displ_only':
+                            strain_x = self.__get_strain_interp(
+                                self.meshes.px, id_elem, gll_point_ids, G, GT,
+                                col_points_xi, col_points_eta, corner_points,
+                                eltype, axis, xi, eta)
+                        elif (self.info.dump_type == 'fullfields' or
+                              self.info.dump_type == 'strain_only'):
+                            strain_x = self.__get_strain(self.meshes.px,
+                                                         id_elem)
 
                 mij = rotations\
                     .rotate_symm_tensor_voigt_xyz_src_to_xyz_earth(
@@ -523,32 +551,163 @@ class InstaseisDB(BaseInstaseisDB):
     def __get_strain_interp(self, mesh, id_elem, gll_point_ids, G, GT,
                             col_points_xi, col_points_eta, corner_points,
                             eltype, axis, xi, eta):
+
+        # Hacked special case handling...
+        if "merged_snapshots" in mesh.mesh_dict:
+            buffer_id_x = str(id_elem) + "_x"
+            buffer_id_z = str(id_elem) + "_z"
+            if buffer_id_x not in mesh.strain_buffer or \
+                    buffer_id_z not in mesh.strain_buffer:
+                # Single precision in the NetCDF files but the later
+                # interpolation routines require double precision. Assignment
+                # to this array will force a cast.
+                utemp_x = np.zeros((mesh.ndumps, mesh.npol + 1,
+                                  mesh.npol + 1, 3),
+                                 dtype=np.float64, order="F")
+                utemp_z = np.zeros((mesh.ndumps, mesh.npol + 1,
+                                    mesh.npol + 1, 3),
+                                   dtype=np.float64, order="F")
+                _t = mesh.mesh_dict["merged_snapshots"][id_elem]
+
+                # First three are x, last two are z.
+                utemp_x[:] = _t[:, :, :, :3]
+                utemp_z[:, :, :, 0] = _t[:, :, :, 3]
+                utemp_z[:, :, :, 2] = _t[:, :, :, 4]
+
+                strain_fct_map = {
+                    "monopole": sem_derivatives.strain_monopole_td,
+                    "dipole": sem_derivatives.strain_dipole_td,
+                    "quadpole": sem_derivatives.strain_quadpole_td}
+
+                strain_x = strain_fct_map[mesh.excitation_type](
+                    utemp_x, G, GT, col_points_xi, col_points_eta, mesh.npol,
+                    mesh.ndumps, corner_points, eltype, axis)
+                strain_z = strain_fct_map[mesh.excitation_type](
+                    utemp_z, G, GT, col_points_xi, col_points_eta, mesh.npol,
+                    mesh.ndumps, corner_points, eltype, axis)
+
+                mesh.strain_buffer.add(buffer_id_x, strain_x)
+                mesh.strain_buffer.add(buffer_id_z, strain_z)
+            else:
+                strain_x = mesh.strain_buffer.get(buffer_id_x)
+                strain_z = mesh.strain_buffer.get(buffer_id_z)
+
+            strain_x = np.require(strain_x, requirements="F")
+            strain_z = np.require(strain_z, requirements="F")
+
+            final_strain_x = np.empty((strain_x.shape[0], 6), order="F")
+            final_strain_z = np.empty((strain_z.shape[0], 6), order="F")
+
+            for i in range(6):
+                final_strain_x[:, i] = spectral_basis.lagrange_interpol_2D_td(
+                        col_points_xi, col_points_eta, strain_x[:, :, :, i],
+                        xi, eta)
+                final_strain_z[:, i] = spectral_basis.lagrange_interpol_2D_td(
+                        col_points_xi, col_points_eta, strain_z[:, :, :, i],
+                        xi, eta)
+
+            if not mesh.excitation_type == "monopole":
+                final_strain_x[:, 3] *= -1.0
+                final_strain_x[:, 5] *= -1.0
+                final_strain_z[:, 3] *= -1.0
+                final_strain_z[:, 5] *= -1.0
+
+            return final_strain_x, final_strain_z
+
+
         if id_elem not in mesh.strain_buffer:
+
             # Single precision in the NetCDF files but the later interpolation
             # routines require double precision. Assignment to this array will
             # force a cast.
             utemp = np.zeros((mesh.ndumps, mesh.npol + 1, mesh.npol + 1, 3),
                              dtype=np.float64, order="F")
 
-            mesh_dict = mesh.f.groups["Snapshots"].variables
+            if "unrolled_snapshots" in mesh.mesh_dict:
+                _t = mesh.mesh_dict["unrolled_snapshots"][id_elem]
+                # Potentially have to unpack only two into a three array
+                # last dimension.
+                if _t.shape[-1] == 3:
+                    utemp[:] = _t
+                elif _t.shape[-1] == 2:
+                    utemp[:, :, :, 0] = _t[:, :, :, 0]
+                    utemp[:, :, :, 2] = _t[:, :, :, 1]
+                else:
+                    # Should not happen.
+                    raise NotImplementedError
 
-            # Load displacement from all GLL points.
-            for i, var in enumerate(["disp_s", "disp_p", "disp_z"]):
-                if var not in mesh_dict:
-                    continue
+            else:
+                # Load displacement from all GLL points.
+                for i, var in enumerate(["disp_s", "disp_p", "disp_z"]):
+                    if var not in mesh.mesh_dict:
+                        continue
 
-                # The netCDF Python wrappers starting with version 1.1.6
-                # disallow duplicate and unordered indices while slicing. So
-                # we need to do it manually.
-                # The list of ids we have is unique but not sorted.
-                ids = gll_point_ids.flatten()
-                s_ids = np.sort(ids)
-                temp = mesh_dict[var][:, s_ids]
-                for ipol in range(mesh.npol + 1):
-                    for jpol in range(mesh.npol + 1):
-                        idx = ipol * 5 + jpol
-                        utemp[:, jpol, ipol, i] = \
-                            temp[:, np.argwhere(s_ids == ids[idx])[0][0]]
+                    # Two cases - this might seem like over-optimization but
+                    # actually makes a big difference.
+                    #
+                    # The memory mapped approach does not benefit from I/O
+                    # chunking. Might be due to internal optimization - it
+                    # actually gets slower with it as it results in more array
+                    # access operations.
+                    #
+                    # The normal h5py way benefits quite a lot from I/O
+                    # chunking.
+                    m = mesh.mesh_dict[var]
+                    if isinstance(m, np.memmap):
+                        # Simplest case is the fastest - maybe due to internal
+                        # optimizations?
+                        ids = gll_point_ids.flatten()
+
+                        if m.time_axis == 0:
+                            _temp = np.array(m[:, ids])
+                            for ipol in range(mesh.npol + 1):
+                                for jpol in range(mesh.npol + 1):
+                                    idx = ipol * 5 + jpol
+                                    utemp[:, jpol, ipol, i] = _temp[:, idx]
+                        elif m.time_axis == 1:
+                            _temp = np.array(m[ids, :])
+                            for ipol in range(mesh.npol + 1):
+                                for jpol in range(mesh.npol + 1):
+                                    idx = ipol * 5 + jpol
+                                    utemp[:, jpol, ipol, i] = _temp[idx, :]
+                        else:
+                            raise NotImplementedError
+                    else:
+                        # The list of ids we have is unique but not sorted.
+                        ids = gll_point_ids.flatten()
+                        s_ids = np.sort(ids)
+
+                        # Request successive indices in one go.
+                        chunks = helpers.io_chunker(s_ids)
+                        _temp = []
+                        for _c in chunks:
+                            if isinstance(_c, list):
+                                _temp.append(m[:, _c[0]:_c[1]])
+                            else:
+                                _temp.append(m[:, _c])
+
+                        _t = np.empty((_temp[0].shape[0], 25),
+                                      dtype=_temp[0].dtype)
+
+                        k = 0
+                        for _i in _temp:
+                            if len(_i.shape) == 1:
+                                _t[:, k] = _i
+                                k += 1
+                            else:
+                                for _j in range(_i.shape[1]):
+                                    _t[:, k + _j] = _i[:, _j]
+
+                                k += _j + 1
+
+                        _temp = _t
+
+                        for ipol in range(mesh.npol + 1):
+                            for jpol in range(mesh.npol + 1):
+                                idx = ipol * 5 + jpol
+                                utemp[:, jpol, ipol, i] = \
+                                    _temp[:, np.argwhere(
+                                        s_ids == ids[idx])[0][0]]
 
             strain_fct_map = {
                 "monopole": sem_derivatives.strain_monopole_td,
@@ -579,14 +738,12 @@ class InstaseisDB(BaseInstaseisDB):
         if id_elem not in mesh.strain_buffer:
             strain_temp = np.zeros((self.info.npts, 6), order="F")
 
-            mesh_dict = mesh.f.groups["Snapshots"].variables
-
             for i, var in enumerate([
                     'strain_dsus', 'strain_dsuz', 'strain_dpup',
                     'strain_dsup', 'strain_dzup', 'straintrace']):
-                if var not in mesh_dict:
+                if var not in mesh.mesh_dict:
                     continue
-                strain_temp[:, i] = mesh_dict[var][:, id_elem]
+                strain_temp[:, i] = mesh.mesh_dict[var][:, id_elem]
 
             # transform strain to voigt mapping
             # dsus, dpup, dzuz, dzup, dsuz, dsup
@@ -610,11 +767,9 @@ class InstaseisDB(BaseInstaseisDB):
             utemp = np.zeros((mesh.ndumps, mesh.npol + 1, mesh.npol + 1, 3),
                              dtype=np.float64, order="F")
 
-            mesh_dict = mesh.f.groups["Snapshots"].variables
-
             # Load displacement from all GLL points.
             for i, var in enumerate(["disp_s", "disp_p", "disp_z"]):
-                if var not in mesh_dict:
+                if var not in mesh.mesh_dict:
                     continue
                 # The netCDF Python wrappers starting with version 1.1.6
                 # disallow duplicate and unordered indices while slicing. So
@@ -622,7 +777,7 @@ class InstaseisDB(BaseInstaseisDB):
                 # The list of ids we have is unique but not sorted.
                 ids = gll_point_ids.flatten()
                 s_ids = np.sort(ids)
-                temp = mesh_dict[var][:, s_ids]
+                temp = mesh.mesh_dict[var][:, s_ids]
                 for ipol in range(mesh.npol + 1):
                     for jpol in range(mesh.npol + 1):
                         idx = ipol * 5 + jpol
@@ -653,7 +808,9 @@ class InstaseisDB(BaseInstaseisDB):
                 filesize += os.path.getsize(m.filename)
 
         if self._is_reciprocal:
-            if self.meshes.pz is not None and self.meshes.px is not None:
+            if isinstance(self.meshes, MeshCollection_merged):
+                components = 'vertical and horizontal'
+            elif self.meshes.pz is not None and self.meshes.px is not None:
                 components = 'vertical and horizontal'
             elif self.meshes.pz is None and self.meshes.px is not None:
                 components = 'horizontal only'

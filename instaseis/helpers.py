@@ -125,3 +125,20 @@ def geocentric_to_elliptic_latitude(lat, axis_a=6378137.0,
         return lat
 
     return math.degrees(math.atan(math.tan(math.radians(lat)) / (1 - E_2)))
+
+
+def io_chunker(arr):
+    idx = []
+    for _i in range(len(arr)):
+        if _i == 0:
+            idx.append(arr[_i])
+            continue
+        diff = arr[_i] - arr[_i - 1]
+        if diff == 1:
+            if isinstance(idx[-1], list):
+                idx[-1][-1] += 1
+            else:
+                idx[-1] = [idx[-1], idx[-1] + 2]
+        else:
+            idx.append(arr[_i])
+    return idx

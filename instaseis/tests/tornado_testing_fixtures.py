@@ -145,6 +145,8 @@ DBS["db_bwd_displ_only"] = os.path.join(DATA, "100s_db_bwd_displ_only")
 DBS["db_bwd_strain_only"] = os.path.join(DATA, "100s_db_bwd_strain_only")
 DBS["db_fwd"] = os.path.join(DATA, "100s_db_fwd")
 DBS["db_fwd_deep"] = os.path.join(DATA, "100s_db_fwd_deep")
+DBS["db_bwd_displ_only_uncompressed"] = \
+    os.path.join(DATA, "100s_db_bwd_displ_only_uncompressed")
 
 
 def event_info_mock_callback(event_id):

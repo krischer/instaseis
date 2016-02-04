@@ -2,7 +2,6 @@
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 
-import netCDF4
 import re
 import warnings
 
@@ -113,15 +112,6 @@ def __version_cmp(required_version, version):
     if normalize(version) < normalize(required_version):
         return False
     return True
-
-
-# There are some serious errors with older netCDF version when doing lots of
-# I/O. Thus raise a warning and delegate responsibilities to the users.
-if not __version_cmp("4.3", netCDF4.__netcdf4libversion__):
-    msg = ("There are some issues when using a netCDF version smaller "
-           "than 4.3 (you are running version %s). Please update your netCDF "
-           "installation." % netCDF4.__netcdf4libversion__)
-    warnings.warn(msg, InstaseisWarning)
 
 
 from .source import Source, Receiver, ForceSource, FiniteSource  # NoQa

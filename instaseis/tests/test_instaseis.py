@@ -35,7 +35,8 @@ DATA = os.path.join(os.path.dirname(os.path.abspath(
     inspect.getfile(inspect.currentframe()))), "data")
 
 DBS = [os.path.join(DATA, "100s_db_fwd"),
-       os.path.join(DATA, "100s_db_bwd_displ_only")]
+       os.path.join(DATA, "100s_db_bwd_displ_only"),
+       os.path.join(DATA, "100s_db_bwd_displ_only_uncompressed")]
 
 
 def test_fwd_vs_bwd():
@@ -1362,3 +1363,61 @@ def test_receiver_settings():
     assert tr.stats.station == "ALTM"
     assert tr.stats.location == "SY"
     assert tr.stats.channel[-1] == "Z"
+
+
+def test_compressed_vs_uncompressed_database():
+    """
+    Compressed and uncompressed databases are using different extraction
+    methods.
+
+    This test asserts that both yield identical results.
+    """
+    db = InstaseisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
+    db_uncompressed = InstaseisDB(os.path.join(
+            DATA, "100s_db_bwd_displ_only_uncompressed"))
+
+    receiver = Receiver(latitude=42.6390, longitude=74.4940)
+    source = Source(
+            latitude=89.91, longitude=0.0, depth_in_m=12000,
+            m_rr=4.710000e+24 / 1E7,
+            m_tt=3.810000e+22 / 1E7,
+            m_pp=-4.740000e+24 / 1E7,
+            m_rt=3.990000e+23 / 1E7,
+            m_rp=-8.050000e+23 / 1E7,
+            m_tp=-1.230000e+24 / 1E7)
+
+    st = db.get_seismograms(
+            source=source, receiver=receiver,
+            components=('Z', 'N', 'E', 'R', 'T'))
+    st_uc = db_uncompressed.get_seismograms(
+            source=source, receiver=receiver,
+            components=('Z', 'N', 'E', 'R', 'T'))
+
+    assert st == st_uc
+
+    # read on init
+    db = InstaseisDB(os.path.join(DATA, "100s_db_bwd_displ_only"),
+                     read_on_demand=False)
+    db_uncompressed = InstaseisDB(os.path.join(
+            DATA, "100s_db_bwd_displ_only_uncompressed"), read_on_demand=False)
+
+    st = db.get_seismograms(
+            source=source, receiver=receiver,
+            components=('Z', 'N', 'E', 'R', 'T'))
+    st_uc = db_uncompressed.get_seismograms(
+            source=source, receiver=receiver,
+            components=('Z', 'N', 'E', 'R', 'T'))
+
+    assert st == st_uc
+
+    # test resampling with a no-op interpolation.
+    dt = db.info.dt
+
+    st = db.get_seismograms(
+            source=source, receiver=receiver,
+            components=('Z', 'N', 'E', 'R', 'T'), dt=dt, kernelwidth=5)
+    st_uc = db_uncompressed.get_seismograms(
+            source=source, receiver=receiver,
+            components=('Z', 'N', 'E', 'R', 'T'), dt=dt, kernelwidth=5)
+
+    assert st == st_uc

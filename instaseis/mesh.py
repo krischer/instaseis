@@ -3,6 +3,17 @@
 """
 Mesh object also taking care of opening and closing the netCDF files.
 
+Please note that this module actually uses h5py instead of the Python
+netcdf4 library to read the files. This enables us to skip one layer of
+software. E.g.
+
+* HDF5 -> C netCDF -> Python netcdf
+
+instead of
+
+* HDF5 -> h5py
+
+
 :copyright:
     Lion Krischer (krischer@geophysik.uni-muenchen.de), 2014
     Martin van Driel (Martin@vanDriel.de), 2014
@@ -13,7 +24,7 @@ Mesh object also taking care of opening and closing the netCDF files.
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 
-import netCDF4
+import h5py
 import numpy as np
 from obspy import UTCDateTime
 from scipy.spatial import cKDTree
@@ -95,32 +106,107 @@ class Mesh(object):
     def __init__(self, filename, full_parse=False,
                  strain_buffer_size_in_mb=0, displ_buffer_size_in_mb=0,
                  read_on_demand=True):
-        self.f = netCDF4.Dataset(filename, "r", format="NETCDF4")
+        self.f = h5py.File(filename, "r")
         self.filename = filename
         self.read_on_demand = read_on_demand
         self._parse(full_parse=full_parse)
         self.strain_buffer = Buffer(strain_buffer_size_in_mb)
         self.displ_buffer = Buffer(displ_buffer_size_in_mb)
+        self._create_mesh_dict()
 
-    def __del__(self):
-        try:
-            self.f.close()
-        except:
-            pass
+    def _create_mesh_dict(self):
+        """
+        Creates a dictionary of the required data.
+
+        Either creates memory maps if possible with the data or just points
+        towards the HDF5 groups.
+        """
+        if "unrolled_snapshots" in self.f:
+            ds = self.f["unrolled_snapshots"]
+            offset = ds.id.get_offset()
+            if ds.chunks is None and ds.compression is None and \
+                    offset is not None:
+                self.mesh_dict = {}
+                try:
+                    self.mesh_dict["unrolled_snapshots"] = \
+                        np.memmap(self.filename, mode='r', shape=ds.shape,
+                                  offset=offset, dtype=ds.dtype, order="C")
+                except:
+                    self.mesh_dict["unrolled_snapshots"] = ds
+            else:
+                raise NotImplementedError("Unrolled snapshots must not be "
+                                          "chunked in the netCDF file.")
+            return
+        elif "merged_snapshots" in self.f:
+            ds = self.f["merged_snapshots"]
+            offset = ds.id.get_offset()
+            if ds.chunks is None and ds.compression is None and \
+                            offset is not None:
+                self.mesh_dict = {}
+                try:
+                    self.mesh_dict["merged_snapshots"] = \
+                        np.memmap(self.filename, mode='r', shape=ds.shape,
+                                  offset=offset, dtype=ds.dtype, order="C")
+                except:
+                    self.mesh_dict["merged_snapshots"] = ds
+            else:
+                raise NotImplementedError("Merged snapshots must not be "
+                                          "chunked in the netCDF file.")
+            return
+
+        mesh_dict = {}
+
+        def get_time_axis(ds):
+            """Helper function to determine the time axis of the mesh."""
+            if ds.shape[0] == ds.shape[1]:
+                raise NotImplementedError("Both dimensions in the dataset "
+                                          "are identical. This is currently "
+                                          "not supported.")
+            elif ds.shape[0] == self.ndumps:
+                return 0
+            elif ds.shape[1] == self.ndumps:
+                return 1
+            else:
+                raise ValueError("Could not determine the time axis in the "
+                                 "2D array. It has an incompatible shape.")
+
+        for key, value in self.f["Snapshots"].items():
+            offset = value.id.get_offset()
+            time_axis = get_time_axis(value)
+            if value.chunks is None and value.compression is None and \
+                    offset is not None:
+                try:
+                    mesh_dict[key] = \
+                        np.memmap(self.filename, mode='r', shape=value.shape,
+                                  offset=offset, dtype=value.dtype, order="C")
+                except:
+                    mesh_dict[key] = value
+            else:
+                if time_axis != 0:
+                    raise NotImplementedError(
+                        "The current implementation requires chunked "
+                        "netCDF files to have the time as the first axis and "
+                        "the gll points as the second.")
+                mesh_dict[key] = value
+
+            mesh_dict[key].time_axis = time_axis
+
+        self.mesh_dict = mesh_dict
 
     def _parse(self, full_parse=False):
         # Cheap sanity check. No need to parse the rest.
         self.dump_type = \
-            getattr(self.f, "dump type (displ_only, displ_velo, fullfields)")
+            self.f.attrs["dump type "
+                         "(displ_only, displ_velo, fullfields)"].decode()
         if (self.dump_type != "displ_only" and
                 self.dump_type != "fullfields" and
                 self.dump_type != "strain_only"):
             raise NotImplementedError
 
-        self.npol = self.f.npol
+        self.npol = self.f.attrs["npol"][0]
 
         try:
-            self.file_version = getattr(self.f, "file version")
+            self.file_version = self.f.attrs["file version"][0]
         except AttributeError:
             raise ValueError("Database file so old that it does not even have "
                              "a version number. Please update AxiSEM or get "
@@ -131,11 +217,8 @@ class Mesh(object):
                              "expected: %d, found: %d." %
                              (self.MIN_FILE_VERSION, self.file_version))
 
-        self.ndumps = getattr(self.f, "number of strain dumps")
-        snapshot_vars = self.f.groups["Snapshots"].variables
-        contents = sorted(list(snapshot_vars.keys()))
-        self.chunks = snapshot_vars[contents[0]].chunking()
-        self.excitation_type = getattr(self.f, "excitation type")
+        self.ndumps = self.f.attrs["number of strain dumps"][0]
+        self.excitation_type = self.f.attrs["excitation type"].decode()
 
         # The rest is not needed for every mesh.
 
@@ -143,26 +226,26 @@ class Mesh(object):
             return
 
         # Read some basic information to have easier access later on.
-        self.source_type = getattr(self.f, "source type")
-        self.amplitude = getattr(self.f, "scalar source magnitude")
-        self.dt = getattr(self.f, "strain dump sampling rate in sec")
-        self.source_shift = getattr(self.f, "source shift factor in sec")
-        self.source_shift_samp = getattr(
-            self.f, "source shift factor for deltat_coarse")
+        self.source_type = self.f.attrs["source type"].decode()
+        self.amplitude = self.f.attrs["scalar source magnitude"][0]
+        self.dt = self.f.attrs["strain dump sampling rate in sec"][0]
+        self.source_shift = self.f.attrs["source shift factor in sec"][0]
+        self.source_shift_samp = self.f.attrs[
+            "source shift factor for deltat_coarse"][0]
 
         possible_stf_groups = ["Surface", "Snapshots"]
         found_stf = False
         for g in possible_stf_groups:
-            if g not in self.f.groups:
+            if g not in self.f:
                 continue
-            group = self.f.groups[g]
+            group = self.f[g]
 
-            if "stf_d_dump" not in group.variables or \
-                    "stf_dump" not in group.variables:
+            if "stf_d_dump" not in group or \
+                    "stf_dump" not in group:
                 continue
 
-            stf_d_dump = group.variables["stf_d_dump"][:]
-            stf_dump = group.variables["stf_dump"][:]
+            stf_d_dump = group["stf_d_dump"][:]
+            stf_dump = group["stf_dump"][:]
 
             if np.ma.is_masked(stf_d_dump) or \
                     np.ma.is_masked(stf_dump) or \
@@ -183,51 +266,43 @@ class Mesh(object):
         self.stf_d_norm = self.stf_d / self.amplitude
         self.stf_norm = self.stf / self.amplitude
 
-        self.npoints = self.f.npoints
+        self.npoints = self.f.attrs["npoints"][0]
 
-        if self.dump_type == "displ_only":
-            self.compression_level = \
-                self.f.groups["Snapshots"].variables["disp_s"]\
-                .filters()["complevel"]
-        elif self.dump_type == "fullfields" or self.dump_type == "strain_only":
-            self.compression_level = \
-                self.f.groups["Snapshots"].variables["strain_dsus"]\
-                .filters()["complevel"]
-
-        self.background_model = getattr(self.f, "background model")
+        self.background_model = self.f.attrs["background model"].decode()
         if self.file_version >= 8:
-            self.external_model_name = getattr(self.f, "external model name")
+            self.external_model_name = \
+                self.f.attrs["external model name"].decode()
         else:
             if self.background_model == 'external':
                 self.external_model_name = 'unknown'
             else:
                 self.external_model_name = ''
-        self.attenuation = bool(getattr(self.f, "attenuation"))
-        self.planet_radius = getattr(self.f, "planet radius") * 1e3
-        self.dominant_period = getattr(self.f, "dominant source period")
-        self.axisem_version = getattr(self.f, "git commit hash")
-        self.creation_time = UTCDateTime(self.f.datetime)
+        self.attenuation = bool(self.f.attrs["attenuation"][0])
+        self.planet_radius = self.f.attrs["planet radius"][0] * 1e3
+        self.dominant_period = self.f.attrs["dominant source period"][0]
+        self.axisem_version = self.f.attrs["git commit hash"].decode()
+        self.creation_time = UTCDateTime(self.f.attrs["datetime"].decode())
         self.axisem_compiler = "%s %s" % (
-            getattr(self.f, "compiler brand"),
-            getattr(self.f, "compiler version"))
+            self.f.attrs["compiler brand"].decode(),
+            self.f.attrs["compiler version"].decode())
         self.axisem_user = "%s on %s" % (
-            getattr(self.f, "user name"),
-            getattr(self.f, "host name"))
+            self.f.attrs["user name"].decode(),
+            self.f.attrs["host name"].decode())
 
-        self.kwf_rmin = getattr(self.f, "kernel wavefield rmin")
-        self.kwf_rmax = getattr(self.f, "kernel wavefield rmax")
-        self.kwf_colatmin = getattr(self.f, "kernel wavefield colatmin")
-        self.kwf_colatmax = getattr(self.f, "kernel wavefield colatmax")
-        self.time_scheme = getattr(self.f, "time scheme")
-        self.source_depth = getattr(self.f, "source depth in km")
-        self.stf_kind = getattr(self.f, "source time function")
+        self.kwf_rmin = self.f.attrs["kernel wavefield rmin"][0]
+        self.kwf_rmax = self.f.attrs["kernel wavefield rmax"][0]
+        self.kwf_colatmin = self.f.attrs["kernel wavefield colatmin"][0]
+        self.kwf_colatmax = self.f.attrs["kernel wavefield colatmax"][0]
+        self.time_scheme = self.f.attrs["time scheme"].decode()
+        self.source_depth = self.f.attrs["source depth in km"][0]
+        self.stf_kind = self.f.attrs["source time function"].decode()
 
         if self.dump_type == "displ_only":
-            self.gll_points = self.f.groups["Mesh"].variables["gll"][:]
-            self.glj_points = self.f.groups["Mesh"].variables["glj"][:]
-            self.G0 = self.f.groups["Mesh"].variables["G0"][:]
-            self.G1 = self.f.groups["Mesh"].variables["G1"][:].T
-            self.G2 = self.f.groups["Mesh"].variables["G2"][:].T
+            self.gll_points = self.f["Mesh"]["gll"][:]
+            self.glj_points = self.f["Mesh"]["glj"][:]
+            self.G0 = self.f["Mesh"]["G0"][:]
+            self.G1 = self.f["Mesh"]["G1"][:].T
+            self.G2 = self.f["Mesh"]["G2"][:].T
 
             self.G1T = np.require(self.G1.transpose(),
                                   requirements=["F_CONTIGUOUS"])
@@ -235,8 +310,8 @@ class Mesh(object):
                                   requirements=["F_CONTIGUOUS"])
 
             # Build a kdtree of the element midpoints.
-            self.s_mp = self.f.groups["Mesh"].variables["mp_mesh_S"]
-            self.z_mp = self.f.groups["Mesh"].variables["mp_mesh_Z"]
+            self.s_mp = self.f["Mesh"]["mp_mesh_S"]
+            self.z_mp = self.f["Mesh"]["mp_mesh_Z"]
 
             self.mesh = np.empty((self.s_mp.shape[0], 2),
                                  dtype=self.s_mp.dtype)
@@ -249,18 +324,18 @@ class Mesh(object):
             # memory use it should be acceptable and result in much less netCDF
             # reads.
             if not self.read_on_demand:
-                self.fem_mesh = self.f.groups["Mesh"].variables["fem_mesh"][:]
-                self.eltypes = self.f.groups["Mesh"].variables["eltype"][:]
-                self.mesh_S = self.f.groups["Mesh"].variables["mesh_S"][:]
-                self.mesh_Z = self.f.groups["Mesh"].variables["mesh_Z"][:]
-                self.sem_mesh = self.f.groups["Mesh"].variables["sem_mesh"][:]
-                self.axis = self.f.groups["Mesh"].variables["axis"][:]
-                self.mesh_mu = self.f.groups["Mesh"].variables["mesh_mu"][:]
+                self.fem_mesh = self.f["Mesh"]["fem_mesh"][:]
+                self.eltypes = self.f["Mesh"]["eltype"][:]
+                self.mesh_S = self.f["Mesh"]["mesh_S"][:]
+                self.mesh_Z = self.f["Mesh"]["mesh_Z"][:]
+                self.sem_mesh = self.f["Mesh"]["sem_mesh"][:]
+                self.axis = self.f["Mesh"]["axis"][:]
+                self.mesh_mu = self.f["Mesh"]["mesh_mu"][:]
 
         elif self.dump_type == "fullfields" or self.dump_type == "strain_only":
             # Build a kdtree of the stored gll points.
-            self.mesh_S = self.f.groups["Mesh"].variables["mesh_S"]
-            self.mesh_Z = self.f.groups["Mesh"].variables["mesh_Z"]
+            self.mesh_S = self.f["Mesh"]["mesh_S"]
+            self.mesh_Z = self.f["Mesh"]["mesh_Z"]
 
             self.mesh = np.empty((self.mesh_S.shape[0], 2),
                                  dtype=self.mesh_S.dtype)
@@ -270,4 +345,4 @@ class Mesh(object):
             self.kdtree = cKDTree(data=self.mesh)
 
             if not self.read_on_demand:
-                self.mesh_mu = self.f.groups["Mesh"].variables["mesh_mu"][:]
+                self.mesh_mu = self.f["Mesh"]["mesh_mu"][:]
