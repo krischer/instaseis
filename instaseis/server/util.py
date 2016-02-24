@@ -15,6 +15,7 @@ import threading
 import numpy as np
 import obspy
 from obspy.core.util import gps2DistAzimuth, locations2degrees
+from obspy.io.sac.util import utcdatetime_to_sac_nztimes
 import tornado.web
 
 from .. import ForceSource, FiniteSource
@@ -218,6 +219,11 @@ def _validate_and_write_waveforms(st, callback, starttime, endtime, scale,
             # Prefix version numbers to identify them at a glance.
             tr.stats.sac.kt7 = "A" + db.info.axisem_version[:7]
             tr.stats.sac.kt8 = "I" + __version__[:7]
+
+            # Times have to be set by hand.
+            t,_ = utcdatetime_to_sac_nztimes(tr.stats.starttime)
+            for key, value in t.items():
+                tr.stats.sac[key] = value
 
             with io.BytesIO() as temp:
                 tr.write(temp, format="sac")
