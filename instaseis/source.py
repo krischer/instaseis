@@ -20,7 +20,7 @@ import numpy as np
 import obspy
 from obspy.core.util.geodetics.flinnengdahl import FlinnEngdahl
 from obspy.signal.filter import lowpass
-from obspy.signal.util import nextpow2
+from obspy.signal.util import next_pow_2
 import obspy.xseed.parser
 import os
 from scipy import interp
@@ -1449,7 +1449,7 @@ class FiniteSource(object):
             nsamp = int(ps_ts_max.time_shift / dt + len(ps_ts_max.sliprate))
 
         finite_sliprate = np.zeros(nsamp)
-        nfft = nextpow2(nsamp) * 2
+        nfft = next_pow_2(nsamp) * 2
         self.resample_sliprate(dt, nsamp)
 
         for ps in self.pointsources:
