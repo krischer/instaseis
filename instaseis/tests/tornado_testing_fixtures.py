@@ -6,6 +6,7 @@ The tornado.testing Async stuff packaged as fixtures for use with py.test
 Originally from https://gist.github.com/robcowie/7843633; modified for the
 instaseis server.
 """
+from collections import OrderedDict
 import inspect
 import os
 import pytest
@@ -13,12 +14,6 @@ import re
 import responses
 import socket
 import sys
-
-# Python 2.6 compat.
-try:
-    from collections import OrderedDict
-except ImportError:
-    from ordereddict import OrderedDict
 
 from tornado import netutil
 from tornado.httpserver import HTTPServer

@@ -146,10 +146,6 @@ INSTALL_REQUIRES = ["netCDF4 >= 1.1",
                     "pytest",
                     "responses"]
 
-# Add argparse and ordereddict for Python 2.6. Both are standard library
-# packages for Python >= 2.7.
-if sys.version_info[:2] == (2, 6):
-    INSTALL_REQUIRES.extend(["argparse", "ordereddict"])
 # Add mock for Python 2.x. Starting with Python 3 it is part of the standard
 # library.
 if sys.version_info[0] == 2:
@@ -187,11 +183,11 @@ setup_config = dict(
         "Operating System :: POSIX",
         "Operating System :: MacOS",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 2.6",
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.3",
         "Programming Language :: Python :: 3.4",
+        "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: Implementation :: CPython",
         "Topic :: Scientific/Engineering",
         "Topic :: Scientific/Engineering :: Physics"
