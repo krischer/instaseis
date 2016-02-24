@@ -221,7 +221,7 @@ def _validate_and_write_waveforms(st, callback, starttime, endtime, scale,
             tr.stats.sac.kt8 = "I" + __version__[:7]
 
             # Times have to be set by hand.
-            t,_ = utcdatetime_to_sac_nztimes(tr.stats.starttime)
+            t, _ = utcdatetime_to_sac_nztimes(tr.stats.starttime)
             for key, value in t.items():
                 tr.stats.sac[key] = value
 
