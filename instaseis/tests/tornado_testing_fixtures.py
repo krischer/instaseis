@@ -27,7 +27,7 @@ from tornado.testing import AsyncHTTPClient
 from tornado.util import raise_exc_info
 
 from obspy.taup import TauPyModel
-from obspy.core.util import geodetics
+from obspy import geodetics
 
 import instaseis
 from instaseis.server.app import get_application

@@ -110,7 +110,7 @@ def test_parse_obspy_objects():
     """
     Tests parsing from ObsPy objects.
     """
-    cat = obspy.readEvents(EVENT_FILE)
+    cat = obspy.read_events(EVENT_FILE)
     ev = cat[0]
 
     _assert_src(Source.parse(cat))

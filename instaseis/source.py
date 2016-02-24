@@ -18,10 +18,11 @@ import functools
 import io
 import numpy as np
 import obspy
-from obspy.core.util.geodetics.flinnengdahl import FlinnEngdahl
+import obspy.core.inventory
+from obspy.geodetics.flinnengdahl import FlinnEngdahl
 from obspy.signal.filter import lowpass
 from obspy.signal.util import next_pow_2
-import obspy.xseed.parser
+import obspy.io.xseed.parser
 import os
 from scipy import interp
 import warnings
@@ -350,7 +351,7 @@ class Source(SourceOrReceiver):
         if isinstance(filename_or_obj, (str, bytes)):
             # Anything ObsPy can read.
             try:
-                src = obspy.readEvents(filename_or_obj)
+                src = obspy.read_events(filename_or_obj)
             except:
                 pass
             else:
@@ -852,18 +853,18 @@ class Receiver(SourceOrReceiver):
             except:
                 pass
         # ObsPy inventory.
-        elif isinstance(filename_or_obj, obspy.station.Inventory):
+        elif isinstance(filename_or_obj, obspy.core.inventory.Inventory):
             for network in filename_or_obj:
                 receivers.extend(Receiver.parse(network))
             return receivers
         # ObsPy network.
-        elif isinstance(filename_or_obj, obspy.station.Network):
+        elif isinstance(filename_or_obj, obspy.core.inventory.Network):
             for station in filename_or_obj:
                 receivers.extend(Receiver.parse(
                     station, network_code=filename_or_obj.code))
             return receivers
         # ObsPy station.
-        elif isinstance(filename_or_obj, obspy.station.Station):
+        elif isinstance(filename_or_obj, obspy.core.inventory.Station):
             if network_code is None:
                 raise ReceiverParseError("network_code must be given.")
             # If there are no channels, use the station coordinates.
@@ -912,8 +913,8 @@ class Receiver(SourceOrReceiver):
                 longitude=coords[1],
                 network=filename_or_obj.stats.network,
                 station=filename_or_obj.stats.station)]
-        elif isinstance(filename_or_obj, obspy.xseed.parser.Parser):
-            inv = filename_or_obj.getInventory()
+        elif isinstance(filename_or_obj, obspy.io.xseed.parser.Parser):
+            inv = filename_or_obj.get_inventory()
             stations = collections.defaultdict(list)
             for chan in inv["channels"]:
                 stat = tuple(chan["channel_id"].split(".")[:2])
@@ -958,7 +959,8 @@ class Receiver(SourceOrReceiver):
 
         # Last but not least try to parse it as a SEED file.
         try:
-            return Receiver.parse(obspy.xseed.parser.Parser(filename_or_obj))
+            return Receiver.parse(
+                obspy.io.xseed.parser.Parser(filename_or_obj))
         except ReceiverParseError as e:
             raise e
         except:

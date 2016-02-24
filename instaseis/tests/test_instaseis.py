@@ -686,7 +686,7 @@ def test_higher_level_event_and_receiver_parsing():
     formats.
     """
     # Create an event and modify it to match the settings of the test data.
-    event = obspy.readEvents(os.path.join(
+    event = obspy.read_events(os.path.join(
         DATA, "GCMT_event_STRAIT_OF_GIBRALTAR.xml"))[0]
     event.origins = event.origins[:1]
     event.magnitudes = event.magnitudes[:1]

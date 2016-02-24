@@ -14,7 +14,7 @@ import threading
 
 import numpy as np
 import obspy
-from obspy.core.util import gps2DistAzimuth, locations2degrees
+from obspy.geodetics import gps2dist_azimuth, locations2degrees
 from obspy.io.sac.util import utcdatetime_to_sac_nztimes
 import tornado.web
 
@@ -194,7 +194,7 @@ def _validate_and_write_waveforms(st, callback, starttime, endtime, scale,
 
             # Sac coordinates are elliptical thus it only makes sense to
             # have elliptical distances.
-            dist_in_m, az, baz = gps2DistAzimuth(
+            dist_in_m, az, baz = gps2dist_azimuth(
                 lat1=tr.stats.sac.evla,
                 lon1=tr.stats.sac.evlo,
                 lat2=tr.stats.sac.stla,

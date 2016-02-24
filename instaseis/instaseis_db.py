@@ -16,7 +16,7 @@ from __future__ import (absolute_import, division, print_function,
 
 import collections
 import numpy as np
-from obspy.signal.util import nextpow2
+from obspy.signal.util import next_pow_2
 import os
 
 from . import InstaseisError, InstaseisNotFoundError
@@ -676,7 +676,7 @@ class InstaseisDB(BaseInstaseisDB):
             dt=float(self.parsed_mesh.dt),
             sampling_rate=float(1.0 / self.parsed_mesh.dt),
             npts=int(self.parsed_mesh.ndumps),
-            nfft=int(nextpow2(self.parsed_mesh.ndumps) * 2),
+            nfft=int(next_pow_2(self.parsed_mesh.ndumps) * 2),
             length=float(self.parsed_mesh.dt * (self.parsed_mesh.ndumps - 1)),
             stf=self.parsed_mesh.stf_kind,
             src_shift=float(self.parsed_mesh.source_shift),

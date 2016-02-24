@@ -21,7 +21,7 @@ import inspect
 from mpl_toolkits.basemap import Basemap
 import numpy as np
 from obspy.imaging.mopad_wrapper import Beach
-from obspy.core.util import geodetics
+from obspy import geodetics
 from obspy.taup import TauPyModel
 import os
 import sys
@@ -404,7 +404,7 @@ class Window(QtGui.QMainWindow):
                 if not st:
                     return
 
-                baz = geodetics.gps2DistAzimuth(
+                baz = geodetics.gps2dist_azimuth(
                     self.finite_source.CMT.latitude,
                     self.finite_source.CMT.longitude,
                     rec.latitude, rec.longitude)[2]
