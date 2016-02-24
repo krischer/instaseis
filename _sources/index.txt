@@ -112,7 +112,7 @@ and Mac OS X. Adding support for Windows is mainly a question of compiling the
 shared Fortran librarys - pull requests are welcome.
 
 * ``gfortran >= 4.7``
-* ``Python 2.6, 2.7, 3.3, or 3.4``
+* ``Python 2.7, 3.3, 3.4, or 3.5``
 * ``NumPy >= 1.7``
 * ``ObsPy >= 0.10.2``
 * ``netCDF4 >= 4.3`` including Python bindings (``>= 1.1``)

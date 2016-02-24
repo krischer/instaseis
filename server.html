@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Instaseis Server &mdash; instaseis 0.1.1-5-g544d documentation</title>
+    <title>Instaseis Server &mdash; instaseis 0.1.1-13-g771b documentation</title>
     
     <link rel="stylesheet" href="_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.1.1-5-g544d',
+        VERSION:     '0.1.1-13-g771b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -31,7 +31,7 @@
     <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="_static/bootstrap-3.3.4/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.1.1-5-g544d documentation" href="index.html" />
+    <link rel="top" title="instaseis 0.1.1-13-g771b documentation" href="index.html" />
     <link rel="next" title="GET /" href="routes/root.html" />
     <link rel="prev" title="Utility Functions" href="helpers.html" />
 <meta charset='utf-8'>
@@ -53,7 +53,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.1.1-5-g544d</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.1.1-13-g771b</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -121,7 +121,7 @@ local database.</p>
 <div class="section" id="starting-a-server">
 <h2>Starting a Server<a class="headerlink" href="#starting-a-server" title="Permalink to this headline">¶</a></h2>
 <p>To launch a server, just execute</p>
-<div class="highlight-bash"><div class="highlight"><pre>$ python -m instaseis.server --port <span class="m">8765</span> --buffer_size_in_mb <span class="m">100</span> /path/to/db
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ python -m instaseis.server --port <span class="m">8765</span> --buffer_size_in_mb <span class="m">100</span> /path/to/db
 </pre></div>
 </div>
 <p>which will launch a webserver and start serving at the specified port. The
@@ -140,7 +140,7 @@ will create 4 buffers, each <code class="docutils literal"><span class="pre">buf
 <h2>Connecting to a Server<a class="headerlink" href="#connecting-to-a-server" title="Permalink to this headline">¶</a></h2>
 <p>Connecting works by simply opening a connection to said machine, e.g. if
 the server is running on the same machine:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">instaseis</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">instaseis</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">instaseis</span><span class="o">.</span><span class="n">open_db</span><span class="p">(</span><span class="s2">&quot;http://127.0.0.1:8765&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
 <span class="go">RemoteInstaseisDB reciprocal Green&#39;s function Database (v7) generated with these parameters:</span>
@@ -193,7 +193,7 @@ system to system but it should not be hard to find.</p>
 <p>Supervisor takes care to start, monitor, and restart the Instaseis server
 making sure it runs all the time. A very minimal supervisor configuration
 that launches two Instaseis server instances serving two different databases:</p>
-<div class="highlight-ini"><div class="highlight"><pre><span class="k">[program:instaseis_20s]</span>
+<div class="highlight-ini"><div class="highlight"><pre><span></span><span class="k">[program:instaseis_20s]</span>
 <span class="na">command</span><span class="o">=</span><span class="s">/path/to/python -m instaseis.server --port=8765 --buffer_size_in_mb=50 /path/to/20s_PREM_ANI_FORCES</span>
 <span class="na">autostart</span><span class="o">=</span><span class="s">true</span>
 <span class="na">autorestart</span><span class="o">=</span><span class="s">true</span>
@@ -215,7 +215,7 @@ Instaseis server instances started with supervisor to
 <code class="docutils literal"><span class="pre">http://site-name.org:8080/20s_PREM_ANI_FORCES</span></code> and
 <code class="docutils literal"><span class="pre">http://site-name.org:8080/10s_PREM_ANI_FORCES</span></code>. One can easily imaging
 this being done for a number of models at various frequencies.</p>
-<div class="highlight-ini"><div class="highlight"><pre>server {
+<div class="highlight-ini"><div class="highlight"><pre><span></span>server {
     listen 8080;
     server_name localhost;
     location /20s_PREM_ANI_FORCES/ {
@@ -237,7 +237,7 @@ issues it is a potential solution.</p>
 <div class="section" id="logging">
 <h2>Logging<a class="headerlink" href="#logging" title="Permalink to this headline">¶</a></h2>
 <p>The Instaseis server starting script</p>
-<div class="highlight-bash"><div class="highlight"><pre>$ python -m instaseis.server
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ python -m instaseis.server
 </pre></div>
 </div>
 <p>offers basic functionality to log to standard out. By default it logs at the

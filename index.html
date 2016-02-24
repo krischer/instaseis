@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Instaseis: Instant Global Seismograms Based on a Broadband Waveform Database &mdash; instaseis 0.1.1-5-g544d documentation</title>
+    <title>Instaseis: Instant Global Seismograms Based on a Broadband Waveform Database &mdash; instaseis 0.1.1-13-g771b documentation</title>
     
     <link rel="stylesheet" href="_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.1.1-5-g544d',
+        VERSION:     '0.1.1-13-g771b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -31,7 +31,7 @@
     <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="_static/bootstrap-3.3.4/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.1.1-5-g544d documentation" href="#" />
+    <link rel="top" title="instaseis 0.1.1-13-g771b documentation" href="#" />
     <link rel="next" title="Main Instaseis Classes" href="instaseis.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="#">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.1.1-5-g544d</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.1.1-13-g771b</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -203,7 +203,7 @@ and Mac OS X. Adding support for Windows is mainly a question of compiling the
 shared Fortran librarys - pull requests are welcome.</p>
 <ul class="simple">
 <li><code class="docutils literal"><span class="pre">gfortran</span> <span class="pre">&gt;=</span> <span class="pre">4.7</span></code></li>
-<li><code class="docutils literal"><span class="pre">Python</span> <span class="pre">2.6,</span> <span class="pre">2.7,</span> <span class="pre">3.3,</span> <span class="pre">or</span> <span class="pre">3.4</span></code></li>
+<li><code class="docutils literal"><span class="pre">Python</span> <span class="pre">2.7,</span> <span class="pre">3.3,</span> <span class="pre">3.4,</span> <span class="pre">or</span> <span class="pre">3.5</span></code></li>
 <li><code class="docutils literal"><span class="pre">NumPy</span> <span class="pre">&gt;=</span> <span class="pre">1.7</span></code></li>
 <li><code class="docutils literal"><span class="pre">ObsPy</span> <span class="pre">&gt;=</span> <span class="pre">0.10.2</span></code></li>
 <li><code class="docutils literal"><span class="pre">netCDF4</span> <span class="pre">&gt;=</span> <span class="pre">4.3</span></code> including Python bindings (<code class="docutils literal"><span class="pre">&gt;=</span> <span class="pre">1.1</span></code>)</li>
@@ -225,12 +225,12 @@ shared Fortran librarys - pull requests are welcome.</p>
 <div class="section" id="fortran-compiler">
 <h4>Fortran Compiler<a class="headerlink" href="#fortran-compiler" title="Permalink to this headline">¶</a></h4>
 <p>If you don&#8217;t have <code class="docutils literal"><span class="pre">gfortran</span></code>, please install it (on Linux) with</p>
-<div class="highlight-bash"><div class="highlight"><pre>$ sudo apt-get install gfortran
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ sudo apt-get install gfortran
 </pre></div>
 </div>
 <p>or the equivalent of your distribution. On OSX we recommend to install
 <a class="reference external" href="http://brew.sh/">Homebrew</a> and then use it to install <code class="docutils literal"><span class="pre">gfortran</span></code>:</p>
-<div class="highlight-bash"><div class="highlight"><pre>$ brew install gcc
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ brew install gcc
 </pre></div>
 </div>
 </div>
@@ -244,7 +244,7 @@ modules with a convenient installer (does not require root access!).
 Once installed assert that <code class="docutils literal"><span class="pre">pip</span></code> and <code class="docutils literal"><span class="pre">conda</span></code> point to the Anaconda
 installation folder (you may need to open a new terminal after installing
 Anaconda).</p>
-<div class="highlight-bash"><div class="highlight"><pre>$ conda install -c obspy obspy netcdf4 future requests tornado flake8 pytest mock basemap pyqt pip
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ conda install -c obspy obspy netcdf4 future requests tornado flake8 pytest mock basemap pyqt pip
 $ pip install responses pyqtgraph
 </pre></div>
 </div>
@@ -252,7 +252,7 @@ $ pip install responses pyqtgraph
 display</strong>. In that case please edit (on Linux)
 <code class="docutils literal"><span class="pre">~/.config/matplotlib/matplotlibrc</span></code> (create if it does not exist) and make
 sure the following line is part of it:</p>
-<div class="highlight-bash"><div class="highlight"><pre>backend: agg
+<div class="highlight-bash"><div class="highlight"><pre><span></span>backend: agg
 </pre></div>
 </div>
 </div>
@@ -262,14 +262,14 @@ sure the following line is part of it:</p>
 <div class="section" id="user-installation">
 <h4>User Installation<a class="headerlink" href="#user-installation" title="Permalink to this headline">¶</a></h4>
 <p><strong>Once released (not yet!)</strong>, installation of Instaseis is as easy as</p>
-<div class="highlight-bash"><div class="highlight"><pre>$ pip install instaseis
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ pip install instaseis
 </pre></div>
 </div>
 </div>
 <div class="section" id="developer-installation">
 <h4>Developer Installation<a class="headerlink" href="#developer-installation" title="Permalink to this headline">¶</a></h4>
 <p>Clone the git repository and install in an editable fashion.</p>
-<div class="highlight-bash"><div class="highlight"><pre>$ git clone https://github.com/krischer/instaseis.git
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ git clone https://github.com/krischer/instaseis.git
 $ <span class="nb">cd</span> instaseis
 $ pip install -v -e .
 </pre></div>
@@ -279,7 +279,7 @@ $ pip install -v -e .
 <div class="section" id="testing">
 <h3><a class="toc-backref" href="#id5">Testing</a><a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h3>
 <p>To assert that your installation is working properly, execute</p>
-<div class="highlight-bash"><div class="highlight"><pre>$ python -m instaseis.tests
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ python -m instaseis.tests
 </pre></div>
 </div>
 <p>and make sure all tests pass. Otherwise please contact the developers.</p>
@@ -288,11 +288,11 @@ $ pip install -v -e .
 <h3><a class="toc-backref" href="#id6">Build the Documentation</a><a class="headerlink" href="#build-the-documentation" title="Permalink to this headline">¶</a></h3>
 <p>The documentation requires <code class="docutils literal"><span class="pre">sphinx</span></code> and the Bootstrap theme. Install both
 with</p>
-<div class="highlight-bash"><div class="highlight"><pre>$ pip install sphinx sphinx-bootstrap-theme
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ pip install sphinx sphinx-bootstrap-theme
 </pre></div>
 </div>
 <p>Build the doc with</p>
-<div class="highlight-bash"><div class="highlight"><pre>$ <span class="nb">cd</span> doc
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> doc
 $ make html
 </pre></div>
 </div>
@@ -357,7 +357,7 @@ please pass <code class="docutils literal"><span class="pre">/path/to/DB</span><
 Instaseis will recursively search the child directories for the necessary
 files and open them.</p>
 </div>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">instaseis</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">instaseis</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Open connection to a local database by giving the path on disc where</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># the `ordered_output.nc4` files of AxiSEM are stored.</span>
@@ -393,7 +393,7 @@ files and open them.</p>
 </pre></div>
 </div>
 <p>The <a class="reference internal" href="instaseis.html#instaseis.base_instaseis_db.BaseInstaseisDB.get_seismograms" title="instaseis.base_instaseis_db.BaseInstaseisDB.get_seismograms"><code class="xref py py-meth docutils literal"><span class="pre">get_seismograms()</span></code></a>
-method is called to generate seismograms as <a class="reference external" href="http://docs.obspy.org/packages/autogen/obspy.core.stream.Stream.html#obspy.core.stream.Stream" title="(in ObsPy Documentation (0.10.2) v0.10)"><code class="xref py py-class docutils literal"><span class="pre">Stream</span></code></a>
+method is called to generate seismograms as <a class="reference external" href="http://docs.obspy.org/packages/autogen/obspy.core.stream.Stream.html#obspy.core.stream.Stream" title="(in ObsPy Documentation (1.0.0) v1.0)"><code class="xref py py-class docutils literal"><span class="pre">Stream</span></code></a>
 objects with the waveform data. This enables easy serialization in a large
 selection of formats and facilitates post processing by utilizing ObsPy.</p>
 <p>To generate seismograms source information must be given either as a
@@ -402,7 +402,7 @@ selection of formats and facilitates post processing by utilizing ObsPy.</p>
 <a class="reference internal" href="source.html#instaseis.source.FiniteSource" title="instaseis.source.FiniteSource"><code class="xref py py-class docutils literal"><span class="pre">FiniteSource</span></code></a> object. Receiver information must be
 passed in form of a <a class="reference internal" href="source.html#instaseis.source.Receiver" title="instaseis.source.Receiver"><code class="xref py py-class docutils literal"><span class="pre">Receiver</span></code></a> object. Please refer
 to the documentation of these classes for more details.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">obspy</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">obspy</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">receiver</span> <span class="o">=</span> <span class="n">instaseis</span><span class="o">.</span><span class="n">Receiver</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="n">latitude</span><span class="o">=</span><span class="mf">42.6390</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="mf">74.4940</span><span class="p">,</span> <span class="n">network</span><span class="o">=</span><span class="s2">&quot;AB&quot;</span><span class="p">,</span> <span class="n">station</span><span class="o">=</span><span class="s2">&quot;CED&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">source</span> <span class="o">=</span> <span class="n">instaseis</span><span class="o">.</span><span class="n">Source</span><span class="p">(</span>
@@ -424,7 +424,7 @@ to the documentation of these classes for more details.</p>
 </div>
 <p>Source and receiver can also be replaced by ObsPy objects. This can be used
 to calculate synthetics based on standard file formats and web services.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Read event information from a local QuakeML file.</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Read event information from a local QuakeML file.</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cat</span> <span class="o">=</span> <span class="n">obspy</span><span class="o">.</span><span class="n">readEvents</span><span class="p">(</span><span class="s2">&quot;quake.xml&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">cat</span><span class="p">)</span>
 <span class="go">1 Event(s) in Catalog:</span>
@@ -455,7 +455,7 @@ to calculate synthetics based on standard file formats and web services.</p>
 <span id="gui-label"></span><h2><a class="toc-backref" href="#id11">GUI</a><a class="headerlink" href="#gui" title="Permalink to this headline">¶</a></h2>
 <p>Instaseis contains an optional graphical user interface which is useful to
 explore a database and for educational purposes. To launch it just type</p>
-<div class="highlight-bash"><div class="highlight"><pre>$ python -m instaseis.gui
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ python -m instaseis.gui
 </pre></div>
 </div>
 <img alt="http://i.imgur.com/FfEtlCU.png" src="http://i.imgur.com/FfEtlCU.png" />

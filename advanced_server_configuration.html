@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Advanced Server Configuration &mdash; instaseis 0.1.1-5-g544d documentation</title>
+    <title>Advanced Server Configuration &mdash; instaseis 0.1.1-13-g771b documentation</title>
     
     <link rel="stylesheet" href="_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.1.1-5-g544d',
+        VERSION:     '0.1.1-13-g771b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -31,7 +31,7 @@
     <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="_static/bootstrap-3.3.4/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.1.1-5-g544d documentation" href="index.html" />
+    <link rel="top" title="instaseis 0.1.1-13-g771b documentation" href="index.html" />
     <link rel="prev" title="POST /finite_source" href="routes/finite_source.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.1.1-5-g544d</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.1.1-13-g771b</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -158,7 +158,7 @@ with that: <a class="reference internal" href="helpers.html#instaseis.helpers.el
 <li><a class="reference internal" href="routes/seismograms.html"><em>GET /seismograms</em></a></li>
 </ul>
 <p><strong>Function Signature:</strong></p>
-<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">get_station_coordinates</span><span class="p">(</span><span class="n">networks</span><span class="p">,</span> <span class="n">stations</span><span class="p">):</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_station_coordinates</span><span class="p">(</span><span class="n">networks</span><span class="p">,</span> <span class="n">stations</span><span class="p">):</span>
     <span class="o">...</span>
     <span class="k">return</span> <span class="p">[</span><span class="o">...</span><span class="p">]</span>
 </pre></div>
@@ -177,7 +177,7 @@ has the following keys: <code class="docutils literal"><span class="pre">&quot;n
 <li>Raise a <code class="docutils literal"><span class="pre">ValueError</span></code> for other cases.</li>
 </ul>
 <p><strong>Examples:</strong></p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">get_station_coordinates</span><span class="p">(</span><span class="n">networks</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;IU&quot;</span><span class="p">],</span> <span class="n">stations</span><span class="p">[</span><span class="s2">&quot;ANMO&quot;</span><span class="p">])</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_station_coordinates</span><span class="p">(</span><span class="n">networks</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;IU&quot;</span><span class="p">],</span> <span class="n">stations</span><span class="p">[</span><span class="s2">&quot;ANMO&quot;</span><span class="p">])</span>
 <span class="go">[{&quot;latitude&quot;: 34.94591,</span>
 <span class="go">   &quot;longitude&quot;: -106.4572,</span>
 <span class="go">   &quot;network&quot;: &quot;IU&quot;,</span>
@@ -213,7 +213,7 @@ that: <a class="reference internal" href="helpers.html#instaseis.helpers.ellipti
 <li><a class="reference internal" href="routes/seismograms.html"><em>GET /seismograms</em></a></li>
 </ul>
 <p><strong>Function Signature:</strong></p>
-<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">get_event</span><span class="p">(</span><span class="n">event_id</span><span class="p">):</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_event</span><span class="p">(</span><span class="n">event_id</span><span class="p">):</span>
     <span class="o">...</span>
     <span class="k">return</span> <span class="p">{</span><span class="o">...</span><span class="p">}</span>
 </pre></div>
@@ -231,7 +231,7 @@ have to be in <em>Nm</em>.</li>
 <li>A <code class="docutils literal"><span class="pre">ValueError</span></code> will be always be interpreted as a not found event.</li>
 </ul>
 <p><strong>Examples:</strong></p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">get_event</span><span class="p">(</span><span class="s2">&quot;B071791B&quot;</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_event</span><span class="p">(</span><span class="s2">&quot;B071791B&quot;</span><span class="p">)</span>
 <span class="go">{&quot;m_rr&quot;: -58000000000000000,</span>
 <span class="go"> &quot;m_tt&quot;: 78100000000000000,</span>
 <span class="go"> &quot;m_pp&quot;: -20100000000000000,</span>
@@ -264,7 +264,7 @@ function also receives the <code class="docutils literal"><span class="pre">info
 <li><a class="reference internal" href="routes/seismograms.html"><em>GET /seismograms</em></a></li>
 </ul>
 <p><strong>Function Signature:</strong></p>
-<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">get_travel_time</span><span class="p">(</span><span class="n">sourcelatitude</span><span class="p">,</span> <span class="n">sourcelongitude</span><span class="p">,</span> <span class="n">sourcedepthinmeters</span><span class="p">,</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_travel_time</span><span class="p">(</span><span class="n">sourcelatitude</span><span class="p">,</span> <span class="n">sourcelongitude</span><span class="p">,</span> <span class="n">sourcedepthinmeters</span><span class="p">,</span>
                     <span class="n">receiverlatitude</span><span class="p">,</span> <span class="n">receiverlongitude</span><span class="p">,</span>
                     <span class="n">receiverdepthinmeters</span><span class="p">,</span> <span class="n">phase_name</span><span class="p">,</span> <span class="n">db_info</span><span class="p">):</span>
     <span class="o">...</span>
@@ -290,7 +290,7 @@ to calculate travel times for different models depending on the database.</li>
 <li>Raise a <code class="docutils literal"><span class="pre">ValueError</span></code> for other cases, e.g. unknown phase name, invalid source-receiver geometry, ...</li>
 </ul>
 <p><strong>Examples:</strong></p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">get_travel_time</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">50.0</span><span class="p">,</span> <span class="mi">300000</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s2">&quot;P&quot;</span><span class="p">,</span> <span class="p">{})</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_travel_time</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">50.0</span><span class="p">,</span> <span class="mi">300000</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s2">&quot;P&quot;</span><span class="p">,</span> <span class="p">{})</span>
 <span class="go">504.357</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">get_travel_time</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">50.0</span><span class="p">,</span> <span class="mi">300000</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s2">&quot;Pdiff&quot;</span><span class="p">,</span> <span class="p">{})</span>
@@ -307,7 +307,7 @@ to calculate travel times for different models depending on the database.</li>
 <p>You will have to create a new file and pass the three callback functions to the
 <code class="docutils literal"><span class="pre">launch_io_loop()</span></code> function. The following code snippet will give you a
 similar command line interface to the default Instaseis server:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="p">(</span><span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="p">(</span><span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span>
                         <span class="n">unicode_literals</span><span class="p">)</span>
 <span class="kn">import</span> <span class="nn">argparse</span>
 <span class="kn">import</span> <span class="nn">os</span>
