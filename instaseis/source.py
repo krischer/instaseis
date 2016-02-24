@@ -900,9 +900,8 @@ class Receiver(SourceOrReceiver):
             if not hasattr(filename_or_obj.stats, "sac"):
                 raise ReceiverParseError("ObsPy Trace must have an sac "
                                          "attribute.")
-            coords = (filename_or_obj.stats.sac.stla,
-                      filename_or_obj.stats.sac.stlo)
-            if -12345.0 in coords:
+            if not "stla" not in filename_or_obj.stats.sac or \
+                    "stlo" not in filename_or_obj.stats.sac:
                 raise ReceiverParseError(
                     "SAC file does not contain coordinates for channel '%s'" %
                     filename_or_obj.id)
