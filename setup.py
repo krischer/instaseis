@@ -138,7 +138,7 @@ lib = MyExtension('instaseis',
 
 INSTALL_REQUIRES = ["netCDF4 >= 1.1",
                     "numpy",
-                    "obspy >= 0.10.2",
+                    "obspy >= 1.0.0",
                     "future",
                     "requests",
                     "tornado>=4.0.0",
