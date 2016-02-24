@@ -66,8 +66,18 @@ def rotate_symm_tensor_voigt_xyz_earth_to_xyz_src(mt, phi, theta):
                   [ct * sp, cp, st * sp],
                   [-st, 0, ct]])
 
+    # This double matrix product involves number that might differ by 20
+    # orders of magnitudes which makes it numerically tricky. Thus we employ
+    # quad precision numbers to make it a bit more stable and reproducable.
+    R = np.require(R, dtype=np.float128)
+    A = np.require(A, dtype=np.float128)
+
     B = np.dot(np.dot(R.T, A), R)
-    return np.array([B[0, 0], B[1, 1], B[2, 2], B[1, 2], B[0, 2], B[0, 1]])
+
+    # Convert back to single precision.
+    return np.require(
+        np.array([B[0, 0], B[1, 1], B[2, 2], B[1, 2], B[0, 2], B[0, 1]]),
+        dtype=np.float64)
 
 
 def rotate_symm_tensor_voigt_xyz_src_to_xyz_earth(mt, phi, theta):

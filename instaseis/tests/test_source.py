@@ -302,10 +302,9 @@ def test_CMT_finite_source():
     finitesource.compute_centroid()
 
     np.testing.assert_allclose(
-        # XXX: Why did this change???j
-        np.array([-3.91886976e+04, 3.90905071e+04, 9.81905182e+01,
-                  1.94225428e+04, -5.267504e+03, 3.19598660e+20]),
-        finitesource.CMT.tensor_voigt)
+        np.array([-3.918870e+04, 3.909051e+04, 9.819052e+01,
+                  1.942254e+04, -5.476000e+03, 3.195987e+20]),
+        finitesource.CMT.tensor_voigt, rtol=1E-5)
 
     np.testing.assert_allclose(np.array([finitesource.CMT.latitude]),
                                np.array([0.0]))
