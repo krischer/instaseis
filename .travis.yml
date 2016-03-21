@@ -42,7 +42,7 @@ install:
   - git status
 
 script:
-  - coverage run --source=instaseis -m instaseis.tests
+  - export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libgfortran.so.3 && coverage run --source=instaseis -m instaseis.tests
   # Docs only need to be built once.
   - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then cd $TRAVIS_BUILD_DIR/doc; make html ; fi
 
