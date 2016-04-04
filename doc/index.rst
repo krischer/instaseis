@@ -115,7 +115,7 @@ shared Fortran librarys - pull requests are welcome.
 * ``Python 2.7, 3.3, 3.4, or 3.5``
 * ``NumPy >= 1.7``
 * ``ObsPy >= 1.0.0``
-* ``netCDF4 >= 4.3`` including Python bindings (``>= 1.1``)
+* ``h5py``
 * ``future``
 * ``requests``
 * ``responses``
@@ -162,7 +162,7 @@ Anaconda).
 
 .. code-block:: bash
 
-    $ conda install -c obspy obspy netcdf4 future requests tornado flake8 pytest mock basemap pyqt pip
+    $ conda install -c obspy obspy h5py future requests tornado flake8 pytest mock basemap pyqt pip
     $ pip install responses pyqtgraph
 
 A possible complication arises **if you are running on a server without a
