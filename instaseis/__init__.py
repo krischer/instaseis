@@ -95,23 +95,9 @@ def open_db(path, *args, **kwargs):
 __version__ = get_git_version()
 
 
-if __version__.startswith("0.0.0-tar/zipball"):
+if __version__.startswith("0.0.0-tar/zipball"):  # pragma: no cover
     warnings.warn("Please don't install from a tarball. Use the proper pypi "
                   "release or install from git.", UserWarning)
-
-
-def __version_cmp(required_version, version):
-    """
-    based on http://stackoverflow.com/a/1714190/1657047
-    """
-    def normalize(v):
-        # Strip any additional version specifiers.
-        v = v.split("-")[0].strip("-").strip("~")
-        return [int(x) for x in re.sub(r'(\.0+)*$', '', v).split(".")]
-
-    if normalize(version) < normalize(required_version):
-        return False
-    return True
 
 
 from .source import Source, Receiver, ForceSource, FiniteSource  # NoQa

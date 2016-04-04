@@ -26,9 +26,9 @@ import instaseis
 
 # Conditionally import mock either from the stdlib or as a separate library.
 import sys
-if sys.version_info[0] == 2:
+if sys.version_info[0] == 2:  # pragma: no cover
     import mock
-else:
+else:  # pragma: no cover
     import unittest.mock as mock
 
 DATA = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")

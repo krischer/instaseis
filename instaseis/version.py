@@ -34,6 +34,8 @@
 #   include RELEASE-VERSION
 # NO IMPORTS FROM INSTASEIS OR FUTURE IN THIS FILE! (file gets used at
 # installation time)
+
+
 import io
 import os
 import inspect
@@ -48,7 +50,7 @@ INSTASEIS_ROOT = os.path.abspath(os.path.join(script_dir, os.pardir))
 VERSION_FILE = os.path.join(script_dir, "RELEASE-VERSION")
 
 
-def call_git_describe(abbrev=4):
+def call_git_describe(abbrev=4):  # pragma: no cover
     try:
         p = Popen(['git', 'rev-parse', '--show-toplevel'],
                   cwd=INSTASEIS_ROOT, stdout=PIPE, stderr=PIPE)
@@ -75,7 +77,7 @@ def call_git_describe(abbrev=4):
         return None
 
 
-def read_release_version():
+def read_release_version():  # pragma: no cover
     try:
         with io.open(VERSION_FILE, "rt") as fh:
             version = fh.readline()
@@ -84,12 +86,12 @@ def read_release_version():
         return None
 
 
-def write_release_version(version):
+def write_release_version(version):  # pragma: no cover
     with io.open(VERSION_FILE, "wb") as fh:
         fh.write(("%s\n" % version).encode('ascii', 'strict'))
 
 
-def get_git_version(abbrev=4):
+def get_git_version(abbrev=4):  # pragma: no cover
     # Read in the version that's currently in RELEASE-VERSION.
     release_version = read_release_version()
 

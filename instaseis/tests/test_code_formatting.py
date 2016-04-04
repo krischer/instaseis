@@ -19,7 +19,7 @@ import warnings
 
 
 def test_flake8():
-    if flake8.__version__ <= "2":
+    if flake8.__version__ <= "2":  # pragma: no cover
         msg = ("Module was designed to be tested with flake8 >= 2.0. "
                "Please update.")
         warnings.warn(msg)

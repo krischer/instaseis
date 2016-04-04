@@ -85,7 +85,7 @@ class AsyncClient(object):
             self.__running = False
         self.__stopped = True
 
-    def __rethrow(self):
+    def __rethrow(self):  # pragma: no cover
         if self.__failure is not None:
             failure = self.__failure
             self.__failure = None
@@ -96,7 +96,7 @@ class AsyncClient(object):
             timeout = 5
 
         if not self.__stopped:
-            if timeout:
+            if timeout:  # pragma: no cover
                 def timeout_func():
                     try:
                         raise self.failureException(
