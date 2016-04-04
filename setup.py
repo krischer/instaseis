@@ -21,7 +21,7 @@ readily includes other planets such as Mars.
 For more information visit http://www.instaseis.net.
 
 :copyright:
-    The Instaseis Development Team (instaseis@googlegroups.com), 2014-2015
+    The Instaseis Development Team (instaseis@googlegroups.com), 2014-2016
 :license:
     GNU Lesser General Public License, Version 3 [non-commercial/academic use]
     (http://www.gnu.org/copyleft/lgpl.html)
@@ -136,9 +136,9 @@ lib = MyExtension('instaseis',
                       os.path.join(src, "lanczos.c"),
                   ])
 
-INSTALL_REQUIRES = ["netCDF4 >= 1.1",
+INSTALL_REQUIRES = ["h5py",
                     "numpy",
-                    "obspy >= 1.0.0",
+                    "obspy >= 1.0.1",
                     "future",
                     "requests",
                     "tornado>=4.0.0",
