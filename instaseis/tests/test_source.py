@@ -480,3 +480,12 @@ def test_str_method_of_force_source():
         "\tFr        :   1.00e+00 N\n"
         "\tFt        :   2.00e+00 N\n"
         "\tFp        :   3.00e+00 N\n")
+
+
+def test_properties_force_source():
+    """
+    Tests some properties of the force source.
+    """
+    src = ForceSource(latitude=0.0, longitude=0.0, f_r=1.0, f_t=2.0, f_p=3.0)
+    np.testing.assert_allclose(src.force_tpr, [2.0, 3.0, 1.0])
+    np.testing.assert_allclose(src.force_rtp, [1.0, 2.0, 3.0])
