@@ -380,3 +380,11 @@ def test_equality_methods():
     assert rec2 != src1
     assert rec2 != src1
     assert rec2 != src2
+
+
+def test_radian_calculations():
+    src = Source(latitude=90.0, longitude=180.0)
+    assert np.isclose(src.latitude, 90.0)
+    assert np.isclose(src.latitude_rad, np.pi / 2.0)
+    assert np.isclose(src.longitude, 180.0)
+    assert np.isclose(src.longitude_rad, np.pi)
