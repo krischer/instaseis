@@ -165,3 +165,18 @@ def test_station_x_y_z():
     assert abs(station.colatitude - 47.3609999) < 1E-5
     assert station.depth_in_m == 0.0
     assert station.radius_in_m() == 6371000.0
+
+
+def test_str_method_of_receiver():
+    """
+    Tests the string method of the receiver class.
+    """
+    rec = Receiver(latitude=1.0, longitude=2.0, network="BW", station="ALTM")
+    assert str(rec) == (
+        "Instaseis Receiver:\n"
+        "\tlongitude :    2.0 deg\n"
+        "\tlatitude  :    1.0 deg\n"
+        "\tnetwork   : BW\n"
+        "\tstation   : ALTM\n"
+        "\tlocation  : \n"
+    )
