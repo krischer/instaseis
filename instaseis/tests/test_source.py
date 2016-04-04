@@ -17,7 +17,7 @@ import os
 import numpy as np
 import pytest
 
-from instaseis import Source, FiniteSource, Receiver
+from instaseis import Source, FiniteSource, Receiver, SourceParseError
 from instaseis.helpers import elliptic_to_geocentric_latitude
 from instaseis.source import moment2magnitude, magnitude2moment
 from instaseis.source import (fault_vectors_lmn, strike_dip_rake_from_ln,
@@ -388,3 +388,43 @@ def test_radian_calculations():
     assert np.isclose(src.latitude_rad, np.pi / 2.0)
     assert np.isclose(src.longitude, 180.0)
     assert np.isclose(src.longitude_rad, np.pi)
+
+
+def test_event_parsing_failure_states():
+    """
+    Tests the failures when parsing an event.
+    """
+    # Random string.
+    with pytest.raises(SourceParseError) as err:
+        Source.parse("random strings")
+    assert err.value.args[0] == "Could not parse the given source."
+
+    # Empty catalog.
+    cat = obspy.read_events()
+    cat.events = []
+    with pytest.raises(SourceParseError) as err:
+        Source.parse(cat)
+    assert err.value.args[0] == "Event catalog contains zero events."
+
+    event = obspy.read_events(EVENT_FILE)[0]
+
+    # Event with no origin.
+    ev = event.copy()
+    ev.origins = []
+    with pytest.raises(SourceParseError) as err:
+        Source.parse(ev)
+    assert err.value.args[0] == "Event must contain an origin."
+
+    # Event with no focmec.
+    ev = event.copy()
+    ev.focal_mechanisms = []
+    with pytest.raises(SourceParseError) as err:
+        Source.parse(ev)
+    assert err.value.args[0] == "Event must contain a focal mechanism."
+
+    # Event with no moment tensor.
+    ev = event.copy()
+    ev.focal_mechanisms[0].moment_tensor = None
+    with pytest.raises(SourceParseError) as err:
+        Source.parse(ev)
+    assert err.value.args[0] == "Event must contain a moment tensor."
