@@ -21,6 +21,7 @@ import numpy as np
 from .tornado_testing_fixtures import *  # NOQA
 from .tornado_testing_fixtures import _assemble_url
 
+import instaseis
 from instaseis.helpers import geocentric_to_elliptic_latitude
 
 # Conditionally import mock either from the stdlib or as a separate library.
