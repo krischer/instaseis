@@ -17,7 +17,7 @@ import os
 import numpy as np
 import pytest
 
-from instaseis import Source, FiniteSource
+from instaseis import Source, FiniteSource, Receiver
 from instaseis.helpers import elliptic_to_geocentric_latitude
 from instaseis.source import moment2magnitude, magnitude2moment
 from instaseis.source import (fault_vectors_lmn, strike_dip_rake_from_ln,
@@ -347,3 +347,36 @@ def test_strike_dip_rake_from_ln():
         np.testing.assert_allclose(np.array([strike]), np.array([s]))
         np.testing.assert_allclose(np.array([dip]), np.array([d]))
         np.testing.assert_allclose(np.array([rake]), np.array([r]))
+
+
+def test_equality_methods():
+    """
+    Tests the (in)equality methods of source and receiver objects. They both
+    inherit from the same base class thus they are tested here - but it
+    would also be suitable for the receiver tests.
+    """
+    src1 = Source(latitude=1, longitude=2)
+    src2 = Source(latitude=3, longitude=3)
+    rec1 = Receiver(latitude=1, longitude=2)
+    rec2 = Receiver(latitude=3, longitude=3)
+
+    assert src1 == src1
+    assert src2 == src2
+    assert rec1 == rec1
+    assert rec2 == rec2
+
+    assert src1 != src2
+    assert src1 != rec1
+    assert src1 != rec2
+
+    assert src2 != src1
+    assert src2 != rec1
+    assert src2 != rec2
+
+    assert rec1 != rec2
+    assert rec1 != src1
+    assert rec1 != src2
+
+    assert rec2 != src1
+    assert rec2 != src1
+    assert rec2 != src2
