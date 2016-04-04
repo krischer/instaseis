@@ -17,7 +17,8 @@ import os
 import numpy as np
 import pytest
 
-from instaseis import Source, FiniteSource, Receiver, SourceParseError
+from instaseis import (Source, FiniteSource, Receiver, SourceParseError,
+                       ForceSource)
 from instaseis.helpers import elliptic_to_geocentric_latitude
 from instaseis.source import moment2magnitude, magnitude2moment
 from instaseis.source import (fault_vectors_lmn, strike_dip_rake_from_ln,
@@ -467,3 +468,15 @@ def test_str_method_of_src():
         "\tMrt              :   0.00e+00 Nm\n"
         "\tMrp              :   0.00e+00 Nm\n"
         "\tMtp              :   0.00e+00 Nm\n")
+
+
+def test_str_method_of_force_source():
+    src = ForceSource(latitude=0.0, longitude=0.0, f_r=1.0, f_t=2.0, f_p=3.0)
+    assert str(src) == (
+        "Instaseis Force Source:\n"
+        "\torigin time      : 1970-01-01T00:00:00.000000Z\n"
+        "\tlongitude :    0.0 deg\n"
+        "\tlatitude  :    0.0 deg\n"
+        "\tFr        :   1.00e+00 N\n"
+        "\tFt        :   2.00e+00 N\n"
+        "\tFp        :   3.00e+00 N\n")
