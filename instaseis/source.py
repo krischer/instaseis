@@ -747,7 +747,7 @@ class ForceSource(SourceOrReceiver):
         List of force components in r, theta, phi, coordinates:
         [f_r, f_t, f_p]
         """
-        return np.array([self.f_t, self.f_p, self.f_r])
+        return np.array([self.f_r, self.f_t, self.f_p])
 
     def __str__(self):
         return_str = 'Instaseis Force Source:\n'
