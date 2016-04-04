@@ -280,10 +280,8 @@ def test_greens_function_retrieval(all_clients):
 
     with mock.patch("instaseis.base_instaseis_db.BaseInstaseisDB"
                     ".get_greens_function") as p:
-        def raise_err():
-            raise ValueError("random crash")
 
-        p.side_effect = raise_err
+        p.side_effect = ValueError("random crash")
         request = client.fetch(_assemble_url('greens_function', **params))
 
     assert request.code == 400
@@ -1707,12 +1705,8 @@ def test_seismograms_retrieval(all_clients):
             np.testing.assert_allclose(tr_server.data, tr_db.data,
                                        atol=1E-10 * tr_server.data.ptp())
 
-        if client.is_reciprocal:
-            params["sourcedepthinmeters"] = "5.0"
-            params["receiverdepthinmeters"] = "0.0"
-        else:
-            params["sourcedepthinmeters"] = "0.0"
-            params["receiverdepthinmeters"] = "55.0"
+        params["sourcedepthinmeters"] = "5.0"
+        params["receiverdepthinmeters"] = "0.0"
 
         params["origintime"] = str(time)
         params["networkcode"] = "BW"

@@ -83,10 +83,7 @@ def test_triggering_random_error_during_parsing(reciprocal_clients):
 
     with mock.patch("instaseis.source.FiniteSource"
                     ".from_usgs_param_file") as p:
-        def raise_err():
-            raise ValueError("random crash")
-
-        p.side_effect = raise_err
+        p.side_effect = ValueError("random crash")
         request = client.fetch(_assemble_url('finite_source', **params),
                                method="POST", body=body)
 
@@ -207,10 +204,7 @@ def test_finite_source_retrieval(reciprocal_clients, usgs_param):
 
     with mock.patch("instaseis.base_instaseis_db.BaseInstaseisDB"
                     ".get_seismograms_finite_source") as p:
-        def raise_err():
-            raise ValueError("random crash")
-
-        p.side_effect = raise_err
+        p.side_effect = ValueError("random crash")
         request = client.fetch(_assemble_url('finite_source', **params),
                                method="POST", body=body)
 
