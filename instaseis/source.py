@@ -428,7 +428,7 @@ class Source(SourceOrReceiver):
                 [float(origin_time[-1])]
             try:
                 origin_time = obspy.UTCDateTime(*values)
-            except (TypeError, ValueError):
+            except (TypeError, ValueError):  # pragma: no cover
                 warnings.warn("Could not determine origin time from line: %s"
                               % line)
                 origin_time = obspy.UTCDateTime(0)
@@ -681,8 +681,9 @@ class Source(SourceOrReceiver):
         return_str += '\torigin time      : %s\n' % (self.origin_time,)
         return_str += '\tLongitude        : %6.1f deg\n' % (self.longitude,)
         return_str += '\tLatitude         : %6.1f deg\n' % (self.latitude,)
-        return_str += '\tDepth            : %6.1e km\n' \
-                      % (self.depth_in_m / 1e3,)
+        return_str += '\tDepth            : %s km\n' % (
+            "%6.1e km" % self.depth_in_m / 1e3
+            if self.depth_in_m is not None else " not set")
         return_str += '\tMoment Magnitude :   %4.2f\n' \
                       % (self.moment_magnitude,)
         return_str += '\tScalar Moment    : %10.2e Nm\n' % (self.M0,)

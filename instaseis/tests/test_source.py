@@ -428,3 +428,42 @@ def test_event_parsing_failure_states():
     with pytest.raises(SourceParseError) as err:
         Source.parse(ev)
     assert err.value.args[0] == "Event must contain a moment tensor."
+
+
+def test_sliprate_convenience_methods():
+    """
+    Tests some convenience methods of sliprates.
+    """
+    src = Source(latitude=0.0, longitude=90.0)
+    src.set_sliprate_dirac(2.0, 5)
+    np.testing.assert_allclose(np.array([0.5, 0, 0, 0, 0]), src.sliprate)
+
+    src = Source(latitude=0.0, longitude=90.0)
+    src.set_sliprate_lp(2.0, 5, 0.1)
+    np.testing.assert_allclose(np.array(
+        [0.023291, 0.111382, 0.211022, 0.186723, 0.045481]), src.sliprate,
+        rtol=1E-3)
+
+    src = Source(latitude=0.0, longitude=90.0)
+    src.sliprate = np.ones(5)
+    src.dt = 0.25
+    src.normalize_sliprate()
+    np.testing.assert_allclose(np.ones(5), src.sliprate)
+
+
+def test_str_method_of_src():
+    src = Source(latitude=0.0, longitude=90.0)
+    assert str(src) == (
+        "Instaseis Source:\n"
+        "\torigin time      : 1970-01-01T00:00:00.000000Z\n"
+        "\tLongitude        :   90.0 deg\n"
+        "\tLatitude         :    0.0 deg\n"
+        "\tDepth            :  not set km\n"
+        "\tMoment Magnitude :   -inf\n"
+        "\tScalar Moment    :   0.00e+00 Nm\n"
+        "\tMrr              :   0.00e+00 Nm\n"
+        "\tMtt              :   0.00e+00 Nm\n"
+        "\tMpp              :   0.00e+00 Nm\n"
+        "\tMrt              :   0.00e+00 Nm\n"
+        "\tMrp              :   0.00e+00 Nm\n"
+        "\tMtp              :   0.00e+00 Nm\n")
