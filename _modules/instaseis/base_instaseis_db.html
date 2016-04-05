@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>instaseis.base_instaseis_db &mdash; instaseis 0.1.1-23-g94ce documentation</title>
+    <title>instaseis.base_instaseis_db &mdash; instaseis 0.1.1-49-g1234 documentation</title>
     
     <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.1.1-23-g94ce',
+        VERSION:     '0.1.1-49-g1234',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -31,7 +31,7 @@
     <script type="text/javascript" src="../../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../../_static/bootstrap-3.3.4/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../../_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.1.1-23-g94ce documentation" href="../../index.html" />
+    <link rel="top" title="instaseis 0.1.1-49-g1234 documentation" href="../../index.html" />
     <link rel="up" title="instaseis" href="../instaseis.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.1.1-23-g94ce</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.1.1-49-g1234</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -129,11 +129,11 @@
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">obspy.core</span> <span class="kn">import</span> <span class="n">AttribDict</span><span class="p">,</span> <span class="n">Stream</span><span class="p">,</span> <span class="n">Trace</span><span class="p">,</span> <span class="n">UTCDateTime</span>
+<span class="kn">from</span> <span class="nn">obspy.signal.interpolation</span> <span class="kn">import</span> <span class="n">lanczos_interpolation</span>
 <span class="kn">from</span> <span class="nn">scipy.integrate</span> <span class="kn">import</span> <span class="n">cumtrapz</span>
 
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">lanczos</span>
 <span class="kn">from</span> <span class="nn">.source</span> <span class="kn">import</span> <span class="n">Source</span><span class="p">,</span> <span class="n">ForceSource</span><span class="p">,</span> <span class="n">Receiver</span>
-<span class="kn">from</span> <span class="nn">.helpers</span> <span class="kn">import</span> <span class="n">get_band_code</span>
+<span class="kn">from</span> <span class="nn">.helpers</span> <span class="kn">import</span> <span class="n">get_band_code</span><span class="p">,</span> <span class="n">sizeof_fmt</span>
 
 
 <span class="n">DEFAULT_MU</span> <span class="o">=</span> <span class="mf">32e9</span>
@@ -161,7 +161,8 @@
     <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_derivative</span><span class="p">):</span>
         <span class="n">data</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">comp</span><span class="p">],</span> <span class="p">[</span><span class="n">dt_out</span><span class="p">])</span>
 
-    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="n">n_derivative</span><span class="p">):</span>
+    <span class="c1"># Cannot happen currently - maybe with other source time functions?</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="n">n_derivative</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
         <span class="c1"># adding a zero at the beginning to avoid phase shift</span>
         <span class="n">data</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">=</span> <span class="n">cumtrapz</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">comp</span><span class="p">],</span> <span class="n">dx</span><span class="o">=</span><span class="n">dt_out</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
 
@@ -363,6 +364,7 @@
             <span class="mi">0</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">sliprate</span><span class="p">,</span>
             <span class="mi">1</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">slip</span><span class="p">}</span>
 
+        <span class="c1"># Can never be negative with the current logic.</span>
         <span class="n">n_derivative</span> <span class="o">=</span> <span class="n">KIND_MAP</span><span class="p">[</span><span class="n">kind</span><span class="p">]</span> <span class="o">-</span> <span class="n">STF_MAP</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">stf</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">ForceSource</span><span class="p">):</span>
@@ -372,14 +374,9 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;remove_source_shift&#39; argument not &quot;</span>
                              <span class="s2">&quot;compatible with &#39;reconvolve_stf&#39;.&quot;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="s2">&quot;origin_time&quot;</span><span class="p">):</span>
-            <span class="n">origin_time</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">origin_time</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">origin_time</span> <span class="o">=</span> <span class="n">UTCDateTime</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-
         <span class="c1"># Calculate the final time information about the seismograms.</span>
         <span class="n">time_information</span> <span class="o">=</span> <span class="n">_get_seismogram_times</span><span class="p">(</span>
-            <span class="n">info</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">,</span> <span class="n">origin_time</span><span class="o">=</span><span class="n">origin_time</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span>
+            <span class="n">info</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">,</span> <span class="n">origin_time</span><span class="o">=</span><span class="n">source</span><span class="o">.</span><span class="n">origin_time</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span>
             <span class="n">kernelwidth</span><span class="o">=</span><span class="n">kernelwidth</span><span class="p">,</span> <span class="n">remove_source_shift</span><span class="o">=</span><span class="n">remove_source_shift</span><span class="p">,</span>
             <span class="n">reconvolve_stf</span><span class="o">=</span><span class="n">reconvolve_stf</span><span class="p">)</span>
 
@@ -416,7 +413,7 @@
                     <span class="n">dataf</span> <span class="o">*</span> <span class="n">stf_conv_f</span> <span class="o">/</span> <span class="n">stf_deconv_f</span><span class="p">)[:</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">npts</span><span class="p">]</span>
 
             <span class="k">if</span> <span class="n">dt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-                <span class="n">data</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">=</span> <span class="n">lanczos</span><span class="o">.</span><span class="n">lanczos_interpolation</span><span class="p">(</span>
+                <span class="n">data</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">=</span> <span class="n">lanczos_interpolation</span><span class="p">(</span>
                     <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="n">comp</span><span class="p">],</span> <span class="n">old_start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">old_dt</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span>
                     <span class="n">new_start</span><span class="o">=</span><span class="n">time_information</span><span class="p">[</span><span class="s2">&quot;time_shift_at_beginning&quot;</span><span class="p">],</span>
                     <span class="n">new_dt</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span>
@@ -467,7 +464,7 @@
 
     <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">_get_seismograms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">receiver</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Z&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;E&quot;</span><span class="p">)):</span>
-        <span class="k">pass</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 
     <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">_get_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -484,7 +481,7 @@
 <span class="sd">        ``&quot;directory&quot;``, ``&quot;filesize&quot;``, ``&quot;compiler&quot;``, ``&quot;user&quot;``,</span>
 <span class="sd">        ``&quot;format_version&quot;``, ``&quot;axisem_version&quot;``, ``&quot;datetime&quot;``</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">pass</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 
 <div class="viewcode-block" id="BaseInstaseisDB.get_seismograms_finite_source"><a class="viewcode-back" href="../../instaseis.html#instaseis.base_instaseis_db.BaseInstaseisDB.get_seismograms_finite_source">[docs]</a>    <span class="k">def</span> <span class="nf">get_seismograms_finite_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sources</span><span class="p">,</span> <span class="n">receiver</span><span class="p">,</span>
                                       <span class="n">components</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Z&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;E&quot;</span><span class="p">),</span>
@@ -550,7 +547,8 @@
                     <span class="n">data_summed</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">+=</span> <span class="n">data</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">*</span> <span class="n">corr_fac</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">data_summed</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">*</span> <span class="n">corr_fac</span>
-            <span class="k">if</span> <span class="n">progress_callback</span><span class="p">:</span>
+            <span class="c1"># Only used for the GUI.</span>
+            <span class="k">if</span> <span class="n">progress_callback</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
                 <span class="n">cancel</span> <span class="o">=</span> <span class="n">progress_callback</span><span class="p">(</span><span class="n">_i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">count</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">cancel</span><span class="p">:</span>
                     <span class="k">return</span> <span class="bp">None</span>
@@ -561,7 +559,7 @@
                 <span class="c1"># time function here.</span>
                 <span class="n">new_npts</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span>
                     <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">comp</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">dt</span> <span class="o">/</span> <span class="n">dt</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-                <span class="n">data_summed</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">=</span> <span class="n">lanczos</span><span class="o">.</span><span class="n">lanczos_interpolation</span><span class="p">(</span>
+                <span class="n">data_summed</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">=</span> <span class="n">lanczos_interpolation</span><span class="p">(</span>
                     <span class="n">data</span><span class="o">=</span><span class="n">data_summed</span><span class="p">[</span><span class="n">comp</span><span class="p">],</span> <span class="n">old_start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">old_dt</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span>
                     <span class="n">new_start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">new_dt</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span> <span class="n">new_npts</span><span class="o">=</span><span class="n">new_npts</span><span class="p">,</span>
                     <span class="n">a</span><span class="o">=</span><span class="n">kernelwidth</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="s2">&quot;blackman&quot;</span><span class="p">)</span>
@@ -619,14 +617,14 @@
 <span class="sd">        :type kind: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">kind</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;displacement&#39;</span><span class="p">,</span> <span class="s1">&#39;velocity&#39;</span><span class="p">,</span> <span class="s1">&#39;acceleration&#39;</span><span class="p">]:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;unknown kind </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">kind</span><span class="p">,))</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;unknown kind &#39;</span><span class="si">%s</span><span class="s2">&#39;.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">kind</span><span class="p">,))</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">is_reciprocal</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;forward DB cannot be used with &#39;</span>
-                             <span class="s1">&#39;get_greens_seiscomp()&#39;</span><span class="p">)</span>
+                             <span class="s1">&#39;get_greens_function()&#39;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">components</span> <span class="o">==</span> <span class="s1">&#39;vertical and horizontal&#39;</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;get_greens_seiscomp() needs a DB with both &#39;</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;get_greens_function() needs a DB with both &#39;</span>
                              <span class="s1">&#39;vertical and horizontal components&#39;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="mf">0.</span> <span class="o">&lt;=</span> <span class="n">epicentral_distance_degree</span> <span class="o">&lt;=</span> <span class="mf">180.</span><span class="p">:</span>
@@ -667,7 +665,7 @@
             <span class="n">receiver</span> <span class="o">=</span> <span class="n">rec</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="n">kind</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;displacement&#39;</span><span class="p">,</span> <span class="s1">&#39;velocity&#39;</span><span class="p">,</span> <span class="s1">&#39;acceleration&#39;</span><span class="p">]:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;unknown kind </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">kind</span><span class="p">,))</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;unknown kind &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">kind</span><span class="p">,))</span>
 
         <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">components</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">comp</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;E&quot;</span><span class="p">,</span> <span class="s2">&quot;Z&quot;</span><span class="p">,</span> <span class="s2">&quot;R&quot;</span><span class="p">,</span> <span class="s2">&quot;T&quot;</span><span class="p">]:</span>
@@ -701,7 +699,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__cached_info</span> <span class="o">=</span> <span class="n">AttribDict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_info</span><span class="p">())</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_info</span>
 
-    <span class="k">def</span> <span class="nf">_repr_pretty_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">cycle</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_repr_pretty_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">cycle</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
         <span class="n">p</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -767,19 +765,6 @@
             <span class="n">datetime</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">datetime</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">return_str</span></div>
-
-
-<span class="k">def</span> <span class="nf">sizeof_fmt</span><span class="p">(</span><span class="n">num</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Handy formatting for human readable filesizes.</span>
-
-<span class="sd">    From http://stackoverflow.com/a/1094933/1657047</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;bytes&quot;</span><span class="p">,</span> <span class="s2">&quot;KB&quot;</span><span class="p">,</span> <span class="s2">&quot;MB&quot;</span><span class="p">,</span> <span class="s2">&quot;GB&quot;</span><span class="p">]:</span>
-        <span class="k">if</span> <span class="n">num</span> <span class="o">&lt;</span> <span class="mf">1024.0</span> <span class="ow">and</span> <span class="n">num</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mf">1024.0</span><span class="p">:</span>
-            <span class="k">return</span> <span class="s2">&quot;</span><span class="si">%3.1f</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">num</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
-        <span class="n">num</span> <span class="o">/=</span> <span class="mf">1024.0</span>
-    <span class="k">return</span> <span class="s2">&quot;</span><span class="si">%3.1f</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">num</span><span class="p">,</span> <span class="s2">&quot;TB&quot;</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_get_seismogram_times</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="n">origin_time</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">kernelwidth</span><span class="p">,</span>

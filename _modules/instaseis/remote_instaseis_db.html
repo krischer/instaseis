@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>instaseis.remote_instaseis_db &mdash; instaseis 0.1.1-23-g94ce documentation</title>
+    <title>instaseis.remote_instaseis_db &mdash; instaseis 0.1.1-49-g1234 documentation</title>
     
     <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.1.1-23-g94ce',
+        VERSION:     '0.1.1-49-g1234',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -31,7 +31,7 @@
     <script type="text/javascript" src="../../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../../_static/bootstrap-3.3.4/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../../_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.1.1-23-g94ce documentation" href="../../index.html" />
+    <link rel="top" title="instaseis 0.1.1-49-g1234 documentation" href="../../index.html" />
     <link rel="up" title="instaseis" href="../instaseis.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.1.1-23-g94ce</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.1.1-49-g1234</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -151,7 +151,7 @@
 
         <span class="c1"># Parse the root message of the server.</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">root</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_download_url</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_url</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">),</span> <span class="n">unpack_json</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+            <span class="n">root</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_download_url</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_url</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">))</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">InstaseisError</span><span class="p">(</span><span class="s2">&quot;Failed to connect to remote Instaseis &quot;</span>
                                  <span class="s2">&quot;server due to: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
@@ -189,7 +189,7 @@
         <span class="n">params</span><span class="p">[</span><span class="s2">&quot;receiverlatitude&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">receiver</span><span class="o">.</span><span class="n">latitude</span>
         <span class="n">params</span><span class="p">[</span><span class="s2">&quot;receiverlongitude&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">receiver</span><span class="o">.</span><span class="n">longitude</span>
         <span class="k">if</span> <span class="n">receiver</span><span class="o">.</span><span class="n">depth_in_m</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;receiverdepthinm&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">receiver</span><span class="o">.</span><span class="n">depth_in_m</span>
+            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;receiverdepthinmeters&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">receiver</span><span class="o">.</span><span class="n">depth_in_m</span>
         <span class="k">if</span> <span class="n">receiver</span><span class="o">.</span><span class="n">network</span><span class="p">:</span>
             <span class="n">params</span><span class="p">[</span><span class="s2">&quot;networkcode&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">receiver</span><span class="o">.</span><span class="n">network</span>
         <span class="k">if</span> <span class="n">receiver</span><span class="o">.</span><span class="n">station</span><span class="p">:</span>
@@ -199,7 +199,7 @@
         <span class="n">params</span><span class="p">[</span><span class="s2">&quot;sourcelatitude&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">latitude</span>
         <span class="n">params</span><span class="p">[</span><span class="s2">&quot;sourcelongitude&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">longitude</span>
         <span class="k">if</span> <span class="n">source</span><span class="o">.</span><span class="n">depth_in_m</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;sourcedepthinm&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">depth_in_m</span>
+            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;sourcedepthinmeters&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">depth_in_m</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">ForceSource</span><span class="p">):</span>
             <span class="n">params</span><span class="p">[</span><span class="s2">&quot;fr&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">f_r</span>
             <span class="n">params</span><span class="p">[</span><span class="s2">&quot;ft&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">f_t</span>
@@ -217,7 +217,7 @@
         <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_url</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="s2">&quot;seismograms_raw&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">)</span>
 
         <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-        <span class="k">if</span> <span class="s2">&quot;Instaseis-Mu&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">r</span><span class="o">.</span><span class="n">headers</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">&quot;Instaseis-Mu&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">r</span><span class="o">.</span><span class="n">headers</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Mu is not passed via the HTTP headers. Maybe some &quot;</span>
                           <span class="s2">&quot;proxy removed it? Mu is now always the default mu.&quot;</span><span class="p">,</span>
                           <span class="n">InstaseisWarning</span><span class="p">)</span>
@@ -242,7 +242,9 @@
         <span class="k">return</span> <span class="n">data</span>
 
     <span class="k">def</span> <span class="nf">_get_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">:</span>
+        <span class="c1"># Not tested in the test-suite as it would be awkward to do with the</span>
+        <span class="c1"># current setup. But manually vetted and should be good.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
             <span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">path</span>
 
         <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">://</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_scheme</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_netloc</span><span class="p">)</span>
@@ -252,25 +254,24 @@
             <span class="n">url</span> <span class="o">+=</span> <span class="s2">&quot;?</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">urlencode</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">url</span>
 
-    <span class="k">def</span> <span class="nf">_download_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">unpack_json</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_download_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Helper function downloading data from a URL.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
+        <span class="c1"># Not tested in test suite as it would be awkward to do. Manually</span>
+        <span class="c1"># tested and should be good.</span>
+        <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
             <span class="k">raise</span> <span class="n">InstaseisError</span><span class="p">(</span><span class="s2">&quot;Status code </span><span class="si">%i</span><span class="s2"> when downloading &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span>
                 <span class="n">r</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="n">url</span><span class="p">))</span>
-        <span class="k">if</span> <span class="n">unpack_json</span> <span class="ow">is</span> <span class="bp">True</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">text</span>
+        <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">_get_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a dictionary with information about the currently loaded</span>
 <span class="sd">        database.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_download_url</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_url</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="s2">&quot;info&quot;</span><span class="p">),</span> <span class="n">unpack_json</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_download_url</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_url</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="s2">&quot;info&quot;</span><span class="p">))</span>
         <span class="n">info</span><span class="p">[</span><span class="s2">&quot;directory&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span>
         <span class="c1"># Convert types lost in the translation to JSON.</span>
         <span class="n">info</span><span class="p">[</span><span class="s2">&quot;datetime&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">obspy</span><span class="o">.</span><span class="n">UTCDateTime</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;datetime&quot;</span><span class="p">])</span>

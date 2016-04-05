@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Instaseis Server &mdash; instaseis 0.1.1-23-g94ce documentation</title>
+    <title>Instaseis Server &mdash; instaseis 0.1.1-49-g1234 documentation</title>
     
     <link rel="stylesheet" href="_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.1.1-23-g94ce',
+        VERSION:     '0.1.1-49-g1234',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -31,7 +31,7 @@
     <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="_static/bootstrap-3.3.4/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.1.1-23-g94ce documentation" href="index.html" />
+    <link rel="top" title="instaseis 0.1.1-49-g1234 documentation" href="index.html" />
     <link rel="next" title="GET /" href="routes/root.html" />
     <link rel="prev" title="Utility Functions" href="helpers.html" />
 <meta charset='utf-8'>
@@ -53,7 +53,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.1.1-23-g94ce</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.1.1-49-g1234</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -215,18 +215,18 @@ Instaseis server instances started with supervisor to
 <code class="docutils literal"><span class="pre">http://site-name.org:8080/20s_PREM_ANI_FORCES</span></code> and
 <code class="docutils literal"><span class="pre">http://site-name.org:8080/10s_PREM_ANI_FORCES</span></code>. One can easily imaging
 this being done for a number of models at various frequencies.</p>
-<div class="highlight-ini"><div class="highlight"><pre><span></span>server {
-    listen 8080;
-    server_name localhost;
-    location /20s_PREM_ANI_FORCES/ {
-        rewrite ^/20s_PREM_ANI_FORCES/?(.*)$ /$1 break;
-        proxy_pass  http://127.0.0.1:8765;
-    }
-    location /10s_PREM_ANI_FORCES/ {
-        rewrite ^/10s_PREM_ANI_FORCES/?(.*)$ /$1 break;
-        proxy_pass  http://127.0.0.1:8766;
-    }
-}
+<div class="highlight-nginx"><div class="highlight"><pre><span></span><span class="k">server</span> <span class="p">{</span>
+    <span class="kn">listen</span> <span class="mi">8080</span><span class="p">;</span>
+    <span class="kn">server_name</span> <span class="s">localhost</span><span class="p">;</span>
+    <span class="kn">location</span> <span class="s">/20s_PREM_ANI_FORCES/</span> <span class="p">{</span>
+        <span class="kn">rewrite</span> <span class="s">^/20s_PREM_ANI_FORCES/?(.*)</span>$ <span class="s">/</span><span class="nv">$1</span> <span class="s">break</span><span class="p">;</span>
+        <span class="kn">proxy_pass</span>  <span class="s">http://127.0.0.1:8765</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="kn">location</span> <span class="s">/10s_PREM_ANI_FORCES/</span> <span class="p">{</span>
+        <span class="kn">rewrite</span> <span class="s">^/10s_PREM_ANI_FORCES/?(.*)</span>$ <span class="s">/</span><span class="nv">$1</span> <span class="s">break</span><span class="p">;</span>
+        <span class="kn">proxy_pass</span>  <span class="s">http://127.0.0.1:8766</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
 </pre></div>
 </div>
 <p>Load balancing can also be achieved by a combination of supervisor and nginx.

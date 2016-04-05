@@ -128,7 +128,7 @@ Instaseis server instances started with supervisor to
 ``http://site-name.org:8080/10s_PREM_ANI_FORCES``. One can easily imaging
 this being done for a number of models at various frequencies.
 
-.. code-block:: ini
+.. code-block:: nginx
 
     server {
         listen 8080;
