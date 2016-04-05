@@ -36,7 +36,7 @@ class InstaseisTimeSeriesHandler(with_metaclass(ABCMeta,
     def __init__(self, *args, **kwargs):
         super(InstaseisTimeSeriesHandler, self).__init__(*args, **kwargs)
 
-    def on_connection_close(self):
+    def on_connection_close(self):  # pragma: no cover
         """
         Called when the client cancels the connection. Then the loop
         requesting seismograms will stop.
@@ -175,7 +175,7 @@ class InstaseisTimeSeriesHandler(with_metaclass(ABCMeta,
         Implement this function to make checks not already performed in
         validate_common_parameters().
         """
-        pass
+        raise NotImplementedError
 
     def parse_time_settings(self, args):
         """
@@ -306,7 +306,8 @@ class InstaseisTimeSeriesHandler(with_metaclass(ABCMeta,
             err_msg = str(e)
             if err_msg.lower().startswith("invalid phase name"):
                 msg = "Invalid phase name: %s" % phase
-            else:
+            # This is just a safeguard - its save to not coverage test it.
+            else:  # pragma: no cover
                 msg = "Failed to calculate travel time due to: %s" % err_msg
             raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
         return tt

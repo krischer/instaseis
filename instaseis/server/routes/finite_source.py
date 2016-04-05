@@ -384,7 +384,7 @@ class FiniteSourceSeismogramsHandler(InstaseisTimeSeriesHandler):
             starttime, endtime = time_values
 
             # Validate the source-receiver geometry.
-            # self.validate_geometry(source=finite_source, receiver=receiver)
+            self.validate_geometry(source=finite_source, receiver=receiver)
 
             # Yield from the task. This enables a context switch and thus
             # async behaviour.

@@ -80,7 +80,7 @@ class RemoteInstaseisDB(BaseInstaseisDB):
         params["receiverlatitude"] = receiver.latitude
         params["receiverlongitude"] = receiver.longitude
         if receiver.depth_in_m is not None:
-            params["receiverdepthinm"] = receiver.depth_in_m
+            params["receiverdepthinmeters"] = receiver.depth_in_m
         if receiver.network:
             params["networkcode"] = receiver.network
         if receiver.station:
@@ -90,7 +90,7 @@ class RemoteInstaseisDB(BaseInstaseisDB):
         params["sourcelatitude"] = source.latitude
         params["sourcelongitude"] = source.longitude
         if source.depth_in_m is not None:
-            params["sourcedepthinm"] = source.depth_in_m
+            params["sourcedepthinmeters"] = source.depth_in_m
         if isinstance(source, ForceSource):
             params["fr"] = source.f_r
             params["ft"] = source.f_t

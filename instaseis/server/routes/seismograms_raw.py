@@ -70,7 +70,7 @@ class RawSeismogramsHandler(InstaseisTimeSeriesHandler):
         # Source parameters.
         "sourcelatitude": {"type": float, "required": True},
         "sourcelongitude": {"type": float, "required": True},
-        "sourcedepthinm": {"type": float, "default": 0.0},
+        "sourcedepthinmeters": {"type": float, "default": 0.0},
         # Source can either be given as the moment tensor components in Nm.
         "mrr": {"type": float},
         "mtt": {"type": float},
@@ -93,7 +93,7 @@ class RawSeismogramsHandler(InstaseisTimeSeriesHandler):
         # Receiver parameters.
         "receiverlatitude": {"type": float, "required": True},
         "receiverlongitude": {"type": float, "required": True},
-        "receiverdepthinm": {"type": float, "default": 0.0},
+        "receiverdepthinmeters": {"type": float, "default": 0.0},
         "networkcode": {"type": str},
         "stationcode": {"type": str},
         "locationcode": {"type": str}
@@ -125,7 +125,7 @@ class RawSeismogramsHandler(InstaseisTimeSeriesHandler):
                 try:
                     source = Source(latitude=args.sourcelatitude,
                                     longitude=args.sourcelongitude,
-                                    depth_in_m=args.sourcedepthinm,
+                                    depth_in_m=args.sourcedepthinmeters,
                                     m_rr=args.mrr, m_tt=args.mtt,
                                     m_pp=args.mpp, m_rt=args.mrt,
                                     m_rp=args.mrp, m_tp=args.mtp,
@@ -141,7 +141,7 @@ class RawSeismogramsHandler(InstaseisTimeSeriesHandler):
                     source = Source.from_strike_dip_rake(
                         latitude=args.sourcelatitude,
                         longitude=args.sourcelongitude,
-                        depth_in_m=args.sourcedepthinm,
+                        depth_in_m=args.sourcedepthinmeters,
                         strike=args.strike, dip=args.dip, rake=args.rake,
                         M0=args.M0, origin_time=args.origintime)
                 except:
@@ -155,7 +155,7 @@ class RawSeismogramsHandler(InstaseisTimeSeriesHandler):
                 try:
                     source = ForceSource(latitude=args.sourcelatitude,
                                          longitude=args.sourcelongitude,
-                                         depth_in_m=args.sourcedepthinm,
+                                         depth_in_m=args.sourcedepthinmeters,
                                          f_r=args.fr, f_t=args.ft,
                                          f_p=args.fp,
                                          origin_time=args.origintime)
@@ -179,7 +179,7 @@ class RawSeismogramsHandler(InstaseisTimeSeriesHandler):
                                 network=args.networkcode,
                                 station=args.stationcode,
                                 location=args.locationcode,
-                                depth_in_m=args.receiverdepthinm)
+                                depth_in_m=args.receiverdepthinmeters)
         except:
             msg = ("Could not construct receiver with passed parameters. "
                    "Check parameters for sanity.")

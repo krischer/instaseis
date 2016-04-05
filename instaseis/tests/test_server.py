@@ -515,6 +515,7 @@ def test_raw_seismograms_error_handling(all_clients):
     basic_parameters = {
         "sourcelatitude": 10,
         "sourcelongitude": 10,
+        "receiverdepthinmeters": 0,
         "receiverlatitude": -10,
         "receiverlongitude": -10}
 
@@ -836,9 +837,9 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
         # Moment tensor source with a couple more parameters.
         p.reset_mock()
 
-        params["sourcedepthinm"] = "5.0"
+        params["sourcedepthinmeters"] = "5.0"
         params["origintime"] = str(time)
-        params["receiverdepthinm"] = "55.0"
+        params["receiverdepthinmeters"] = "55.0"
         params["networkcode"] = "BW"
         params["stationcode"] = "ALTM"
         params["locationcode"] = "XX"
@@ -883,9 +884,9 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
         # Moment tensor source with a couple more parameters.
         p.reset_mock()
 
-        params["sourcedepthinm"] = "5.0"
+        params["sourcedepthinmeters"] = "5.0"
         params["origintime"] = str(time)
-        params["receiverdepthinm"] = "55.0"
+        params["receiverdepthinmeters"] = "55.0"
         params["networkcode"] = "BW"
         params["stationcode"] = "ALTM"
         params["locationcode"] = "XX"
@@ -931,9 +932,9 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
             # Moment tensor source with a couple more parameters.
             p.reset_mock()
 
-            params["sourcedepthinm"] = "5.0"
+            params["sourcedepthinmeters"] = "5.0"
             params["origintime"] = str(time)
-            params["receiverdepthinm"] = "55.0"
+            params["receiverdepthinmeters"] = "55.0"
             params["networkcode"] = "BW"
             params["stationcode"] = "ALTM"
             params["locationcode"] = "XX"
