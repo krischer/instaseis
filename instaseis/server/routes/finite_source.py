@@ -20,7 +20,6 @@ from ... import FiniteSource
 from ..util import run_async, IOQueue, _validtimesetting, \
     _validate_and_write_waveforms
 from ..instaseis_request import InstaseisTimeSeriesHandler
-from ...lanczos import interpolate_trace
 from ...source import USGSParamFileParsingException
 
 from ...base_instaseis_db import (KIND_MAP, STF_MAP, INV_KIND_MAP,
@@ -73,11 +72,11 @@ def _get_finite_source(db, finite_source, receiver, components, units, dt,
     # Manually interpolate to get the times consistent.
     if dt:
         offset = round(finite_source.additional_time_shift % dt, 6)
-
-        for tr in st:
-            interpolate_trace(tr, sampling_rate=1.0 / dt, a=kernelwidth,
-                              window="blackman",
-                              starttime=time_of_first_sample + offset)
+        st.interpolate(sampling_rate=1.0 / dt,
+                       starttime=time_of_first_sample + offset,
+                       method="lanczos",
+                       a=kernelwidth,
+                       window="blackman")
 
     # Integrate/differentiate here. No need to do it for every single
     # seismogram and stack the errors.

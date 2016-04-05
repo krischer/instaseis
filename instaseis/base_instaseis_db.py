@@ -20,9 +20,9 @@ import warnings
 
 import numpy as np
 from obspy.core import AttribDict, Stream, Trace, UTCDateTime
+from obspy.signal.interpolation import lanczos_interpolation
 from scipy.integrate import cumtrapz
 
-from . import lanczos
 from .source import Source, ForceSource, Receiver
 from .helpers import get_band_code
 
@@ -307,7 +307,7 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
                     dataf * stf_conv_f / stf_deconv_f)[:self.info.npts]
 
             if dt is not None:
-                data[comp] = lanczos.lanczos_interpolation(
+                data[comp] = lanczos_interpolation(
                     data=data[comp], old_start=0, old_dt=self.info.dt,
                     new_start=time_information["time_shift_at_beginning"],
                     new_dt=dt,
@@ -452,7 +452,7 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
                 # time function here.
                 new_npts = int(round(
                     (len(data[comp]) - 1) * self.info.dt / dt, 6) + 1)
-                data_summed[comp] = lanczos.lanczos_interpolation(
+                data_summed[comp] = lanczos_interpolation(
                     data=data_summed[comp], old_start=0, old_dt=self.info.dt,
                     new_start=0, new_dt=dt, new_npts=new_npts,
                     a=kernelwidth, window="blackman")
