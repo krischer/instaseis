@@ -123,12 +123,12 @@ class Mesh(object):
 
         try:
             self.file_version = self.f.attrs["file version"][0]
-        except AttributeError:
+        except AttributeError:  # pragma: no cover
             raise ValueError("Database file so old that it does not even have "
                              "a version number. Please update AxiSEM or get "
                              "new databases.")
 
-        if self.file_version < self.MIN_FILE_VERSION:
+        if self.file_version < self.MIN_FILE_VERSION:  # pragma: no cover
             raise ValueError("Database file too old. Minimum file version "
                              "expected: %d, found: %d." %
                              (self.MIN_FILE_VERSION, self.file_version))
@@ -152,12 +152,12 @@ class Mesh(object):
         possible_stf_groups = ["Surface", "Snapshots"]
         found_stf = False
         for g in possible_stf_groups:
-            if g not in self.f:
+            if g not in self.f:  # pragma: no cover
                 continue
             group = self.f[g]
 
             if "stf_d_dump" not in group or \
-                    "stf_dump" not in group:
+                    "stf_dump" not in group:  # pragma: no cover
                 continue
 
             stf_d_dump = group["stf_d_dump"][:]
@@ -166,13 +166,13 @@ class Mesh(object):
             if np.ma.is_masked(stf_d_dump) or \
                     np.ma.is_masked(stf_dump) or \
                     np.isnan(np.sum(stf_d_dump)) or \
-                    np.isnan(np.sum(stf_dump)):
+                    np.isnan(np.sum(stf_dump)):  # pragma: no cover
                 continue
 
             found_stf = True
             break
 
-        if found_stf is False:
+        if found_stf is False:  # pragma: no cover
             raise ValueError("Could not extract valid slip and sliprates "
                              "from the netcdf files.")
 
@@ -185,11 +185,11 @@ class Mesh(object):
         self.npoints = self.f.attrs["npoints"][0]
 
         self.background_model = self.f.attrs["background model"].decode()
-        if self.file_version >= 8:
+        if self.file_version >= 8:  # pragma: no cover
             self.external_model_name = \
                 self.f.attrs["external model name"].decode()
         else:
-            if self.background_model == 'external':
+            if self.background_model == 'external':  # pragma: no cover
                 self.external_model_name = 'unknown'
             else:
                 self.external_model_name = ''

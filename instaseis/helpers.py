@@ -31,7 +31,7 @@ def load_lib():
     else:
         # Enable a couple of different library naming schemes.
         possible_files = glob.glob(os.path.join(LIB_DIR, "instaseis*.so"))
-        if not possible_files:
+        if not possible_files:  # pragma: no cover
             raise ValueError("Could not find suitable instaseis shared "
                              "library.")
         filename = possible_files[0]
@@ -125,3 +125,16 @@ def geocentric_to_elliptic_latitude(lat, axis_a=6378137.0,
         return lat
 
     return math.degrees(math.atan(math.tan(math.radians(lat)) / (1 - E_2)))
+
+
+def sizeof_fmt(num):
+    """
+    Handy formatting for human readable filesizes.
+
+    From http://stackoverflow.com/a/1094933/1657047
+    """
+    for x in ["bytes", "KB", "MB", "GB"]:
+        if num < 1024.0 and num > -1024.0:
+            return "%3.1f %s" % (num, x)
+        num /= 1024.0
+    return "%3.1f %s" % (num, "TB")

@@ -24,7 +24,7 @@ from instaseis.instaseis_db import InstaseisDB
 from instaseis.base_instaseis_db import _get_seismogram_times
 from instaseis import Source, Receiver, ForceSource
 from instaseis.helpers import (get_band_code, elliptic_to_geocentric_latitude,
-                               geocentric_to_elliptic_latitude)
+                               geocentric_to_elliptic_latitude, sizeof_fmt)
 
 from .testdata import BWD_TEST_DATA, FWD_TEST_DATA
 from .testdata import BWD_STRAIN_ONLY_TEST_DATA, BWD_FORCE_TEST_DATA
@@ -538,6 +538,57 @@ def test_get_greens_vs_get_seismogram():
     np.testing.assert_allclose(st_ref.select(component="T")[0].data,
                                ut, rtol=1E-3, atol=1E-10)
 
+    # Assure it also works with just the data and not necessarily an ObsPy
+    # Stream object.
+    greens_data = db.get_greens_function(epicentral_distance_degree,
+                                         depth_in_m, definition="seiscomp",
+                                         return_obspy_stream=False)
+    assert isinstance(greens_data, dict)
+
+
+def test_greens_function_failures():
+    """
+    Tests some failures for the greens function calculation.
+    """
+    db = InstaseisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
+
+    depth_in_m = 1000
+    epicentral_distance_degree = 20.0
+
+    # Wrong kind.
+    with pytest.raises(ValueError) as err:
+        db.get_greens_function(epicentral_distance_degree, depth_in_m,
+                               definition="seiscomp", kind="random")
+    assert err.value.args[0] == "unknown kind 'random'."
+
+    # Wrong epicentral distance
+    with pytest.raises(ValueError) as err:
+        db.get_greens_function(1000.0, depth_in_m, definition="seiscomp")
+    assert err.value.args[0] == ("epicentral_distance_degree should be in "
+                                 "[0, 180]")
+
+    # Source depth has to be positive.
+    with pytest.raises(ValueError) as err:
+        db.get_greens_function(100.0, -20, definition="seiscomp")
+    assert err.value.args[0] == "source_depth_in_m should be positive"
+
+    # Requires a reciprocal database.
+    db.info.is_reciprocal = False
+    with pytest.raises(ValueError) as err:
+        db.get_greens_function(epicentral_distance_degree, depth_in_m,
+                               definition="seiscomp")
+    assert err.value.args[0] == ("forward DB cannot be used with "
+                                 "get_greens_function()")
+
+    # Requires both components
+    db.info.is_reciprocal = True
+    db.info.components = "vertical"
+    with pytest.raises(ValueError) as err:
+        db.get_greens_function(epicentral_distance_degree, depth_in_m,
+                               definition="seiscomp")
+    assert err.value.args[0] == ("get_greens_function() needs a DB with both "
+                                 "vertical and horizontal components")
+
 
 def test_finite_source():
     """
@@ -615,6 +666,12 @@ def test_finite_source():
     assert tr.stats.station == "ALTM"
     assert tr.stats.location == "SY"
     assert tr.stats.channel[-1] == "Z"
+
+    # Make sure the correct_mu setting actually does something.
+    st_2 = instaseis_bwd.get_seismograms_finite_source(
+        sources=[source], receiver=receiver, components=('Z'),
+        correct_mu=True)
+    assert st != st_2
 
 
 def test_get_band_code_method():
@@ -1362,3 +1419,55 @@ def test_receiver_settings():
     assert tr.stats.station == "ALTM"
     assert tr.stats.location == "SY"
     assert tr.stats.channel[-1] == "Z"
+
+
+def test_some_failure_conditions():
+    """
+    Tests some failure conditions.
+    """
+    db = InstaseisDB(os.path.join(DATA, "100s_db_fwd"))
+    source = Source(latitude=4., longitude=3.0, depth_in_m=None,
+                    m_rr=4.71e+17, m_tt=3.81e+17, m_pp=-4.74e+17,
+                    m_rt=3.99e+17, m_rp=-8.05e+17, m_tp=-1.23e+17)
+    receiver = Receiver(latitude=10.0, longitude=20.0)
+
+    # Reconvolving with stf requires a source time function.
+    with pytest.raises(ValueError) as err:
+        db.get_seismograms(
+            source=source, receiver=receiver,
+            components=('Z', 'N', 'E', 'R', 'T'), dt=2.0, reconvolve_stf=True,
+            remove_source_shift=False, kernelwidth=1)
+
+    assert err.value.args[0] == "source has no source time function"
+
+    # Incompatible source time function.
+    source.sliprate = np.arange(100)
+    source.dt = 0.123
+    with pytest.raises(ValueError) as err:
+        db.get_seismograms(
+            source=source, receiver=receiver,
+            components=('Z', 'N', 'E', 'R', 'T'), dt=2.0, reconvolve_stf=True,
+            remove_source_shift=False, kernelwidth=1)
+
+    assert err.value.args[0] == "dt of the source not compatible"
+
+    # Multiple receivers.
+    with pytest.raises(ValueError) as err:
+        db.get_seismograms(
+            source=source, receiver=obspy.read_inventory(),
+            components=('Z', 'N', 'E', 'R', 'T'))
+    assert err.value.args[0].startswith("Receiver object/file contains "
+                                        "multiple stations.")
+
+    # Wrong kind.
+    with pytest.raises(ValueError) as err:
+        db.get_seismograms(
+            source=source, receiver=receiver, kind="random")
+    assert err.value.args[0] == "unknown kind 'random'"
+
+
+def test_sizeof_fmt_function():
+    assert sizeof_fmt(1024) == "1.0 KB"
+    assert sizeof_fmt(1024 ** 2) == "1.0 MB"
+    assert sizeof_fmt(1024 ** 3) == "1.0 GB"
+    assert sizeof_fmt(1024 ** 4) == "1.0 TB"

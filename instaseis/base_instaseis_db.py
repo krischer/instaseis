@@ -24,7 +24,7 @@ from obspy.signal.interpolation import lanczos_interpolation
 from scipy.integrate import cumtrapz
 
 from .source import Source, ForceSource, Receiver
-from .helpers import get_band_code
+from .helpers import get_band_code, sizeof_fmt
 
 
 DEFAULT_MU = 32e9
@@ -52,7 +52,8 @@ def _diff_and_integrate(n_derivative, data, comp, dt_out):
     for _ in np.arange(n_derivative):
         data[comp] = np.gradient(data[comp], [dt_out])
 
-    for _ in np.arange(-n_derivative):
+    # Cannot happen currently - maybe with other source time functions?
+    for _ in np.arange(-n_derivative):  # pragma: no cover
         # adding a zero at the beginning to avoid phase shift
         data[comp] = cumtrapz(data[comp], dx=dt_out, initial=0.0)
 
@@ -254,6 +255,7 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
             0: self.info.sliprate,
             1: self.info.slip}
 
+        # Can never be negative with the current logic.
         n_derivative = KIND_MAP[kind] - STF_MAP[self.info.stf]
 
         if isinstance(source, ForceSource):
@@ -263,14 +265,9 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
             raise ValueError("'remove_source_shift' argument not "
                              "compatible with 'reconvolve_stf'.")
 
-        if hasattr(source, "origin_time"):
-            origin_time = source.origin_time
-        else:
-            origin_time = UTCDateTime(0)
-
         # Calculate the final time information about the seismograms.
         time_information = _get_seismogram_times(
-            info=self.info, origin_time=origin_time, dt=dt,
+            info=self.info, origin_time=source.origin_time, dt=dt,
             kernelwidth=kernelwidth, remove_source_shift=remove_source_shift,
             reconvolve_stf=reconvolve_stf)
 
@@ -358,7 +355,7 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
 
     @abstractmethod
     def _get_seismograms(self, source, receiver, components=("Z", "N", "E")):
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def _get_info(self):
@@ -375,7 +372,7 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
         ``"directory"``, ``"filesize"``, ``"compiler"``, ``"user"``,
         ``"format_version"``, ``"axisem_version"``, ``"datetime"``
         """
-        pass
+        raise NotImplementedError
 
     def get_seismograms_finite_source(self, sources, receiver,
                                       components=("Z", "N", "E"),
@@ -441,7 +438,8 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
                     data_summed[comp] += data[comp] * corr_fac
                 else:
                     data_summed[comp] = data[comp] * corr_fac
-            if progress_callback:
+            # Only used for the GUI.
+            if progress_callback:  # pragma: no cover
                 cancel = progress_callback(_i + 1, count)
                 if cancel:
                     return None
@@ -510,14 +508,14 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
         :type kind: str
         """
         if kind not in ['displacement', 'velocity', 'acceleration']:
-            raise ValueError('unknown kind %s' % (kind,))
+            raise ValueError("unknown kind '%s'." % (kind,))
 
         if not self.info.is_reciprocal:
             raise ValueError('forward DB cannot be used with '
-                             'get_greens_seiscomp()')
+                             'get_greens_function()')
 
         if not self.info.components == 'vertical and horizontal':
-            raise ValueError('get_greens_seiscomp() needs a DB with both '
+            raise ValueError('get_greens_function() needs a DB with both '
                              'vertical and horizontal components')
 
         if not 0. <= epicentral_distance_degree <= 180.:
@@ -558,7 +556,7 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
             receiver = rec[0]
 
         if kind not in ['displacement', 'velocity', 'acceleration']:
-            raise ValueError('unknown kind %s' % (kind,))
+            raise ValueError("unknown kind '%s'" % (kind,))
 
         for comp in components:
             if comp not in ["N", "E", "Z", "R", "T"]:
@@ -592,7 +590,7 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
         self.__cached_info = AttribDict(self._get_info())
         return self.__cached_info
 
-    def _repr_pretty_(self, p, cycle):
+    def _repr_pretty_(self, p, cycle):  # pragma: no cover
         p.text(str(self))
 
     def __str__(self):
@@ -658,19 +656,6 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
             datetime=info.datetime
         )
         return return_str
-
-
-def sizeof_fmt(num):
-    """
-    Handy formatting for human readable filesizes.
-
-    From http://stackoverflow.com/a/1094933/1657047
-    """
-    for x in ["bytes", "KB", "MB", "GB"]:
-        if num < 1024.0 and num > -1024.0:
-            return "%3.1f %s" % (num, x)
-        num /= 1024.0
-    return "%3.1f %s" % (num, "TB")
 
 
 def _get_seismogram_times(info, origin_time, dt, kernelwidth,
