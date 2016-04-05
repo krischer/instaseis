@@ -243,14 +243,12 @@ class InstaseisDB(BaseInstaseisDB):
                     # sorted for newer netcdf versions. The double argsort()
                     # gives the indices in the sorted array to restore the
                     # original order.
-                    order = corner_point_ids.argsort().argsort()
-                    corner_point_ids.sort()
-
                     eltype = mesh["eltype"][idx]
-                    corner_points[:, 0] = \
-                        mesh["mesh_S"][corner_point_ids][order]
-                    corner_points[:, 1] = \
-                        mesh["mesh_Z"][corner_point_ids][order]
+
+                    m_s = mesh["mesh_S"]
+                    m_z = mesh["mesh_Z"]
+                    corner_points[:, 0] = [m_s[_i] for _i in corner_point_ids]
+                    corner_points[:, 1] = [m_z[_i] for _i in corner_point_ids]
 
                 isin, xi, eta = finite_elem_mapping.inside_element(
                     rotmesh_s, rotmesh_z, corner_points, eltype,
@@ -258,7 +256,7 @@ class InstaseisDB(BaseInstaseisDB):
                 if isin:
                     id_elem = idx
                     break
-            else:
+            else:  # pragma: no cover
                 raise ValueError("Element not found")
 
             if not self.read_on_demand:

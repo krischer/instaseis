@@ -13,6 +13,7 @@ Basic integration tests for the AxiSEM database Python interface.
 from __future__ import absolute_import
 
 import inspect
+import io
 import math
 import numpy as np
 import obspy
@@ -20,7 +21,8 @@ import os
 import pytest
 import shutil
 
-from instaseis.instaseis_db import InstaseisDB
+from instaseis.instaseis_db import (InstaseisDB, InstaseisNotFoundError,
+                                    InstaseisError)
 from instaseis.base_instaseis_db import _get_seismogram_times
 from instaseis import Source, Receiver, ForceSource
 from instaseis.helpers import (get_band_code, elliptic_to_geocentric_latitude,
@@ -1471,3 +1473,127 @@ def test_sizeof_fmt_function():
     assert sizeof_fmt(1024 ** 2) == "1.0 MB"
     assert sizeof_fmt(1024 ** 3) == "1.0 GB"
     assert sizeof_fmt(1024 ** 4) == "1.0 TB"
+
+
+def test_failures_when_opening_databases(tmpdir):
+    """
+    Tests various failures when opening databases.
+    """
+    # Add a deep folder that should not be tested.
+    os.makedirs(os.path.join(tmpdir.strpath, "1", "2", "3", "4", "5"))
+
+    # Nothing there currently.
+    with pytest.raises(InstaseisNotFoundError) as err:
+        InstaseisDB(tmpdir.strpath)
+    assert err.value.args[0].startswith("No suitable netCDF files")
+
+    # Three files are no good.
+    f_1 = os.path.join(tmpdir.strpath, "1", "ordered_output.nc4")
+    f_2 = os.path.join(tmpdir.strpath, "2", "ordered_output.nc4")
+    f_3 = os.path.join(tmpdir.strpath, "3", "ordered_output.nc4")
+
+    for f in [f_1, f_2, f_3]:
+        if not os.path.exists(os.path.dirname(f)):
+            os.makedirs(os.path.dirname(f))
+        with io.open(f, "wb") as fh:
+            fh.write(b" ")
+
+    with pytest.raises(InstaseisError) as err:
+        InstaseisDB(tmpdir.strpath)
+    assert err.value.args[0].startswith("1, 2 or 4 netCDF must be present in "
+                                        "the folder structure.")
+
+    # Two netcdf files but in funny places.
+    os.remove(f_3)
+    with pytest.raises(InstaseisError) as err:
+        InstaseisDB(tmpdir.strpath)
+    assert err.value.args[0].startswith(
+        "Could not find any suitable netCDF files. Did you pass the correct "
+        "directory?")
+
+    # Two PX files.
+    os.remove(f_1)
+    os.remove(f_2)
+    f_1 = os.path.join(tmpdir.strpath, "1", "PX", "ordered_output.nc4")
+    f_2 = os.path.join(tmpdir.strpath, "2", "PX", "ordered_output.nc4")
+    for f in [f_1, f_2]:
+        if not os.path.exists(os.path.dirname(f)):
+            os.makedirs(os.path.dirname(f))
+        with io.open(f, "wb") as fh:
+            fh.write(b" ")
+
+    with pytest.raises(InstaseisError) as err:
+        InstaseisDB(tmpdir.strpath)
+    assert err.value.args[0].startswith("Found 2 files for component PX:")
+
+    # Only two moment tensor components.
+    os.remove(f_1)
+    os.remove(f_2)
+    f_1 = os.path.join(tmpdir.strpath, "1", "MZZ", "ordered_output.nc4")
+    f_2 = os.path.join(tmpdir.strpath, "2", "MXX_P_MYY", "ordered_output.nc4")
+    for f in [f_1, f_2]:
+        if not os.path.exists(os.path.dirname(f)):
+            os.makedirs(os.path.dirname(f))
+        with io.open(f, "wb") as fh:
+            fh.write(b" ")
+
+    with pytest.raises(InstaseisError) as err:
+        InstaseisDB(tmpdir.strpath)
+    assert err.value.args[0] == ("Expecting all four elemental moment tensor "
+                                 "subfolders to be present.")
+
+
+def test_read_on_demand():
+    db = InstaseisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
+
+    receiver = Receiver(latitude=42.6390, longitude=74.4940)
+    source = Source(
+        latitude=89.91, longitude=0.0, depth_in_m=12000,
+        m_rr=4.710000e+24 / 1E7,
+        m_tt=3.810000e+22 / 1E7,
+        m_pp=-4.740000e+24 / 1E7,
+        m_rt=3.990000e+23 / 1E7,
+        m_rp=-8.050000e+23 / 1E7,
+        m_tp=-1.230000e+24 / 1E7)
+
+    st = db.get_seismograms(source=source, receiver=receiver,
+                            components=('Z', 'N', 'E', 'R', 'T'))
+
+    np.testing.assert_allclose(st.select(component='Z')[0].data,
+                               BWD_TEST_DATA["Z"], rtol=1E-7, atol=1E-12)
+    np.testing.assert_allclose(st.select(component='N')[0].data,
+                               BWD_TEST_DATA["N"], rtol=1E-7, atol=1E-12)
+    np.testing.assert_allclose(st.select(component='E')[0].data,
+                               BWD_TEST_DATA["E"], rtol=1E-7, atol=1E-12)
+    np.testing.assert_allclose(st.select(component='R')[0].data,
+                               BWD_TEST_DATA["R"], rtol=1E-7, atol=1E-12)
+    np.testing.assert_allclose(st.select(component='T')[0].data,
+                               BWD_TEST_DATA["T"], rtol=1E-7, atol=1E-12)
+
+    # Same thing with read-on-demand.
+    db = InstaseisDB(os.path.join(DATA, "100s_db_bwd_displ_only"),
+                     read_on_demand=True)
+
+    receiver = Receiver(latitude=42.6390, longitude=74.4940)
+    source = Source(
+        latitude=89.91, longitude=0.0, depth_in_m=12000,
+        m_rr=4.710000e+24 / 1E7,
+        m_tt=3.810000e+22 / 1E7,
+        m_pp=-4.740000e+24 / 1E7,
+        m_rt=3.990000e+23 / 1E7,
+        m_rp=-8.050000e+23 / 1E7,
+        m_tp=-1.230000e+24 / 1E7)
+
+    st = db.get_seismograms(source=source, receiver=receiver,
+                            components=('Z', 'N', 'E', 'R', 'T'))
+
+    np.testing.assert_allclose(st.select(component='Z')[0].data,
+                               BWD_TEST_DATA["Z"], rtol=1E-7, atol=1E-12)
+    np.testing.assert_allclose(st.select(component='N')[0].data,
+                               BWD_TEST_DATA["N"], rtol=1E-7, atol=1E-12)
+    np.testing.assert_allclose(st.select(component='E')[0].data,
+                               BWD_TEST_DATA["E"], rtol=1E-7, atol=1E-12)
+    np.testing.assert_allclose(st.select(component='R')[0].data,
+                               BWD_TEST_DATA["R"], rtol=1E-7, atol=1E-12)
+    np.testing.assert_allclose(st.select(component='T')[0].data,
+                               BWD_TEST_DATA["T"], rtol=1E-7, atol=1E-12)
