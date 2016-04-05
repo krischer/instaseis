@@ -118,7 +118,7 @@ def test_parse_obspy_objects():
     _assert_src(Source.parse(ev))
 
 
-def test_parse_srf_file():
+def test_parse_srf_file(tmpdir):
     """
     Tests parsing from a .srf file.
     """
@@ -137,6 +137,15 @@ def test_parse_srf_file():
             -3.91886976e+03, 3.91886976e+03, -1.19980783e-13, 1.95943488e+03,
             3.20000000e+19])
         np.testing.assert_allclose(src_params, src_params_ref)
+
+    # Try parsing it again, but this time with a couple of empty lines in
+    # front of it.
+    filename = os.path.join(tmpdir.strpath, "temp.srf")
+    with io.open(SRF_FILE, "rt") as fh_1, io.open(filename, "wt") as fh_2:
+        fh_2.write("\n\n\n\n")
+        fh_2.write(fh_1.read())
+    finitesource_2 = FiniteSource.from_srf_file(filename, True)
+    assert finitesource_2.npointsources == 10
 
 
 def test_parsing_empty_usgs_file():
@@ -213,6 +222,21 @@ def test_Haskell():
     np.testing.assert_almost_equal(finitesource.moment_magnitude,
                                    7.33333333333333)
 
+    # Should raise an error if above ground.
+    with pytest.raises(ValueError) as err:
+        FiniteSource.from_Haskell(
+            latitude, longitude, -100.0, strike, dip, rake, M0,
+            fault_length,
+            fault_width, rupture_velocity, nl=nl, nw=nw)
+    assert err.value.args[0].startswith("At least one source point outside")
+
+    # Manually settings trise and tfall.
+    finitesource = FiniteSource.from_Haskell(
+        latitude, longitude, depth_in_m, strike, dip, rake, M0, fault_length,
+        fault_width, rupture_velocity, nl=nl, nw=nw, trise=1.0, tfall=1.0)
+    np.testing.assert_almost_equal(finitesource.moment_magnitude,
+                                   7.33333333333333)
+
 
 def test_resample_stf():
     """
@@ -259,6 +283,8 @@ def test_min_max_functions():
 
     assert finitesource.min_latitude == 0.0
     assert finitesource.max_latitude == 0.0
+
+    assert finitesource.rupture_duration == 222.22222
 
 
 def test_M0():
@@ -458,6 +484,30 @@ def test_sliprate_convenience_methods():
     np.testing.assert_allclose(np.ones(5), src.sliprate)
 
 
+def test_sliprate_convenience_methods_finite_source():
+    """
+    Tests some convenience methods of sliprates for finite sources.
+    """
+    src = Source(latitude=0.0, longitude=90.0)
+    fs = FiniteSource(pointsources=[src])
+    fs.set_sliprate_dirac(2.0, 5)
+    np.testing.assert_allclose(np.array([0.5, 0, 0, 0, 0]), src.sliprate)
+
+    src = Source(latitude=0.0, longitude=90.0)
+    fs = FiniteSource(pointsources=[src])
+    fs.set_sliprate_lp(2.0, 5, 0.1)
+    np.testing.assert_allclose(np.array(
+        [0.023291, 0.111382, 0.211022, 0.186723, 0.045481]), src.sliprate,
+        rtol=1E-3)
+
+    src = Source(latitude=0.0, longitude=90.0)
+    src.sliprate = np.ones(5)
+    src.dt = 0.25
+    fs = FiniteSource(pointsources=[src])
+    fs.normalize_sliprate()
+    np.testing.assert_allclose(np.ones(5), src.sliprate)
+
+
 def test_str_method_of_src():
     src = Source(latitude=0.0, longitude=90.0)
     assert str(src) == (
@@ -488,6 +538,27 @@ def test_str_method_of_force_source():
         "\tFp        :   3.00e+00 N\n")
 
 
+def test_str_method_of_finite_source():
+    finitesource = FiniteSource.from_srf_file(SRF_FILE, True)
+    assert str(finitesource) == (
+            "Instaseis Finite Source:\n"
+            "\tMoment Magnitude     : 7.67\n"
+            "\tscalar Moment        :   3.20e+20 Nm\n"
+            "\t#point sources       : 10\n"
+            "\trupture duration     :  222.2 s\n"
+            "\ttime shift           :    0.0 s\n"
+            "\tmin depth            : 50000.0 m\n"
+            "\tmax depth            : 50000.0 m\n"
+            "\thypocenter depth     : 50000.0 m\n"
+            "\tmin latitude         :    0.0 deg\n"
+            "\tmax latitude         :    0.0 deg\n"
+            "\thypocenter latitude  :    0.0 deg\n"
+            "\tmin longitude        :    0.0 deg\n"
+            "\tmax longitude        :    9.0 deg\n"
+            "\thypocenter longitude :    0.0 deg\n"
+    )
+
+
 def test_properties_force_source():
     """
     Tests some properties of the force source.
@@ -495,3 +566,25 @@ def test_properties_force_source():
     src = ForceSource(latitude=0.0, longitude=0.0, f_r=1.0, f_t=2.0, f_p=3.0)
     np.testing.assert_allclose(src.force_tpr, [2.0, 3.0, 1.0])
     np.testing.assert_allclose(src.force_rtp, [1.0, 2.0, 3.0])
+
+
+def test_finite_source_iteration_over_empty_fs():
+    """
+    Raises a ValueError when trying to iterate over an empty finite source
+    object. This is safe-guard against obvious errors so in this particular
+    case its better to be explicit instead of just not looping.
+    """
+    fs = FiniteSource()
+    with pytest.raises(ValueError) as err:
+        [_i for _i in fs]
+    assert err.value.args[0] == "FiniteSource not Initialized"
+
+
+def test_reading_finite_source_with_slip_along_u2_axis():
+    """
+    Tests SRF files with slips along the u2 axis with a constructed file.
+    """
+    # Constructed file with known properties.
+    filename = os.path.join(DATA, "strike_slip_eq_2pts.srf")
+    finitesource = FiniteSource.from_srf_file(filename, True)
+    assert finitesource.npointsources == 3

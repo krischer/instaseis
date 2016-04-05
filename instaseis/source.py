@@ -1218,7 +1218,7 @@ class FiniteSource(object):
 
                 # Negative rupture times are not supported with the current
                 # logic.
-                if tinit < 0:
+                if tinit < 0:  # pragma: no cover
                     raise USGSParamFileParsingException(
                         "File contains a negative rupture time "
                         "which Instaseis cannot currently deal "
@@ -1336,7 +1336,7 @@ class FiniteSource(object):
 
         # make sure all points are inside the planet
         if np.any(src_depth < 0):
-            raise ValueError('at least on source point outside planet, '
+            raise ValueError('At least one source point outside planet, '
                              'maximum height in m: %f' % (-src_depth.min(),))
 
         # compute time shifts as distance along xi1
