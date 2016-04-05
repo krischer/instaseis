@@ -8,13 +8,13 @@ Launch Instaseis server.
 :license:
     GNU Lesser General Public License, Version 3 [non-commercial/academic use]
     (http://www.gnu.org/copyleft/lgpl.html)
-"""
+"""  # pragma: no cover
 from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
-import argparse
-import os
+                        unicode_literals)  # pragma: no cover
+import argparse  # pragma: no cover
+import os  # pragma: no cover
 
-from instaseis.server.app import launch_io_loop
+from instaseis.server.app import launch_io_loop  # pragma: no cover
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(

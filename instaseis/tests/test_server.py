@@ -1101,7 +1101,8 @@ def test_object_creation_for_seismogram_route(all_clients):
         "sourcelongitude": 10,
         "sourcedepthinmeters": client.source_depth,
         "receiverlatitude": -10,
-        "receiverlongitude": -10}
+        "receiverlongitude": -10,
+        "receiverdepthinmeters": 0.0}
 
     dt = 24.724845445855724
 

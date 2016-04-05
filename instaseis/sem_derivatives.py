@@ -63,6 +63,6 @@ def strain_dipole_td(u, G, GT, xi, eta, npol, nsamp, nodes, element_type,
 
 
 def strain_quadpole_td(u, G, GT, xi, eta, npol, nsamp, nodes, element_type,
-                       axial):
+                       axial):  # pragma: no cover
     return _strain_td(u, G, GT, xi, eta, npol, nsamp, nodes, element_type,
                       axial, lib.strain_quadpole_td)

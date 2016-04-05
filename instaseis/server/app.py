@@ -58,7 +58,7 @@ def launch_io_loop(db_path, port, buffer_size_in_mb, quiet, log_level,
                    max_size_of_finite_sources=1000,
                    station_coordinates_callback=None,
                    event_info_callback=None,
-                   travel_time_callback=None):
+                   travel_time_callback=None):  # pragma: no cover
     """
     Launch the instaseis server.
 

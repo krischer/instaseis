@@ -127,6 +127,7 @@ def test_finite_source_retrieval(reciprocal_clients, usgs_param):
     basic_parameters = {
         "receiverlongitude": 11,
         "receiverlatitude": 22,
+        "receiverdepthinmeters": 0,
         "format": "miniseed"}
 
     with io.open(usgs_param, "rb") as fh:
@@ -520,6 +521,38 @@ def test_various_failure_conditions(reciprocal_clients_all_callbacks,
                            method="POST", body=body)
     assert request.code == 400
     assert request.reason.startswith("A scale of zero means")
+
+    # Invalid receiver coordinates.
+    params = copy.deepcopy(basic_parameters)
+    params["receiverlatitude"] = 1E9
+    request = client.fetch(_assemble_url('finite_source', **params),
+                           method="POST", body=body)
+    assert request.code == 400
+    assert request.reason == ("Could not construct receiver with passed "
+                              "parameters. Check parameters for sanity.")
+
+    # Invalid receiver coordinates based on a station coordinates query.
+    params = copy.deepcopy(basic_parameters)
+    del params["receiverlatitude"]
+    del params["receiverlongitude"]
+    params["network"] = "XX"
+    params["station"] = "DUMMY"
+    request = client.fetch(_assemble_url('finite_source', **params),
+                           method="POST", body=body)
+    assert request.code == 400
+    assert request.reason == ("Station coordinate query returned invalid "
+                              "coordinates.")
+
+    # Coordinates not found
+    params = copy.deepcopy(basic_parameters)
+    del params["receiverlatitude"]
+    del params["receiverlongitude"]
+    params["network"] = "UN"
+    params["station"] = "KNOWN"
+    request = client.fetch(_assemble_url('finite_source', **params),
+                           method="POST", body=body)
+    assert request.code == 404
+    assert request.reason == "No coordinates found satisfying the query."
 
 
 def test_uploading_empty_usgs_file(reciprocal_clients):

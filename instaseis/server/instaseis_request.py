@@ -398,10 +398,7 @@ class InstaseisTimeSeriesHandler(with_metaclass(ABCMeta,
 
         receivers = []
 
-        if "receiverdepthinmeters" in args:
-            rec_depth = args.receiverdepthinmeters
-        else:
-            rec_depth = 0.0
+        rec_depth = args.receiverdepthinmeters
 
         # Construct either a single receiver object.
         if args.receiverlatitude is not None:
@@ -439,8 +436,8 @@ class InstaseisTimeSeriesHandler(with_metaclass(ABCMeta,
                         station=station["station"],
                         depth_in_m=0))
                 except:
-                    msg = ("Could not construct receiver with passed "
-                           "parameters. Check parameters for sanity.")
+                    msg = ("Station coordinate query returned invalid "
+                           "coordinates.")
                     raise tornado.web.HTTPError(400, log_message=msg,
                                                 reason=msg)
         return receivers
