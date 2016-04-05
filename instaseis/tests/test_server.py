@@ -4855,3 +4855,4 @@ def test_custom_stf(all_clients):
                            method="POST", body=json.dumps(body))
     assert request.code == 200
     st_server = obspy.read(request.buffer)
+    st_server

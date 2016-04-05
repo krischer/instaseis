@@ -712,6 +712,7 @@ class ForceSource(SourceOrReceiver):
         peak of the source time function used to generate the database.
         If you reconvolve with another source time function this time is
         the time of the first sample of the final seismogram.
+    :param sliprate: normalized source time function (sliprate)
 
 
     >>> import instaseis
@@ -726,12 +727,13 @@ class ForceSource(SourceOrReceiver):
         Fp        :   0.00e+00 N
     """
     def __init__(self, latitude, longitude, depth_in_m=None, f_r=0., f_t=0.,
-                 f_p=0., origin_time=obspy.UTCDateTime(0)):
+                 f_p=0., origin_time=obspy.UTCDateTime(0), sliprate=None):
         super(ForceSource, self).__init__(latitude, longitude, depth_in_m)
         self.f_r = f_r
         self.f_t = f_t
         self.f_p = f_p
         self.origin_time = origin_time
+        self.sliprate = sliprate
 
     @property
     def force_tpr(self):

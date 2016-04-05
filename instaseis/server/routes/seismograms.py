@@ -17,10 +17,11 @@ from jsonschema import validate as json_validate
 from jsonschema import ValidationError as JSONValidationError
 import numpy as np
 import obspy
+from obspy.signal.interpolation import lanczos_interpolation
 import tornado.gen
 import tornado.web
 
-from ... import Source, ForceSource, Receiver, lanczos
+from ... import Source, ForceSource, Receiver
 from ..util import run_async, IOQueue, _validtimesetting, \
     _validate_and_write_waveforms
 from ..instaseis_request import InstaseisTimeSeriesHandler
@@ -67,7 +68,7 @@ def _get_seismogram(db, source, receiver, components, units, dt, kernelwidth,
             kind=units, remove_source_shift=False,
             reconvolve_stf=reconvolve_stf, return_obspy_stream=True, dt=dt,
             kernelwidth=kernelwidth)
-    except Exception as e:
+    except Exception:
         msg = ("Could not extract seismogram. Make sure, the components "
                "are valid, and the depth settings are correct.")
         callback((tornado.web.HTTPError(400, log_message=msg, reason=msg),
@@ -139,7 +140,7 @@ def _parse_validate_and_resample_stf(request, db_info, callback):
         np.zeros(20), j["data"], np.zeros(missing_samples + 20)])
 
     # Resample it using sinc reconstruction.
-    data = lanczos.lanczos_interpolation(
+    data = lanczos_interpolation(
         data,
         # Account for the additional samples at the beginning.
         old_start=-20 * j["sample_spacing_in_sec"],
