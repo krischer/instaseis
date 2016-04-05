@@ -42,7 +42,7 @@ class RemoteInstaseisDB(BaseInstaseisDB):
 
         # Parse the root message of the server.
         try:
-            root = self._download_url(self._get_url(path=""), unpack_json=True)
+            root = self._download_url(self._get_url(path=""))
         except Exception as e:
             raise InstaseisError("Failed to connect to remote Instaseis "
                                  "server due to: %s" % (str(e)))
@@ -108,7 +108,7 @@ class RemoteInstaseisDB(BaseInstaseisDB):
         url = self._get_url(path="seismograms_raw", **params)
 
         r = requests.get(url)
-        if "Instaseis-Mu" not in r.headers:
+        if "Instaseis-Mu" not in r.headers:  # pragma: no cover
             warnings.warn("Mu is not passed via the HTTP headers. Maybe some "
                           "proxy removed it? Mu is now always the default mu.",
                           InstaseisWarning)
@@ -133,7 +133,9 @@ class RemoteInstaseisDB(BaseInstaseisDB):
         return data
 
     def _get_url(self, path, **kwargs):
-        if self._path:
+        # Not tested in the test-suite as it would be awkward to do with the
+        # current setup. But manually vetted and should be good.
+        if self._path:  # pragma: no cover
             path = "/" + self._path + "/" + path
 
         url = "%s://%s" % (self._scheme, self._netloc)
@@ -143,25 +145,24 @@ class RemoteInstaseisDB(BaseInstaseisDB):
             url += "?%s" % urlencode(kwargs)
         return url
 
-    def _download_url(self, url, unpack_json=False):
+    def _download_url(self, url):
         """
         Helper function downloading data from a URL.
         """
         r = requests.get(url)
-        if r.status_code != 200:
+        # Not tested in test suite as it would be awkward to do. Manually
+        # tested and should be good.
+        if r.status_code != 200:  # pragma: no cover
             raise InstaseisError("Status code %i when downloading '%s'" % (
                 r.status_code, url))
-        if unpack_json is True:
-            return r.json()
-        else:
-            return r.text
+        return r.json()
 
     def _get_info(self):
         """
         Returns a dictionary with information about the currently loaded
         database.
         """
-        info = self._download_url(self._get_url(path="info"), unpack_json=True)
+        info = self._download_url(self._get_url(path="info"))
         info["directory"] = self.url
         # Convert types lost in the translation to JSON.
         info["datetime"] = obspy.UTCDateTime(info["datetime"])

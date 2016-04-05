@@ -14,10 +14,18 @@ from __future__ import absolute_import
 import copy
 import numpy as np
 import responses
+import warnings
 
 import instaseis
 from .tornado_testing_fixtures import *  # NOQA
 from .tornado_testing_fixtures import _add_callback
+
+# Conditionally import mock either from the stdlib or as a separate library.
+import sys
+if sys.version_info[0] == 2:  # pragma: no cover
+    import mock
+else:  # pragma: no cover
+    import unittest.mock as mock
 
 
 @responses.activate
@@ -113,3 +121,53 @@ def test_seismogram_extraction(all_remote_dbs):
             f_p=1.73E10)
         kwargs = {"source": source, "receiver": receiver}
         _compare_streams(r_db, l_db, kwargs)
+
+    # Fix receiver depth, network, and station codes.
+    receiver = instaseis.Receiver(latitude=10., longitude=20.,
+                                  depth_in_m=0.0, station="ALTM",
+                                  network="BW")
+
+    kwargs = {"source": source, "receiver": receiver,
+              "components": ["Z", "N", "E", "R", "T"]}
+    _compare_streams(r_db, l_db, kwargs)
+
+
+def test_initialization_failures(recwarn):
+    """
+    Tests various initialization failures for the remote instaseis db.
+    """
+    # Random error during init.
+    with mock.patch("instaseis.remote_instaseis_db.RemoteInstaseisDB"
+                    "._download_url") as p:
+        p.side_effect = ValueError("random")
+        with pytest.raises(instaseis.InstaseisError) as err:
+            instaseis.open_db("http://localhost:8765432")
+
+    assert err.value.args[0] == ("Failed to connect to remote Instaseis "
+                                 "server due to: random")
+
+    # Invalid JSON returned.
+    with mock.patch("instaseis.remote_instaseis_db.RemoteInstaseisDB"
+                    "._download_url") as p:
+        p.return_value = {"a": "b"}
+        with pytest.raises(instaseis.InstaseisError) as err:
+            instaseis.open_db("http://localhost:8765432")
+
+    assert err.value.args[0].startswith("Instaseis server responded with "
+                                        "invalid response:")
+
+    # Incompatible version number - should raise a warning.
+    warnings.simplefilter("always")
+    with mock.patch("instaseis.remote_instaseis_db.RemoteInstaseisDB"
+                    "._download_url") as p_1:
+        p_1.return_value = {"type": "Instaseis Remote Server",
+                            "datetime": "2001-01-01",
+                            "version": "test version"}
+        try:
+            instaseis.open_db("http://localhost:8765432")
+        except:
+            pass
+
+    assert len(recwarn) == 1
+    assert recwarn[0].message.args[0].startswith(
+        'Instaseis versions on server')
