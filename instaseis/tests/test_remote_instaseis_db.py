@@ -133,7 +133,7 @@ def test_seismogram_extraction(all_remote_dbs):
     _compare_streams(r_db, l_db, kwargs)
 
 
-def test_initialization_failures(recwarn):
+def test_initialization_failures():
     """
     Tests various initialization failures for the remote instaseis db.
     """
@@ -158,17 +158,17 @@ def test_initialization_failures(recwarn):
                                         "invalid response:")
 
     # Incompatible version number - should raise a warning.
-    warnings.simplefilter("always")
-    with mock.patch("instaseis.remote_instaseis_db.RemoteInstaseisDB"
-                    "._download_url") as p_1:
-        p_1.return_value = {"type": "Instaseis Remote Server",
-                            "datetime": "2001-01-01",
-                            "version": "test version"}
-        try:
-            instaseis.open_db("http://localhost:8765432")
-        except:
-            pass
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+        with mock.patch("instaseis.remote_instaseis_db.RemoteInstaseisDB"
+                        "._download_url") as p_1:
+            p_1.return_value = {"type": "Instaseis Remote Server",
+                                "datetime": "2001-01-01",
+                                "version": "test version"}
+            try:
+                instaseis.open_db("http://localhost:8765432")
+            except:
+                pass
 
-    assert len(recwarn) == 1
-    assert recwarn[0].message.args[0].startswith(
-        'Instaseis versions on server')
+    assert len(w) == 1
+    assert w[0].message.args[0].startswith('Instaseis versions on server')
