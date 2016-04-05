@@ -132,8 +132,7 @@ lib = MyExtension('instaseis',
                       os.path.join(src, "global_parameters.f90"),
                       os.path.join(src, "finite_elem_mapping.f90"),
                       os.path.join(src, "spectral_basis.f90"),
-                      os.path.join(src, "sem_derivatives.f90"),
-                      os.path.join(src, "lanczos.c"),
+                      os.path.join(src, "sem_derivatives.f90")
                   ])
 
 INSTALL_REQUIRES = ["h5py",
