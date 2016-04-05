@@ -469,6 +469,27 @@ def test_incremental_bwd_force_source():
     np.testing.assert_allclose(st_bwd.select(component='T')[0].data,
                                BWD_FORCE_TEST_DATA["T"], rtol=1E-7, atol=1E-12)
 
+    # Force source does not work with strain databases.
+    db_strain = InstaseisDB(os.path.join(DATA, "100s_db_bwd_strain_only"))
+
+    receiver = Receiver(latitude=42.6390, longitude=74.4940)
+    source = ForceSource(
+        latitude=89.91, longitude=0.0, depth_in_m=12000,
+        f_r=1.23E10,
+        f_t=2.55E10,
+        f_p=1.73E10)
+
+    with pytest.raises(ValueError) as err:
+        db_strain.get_seismograms(source=source, receiver=receiver)
+
+    assert err.value.args[0] == "Force sources only in displ_only mode"
+
+    # Force source, extract single component.
+    for comp in ["Z", "N", "E", "R", "T"]:
+        st = instaseis_bwd.get_seismograms(
+            source=source, receiver=receiver, components=[comp])
+        assert [tr.stats.channel[-1] for tr in st] == [comp]
+
 
 def test_get_greens_vs_get_seismogram():
     """
