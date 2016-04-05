@@ -15,6 +15,7 @@ import copy
 import numpy as np
 import responses
 import warnings
+import pytest
 
 import instaseis
 from .tornado_testing_fixtures import *  # NOQA
