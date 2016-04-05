@@ -145,7 +145,7 @@ class SyngineInstaseisDB(BaseInstaseisDB):
                 "Status code %i when downloading '%s'. Reason: '%s'" % (
                     r.status_code, url, reason))
 
-        if "instaseis-mu" not in r.headers:
+        if "instaseis-mu" not in r.headers:  # pragma: no cover
             warnings.warn("Mu is not passed via the HTTP headers. Maybe some "
                           "proxy removed it? Mu is now always the default mu.",
                           InstaseisWarning)

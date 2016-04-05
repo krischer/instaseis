@@ -31,8 +31,9 @@ def lagrange_interpol_2D_td(points1, points2, coefficients, x1, x2):
     coefficients = np.require(coefficients, dtype=np.float64,
                               requirements=["F_CONTIGUOUS"])
 
-    if len(points1) != len(points2):
-        raise ValueError
+    # Should be safe enough. This was never raised while extracting a lot of
+    # seismograms.
+    assert len(points1) == len(points2)
 
     N = len(points1) - 1
     nsamp = coefficients.shape[0]

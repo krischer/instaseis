@@ -866,8 +866,6 @@ class Receiver(SourceOrReceiver):
             return receivers
         # ObsPy station.
         elif isinstance(filename_or_obj, obspy.core.inventory.Station):
-            if network_code is None:
-                raise ReceiverParseError("network_code must be given.")
             # If there are no channels, use the station coordinates.
             if not filename_or_obj.channels:
                 return [Receiver(
@@ -940,15 +938,6 @@ class Receiver(SourceOrReceiver):
             raise e
         except:
             pass
-        # Many StationXML files do not conform to the standard, thus the
-        # ObsPy format detection fails. Catch those here.
-        try:
-            return Receiver.parse(obspy.read_inventory(filename_or_obj,
-                                                       format="stationxml"))
-        except ReceiverParseError as e:
-            raise e
-        except:
-            pass
 
         # SAC files contain station coordinates.
         try:
@@ -967,7 +956,7 @@ class Receiver(SourceOrReceiver):
         except:
             pass
 
-        raise ValueError("'%s' could not be parsed." % repr(filename_or_obj))
+        raise ValueError("%s could not be parsed." % repr(filename_or_obj))
 
     @staticmethod
     def _parse_stations_file(filename):
@@ -1029,7 +1018,7 @@ class FiniteSource(object):
     def __iter__(self):
         return self
 
-    def next(self):
+    def next(self):  # pragma: no cover
         """
         For Py2K compat.
         """

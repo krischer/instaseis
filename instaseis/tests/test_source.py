@@ -407,6 +407,12 @@ def test_event_parsing_failure_states():
         Source.parse(cat)
     assert err.value.args[0] == "Event catalog contains zero events."
 
+    # Catalog with lots of events.
+    cat = obspy.read_events()
+    with pytest.raises(SourceParseError) as err:
+        Source.parse(cat)
+    assert err.value.args[0].startswith("Event catalog contains 3 events")
+
     event = obspy.read_events(EVENT_FILE)[0]
 
     # Event with no origin.

@@ -11,6 +11,7 @@ Tests for the receiver handling.
 """
 from __future__ import absolute_import
 
+import io
 import obspy
 import os
 import pytest
@@ -180,3 +181,52 @@ def test_str_method_of_receiver():
         "\tstation   : ALTM\n"
         "\tlocation  : \n"
     )
+
+
+def test_error_handling_when_parsing_station_files(tmpdir):
+    """
+    Tests error handling when parsing station files.
+    """
+    # Differing coordinates for channels of the same station.
+    inv = obspy.read_inventory()
+    with pytest.raises(ReceiverParseError) as err:
+        inv[0][0][0].latitude -= 10
+        Receiver.parse(inv)
+    assert err.value.args[0] == ("The coordinates of the channels of station "
+                                 "'GR.FUR' are not identical.")
+
+    # Once again, with a file.
+    with io.BytesIO() as buf:
+        inv.write(buf, format="stationxml")
+        buf.seek(0)
+        with pytest.raises(ReceiverParseError) as err:
+            Receiver.parse(buf)
+    assert err.value.args[0] == ("The coordinates of the channels of station "
+                                 "'GR.FUR' are not identical.")
+
+    # ObsPy Trace without a sac attribute.
+    with pytest.raises(ReceiverParseError) as err:
+        Receiver.parse(obspy.read())
+    assert err.value.args[0] == ("ObsPy Trace must have an sac attribute.")
+
+    # Trigger error when a SEED files has differing origins.
+    filename = os.path.join(DATA, "dataless.seed.BW_FURT")
+    p = obspy.io.xseed.parser.Parser(filename)
+    p.blockettes[52][1].latitude += 1
+    with pytest.raises(ReceiverParseError) as err:
+        Receiver.parse(p)
+    assert err.value.args[0] == ("The coordinates of the channels of station "
+                                 "'BW.FURT' are not identical")
+
+    # Same thing but this time with a file.
+    tmpfile = os.path.join(tmpdir.strpath, "temp.seed")
+    p.write_seed(tmpfile)
+    with pytest.raises(ReceiverParseError) as err:
+        Receiver.parse(tmpfile)
+    assert err.value.args[0] == ("The coordinates of the channels of station "
+                                 "'BW.FURT' are not identical")
+
+    # Parsing random string.
+    with pytest.raises(ValueError) as err:
+        Receiver.parse("random_string")
+    assert err.value.args[0] == "'random_string' could not be parsed."
