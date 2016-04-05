@@ -142,7 +142,7 @@ def test_parse_srf_file(tmpdir):
     # front of it.
     filename = os.path.join(tmpdir.strpath, "temp.srf")
     with io.open(SRF_FILE, "rt") as fh_1, io.open(filename, "wt") as fh_2:
-        fh_2.write("\n\n\n\n")
+        fh_2.write(u"\n\n\n\n")
         fh_2.write(fh_1.read())
     finitesource_2 = FiniteSource.from_srf_file(filename, True)
     assert finitesource_2.npointsources == 10
