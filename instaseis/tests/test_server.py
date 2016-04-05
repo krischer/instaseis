@@ -969,6 +969,13 @@ def test_seismograms_error_handling(all_clients):
         "receiverlatitude": -10,
         "receiverlongitude": -10}
 
+    # No source given at all.
+    request = client.fetch(_assemble_url('seismograms',
+                                         receiverlatitude=-10,
+                                         receiverlongitude=10))
+    assert request.code == 400
+    assert request.reason == "No source specified"
+
     # Remove the source latitude, a required parameter.
     params = copy.deepcopy(basic_parameters)
     del params["sourcelatitude"]
@@ -2077,6 +2084,12 @@ def test_coordinates_route_with_stations_coordinates_callback(
              'properties': {'network_code': 'IU', 'station_code': 'ANMO'},
              'type': 'Feature'}],
         'type': 'FeatureCollection'}
+
+    # network and station must be given.
+    request = client.fetch("/coordinates?network=IU")
+    assert request.code == 400
+    assert request.reason == ("Parameters 'network' and 'station' must be "
+                              "given.")
 
 
 def test_cors_headers(all_clients_all_callbacks):
@@ -3382,6 +3395,17 @@ def test_station_query_various_failures(
     assert request.code == 404
     assert request.reason == ("No coordinates found satisfying the query.")
 
+    # Trigger a very specific error occuring when the station coordinate
+    # callback yields invalid coordinates.
+    p = copy.deepcopy(params)
+    p["network"] = "XX"
+    p["station"] = "DUMMY"
+
+    request = client.fetch(_assemble_url('seismograms', **p))
+    assert request.code == 400
+    assert request.reason == ("Could not construct receiver with passed "
+                              "parameters. Check parameters for sanity.")
+
 
 def test_station_query_no_callback(all_clients):
     """
@@ -3455,6 +3479,13 @@ def test_event_query_various_failures(all_clients_event_callback):
     assert request.reason == (
         "'eventid' and 'origintime' parameters cannot both be passed at the "
         "same time.")
+
+    # Callback returns an invalid event.
+    p = copy.deepcopy(params)
+    p["eventid"] = "invalid_event"
+    request = client.fetch(_assemble_url('seismograms', **p))
+    assert request.code == 400
+    assert request.reason == ("Event callback returned an invalid result.")
 
 
 def test_event_parameters_by_querying(all_clients_event_callback):

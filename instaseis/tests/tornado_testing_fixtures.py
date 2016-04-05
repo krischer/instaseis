@@ -158,6 +158,14 @@ def event_info_mock_callback(event_id):
             "longitude": -104.21,
             "depth_in_m": 0,
             "origin_time": "1991-07-17T16:41:33.100000Z"}
+    # Half the information is missing.
+    elif event_id == "invalid_event":
+        return {
+            "m_rr": -58000000000000000,
+            "m_pp": -20100000000000000,
+            "m_rp": 108100000000000000,
+            "latitude": -3.8,
+            "origin_time": "1991-07-17T16:41:33.100000Z"}
     else:
         raise ValueError
 
@@ -187,6 +195,13 @@ def station_coordinates_mock_callback(networks, stations):
             "longitude": -106.4572,
             "network": "IU",
             "station": "ANMO"}]
+    # Invalid coordinates!
+    elif networks == ["XX"] and stations == ["DUMMY"]:
+        return [{
+            "latitude": 3E9,
+            "longitude": -106.4572,
+            "network": "XX",
+            "station": "DUMMY"}]
     else:
         return []
 

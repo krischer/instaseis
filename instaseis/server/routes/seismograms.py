@@ -359,7 +359,7 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
                     "m_rr", "m_tt", "m_pp", "m_rt", "m_rp", "m_tp", "latitude",
                     "longitude", "depth_in_m", "origin_time")):
                 msg = "Event callback returned an invalid result."
-                raise tornado.web.HTTPError(500, log_message=msg, reason="")
+                raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
             __event["origin_time"] = obspy.UTCDateTime(__event["origin_time"])
 
             # In case the event is extracted, set the origin time to the
@@ -398,7 +398,7 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
             # pretty manual right now. Maybe there is a better way? This
             # enables to server to stop serving if the connection has been
             # cancelled on the client side.
-            if self.connection_closed:
+            if self.connection_closed:  # pragma: no cover
                 self.flush()
                 self.finish()
                 return
@@ -426,7 +426,7 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
                 label=args.label)
 
             # Check connection once again.
-            if self.connection_closed:
+            if self.connection_closed:  # pragma: no cover
                 self.flush()
                 self.finish()
                 return

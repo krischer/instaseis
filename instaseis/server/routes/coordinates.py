@@ -19,13 +19,14 @@ class CoordinatesHandler(InstaseisRequestHandler):
             raise tornado.web.HTTPError(
                 404, log_message=msg, reason=msg)
 
-        networks = self.get_argument("network")
-        stations = self.get_argument("station")
+        networks = self.get_argument("network", [])
+        stations = self.get_argument("station", [])
 
+        # Manually raise to get prettier errors.
         if not networks or not stations:
             msg = "Parameters 'network' and 'station' must be given."
             raise tornado.web.HTTPError(
-                404, log_message=msg, reason=msg)
+                400, log_message=msg, reason=msg)
 
         networks = networks.split(",")
         stations = stations.split(",")

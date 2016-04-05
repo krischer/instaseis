@@ -513,6 +513,14 @@ def test_various_failure_conditions(reciprocal_clients_all_callbacks,
                               "late/with too large offsets if the database is "
                               "not long enough.")
 
+    # Scale of zero.
+    params = copy.deepcopy(basic_parameters)
+    params["scale"] = 0.0
+    request = client.fetch(_assemble_url('finite_source', **params),
+                           method="POST", body=body)
+    assert request.code == 400
+    assert request.reason.startswith("A scale of zero means")
+
 
 def test_uploading_empty_usgs_file(reciprocal_clients):
     """
