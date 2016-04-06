@@ -4969,7 +4969,6 @@ def test_sourcewidth_parameter(all_clients):
         "format": "miniseed",
         "sourcemomenttensor": "100000,200000,300000,400000,500000,600000"}
 
-
     r = client.fetch(_assemble_url('seismograms', sourcewidth=1.0,
                                    **basic_parameters))
     assert r.code == 400

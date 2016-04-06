@@ -23,7 +23,7 @@ import tornado.web
 
 from ... import Source, ForceSource, Receiver
 from ..util import run_async, IOQueue, _validtimesetting, \
-    _validate_and_write_waveforms
+    _validate_and_write_waveforms, get_gaussian_source_time_function
 from ..instaseis_request import InstaseisTimeSeriesHandler
 
 
@@ -499,6 +499,19 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
         # Parse the arguments. This will also perform a number of sanity
         # checks.
         args = self.parse_arguments()
+
+        # We'll piggyback the sourcewidth on the implementation of the custom
+        # STF. This is not super clean to be honest but its simple and it
+        # works.
+        if args.sourcewidth:
+            dt = self.application.db.info.dt
+            offset, data = get_gaussian_source_time_function(
+                source_width=args.sourcewidth, dt=dt)
+            custom_stf = {
+                "relative_origin_time_in_sec": offset,
+                "sample_spacing_in_sec": dt,
+                "data": data
+            }
 
         if args.eventid is not None:
             # It has to be extracted here to get the origin time which is
