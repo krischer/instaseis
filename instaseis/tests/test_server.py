@@ -4997,8 +4997,8 @@ def test_sourcewidth_parameter(all_clients):
     assert r.code == 200
     st = obspy.read(r.buffer)
 
-    r = client.fetch(_assemble_url('seismograms', **basic_parameters,
-                                   sourcewidth=200.0))
+    r = client.fetch(_assemble_url('seismograms', sourcewidth=200.0,
+                                   **basic_parameters))
     st_re = obspy.read(r.buffer)
 
     for comp in ["Z", "N", "E", "R", "T"]:

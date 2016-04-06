@@ -11,6 +11,7 @@ import inspect
 import io
 import json
 import os
+import re
 import zipfile
 
 from jsonschema import validate as json_validate
@@ -101,7 +102,7 @@ def _parse_validate_and_resample_stf(request, db_info, callback):
     with io.BytesIO(request.body) as buf:
         try:
             j = json.loads(buf.read().decode())
-        except Exception as e:
+        except Exception:
             msg = "The body of the POST request is not a valid JSON file."
             callback(tornado.web.HTTPError(400, log_message=msg, reason=msg))
             return
@@ -110,7 +111,9 @@ def _parse_validate_and_resample_stf(request, db_info, callback):
     try:
         json_validate(j, _json_schema)
     except JSONValidationError as e:
-        msg = "Validation Error in JSON file: " + e.message
+        # Replace the u'' unicode string specifier for consistent error
+        # messages.
+        msg = "Validation Error in JSON file: " + re.sub(r"u'", "'", e.message)
         callback(tornado.web.HTTPError(400, log_message=msg, reason=msg))
         return
 
