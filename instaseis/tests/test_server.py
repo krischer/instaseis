@@ -18,12 +18,14 @@ import zipfile
 
 import obspy
 import numpy as np
+from scipy.integrate import simps
 import pytest
 from .tornado_testing_fixtures import *  # NOQA
 from .tornado_testing_fixtures import _assemble_url
 
 import instaseis
 from instaseis.helpers import geocentric_to_elliptic_latitude
+from instaseis.server import util
 
 # Conditionally import mock either from the stdlib or as a separate library.
 import sys
@@ -4902,3 +4904,32 @@ def test_custom_stf(all_clients):
 
     # Now they should be identical again.
     _compare_streams(st_custom_stf, st_default)
+
+
+def test_gaussian_source_time_function_calculation():
+    """
+    Tests the calculation of a Gaussian source time function.
+    """
+    # Test the integral. More accurate for smaller deltas.
+    _, y = util.get_gaussian_source_time_function(4, 1.2)
+    assert np.isclose(simps(y, dx=1.2), 1.0, rtol=1E-2)
+    _, y = util.get_gaussian_source_time_function(4, 1.0)
+    assert np.isclose(simps(y, dx=1.0), 1.0, rtol=1E-3)
+    _, y = util.get_gaussian_source_time_function(4, 0.1)
+    assert np.isclose(simps(y, dx=0.1), 1.0, rtol=1E-6)
+    _, y = util.get_gaussian_source_time_function(4, 0.01)
+    assert np.isclose(simps(y, dx=0.01), 1.0, rtol=1E-7)
+
+    # Test the offset. Always has to be larger then the chosen source width
+    # and at a sample.
+    assert util.get_gaussian_source_time_function(4, 1.0)[0] == 4.0
+    assert util.get_gaussian_source_time_function(4, 1.1)[0] == 4.4
+    assert util.get_gaussian_source_time_function(4, 1.2)[0] == 4.8
+    assert util.get_gaussian_source_time_function(4, 2.0)[0] == 4.0
+
+    # Test a known good solution.
+    np.testing.assert_allclose(
+        util.get_gaussian_source_time_function(4, 2.5)[1],
+        [0.0, 1.089142E-3, 5.641895E-1, 1.089142E-3, 7.835433E-12, 0],
+        rtol=1E-5)
+
