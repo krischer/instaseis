@@ -125,14 +125,20 @@ def _parse_validate_and_resample_stf(request, db_info, callback):
     j["data"] = np.array(j["data"], np.float64)
 
     # A couple more custom validations.
+    message = None
+
+    # Make sure its not all zeros.
+    if np.abs(j["data"]).max() < 1E-20:
+        message = ("All zero (or nearly all zero) source time functions don't "
+                   "make any sense.")
+
     # The data must begin and end with zero. The user is responsible for the
     # tapering.
-    message = None
     if j["data"][0] != 0.0 or j["data"][-1] != 0.0:
         message = "Must begin and end with zero."
 
     if message:
-        msg = "STF Data did not validate: %s" % message
+        msg = "STF data did not validate: %s" % message
         callback(tornado.web.HTTPError(400, log_message=msg, reason=msg))
         return
 
