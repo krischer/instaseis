@@ -32,6 +32,14 @@ else:  # pragma: no cover
     import unittest.mock as mock
 
 
+def _compare_streams(st1, st2):
+    for tr1, tr2 in zip(st1, st2):
+        assert tr1.stats.__dict__ == tr2.stats.__dict__
+        rtol = 1E-4
+        atol = 1E-4 * max(np.abs(tr1.data).max(), np.abs(tr2.data).max())
+        np.testing.assert_allclose(tr1.data, tr2.data, rtol=rtol, atol=atol)
+
+
 def test_root_route(all_clients):
     """
     Shows very basic information and the version of the client. Test is run
@@ -4797,7 +4805,7 @@ def test_error_handling_custom_stf(all_clients):
     assert request.code == 400
     assert request.reason == (
         "Validation Error in JSON file: 'random' is not one of "
-        "['moment_rate', 'moment']")
+        "['moment_rate']")
 
     body = copy.deepcopy(valid_json)
     body["sample_spacing_in_sec"] = -0.1
@@ -4831,13 +4839,7 @@ def test_custom_stf(all_clients):
     Test the custom STF.
     """
     client = all_clients
-
-    valid_json = {
-        "units": "moment_rate",
-        "relative_origin_time_in_sec": 15.23,
-        "sample_spacing_in_sec": 50.0,
-        "data": [0.0, 4, 25, 5.6, 2.4, 0.0]
-    }
+    db = instaseis.open_db(client.filepath)
 
     basic_parameters = {
         "sourcelatitude": 10,
@@ -4849,10 +4851,23 @@ def test_custom_stf(all_clients):
         "dt": 0.01,
         "sourcemomenttensor": "100000,200000,300000,400000,500000,600000"}
 
-    # Moment tensor source.
+    # First test: Just reconvolve with the sliprate of the database...that
+    # should not change it at all!
+    valid_json = {
+        "units": "moment_rate",
+        "relative_origin_time_in_sec": db.info.src_shift,
+        "sample_spacing_in_sec": db.info.dt,
+        "data": [float(_i) for _i in db.info.sliprate]
+    }
+
     body = copy.deepcopy(valid_json)
-    request = client.fetch(_assemble_url('seismograms', **basic_parameters),
-                           method="POST", body=json.dumps(body))
-    assert request.code == 200
-    st_server = obspy.read(request.buffer)
-    st_server
+    r = client.fetch(_assemble_url('seismograms', **basic_parameters),
+                     method="POST", body=json.dumps(body))
+    assert r.code == 200
+    st_custom_stf = obspy.read(r.buffer)
+
+    r = client.fetch(_assemble_url('seismograms', **basic_parameters))
+    assert r.code == 200
+    st_default = obspy.read(r.buffer)
+
+    _compare_streams(st_custom_stf, st_default)
