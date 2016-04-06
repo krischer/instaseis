@@ -4966,6 +4966,7 @@ def test_sourcewidth_parameter(all_clients):
         "sourcedepthinmeters": client.source_depth,
         "receiverlatitude": -10,
         "receiverlongitude": -10,
+        "components": "ZNERT",
         "format": "miniseed",
         "sourcemomenttensor": "100000,200000,300000,400000,500000,600000"}
 
@@ -4979,3 +4980,19 @@ def test_sourcewidth_parameter(all_clients):
                                    **basic_parameters))
     assert r.code == 400
     assert r.reason == "The sourcewidth must not be larger than 600 seconds."
+
+    # This is unfortunately really hard to test - so we'll just take the FFT
+    # of a normal and a reconvolved one and make sure the reconvolved one
+    # has less energy.
+    r = client.fetch(_assemble_url('seismograms', **basic_parameters))
+    assert r.code == 200
+    st = obspy.read(r.buffer)
+
+    r = client.fetch(_assemble_url('seismograms', **basic_parameters,
+                                   sourcewidth=200.0))
+    st_re = obspy.read(r.buffer)
+
+    for comp in ["Z", "N", "E", "R", "T"]:
+        d = st.select(component=comp)[0].data
+        d_re = st_re.select(component=comp)[0].data
+        assert np.abs(np.fft.rfft(d)).sum() > np.abs(np.fft.rfft(d_re)).sum()
