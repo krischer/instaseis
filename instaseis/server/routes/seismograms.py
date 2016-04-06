@@ -212,6 +212,9 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
         # Scale parameter.
         "scale": {"type": float, "default": 1.0},
 
+        # Source width in seconds. STF will be a gaussian.
+        "sourcewidth": {"type": float},
+
         # Or last but not least by specifying an event id.
         "eventid": {"type": str},
 
@@ -258,6 +261,18 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
             msg = ("A scale of zero means all seismograms have an amplitude "
                    "of zero. No need to get it in the first place.")
             raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+
+        if args.sourcewidth is not None:
+            if args.sourcewidth < self.application.db.info.period:
+                msg = ("The sourcewidth must not be smaller than the mesh "
+                       "period of the database (%.3f seconds)." %
+                       self.application.db.info.period)
+                raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+            # Set some reasonable upper limit to stabilize the logic and
+            # calculations.
+            if args.sourcewidth > 600.0:
+                msg = "The sourcewidth must not be larger than 600 seconds."
+                raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
         self.validate_receiver_parameters(args)
         self.validate_source_parameters(args)
@@ -453,6 +468,10 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
     @tornado.web.asynchronous
     @tornado.gen.coroutine
     def post(self):
+        if "sourcewidth" in self.request.arguments.keys():
+            msg = "Parameter 'sourcewidth' is not allowed for POST requests."
+            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+
         # Coroutine + thread as potentially pretty expensive.
         response = yield tornado.gen.Task(
             _parse_validate_and_resample_stf,

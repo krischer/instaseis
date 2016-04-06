@@ -4905,6 +4905,16 @@ def test_custom_stf(all_clients):
     # Now they should be identical again.
     _compare_streams(st_custom_stf, st_default)
 
+    # Parameter "sourcewidth" not compatible with POST requests.
+    body = copy.deepcopy(valid_json)
+    body["relative_origin_time_in_sec"] = db.info.src_shift + db.info.dt
+    r = client.fetch(_assemble_url('seismograms', sourcewidth=1.0,
+                                   **basic_parameters),
+                     method="POST", body=json.dumps(body))
+    assert r.code == 400
+    assert r.reason == ("Parameter 'sourcewidth' is not allowed for POST "
+                        "requests.")
+
 
 def test_gaussian_source_time_function_calculation():
     """
@@ -4933,3 +4943,30 @@ def test_gaussian_source_time_function_calculation():
         [0.0, 1.089142E-3, 5.641895E-1, 1.089142E-3, 7.835433E-12, 0],
         rtol=1E-5)
 
+
+def test_sourcewidth_parameter(all_clients):
+    """
+    Tests the sourcewidth parameter.
+    """
+    client = all_clients
+
+    basic_parameters = {
+        "sourcelatitude": 10,
+        "sourcelongitude": 10,
+        "sourcedepthinmeters": client.source_depth,
+        "receiverlatitude": -10,
+        "receiverlongitude": -10,
+        "format": "miniseed",
+        "sourcemomenttensor": "100000,200000,300000,400000,500000,600000"}
+
+
+    r = client.fetch(_assemble_url('seismograms', sourcewidth=1.0,
+                                   **basic_parameters))
+    assert r.code == 400
+    assert r.reason == ("The sourcewidth must not be smaller than the mesh "
+                        "period of the database (100.000 seconds).")
+
+    r = client.fetch(_assemble_url('seismograms', sourcewidth=601.0,
+                                   **basic_parameters))
+    assert r.code == 400
+    assert r.reason == "The sourcewidth must not be larger than 600 seconds."
