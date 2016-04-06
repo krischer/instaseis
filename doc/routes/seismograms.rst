@@ -82,6 +82,11 @@ Custom STF
 | ``kernelwidth``             | Integer  | False    | 12                          | Specify the width of the sinc kernel used for resampling to requested sample         |
 |                             |          |          |                             | interval in terms of the original sampling interval.                                 |
 +-----------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
+| ``sourcewidth``             | Integer  | False    | 15.0                        | Optionally convolve the seismograms with a Gaussian source time function (moment     |
+|                             |          |          |                             | rate) of approximately the given width in seconds. The origin time is assumed to be  |
+|                             |          |          |                             | the peak of the Gaussian. Must be larger than the database period. Must not be used  |
+|                             |          |          |                             | for a POST requests with a custom STF.                                               |
++-----------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
 | **Time Parameters**                                                                                                                                                    |
 +-----------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
 | ``origintime``              | Datetime | False    | 1900-01-01T00:00:00.000000Z | Specify the source origin time. This must be specified as an                         |
