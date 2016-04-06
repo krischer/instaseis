@@ -22,6 +22,7 @@ import numpy as np
 from obspy.core import AttribDict, Stream, Trace, UTCDateTime
 from obspy.signal.interpolation import lanczos_interpolation
 from scipy.integrate import cumtrapz
+import scipy.signal
 
 from ..source import Source, ForceSource, Receiver
 from ..helpers import get_band_code, sizeof_fmt, rfftfreq
@@ -278,6 +279,9 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
 
         for comp in components:
             if reconvolve_stf:
+                # We assume here that the sliprate is well-behaved,
+                # e.g. zeros at the boundaries and no energy above the mesh
+                # resolution.
                 if source.dt is None or source.sliprate is None:
                     raise ValueError("source has no source time function")
 
@@ -301,9 +305,12 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
                         np.exp(- 1j * rfftfreq(self.info.nfft) *
                                2. * np.pi * source.time_shift / self.info.dt)
 
-                # XXX: double check whether a taper is needed at the end of the
-                # trace
-                dataf = np.fft.rfft(data[comp], n=self.info.nfft)
+                # Apply a 5 percent, at least 5 samples taper at the end.
+                # The first sample is guaranteed to be zero in any case.
+                tlen = max(0.05 * len(data[comp]), 5)
+                taper = np.ones_like(data[comp])
+                taper[-tlen:] = scipy.signal.hann(tlen * 2)[tlen:]
+                dataf = np.fft.rfft(taper * data[comp], n=self.info.nfft)
 
                 data[comp] = np.fft.irfft(
                     dataf * stf_conv_f / stf_deconv_f)[:self.info.npts]
