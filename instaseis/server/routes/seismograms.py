@@ -138,9 +138,8 @@ def _parse_validate_and_resample_stf(request, db_info, callback):
 
     missing_length = db_info.length - (
         len(j["data"]) - 1) * j["sample_spacing_in_sec"]
-    missing_samples = int(missing_length / j["sample_spacing_in_sec"]) + 1
-    if missing_samples < 0:
-        missing_samples = 1
+    missing_samples = max(int(missing_length / j["sample_spacing_in_sec"]) + 1,
+                          0)
 
     # Add a buffer of 20 samples at the beginning and at the end.
     data = np.concatenate([
