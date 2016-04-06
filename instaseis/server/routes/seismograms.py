@@ -396,6 +396,7 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
         if custom_stf:
             source.sliprate = custom_stf["data"]
             source.dt = self.application.db.info.dt
+            source.time_shift = -custom_stf["relative_origin_time_in_sec"]
 
         return source
 
