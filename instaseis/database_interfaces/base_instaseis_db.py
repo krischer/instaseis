@@ -16,6 +16,7 @@ from __future__ import (absolute_import, division, print_function,
 from future.utils import with_metaclass
 
 from abc import ABCMeta, abstractmethod
+import math
 import warnings
 
 import numpy as np
@@ -307,7 +308,7 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
 
                 # Apply a 5 percent, at least 5 samples taper at the end.
                 # The first sample is guaranteed to be zero in any case.
-                tlen = max(0.05 * len(data[comp]), 5)
+                tlen = max(int(math.ceil(0.05 * len(data[comp]))), 5)
                 taper = np.ones_like(data[comp])
                 taper[-tlen:] = scipy.signal.hann(tlen * 2)[tlen:]
                 dataf = np.fft.rfft(taper * data[comp], n=self.info.nfft)
