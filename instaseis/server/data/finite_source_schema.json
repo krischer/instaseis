@@ -6,7 +6,7 @@
     "units": {
       "id": "http://instaseis.net/source_time_function/1.0/units",
       "type": "string",
-      "enum": ["moment_rate", "moment"]
+      "enum": ["moment_rate"]
     },
     "relative_origin_time_in_sec": {
       "id": "http://instaseis.net/source_time_function/1.0/relative_origin_time_in_sec",
