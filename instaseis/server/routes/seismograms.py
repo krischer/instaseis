@@ -114,6 +114,13 @@ def _parse_validate_and_resample_stf(request, db_info, callback):
         callback(tornado.web.HTTPError(400, log_message=msg, reason=msg))
         return
 
+    # Make sure the sampling rate is ok.
+    if j["sample_spacing_in_sec"] < db_info.dt:
+        msg = "'sample_spacing_in_sec' in the JSON file must not be smaller " \
+              "than the database dt [%.3f seconds]." % db_info.dt
+        callback(tornado.web.HTTPError(400, log_message=msg, reason=msg))
+        return
+
     # Convert to numpy array.
     j["data"] = np.array(j["data"], np.float64)
 

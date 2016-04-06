@@ -4836,6 +4836,16 @@ def test_error_handling_custom_stf(all_clients):
     assert request.reason == (
         "STF Data did not validate: Must begin and end with zero.")
 
+    # The sample spacing must not be smaller than the database sampling.
+    body = copy.deepcopy(valid_json)
+    body["sample_spacing_in_sec"] = 10.0
+    request = client.fetch(_assemble_url('seismograms'),
+                           method="POST", body=json.dumps(body))
+    assert request.code == 400
+    assert request.reason == (
+        "'sample_spacing_in_sec' in the JSON file must not be smaller than "
+        "the database dt [24.725 seconds].")
+
 
 def test_custom_stf(all_clients):
     """
