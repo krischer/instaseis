@@ -18,6 +18,7 @@ import zipfile
 
 import obspy
 import numpy as np
+import pytest
 from .tornado_testing_fixtures import *  # NOQA
 from .tornado_testing_fixtures import _assemble_url
 
@@ -35,7 +36,7 @@ else:  # pragma: no cover
 def _compare_streams(st1, st2):
     for tr1, tr2 in zip(st1, st2):
         assert tr1.stats.__dict__ == tr2.stats.__dict__
-        rtol = 1E-4
+        rtol = 1E-3
         atol = 1E-4 * max(np.abs(tr1.data).max(), np.abs(tr2.data).max())
         np.testing.assert_allclose(tr1.data, tr2.data, rtol=rtol, atol=atol)
 
@@ -4848,7 +4849,6 @@ def test_custom_stf(all_clients):
         "receiverlatitude": -10,
         "receiverlongitude": -10,
         "format": "miniseed",
-        "dt": 0.01,
         "sourcemomenttensor": "100000,200000,300000,400000,500000,600000"}
 
     # First test: Just reconvolve with the sliprate of the database...that
@@ -4870,4 +4870,35 @@ def test_custom_stf(all_clients):
     assert r.code == 200
     st_default = obspy.read(r.buffer)
 
+    # Cut of the last couple of samples: the convolution requires a taper at
+    # the end, thus samples at the end WILL be different.
+    for tr in st_default + st_custom_stf:
+        tr.data = tr.data[:-5]
+
+    _compare_streams(st_custom_stf, st_default)
+
+    # Now we try the same thing, but shift it one sample.
+    body = copy.deepcopy(valid_json)
+    body["relative_origin_time_in_sec"] = db.info.src_shift + db.info.dt
+    r = client.fetch(_assemble_url('seismograms', **basic_parameters),
+                     method="POST", body=json.dumps(body))
+    assert r.code == 200
+    st_custom_stf = obspy.read(r.buffer)
+
+    r = client.fetch(_assemble_url('seismograms', **basic_parameters))
+    assert r.code == 200
+    st_default = obspy.read(r.buffer)
+
+    with pytest.raises(AssertionError):
+        _compare_streams(st_custom_stf, st_default)
+
+    # We shifted the reference time of the custom stf seismograms one delta
+    # to the right, thus the actuall seismogram will be shifted one delta to
+    # the left!
+    for tr in st_default:
+        tr.data = tr.data[1:-5]
+    for tr in st_custom_stf:
+        tr.data = tr.data[:-6]
+
+    # Now they should be identical again.
     _compare_streams(st_custom_stf, st_default)
