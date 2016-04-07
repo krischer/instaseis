@@ -17,16 +17,13 @@ from __future__ import (absolute_import, division, print_function,
 import collections
 import numpy as np
 
-from .instaseis_db import InstaseisDB
+from .base_netcdf_instaseis_db import BaseNetCDFInstaseisDB
 from . import mesh
 from .. import rotations
 from ..source import Source, ForceSource
 
 
-MeshCollection_bwd = collections.namedtuple("MeshCollection_bwd", ["px", "pz"])
-
-
-class ReciprocalInstaseisDB(InstaseisDB):
+class ReciprocalInstaseisDB(BaseNetCDFInstaseisDB):
     def __init__(self, db_path, netcdf_files, *args, **kwargs):
         """
         :param db_path: Path to the Instaseis Database containing
@@ -45,7 +42,7 @@ class ReciprocalInstaseisDB(InstaseisDB):
             useful e.g. for finite sources, default).
         :type read_on_demand: bool, optional
         """
-        InstaseisDB.__init__(self, db_path=db_path, *args, **kwargs)
+        BaseNetCDFInstaseisDB.__init__(self, db_path=db_path, *args, **kwargs)
         self._parse_meshes(netcdf_files)
 
     def _parse_meshes(self, files):
@@ -92,7 +89,11 @@ class ReciprocalInstaseisDB(InstaseisDB):
         else:
             # Should not happen.
             raise NotImplementedError
+
+        MeshCollection_bwd = collections.namedtuple(
+            "MeshCollection_bwd", ["px", "pz"])
         self.meshes = MeshCollection_bwd(px=px_m, pz=pz_m)
+
         self._is_reciprocal = True
 
     def _get_data(self, source, receiver, components, rotmesh_s, rotmesh_phi,

@@ -14,7 +14,6 @@ AxiSEM.
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 
-import collections
 import numpy as np
 from obspy.signal.util import next_pow_2
 import os
@@ -26,12 +25,10 @@ from .. import sem_derivatives
 from .. import spectral_basis
 
 
-MeshCollection_bwd = collections.namedtuple("MeshCollection_bwd", ["px", "pz"])
-
-
-class InstaseisDB(BaseInstaseisDB):
+class BaseNetCDFInstaseisDB(BaseInstaseisDB):
     """
-    Class for extracting seismograms from a local Instaseis database.
+    Base class for extracting seismograms from a local Instaseis netCDF
+    database.
     """
     def __init__(self, db_path, buffer_size_in_mb=100,
                  read_on_demand=False, *args, **kwargs):

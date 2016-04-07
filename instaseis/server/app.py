@@ -15,7 +15,7 @@ import tornado.gen
 import tornado.ioloop
 import tornado.web
 
-from ..database_interfaces.instaseis_db import InstaseisDB
+from ..database_interfaces import find_and_open_files
 
 from .routes.coordinates import CoordinatesHandler
 from .routes.events import EventHandler
@@ -81,8 +81,8 @@ def launch_io_loop(db_path, port, buffer_size_in_mb, quiet, log_level,
         time for certain seismic phase and a given source/receiver geometry.
     """
     application = get_application()
-    application.db = InstaseisDB(db_path=db_path,
-                                 buffer_size_in_mb=buffer_size_in_mb)
+    application.db = find_and_open_files(
+        db_path=db_path, buffer_size_in_mb=buffer_size_in_mb)
     application.station_coordinates_callback = station_coordinates_callback
     application.event_info_callback = event_info_callback
 

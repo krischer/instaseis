@@ -802,8 +802,8 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
 
     time = obspy.UTCDateTime(2010, 1, 2, 3, 4, 5)
 
-    with mock.patch("instaseis.database_interfaces.instaseis_db.InstaseisDB"
-                    "._get_seismograms") as p:
+    with mock.patch("instaseis.database_interfaces.base_netcdf_instaseis_db"
+                    ".BaseNetCDFInstaseisDB._get_seismograms") as p:
         _st = obspy.read()
         for tr in _st:
             tr.stats.instaseis = obspy.core.AttribDict()
@@ -1117,8 +1117,8 @@ def test_object_creation_for_seismogram_route(all_clients):
 
     time = obspy.UTCDateTime(2010, 1, 2, 3, 4, 5)
 
-    with mock.patch("instaseis.database_interfaces.instaseis_db.InstaseisDB"
-                    ".get_seismograms") as p:
+    with mock.patch("instaseis.database_interfaces.base_netcdf_instaseis_db"
+                    ".BaseNetCDFInstaseisDB.get_seismograms") as p:
         _st = obspy.read()
         for tr in _st:
             tr.stats.instaseis = obspy.core.AttribDict()
@@ -3541,8 +3541,8 @@ def test_event_parameters_by_querying(all_clients_event_callback):
                                    atol=tr.data.ptp() / 1E9)
 
     # Also perform a mock comparison to test the actually created object.
-    with mock.patch("instaseis.database_interfaces.instaseis_db.InstaseisDB"
-                    ".get_seismograms") as patch:
+    with mock.patch("instaseis.database_interfaces.base_netcdf_instaseis_db"
+                    ".BaseNetCDFInstaseisDB.get_seismograms") as patch:
         _st = obspy.read()
         for tr in _st:
             tr.stats.instaseis = obspy.core.AttribDict()
