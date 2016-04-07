@@ -96,9 +96,9 @@ class ReciprocalInstaseisDB(BaseNetCDFInstaseisDB):
 
         self._is_reciprocal = True
 
-    def _get_data(self, source, receiver, components, rotmesh_s, rotmesh_phi,
-                  rotmesh_z, id_elem, gll_point_ids, xi, eta, corner_points,
-                  col_points_xi, col_points_eta, axis, eltype):
+    def _get_data(self, source, receiver, components, coordinates,
+                  element_info):
+        ei = element_info
         # Collect data arrays and mu in a dictionary.
         data = {}
 
@@ -111,10 +111,10 @@ class ReciprocalInstaseisDB(BaseNetCDFInstaseisDB):
             mesh_mu = mesh["mesh_mu"]
         if self.info.dump_type == "displ_only":
             npol = self.info.spatial_order
-            mu = mesh_mu[gll_point_ids[npol // 2, npol // 2]]
+            mu = mesh_mu[ei.gll_point_ids[npol // 2, npol // 2]]
         else:
             # XXX: Is this correct?
-            mu = mesh_mu[id_elem]
+            mu = mesh_mu[ei.id_elem]
         data["mu"] = mu
 
         fac_1_map = {"N": np.cos,
@@ -124,7 +124,7 @@ class ReciprocalInstaseisDB(BaseNetCDFInstaseisDB):
 
         if isinstance(source, Source):
             if self.info.dump_type == 'displ_only':
-                if axis:
+                if ei.axis:
                     G = self.parsed_mesh.G2
                     GT = self.parsed_mesh.G1T
                 else:
@@ -138,22 +138,22 @@ class ReciprocalInstaseisDB(BaseNetCDFInstaseisDB):
             if "Z" in components:
                 if self.info.dump_type == 'displ_only':
                     strain_z = self._get_strain_interp(
-                        self.meshes.pz, id_elem, gll_point_ids, G, GT,
-                        col_points_xi, col_points_eta, corner_points,
-                        eltype, axis, xi, eta)
+                        self.meshes.pz, ei.id_elem, ei.gll_point_ids, G, GT,
+                        ei.col_points_xi, ei.col_points_eta, ei.corner_points,
+                        ei.eltype, ei.axis, ei.xi, ei.eta)
                 elif (self.info.dump_type == 'fullfields' or
                       self.info.dump_type == 'strain_only'):
-                    strain_z = self._get_strain(self.meshes.pz, id_elem)
+                    strain_z = self._get_strain(self.meshes.pz, ei.id_elem)
 
             if any(comp in components for comp in ['N', 'E', 'R', 'T']):
                 if self.info.dump_type == 'displ_only':
                     strain_x = self._get_strain_interp(
-                        self.meshes.px, id_elem, gll_point_ids, G, GT,
-                        col_points_xi, col_points_eta, corner_points,
-                        eltype, axis, xi, eta)
+                        self.meshes.px, ei.id_elem, ei.gll_point_ids, G, GT,
+                        ei.col_points_xi, ei.col_points_eta, ei.corner_points,
+                        ei.eltype, ei.axis, ei.xi, ei.eta)
                 elif (self.info.dump_type == 'fullfields' or
                       self.info.dump_type == 'strain_only'):
-                    strain_x = self._get_strain(self.meshes.px, id_elem)
+                    strain_x = self._get_strain(self.meshes.px, ei.id_elem)
 
             mij = rotations \
                 .rotate_symm_tensor_voigt_xyz_src_to_xyz_earth(
@@ -164,7 +164,7 @@ class ReciprocalInstaseisDB(BaseNetCDFInstaseisDB):
                     mij, np.deg2rad(receiver.longitude),
                     np.deg2rad(receiver.colatitude))
             mij = rotations.rotate_symm_tensor_voigt_xyz_to_src(
-                mij, rotmesh_phi)
+                mij, coordinates.phi)
             mij /= self.parsed_mesh.amplitude
 
             if "Z" in components:
@@ -192,8 +192,8 @@ class ReciprocalInstaseisDB(BaseNetCDFInstaseisDB):
                 if comp not in components:
                     continue
 
-                fac_1 = fac_1_map[comp](rotmesh_phi)
-                fac_2 = fac_2_map[comp](rotmesh_phi)
+                fac_1 = fac_1_map[comp](coordinates.phi)
+                fac_2 = fac_2_map[comp](coordinates.phi)
 
                 final = np.zeros(strain_x.shape[0], dtype="float64")
                 final += strain_x[:, 0] * mij[0] * 1.0 * fac_1
@@ -211,16 +211,18 @@ class ReciprocalInstaseisDB(BaseNetCDFInstaseisDB):
                 raise ValueError("Force sources only in displ_only mode")
 
             if "Z" in components:
-                displ_z = self._get_displacement(self.meshes.pz, id_elem,
-                                                 gll_point_ids,
-                                                 col_points_xi,
-                                                 col_points_eta, xi, eta)
+                displ_z = self._get_displacement(self.meshes.pz, ei.id_elem,
+                                                 ei.gll_point_ids,
+                                                 ei.col_points_xi,
+                                                 ei.col_points_eta, ei.xi,
+                                                 ei.eta)
 
             if any(comp in components for comp in ['N', 'E', 'R', 'T']):
-                displ_x = self._get_displacement(self.meshes.px, id_elem,
-                                                 gll_point_ids,
-                                                 col_points_xi,
-                                                 col_points_eta, xi, eta)
+                displ_x = self._get_displacement(self.meshes.px, ei.id_elem,
+                                                 ei.gll_point_ids,
+                                                 ei.col_points_xi,
+                                                 ei.col_points_eta, ei.xi,
+                                                 ei.eta)
 
             force = rotations.rotate_vector_xyz_src_to_xyz_earth(
                 source.force_tpr, np.deg2rad(source.longitude),
@@ -229,7 +231,7 @@ class ReciprocalInstaseisDB(BaseNetCDFInstaseisDB):
                 force, np.deg2rad(receiver.longitude),
                 np.deg2rad(receiver.colatitude))
             force = rotations.rotate_vector_xyz_to_src(
-                force, rotmesh_phi)
+                force, coordinates.phi)
             force /= self.parsed_mesh.amplitude
 
             if "Z" in components:
@@ -253,8 +255,8 @@ class ReciprocalInstaseisDB(BaseNetCDFInstaseisDB):
                 if comp not in components:
                     continue
 
-                fac_1 = fac_1_map[comp](rotmesh_phi)
-                fac_2 = fac_2_map[comp](rotmesh_phi)
+                fac_1 = fac_1_map[comp](coordinates.phi)
+                fac_2 = fac_2_map[comp](coordinates.phi)
 
                 final = np.zeros(displ_x.shape[0], dtype="float64")
                 final += displ_x[:, 0] * force[0] * fac_1

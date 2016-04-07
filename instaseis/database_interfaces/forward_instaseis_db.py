@@ -71,9 +71,9 @@ class ForwardInstaseisDB(BaseNetCDFInstaseisDB):
 
         self._is_reciprocal = False
 
-    def _get_data(self, source, receiver, components, rotmesh_s,
-                  rotmesh_phi, rotmesh_z, id_elem, gll_point_ids, xi, eta,
-                  corner_points, col_points_xi, col_points_eta, axis, eltype):
+    def _get_data(self, source, receiver, components, coordinates,
+                  element_info):
+        ei = element_info
         # Collect data arrays and mu in a dictionary.
         data = {}
 
@@ -86,10 +86,10 @@ class ForwardInstaseisDB(BaseNetCDFInstaseisDB):
             mesh_mu = mesh["mesh_mu"]
         if self.info.dump_type == "displ_only":
             npol = self.info.spatial_order
-            mu = mesh_mu[gll_point_ids[npol // 2, npol // 2]]
+            mu = mesh_mu[ei.gll_point_ids[npol // 2, npol // 2]]
         else:
             # XXX: Is this correct?
-            mu = mesh_mu[id_elem]
+            mu = mesh_mu[ei.id_elem]
         data["mu"] = mu
 
         if not isinstance(source, Source):
@@ -97,18 +97,18 @@ class ForwardInstaseisDB(BaseNetCDFInstaseisDB):
         if self.info.dump_type != 'displ_only':
             raise NotImplementedError
 
-        displ_1 = self._get_displacement(self.meshes.m1, id_elem,
-                                         gll_point_ids, col_points_xi,
-                                         col_points_eta, xi, eta)
-        displ_2 = self._get_displacement(self.meshes.m2, id_elem,
-                                         gll_point_ids, col_points_xi,
-                                         col_points_eta, xi, eta)
-        displ_3 = self._get_displacement(self.meshes.m3, id_elem,
-                                         gll_point_ids, col_points_xi,
-                                         col_points_eta, xi, eta)
-        displ_4 = self._get_displacement(self.meshes.m4, id_elem,
-                                         gll_point_ids, col_points_xi,
-                                         col_points_eta, xi, eta)
+        displ_1 = self._get_displacement(self.meshes.m1, ei.id_elem,
+                                         ei.gll_point_ids, ei.col_points_xi,
+                                         ei.col_points_eta, ei.xi, ei.eta)
+        displ_2 = self._get_displacement(self.meshes.m2, ei.id_elem,
+                                         ei.gll_point_ids, ei.col_points_xi,
+                                         ei.col_points_eta, ei.xi, ei.eta)
+        displ_3 = self._get_displacement(self.meshes.m3, ei.id_elem,
+                                         ei.gll_point_ids, ei.col_points_xi,
+                                         ei.col_points_eta, ei.xi, ei.eta)
+        displ_4 = self._get_displacement(self.meshes.m4, ei.id_elem,
+                                         ei.gll_point_ids, ei.col_points_xi,
+                                         ei.col_points_eta, ei.xi, ei.eta)
 
         mij = source.tensor / self.parsed_mesh.amplitude
         # mij is [m_rr, m_tt, m_pp, m_rt, m_rp, m_tp]
@@ -121,23 +121,25 @@ class ForwardInstaseisDB(BaseNetCDFInstaseisDB):
         final[:, 0] += displ_2[:, 0] * (mij[1] + mij[2])
         final[:, 2] += displ_2[:, 2] * (mij[1] + mij[2])
 
-        fac_1 = mij[3] * np.cos(rotmesh_phi) + mij[4] * np.sin(rotmesh_phi)
-        fac_2 = -mij[3] * np.sin(rotmesh_phi) + mij[4] * np.cos(rotmesh_phi)
+        fac_1 = mij[3] * np.cos(coordinates.phi) + \
+            mij[4] * np.sin(coordinates.phi)
+        fac_2 = -mij[3] * np.sin(coordinates.phi) + \
+            mij[4] * np.cos(coordinates.phi)
 
         final[:, 0] += displ_3[:, 0] * fac_1
         final[:, 1] += displ_3[:, 1] * fac_2
         final[:, 2] += displ_3[:, 2] * fac_1
 
-        fac_1 = (mij[1] - mij[2]) * np.cos(2 * rotmesh_phi) \
-            + 2 * mij[5] * np.sin(2 * rotmesh_phi)
-        fac_2 = -(mij[1] - mij[2]) * np.sin(2 * rotmesh_phi) \
-            + 2 * mij[5] * np.cos(2 * rotmesh_phi)
+        fac_1 = (mij[1] - mij[2]) * np.cos(2 * coordinates.phi) \
+            + 2 * mij[5] * np.sin(2 * coordinates.phi)
+        fac_2 = -(mij[1] - mij[2]) * np.sin(2 * coordinates.phi) \
+            + 2 * mij[5] * np.cos(2 * coordinates.phi)
 
         final[:, 0] += displ_4[:, 0] * fac_1
         final[:, 1] += displ_4[:, 1] * fac_2
         final[:, 2] += displ_4[:, 2] * fac_1
 
-        rotmesh_colat = np.arctan2(rotmesh_s, rotmesh_z)
+        rotmesh_colat = np.arctan2(coordinates.s, coordinates.z)
 
         if "T" in components:
             # need the - for consistency with reciprocal mode,
@@ -152,7 +154,7 @@ class ForwardInstaseisDB(BaseNetCDFInstaseisDB):
             # transpose needed because rotations assume different slicing
             # (ugly)
             final = rotations.rotate_vector_src_to_NEZ(
-                final.T, rotmesh_phi,
+                final.T, coordinates.phi,
                 source.longitude_rad, source.colatitude_rad,
                 receiver.longitude_rad, receiver.colatitude_rad).T
 

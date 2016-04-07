@@ -14,6 +14,8 @@ AxiSEM.
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 
+import collections
+
 import numpy as np
 from obspy.signal.util import next_pow_2
 import os
@@ -23,6 +25,13 @@ from .. import finite_elem_mapping
 from .. import rotations
 from .. import sem_derivatives
 from .. import spectral_basis
+
+
+ElementInfo = collections.namedtuple("ElementInfo", [
+    "id_elem", "gll_point_ids", "xi", "eta", "corner_points", "col_points_xi",
+    "col_points_eta", "axis", "eltype"])
+
+Coordinates = collections.namedtuple("Coordinates", ["s", "phi", "z"])
 
 
 class BaseNetCDFInstaseisDB(BaseInstaseisDB):
@@ -53,14 +62,14 @@ class BaseNetCDFInstaseisDB(BaseInstaseisDB):
         self.buffer_size_in_mb = buffer_size_in_mb
         self.read_on_demand = read_on_demand
 
-    def _get_element_id(self, rotmesh_s, rotmesh_z):
+    def _get_element_info(self, coordinates):
 
         k_map = {"displ_only": 6,
                  "strain_only": 1,
                  "fullfields": 1}
 
         nextpoints = self.parsed_mesh.kdtree.query(
-            [rotmesh_s, rotmesh_z], k=k_map[self.info.dump_type])
+            [coordinates.s, coordinates.z], k=k_map[self.info.dump_type])
 
         # Find the element containing the point of interest.
         mesh = self.parsed_mesh.f["Mesh"]
@@ -90,7 +99,7 @@ class BaseNetCDFInstaseisDB(BaseInstaseisDB):
                     corner_points[:, 1] = [m_z[_i] for _i in corner_point_ids]
 
                 isin, xi, eta = finite_elem_mapping.inside_element(
-                    rotmesh_s, rotmesh_z, corner_points, eltype,
+                    coordinates.s, coordinates.z, corner_points, eltype,
                     tolerance=1E-3)
                 if isin:
                     id_elem = idx
@@ -122,12 +131,13 @@ class BaseNetCDFInstaseisDB(BaseInstaseisDB):
             xi = None
             eta = None
 
-        return (id_elem, gll_point_ids, xi, eta, corner_points,
-                col_points_xi, col_points_eta, axis, eltype)
+        return ElementInfo(
+            id_elem=id_elem, gll_point_ids=gll_point_ids, xi=xi, eta=eta,
+            corner_points=corner_points, col_points_xi=col_points_xi,
+            col_points_eta=col_points_eta, axis=axis, eltype=eltype)
 
-    def _get_data(self, source, receiver, components, rotmesh_s, rotmesh_phi,
-                  rotmesh_z, id_elem, gll_point_ids, xi, eta, corner_points,
-                  col_points_xi, col_points_eta, axis, eltype):
+    def _get_data(self, source, receiver, components, coordinates,
+                  element_info):
         raise NotImplementedError
 
     def _get_seismograms(self, source, receiver, components=("Z", "N", "E")):
@@ -154,16 +164,13 @@ class BaseNetCDFInstaseisDB(BaseInstaseisDB):
             a.z(planet_radius=self.info.planet_radius),
             b.longitude, b.colatitude)
 
-        id_elem, gll_point_ids, xi, eta, corner_points, col_points_xi, \
-            col_points_eta, axis, eltype = \
-            self._get_element_id(rotmesh_s=rotmesh_s, rotmesh_z=rotmesh_z)
+        coordinates = Coordinates(s=rotmesh_s, phi=rotmesh_phi, z=rotmesh_z)
 
-        data = self._get_data(source, receiver, components,
-                              rotmesh_s, rotmesh_phi, rotmesh_z, id_elem,
-                              gll_point_ids, xi, eta, corner_points,
-                              col_points_xi, col_points_eta, axis, eltype)
+        element_info = self._get_element_info(coordinates=coordinates)
 
-        return data
+        return self._get_data(
+            source=source, receiver=receiver, components=components,
+            coordinates=coordinates, element_info=element_info)
 
     def _get_strain_interp(self, mesh, id_elem, gll_point_ids, G, GT,
                            col_points_xi, col_points_eta, corner_points,
