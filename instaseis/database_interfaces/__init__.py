@@ -13,7 +13,8 @@ import collections
 import os
 
 from .. import InstaseisError, InstaseisNotFoundError
-from .instaseis_db import InstaseisDB
+from .forward_instaseis_db import ForwardInstaseisDB
+from .reciprocal_instaseis_db import ReciprocalInstaseisDB
 
 
 def find_and_open_files(path, *args, **kwargs):
@@ -63,8 +64,8 @@ def find_and_open_files(path, *args, **kwargs):
 
     # Two valid cases.
     if "PX" in netcdf_files or "PZ" in netcdf_files:
-        return InstaseisDB(db_path=path, netcdf_files=netcdf_files,
-                           type="reciprocal", *args, **kwargs)
+        return ReciprocalInstaseisDB(db_path=path, netcdf_files=netcdf_files,
+                                     *args, **kwargs)
     elif "MZZ" in netcdf_files or "MXX_P_MYY" in netcdf_files or \
             "MXZ_MYZ" in netcdf_files or "MXY_MXX_M_MYY" in netcdf_files:
         if sorted(netcdf_files.keys()) != sorted([
@@ -72,8 +73,8 @@ def find_and_open_files(path, *args, **kwargs):
             raise InstaseisError(
                 "Expecting all four elemental moment tensor subfolders "
                 "to be present.")
-        return InstaseisDB(db_path=path, netcdf_files=netcdf_files,
-                           type="forward", *args, **kwargs)
+        return ForwardInstaseisDB(db_path=path, netcdf_files=netcdf_files,
+                                  *args, **kwargs)
     else:
         raise InstaseisError(
             "Could not find any suitable netCDF files. Did you pass the "
