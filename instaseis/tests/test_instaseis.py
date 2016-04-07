@@ -40,6 +40,11 @@ DATA = os.path.join(os.path.dirname(os.path.abspath(
 DBS = [os.path.join(DATA, "100s_db_fwd"),
        os.path.join(DATA, "100s_db_bwd_displ_only")]
 
+TEST_DATA = {
+    os.path.join(DATA, "100s_db_fwd"): FWD_TEST_DATA,
+    os.path.join(DATA, "100s_db_bwd_displ_only"): BWD_TEST_DATA
+}
+
 
 def test_fwd_vs_bwd():
     """
@@ -1574,12 +1579,23 @@ def test_failures_when_opening_databases(tmpdir):
                                  "subfolders to be present.")
 
 
-def test_read_on_demand():
-    db = find_and_open_files(os.path.join(DATA, "100s_db_bwd_displ_only"))
+@pytest.mark.parametrize("database_folder", DBS)
+@pytest.mark.parametrize("read_on_demand", [True, False])
+def test_read_on_demand(database_folder, read_on_demand):
+    """
+    Make sure that databases work in read_on_demand mode.
+    """
+    db = find_and_open_files(database_folder, read_on_demand=read_on_demand)
 
     receiver = Receiver(latitude=42.6390, longitude=74.4940)
+
+    if "100s_db_fwd" in database_folder:
+        depth_in_m = None
+    else:
+        depth_in_m = 12000
+
     source = Source(
-        latitude=89.91, longitude=0.0, depth_in_m=12000,
+        latitude=89.91, longitude=0.0, depth_in_m=depth_in_m,
         m_rr=4.710000e+24 / 1E7,
         m_tt=3.810000e+22 / 1E7,
         m_pp=-4.740000e+24 / 1E7,
@@ -1590,41 +1606,15 @@ def test_read_on_demand():
     st = db.get_seismograms(source=source, receiver=receiver,
                             components=('Z', 'N', 'E', 'R', 'T'))
 
-    np.testing.assert_allclose(st.select(component='Z')[0].data,
-                               BWD_TEST_DATA["Z"], rtol=1E-7, atol=1E-12)
-    np.testing.assert_allclose(st.select(component='N')[0].data,
-                               BWD_TEST_DATA["N"], rtol=1E-7, atol=1E-12)
-    np.testing.assert_allclose(st.select(component='E')[0].data,
-                               BWD_TEST_DATA["E"], rtol=1E-7, atol=1E-12)
-    np.testing.assert_allclose(st.select(component='R')[0].data,
-                               BWD_TEST_DATA["R"], rtol=1E-7, atol=1E-12)
-    np.testing.assert_allclose(st.select(component='T')[0].data,
-                               BWD_TEST_DATA["T"], rtol=1E-7, atol=1E-12)
-
-    # Same thing with read-on-demand.
-    db = find_and_open_files(
-        os.path.join(DATA, "100s_db_bwd_displ_only"), read_on_demand=True)
-
-    receiver = Receiver(latitude=42.6390, longitude=74.4940)
-    source = Source(
-        latitude=89.91, longitude=0.0, depth_in_m=12000,
-        m_rr=4.710000e+24 / 1E7,
-        m_tt=3.810000e+22 / 1E7,
-        m_pp=-4.740000e+24 / 1E7,
-        m_rt=3.990000e+23 / 1E7,
-        m_rp=-8.050000e+23 / 1E7,
-        m_tp=-1.230000e+24 / 1E7)
-
-    st = db.get_seismograms(source=source, receiver=receiver,
-                            components=('Z', 'N', 'E', 'R', 'T'))
+    td = TEST_DATA[database_folder]
 
     np.testing.assert_allclose(st.select(component='Z')[0].data,
-                               BWD_TEST_DATA["Z"], rtol=1E-7, atol=1E-12)
+                               td["Z"], rtol=1E-7, atol=1E-12)
     np.testing.assert_allclose(st.select(component='N')[0].data,
-                               BWD_TEST_DATA["N"], rtol=1E-7, atol=1E-12)
+                               td["N"], rtol=1E-7, atol=1E-12)
     np.testing.assert_allclose(st.select(component='E')[0].data,
-                               BWD_TEST_DATA["E"], rtol=1E-7, atol=1E-12)
+                               td["E"], rtol=1E-7, atol=1E-12)
     np.testing.assert_allclose(st.select(component='R')[0].data,
-                               BWD_TEST_DATA["R"], rtol=1E-7, atol=1E-12)
+                               td["R"], rtol=1E-7, atol=1E-12)
     np.testing.assert_allclose(st.select(component='T')[0].data,
-                               BWD_TEST_DATA["T"], rtol=1E-7, atol=1E-12)
+                               td["T"], rtol=1E-7, atol=1E-12)

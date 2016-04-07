@@ -46,10 +46,9 @@ class ReciprocalInstaseisDB(BaseNetCDFInstaseisDB):
             useful e.g. for finite sources, default).
         :type read_on_demand: bool, optional
         """
-        # No need to call the init of the base class.
-        self.db_path = db_path
-        self.buffer_size_in_mb = buffer_size_in_mb
-        self.read_on_demand = read_on_demand
+        BaseNetCDFInstaseisDB.__init__(
+            self, db_path=db_path, buffer_size_in_mb=buffer_size_in_mb,
+            read_on_demand=read_on_demand, *args, **kwargs)
         self._parse_meshes(netcdf_files)
 
     def _parse_meshes(self, files):
