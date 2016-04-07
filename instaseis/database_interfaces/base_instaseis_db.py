@@ -313,8 +313,14 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
                 taper[-tlen:] = scipy.signal.hann(tlen * 2)[tlen:]
                 dataf = np.fft.rfft(taper * data[comp], n=self.info.nfft)
 
-                data[comp] = np.fft.irfft(
-                    dataf * stf_conv_f / stf_deconv_f)[:self.info.npts]
+                # Ensure numerical stability by not dividing with zero.
+                f = stf_conv_f
+                _l = np.abs(stf_deconv_f)
+                _idx = np.where(_l > 0.0)
+                f[_idx] /= stf_deconv_f[_idx]
+                f[_l == 0] = 0 + 0j
+
+                data[comp] = np.fft.irfft(dataf * f)[:self.info.npts]
 
             if dt is not None:
                 data[comp] = lanczos_interpolation(
