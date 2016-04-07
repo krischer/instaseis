@@ -90,13 +90,9 @@ class ForwardInstaseisDB(BaseNetCDFInstaseisDB):
             mesh_mu = self.parsed_mesh.mesh_mu
         else:
             mesh_mu = mesh["mesh_mu"]
-        if self.info.dump_type == "displ_only":
-            npol = self.info.spatial_order
-            mu = mesh_mu[ei.gll_point_ids[npol // 2, npol // 2]]
-        else:
-            # XXX: Is this correct?
-            mu = mesh_mu[ei.id_elem]
-        data["mu"] = mu
+
+        npol = self.info.spatial_order
+        data["mu"] = mesh_mu[ei.gll_point_ids[npol // 2, npol // 2]]
 
         if not isinstance(source, Source):
             raise NotImplementedError
