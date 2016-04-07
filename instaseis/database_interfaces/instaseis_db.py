@@ -136,28 +136,7 @@ class InstaseisDB(BaseInstaseisDB):
         self.meshes = MeshCollection_fwd(m1_m, m2_m, m3_m, m4_m)
         self._is_reciprocal = False
 
-    def _get_seismograms(self, source, receiver, components=("Z", "N", "E")):
-        """
-        Extract seismograms for a moment tensor point source from the AxiSEM
-        database.
-
-        :param source: instaseis.Source or instaseis.ForceSource object
-        :type source: :class:`instaseis.source.Source` or
-            :class:`instaseis.source.ForceSource`
-        :param receiver: instaseis.Receiver object
-        :type receiver: :class:`instaseis.source.Receiver`
-        :param components: a tuple containing any combination of the
-            strings ``"Z"``, ``"N"``, ``"E"``, ``"R"``, and ``"T"``
-        """
-        if self.info.is_reciprocal:
-            a, b = source, receiver
-        else:
-            a, b = receiver, source
-        rotmesh_s, rotmesh_phi, rotmesh_z = rotations.rotate_frame_rd(
-            a.x(planet_radius=self.info.planet_radius),
-            a.y(planet_radius=self.info.planet_radius),
-            a.z(planet_radius=self.info.planet_radius),
-            b.longitude, b.colatitude)
+    def _get_element_id(self, rotmesh_s, rotmesh_z):
 
         k_map = {"displ_only": 6,
                  "strain_only": 1,
@@ -217,9 +196,49 @@ class InstaseisDB(BaseInstaseisDB):
                 col_points_eta = self.parsed_mesh.gll_points
         else:
             id_elem = nextpoints[1]
+            col_points_xi = None
+            col_points_eta = None
+            gll_point_ids = None
+            axis = None
+            corner_points = None
+            eltype = None
+            xi = None
+            eta = None
+
+        return (id_elem, gll_point_ids, xi, eta, corner_points,
+                col_points_xi, col_points_eta, axis, eltype)
+
+    def _get_seismograms(self, source, receiver, components=("Z", "N", "E")):
+        """
+        Extract seismograms for a moment tensor point source from the AxiSEM
+        database.
+
+        :param source: instaseis.Source or instaseis.ForceSource object
+        :type source: :class:`instaseis.source.Source` or
+            :class:`instaseis.source.ForceSource`
+        :param receiver: instaseis.Receiver object
+        :type receiver: :class:`instaseis.source.Receiver`
+        :param components: a tuple containing any combination of the
+            strings ``"Z"``, ``"N"``, ``"E"``, ``"R"``, and ``"T"``
+        """
+        if self.info.is_reciprocal:
+            a, b = source, receiver
+        else:
+            a, b = receiver, source
+        rotmesh_s, rotmesh_phi, rotmesh_z = rotations.rotate_frame_rd(
+            a.x(planet_radius=self.info.planet_radius),
+            a.y(planet_radius=self.info.planet_radius),
+            a.z(planet_radius=self.info.planet_radius),
+            b.longitude, b.colatitude)
+
+        id_elem, gll_point_ids, xi, eta, corner_points, col_points_xi, \
+            col_points_eta, axis, eltype = \
+            self._get_element_id(rotmesh_s=rotmesh_s, rotmesh_z=rotmesh_z)
 
         # Collect data arrays and mu in a dictionary.
         data = {}
+
+        mesh = self.parsed_mesh.f["Mesh"]
 
         # Get mu.
         if not self.read_on_demand:
