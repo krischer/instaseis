@@ -21,9 +21,10 @@ import os
 import pytest
 import shutil
 
-from instaseis.instaseis_db import (InstaseisDB, InstaseisNotFoundError,
-                                    InstaseisError)
-from instaseis.base_instaseis_db import _get_seismogram_times
+from instaseis.database_interfaces.instaseis_db import (
+    InstaseisDB, InstaseisNotFoundError, InstaseisError)
+from instaseis.database_interfaces.base_instaseis_db import \
+    _get_seismogram_times
 from instaseis import Source, Receiver, ForceSource
 from instaseis.helpers import (get_band_code, elliptic_to_geocentric_latitude,
                                geocentric_to_elliptic_latitude, sizeof_fmt)

@@ -14,7 +14,7 @@ from future.utils import with_metaclass
 from abc import ABCMeta, abstractmethod
 import obspy
 import tornado
-from ..base_instaseis_db import _get_seismogram_times
+from ..database_interfaces.base_instaseis_db import _get_seismogram_times
 from .. import Receiver, FiniteSource
 
 from .. import __version__

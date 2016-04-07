@@ -85,10 +85,10 @@ def open_db(path, *args, **kwargs):
         return syngine_instaseis_db.SyngineInstaseisDB(model=model, *args,
                                                        **kwargs)
     elif "://" in path:
-        from . import remote_instaseis_db
+        from .database_interfaces import remote_instaseis_db
         return remote_instaseis_db.RemoteInstaseisDB(path, *args, **kwargs)
     else:
-        from . import instaseis_db
+        from .database_interfaces import instaseis_db
         return instaseis_db.InstaseisDB(path, *args, **kwargs)
 
 

@@ -15,7 +15,7 @@ import tornado.gen
 import tornado.ioloop
 import tornado.web
 
-from ..instaseis_db import InstaseisDB
+from ..database_interfaces.instaseis_db import InstaseisDB
 
 from .routes.coordinates import CoordinatesHandler
 from .routes.events import EventHandler

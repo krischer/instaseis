@@ -19,14 +19,14 @@ import numpy as np
 from obspy.signal.util import next_pow_2
 import os
 
-from . import InstaseisError, InstaseisNotFoundError
 from .base_instaseis_db import BaseInstaseisDB
-from . import finite_elem_mapping
 from . import mesh
-from . import rotations
-from . import sem_derivatives
-from . import spectral_basis
-from .source import Source, ForceSource
+from .. import InstaseisError, InstaseisNotFoundError
+from .. import finite_elem_mapping
+from .. import rotations
+from .. import sem_derivatives
+from .. import spectral_basis
+from ..source import Source, ForceSource
 
 
 MeshCollection_bwd = collections.namedtuple("MeshCollection_bwd", ["px", "pz"])

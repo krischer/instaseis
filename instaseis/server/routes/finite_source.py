@@ -22,8 +22,8 @@ from ..util import run_async, IOQueue, _validtimesetting, \
 from ..instaseis_request import InstaseisTimeSeriesHandler
 from ...source import USGSParamFileParsingException
 
-from ...base_instaseis_db import (KIND_MAP, STF_MAP, INV_KIND_MAP,
-                                  _diff_and_integrate)
+from ...database_interfaces.base_instaseis_db import (
+    KIND_MAP, STF_MAP, INV_KIND_MAP, _diff_and_integrate)
 
 
 @run_async

@@ -138,8 +138,8 @@ def test_initialization_failures():
     Tests various initialization failures for the remote instaseis db.
     """
     # Random error during init.
-    with mock.patch("instaseis.remote_instaseis_db.RemoteInstaseisDB"
-                    "._download_url") as p:
+    with mock.patch("instaseis.database_interfaces.remote_instaseis_db"
+                    ".RemoteInstaseisDB._download_url") as p:
         p.side_effect = ValueError("random")
         with pytest.raises(instaseis.InstaseisError) as err:
             instaseis.open_db("http://localhost:8765432")
@@ -148,8 +148,8 @@ def test_initialization_failures():
                                  "server due to: random")
 
     # Invalid JSON returned.
-    with mock.patch("instaseis.remote_instaseis_db.RemoteInstaseisDB"
-                    "._download_url") as p:
+    with mock.patch("instaseis.database_interfaces.remote_instaseis_db"
+                    ".RemoteInstaseisDB._download_url") as p:
         p.return_value = {"a": "b"}
         with pytest.raises(instaseis.InstaseisError) as err:
             instaseis.open_db("http://localhost:8765432")
@@ -160,8 +160,8 @@ def test_initialization_failures():
     # Incompatible version number - should raise a warning.
     with warnings.catch_warnings(record=True) as w:
         warnings.simplefilter("always")
-        with mock.patch("instaseis.remote_instaseis_db.RemoteInstaseisDB"
-                        "._download_url") as p_1:
+        with mock.patch("instaseis.database_interfaces.remote_instaseis_db"
+                        ".RemoteInstaseisDB._download_url") as p_1:
             p_1.return_value = {"type": "Instaseis Remote Server",
                                 "datetime": "2001-01-01",
                                 "version": "test version"}

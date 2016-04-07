@@ -278,8 +278,8 @@ def test_greens_function_retrieval(all_clients):
     params = copy.deepcopy(basic_parameters)
     params["format"] = "miniseed"
 
-    with mock.patch("instaseis.base_instaseis_db.BaseInstaseisDB"
-                    ".get_greens_function") as p:
+    with mock.patch("instaseis.database_interfaces.base_instaseis_db"
+                    ".BaseInstaseisDB.get_greens_function") as p:
 
         p.side_effect = ValueError("random crash")
         request = client.fetch(_assemble_url('greens_function', **params))
@@ -293,8 +293,8 @@ def test_greens_function_retrieval(all_clients):
     params = copy.deepcopy(basic_parameters)
     params["format"] = "miniseed"
 
-    with mock.patch("instaseis.base_instaseis_db.BaseInstaseisDB"
-                    ".get_greens_function") as p:
+    with mock.patch("instaseis.database_interfaces.base_instaseis_db"
+                    ".BaseInstaseisDB.get_greens_function") as p:
         st = obspy.read()
         for tr in st:
             tr.stats.starttime = obspy.UTCDateTime(1E5)
@@ -309,8 +309,8 @@ def test_greens_function_retrieval(all_clients):
     params = copy.deepcopy(basic_parameters)
     params["format"] = "miniseed"
 
-    with mock.patch("instaseis.base_instaseis_db.BaseInstaseisDB"
-                    ".get_greens_function") as p:
+    with mock.patch("instaseis.database_interfaces.base_instaseis_db"
+                    ".BaseInstaseisDB.get_greens_function") as p:
         st = obspy.read()
         for tr in st:
             tr.stats.starttime = obspy.UTCDateTime(0)
@@ -604,8 +604,8 @@ def test_raw_seismograms_error_handling(all_clients):
     assert "could not extract seismogram" in request.reason.lower()
 
     # Unlikely to be raised for real, but test the resulting error nonetheless.
-    with mock.patch("instaseis.base_instaseis_db.BaseInstaseisDB"
-                    "._convert_to_stream") as p:
+    with mock.patch("instaseis.database_interfaces.base_instaseis_db"
+                    ".BaseInstaseisDB._convert_to_stream") as p:
         p.side_effect = Exception
 
         params = copy.deepcopy(basic_parameters)
@@ -802,8 +802,8 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
 
     time = obspy.UTCDateTime(2010, 1, 2, 3, 4, 5)
 
-    with mock.patch("instaseis.instaseis_db.InstaseisDB._get_seismograms") \
-            as p:
+    with mock.patch("instaseis.database_interfaces.instaseis_db.InstaseisDB"
+                    "._get_seismograms") as p:
         _st = obspy.read()
         for tr in _st:
             tr.stats.instaseis = obspy.core.AttribDict()
@@ -1117,8 +1117,8 @@ def test_object_creation_for_seismogram_route(all_clients):
 
     time = obspy.UTCDateTime(2010, 1, 2, 3, 4, 5)
 
-    with mock.patch("instaseis.instaseis_db.InstaseisDB.get_seismograms") \
-            as p:
+    with mock.patch("instaseis.database_interfaces.instaseis_db.InstaseisDB"
+                    ".get_seismograms") as p:
         _st = obspy.read()
         for tr in _st:
             tr.stats.instaseis = obspy.core.AttribDict()
@@ -3541,8 +3541,8 @@ def test_event_parameters_by_querying(all_clients_event_callback):
                                    atol=tr.data.ptp() / 1E9)
 
     # Also perform a mock comparison to test the actually created object.
-    with mock.patch("instaseis.instaseis_db.InstaseisDB.get_seismograms") \
-            as patch:
+    with mock.patch("instaseis.database_interfaces.instaseis_db.InstaseisDB"
+                    ".get_seismograms") as patch:
         _st = obspy.read()
         for tr in _st:
             tr.stats.instaseis = obspy.core.AttribDict()

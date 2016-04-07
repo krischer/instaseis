@@ -26,7 +26,7 @@ from obspy import geodetics
 
 import instaseis
 from instaseis.server.app import get_application
-from instaseis.instaseis_db import InstaseisDB
+from instaseis.database_interfaces.instaseis_db import InstaseisDB
 
 
 # Most generic way to get the data folder path.

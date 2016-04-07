@@ -21,8 +21,8 @@ import warnings
 
 from . import (InstaseisError, InstaseisWarning, Source, ForceSource,
                __version__)
-from .base_instaseis_db import BaseInstaseisDB, DEFAULT_MU, STF_MAP, \
-    INV_KIND_MAP
+from .database_interfaces.base_instaseis_db import (
+    BaseInstaseisDB, DEFAULT_MU, STF_MAP, INV_KIND_MAP)
 
 from .helpers import geocentric_to_elliptic_latitude
 

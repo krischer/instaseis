@@ -23,8 +23,8 @@ from obspy.core import AttribDict, Stream, Trace, UTCDateTime
 from obspy.signal.interpolation import lanczos_interpolation
 from scipy.integrate import cumtrapz
 
-from .source import Source, ForceSource, Receiver
-from .helpers import get_band_code, sizeof_fmt
+from ..source import Source, ForceSource, Receiver
+from ..helpers import get_band_code, sizeof_fmt
 
 
 DEFAULT_MU = 32e9
