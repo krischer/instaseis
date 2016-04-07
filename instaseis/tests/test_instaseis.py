@@ -21,8 +21,8 @@ import os
 import pytest
 import shutil
 
-from instaseis.database_interfaces.instaseis_db import (
-    InstaseisDB, InstaseisNotFoundError, InstaseisError)
+from instaseis import InstaseisError, InstaseisNotFoundError
+from instaseis.database_interfaces import find_and_open_files
 from instaseis.database_interfaces.base_instaseis_db import \
     _get_seismogram_times
 from instaseis import Source, Receiver, ForceSource
@@ -45,9 +45,10 @@ def test_fwd_vs_bwd():
     """
     Test fwd against bwd mode
     """
-    instaseis_fwd = InstaseisDB(os.path.join(DATA, "100s_db_fwd"))
+    instaseis_fwd = find_and_open_files(os.path.join(DATA, "100s_db_fwd"))
 
-    instaseis_bwd = InstaseisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
+    instaseis_bwd = find_and_open_files(os.path.join(
+        DATA, "100s_db_bwd_displ_only"))
 
     source_fwd = Source(latitude=4., longitude=3.0, depth_in_m=None,
                         m_rr=4.71e+17, m_tt=3.81e+17, m_pp=-4.74e+17,
@@ -96,9 +97,10 @@ def test_fwd_vs_bwd_axial():
     in non axial case, presumably because the close source, which is not
     exactly a point source in the SEM representation.
     """
-    instaseis_fwd = InstaseisDB(os.path.join(DATA, "100s_db_fwd_deep"))
+    instaseis_fwd = find_and_open_files(os.path.join(DATA, "100s_db_fwd_deep"))
 
-    instaseis_bwd = InstaseisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
+    instaseis_bwd = find_and_open_files(
+        os.path.join(DATA, "100s_db_bwd_displ_only"))
 
     source_fwd = Source(latitude=0., longitude=0., depth_in_m=None,
                         m_rr=4.71e+17, m_tt=3.81e+17, m_pp=-4.74e+17,
@@ -149,7 +151,8 @@ def test_incremental_bwd():
     """
     incremental tests of bwd mode with displ_only db
     """
-    instaseis_bwd = InstaseisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
+    instaseis_bwd = find_and_open_files(
+        os.path.join(DATA, "100s_db_bwd_displ_only"))
 
     receiver = Receiver(latitude=42.6390, longitude=74.4940)
     source = Source(
@@ -178,8 +181,8 @@ def test_incremental_bwd():
     assert instaseis_bwd.meshes.pz.strain_buffer.efficiency == 0.0
 
     # read on init
-    instaseis_bwd = InstaseisDB(os.path.join(DATA, "100s_db_bwd_displ_only"),
-                                read_on_demand=False)
+    instaseis_bwd = find_and_open_files(
+        os.path.join(DATA, "100s_db_bwd_displ_only"), read_on_demand=False)
 
     st_bwd = instaseis_bwd.get_seismograms(
         source=source, receiver=receiver, components=('Z', 'N', 'E', 'R', 'T'))
@@ -246,7 +249,7 @@ def test_vertical_only_db(tmpdir):
         m_tp=-1.230000e+24 / 1E7)
 
     # vertical only DB
-    instaseis_bwd = InstaseisDB(tmpdir)
+    instaseis_bwd = find_and_open_files(tmpdir)
 
     st_bwd = instaseis_bwd.get_seismograms(
         source=source, receiver=receiver, components=('Z'))
@@ -279,7 +282,7 @@ def test_horizontal_only_db(tmpdir):
         m_tp=-1.230000e+24 / 1E7)
 
     # vertical only DB
-    instaseis_bwd = InstaseisDB(tmpdir)
+    instaseis_bwd = find_and_open_files(tmpdir)
 
     st_bwd = instaseis_bwd.get_seismograms(
         source=source, receiver=receiver, components=('N'))
@@ -309,7 +312,7 @@ def test_requesting_wrong_component_horizontal(tmpdir):
         m_tp=-1.230000e+24 / 1E7)
 
     # vertical only DB
-    instaseis_bwd = InstaseisDB(tmpdir)
+    instaseis_bwd = find_and_open_files(tmpdir)
 
     with pytest.raises(ValueError):
         instaseis_bwd.get_seismograms(
@@ -337,7 +340,7 @@ def test_requesting_wrong_component_vertical(tmpdir):
         m_tp=-1.230000e+24 / 1E7)
 
     # vertical only DB
-    instaseis_bwd = InstaseisDB(tmpdir)
+    instaseis_bwd = find_and_open_files(tmpdir)
 
     with pytest.raises(ValueError):
         instaseis_bwd.get_seismograms(
@@ -357,7 +360,7 @@ def test_incremental_fwd():
     """
     incremental tests of fwd mode
     """
-    instaseis_fwd = InstaseisDB(os.path.join(DATA, "100s_db_fwd"))
+    instaseis_fwd = find_and_open_files(os.path.join(DATA, "100s_db_fwd"))
 
     receiver = Receiver(latitude=42.6390, longitude=74.4940)
     source = Source(
@@ -410,7 +413,8 @@ def test_incremental_bwd_strain_only():
     """
     incremental tests of bwd mode with strain_only DB
     """
-    instaseis_bwd = InstaseisDB(os.path.join(DATA, "100s_db_bwd_strain_only"))
+    instaseis_bwd = find_and_open_files(
+        os.path.join(DATA, "100s_db_bwd_strain_only"))
 
     receiver = Receiver(latitude=42.6390, longitude=74.4940)
     source = Source(
@@ -446,7 +450,8 @@ def test_incremental_bwd_force_source():
     """
     incremental tests of bwd mode with source force
     """
-    instaseis_bwd = InstaseisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
+    instaseis_bwd = find_and_open_files(
+        os.path.join(DATA, "100s_db_bwd_displ_only"))
 
     receiver = Receiver(latitude=42.6390, longitude=74.4940)
     source = ForceSource(
@@ -471,7 +476,8 @@ def test_incremental_bwd_force_source():
                                BWD_FORCE_TEST_DATA["T"], rtol=1E-7, atol=1E-12)
 
     # Force source does not work with strain databases.
-    db_strain = InstaseisDB(os.path.join(DATA, "100s_db_bwd_strain_only"))
+    db_strain = find_and_open_files(
+        os.path.join(DATA, "100s_db_bwd_strain_only"))
 
     receiver = Receiver(latitude=42.6390, longitude=74.4940)
     source = ForceSource(
@@ -496,7 +502,7 @@ def test_get_greens_vs_get_seismogram():
     """
     Test get_greens_function() against default get_seismograms()
     """
-    db = InstaseisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
+    db = find_and_open_files(os.path.join(DATA, "100s_db_bwd_displ_only"))
 
     depth_in_m = 1000
     epicentral_distance_degree = 20
@@ -574,7 +580,7 @@ def test_greens_function_failures():
     """
     Tests some failures for the greens function calculation.
     """
-    db = InstaseisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
+    db = find_and_open_files(os.path.join(DATA, "100s_db_bwd_displ_only"))
 
     depth_in_m = 1000
     epicentral_distance_degree = 20.0
@@ -619,7 +625,8 @@ def test_finite_source():
     incremental tests of bwd mode with source force
     """
     from obspy.signal.filter import lowpass
-    instaseis_bwd = InstaseisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
+    instaseis_bwd = find_and_open_files(
+        os.path.join(DATA, "100s_db_bwd_displ_only"))
 
     receiver = Receiver(latitude=42.6390, longitude=74.4940)
 
@@ -725,7 +732,8 @@ def test_origin_time_of_resulting_seismograms():
     """
     Makes sure that the origin time is passed to the seismograms.
     """
-    instaseis_bwd = InstaseisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
+    instaseis_bwd = find_and_open_files(
+        os.path.join(DATA, "100s_db_bwd_displ_only"))
 
     receiver = Receiver(latitude=42.6390, longitude=74.4940)
     source = Source(
@@ -798,7 +806,8 @@ def test_higher_level_event_and_receiver_parsing():
     inv[0][0].channels = []
 
     # receiver = Receiver(latitude=42.6390, longitude=74.4940)
-    instaseis_bwd = InstaseisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
+    instaseis_bwd = find_and_open_files(
+        os.path.join(DATA, "100s_db_bwd_displ_only"))
 
     st = instaseis_bwd.get_seismograms(source=event, receiver=inv,
                                        components=('Z'))
@@ -817,7 +826,7 @@ def test_resampling_and_time_settings(db):
     This tests should assure that the origin time is always the peak of the
     source time function.
     """
-    db = InstaseisDB(db)
+    db = find_and_open_files(db)
 
     origin_time = obspy.UTCDateTime(2015, 1, 1, 1, 1)
 
@@ -884,7 +893,7 @@ def test_time_settings_with_resample_stf(db):
 
     origin_time = obspy.UTCDateTime(2015, 1, 1, 1, 1)
 
-    db = InstaseisDB(db)
+    db = find_and_open_files(db)
 
     receiver = Receiver(latitude=42.6390, longitude=74.4940)
     source = Source(
@@ -943,7 +952,7 @@ def test_remove_samples_at_end_for_interpolation(db):
     Remove some samples at the end for the resampling to avoid boundary
     effects.
     """
-    db = InstaseisDB(db)
+    db = find_and_open_files(db)
 
     origin_time = obspy.UTCDateTime(2015, 1, 1, 1, 1)
 
@@ -994,7 +1003,7 @@ def test_get_time_information(db):
     Tests the _get_seismogram_times() function. Also make sure it is
     consistent with the actually produces seismograms.
     """
-    db = InstaseisDB(db)
+    db = find_and_open_files(db)
 
     origin_time = obspy.UTCDateTime(2015, 1, 1, 1, 1)
 
@@ -1221,7 +1230,7 @@ def test_get_time_information_reconvolve_stf(db):
     In that case time shifts and what not are no longer applied.
     """
     from obspy.signal.filter import lowpass
-    db = InstaseisDB(db)
+    db = find_and_open_files(db)
 
     origin_time = obspy.UTCDateTime(2015, 1, 1, 1, 1)
 
@@ -1413,7 +1422,7 @@ def test_coordinate_conversions_round_trips():
 
 
 def test_receiver_settings():
-    db = InstaseisDB(os.path.join(DATA, "100s_db_fwd"))
+    db = find_and_open_files(os.path.join(DATA, "100s_db_fwd"))
 
     source = Source(latitude=4., longitude=3.0, depth_in_m=None,
                     m_rr=4.71e+17, m_tt=3.81e+17, m_pp=-4.74e+17,
@@ -1449,7 +1458,7 @@ def test_some_failure_conditions():
     """
     Tests some failure conditions.
     """
-    db = InstaseisDB(os.path.join(DATA, "100s_db_fwd"))
+    db = find_and_open_files(os.path.join(DATA, "100s_db_fwd"))
     source = Source(latitude=4., longitude=3.0, depth_in_m=None,
                     m_rr=4.71e+17, m_tt=3.81e+17, m_pp=-4.74e+17,
                     m_rt=3.99e+17, m_rp=-8.05e+17, m_tp=-1.23e+17)
@@ -1506,7 +1515,7 @@ def test_failures_when_opening_databases(tmpdir):
 
     # Nothing there currently.
     with pytest.raises(InstaseisNotFoundError) as err:
-        InstaseisDB(tmpdir.strpath)
+        find_and_open_files(tmpdir.strpath)
     assert err.value.args[0].startswith("No suitable netCDF files")
 
     # Three files are no good.
@@ -1521,14 +1530,14 @@ def test_failures_when_opening_databases(tmpdir):
             fh.write(b" ")
 
     with pytest.raises(InstaseisError) as err:
-        InstaseisDB(tmpdir.strpath)
+        find_and_open_files(tmpdir.strpath)
     assert err.value.args[0].startswith("1, 2 or 4 netCDF must be present in "
                                         "the folder structure.")
 
     # Two netcdf files but in funny places.
     os.remove(f_3)
     with pytest.raises(InstaseisError) as err:
-        InstaseisDB(tmpdir.strpath)
+        find_and_open_files(tmpdir.strpath)
     assert err.value.args[0].startswith(
         "Could not find any suitable netCDF files. Did you pass the correct "
         "directory?")
@@ -1545,7 +1554,7 @@ def test_failures_when_opening_databases(tmpdir):
             fh.write(b" ")
 
     with pytest.raises(InstaseisError) as err:
-        InstaseisDB(tmpdir.strpath)
+        find_and_open_files(tmpdir.strpath)
     assert err.value.args[0].startswith("Found 2 files for component PX:")
 
     # Only two moment tensor components.
@@ -1560,13 +1569,13 @@ def test_failures_when_opening_databases(tmpdir):
             fh.write(b" ")
 
     with pytest.raises(InstaseisError) as err:
-        InstaseisDB(tmpdir.strpath)
+        find_and_open_files(tmpdir.strpath)
     assert err.value.args[0] == ("Expecting all four elemental moment tensor "
                                  "subfolders to be present.")
 
 
 def test_read_on_demand():
-    db = InstaseisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
+    db = find_and_open_files(os.path.join(DATA, "100s_db_bwd_displ_only"))
 
     receiver = Receiver(latitude=42.6390, longitude=74.4940)
     source = Source(
@@ -1593,8 +1602,8 @@ def test_read_on_demand():
                                BWD_TEST_DATA["T"], rtol=1E-7, atol=1E-12)
 
     # Same thing with read-on-demand.
-    db = InstaseisDB(os.path.join(DATA, "100s_db_bwd_displ_only"),
-                     read_on_demand=True)
+    db = find_and_open_files(
+        os.path.join(DATA, "100s_db_bwd_displ_only"), read_on_demand=True)
 
     receiver = Receiver(latitude=42.6390, longitude=74.4940)
     source = Source(

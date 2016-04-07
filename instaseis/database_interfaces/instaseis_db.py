@@ -21,7 +21,6 @@ import os
 
 from .base_instaseis_db import BaseInstaseisDB
 from . import mesh
-from .. import InstaseisError, InstaseisNotFoundError
 from .. import finite_elem_mapping
 from .. import rotations
 from .. import sem_derivatives
@@ -38,8 +37,8 @@ class InstaseisDB(BaseInstaseisDB):
     """
     Class for extracting seismograms from a local Instaseis database.
     """
-    def __init__(self, db_path, buffer_size_in_mb=100, read_on_demand=False,
-                 *args, **kwargs):
+    def __init__(self, db_path, netcdf_files, type, buffer_size_in_mb=100,
+                 read_on_demand=False, *args, **kwargs):
         """
         :param db_path: Path to the Instaseis Database containing
             subdirectories PZ and/or PX each containing a
@@ -57,71 +56,15 @@ class InstaseisDB(BaseInstaseisDB):
             useful e.g. for finite sources, default).
         :type read_on_demand: bool, optional
         """
-
         self.db_path = db_path
         self.buffer_size_in_mb = buffer_size_in_mb
         self.read_on_demand = read_on_demand
-        self._find_and_open_files()
-
-    def _find_and_open_files(self):
-        """
-        Helper function walking the file tree below self.db_path and
-        attempts to find the correct netCDF files.
-        """
-        found_files = []
-        for root, dirs, filenames in os.walk(self.db_path, followlinks=True):
-            # Limit depth of filetree traversal
-            nested_levels = os.path.relpath(root, self.db_path).split(
-                os.path.sep)
-            if len(nested_levels) >= 4:
-                del dirs[:]
-            if "ordered_output.nc4" not in filenames:
-                continue
-            found_files.append(os.path.join(root, "ordered_output.nc4"))
-
-        if len(found_files) == 0:
-            raise InstaseisNotFoundError(
-                "No suitable netCDF files found under '%s'" % self.db_path)
-        elif len(found_files) not in [1, 2, 4]:
-            raise InstaseisError(
-                "1, 2 or 4 netCDF must be present in the folder structure. "
-                "Found %i: \t%s" % (len(found_files),
-                                    "\n\t".join(found_files)))
-
-        # Parse to find the correct components.
-        netcdf_files = collections.defaultdict(list)
-        patterns = ["PX", "PZ", "MZZ", "MXX_P_MYY", "MXZ_MYZ", "MXY_MXX_M_MYY"]
-        for filename in found_files:
-            s = os.path.relpath(filename, self.db_path).split(os.path.sep)
-            for p in patterns:
-                if p in s:
-                    netcdf_files[p].append(filename)
-
-        # Assert at most one file per type.
-        for key, files in netcdf_files.items():
-            if len(files) != 1:
-                raise InstaseisError(
-                    "Found %i files for component %s:\n\t%s" % (
-                        len(files), key, "\n\t".join(files)))
-            netcdf_files[key] = files[0]
-
-        # Two valid cases.
-        if "PX" in netcdf_files or "PZ" in netcdf_files:
+        if type == "reciprocal":
             self._parse_fs_meshes(netcdf_files)
-        elif "MZZ" in netcdf_files or "MXX_P_MYY" in netcdf_files or \
-                "MXZ_MYZ" in netcdf_files or "MXY_MXX_M_MYY" in netcdf_files:
-            if sorted(netcdf_files.keys()) != sorted([
-                    "MZZ", "MXX_P_MYY", "MXZ_MYZ", "MXY_MXX_M_MYY"]):
-                raise InstaseisError(
-                    "Expecting all four elemental moment tensor subfolders "
-                    "to be present.")
+        elif type == "forward":
             self._parse_mt_meshes(netcdf_files)
         else:
-            raise InstaseisError(
-                "Could not find any suitable netCDF files. Did you pass the "
-                "correct directory? E.g. if the 'ordered_output.nc4' files "
-                "are located in '/path/to/PZ/Data', please pass '/path/to/' "
-                "to Instaseis.")
+            raise NotImplemented
 
     def _parse_fs_meshes(self, files):
         if "PX" in files:

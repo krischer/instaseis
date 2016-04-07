@@ -26,7 +26,7 @@ from obspy import geodetics
 
 import instaseis
 from instaseis.server.app import get_application
-from instaseis.database_interfaces.instaseis_db import InstaseisDB
+from instaseis.database_interfaces import find_and_open_files
 
 
 # Most generic way to get the data folder path.
@@ -238,7 +238,7 @@ def create_async_client(path, station_coordinates_callback=None,
                         event_info_callback=None,
                         travel_time_callback=None):
     application = get_application()
-    application.db = InstaseisDB(path)
+    application.db = find_and_open_files(path=path)
     application.station_coordinates_callback = station_coordinates_callback
     application.event_info_callback = event_info_callback
     application.travel_time_callback = travel_time_callback

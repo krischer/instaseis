@@ -88,8 +88,8 @@ def open_db(path, *args, **kwargs):
         from .database_interfaces import remote_instaseis_db
         return remote_instaseis_db.RemoteInstaseisDB(path, *args, **kwargs)
     else:
-        from .database_interfaces import instaseis_db
-        return instaseis_db.InstaseisDB(path, *args, **kwargs)
+        from .database_interfaces import find_and_open_files
+        return find_and_open_files(path=path, *args, **kwargs)
 
 
 __version__ = get_git_version()
