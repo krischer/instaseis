@@ -14,6 +14,9 @@ AxiSEM.
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 
+from future.utils import with_metaclass
+
+from abc import ABCMeta, abstractmethod
 import collections
 
 import numpy as np
@@ -34,7 +37,7 @@ ElementInfo = collections.namedtuple("ElementInfo", [
 Coordinates = collections.namedtuple("Coordinates", ["s", "phi", "z"])
 
 
-class BaseNetCDFInstaseisDB(BaseInstaseisDB):
+class BaseNetCDFInstaseisDB(with_metaclass(ABCMeta, BaseInstaseisDB)):
     """
     Base class for extracting seismograms from a local Instaseis netCDF
     database.
@@ -63,7 +66,10 @@ class BaseNetCDFInstaseisDB(BaseInstaseisDB):
         self.read_on_demand = read_on_demand
 
     def _get_element_info(self, coordinates):
-
+        """
+        Find and collect/calculate information about the element containing
+        the given coordinates.
+        """
         k_map = {"displ_only": 6,
                  "strain_only": 1,
                  "fullfields": 1}
@@ -136,22 +142,36 @@ class BaseNetCDFInstaseisDB(BaseInstaseisDB):
             corner_points=corner_points, col_points_xi=col_points_xi,
             col_points_eta=col_points_eta, axis=axis, eltype=eltype)
 
+    @abstractmethod
     def _get_data(self, source, receiver, components, coordinates,
                   element_info):
+        """
+        Has to be implemented by each implementation.
+
+        Must return a dictionary with the keys being the components, and the
+        values the corresponding data arrays.
+
+        :param source: The source.
+        :param receiver: The receiver.
+        :param components: The requested components.
+        :param coordinates: The coordinates in correct coordinates system.
+        :param element_info: Information about the element containing the
+            coordinates.
+        """
         raise NotImplementedError
 
     def _get_seismograms(self, source, receiver, components=("Z", "N", "E")):
         """
-        Extract seismograms for a moment tensor point source from the AxiSEM
-        database.
+        Extract seismograms from a netCDF based Instaseis database.
 
-        :param source: instaseis.Source or instaseis.ForceSource object
         :type source: :class:`instaseis.source.Source` or
             :class:`instaseis.source.ForceSource`
-        :param receiver: instaseis.Receiver object
+        :param source: The source.
         :type receiver: :class:`instaseis.source.Receiver`
-        :param components: a tuple containing any combination of the
-            strings ``"Z"``, ``"N"``, ``"E"``, ``"R"``, and ``"T"``
+        :param receiver: The receiver.
+        :type components: tuple
+        :param components: The requests components. Any combinations of
+            ``"Z"``, ``"N"``, ``"E"``, ``"R"``, and ``"T"``
         """
         if self.info.is_reciprocal:
             a, b = source, receiver

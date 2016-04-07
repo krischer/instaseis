@@ -24,7 +24,11 @@ from ..source import Source
 
 
 class ForwardInstaseisDB(BaseNetCDFInstaseisDB):
-    def __init__(self, db_path, netcdf_files, *args, **kwargs):
+    """
+    Forward Instaseis database.
+    """
+    def __init__(self, db_path, netcdf_files, buffer_size_in_mb=100,
+                 read_on_demand=False, *args, **kwargs):
         """
         :param db_path: Path to the Instaseis Database containing
             subdirectories PZ and/or PX each containing a
@@ -42,7 +46,10 @@ class ForwardInstaseisDB(BaseNetCDFInstaseisDB):
             useful e.g. for finite sources, default).
         :type read_on_demand: bool, optional
         """
-        BaseNetCDFInstaseisDB.__init__(self, db_path=db_path, *args, **kwargs)
+        # No need to call the init of the base class.
+        self.db_path = db_path
+        self.buffer_size_in_mb = buffer_size_in_mb
+        self.read_on_demand = read_on_demand
         self._parse_meshes(netcdf_files)
 
     def _parse_meshes(self, files):
