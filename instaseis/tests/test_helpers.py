@@ -11,8 +11,6 @@ Tests for some helper routines.
 """
 from __future__ import absolute_import, division
 
-import numpy as np
-
 from instaseis.helpers import io_chunker
 
 

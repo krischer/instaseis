@@ -25,6 +25,7 @@ import os
 
 from .base_instaseis_db import BaseInstaseisDB
 from .. import finite_elem_mapping
+from .. import helpers
 from .. import rotations
 from .. import sem_derivatives
 from .. import spectral_basis
@@ -202,6 +203,9 @@ class BaseNetCDFInstaseisDB(with_metaclass(ABCMeta, BaseInstaseisDB)):
             utemp = np.zeros((mesh.ndumps, mesh.npol + 1, mesh.npol + 1, 3),
                              dtype=np.float64, order="F")
 
+            # The list of ids we have is unique but not sorted.
+            ids = gll_point_ids.flatten()
+            s_ids = np.sort(ids)
             mesh_dict = mesh.f["Snapshots"]
 
             # Load displacement from all GLL points.
@@ -209,18 +213,40 @@ class BaseNetCDFInstaseisDB(with_metaclass(ABCMeta, BaseInstaseisDB)):
                 if var not in mesh_dict:
                     continue
 
-                # The netCDF Python wrappers starting with version 1.1.6
-                # disallow duplicate and unordered indices while slicing. So
-                # we need to do it manually.
-                # The list of ids we have is unique but not sorted.
-                ids = gll_point_ids.flatten()
-                s_ids = np.sort(ids)
-                temp = mesh_dict[var][:, s_ids]
+                # Chunk the I/O by requesting successive indices in one go -
+                # this actually makes quite a big difference on some file
+                # systems.
+                chunks = helpers.io_chunker(s_ids)
+                _temp = []
+                m = mesh_dict[var]
+                for _c in chunks:
+                    if isinstance(_c, list):
+                        _temp.append(m[:, _c[0]:_c[1]])
+                    else:
+                        _temp.append(m[:, _c])
+
+                _t = np.empty((_temp[0].shape[0], 25),
+                              dtype=_temp[0].dtype)
+
+                k = 0
+                for _i in _temp:
+                    if len(_i.shape) == 1:
+                        _t[:, k] = _i
+                        k += 1
+                    else:
+                        for _j in range(_i.shape[1]):
+                            _t[:, k + _j] = _i[:, _j]
+
+                        k += _j + 1
+
+                _temp = _t
+
                 for ipol in range(mesh.npol + 1):
                     for jpol in range(mesh.npol + 1):
                         idx = ipol * 5 + jpol
                         utemp[:, jpol, ipol, i] = \
-                            temp[:, np.argwhere(s_ids == ids[idx])[0][0]]
+                            _temp[:, np.argwhere(
+                                s_ids == ids[idx])[0][0]]
 
             strain_fct_map = {
                 "monopole": sem_derivatives.strain_monopole_td,
