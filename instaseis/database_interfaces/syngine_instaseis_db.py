@@ -19,12 +19,12 @@ import platform
 import requests
 import warnings
 
-from . import (InstaseisError, InstaseisWarning, Source, ForceSource,
-               __version__)
-from .database_interfaces.base_instaseis_db import (
+from instaseis import (InstaseisError, InstaseisWarning, Source, ForceSource,
+                       __version__)
+from instaseis.database_interfaces.base_instaseis_db import (
     BaseInstaseisDB, DEFAULT_MU, STF_MAP, INV_KIND_MAP)
 
-from .helpers import geocentric_to_elliptic_latitude
+from instaseis.helpers import geocentric_to_elliptic_latitude
 
 from future import standard_library
 with standard_library.hooks():

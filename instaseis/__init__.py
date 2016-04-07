@@ -81,7 +81,7 @@ def open_db(path, *args, **kwargs):
     """
     if path.startswith("syngine://"):
         model = re.sub("syngine://", "", path).strip()
-        from . import syngine_instaseis_db
+        from instaseis.database_interfaces import syngine_instaseis_db
         return syngine_instaseis_db.SyngineInstaseisDB(model=model, *args,
                                                        **kwargs)
     elif "://" in path:
