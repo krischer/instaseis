@@ -92,6 +92,23 @@ class Buffer(object):
             return float(self._hits) / float(self._hits + self._fails)
 
 
+def get_time_axis(ds, ndumps):
+    """
+    Helper function to determine the time axis of the mesh.
+    """
+    if ds.shape[0] == ds.shape[1]:
+        raise NotImplementedError("Both dimensions in the dataset "
+                                  "are identical. This is currently "
+                                  "not supported.")
+    elif ds.shape[0] == ndumps:
+        return 0
+    elif ds.shape[1] == ndumps:
+        return 1
+    else:
+        raise ValueError("Could not determine the time axis in the "
+                         "2D array. It has an incompatible shape.")
+
+
 class Mesh(object):
     """
     A class to handle the actual netCDF files written by AxiSEM.
@@ -106,8 +123,14 @@ class Mesh(object):
         self.filename = filename
         self.read_on_demand = read_on_demand
         self._parse(full_parse=full_parse)
+        self._find_time_axis()
         self.strain_buffer = Buffer(strain_buffer_size_in_mb)
         self.displ_buffer = Buffer(displ_buffer_size_in_mb)
+
+    def _find_time_axis(self):
+        self.time_axis = {}
+        for key, value in self.f["Snapshots"].items():
+            self.time_axis[key] = get_time_axis(value, self.ndumps)
 
     def _parse(self, full_parse=False):
         # Cheap sanity check. No need to parse the rest.

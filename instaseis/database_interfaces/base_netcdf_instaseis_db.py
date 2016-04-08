@@ -213,17 +213,28 @@ class BaseNetCDFInstaseisDB(with_metaclass(ABCMeta, BaseInstaseisDB)):
                 if var not in mesh_dict:
                     continue
 
+                # Make sure it can work with normal and transposed arrays to
+                # support legacy as well as modern, transposed databases.
+                time_axis = mesh.time_axis[var]
+
                 # Chunk the I/O by requesting successive indices in one go -
                 # this actually makes quite a big difference on some file
                 # systems.
                 chunks = helpers.io_chunker(s_ids)
                 _temp = []
                 m = mesh_dict[var]
-                for _c in chunks:
-                    if isinstance(_c, list):
-                        _temp.append(m[:, _c[0]:_c[1]])
-                    else:
-                        _temp.append(m[:, _c])
+                if time_axis == 0:
+                    for _c in chunks:
+                        if isinstance(_c, list):
+                            _temp.append(m[:, _c[0]:_c[1]])
+                        else:
+                            _temp.append(m[:, _c])
+                else:
+                    for _c in chunks:
+                        if isinstance(_c, list):
+                            _temp.append(m[_c[0]:_c[1], :].T)
+                        else:
+                            _temp.append(m[_c, :].T)
 
                 _t = np.empty((_temp[0].shape[0], 25),
                               dtype=_temp[0].dtype)
