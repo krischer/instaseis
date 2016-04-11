@@ -682,7 +682,7 @@ class Source(SourceOrReceiver):
         return_str += '\tLongitude        : %6.1f deg\n' % (self.longitude,)
         return_str += '\tLatitude         : %6.1f deg\n' % (self.latitude,)
         return_str += '\tDepth            : %s km\n' % (
-            "%6.1e km" % self.depth_in_m / 1e3
+            "%6.1e km" % (self.depth_in_m / 1e3)
             if self.depth_in_m is not None else " not set")
         return_str += '\tMoment Magnitude :   %4.2f\n' \
                       % (self.moment_magnitude,)
