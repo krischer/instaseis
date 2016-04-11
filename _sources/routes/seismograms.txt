@@ -1,5 +1,5 @@
-GET/POST /seismograms
-^^^^^^^^^^^^^^^^^^^^^
+GET /seismograms
+^^^^^^^^^^^^^^^^
 
 .. note::
 
@@ -10,10 +10,7 @@ GET/POST /seismograms
 Description
     Returns Instaseis seismograms. In addition to the functionality of the
     ``/seismograms_raw`` route this one has quite a couple of convenience
-    function and is suitable to be queried by any program able to use HTTP.
-    It is possible to ``GET`` and ``POST`` to this route: ``GET`` will just
-    retrieve seismograms, ``POST`` allows one to upload a custom source time
-    function, see below for details.
+    function and is suitable to be queried by any program able to use HTTP
 
 Content-Type
     * ``application/zip`` (if zipped SAC data is requested)
@@ -22,7 +19,7 @@ Content-Type
 Special Response Headers
     ``Instaseis-Mu``: This transports the mu of the model for the given
     seismogram which is needed for some finite source calculations. Please make
-    sure your proxy, if any, does not filter it.
+    sure your proxy does not filter it.
 
 Filetype
     Returns a ZIP archive with SAC files or MiniSEED files encoded with
@@ -35,30 +32,6 @@ Filetype
     * ``KT7``: The first seven letters of the AxiSEM version number used to generate the model. Prefixed with ``A``.
     * ``KT8``: The first seven letters of the Instaseis version number used to generate the seismogram. Prefixed with ``I``.
     * ``USER0``: The scale factor used to generate the waveforms.
-
-Custom STF
-    A custom source time function can be uploaded with ``POST``. The request
-    body in this case has to be a JSON file, the other parameters work as for
-    the ``GET`` case, except otherwise noted. The JSON file must be akin to the
-    following:
-
-    .. code-block:: JSON
-
-        {
-            "units": "moment_rate",
-            "relative_origin_time_in_sec": 5.0,
-            "sample_spacing_in_sec": 10.0,
-            "data": [0.0, 0.2, 0.5, 0.2, 0.0, 0.0, 0.0]
-        }
-
-    Keep in mind that what you are specifying is the moment rate, in seismology
-    oftentimes called the source time function, which is the only currently
-    supported ``unit``.  ``relative_origin_time_in_sec`` is the offset in
-    seconds from the first sample which should be considered the origin time of
-    the resulting seismogram (must be between 0 and 600 seconds).
-    ``sample_spacing_in_sec`` is the sample interval in seconds and ``data``
-    the actual data array. The exact units do not matter as it will be
-    normalized in any case.
 
 +-----------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
 | Parameter                   | Type     | Required | Default Value               | Description                                                                          |
@@ -81,11 +54,6 @@ Custom STF
 +-----------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
 | ``kernelwidth``             | Integer  | False    | 12                          | Specify the width of the sinc kernel used for resampling to requested sample         |
 |                             |          |          |                             | interval in terms of the original sampling interval.                                 |
-+-----------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
-| ``sourcewidth``             | Integer  | False    | 15.0                        | Optionally convolve the seismograms with a Gaussian source time function (moment     |
-|                             |          |          |                             | rate) of approximately the given width in seconds. The origin time is assumed to be  |
-|                             |          |          |                             | the peak of the Gaussian. Must be larger than the database period. Must not be used  |
-|                             |          |          |                             | for a POST requests with a custom STF.                                               |
 +-----------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
 | **Time Parameters**                                                                                                                                                    |
 +-----------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
