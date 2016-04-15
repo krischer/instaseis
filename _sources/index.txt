@@ -175,6 +175,29 @@ sure the following line is part of it:
     backend: agg
 
 
+A fairly recent development is that ``conda``, on some systems, ships
+``libgfortran3`` versions incompatible with the system libraries. If you see
+errors like
+
+.. code-block:: bash
+
+    ImportError:
+    /home/travis/miniconda/lib/python2.7/site-packages/scipy/special/../../../../libgfortran.so.3:
+    version `GFORTRAN_1.4' not found
+
+please try the following:
+
+.. code-block:: bash
+
+    $ conda remove libgfortran --force
+
+and if that results in some other issues (try it first!), also execute:
+
+.. code-block:: bash
+
+    $ conda install libgcc --force
+
+
 Installing Instaseis
 ^^^^^^^^^^^^^^^^^^^^
 
