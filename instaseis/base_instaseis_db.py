@@ -24,7 +24,7 @@ from obspy.signal.interpolation import lanczos_interpolation
 from scipy.integrate import cumtrapz
 
 from .source import Source, ForceSource, Receiver
-from .helpers import get_band_code, sizeof_fmt
+from .helpers import get_band_code, sizeof_fmt, rfftfreq
 
 
 DEFAULT_MU = 32e9
@@ -293,7 +293,7 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
 
                 if source.time_shift is not None:
                     stf_conv_f *= \
-                        np.exp(- 1j * np.fft.rfftfreq(self.info.nfft) *
+                        np.exp(- 1j * rfftfreq(self.info.nfft) *
                                2. * np.pi * source.time_shift / self.info.dt)
 
                 # XXX: double check whether a taper is needed at the end of the
