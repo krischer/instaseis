@@ -702,7 +702,7 @@ pure function jacobian_spheroid(xi, eta, nodes)
     = - (1 + eta) * r(4) * (theta(3) - theta(4)) / 4 &
        * dsin(((1 - xi) * theta(4) + (1 + xi) * theta(3)) / 2) &
       - (1 - eta) * r(1) * (theta(2) - theta(1)) / 4  &
-       * dsin(((1 - xi) * theta(1) + (1 + xi) * theta(3)) / 2)
+       * dsin(((1 - xi) * theta(1) + (1 + xi) * theta(2)) / 2)
 
   jacobian_spheroid(2,2) &
     = 0.5d0 * ( r(4) * dcos(((1 - xi) * theta(4) + (1 + xi) * theta(3)) / 2) &
