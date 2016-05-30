@@ -1,9 +1,30 @@
-License valid for non-commercial/academic use only. Please contact us for other
-uses.
+Copyright 2016, by ETH Zurich and LMU Munich
 
-Instaseis is licensed under the LGPL v3.0, e.g. it is licensed with the
-GPL v3.0 and the additional set of permissions granted by the LGPL v3.0
-license. This file contains both licenses.
+  ETH Zurich and LMU Munich (Ludwig Maximilian University of Munich) provides
+its Instaseis software under a modified LGPL license designed to meet the
+development and distribution needs of both commercial distributors, and private
+individuals or research institution that use the software non-commercially.
+
+                    Instaseis commercial use
+
+  Vendors and other distributors that want to distribute Instaseis software
+commercially or to combine their own software with Instaseis software and
+distribute commercially the combined software, must enter into a commercial
+license agreement with ETH Zurich. Please contact the authors for further
+information.
+
+        License for non-commercial private, individual and research use:
+
+  THIS LICENSE IS INTENDED ONLY FOR PRIVATE, INDIVIDUAL, RESEARCH AND
+NON-COMMERCIAL USE. IF YOU INTEND TO USE THE SOFTWARE FOR ANY COMMERCIAL
+PURPOSES PLEASE CONTACT THE AUTHORS.
+
+  For non-commercial private, individual and research use the Instaseis
+software is licensed under the following LGPL license. For avoidance of doubt
+any commercial use, also offering services or interpreted data obtained by the
+Instaseis software, by a private/individual party or by a research institution
+(private or public) is strictly prohibited and requires a commercial license
+agreement with ETH Zurich.
 
 
                     GNU GENERAL PUBLIC LICENSE
