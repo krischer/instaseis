@@ -451,6 +451,115 @@ class Source(SourceOrReceiver):
                     origin_time=origin_time)
 
     @classmethod
+    def from_SCARDEC_file(self, filename):
+        """
+        Initialize a source object from a SCARDEC file.
+
+        Coordinates are assumed to be defined on the WGS84 ellipsoid and
+        will be converted to geocentric coordinates.
+
+        :param filename: path to the SCARDEC file
+
+        >>> import instaseis
+        >>> source = instaseis.Source.from_CMTSOLUTION_file('file.cmt')
+        >>> print(source)
+        Instaseis Source:
+            Longitude        : -177.0 deg
+            Latitude         :  -29.2 deg
+            Depth            : 4.8e+01 km
+            Moment Magnitude :   7.32
+            Scalar Moment    :   9.63e+19 Nm
+            Mrr              :   7.68e+19 Nm
+            Mtt              :   9.00e+17 Nm
+            Mpp              :  -7.77e+19 Nm
+            Mrt              :   1.39e+19 Nm
+            Mrp              :   4.52e+19 Nm
+            Mtp              :  -3.26e+19 Nm
+        """
+        with open(filename, "rt") as f:
+            line = f.readline()
+            origin_time = line.strip().split()[:6]
+            values = list(map(int, origin_time[:-1])) + \
+                [float(origin_time[-1])]
+            try:
+                origin_time = obspy.UTCDateTime(*values)
+            except (TypeError, ValueError):  # pragma: no cover
+                warnings.warn("Could not determine origin time from line: %s"
+                              % line)
+                origin_time = obspy.UTCDateTime(0)
+
+            # Rest of the line contains latitude and longitude
+            line = line.split()[6:]
+            latitude, longitude = map(float, line[:2])
+
+            # The second line encodes depth and the two focal mechanisms
+            line = f.readline()
+            line = line.split()
+
+            # First three values are depth, scalar moment (in Nm) and moment magnitude
+            depth, scalar_moment, moment_mag = map(float, line[0:3])
+
+            # depth is in km in SCARDEC files
+            depth_in_m = depth * 1e3
+
+            # Next six values are strike, dip, rake for both planes
+            strike1, dip1, rake1 = map(float, line[3:6])
+            strike2, dip2, rake2 = map(float, line[6:9])
+
+            # The rest of the file is the moment rate function
+            # In each line: time (sec), moment rate (Nm/sec)
+            stf_time = []
+            stf_mr = []
+            for line in f:
+                stf_time.append(float(line.split()[0]))
+                stf_mr.append(float(line.split()[1]))
+
+            # Normalize the source time function
+            stf_mr = np.array(stf_mr)
+            stf_mr /= scalar_moment
+
+            # Calculate the time step
+            stf_dt = np.mean(np.diff(stf_time))
+
+            # Calculate the stf offset (time of first sample wrt to origin time)
+            time_shift = stf_time[0]
+
+            # Calculate a moment tensor
+            dip1 *= np.pi / 180.
+            rake1 *= np.pi / 180.
+            strike1 *= np.pi / 180.
+
+            m_rr = - scalar_moment * ((np.sin(dip1) * np.cos(rake1) *
+                                       np.sin(2 * strike1)) +
+                                      (np.sin(2*dip1) * np.sin(rake1) *
+                                       np.sin(2 * strike1)))
+            m_rt = scalar_moment * ((np.sin(dip1) * np.cos(rake1) *
+                                     np.cos(2 * strike1)) +
+                                    (np.sin(2*dip1) * np.sin(rake1) *
+                                     np.sin(2 * strike1) * 0.5))
+            m_tt = scalar_moment * ((np.sin(dip1) * np.cos(rake1) *
+                                     np.sin(2 * strike1)) -
+                                    (np.sin(2*dip1) * np.sin(rake1) *
+                                     np.cos(2 * strike1)))
+            m_rp = - scalar_moment * ((np.cos(dip1) * np.cos(rake1) *
+                                       np.cos(strike1)) +
+                                      (np.cos(2*dip1) * np.sin(rake1) *
+                                       np.sin(strike1)))
+            m_tp = - scalar_moment * ((np.cos(dip1) * np.cos(rake1) *
+                                       np.sin(strike1)) -
+                                      (np.cos(2*dip1) * np.sin(rake1) *
+                                       np.cos(strike1)))
+            m_pp = scalar_moment * (np.sin(2*dip1) * np.sin(rake1))
+
+        return self(elliptic_to_geocentric_latitude(latitude), longitude,
+                    depth_in_m,
+                    m_rr, m_tt, m_pp, m_rt, m_rp, m_tp,
+                    time_shift=time_shift,
+                    sliprate=stf_mr,
+                    dt=stf_dt,
+                    origin_time=origin_time)
+
+    @classmethod
     def from_strike_dip_rake(self, latitude, longitude, depth_in_m, strike,
                              dip, rake, M0, time_shift=None, sliprate=None,
                              dt=None, origin_time=obspy.UTCDateTime(0)):
