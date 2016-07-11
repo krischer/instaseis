@@ -18,6 +18,8 @@ import inspect
 import math
 import os
 
+import numpy as np
+
 
 LIB_DIR = os.path.join(os.path.dirname(os.path.abspath(
     inspect.getfile(inspect.currentframe()))), "lib")
@@ -159,3 +161,16 @@ def io_chunker(arr):
         else:
             idx.append(arr[_i])
     return idx
+
+
+def rfftfreq(n, d=1.0):  # pragma: no cover
+    """
+    Polyfill for numpy's rfftfreq() for numpy versions that don't have it.
+    """
+    if hasattr(np.fft, "rfftfreq"):
+        return np.fft.rfftfreq(n=n, d=d)
+
+    val = 1.0 / (n * d)
+    N = n // 2 + 1
+    results = np.arange(0, N, dtype=int)
+    return results * val

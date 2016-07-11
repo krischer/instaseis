@@ -588,3 +588,26 @@ def test_reading_finite_source_with_slip_along_u2_axis():
     filename = os.path.join(DATA, "strike_slip_eq_2pts.srf")
     finitesource = FiniteSource.from_srf_file(filename, True)
     assert finitesource.npointsources == 3
+
+
+def test_print_regressions():
+    """
+    Guard against a regression for printing a source object.
+    """
+    src = Source.from_strike_dip_rake(
+        latitude=27.77, longitude=85.37, depth_in_m=12000.0,
+        M0=1e+21, strike=32., dip=62., rake=90.)
+    assert(str(src)) == (
+        "Instaseis Source:\n"
+        "\torigin time      : 1970-01-01T00:00:00.000000Z\n"
+        "\tLongitude        :   85.4 deg\n"
+        "\tLatitude         :   27.8 deg\n"
+        "\tDepth            : 1.2e+01 km km\n"
+        "\tMoment Magnitude :   8.00\n"
+        "\tScalar Moment    :   1.00e+21 Nm\n"
+        "\tMrr              :   8.29e+20 Nm\n"
+        "\tMtt              :  -2.33e+20 Nm\n"
+        "\tMpp              :  -5.96e+20 Nm\n"
+        "\tMrt              :   2.96e+20 Nm\n"
+        "\tMrp              :   4.74e+20 Nm\n"
+        "\tMtp              :  -3.73e+20 Nm\n")

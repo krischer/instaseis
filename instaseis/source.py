@@ -30,7 +30,7 @@ import warnings
 from . import ReceiverParseError, SourceParseError
 from . import rotations
 from .helpers import (elliptic_to_geocentric_latitude,
-                      geocentric_to_elliptic_latitude)
+                      geocentric_to_elliptic_latitude, rfftfreq)
 
 DEFAULT_MU = 32e9
 
@@ -682,7 +682,7 @@ class Source(SourceOrReceiver):
         return_str += '\tLongitude        : %6.1f deg\n' % (self.longitude,)
         return_str += '\tLatitude         : %6.1f deg\n' % (self.latitude,)
         return_str += '\tDepth            : %s km\n' % (
-            "%6.1e km" % self.depth_in_m / 1e3
+            "%6.1e km" % (self.depth_in_m / 1e3)
             if self.depth_in_m is not None else " not set")
         return_str += '\tMoment Magnitude :   %4.2f\n' \
                       % (self.moment_magnitude,)
@@ -1458,7 +1458,7 @@ class FiniteSource(object):
 
             # sum sliprates with time shift applied
             sliprate_f = np.fft.rfft(ps.sliprate, n=nfft)
-            sliprate_f *= np.exp(- 1j * np.fft.rfftfreq(nfft) *
+            sliprate_f *= np.exp(- 1j * rfftfreq(nfft) *
                                  2. * np.pi * ps.time_shift / dt)
             finite_sliprate += np.fft.irfft(sliprate_f)[:nsamp] \
                 * ps.M0 / finite_M0
