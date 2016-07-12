@@ -127,16 +127,23 @@ class Mesh(object):
         self.strain_buffer = Buffer(strain_buffer_size_in_mb)
         self.displ_buffer = Buffer(displ_buffer_size_in_mb)
 
+    def _get_str_attr(self, name):
+        attr = self.f.attrs[name]
+        if isinstance(attr, np.ndarray):
+            attr = attr[0]
+        try:
+            return attr.decode()
+        except:
+            return attr
+
     def _find_time_axis(self):
         self.time_axis = {}
         for key, value in self.f["Snapshots"].items():
             self.time_axis[key] = get_time_axis(value, self.ndumps)
 
     def _parse(self, full_parse=False):
-        # Cheap sanity check. No need to parse the rest.
-        self.dump_type = \
-            self.f.attrs["dump type "
-                         "(displ_only, displ_velo, fullfields)"].decode()
+        self.dump_type = self._get_str_attr(
+            "dump type (displ_only, displ_velo, fullfields)")
         if (self.dump_type != "displ_only" and
                 self.dump_type != "fullfields" and
                 self.dump_type != "strain_only"):
@@ -157,7 +164,7 @@ class Mesh(object):
                              (self.MIN_FILE_VERSION, self.file_version))
 
         self.ndumps = self.f.attrs["number of strain dumps"][0]
-        self.excitation_type = self.f.attrs["excitation type"].decode()
+        self.excitation_type = self._get_str_attr("excitation type")
 
         # The rest is not needed for every mesh.
 
@@ -165,7 +172,7 @@ class Mesh(object):
             return
 
         # Read some basic information to have easier access later on.
-        self.source_type = self.f.attrs["source type"].decode()
+        self.source_type = self._get_str_attr("source type")
         self.amplitude = self.f.attrs["scalar source magnitude"][0]
         self.dt = self.f.attrs["strain dump sampling rate in sec"][0]
         self.source_shift = self.f.attrs["source shift factor in sec"][0]
@@ -207,10 +214,10 @@ class Mesh(object):
 
         self.npoints = self.f.attrs["npoints"][0]
 
-        self.background_model = self.f.attrs["background model"].decode()
+        self.background_model = self._get_str_attr("background model")
         if self.file_version >= 8:  # pragma: no cover
             self.external_model_name = \
-                self.f.attrs["external model name"].decode()
+                self._get_str_attr("external model name")
         else:
             if self.background_model == 'external':  # pragma: no cover
                 self.external_model_name = 'unknown'
@@ -219,22 +226,22 @@ class Mesh(object):
         self.attenuation = bool(self.f.attrs["attenuation"][0])
         self.planet_radius = self.f.attrs["planet radius"][0] * 1e3
         self.dominant_period = self.f.attrs["dominant source period"][0]
-        self.axisem_version = self.f.attrs["git commit hash"].decode()
-        self.creation_time = UTCDateTime(self.f.attrs["datetime"].decode())
+        self.axisem_version = self._get_str_attr("git commit hash")
+        self.creation_time = UTCDateTime(self._get_str_attr("datetime"))
         self.axisem_compiler = "%s %s" % (
-            self.f.attrs["compiler brand"].decode(),
-            self.f.attrs["compiler version"].decode())
+            self._get_str_attr("compiler brand"),
+            self._get_str_attr("compiler version"))
         self.axisem_user = "%s on %s" % (
-            self.f.attrs["user name"].decode(),
-            self.f.attrs["host name"].decode())
+            self._get_str_attr("user name"),
+            self._get_str_attr("host name"))
 
         self.kwf_rmin = self.f.attrs["kernel wavefield rmin"][0]
         self.kwf_rmax = self.f.attrs["kernel wavefield rmax"][0]
         self.kwf_colatmin = self.f.attrs["kernel wavefield colatmin"][0]
         self.kwf_colatmax = self.f.attrs["kernel wavefield colatmax"][0]
-        self.time_scheme = self.f.attrs["time scheme"].decode()
+        self.time_scheme = self._get_str_attr("time scheme")
         self.source_depth = self.f.attrs["source depth in km"][0]
-        self.stf_kind = self.f.attrs["source time function"].decode()
+        self.stf_kind = self._get_str_attr("source time function")
 
         if self.dump_type == "displ_only":
             self.gll_points = self.f["Mesh"]["gll"][:]
