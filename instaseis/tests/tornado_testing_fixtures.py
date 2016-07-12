@@ -141,6 +141,10 @@ DBS["db_bwd_strain_only"] = os.path.join(DATA, "100s_db_bwd_strain_only")
 DBS["db_fwd"] = os.path.join(DATA, "100s_db_fwd")
 DBS["db_fwd_deep"] = os.path.join(DATA, "100s_db_fwd_deep")
 
+# Add all automatically created repacked databases to the server test suite.
+for name, path in pytest.config.dbs["databases"].items():
+    DBS[name] = path
+
 
 def event_info_mock_callback(event_id):
     """
