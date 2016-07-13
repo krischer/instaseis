@@ -275,13 +275,13 @@ def _merge_files(px_in, pz_in, out, contiguous, compression_level, quiet):
     dims = (dim_elements, dim_nvars, dim_jpol, dim_ipol,
             out.dimensions["snapshots"])
     dimensions = [_i.name for _i in dims]
-    # These also determine our chunk settings.
-    chunksizes = [_i.size for _i in dims]
 
     if contiguous:
         zlib = False
+        chunksizes = None
     else:
         zlib = True
+        chunksizes = [_i.size for _i in dims]
 
     # We'll called it MergedSnapshots
     x = out.createVariable(
@@ -292,7 +292,7 @@ def _merge_files(px_in, pz_in, out, contiguous, compression_level, quiet):
         chunksizes=chunksizes,
         datatype=dtype)
 
-    utemp = np.zeros(chunksizes[1:], dtype=dtype, order="C")
+    utemp = np.zeros([_i.size for _i in dims[1:]], dtype=dtype, order="C")
 
     # Now it becomes more interesting and very slow.
     sem_mesh = px_in["Mesh"]["sem_mesh"]

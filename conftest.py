@@ -32,7 +32,7 @@ def repack_databases():
         }
 
     import h5py
-    from instaseis.scripts.repack_db import repack_file
+    from instaseis.scripts.repack_db import merge_files, repack_file
 
     root_folder = tempfile.mkdtemp()
 
@@ -107,6 +107,13 @@ def repack_databases():
     repack_file(input_filename=pz_tr, output_filename=pz_r_tr, contiguous=True,
                 compression_level=None, quiet=True, transpose=False)
 
+    # Add a merged database.
+    merged_bw_db = os.path.join(
+        root_folder, "merged_100s_db_bwd_displ_only")
+    os.makedirs(merged_bw_db)
+    merge_files(filenames=[px, pz], output_folder=merged_bw_db,
+                contiguous=True, compression_level=None, quiet=False)
+
     # Actually test the shapes of the fields to see that something happened.
     with h5py.File(pz, mode="r") as f:
         original_shape = f["Snapshots"]["disp_z"].shape
@@ -118,11 +125,14 @@ def repack_databases():
         repacked_shape = f["Snapshots"]["disp_z"].shape
     with h5py.File(pz_r_tr, mode="r") as f:
         repacked_transposed_shape = f["Snapshots"]["disp_z"].shape
+    with h5py.File(os.path.join(merged_bw_db, "merged_output.nc4"), "r") as f:
+        merged_shape = f["MergedSnapshots"].shape
 
     assert original_shape == tuple(reversed(transposed_shape))
     assert original_shape == transposed_and_back_shape
     assert original_shape == repacked_shape
     assert original_shape == tuple(reversed(repacked_transposed_shape))
+    assert merged_shape == (192, 5, 5, 5, 73)
 
     dbs = collections.OrderedDict()
     # Important is that the name is fairly similar to the original
@@ -133,6 +143,7 @@ def repack_databases():
     dbs["repacked_100s_db_bwd_displ_only"] = repacked_bw_db
     dbs["repacked_transposed_100s_db_bwd_displ_only"] = \
         repacked_transposed_bw_db
+    dbs["merged_100s_db_bwd_displ_only"] = merged_bw_db
 
     return {
         "root_folder": root_folder,
