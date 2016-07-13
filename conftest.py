@@ -1,9 +1,12 @@
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 
+import collections
+import pickle
 import os
 import shutil
 import tempfile
+import time
 
 
 TEST_DATA = os.path.join(os.path.dirname(__file__), "instaseis", "tests",
@@ -58,22 +61,54 @@ def repack_databases():
     transpose_data(input_filename=pz_out, output_filename=pz_out_and_back,
                    contiguous=False, compression_level=4)
 
+    dbs = collections.OrderedDict()
+    # Important is that the name is fairly similar to the original
+    # as some tests use the patterns in the name.
+    dbs["transposed_100s_db_bwd_displ_only"] = transposed_bw_db
+    dbs["transposed_and_back_100s_db_bwd_displ_only"] = \
+        transposed_and_back_bw_db
+
     return {
         "root_folder": root_folder,
-        "databases": {
-            # Important is that the name is fairly similar to the original
-            # as some tests use the patterns in the name.
-            "transposed_100s_db_bwd_displ_only": transposed_bw_db,
-            "transposed_and_back_100s_db_bwd_displ_only":
-                transposed_and_back_bw_db
-        }
+        "databases": dbs
     }
 
 
+def is_master(config):
+    """
+    Returns True/False if the current node is the master node.
+
+    Only applies to if run with pytest-xdist.
+    """
+    # This attribute is only set on slaves.
+    if hasattr(config, "slaveinput"):
+        return False
+    else:
+        return True
+
+
 def pytest_configure(config):
-    config.dbs = repack_databases()
+    if is_master(config):
+        config.dbs = repack_databases()
+    else:
+        while True:
+            if "dbs" not in config.slaveinput:
+                time.sleep(0.01)
+            break
+        config.dbs = pickle.loads(config.slaveinput["dbs"])
+
+
+def pytest_configure_node(node):
+    """
+    This is only called on the master - we use it to send the information to
+    all the slaves.
+
+    Only applies to if run with pytest-xdist.
+    """
+    node.slaveinput["dbs"] = pickle.dumps(node.config.dbs)
 
 
 def pytest_unconfigure(config):
-    if os.path.exists(config.dbs["root_folder"]):
-        shutil.rmtree(config.dbs["root_folder"])
+    if is_master(config):
+        if os.path.exists(config.dbs["root_folder"]):
+            shutil.rmtree(config.dbs["root_folder"])
