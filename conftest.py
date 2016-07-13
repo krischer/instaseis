@@ -114,6 +114,15 @@ def repack_databases():
     merge_files(filenames=[px, pz], output_folder=merged_bw_db,
                 contiguous=True, compression_level=None, quiet=False)
 
+    # Another merged database but this time originating from a transposed
+    # database.
+    merged_transposed_bw_db = os.path.join(
+        root_folder, "merged_transposed_100s_db_bwd_displ_only")
+    os.makedirs(merged_transposed_bw_db)
+    merge_files(filenames=[px_tr, pz_tr],
+                output_folder=merged_transposed_bw_db,
+                contiguous=True, compression_level=None, quiet=False)
+
     # Actually test the shapes of the fields to see that something happened.
     with h5py.File(pz, mode="r") as f:
         original_shape = f["Snapshots"]["disp_z"].shape
@@ -127,12 +136,16 @@ def repack_databases():
         repacked_transposed_shape = f["Snapshots"]["disp_z"].shape
     with h5py.File(os.path.join(merged_bw_db, "merged_output.nc4"), "r") as f:
         merged_shape = f["MergedSnapshots"].shape
+    with h5py.File(os.path.join(merged_transposed_bw_db,
+                                "merged_output.nc4"), "r") as f:
+        merged_tr_shape = f["MergedSnapshots"].shape
 
     assert original_shape == tuple(reversed(transposed_shape))
     assert original_shape == transposed_and_back_shape
     assert original_shape == repacked_shape
     assert original_shape == tuple(reversed(repacked_transposed_shape))
     assert merged_shape == (192, 5, 5, 5, 73)
+    assert merged_tr_shape == (192, 5, 5, 5, 73)
 
     dbs = collections.OrderedDict()
     # Important is that the name is fairly similar to the original
@@ -144,6 +157,7 @@ def repack_databases():
     dbs["repacked_transposed_100s_db_bwd_displ_only"] = \
         repacked_transposed_bw_db
     dbs["merged_100s_db_bwd_displ_only"] = merged_bw_db
+    dbs["merged_transposed_100s_db_bwd_displ_only"] = merged_transposed_bw_db
 
     return {
         "root_folder": root_folder,

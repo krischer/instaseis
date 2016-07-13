@@ -262,6 +262,8 @@ def _merge_files(px_in, pz_in, out, contiguous, compression_level, quiet):
         pz_in["Snapshots"]["disp_s"],
         pz_in["Snapshots"]["disp_z"]]
 
+    time_axis = np.argmin(meshes[0].shape)
+
     dtype = meshes[0].dtype
 
     # Create new dimensions.
@@ -305,12 +307,20 @@ def _merge_files(px_in, pz_in, out, contiguous, compression_level, quiet):
                 # The list of ids we have is unique but not sorted.
                 ids = gll_point_ids.flatten()
                 s_ids = np.sort(ids)
-                temp = var[:, s_ids]
-                for jpol in range(dim_jpol.size):
-                    for ipol in range(dim_ipol.size):
-                        idx = ipol * 5 + jpol
-                        utemp[i, jpol, ipol, :] = \
-                            temp[:, np.argwhere(s_ids == ids[idx])[0][0]]
+                if time_axis == 0:
+                    temp = var[:, s_ids]
+                    for jpol in range(dim_jpol.size):
+                        for ipol in range(dim_ipol.size):
+                            idx = ipol * 5 + jpol
+                            utemp[i, jpol, ipol, :] = \
+                                temp[:, np.argwhere(s_ids == ids[idx])[0][0]]
+                else:
+                    temp = var[s_ids, :]
+                    for jpol in range(dim_jpol.size):
+                        for ipol in range(dim_ipol.size):
+                            idx = ipol * 5 + jpol
+                            utemp[i, jpol, ipol, :] = \
+                                temp[np.argwhere(s_ids == ids[idx])[0][0], :]
             x[gll_idx] = utemp
 
 
