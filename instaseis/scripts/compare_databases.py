@@ -43,7 +43,6 @@ def compare_dbs(databases):
 
     max_depth = (reference.info.max_radius - reference.info.min_radius)
 
-
     while True:
         receiver = instaseis.Receiver(
             latitude=random.random() * 180.0 - 90.0,

@@ -157,6 +157,8 @@ def unroll_and_merge(filenames, output_folder):
     assert os.path.exists(pz)
     assert not os.path.exists(output_filename)
 
+    import h5py
+
     try:
         f_in_x = h5py.File(px, "r")
         f_in_z = h5py.File(pz, "r")
@@ -224,8 +226,7 @@ def unroll_and_merge(filenames, output_folder):
                         for jpol in range(npol + 1):
                             idx = ipol * 5 + jpol
                             utemp[:, jpol, ipol, i] = \
-                                temp[:,
-                                np.argwhere(s_ids == ids[idx])[0][0]]
+                                temp[:, np.argwhere(s_ids == ids[idx])[0][0]]
                 ds_o[gll_idx] = utemp
 
     finally:

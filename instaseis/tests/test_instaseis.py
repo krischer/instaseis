@@ -307,6 +307,7 @@ def test_horizontal_only_db(tmpdir):
     np.testing.assert_allclose(st_bwd.select(component='N')[0].data,
                                BWD_TEST_DATA["N"], rtol=1E-7, atol=1E-12)
 
+
 def test_requesting_wrong_component_horizontal(tmpdir):
     # Copy only the horizontal component data.
     tmpdir = str(tmpdir)
