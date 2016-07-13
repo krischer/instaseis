@@ -131,7 +131,6 @@ The optional graphical user interface furthermore requires
 * ``matplolitb``
 * ``basemap``
 
-
 Fortran Compiler
 ~~~~~~~~~~~~~~~~
 
@@ -224,6 +223,15 @@ Clone the git repository and install in an editable fashion.
 
 Testing
 ^^^^^^^
+
+Many test run without these two packages, but executing the full test suite
+requires two additional packages: ``click`` and ``netcdf4``. If you don't
+already have them, install with
+
+.. code-block::
+
+    $ conda install click netcdf4
+
 
 To assert that your installation is working properly, execute
 
