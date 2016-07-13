@@ -31,6 +31,7 @@ def repack_databases():
             "databases": {}
         }
 
+    import h5py
     from instaseis.scripts.repack_instaseis_database import repack_file
 
     root_folder = tempfile.mkdtemp()
@@ -45,15 +46,15 @@ def repack_databases():
     px = os.path.join(db, "PX", "Data", f)
     pz = os.path.join(db, "PZ", "Data", f)
 
-    px_out = os.path.join(transposed_bw_db, "PX", f)
-    pz_out = os.path.join(transposed_bw_db, "PZ", f)
+    px_tr = os.path.join(transposed_bw_db, "PX", f)
+    pz_tr = os.path.join(transposed_bw_db, "PZ", f)
 
-    os.makedirs(os.path.dirname(px_out))
-    os.makedirs(os.path.dirname(pz_out))
+    os.makedirs(os.path.dirname(px_tr))
+    os.makedirs(os.path.dirname(pz_tr))
 
-    repack_file(input_filename=px, output_filename=px_out, contiguous=True,
+    repack_file(input_filename=px, output_filename=px_tr, contiguous=True,
                 compression_level=None, quiet=True, transpose=True)
-    repack_file(input_filename=pz, output_filename=pz_out, contiguous=True,
+    repack_file(input_filename=pz, output_filename=pz_tr, contiguous=True,
                 compression_level=None, quiet=True, transpose=True)
 
     # Now transpose it again which should result in the original layout.
@@ -61,15 +62,15 @@ def repack_databases():
         root_folder, "transposed_and_back_100s_db_bwd_displ_only")
     os.makedirs(transposed_and_back_bw_db)
 
-    px_out_and_back = os.path.join(transposed_and_back_bw_db, "PX", f)
-    pz_out_and_back = os.path.join(transposed_and_back_bw_db, "PZ", f)
-    os.makedirs(os.path.dirname(px_out_and_back))
-    os.makedirs(os.path.dirname(pz_out_and_back))
+    px_tr_and_back = os.path.join(transposed_and_back_bw_db, "PX", f)
+    pz_tr_and_back = os.path.join(transposed_and_back_bw_db, "PZ", f)
+    os.makedirs(os.path.dirname(px_tr_and_back))
+    os.makedirs(os.path.dirname(pz_tr_and_back))
 
-    repack_file(input_filename=px_out, output_filename=px_out_and_back,
+    repack_file(input_filename=px_tr, output_filename=px_tr_and_back,
                 contiguous=False, compression_level=4, quiet=True,
                 transpose=True)
-    repack_file(input_filename=pz_out, output_filename=pz_out_and_back,
+    repack_file(input_filename=pz_tr, output_filename=pz_tr_and_back,
                 contiguous=False, compression_level=4, quiet=True,
                 transpose=True)
 
@@ -90,6 +91,39 @@ def repack_databases():
     repack_file(input_filename=pz, output_filename=pz_r, contiguous=True,
                 compression_level=None, quiet=True, transpose=False)
 
+    # Also repack the transposed database.
+    repacked_transposed_bw_db = os.path.join(
+        root_folder, "repacked_transposed_100s_db_bwd_displ_only")
+    os.makedirs(repacked_transposed_bw_db)
+
+    px_r_tr = os.path.join(repacked_transposed_bw_db, "PX", f)
+    pz_r_tr = os.path.join(repacked_transposed_bw_db, "PZ", f)
+
+    os.makedirs(os.path.dirname(px_r_tr))
+    os.makedirs(os.path.dirname(pz_r_tr))
+
+    repack_file(input_filename=px_tr, output_filename=px_r_tr, contiguous=True,
+                compression_level=None, quiet=True, transpose=False)
+    repack_file(input_filename=pz_tr, output_filename=pz_r_tr, contiguous=True,
+                compression_level=None, quiet=True, transpose=False)
+
+    # Actually test the shapes of the fields to see that something happened.
+    with h5py.File(pz, mode="r") as f:
+        original_shape = f["Snapshots"]["disp_z"].shape
+    with h5py.File(pz_tr, mode="r") as f:
+        transposed_shape = f["Snapshots"]["disp_z"].shape
+    with h5py.File(pz_tr_and_back, mode="r") as f:
+        transposed_and_back_shape = f["Snapshots"]["disp_z"].shape
+    with h5py.File(pz_r, mode="r") as f:
+        repacked_shape = f["Snapshots"]["disp_z"].shape
+    with h5py.File(pz_r_tr, mode="r") as f:
+        repacked_transposed_shape = f["Snapshots"]["disp_z"].shape
+
+    assert original_shape == tuple(reversed(transposed_shape))
+    assert original_shape == transposed_and_back_shape
+    assert original_shape == repacked_shape
+    assert original_shape == tuple(reversed(repacked_transposed_shape))
+
     dbs = collections.OrderedDict()
     # Important is that the name is fairly similar to the original
     # as some tests use the patterns in the name.
@@ -97,6 +131,8 @@ def repack_databases():
     dbs["transposed_and_back_100s_db_bwd_displ_only"] = \
         transposed_and_back_bw_db
     dbs["repacked_100s_db_bwd_displ_only"] = repacked_bw_db
+    dbs["repacked_transposed_100s_db_bwd_displ_only"] = \
+        repacked_transposed_bw_db
 
     return {
         "root_folder": root_folder,
