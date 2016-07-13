@@ -281,10 +281,11 @@ def repack_database(input_folder, output_folder, contiguous,
                     compression_level, method):
     found_filenames = []
     for root, _, filenames in os.walk(input_folder):
-        for filename in filenames:
-            if filename not in  ["ordered_output.nc4", "axisem_output.nc4"]:
+        for filename in sorted(filenames, reverse=True):
+            if filename not in ["ordered_output.nc4", "axisem_output.nc4"]:
                 continue
             found_filenames.append(os.path.join(root, filename))
+            break
 
     assert found_filenames, "No files named `ordered_output.nc4` found."
 

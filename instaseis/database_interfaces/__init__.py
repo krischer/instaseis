@@ -32,7 +32,7 @@ def find_and_open_files(path, *args, **kwargs):
             os.path.sep)
         if len(nested_levels) >= 4:
             del dirs[:]
-        for filename in filenames:
+        for filename in sorted(filenames, reverse=True):
             if filename in ["ordered_output.nc4", "axisem_output.nc4"]:
                 break
         else:
