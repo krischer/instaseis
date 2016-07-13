@@ -264,11 +264,21 @@ class ReciprocalMergedInstaseisDB(BaseNetCDFInstaseisDB):
 
             if vertical:
                 # Vertical expects disp_s at index 0 and disp_z at index 2.
-                utemp_z = utemp[:, :, :, -3:]
-                utemp_z[:, :, :, 0] = utemp_z[:, :, :, 1]
-                utemp_z[:, :, :, 1][:] = 0
-                utemp_z = np.require(utemp_z, requirements=["F"],
-                                     dtype=np.float64)
+                # Expand if only vertical.
+                _s = list(utemp.shape)
+                if _s[-1] == 2:
+                    _s[-1] = 3
+                    utemp_new = np.zeros(_s, dtype=utemp.dtype)
+                    utemp_new[:, :, :, 0] = utemp[:, :, :, 0]
+                    utemp_new[:, :, :, 2] = utemp[:, :, :, 1]
+                    utemp_z = utemp_new
+                # Reform all others.
+                else:
+                    utemp_z = utemp[:, :, :, -3:]
+                    utemp_z[:, :, :, 0] = utemp_z[:, :, :, 1]
+                    utemp_z[:, :, :, 1][:] = 0
+                    utemp_z = np.require(utemp_z, requirements=["F"],
+                                         dtype=np.float64)
 
                 strain_z = strain_fct_map["monopole"](
                     utemp_z, G, GT, col_points_xi, col_points_eta,
