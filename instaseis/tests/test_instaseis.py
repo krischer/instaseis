@@ -195,8 +195,11 @@ def test_incremental_bwd(bwd_db):
                                BWD_TEST_DATA["R"], rtol=1E-7, atol=1E-12)
     np.testing.assert_allclose(st_bwd.select(component='T')[0].data,
                                BWD_TEST_DATA["T"], rtol=1E-7, atol=1E-12)
-    assert instaseis_bwd.meshes.px.strain_buffer.efficiency == 0.0
-    assert instaseis_bwd.meshes.pz.strain_buffer.efficiency == 0.0
+    if hasattr(instaseis_bwd.meshes, "px"):
+        assert instaseis_bwd.meshes.px.strain_buffer.efficiency == 0.0
+        assert instaseis_bwd.meshes.pz.strain_buffer.efficiency == 0.0
+    else:
+        assert instaseis_bwd.meshes.merged.strain_buffer.efficiency == 0.0
 
     # read on init
     instaseis_bwd = find_and_open_files(bwd_db, read_on_demand=False)
@@ -214,8 +217,11 @@ def test_incremental_bwd(bwd_db):
                                BWD_TEST_DATA["R"], rtol=1E-7, atol=1E-12)
     np.testing.assert_allclose(st_bwd.select(component='T')[0].data,
                                BWD_TEST_DATA["T"], rtol=1E-7, atol=1E-12)
-    assert instaseis_bwd.meshes.px.strain_buffer.efficiency == 0.0
-    assert instaseis_bwd.meshes.pz.strain_buffer.efficiency == 0.0
+    if hasattr(instaseis_bwd.meshes, "px"):
+        assert instaseis_bwd.meshes.px.strain_buffer.efficiency == 0.0
+        assert instaseis_bwd.meshes.pz.strain_buffer.efficiency == 0.0
+    else:
+        assert instaseis_bwd.meshes.merged.strain_buffer.efficiency == 0.0
 
     # read the same again to test buffer
     st_bwd = instaseis_bwd.get_seismograms(
@@ -230,8 +236,12 @@ def test_incremental_bwd(bwd_db):
                                BWD_TEST_DATA["R"], rtol=1E-7, atol=1E-12)
     np.testing.assert_allclose(st_bwd.select(component='T')[0].data,
                                BWD_TEST_DATA["T"], rtol=1E-7, atol=1E-12)
-    assert instaseis_bwd.meshes.px.strain_buffer.efficiency == 1.0 / 2.0
-    assert instaseis_bwd.meshes.pz.strain_buffer.efficiency == 1.0 / 2.0
+    if hasattr(instaseis_bwd.meshes, "px"):
+        assert instaseis_bwd.meshes.px.strain_buffer.efficiency == 1.0 / 2.0
+        assert instaseis_bwd.meshes.pz.strain_buffer.efficiency == 1.0 / 2.0
+    else:
+        assert instaseis_bwd.meshes.merged.strain_buffer.efficiency == \
+            1.0 / 2.0
 
     # test resampling with a no-op interpolation.
     dt = instaseis_bwd.info.dt

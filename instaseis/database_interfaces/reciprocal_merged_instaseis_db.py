@@ -165,19 +165,9 @@ class ReciprocalMergedInstaseisDB(BaseNetCDFInstaseisDB):
             if self.info.dump_type != 'displ_only':
                 raise ValueError("Force sources only in displ_only mode")
 
-            if "Z" in components:
-                displ_z = self._get_displacement(self.meshes.pz, ei.id_elem,
-                                                 ei.gll_point_ids,
-                                                 ei.col_points_xi,
-                                                 ei.col_points_eta, ei.xi,
-                                                 ei.eta)
-
-            if any(comp in components for comp in ['N', 'E', 'R', 'T']):
-                displ_x = self._get_displacement(self.meshes.px, ei.id_elem,
-                                                 ei.gll_point_ids,
-                                                 ei.col_points_xi,
-                                                 ei.col_points_eta, ei.xi,
-                                                 ei.eta)
+            displ_x, displ_z = self._get_displacement(
+                ei.id_elem, ei.gll_point_ids, ei.col_points_xi,
+                ei.col_points_eta, ei.xi, ei.eta)
 
             force = rotations.rotate_vector_xyz_src_to_xyz_earth(
                 source.force_tpr, np.deg2rad(source.longitude),
@@ -226,21 +216,26 @@ class ReciprocalMergedInstaseisDB(BaseNetCDFInstaseisDB):
 
         return data
 
+    def _get_and_reorder_utemp(self, id_elem):
+        # We can now read it in a single go!
+        utemp = self.meshes.merged.f["MergedSnapshots"][id_elem]
+
+        # utemp is currently (nvars, jpol, ipol, npts)
+        # 1. Roll to (npts, nvar, jpol, ipol)
+        utemp = np.rollaxis(utemp, 3, 0)
+        # 2. Roll to (npts, jpol, nvar, ipol)
+        utemp = np.rollaxis(utemp, 2, 1)
+        # 3. Roll to (npts, jpol, ipol, nvar)
+        utemp = np.rollaxis(utemp, 3, 2)
+
+        return utemp
+
     def _get_strain_interp(self, id_elem, gll_point_ids, G, GT,
                            col_points_xi, col_points_eta, corner_points,
                            eltype, axis, xi, eta):
         mesh = self.meshes.merged
         if id_elem not in mesh.strain_buffer:
-            # We can now read it in a single go!
-            utemp = mesh.f["MergedSnapshots"][id_elem]
-
-            # utemp is currently (nvars, jpol, ipol, npts)
-            # 1. Roll to (npts, nvar, jpol, ipol)
-            utemp = np.rollaxis(utemp, 3, 0)
-            # 2. Roll to (npts, jpol, nvar, ipol)
-            utemp = np.rollaxis(utemp, 2, 1)
-            # 3. Roll to (npts, jpol, ipol, nvar)
-            utemp = np.rollaxis(utemp, 3, 2)
+            utemp = self._get_and_reorder_utemp(id_elem)
 
             strain_fct_map = {
                 "monopole": sem_derivatives.strain_monopole_td,
@@ -255,13 +250,13 @@ class ReciprocalMergedInstaseisDB(BaseNetCDFInstaseisDB):
                 mesh.npol, mesh.ndumps, corner_points, eltype, axis)
 
             # Vertical expects disp_s at index 0 and disp_z at index 2.
-            utemp = utemp[:, :, :, -3:]
-            utemp[:, :, :, 0] = utemp[:, :, :, 1]
-            utemp[:, :, :, 1][:] = 0
-            utemp = np.require(utemp, requirements=["F"], dtype=np.float64)
+            utemp_z = utemp[:, :, :, -3:]
+            utemp_z[:, :, :, 0] = utemp_z[:, :, :, 1]
+            utemp_z[:, :, :, 1][:] = 0
+            utemp_z = np.require(utemp_z, requirements=["F"], dtype=np.float64)
 
             strain_z = strain_fct_map["monopole"](
-                utemp, G, GT, col_points_xi, col_points_eta,
+                utemp_z, G, GT, col_points_xi, col_points_eta,
                 mesh.npol, mesh.ndumps, corner_points, eltype, axis)
 
             mesh.strain_buffer.add(id_elem, (strain_x, strain_z))
@@ -283,3 +278,35 @@ class ReciprocalMergedInstaseisDB(BaseNetCDFInstaseisDB):
             all_strains[name] = final_strain
 
         return all_strains["strain_x"], all_strains["strain_z"]
+
+    def _get_displacement(self, id_elem, gll_point_ids,
+                          col_points_xi, col_points_eta, xi, eta):
+        mesh = self.meshes.merged
+        if id_elem not in mesh.displ_buffer:
+            utemp = self._get_and_reorder_utemp(id_elem)
+            mesh.displ_buffer.add(id_elem, utemp)
+        else:
+            utemp = mesh.displ_buffer.get(id_elem)
+
+        final_displacement_x = np.empty((utemp.shape[0], 3), order="F")
+        utemp_x = utemp[:, :, :, :3]
+        utemp_x = np.require(utemp_x, requirements=["F"],
+                             dtype=np.float64)
+        for i in range(3):
+            final_displacement_x[:, i] = \
+                spectral_basis.lagrange_interpol_2D_td(
+                    col_points_xi, col_points_eta,
+                    utemp_x[:, :, :, i], xi, eta)
+
+        utemp_z = utemp[:, :, :, -3:]
+        utemp_z[:, :, :, 0] = utemp_z[:, :, :, 1]
+        utemp_z[:, :, :, 1][:] = 0
+        utemp_z = np.require(utemp_z, requirements=["F"], dtype=np.float64)
+        final_displacement_z = np.empty((utemp.shape[0], 3), order="F")
+        for i in range(3):
+            final_displacement_z[:, i] = \
+                spectral_basis.lagrange_interpol_2D_td(
+                    col_points_xi, col_points_eta,
+                    utemp_z[:, :, :, i], xi, eta)
+
+        return final_displacement_x, final_displacement_z
