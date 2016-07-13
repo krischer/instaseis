@@ -13,7 +13,7 @@ Usage:
 
 .. code-block:: bash
 
-    $ python -m instaseis.scripts.compare_databases DB1 DB2 DB3
+    $ python -m instaseis.scripts.compare_dbs DB1 DB2 DB3
 
 
 In this example ``DB2``  and ``DB3`` will both be compared the ``DB1``.
