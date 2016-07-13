@@ -53,6 +53,8 @@ for name, path in pytest.config.dbs["databases"].items():
         test_data = BWD_TEST_DATA
     elif "fwd" in name:
         test_data = FWD_TEST_DATA
+    elif "horizontal_only" in name or "vertical_only" in name:
+        test_data = FWD_TEST_DATA
     else:  # pragma: no cover
         raise NotImplementedError
     TEST_DATA[path] = test_data
@@ -850,6 +852,21 @@ def test_higher_level_event_and_receiver_parsing(bwd_db):
 
 
 @pytest.mark.parametrize("db", DBS)
+def test_available_components_decorator(db):
+    db = find_and_open_files(db)
+    if "vertical" in db.info.components and "horizontal" in db.info.components:
+        assert db.available_components == ["Z", "N", "E", "R", "T"]
+    elif "4 elemental moment tensors" in db.info.components:
+        assert db.available_components == ["Z", "N", "E", "R", "T"]
+    elif "vertical" in db.info.components:
+        assert db.available_components == ["Z"]
+    elif "horizontal" in db.info.components:
+        assert db.available_components == ["N", "E", "R", "T"]
+    else:  # pragma: no cover
+        raise NotImplementedError
+
+
+@pytest.mark.parametrize("db", DBS)
 def test_resampling_and_time_settings(db):
     """
     This tests should assure that the origin time is always the peak of the
@@ -868,7 +885,8 @@ def test_resampling_and_time_settings(db):
     # The `remove_source_shift` argument will cut away the first couple of
     # samples. This results in the first sample being the origin time.
     st_r_shift = db.get_seismograms(source=source, receiver=receiver,
-                                    remove_source_shift=True)
+                                    remove_source_shift=True,
+                                    components=db.available_components)
     for tr in st_r_shift:
         assert tr.stats.starttime == origin_time
     length = st_r_shift[0].stats.npts
@@ -876,7 +894,8 @@ def test_resampling_and_time_settings(db):
     # Now if we don't remove it we should have a couple more samples. If we
     # don't resample it should be more or less exact.
     st = db.get_seismograms(source=source, receiver=receiver,
-                            remove_source_shift=False)
+                            remove_source_shift=False,
+                            components=db.available_components)
     for tr in st:
         assert tr.stats.starttime == origin_time - \
             (db.info.src_shift_samples * db.info.dt)
@@ -892,14 +911,16 @@ def test_resampling_and_time_settings(db):
     # source time function.
     st_r_shift = db.get_seismograms(source=source, receiver=receiver,
                                     remove_source_shift=True, dt=12,
-                                    kernelwidth=1)
+                                    kernelwidth=1,
+                                    components=db.available_components)
     for tr in st_r_shift:
         assert tr.stats.starttime == origin_time
     length = st_r_shift[0].stats.npts
 
     st = db.get_seismograms(source=source, receiver=receiver,
                             remove_source_shift=False, dt=12,
-                            kernelwidth=1)
+                            kernelwidth=1,
+                            components=db.available_components)
     for tr in st:
         assert tr.stats.starttime == origin_time - 14 * 12
 
@@ -946,7 +967,7 @@ def test_time_settings_with_resample_stf(db):
     with pytest.raises(ValueError) as err:
         db.get_seismograms(
             source=source, receiver=receiver,
-            components=('Z', 'N', 'E', 'R', 'T'), dt=0.1, reconvolve_stf=True,
+            components=db.available_components, dt=0.1, reconvolve_stf=True,
             remove_source_shift=True)
     assert isinstance(err.value, ValueError)
     assert err.value.args[0] == ("'remove_source_shift' argument not "
@@ -955,21 +976,21 @@ def test_time_settings_with_resample_stf(db):
     # No matter the dt, the first sample will always be set to the origin time.
     st = db.get_seismograms(
         source=source, receiver=receiver,
-        components=('Z', 'N', 'E', 'R', 'T'), reconvolve_stf=True,
+        components=db.available_components, reconvolve_stf=True,
         remove_source_shift=False)
     for tr in st:
         assert tr.stats.starttime == origin_time
 
     st = db.get_seismograms(
         source=source, receiver=receiver,
-        components=('Z', 'N', 'E', 'R', 'T'), reconvolve_stf=True,
+        components=db.available_components, reconvolve_stf=True,
         remove_source_shift=False, dt=0.1)
     for tr in st:
         assert tr.stats.starttime == origin_time
 
     st = db.get_seismograms(
         source=source, receiver=receiver,
-        components=('Z', 'N', 'E', 'R', 'T'), reconvolve_stf=True,
+        components=db.available_components, reconvolve_stf=True,
         remove_source_shift=False, dt=1.0)
     for tr in st:
         assert tr.stats.starttime == origin_time
@@ -1047,7 +1068,7 @@ def test_get_time_information(db):
            "dt": None,
            "kernelwidth": 5}
     tr = db.get_seismograms(source=source, receiver=receiver,
-                            components=["Z"], **par)[0]
+                            components=db.available_components, **par)[0]
     times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
 
     assert tr.stats.starttime == times["starttime"]
@@ -1066,7 +1087,7 @@ def test_get_time_information(db):
            "dt": None,
            "kernelwidth": 5}
     tr = db.get_seismograms(source=source, receiver=receiver,
-                            components=["Z"], **par)[0]
+                            components=db.available_components, **par)[0]
     times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
 
     assert tr.stats.starttime == times["starttime"]
@@ -1087,7 +1108,7 @@ def test_get_time_information(db):
            "dt": db.info.dt,
            "kernelwidth": 2}
     tr = db.get_seismograms(source=source, receiver=receiver,
-                            components=["Z"], **par)[0]
+                            components=db.available_components, **par)[0]
     times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
 
     assert tr.stats.starttime == times["starttime"]
@@ -1105,7 +1126,7 @@ def test_get_time_information(db):
            "dt": db.info.dt,
            "kernelwidth": 5}
     tr = db.get_seismograms(source=source, receiver=receiver,
-                            components=["Z"], **par)[0]
+                            components=db.available_components, **par)[0]
     times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
 
     assert tr.stats.starttime == times["starttime"]
@@ -1124,7 +1145,7 @@ def test_get_time_information(db):
            "dt": 12.0,
            "kernelwidth": 1}
     tr = db.get_seismograms(source=source, receiver=receiver,
-                            components=["Z"], **par)[0]
+                            components=db.available_components, **par)[0]
     times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
 
     assert tr.stats.starttime == times["starttime"]
@@ -1146,7 +1167,7 @@ def test_get_time_information(db):
            "dt": 12.0,
            "kernelwidth": 2}
     tr = db.get_seismograms(source=source, receiver=receiver,
-                            components=["Z"], **par)[0]
+                            components=db.available_components, **par)[0]
     times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
 
     assert tr.stats.starttime == times["starttime"]
@@ -1168,7 +1189,7 @@ def test_get_time_information(db):
            "dt": 12.0,
            "kernelwidth": 7}
     tr = db.get_seismograms(source=source, receiver=receiver,
-                            components=["Z"], **par)[0]
+                            components=db.available_components, **par)[0]
     times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
 
     assert tr.stats.starttime == times["starttime"]
@@ -1190,7 +1211,7 @@ def test_get_time_information(db):
            "dt": 12.0,
            "kernelwidth": 1}
     tr = db.get_seismograms(source=source, receiver=receiver,
-                            components=["Z"], **par)[0]
+                            components=db.available_components, **par)[0]
     times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
 
     assert tr.stats.starttime == times["starttime"]
@@ -1212,7 +1233,7 @@ def test_get_time_information(db):
            "dt": 12.0,
            "kernelwidth": 2}
     tr = db.get_seismograms(source=source, receiver=receiver,
-                            components=["Z"], **par)[0]
+                            components=db.available_components, **par)[0]
     times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
 
     assert tr.stats.starttime == times["starttime"]
@@ -1234,7 +1255,7 @@ def test_get_time_information(db):
            "dt": 12.0,
            "kernelwidth": 7}
     tr = db.get_seismograms(source=source, receiver=receiver,
-                            components=["Z"], **par)[0]
+                            components=db.available_components, **par)[0]
     times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
 
     assert tr.stats.starttime == times["starttime"]
@@ -1290,7 +1311,7 @@ def test_get_time_information_reconvolve_stf(db):
            "dt": None,
            "kernelwidth": 5}
     tr = db.get_seismograms(source=source, receiver=receiver,
-                            components=["Z"], **par)[0]
+                            components=db.available_components, **par)[0]
     times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
 
     # The seismogram will always start with the origin time and the
@@ -1313,7 +1334,7 @@ def test_get_time_information_reconvolve_stf(db):
            "dt": 12.0,
            "kernelwidth": 1}
     tr = db.get_seismograms(source=source, receiver=receiver,
-                            components=["Z"], **par)[0]
+                            components=db.available_components, **par)[0]
     times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
 
     assert tr.stats.starttime == times["starttime"]
@@ -1337,7 +1358,7 @@ def test_get_time_information_reconvolve_stf(db):
            "dt": 12.0,
            "kernelwidth": 2}
     tr = db.get_seismograms(source=source, receiver=receiver,
-                            components=["Z"], **par)[0]
+                            components=db.available_components, **par)[0]
     times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
 
     assert tr.stats.starttime == times["starttime"]
@@ -1360,7 +1381,7 @@ def test_get_time_information_reconvolve_stf(db):
            "dt": 12.0,
            "kernelwidth": 7}
     tr = db.get_seismograms(source=source, receiver=receiver,
-                            components=["Z"], **par)[0]
+                            components=db.available_components, **par)[0]
     times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
 
     assert tr.stats.starttime == times["starttime"]
@@ -1610,6 +1631,8 @@ def test_read_on_demand(database_folder, read_on_demand):
     Make sure that databases work in read_on_demand mode.
     """
     db = find_and_open_files(database_folder, read_on_demand=read_on_demand)
+    if db.info.components != "vertical_and_horizontal":
+        return
 
     receiver = Receiver(latitude=42.6390, longitude=74.4940)
 

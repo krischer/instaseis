@@ -225,42 +225,84 @@ def merge_files(filenames, output_folder, contiguous, compression_level,
     Completely unroll and merge both files to a single database.
     """
     # Find PX and PZ files.
-    assert len(filenames) == 2
+    assert 1 <= len(filenames) <= 2
     filenames = [os.path.normpath(_i) for _i in filenames]
     px = [_i for _i in filenames if "PX" in _i]
     pz = [_i for _i in filenames if "PZ" in _i]
-    assert len(px) == 1
-    assert len(pz) == 1
-    px = px[0]
-    pz = pz[0]
+    assert len(px) <= 1
+    assert len(pz) <= 1
+    if px:
+        px = px[0]
+        assert os.path.exists(px)
+    else:
+        px = None
+    if pz:
+        pz = pz[0]
+        assert os.path.exists(pz)
+    else:
+        pz = None
 
-    assert os.path.exists(px)
-    assert os.path.exists(pz)
+    # One must exist.
+    assert px or pz
 
     output = os.path.join(output_folder, "merged_output.nc4")
     assert not os.path.exists(output)
 
-    with netCDF4.Dataset(px, "r", format="NETCDF4") as px_in, \
-            netCDF4.Dataset(pz, "r", format="NETCDF4") as pz_in, \
-            netCDF4.Dataset(output, "w", format="NETCDF4") as out:
+    if px and pz:
+        with netCDF4.Dataset(px, "r", format="NETCDF4") as px_in, \
+                netCDF4.Dataset(pz, "r", format="NETCDF4") as pz_in, \
+                netCDF4.Dataset(output, "w", format="NETCDF4") as out:
 
-        _merge_files(px_in=px_in, pz_in=pz_in, out=out, contiguous=contiguous,
-                     compression_level=compression_level, quiet=quiet)
+            _merge_files(px_in=px_in, pz_in=pz_in, out=out,
+                         contiguous=contiguous,
+                         compression_level=compression_level, quiet=quiet)
+    elif pz and not px:
+        with netCDF4.Dataset(pz, "r", format="NETCDF4") as pz_in, \
+                netCDF4.Dataset(output, "w", format="NETCDF4") as out:
+
+            _merge_files(px_in=None, pz_in=pz_in, out=out,
+                         contiguous=contiguous,
+                         compression_level=compression_level, quiet=quiet)
+    elif px and not pz:
+        with netCDF4.Dataset(px, "r", format="NETCDF4") as px_in, \
+                netCDF4.Dataset(output, "w", format="NETCDF4") as out:
+
+            _merge_files(px_in=px_in, pz_in=None, out=out,
+                         contiguous=contiguous,
+                         compression_level=compression_level, quiet=quiet)
+    else:  # pragma: no cover
+        raise NotImplementedError
 
 
 def _merge_files(px_in, pz_in, out, contiguous, compression_level, quiet):
     # First copy everything non-snapshot related.
+    if px_in:
+        c_db = px_in
+    else:
+        c_db = pz_in
     recursive_copy_no_snapshots_no_seismograms(
-        src=px_in, dst=out, quiet=quiet, contiguous=contiguous,
+        src=c_db, dst=out, quiet=quiet, contiguous=contiguous,
         compression_level=compression_level)
 
     # Get all the snapshots from the other databases.
-    meshes = [
-        px_in["Snapshots"]["disp_s"],
-        px_in["Snapshots"]["disp_p"],
-        px_in["Snapshots"]["disp_z"],
-        pz_in["Snapshots"]["disp_s"],
-        pz_in["Snapshots"]["disp_z"]]
+    if px_in and pz_in:
+        meshes = [
+            px_in["Snapshots"]["disp_s"],
+            px_in["Snapshots"]["disp_p"],
+            px_in["Snapshots"]["disp_z"],
+            pz_in["Snapshots"]["disp_s"],
+            pz_in["Snapshots"]["disp_z"]]
+    elif px_in and not pz_in:
+        meshes = [
+            px_in["Snapshots"]["disp_s"],
+            px_in["Snapshots"]["disp_p"],
+            px_in["Snapshots"]["disp_z"]]
+    elif pz_in and not px_in:
+        meshes = [
+            pz_in["Snapshots"]["disp_s"],
+            pz_in["Snapshots"]["disp_z"]]
+    else:  # pragma: no cover
+        raise NotImplementedError
 
     time_axis = np.argmin(meshes[0].shape)
 
@@ -269,7 +311,7 @@ def _merge_files(px_in, pz_in, out, contiguous, compression_level, quiet):
     # Create new dimensions.
     dim_ipol = out.createDimension("ipol", 5)
     dim_jpol = out.createDimension("jpol", 5)
-    dim_nvars = out.createDimension("nvars", 5)
+    dim_nvars = out.createDimension("nvars", len(meshes))
     nelem = out.getncattr("nelem_kwf_global")
     dim_elements = out.createDimension("elements", nelem)
 
@@ -297,7 +339,7 @@ def _merge_files(px_in, pz_in, out, contiguous, compression_level, quiet):
     utemp = np.zeros([_i.size for _i in dims[1:]], dtype=dtype, order="C")
 
     # Now it becomes more interesting and very slow.
-    sem_mesh = px_in["Mesh"]["sem_mesh"]
+    sem_mesh = c_db["Mesh"]["sem_mesh"]
     with click.progressbar(range(nelem), length=nelem, label="\t  ") as idx:
         for gll_idx in idx:
             gll_point_ids = sem_mesh[gll_idx]
@@ -370,7 +412,7 @@ def repack_database(input_folder, output_folder, contiguous,
 
             os.makedirs(os.path.dirname(output_filename))
 
-            if method == "tranposed":
+            if method == "transposed":
                 transpose = True
             else:
                 transpose = False

@@ -196,7 +196,7 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
         else:
             return data
 
-    def get_seismograms(self, source, receiver, components=("Z", "N", "E"),
+    def get_seismograms(self, source, receiver, components=None,
                         kind='displacement', remove_source_shift=True,
                         reconvolve_stf=False, return_obspy_stream=True,
                         dt=None, kernelwidth=12):
@@ -211,7 +211,9 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
         :type components: tuple of str, optional
         :param components: Which components to calculate. Must be a tuple
             containing any combination of ``"Z"``, ``"N"``, ``"E"``,
-            ``"R"``, and ``"T"``.
+            ``"R"``, and ``"T"``. Defaults to ``["Z", "N", "E"]`` for two
+            component databases, to ``["N", "E"]`` for horizontal only
+            databases, and to ``["Z"]`` for vertical only databases.
         :type kind: str, optional
         :param kind: The desired units of the seismogram:
             ``"displacement"``, ``"velocity"``, or ``"acceleration"``.
@@ -239,6 +241,9 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
         :rtype: A :class:`obspy.core.stream.Stream` object or a dictionary
             with NumPy arrays as values.
         """
+        if components is None:
+            components = self.default_components
+
         source, receiver = self._get_seismograms_sanity_checks(
             source=source, receiver=receiver, components=components, kind=kind)
 
@@ -305,7 +310,8 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
 
             if dt is not None:
                 data[comp] = lanczos_interpolation(
-                    data=data[comp], old_start=0, old_dt=self.info.dt,
+                    data=np.require(data[comp], requirements=["C"]),
+                    old_start=0, old_dt=self.info.dt,
                     new_start=time_information["time_shift_at_beginning"],
                     new_dt=dt,
                     new_npts=time_information["npts_before_shift_removal"],
@@ -375,7 +381,7 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
         raise NotImplementedError
 
     def get_seismograms_finite_source(self, sources, receiver,
-                                      components=("Z", "N", "E"),
+                                      components=None,
                                       kind='displacement', dt=None,
                                       kernelwidth=12, correct_mu=False,
                                       progress_callback=None):
@@ -390,7 +396,9 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
         :type components: tuple of str, optional
         :param components: Which components to calculate. Must be a tuple
             containing any combination of ``"Z"``, ``"N"``, ``"E"``,
-            ``"R"``, and ``"T"``.
+            ``"R"``, and ``"T"``. Defaults to ``["Z", "N", "E"]`` for two
+            component databases, to ``["N", "E"]`` for horizontal only
+            databases, and to ``["Z"]`` for vertical only databases.
         :type kind: str, optional
         :param kind: The desired units of the seismogram:
             ``"displacement"``, ``"velocity"``, or ``"acceleration"``.
@@ -414,6 +422,9 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
         :returns: Multi component finite source seismogram.
         :rtype: :class:`obspy.core.stream.Stream`
         """
+        if components is None:
+            components = self.default_components
+
         if not self.info.is_reciprocal:
             raise NotImplementedError
 
@@ -451,9 +462,9 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
                 new_npts = int(round(
                     (len(data[comp]) - 1) * self.info.dt / dt, 6) + 1)
                 data_summed[comp] = lanczos_interpolation(
-                    data=data_summed[comp], old_start=0, old_dt=self.info.dt,
-                    new_start=0, new_dt=dt, new_npts=new_npts,
-                    a=kernelwidth, window="blackman")
+                    data=np.require(data_summed[comp], requirements=["C"]),
+                    old_start=0, old_dt=self.info.dt, new_start=0, new_dt=dt,
+                    new_npts=new_npts, a=kernelwidth, window="blackman")
 
                 # The resampling assumes zeros outside the data range. This
                 # does not introduce any errors at the beginning as the data is
@@ -656,6 +667,37 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
             datetime=info.datetime
         )
         return return_str
+
+    @property
+    def default_components(self):
+        """
+        The components returned by default by most of the higher level
+        routines.
+        """
+        c = self.available_components
+        if len(c) == 5:
+            c = ["Z", "N", "E"]
+        elif len(c) == 4:
+            c = ["N", "E"]
+        elif len(c):
+            c = ["Z"]
+        else:  # pragma: no cover
+            raise NotImplementedError
+        return c
+
+    @property
+    def available_components(self):
+        """
+        Returns a list with all available components.
+        """
+        if self.info.components == "4 elemental moment tensors":
+            return ["Z", "N", "E", "R", "T"]
+        components = []
+        if "vertical" in self.info.components:
+            components.append("Z")
+        if "horizontal" in self.info.components:
+            components.extend(["N", "E", "R", "T"])
+        return components
 
 
 def _get_seismogram_times(info, origin_time, dt, kernelwidth,

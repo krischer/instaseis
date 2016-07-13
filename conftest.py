@@ -14,7 +14,7 @@ TEST_DATA = os.path.join(os.path.dirname(__file__), "instaseis", "tests",
 
 def repack_databases():
     """
-    Repack databases and create a couple temporary test databases.
+    Repack databases and create a couple of temporary test databases.
 
     It will generate various repacked databases and use them in the test
     suite - this for one tests the repacking but also that Instaseis can
@@ -123,6 +123,22 @@ def repack_databases():
                 output_folder=merged_transposed_bw_db,
                 contiguous=True, compression_level=None, quiet=False)
 
+    # Make a horizontal only merged database.
+    horizontal_only_merged_db = os.path.join(
+        root_folder, "horizontal_only_merged_db")
+    os.makedirs(horizontal_only_merged_db)
+    merge_files(filenames=[px_tr],
+                output_folder=horizontal_only_merged_db,
+                contiguous=False, compression_level=2, quiet=False)
+
+    # Make a vertical only merged database.
+    vertical_only_merged_db = os.path.join(
+        root_folder, "vertical_only_merged_db")
+    os.makedirs(vertical_only_merged_db)
+    merge_files(filenames=[pz_tr],
+                output_folder=vertical_only_merged_db,
+                contiguous=False, compression_level=2, quiet=False)
+
     # Actually test the shapes of the fields to see that something happened.
     with h5py.File(pz, mode="r") as f:
         original_shape = f["Snapshots"]["disp_z"].shape
@@ -139,13 +155,23 @@ def repack_databases():
     with h5py.File(os.path.join(merged_transposed_bw_db,
                                 "merged_output.nc4"), "r") as f:
         merged_tr_shape = f["MergedSnapshots"].shape
+    with h5py.File(os.path.join(horizontal_only_merged_db,
+                                "merged_output.nc4"), "r") as f:
+        horizontal_only_merged_tr_shape = f["MergedSnapshots"].shape
+    with h5py.File(os.path.join(vertical_only_merged_db,
+                                "merged_output.nc4"), "r") as f:
+        vertical_only_merged_tr_shape = f["MergedSnapshots"].shape
 
     assert original_shape == tuple(reversed(transposed_shape))
     assert original_shape == transposed_and_back_shape
     assert original_shape == repacked_shape
     assert original_shape == tuple(reversed(repacked_transposed_shape))
-    assert merged_shape == (192, 5, 5, 5, 73)
-    assert merged_tr_shape == (192, 5, 5, 5, 73)
+    assert merged_shape == (192, 5, 5, 5, 73), str(merged_shape)
+    assert merged_tr_shape == (192, 5, 5, 5, 73), str(merged_tr_shape)
+    assert horizontal_only_merged_tr_shape == (192, 3, 5, 5, 73), \
+        str(horizontal_only_merged_tr_shape)
+    assert vertical_only_merged_tr_shape == (192, 2, 5, 5, 73), \
+        str(vertical_only_merged_tr_shape)
 
     dbs = collections.OrderedDict()
     # Important is that the name is fairly similar to the original
@@ -158,6 +184,10 @@ def repack_databases():
         repacked_transposed_bw_db
     dbs["merged_100s_db_bwd_displ_only"] = merged_bw_db
     dbs["merged_transposed_100s_db_bwd_displ_only"] = merged_transposed_bw_db
+
+    # Special databases.
+    dbs["horizontal_only_merged_database"] = horizontal_only_merged_db
+    dbs["vertical_only_merged_database"] = vertical_only_merged_db
 
     return {
         "root_folder": root_folder,

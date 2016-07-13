@@ -91,6 +91,15 @@ class ReciprocalMergedInstaseisDB(BaseNetCDFInstaseisDB):
         fac_2_map = {"N": lambda x: - np.sin(x),
                      "E": np.cos}
 
+        if "Z" in components:
+            vertical = True
+        else:
+            vertical = False
+        if any(comp in components for comp in ['N', 'E', 'R', 'T']):
+            horizontal = True
+        else:
+            horizontal = False
+
         if isinstance(source, Source):
             if self.info.dump_type == 'displ_only':
                 if ei.axis:
@@ -104,7 +113,8 @@ class ReciprocalMergedInstaseisDB(BaseNetCDFInstaseisDB):
                 strain_x, strain_z = self._get_strain_interp(
                     ei.id_elem, ei.gll_point_ids, G, GT,
                     ei.col_points_xi, ei.col_points_eta, ei.corner_points,
-                    ei.eltype, ei.axis, ei.xi, ei.eta)
+                    ei.eltype, ei.axis, ei.xi, ei.eta, horizontal=horizontal,
+                    vertical=vertical)
             elif (self.info.dump_type == 'fullfields' or
                   self.info.dump_type == 'strain_only'):
                 strain_x, strain_z = self._get_strain(
@@ -232,7 +242,7 @@ class ReciprocalMergedInstaseisDB(BaseNetCDFInstaseisDB):
 
     def _get_strain_interp(self, id_elem, gll_point_ids, G, GT,
                            col_points_xi, col_points_eta, corner_points,
-                           eltype, axis, xi, eta):
+                           eltype, axis, xi, eta, horizontal, vertical):
         mesh = self.meshes.merged
         if id_elem not in mesh.strain_buffer:
             utemp = self._get_and_reorder_utemp(id_elem)
@@ -242,22 +252,29 @@ class ReciprocalMergedInstaseisDB(BaseNetCDFInstaseisDB):
                 "dipole": sem_derivatives.strain_dipole_td,
                 "quadpole": sem_derivatives.strain_quadpole_td}
 
-            utemp_x = utemp[:, :, :, :3]
-            utemp_x = np.require(utemp_x, requirements=["F"],
-                                 dtype=np.float64)
-            strain_x = strain_fct_map["dipole"](
-                utemp_x, G, GT, col_points_xi, col_points_eta,
-                mesh.npol, mesh.ndumps, corner_points, eltype, axis)
+            if horizontal:
+                utemp_x = utemp[:, :, :, :3]
+                utemp_x = np.require(utemp_x, requirements=["F"],
+                                     dtype=np.float64)
+                strain_x = strain_fct_map["dipole"](
+                    utemp_x, G, GT, col_points_xi, col_points_eta,
+                    mesh.npol, mesh.ndumps, corner_points, eltype, axis)
+            else:
+                strain_x = None
 
-            # Vertical expects disp_s at index 0 and disp_z at index 2.
-            utemp_z = utemp[:, :, :, -3:]
-            utemp_z[:, :, :, 0] = utemp_z[:, :, :, 1]
-            utemp_z[:, :, :, 1][:] = 0
-            utemp_z = np.require(utemp_z, requirements=["F"], dtype=np.float64)
+            if vertical:
+                # Vertical expects disp_s at index 0 and disp_z at index 2.
+                utemp_z = utemp[:, :, :, -3:]
+                utemp_z[:, :, :, 0] = utemp_z[:, :, :, 1]
+                utemp_z[:, :, :, 1][:] = 0
+                utemp_z = np.require(utemp_z, requirements=["F"],
+                                     dtype=np.float64)
 
-            strain_z = strain_fct_map["monopole"](
-                utemp_z, G, GT, col_points_xi, col_points_eta,
-                mesh.npol, mesh.ndumps, corner_points, eltype, axis)
+                strain_z = strain_fct_map["monopole"](
+                    utemp_z, G, GT, col_points_xi, col_points_eta,
+                    mesh.npol, mesh.ndumps, corner_points, eltype, axis)
+            else:
+                strain_z = None
 
             mesh.strain_buffer.add(id_elem, (strain_x, strain_z))
         else:
@@ -265,6 +282,9 @@ class ReciprocalMergedInstaseisDB(BaseNetCDFInstaseisDB):
 
         all_strains = {}
         for name, strain in (("strain_x", strain_x), ("strain_z", strain_z)):
+            if strain is None:
+                all_strains[name] = None
+                continue
             final_strain = np.empty((strain.shape[0], 6), order="F")
 
             for i in range(6):

@@ -68,7 +68,7 @@ class Buffer(object):
         try:
             return value.nbytes
         except:
-            return sum(_i.nbytes for _i in value)
+            return sum(_i.nbytes for _i in value if _i is not None)
 
     def add(self, key, value):
         """
