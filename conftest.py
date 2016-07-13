@@ -104,6 +104,7 @@ def pytest_configure(config):
         while True:
             if "dbs" not in config.slaveinput:
                 time.sleep(0.01)
+                continue
             break
         config.dbs = pickle.loads(config.slaveinput["dbs"])
 
