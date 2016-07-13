@@ -12,7 +12,6 @@ import time
 TEST_DATA = os.path.join(os.path.dirname(__file__), "instaseis", "tests",
                          "data")
 
-
 def repack_databases():
     """
     Repack databases and create a couple temporary test databases.
@@ -53,9 +52,9 @@ def repack_databases():
     os.makedirs(os.path.dirname(pz_out))
 
     transpose_data(input_filename=px, output_filename=px_out, contiguous=True,
-                   compression_level=None)
+                   compression_level=None, quiet=True)
     transpose_data(input_filename=pz, output_filename=pz_out, contiguous=True,
-                   compression_level=None)
+                   compression_level=None, quiet=True)
 
     # Now transpose it again which should result in the original layout.
     transposed_and_back_bw_db = os.path.join(
@@ -68,9 +67,9 @@ def repack_databases():
     os.makedirs(os.path.dirname(pz_out_and_back))
 
     transpose_data(input_filename=px_out, output_filename=px_out_and_back,
-                   contiguous=False, compression_level=4)
+                   contiguous=False, compression_level=4, quiet=True)
     transpose_data(input_filename=pz_out, output_filename=pz_out_and_back,
-                   contiguous=False, compression_level=4)
+                   contiguous=False, compression_level=4, quiet=True)
 
     dbs = collections.OrderedDict()
     # Important is that the name is fairly similar to the original

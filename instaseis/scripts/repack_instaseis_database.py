@@ -20,7 +20,7 @@ import numpy as np
 
 
 def transpose_data(input_filename, output_filename, contiguous,
-                   compression_level):
+                   compression_level, quiet=False):
     """
     Transposes all data in the "/Snapshots" group.
 
@@ -33,10 +33,10 @@ def transpose_data(input_filename, output_filename, contiguous,
     with netCDF4.Dataset(input_filename, "r", format="NETCDF4") as f_in, \
             netCDF4.Dataset(output_filename, "w", format="NETCDF4") as f_out:
         recursive_copy(src=f_in, dst=f_out, contiguous=contiguous,
-                       compression_level=compression_level)
+                       compression_level=compression_level, quiet=quiet)
 
 
-def recursive_copy(src, dst, contiguous, compression_level):
+def recursive_copy(src, dst, contiguous, compression_level, quiet):
     """
     Recursively copy the whole file and transpose the all /Snapshots
     variables while at it..
@@ -104,24 +104,25 @@ def recursive_copy(src, dst, contiguous, compression_level):
                                zlib=zlib, complevel=compression_level)
         # Non-snapshots variables are just copied in a single go.
         if not is_snap:
-            click.echo(click.style("\tCopying group '%s'..." % name,
-                                   fg="blue"))
+            if not quiet:
+                click.echo(click.style("\tCopying group '%s'..." % name,
+                                       fg="blue"))
             dst.variables[x.name][:] = src.variables[x.name][:]
         # The snapshots variables are incrementally copied and transposed.
         else:
-            click.echo(click.style(
-                "\tCopying 'Snapshots/%s' (%i of %i)..." % (
-                    name, _j, len(src.variables)),
-                fg="blue"))
+            if not quiet:
+                click.echo(click.style(
+                    "\tCopying 'Snapshots/%s' (%i of %i)..." % (
+                        name, _j, len(src.variables)),
+                    fg="blue"))
 
             # Copy around 8 Megabytes at a time. This seems to be the
             # sweet spot at least on my laptop.
             factor = int((8 * 1024 * 1024 / 4) / npts)
             s = int(math.ceil(num_elems / float(factor)))
 
-            with click.progressbar(range(s), length=s,
-                                   label="\t  ") as idx:
-                for _i in idx:
+            if quiet:
+                for _i in range(s):
                     _s = slice(_i * factor, _i * factor + factor)
                     if time_axis == 0:
                         dst.variables[x.name][_s, :] = \
@@ -129,11 +130,22 @@ def recursive_copy(src, dst, contiguous, compression_level):
                     else:
                         dst.variables[x.name][:, _s] = \
                             src.variables[x.name][_s, :].T
+            else:
+                with click.progressbar(range(s), length=s,
+                                       label="\t  ") as idx:
+                    for _i in idx:
+                        _s = slice(_i * factor, _i * factor + factor)
+                        if time_axis == 0:
+                            dst.variables[x.name][_s, :] = \
+                                src.variables[x.name][:, _s].T
+                        else:
+                            dst.variables[x.name][:, _s] = \
+                                src.variables[x.name][_s, :].T
 
     for src_group in src.groups.values():
         dst_group = dst.createGroup(src_group.name)
         recursive_copy(src=src_group, dst=dst_group, contiguous=contiguous,
-                       compression_level=compression_level)
+                       compression_level=compression_level, quiet=quiet)
 
 
 def unroll_and_merge(filenames, output_folder):
