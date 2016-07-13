@@ -385,7 +385,16 @@ class BaseNetCDFInstaseisDB(with_metaclass(ABCMeta, BaseInstaseisDB)):
 
         if self._is_reciprocal:
             if hasattr(self.meshes, "merged"):
-                components = 'vertical and horizontal'
+                # The number of dimensions determines the available components.
+                dims = self.meshes.merged.f["MergedSnapshots"].shape[1]
+                if dims == 5:
+                    components = 'vertical and horizontal'
+                elif dims == 3:
+                    components = 'horizontal only'
+                elif dims == 2:
+                    components = 'vertical only'
+                else:  # pragma: no cover
+                    raise NotImplementedError
             elif self.meshes.pz is not None and self.meshes.px is not None:
                 components = 'vertical and horizontal'
             elif self.meshes.pz is None and self.meshes.px is not None:
