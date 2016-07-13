@@ -11,12 +11,18 @@ Requires click, netCDF4, and numpy.
     GNU Lesser General Public License, Version 3 [non-commercial/academic use]
     (http://www.gnu.org/copyleft/lgpl.html)
 """
+import contextlib
 import math
 import os
 
 import click
 import netCDF4
 import numpy as np
+
+
+@contextlib.contextmanager
+def dummy_progressbar(iterator, *args, **kwargs):
+    yield iterator
 
 
 def repack_file(input_filename, output_filename, contiguous,
@@ -128,7 +134,12 @@ def recursive_copy(src, dst, contiguous, compression_level, transpose, quiet):
             s = int(math.ceil(num_elems / float(factor)))
 
             if quiet:
-                for _i in range(s):
+                pbar = dummy_progressbar
+            else:
+                pbar = click.progressbar
+
+            with pbar(range(s), length=s, label="\t  ") as idx:
+                for _i in idx:
                     _s = slice(_i * factor, _i * factor + factor)
                     if transpose:
                         if time_axis == 0:
@@ -144,25 +155,6 @@ def recursive_copy(src, dst, contiguous, compression_level, transpose, quiet):
                         else:
                             dst.variables[x.name][:, _s] = \
                                 src.variables[x.name][:, _s]
-            else:
-                with click.progressbar(range(s), length=s,
-                                       label="\t  ") as idx:
-                    for _i in idx:
-                        _s = slice(_i * factor, _i * factor + factor)
-                        if transpose:
-                            if time_axis == 0:
-                                dst.variables[x.name][_s, :] = \
-                                    src.variables[x.name][:, _s].T
-                            else:
-                                dst.variables[x.name][:, _s] = \
-                                    src.variables[x.name][_s, :].T
-                        else:
-                            if time_axis == 0:
-                                dst.variables[x.name][_s, :] = \
-                                    src.variables[x.name][_s, :]
-                            else:
-                                dst.variables[x.name][:, _s] = \
-                                    src.variables[x.name][:, _s]
 
     for src_group in src.groups.values():
         dst_group = dst.createGroup(src_group.name)
@@ -171,9 +163,66 @@ def recursive_copy(src, dst, contiguous, compression_level, transpose, quiet):
                        transpose=transpose)
 
 
-def unroll_and_merge(filenames, output_folder):
+def recursive_copy_no_snapshots_no_seismograms(src, dst, quiet, contiguous,
+                                               compression_level):
     """
-    Completely unroll and merge both files.
+    A bit of a copy of the recursive_copy function but it does not copy the
+    snapshots or the seismograms group.
+    """
+    for attr in src.ncattrs():
+        _s = getattr(src, attr)
+        if isinstance(_s, str):
+            dst.setncattr_string(attr, _s)
+        else:
+            setattr(dst, attr, _s)
+
+    items = list(src.dimensions.items())
+
+    for name, dimension in items:
+        dst.createDimension(name, len(
+            dimension) if not dimension.isunlimited() else None)
+
+    for name, variable in src.variables.items():
+        if name in ["Snapshots", "Seismograms"]:
+            continue
+
+        # Use the existing chunking.
+        chunksizes = variable.chunking()
+        # We could infer the chunking here but I'm not sure its worth it.
+        if isinstance(chunksizes, str) and chunksizes == "contiguous":
+            chunksizes = None
+
+        # For a contiguous output, compression and chunking has to be turned
+        # off.
+        if contiguous:
+            zlib = False
+            chunksizes = None
+        else:
+            zlib = True
+
+        dimensions = variable.dimensions
+
+        x = dst.createVariable(name, variable.datatype, dimensions,
+                               chunksizes=chunksizes, contiguous=contiguous,
+                               zlib=zlib, complevel=compression_level)
+        if not quiet:
+            click.echo(click.style("\tCopying group '%s'..." % name,
+                                   fg="blue"))
+        dst.variables[x.name][:] = src.variables[x.name][:]
+
+    for src_group in src.groups.values():
+        if src_group.name in ["Snapshots", "Seismograms"]:
+            continue
+        dst_group = dst.createGroup(src_group.name)
+        recursive_copy_no_snapshots_no_seismograms(
+            src=src_group, dst=dst_group, contiguous=contiguous,
+            compression_level=compression_level, quiet=quiet)
+
+
+def merge_files(filenames, output_folder, contiguous, compression_level,
+                quiet):
+    """
+    Completely unroll and merge both files to a single database.
     """
     # Find PX and PZ files.
     assert len(filenames) == 2
@@ -185,98 +234,84 @@ def unroll_and_merge(filenames, output_folder):
     px = px[0]
     pz = pz[0]
 
-    output_filename = os.path.join(output_folder, "merged_instaseis_db.nc4")
-    assert not os.path.exists(output_filename)
-
     assert os.path.exists(px)
     assert os.path.exists(pz)
-    assert not os.path.exists(output_filename)
 
-    import h5py
+    output = os.path.join(output_folder, "merged_output.nc4")
+    assert not os.path.exists(output)
 
-    try:
-        f_in_x = h5py.File(px, "r")
-        f_in_z = h5py.File(pz, "r")
-        f_out = h5py.File(output_filename, libver="latest")
+    with netCDF4.Dataset(px, "r", format="NETCDF4") as px_in, \
+            netCDF4.Dataset(pz, "r", format="NETCDF4") as pz_in, \
+            netCDF4.Dataset(output, "w", format="NETCDF4") as out:
 
-        # Copy attributes from the vertical file.
-        for key, value in f_in_x.attrs.items():
-            f_out.attrs[key] = value
+        _merge_files(px_in=px_in, pz_in=pz_in, out=out, contiguous=contiguous,
+                     compression_level=compression_level, quiet=quiet)
 
-        # Same from simple groups.
-        for group in f_in_x.keys():
-            # Special cased later on.
-            if group == "Snapshots":
-                continue
-            click.echo(click.style("\tCopying group '%s'..." % group,
-                                   fg="blue"))
-            f_out.copy(f_in_x[group], group)
 
-        # Attempt to copy other things.
-        sn = f_in_z["Snapshots"]
-        f_out.create_group("Snapshots")
-        for group in sn.keys():
-            if not group.startswith("disp_"):
-                f_out.copy(f_in_z["Snapshots"][group], "Snapshots/%s" % group)
+def _merge_files(px_in, pz_in, out, contiguous, compression_level, quiet):
+    # First copy everything non-snapshot related.
+    recursive_copy_no_snapshots_no_seismograms(
+        src=px_in, dst=out, quiet=quiet, contiguous=contiguous,
+        compression_level=compression_level)
 
-        # Create a new array but this time in 5D. The first dimension
-        # is the element number, the second and third are the GLL
-        # points in both directions, the fourth is the time axis, and the
-        # last the displacement axis.
-        npts = f_in_x.attrs["number of strain dumps"][0]
-        number_of_elements = f_in_x.attrs["nelem_kwf_global"][0]
-        npol = f_in_x.attrs["npol"][0]
+    # Get all the snapshots from the other databases.
+    meshes = [
+        px_in["Snapshots"]["disp_s"],
+        px_in["Snapshots"]["disp_p"],
+        px_in["Snapshots"]["disp_z"],
+        pz_in["Snapshots"]["disp_s"],
+        pz_in["Snapshots"]["disp_z"]]
 
-        # Get datasets and the dtype.
-        meshes = [
-            f_in_x["Snapshots"]["disp_s"],
-            f_in_x["Snapshots"]["disp_p"],
-            f_in_x["Snapshots"]["disp_z"],
-            f_in_z["Snapshots"]["disp_s"],
-            f_in_z["Snapshots"]["disp_z"]]
-        dtype = meshes[0].dtype
+    dtype = meshes[0].dtype
 
-        ds_o = f_out.create_dataset(
-            "merged_snapshots",
-            shape=(number_of_elements, npts, npol + 1, npol + 1, 5),
-            dtype=dtype, chunks=None, compression=None)
+    # Create new dimensions.
+    dim_ipol = out.createDimension("ipol", 5)
+    dim_jpol = out.createDimension("jpol", 5)
+    dim_nvars = out.createDimension("nvars", 5)
+    nelem = out.getncattr("nelem_kwf_global")
+    dim_elements = out.createDimension("elements", nelem)
 
-        utemp = np.zeros((npts, npol + 1, npol + 1, 5), dtype=dtype, order="F")
+    # New dimensions for the 5D Array.
+    dims = (dim_elements, dim_nvars, dim_jpol, dim_ipol,
+            out.dimensions["snapshots"])
+    dimensions = [_i.name for _i in dims]
+    # These also determine our chunk settings.
+    chunksizes = [_i.size for _i in dims]
 
-        # Now it becomes more interesting and very slow.
-        sem_mesh = f_in_x["Mesh"]["sem_mesh"]
-        with click.progressbar(range(number_of_elements),
-                               length=number_of_elements,
-                               label="\t  ") as idx:
-            for gll_idx in idx:
-                gll_point_ids = sem_mesh[gll_idx]
+    if contiguous:
+        zlib = False
+    else:
+        zlib = True
 
-                # Load displacement from all GLL points.
-                for i, var in enumerate(meshes):
-                    # The list of ids we have is unique but not sorted.
-                    ids = gll_point_ids.flatten()
-                    s_ids = np.sort(ids)
-                    temp = var[:, s_ids]
-                    for ipol in range(npol + 1):
-                        for jpol in range(npol + 1):
-                            idx = ipol * 5 + jpol
-                            utemp[:, jpol, ipol, i] = \
-                                temp[:, np.argwhere(s_ids == ids[idx])[0][0]]
-                ds_o[gll_idx] = utemp
+    # We'll called it MergedSnapshots
+    x = out.createVariable(
+        varname="MergedSnapshots",
+        dimensions=dimensions,
+        contiguous=contiguous,
+        zlib=zlib,
+        chunksizes=chunksizes,
+        datatype=dtype)
 
-    finally:
-        try:
-            f_in_x.close()
-        except:
-            pass
-        try:
-            f_in_z.close()
-        except:
-            pass
-        try:
-            f_out.close()
-        except:
-            pass
+    utemp = np.zeros(chunksizes[1:], dtype=dtype, order="C")
+
+    # Now it becomes more interesting and very slow.
+    sem_mesh = px_in["Mesh"]["sem_mesh"]
+    with click.progressbar(range(nelem), length=nelem, label="\t  ") as idx:
+        for gll_idx in idx:
+            gll_point_ids = sem_mesh[gll_idx]
+
+            # Load displacement from all GLL points.
+            for i, var in enumerate(meshes):
+                # The list of ids we have is unique but not sorted.
+                ids = gll_point_ids.flatten()
+                s_ids = np.sort(ids)
+                temp = var[:, s_ids]
+                for jpol in range(dim_jpol.size):
+                    for ipol in range(dim_ipol.size):
+                        idx = ipol * 5 + jpol
+                        utemp[i, jpol, ipol, :] = \
+                            temp[:, np.argwhere(s_ids == ids[idx])[0][0]]
+            x[gll_idx] = utemp
 
 
 @click.command()
@@ -289,12 +324,13 @@ def unroll_and_merge(filenames, output_folder):
 @click.option("--compression_level",
               type=click.IntRange(1, 9), default=2,
               help="Compression level from 1 (fast) to 9 (slow).")
-@click.option('--method', type=click.Choice(["transposed", "repack"]),
+@click.option('--method', type=click.Choice(["transposed", "repack", "merge"]),
               required=True,
               help="`transposed` will transpose the data arrays which "
                    "oftentimes results in faster extraction times. `repack` "
                    "will just repack the data and solve some compatibility "
-                   "issues.")
+                   "issues. `merge` will create a single much larger file "
+                   "which is much quicker to read but will take more space.")
 def repack_database(input_folder, output_folder, contiguous,
                     compression_level, method):
     found_filenames = []
@@ -309,11 +345,6 @@ def repack_database(input_folder, output_folder, contiguous,
 
     os.makedirs(output_folder)
 
-    # The unrolled merge completely unrolls everything, dededuplicates the GLL
-    # points, and merges both netCDF files into one big file.
-    # if method == "unrolled_merge":
-    #     unroll_and_merge(filenames=found_filenames,
-    #                      output_folder=output_folder)
     if method in ["transposed", "repack"]:
         for _i, filename in enumerate(found_filenames):
             click.echo(click.style(
@@ -339,6 +370,10 @@ def repack_database(input_folder, output_folder, contiguous,
                         contiguous=contiguous,
                         transpose=transpose,
                         compression_level=compression_level)
+    elif method == "merge":
+        merge_files(filenames=found_filenames, output_folder=output_folder,
+                    contiguous=contiguous, compression_level=compression_level,
+                    quiet=False)
     else:
         raise NotImplementedError
 

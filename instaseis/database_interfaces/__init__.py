@@ -15,6 +15,7 @@ import os
 from .. import InstaseisError, InstaseisNotFoundError
 from .forward_instaseis_db import ForwardInstaseisDB
 from .reciprocal_instaseis_db import ReciprocalInstaseisDB
+from .reciprocal_merged_instaseis_db import ReciprocalMergedInstaseisDB
 
 
 def find_and_open_files(path, *args, **kwargs):
@@ -33,7 +34,8 @@ def find_and_open_files(path, *args, **kwargs):
         if len(nested_levels) >= 4:
             del dirs[:]
         for filename in sorted(filenames, reverse=True):
-            if filename in ["ordered_output.nc4", "axisem_output.nc4"]:
+            if filename in ["ordered_output.nc4", "axisem_output.nc4",
+                            "merged_output.nc4"]:
                 break
         else:
             continue
@@ -47,6 +49,11 @@ def find_and_open_files(path, *args, **kwargs):
             "1, 2 or 4 netCDF must be present in the folder structure. "
             "Found %i: \t%s" % (len(found_files),
                                 "\n\t".join(found_files)))
+
+    # Catch the merged file first because its easy.
+    if len(found_files) == 1 and found_files[0].endswith("merged_output.nc4"):
+        return ReciprocalMergedInstaseisDB(
+            db_path=path, netcdf_file=found_files[0], *args, **kwargs)
 
     # Parse to find the correct components.
     netcdf_files = collections.defaultdict(list)

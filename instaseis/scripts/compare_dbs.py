@@ -35,9 +35,12 @@ import obspy
 
 
 @click.command()
+@click.option("--seed", type=int)
 @click.argument("databases", type=click.Path(exists=True, file_okay=False,
                                              dir_okay=True), nargs=-1)
-def compare_dbs(databases):
+def compare_dbs(seed, databases):
+    if seed:
+        random.seed(seed)
     reference = instaseis.open_db(databases[0])
     others = [instaseis.open_db(_i) for _i in databases[1:]]
 

@@ -384,7 +384,9 @@ class BaseNetCDFInstaseisDB(with_metaclass(ABCMeta, BaseInstaseisDB)):
                 filesize += os.path.getsize(m.filename)
 
         if self._is_reciprocal:
-            if self.meshes.pz is not None and self.meshes.px is not None:
+            if hasattr(self.meshes, "merged"):
+                components = 'vertical and horizontal'
+            elif self.meshes.pz is not None and self.meshes.px is not None:
                 components = 'vertical and horizontal'
             elif self.meshes.pz is None and self.meshes.px is not None:
                 components = 'horizontal only'

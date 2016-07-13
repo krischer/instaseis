@@ -63,6 +63,13 @@ class Buffer(object):
         self._buffer[key] = value
         return value
 
+    def _get_nbytes(self, value):
+        # Works with single arrays and iterables of arrays.
+        try:
+            return value.nbytes
+        except:
+            return sum(_i.nbytes for _i in value)
+
     def add(self, key, value):
         """
         Add an item to the buffer and make sure that the buffer does not exceed
@@ -70,12 +77,12 @@ class Buffer(object):
         """
         self._buffer[key] = value
         # Assuming value is a numpy array
-        self._total_size += value.nbytes
+        self._total_size += self._get_nbytes(value)
 
         # Remove existing values, until the size limit is fulfilled.
         while self._total_size > self._max_size_in_bytes:
             _, v = self._buffer.popitem(last=False)
-            self._total_size -= v.nbytes
+            self._total_size -= self._get_nbytes(v)
 
     def get_size_mb(self):
         return float(self._total_size) / 1024 ** 2
@@ -137,6 +144,10 @@ class Mesh(object):
             return attr
 
     def _find_time_axis(self):
+        # Merged databases are always the same and don't have a Snapshots key.
+        if "Snapshots" not in self.f:
+            return
+
         self.time_axis = {}
         for key, value in self.f["Snapshots"].items():
             if "stf" not in key:
