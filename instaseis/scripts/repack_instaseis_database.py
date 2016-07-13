@@ -41,6 +41,9 @@ def recursive_copy(src, dst, contiguous, compression_level, quiet):
     Recursively copy the whole file and transpose the all /Snapshots
     variables while at it..
     """
+    if src.path == "/Seismograms":
+        return
+
     for attr in src.ncattrs():
         _s = getattr(src, attr)
         if isinstance(_s, str):
@@ -69,7 +72,7 @@ def recursive_copy(src, dst, contiguous, compression_level, quiet):
         shape = variable.shape
 
         # Determine chunking - only for the snapshots.
-        if is_snap:
+        if is_snap and name.startswith("disp_"):
             npts = min(shape)
             num_elems = max(shape)
             time_axis = np.argmin(shape)
@@ -103,7 +106,7 @@ def recursive_copy(src, dst, contiguous, compression_level, quiet):
                                chunksizes=chunksizes, contiguous=contiguous,
                                zlib=zlib, complevel=compression_level)
         # Non-snapshots variables are just copied in a single go.
-        if not is_snap:
+        if not is_snap or not name.startswith("disp_"):
             if not quiet:
                 click.echo(click.style("\tCopying group '%s'..." % name,
                                        fg="blue"))
@@ -113,7 +116,9 @@ def recursive_copy(src, dst, contiguous, compression_level, quiet):
             if not quiet:
                 click.echo(click.style(
                     "\tCopying 'Snapshots/%s' (%i of %i)..." % (
-                        name, _j, len(src.variables)),
+                        name, _j,
+                        len([_i for _i in src.variables
+                             if _i.startswith("disp_")])),
                     fg="blue"))
 
             # Copy around 8 Megabytes at a time. This seems to be the
@@ -277,7 +282,7 @@ def repack_database(input_folder, output_folder, contiguous,
     found_filenames = []
     for root, _, filenames in os.walk(input_folder):
         for filename in filenames:
-            if filename != "ordered_output.nc4":
+            if filename not in  ["ordered_output.nc4", "axisem_output.nc4"]:
                 continue
             found_filenames.append(os.path.join(root, filename))
 
@@ -299,6 +304,9 @@ def repack_database(input_folder, output_folder, contiguous,
             output_filename = os.path.join(
                 output_folder,
                 os.path.relpath(filename, input_folder))
+
+            output_filename = output_filename.replace(
+                "axisem_output.nc4", "ordered_output.nc4")
 
             os.makedirs(os.path.dirname(output_filename))
 

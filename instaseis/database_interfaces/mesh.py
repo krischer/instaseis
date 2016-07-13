@@ -139,7 +139,11 @@ class Mesh(object):
     def _find_time_axis(self):
         self.time_axis = {}
         for key, value in self.f["Snapshots"].items():
-            self.time_axis[key] = get_time_axis(value, self.ndumps)
+            if "stf" not in key:
+                self.time_axis[key] = get_time_axis(value, self.ndumps)
+        else:
+            return
+        raise NotImplementedError  # pragma: no cover
 
     def _parse(self, full_parse=False):
         self.dump_type = self._get_str_attr(

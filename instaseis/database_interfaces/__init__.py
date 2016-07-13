@@ -32,9 +32,12 @@ def find_and_open_files(path, *args, **kwargs):
             os.path.sep)
         if len(nested_levels) >= 4:
             del dirs[:]
-        if "ordered_output.nc4" not in filenames:
+        for filename in filenames:
+            if filename in ["ordered_output.nc4", "axisem_output.nc4"]:
+                break
+        else:
             continue
-        found_files.append(os.path.join(root, "ordered_output.nc4"))
+        found_files.append(os.path.join(root, filename))
 
     if len(found_files) == 0:
         raise InstaseisNotFoundError(
