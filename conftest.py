@@ -32,7 +32,7 @@ def repack_databases():
         }
 
     import h5py
-    from instaseis.scripts.repack_instaseis_database import repack_file
+    from instaseis.scripts.repack_db import repack_file
 
     root_folder = tempfile.mkdtemp()
 
