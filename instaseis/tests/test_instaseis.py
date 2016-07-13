@@ -61,14 +61,13 @@ for name, path in pytest.config.dbs["databases"].items():
 BW_DISPL_DBS = [_i for _i in DBS if "_db_bwd_displ_" in _i]
 
 
-def test_fwd_vs_bwd():
+@pytest.mark.parametrize("bwd_db", BW_DISPL_DBS)
+def test_fwd_vs_bwd(bwd_db):
     """
     Test fwd against bwd mode
     """
     instaseis_fwd = find_and_open_files(os.path.join(DATA, "100s_db_fwd"))
-
-    instaseis_bwd = find_and_open_files(os.path.join(
-        DATA, "100s_db_bwd_displ_only"))
+    instaseis_bwd = find_and_open_files(bwd_db)
 
     source_fwd = Source(latitude=4., longitude=3.0, depth_in_m=None,
                         m_rr=4.71e+17, m_tt=3.81e+17, m_pp=-4.74e+17,
@@ -111,16 +110,15 @@ def test_fwd_vs_bwd():
                                rtol=1E-3, atol=1E-10)
 
 
-def test_fwd_vs_bwd_axial():
+@pytest.mark.parametrize("bwd_db", BW_DISPL_DBS)
+def test_fwd_vs_bwd_axial(bwd_db):
     """
     Test fwd against bwd mode, axial element. Differences are a bit larger then
     in non axial case, presumably because the close source, which is not
     exactly a point source in the SEM representation.
     """
     instaseis_fwd = find_and_open_files(os.path.join(DATA, "100s_db_fwd_deep"))
-
-    instaseis_bwd = find_and_open_files(
-        os.path.join(DATA, "100s_db_bwd_displ_only"))
+    instaseis_bwd = find_and_open_files(bwd_db)
 
     source_fwd = Source(latitude=0., longitude=0., depth_in_m=None,
                         m_rr=4.71e+17, m_tt=3.81e+17, m_pp=-4.74e+17,
@@ -167,12 +165,12 @@ def test_fwd_vs_bwd_axial():
                                rtol=1E-2, atol=5E-9)
 
 
-def test_incremental_bwd():
+@pytest.mark.parametrize("bwd_db", BW_DISPL_DBS)
+def test_incremental_bwd(bwd_db):
     """
     incremental tests of bwd mode with displ_only db
     """
-    instaseis_bwd = find_and_open_files(
-        os.path.join(DATA, "100s_db_bwd_displ_only"))
+    instaseis_bwd = find_and_open_files(bwd_db)
 
     receiver = Receiver(latitude=42.6390, longitude=74.4940)
     source = Source(
@@ -201,8 +199,7 @@ def test_incremental_bwd():
     assert instaseis_bwd.meshes.pz.strain_buffer.efficiency == 0.0
 
     # read on init
-    instaseis_bwd = find_and_open_files(
-        os.path.join(DATA, "100s_db_bwd_displ_only"), read_on_demand=False)
+    instaseis_bwd = find_and_open_files(bwd_db, read_on_demand=False)
 
     st_bwd = instaseis_bwd.get_seismograms(
         source=source, receiver=receiver, components=('Z', 'N', 'E', 'R', 'T'))
@@ -309,7 +306,6 @@ def test_horizontal_only_db(tmpdir):
 
     np.testing.assert_allclose(st_bwd.select(component='N')[0].data,
                                BWD_TEST_DATA["N"], rtol=1E-7, atol=1E-12)
-
 
 def test_requesting_wrong_component_horizontal(tmpdir):
     # Copy only the horizontal component data.
@@ -518,11 +514,12 @@ def test_incremental_bwd_force_source(db):
         assert [tr.stats.channel[-1] for tr in st] == [comp]
 
 
-def test_get_greens_vs_get_seismogram():
+@pytest.mark.parametrize("bwd_db", BW_DISPL_DBS)
+def test_get_greens_vs_get_seismogram(bwd_db):
     """
     Test get_greens_function() against default get_seismograms()
     """
-    db = find_and_open_files(os.path.join(DATA, "100s_db_bwd_displ_only"))
+    db = find_and_open_files(bwd_db)
 
     depth_in_m = 1000
     epicentral_distance_degree = 20
@@ -596,11 +593,12 @@ def test_get_greens_vs_get_seismogram():
     assert isinstance(greens_data, dict)
 
 
-def test_greens_function_failures():
+@pytest.mark.parametrize("bwd_db", BW_DISPL_DBS)
+def test_greens_function_failures(bwd_db):
     """
     Tests some failures for the greens function calculation.
     """
-    db = find_and_open_files(os.path.join(DATA, "100s_db_bwd_displ_only"))
+    db = find_and_open_files(bwd_db)
 
     depth_in_m = 1000
     epicentral_distance_degree = 20.0
@@ -640,13 +638,13 @@ def test_greens_function_failures():
                                  "vertical and horizontal components")
 
 
-def test_finite_source():
+@pytest.mark.parametrize("bwd_db", BW_DISPL_DBS)
+def test_finite_source(bwd_db):
     """
     incremental tests of bwd mode with source force
     """
     from obspy.signal.filter import lowpass
-    instaseis_bwd = find_and_open_files(
-        os.path.join(DATA, "100s_db_bwd_displ_only"))
+    instaseis_bwd = find_and_open_files(bwd_db)
 
     receiver = Receiver(latitude=42.6390, longitude=74.4940)
 
@@ -748,12 +746,12 @@ def test_get_band_code_method():
         assert get_band_code(dt) == letter
 
 
-def test_origin_time_of_resulting_seismograms():
+@pytest.mark.parametrize("bwd_db", BW_DISPL_DBS)
+def test_origin_time_of_resulting_seismograms(bwd_db):
     """
     Makes sure that the origin time is passed to the seismograms.
     """
-    instaseis_bwd = find_and_open_files(
-        os.path.join(DATA, "100s_db_bwd_displ_only"))
+    instaseis_bwd = find_and_open_files(bwd_db)
 
     receiver = Receiver(latitude=42.6390, longitude=74.4940)
     source = Source(
@@ -789,7 +787,8 @@ def test_origin_time_of_resulting_seismograms():
     assert st[0].stats.starttime == org_time
 
 
-def test_higher_level_event_and_receiver_parsing():
+@pytest.mark.parametrize("bwd_db", BW_DISPL_DBS)
+def test_higher_level_event_and_receiver_parsing(bwd_db):
     """
     Tests that events and receivers can be parsed from different supported
     formats.
@@ -826,8 +825,7 @@ def test_higher_level_event_and_receiver_parsing():
     inv[0][0].channels = []
 
     # receiver = Receiver(latitude=42.6390, longitude=74.4940)
-    instaseis_bwd = find_and_open_files(
-        os.path.join(DATA, "100s_db_bwd_displ_only"))
+    instaseis_bwd = find_and_open_files(bwd_db)
 
     st = instaseis_bwd.get_seismograms(source=event, receiver=inv,
                                        components=('Z'))
