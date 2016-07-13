@@ -22,17 +22,16 @@ def repack_databases():
 
     root_folder = tempfile.mkdtemp()
 
+    # First create a transposed database - make it contiguous.
     transposed_bw_db = os.path.join(
         root_folder, "transposed_100s_db_bwd_displ_only")
-    transposed_and_back_bw_db = os.path.join(
-        root_folder, "100s_db_bwd_displ_only")
     os.makedirs(transposed_bw_db)
-    os.makedirs(transposed_and_back_bw_db)
 
     db = os.path.join(TEST_DATA, "100s_db_bwd_displ_only")
     f = "ordered_output.nc4"
     px = os.path.join(db, "PX", "Data", f)
     pz = os.path.join(db, "PZ", "Data", f)
+
     px_out = os.path.join(transposed_bw_db, "PX", f)
     pz_out = os.path.join(transposed_bw_db, "PZ", f)
 
@@ -44,12 +43,29 @@ def repack_databases():
     transpose_data(input_filename=pz, output_filename=pz_out, contiguous=True,
                    compression_level=None)
 
+    # Now transpose it again which should result in the original layout.
+    transposed_and_back_bw_db = os.path.join(
+        root_folder, "transposed_and_back_100s_db_bwd_displ_only")
+    os.makedirs(transposed_and_back_bw_db)
+
+    px_out_and_back = os.path.join(transposed_and_back_bw_db, "PX", f)
+    pz_out_and_back = os.path.join(transposed_and_back_bw_db, "PZ", f)
+    os.makedirs(os.path.dirname(px_out_and_back))
+    os.makedirs(os.path.dirname(pz_out_and_back))
+
+    transpose_data(input_filename=px_out, output_filename=px_out_and_back,
+                   contiguous=False, compression_level=4)
+    transpose_data(input_filename=pz_out, output_filename=pz_out_and_back,
+                   contiguous=False, compression_level=4)
+
     return {
         "root_folder": root_folder,
         "databases": {
             # Important is that the name is fairly similar to the original
             # as some tests use the patterns in the name.
-            "transposed_100s_db_bwd_displ_only": transposed_bw_db
+            "transposed_100s_db_bwd_displ_only": transposed_bw_db,
+            "transposed_and_back_100s_db_bwd_displ_only":
+                transposed_and_back_bw_db
         }
     }
 
