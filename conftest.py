@@ -21,6 +21,17 @@ def repack_databases():
     suite - this for one tests the repacking but also that Instaseis can
     work with a number of different database layouts.
     """
+    try:
+        import netCDF4
+        import click
+    except ImportError:
+        print("\nSkipping database repacking tests which require `click` and "
+              "`netCDF4` to be installed.\n")
+        return {
+            "root_folder": None,
+            "databases": {}
+        }
+
     from instaseis.scripts.repack_instaseis_database import transpose_data
 
     root_folder = tempfile.mkdtemp()
@@ -109,6 +120,6 @@ def pytest_configure_node(node):
 
 
 def pytest_unconfigure(config):
-    if is_master(config):
+    if is_master(config) and config.dbs["root_folder"]:
         if os.path.exists(config.dbs["root_folder"]):
             shutil.rmtree(config.dbs["root_folder"])
