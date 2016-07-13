@@ -295,7 +295,15 @@ class BaseNetCDFInstaseisDB(with_metaclass(ABCMeta, BaseInstaseisDB)):
                     'strain_dsup', 'strain_dzup', 'straintrace']):
                 if var not in mesh_dict:
                     continue
-                strain_temp[:, i] = mesh_dict[var][:, id_elem]
+
+                # Make sure it can work with normal and transposed arrays to
+                # support legacy as well as modern, transposed databases.
+                time_axis = mesh.time_axis[var]
+
+                if time_axis == 0:
+                    strain_temp[:, i] = mesh_dict[var][:, id_elem]
+                else:
+                    strain_temp[:, i] = mesh_dict[var][id_elem, :]
 
             # transform strain to voigt mapping
             # dsus, dpup, dzuz, dzup, dsuz, dsup
@@ -325,18 +333,32 @@ class BaseNetCDFInstaseisDB(with_metaclass(ABCMeta, BaseInstaseisDB)):
             for i, var in enumerate(["disp_s", "disp_p", "disp_z"]):
                 if var not in mesh_dict:
                     continue
+
+                # Make sure it can work with normal and transposed arrays to
+                # support legacy as well as modern, transposed databases.
+                time_axis = mesh.time_axis[var]
+
                 # The netCDF Python wrappers starting with version 1.1.6
                 # disallow duplicate and unordered indices while slicing. So
                 # we need to do it manually.
                 # The list of ids we have is unique but not sorted.
                 ids = gll_point_ids.flatten()
                 s_ids = np.sort(ids)
-                temp = mesh_dict[var][:, s_ids]
-                for ipol in range(mesh.npol + 1):
-                    for jpol in range(mesh.npol + 1):
-                        idx = ipol * 5 + jpol
-                        utemp[:, jpol, ipol, i] = \
-                            temp[:, np.argwhere(s_ids == ids[idx])[0][0]]
+
+                if time_axis == 0:
+                    temp = mesh_dict[var][:, s_ids]
+                    for ipol in range(mesh.npol + 1):
+                        for jpol in range(mesh.npol + 1):
+                            idx = ipol * 5 + jpol
+                            utemp[:, jpol, ipol, i] = \
+                                temp[:, np.argwhere(s_ids == ids[idx])[0][0]]
+                else:
+                    temp = mesh_dict[var][s_ids, :]
+                    for ipol in range(mesh.npol + 1):
+                        for jpol in range(mesh.npol + 1):
+                            idx = ipol * 5 + jpol
+                            utemp[:, jpol, ipol, i] = \
+                                temp[np.argwhere(s_ids == ids[idx])[0][0], :]
 
             mesh.displ_buffer.add(id_elem, utemp)
         else:

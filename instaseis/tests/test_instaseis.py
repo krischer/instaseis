@@ -58,6 +58,9 @@ for name, path in pytest.config.dbs["databases"].items():
     TEST_DATA[path] = test_data
 
 
+BW_DISPL_DBS = [_i for _i in DBS if "_db_bwd_displ_" in _i]
+
+
 def test_fwd_vs_bwd():
     """
     Test fwd against bwd mode
@@ -463,12 +466,12 @@ def test_incremental_bwd_strain_only():
                                atol=1E-12)
 
 
-def test_incremental_bwd_force_source():
+@pytest.mark.parametrize("db", BW_DISPL_DBS)
+def test_incremental_bwd_force_source(db):
     """
     incremental tests of bwd mode with source force
     """
-    instaseis_bwd = find_and_open_files(
-        os.path.join(DATA, "100s_db_bwd_displ_only"))
+    instaseis_bwd = find_and_open_files(db)
 
     receiver = Receiver(latitude=42.6390, longitude=74.4940)
     source = ForceSource(
