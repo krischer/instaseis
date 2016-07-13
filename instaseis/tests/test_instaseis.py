@@ -46,6 +46,18 @@ TEST_DATA = {
 }
 
 
+# Add all automatically created repacked databases to the test suite.
+for name, path in pytest.config.dbs["databases"].items():
+    DBS.append(path)
+    if "bwd" in name:
+        test_data = BWD_TEST_DATA
+    elif "fwd" in name:
+        test_data = FWD_TEST_DATA
+    else:  # pragma: no cover
+        raise NotImplementedError
+    TEST_DATA[path] = test_data
+
+
 def test_fwd_vs_bwd():
     """
     Test fwd against bwd mode
