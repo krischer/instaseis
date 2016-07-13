@@ -31,7 +31,7 @@ def repack_databases():
             "databases": {}
         }
 
-    from instaseis.scripts.repack_instaseis_database import transpose_data
+    from instaseis.scripts.repack_instaseis_database import repack_file
 
     root_folder = tempfile.mkdtemp()
 
@@ -51,10 +51,10 @@ def repack_databases():
     os.makedirs(os.path.dirname(px_out))
     os.makedirs(os.path.dirname(pz_out))
 
-    transpose_data(input_filename=px, output_filename=px_out, contiguous=True,
-                   compression_level=None, quiet=True)
-    transpose_data(input_filename=pz, output_filename=pz_out, contiguous=True,
-                   compression_level=None, quiet=True)
+    repack_file(input_filename=px, output_filename=px_out, contiguous=True,
+                compression_level=None, quiet=True, transpose=True)
+    repack_file(input_filename=pz, output_filename=pz_out, contiguous=True,
+                compression_level=None, quiet=True, transpose=True)
 
     # Now transpose it again which should result in the original layout.
     transposed_and_back_bw_db = os.path.join(
@@ -66,10 +66,29 @@ def repack_databases():
     os.makedirs(os.path.dirname(px_out_and_back))
     os.makedirs(os.path.dirname(pz_out_and_back))
 
-    transpose_data(input_filename=px_out, output_filename=px_out_and_back,
-                   contiguous=False, compression_level=4, quiet=True)
-    transpose_data(input_filename=pz_out, output_filename=pz_out_and_back,
-                   contiguous=False, compression_level=4, quiet=True)
+    repack_file(input_filename=px_out, output_filename=px_out_and_back,
+                contiguous=False, compression_level=4, quiet=True,
+                transpose=True)
+    repack_file(input_filename=pz_out, output_filename=pz_out_and_back,
+                contiguous=False, compression_level=4, quiet=True,
+                transpose=True)
+
+    # Now add another simple repacking test - repack the original one and
+    # repack the transposed one.
+    repacked_bw_db = os.path.join(
+        root_folder, "repacked_100s_db_bwd_displ_only")
+    os.makedirs(repacked_bw_db)
+
+    px_r = os.path.join(repacked_bw_db, "PX", f)
+    pz_r = os.path.join(repacked_bw_db, "PZ", f)
+
+    os.makedirs(os.path.dirname(px_r))
+    os.makedirs(os.path.dirname(pz_r))
+
+    repack_file(input_filename=px, output_filename=px_r, contiguous=True,
+                compression_level=None, quiet=True, transpose=False)
+    repack_file(input_filename=pz, output_filename=pz_r, contiguous=True,
+                compression_level=None, quiet=True, transpose=False)
 
     dbs = collections.OrderedDict()
     # Important is that the name is fairly similar to the original
@@ -77,6 +96,7 @@ def repack_databases():
     dbs["transposed_100s_db_bwd_displ_only"] = transposed_bw_db
     dbs["transposed_and_back_100s_db_bwd_displ_only"] = \
         transposed_and_back_bw_db
+    dbs["repacked_100s_db_bwd_displ_only"] = repacked_bw_db
 
     return {
         "root_folder": root_folder,

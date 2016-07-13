@@ -19,8 +19,8 @@ import netCDF4
 import numpy as np
 
 
-def transpose_data(input_filename, output_filename, contiguous,
-                   compression_level, quiet=False):
+def repack_file(input_filename, output_filename, contiguous,
+                compression_level, transpose, quiet=False):
     """
     Transposes all data in the "/Snapshots" group.
 
@@ -33,10 +33,11 @@ def transpose_data(input_filename, output_filename, contiguous,
     with netCDF4.Dataset(input_filename, "r", format="NETCDF4") as f_in, \
             netCDF4.Dataset(output_filename, "w", format="NETCDF4") as f_out:
         recursive_copy(src=f_in, dst=f_out, contiguous=contiguous,
-                       compression_level=compression_level, quiet=quiet)
+                       compression_level=compression_level, quiet=quiet,
+                       transpose=transpose)
 
 
-def recursive_copy(src, dst, contiguous, compression_level, quiet):
+def recursive_copy(src, dst, contiguous, compression_level, transpose, quiet):
     """
     Recursively copy the whole file and transpose the all /Snapshots
     variables while at it..
@@ -59,7 +60,7 @@ def recursive_copy(src, dst, contiguous, compression_level, quiet):
 
     # The dimensions will be reversed for the snapshots.
     items = list(src.dimensions.items())
-    if is_snap:
+    if is_snap and transpose:
         items = list(reversed(items))
 
     for name, dimension in items:
@@ -79,7 +80,7 @@ def recursive_copy(src, dst, contiguous, compression_level, quiet):
             # Arbitrary limit.
             _c = int(round(32768 / (npts * 4)))
 
-            if time_axis == 0:
+            if time_axis == 0 and transpose:
                 chunksizes = (_c, npts)
             else:
                 chunksizes = (npts, _c)
@@ -99,7 +100,7 @@ def recursive_copy(src, dst, contiguous, compression_level, quiet):
             zlib = True
 
         dimensions = variable.dimensions
-        if is_snap:
+        if is_snap and transpose:
             dimensions = list(reversed(dimensions))
 
         x = dst.createVariable(name, variable.datatype, dimensions,
@@ -129,28 +130,45 @@ def recursive_copy(src, dst, contiguous, compression_level, quiet):
             if quiet:
                 for _i in range(s):
                     _s = slice(_i * factor, _i * factor + factor)
-                    if time_axis == 0:
-                        dst.variables[x.name][_s, :] = \
-                            src.variables[x.name][:, _s].T
-                    else:
-                        dst.variables[x.name][:, _s] = \
-                            src.variables[x.name][_s, :].T
-            else:
-                with click.progressbar(range(s), length=s,
-                                       label="\t  ") as idx:
-                    for _i in idx:
-                        _s = slice(_i * factor, _i * factor + factor)
+                    if transpose:
                         if time_axis == 0:
                             dst.variables[x.name][_s, :] = \
                                 src.variables[x.name][:, _s].T
                         else:
                             dst.variables[x.name][:, _s] = \
                                 src.variables[x.name][_s, :].T
+                    else:
+                        if time_axis == 0:
+                            dst.variables[x.name][_s, :] = \
+                                src.variables[x.name][_s, :]
+                        else:
+                            dst.variables[x.name][:, _s] = \
+                                src.variables[x.name][:, _s]
+            else:
+                with click.progressbar(range(s), length=s,
+                                       label="\t  ") as idx:
+                    for _i in idx:
+                        _s = slice(_i * factor, _i * factor + factor)
+                        if transpose:
+                            if time_axis == 0:
+                                dst.variables[x.name][_s, :] = \
+                                    src.variables[x.name][:, _s].T
+                            else:
+                                dst.variables[x.name][:, _s] = \
+                                    src.variables[x.name][_s, :].T
+                        else:
+                            if time_axis == 0:
+                                dst.variables[x.name][_s, :] = \
+                                    src.variables[x.name][_s, :]
+                            else:
+                                dst.variables[x.name][:, _s] = \
+                                    src.variables[x.name][:, _s]
 
     for src_group in src.groups.values():
         dst_group = dst.createGroup(src_group.name)
         recursive_copy(src=src_group, dst=dst_group, contiguous=contiguous,
-                       compression_level=compression_level, quiet=quiet)
+                       compression_level=compression_level, quiet=quiet,
+                       transpose=transpose)
 
 
 def unroll_and_merge(filenames, output_folder):
@@ -271,12 +289,12 @@ def unroll_and_merge(filenames, output_folder):
 @click.option("--compression_level",
               type=click.IntRange(1, 9), default=2,
               help="Compression level from 1 (fast) to 9 (slow).")
-@click.option('--method', type=click.Choice(["transposed", "merged"]),
+@click.option('--method', type=click.Choice(["transposed", "repack"]),
               required=True,
-              help="'contiguous' will transpose all arrays and store them "
-              "unchunked and uncompressed. 'unrolled' will completely unroll "
-              "all arrays into one. It is a slow transformation and also "
-              "produces a bigger file but Instaseis can read it faster.")
+              help="`transposed` will transpose the data arrays which "
+                   "oftentimes results in faster extraction times. `repack` "
+                   "will just repack the data and solve some compatibility "
+                   "issues.")
 def repack_database(input_folder, output_folder, contiguous,
                     compression_level, method):
     found_filenames = []
@@ -296,7 +314,7 @@ def repack_database(input_folder, output_folder, contiguous,
     # if method == "unrolled_merge":
     #     unroll_and_merge(filenames=found_filenames,
     #                      output_folder=output_folder)
-    if method == "transposed":
+    if method in ["transposed", "repack"]:
         for _i, filename in enumerate(found_filenames):
             click.echo(click.style(
                 "--> Processing file %i of %i: %s" %
@@ -311,10 +329,16 @@ def repack_database(input_folder, output_folder, contiguous,
 
             os.makedirs(os.path.dirname(output_filename))
 
-            transpose_data(input_filename=filename,
-                           output_filename=output_filename,
-                           contiguous=contiguous,
-                           compression_level=compression_level)
+            if method == "tranposed":
+                transpose = True
+            else:
+                transpose = False
+
+            repack_file(input_filename=filename,
+                        output_filename=output_filename,
+                        contiguous=contiguous,
+                        transpose=transpose,
+                        compression_level=compression_level)
     else:
         raise NotImplementedError
 
