@@ -6,6 +6,9 @@ Instaseis supports a number of different database layouts, each with its own
 advantages and disadvantages as well as repacking functionality to convert
 from some layouts to others.
 
+.. contents::
+    :local:
+
 
 Available Layouts
 -----------------
@@ -134,17 +137,17 @@ have to be performed to get data from a single element.
 Merged File Layout
 ^^^^^^^^^^^^^^^^^^
 
-This, in constrast to the *multi file layout* stores everything in a single
+This, in contrast to the *multi file layout* stores everything in a single
 5D array, meaning data from one element can be accessed with a single read
 command. The downside is that many GLL points are duplicated which thus
 increases the file size. On the other hand this layout can easily increase
 the performance by more than an order of magnitude so depending on the use
 case this is the way to go. Turning on compression can save quite a lot of
-space here but comes at the expense of some speed.
+space here but comes at the expense of some speed. Make sure to set the
+chunking in a way that each chunk corresponds to all the data from a single
+element.
 
-**Expected NetCDF file locations:**
-
-``ROOT/.../merged_output.nc4``
+**Expected NetCDF file locations:** ``ROOT/.../merged_output.nc4``
 
 **File layout** (in a commented representation based on the output from
 ``ncdump``)::
@@ -193,7 +196,7 @@ Repacking Script
 ----------------
 
 Instaseis can convert databases from the *multi file layout* (also in the
-form that AxiSEM produces) to:
+form that AxiSEM produces directly) to:
 
 * The same layout - (the `repack` method) - this sometimes improves
   compatibility. Additionally compression settings can be changed.
@@ -201,7 +204,7 @@ form that AxiSEM produces) to:
   performance. Running this more than one time will keep transposing the data
   arrays.
 * The merged layout. Conversion can take a very long time. Compression is
-  also able to save a bit of space.
+  also able to save quite a bit of space.
 
 
 .. code-block:: bash
