@@ -23,7 +23,9 @@ Filetype
 +---------------------------+----------+----------+-----------------------------+----------------------------------------------------------------------+
 | Parameter                 | Type     | Required | Default Value               | Description                                                          |
 +===========================+==========+==========+=============================+======================================================================+
-| ``components``            | String   | False    | ZNE                         | The desired seismogram components. Any combination of Z, N, E, R, T. |
+| ``components``            | String   | False    | ZNE, Z, or NE (depends on   | Specify the orientation of the synthetic seismograms as a list of    |
+|                           |          |          | what the DB supports)       | any combination of | ``Z`` (vertical), ``N`` (north), ``E`` (east),  |
+|                           |          |          |                             | ``R`` (radial), ``T`` (transverse).                                  |
 +---------------------------+----------+----------+-----------------------------+----------------------------------------------------------------------+
 | ``origintime``            | Datetime | False    | 1970-01-01T00:00:00.000000Z | Time of the first sample.                                            |
 +---------------------------+----------+----------+-----------------------------+----------------------------------------------------------------------+
