@@ -81,7 +81,10 @@ class ReciprocalMergedInstaseisDB(BaseNetCDFInstaseisDB):
         if self.info.dump_type == "displ_only":
             npol = self.info.spatial_order
             mu = mesh_mu[ei.gll_point_ids[npol // 2, npol // 2]]
-        else:
+        else:  # pragma: no cover
+            # Merged databases currently not implemented for
+            # non-displacement databases.
+            raise NotImplementedError
             # XXX: Is this correct?
             mu = mesh_mu[ei.id_elem]
         data["mu"] = mu
@@ -106,9 +109,10 @@ class ReciprocalMergedInstaseisDB(BaseNetCDFInstaseisDB):
                     ei.col_points_xi, ei.col_points_eta, ei.corner_points,
                     ei.eltype, ei.axis, ei.xi, ei.eta)
             elif (self.info.dump_type == 'fullfields' or
-                  self.info.dump_type == 'strain_only'):
-                strain_x, strain_z = self._get_strain(
-                    self.meshes.pz, ei.id_elem)
+                  self.info.dump_type == 'strain_only'):  # pragma: no cover
+                # Merged databases currently not implemented for
+                # non-displacement databases.
+                raise NotImplementedError
 
             mij = rotations \
                 .rotate_symm_tensor_voigt_xyz_src_to_xyz_earth(
@@ -162,7 +166,10 @@ class ReciprocalMergedInstaseisDB(BaseNetCDFInstaseisDB):
                 data[comp] = final
 
         elif isinstance(source, ForceSource):
-            if self.info.dump_type != 'displ_only':
+            if self.info.dump_type != 'displ_only':  # pragma: no cover
+                # Merged databases currently not implemented for
+                # non-displacement databases.
+                raise NotImplementedError
                 raise ValueError("Force sources only in displ_only mode")
 
             displ_x, displ_z = self._get_displacement(

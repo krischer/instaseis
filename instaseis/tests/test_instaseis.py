@@ -51,8 +51,6 @@ for name, path in pytest.config.dbs["databases"].items():
     DBS.append(path)
     if "bwd" in name:
         test_data = BWD_TEST_DATA
-    elif "fwd" in name:
-        test_data = FWD_TEST_DATA
     elif "horizontal_only" in name or "vertical_only" in name:
         test_data = FWD_TEST_DATA
     else:  # pragma: no cover
@@ -1631,7 +1629,7 @@ def test_read_on_demand(database_folder, read_on_demand):
     Make sure that databases work in read_on_demand mode.
     """
     db = find_and_open_files(database_folder, read_on_demand=read_on_demand)
-    if db.info.components != "vertical_and_horizontal":
+    if db.info.components != "vertical and horizontal":
         return
 
     receiver = Receiver(latitude=42.6390, longitude=74.4940)

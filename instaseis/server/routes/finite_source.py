@@ -56,7 +56,12 @@ def _get_finite_source(db, finite_source, receiver, components, units, dt,
             # Effectively results in nothing happening so we can perform the
             # differentiation here.
             kind=INV_KIND_MAP[STF_MAP[db.info.stf]])
-    except Exception:
+    except Exception as e:
+        print("====================")
+        print(e)
+        import traceback
+        traceback.print_exc()
+        print("====================")
         msg = ("Could not extract finite source seismograms. Make sure, "
                "the parameters are valid, and the depth settings are correct.")
         callback((tornado.web.HTTPError(400, log_message=msg, reason=msg),
@@ -238,7 +243,7 @@ class FiniteSourceSeismogramsHandler(InstaseisTimeSeriesHandler):
     default_origin_time = obspy.UTCDateTime(1900, 1, 1)
 
     def __init__(self, *args, **kwargs):
-        super(InstaseisTimeSeriesHandler, self).__init__(*args, **kwargs)
+        super(FiniteSourceSeismogramsHandler, self).__init__(*args, **kwargs)
         # Set the correct default arguments.
         self.arguments["components"]["default"] = \
             "".join(self.application.db.default_components)

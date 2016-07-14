@@ -96,15 +96,6 @@ def test_greens_function_error_handling(all_greens_clients):
         "sourcedepthinmeters": client.source_depth,
         "sourcedistanceindegrees": 20}
 
-    # get_greens_function() only works with reciprocal DBs. So make sure we
-    # get the error, but then do the other tests only for reciprocal DBs
-    if not client.is_reciprocal:
-        params = copy.deepcopy(basic_parameters)
-        request = client.fetch(_assemble_url('greens_function', **params))
-        assert request.code == 400
-        assert "the database is not reciprocal" in request.reason.lower()
-        return
-
     # Remove the sourcedistanceindegrees, required parameter.
     params = copy.deepcopy(basic_parameters)
     del params["sourcedistanceindegrees"]
@@ -158,10 +149,6 @@ def test_greens_function_retrieval(all_greens_clients):
     client = all_greens_clients
 
     db = instaseis.open_db(client.filepath)
-
-    # get_greens_function() only works with reciprocal DBs.
-    if not client.is_reciprocal:
-        return
 
     basic_parameters = {
         "sourcedepthinmeters": 1e3,
@@ -328,10 +315,6 @@ def test_phase_relative_offsets_but_no_ttimes_callback_greens_function(
         all_greens_clients):
     client = all_greens_clients
 
-    # get_greens_function() only works with reciprocal DBs.
-    if not client.is_reciprocal:
-        return
-
     params = {
         "sourcedepthinmeters": 1e3,
         "sourcedistanceindegrees": 20,
@@ -371,10 +354,6 @@ def test_phase_relative_offset_failures_greens_function(
     """
     client = all_greens_clients_ttimes_callback
 
-    # get_greens_function() only works with reciprocal DBs.
-    if not client.is_reciprocal:
-        return
-
     params = {
         "sourcedepthinmeters": 1e3,
         "sourcedistanceindegrees": 20,
@@ -408,10 +387,6 @@ def test_phase_relative_offsets_greens_function(
     - must be encoded with %2D
     """
     client = all_greens_clients_ttimes_callback
-
-    # Only for reciprocal databases.
-    if not client.is_reciprocal:
-        return
 
     # At a distance of 50 degrees and with a source depth of 300 km:
     # P: 504.357 seconds

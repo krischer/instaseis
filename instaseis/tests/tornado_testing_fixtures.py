@@ -340,7 +340,8 @@ def all_greens_clients_ttimes_callback(request):
         travel_time_callback=get_travel_time)
 
 
-@pytest.fixture(params=[_i for _i in list(DBS.values()) if "db_bwd" in _i])
+@pytest.fixture(params=[_i for _i in list(DBS.values()) if
+                        ("db_bwd" in _i or "_only_" in _i)])
 def reciprocal_clients_all_callbacks(request):
     """
     Fixture returning reciprocal clients with all callbacks.

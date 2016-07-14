@@ -371,7 +371,7 @@ def test_more_complex_queries(reciprocal_clients_all_callbacks,
     basic_parameters = {
         "receiverlongitude": 11,
         "receiverlatitude": 22,
-        "components": "Z",
+        "components": "".join(db.available_components),
         "format": "miniseed"}
 
     with io.open(usgs_param, "rb") as fh:

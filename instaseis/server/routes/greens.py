@@ -93,7 +93,7 @@ class GreensFunctionHandler(InstaseisTimeSeriesHandler):
     default_label = "instaseis_greens_function"
 
     def __init__(self, *args, **kwargs):
-        super(InstaseisTimeSeriesHandler, self).__init__(*args, **kwargs)
+        super(GreensFunctionHandler, self).__init__(*args, **kwargs)
 
     def validate_parameters(self, args):
         """

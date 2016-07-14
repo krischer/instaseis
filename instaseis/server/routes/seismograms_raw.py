@@ -107,7 +107,7 @@ class RawSeismogramsHandler(InstaseisTimeSeriesHandler):
         pass
 
     def __init__(self, *args, **kwargs):
-        super(InstaseisTimeSeriesHandler, self).__init__(*args, **kwargs)
+        super(RawSeismogramsHandler, self).__init__(*args, **kwargs)
         # Set the correct default arguments.
         self.arguments["components"]["default"] = \
             "".join(self.application.db.default_components)

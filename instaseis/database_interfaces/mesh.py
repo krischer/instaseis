@@ -111,7 +111,7 @@ def get_time_axis(ds, ndumps):
         return 0
     elif ds.shape[1] == ndumps:
         return 1
-    else:
+    else:  # pragma: no cover
         raise ValueError("Could not determine the time axis in the "
                          "2D array. It has an incompatible shape.")
 
