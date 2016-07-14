@@ -256,7 +256,8 @@ def create_async_client(path, station_coordinates_callback=None,
     client.filepath = path
     client.port = port
     # Flag to help deal with forward/backwards databases.
-    if "bwd" in os.path.basename(path):
+    b = os.path.basename(path)
+    if "bwd" in b or "horizontal_only" in b or "vertical_only" in b:
         client.is_reciprocal = True
         client.source_depth = 0.0
     else:
@@ -270,6 +271,17 @@ def create_async_client(path, station_coordinates_callback=None,
 def all_clients(request):
     """
     Fixture returning all clients!
+    """
+    return create_async_client(request.param,
+                               station_coordinates_callback=None)
+
+@pytest.fixture(params=[_i for _i in list(DBS.values()) if (
+        "db_bwd" in _i and
+        "horizontal_only" not in _i and
+        "vertical_only" not in _i)])
+def all_greens_clients(request):
+    """
+    Fixture returning all clients compatible with Green's functions!
     """
     return create_async_client(request.param,
                                station_coordinates_callback=None)
@@ -308,6 +320,19 @@ def all_clients_event_callback(request):
 def all_clients_ttimes_callback(request):
     """
     Fixture returning all clients with a travel time callback.
+    """
+    return create_async_client(
+        request.param,
+        travel_time_callback=get_travel_time)
+
+
+@pytest.fixture(params=[_i for _i in list(DBS.values()) if (
+        "db_bwd" in _i and
+        "horizontal_only" not in _i and
+        "vertical_only" not in _i)])
+def all_greens_clients_ttimes_callback(request):
+    """
+    Fixture returning all clients compatible with Green's functions!
     """
     return create_async_client(
         request.param,
