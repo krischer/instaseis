@@ -176,9 +176,7 @@ sure the following line is part of it:
 
 A fairly recent development is that ``conda``, on some systems, ships
 ``libgfortran3`` versions incompatible with the system libraries. If you see
-errors like
-
-.. code-block:: bash
+errors like::
 
     ImportError:
     /home/travis/miniconda/lib/python2.7/site-packages/scipy/special/../../../../libgfortran.so.3:
@@ -228,7 +226,7 @@ Many test run without these two packages, but executing the full test suite
 requires two additional packages: ``click`` and ``netcdf4``. If you don't
 already have them, install with
 
-.. code-block::
+.. code-block:: bash
 
     $ conda install click netcdf4
 
