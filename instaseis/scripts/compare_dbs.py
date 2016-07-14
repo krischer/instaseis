@@ -34,8 +34,11 @@ import instaseis
 import obspy
 
 
-@click.command()
-@click.option("--seed", type=int)
+@click.command(help="Pass a list of databases to assert that they produce the "
+                    "same seismograms. The first one will be treated as the "
+                    "reference.")
+@click.option("--seed", type=int,
+              help="Optionally pass a seed number to make it reproducible.")
 @click.argument("databases", type=click.Path(exists=True, file_okay=False,
                                              dir_okay=True), nargs=-1)
 def compare_dbs(seed, databases):

@@ -406,9 +406,9 @@ def _merge_files(px_in, pz_in, out, contiguous, compression_level, quiet):
 @click.option("--compression_level",
               type=click.IntRange(1, 9), default=2,
               help="Compression level from 1 (fast) to 9 (slow).")
-@click.option('--method', type=click.Choice(["transposed", "repack", "merge"]),
+@click.option('--method', type=click.Choice(["transpose", "repack", "merge"]),
               required=True,
-              help="`transposed` will transpose the data arrays which "
+              help="`transpose` will transpose the data arrays which "
                    "oftentimes results in faster extraction times. `repack` "
                    "will just repack the data and solve some compatibility "
                    "issues. `merge` will create a single much larger file "
@@ -427,7 +427,7 @@ def repack_database(input_folder, output_folder, contiguous,
 
     os.makedirs(output_folder)
 
-    if method in ["transposed", "repack"]:
+    if method in ["transpose", "repack"]:
         for _i, filename in enumerate(found_filenames):
             click.echo(click.style(
                 "--> Processing file %i of %i: %s" %
@@ -442,7 +442,7 @@ def repack_database(input_folder, output_folder, contiguous,
 
             os.makedirs(os.path.dirname(output_filename))
 
-            if method == "transposed":
+            if method == "transpose":
                 transpose = True
             else:
                 transpose = False
