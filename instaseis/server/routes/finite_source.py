@@ -56,12 +56,7 @@ def _get_finite_source(db, finite_source, receiver, components, units, dt,
             # Effectively results in nothing happening so we can perform the
             # differentiation here.
             kind=INV_KIND_MAP[STF_MAP[db.info.stf]])
-    except Exception as e:
-        print("====================")
-        print(e)
-        import traceback
-        traceback.print_exc()
-        print("====================")
+    except Exception:
         msg = ("Could not extract finite source seismograms. Make sure, "
                "the parameters are valid, and the depth settings are correct.")
         callback((tornado.web.HTTPError(400, log_message=msg, reason=msg),

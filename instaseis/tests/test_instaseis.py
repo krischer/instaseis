@@ -1629,7 +1629,9 @@ def test_read_on_demand(database_folder, read_on_demand):
     Make sure that databases work in read_on_demand mode.
     """
     db = find_and_open_files(database_folder, read_on_demand=read_on_demand)
-    if db.info.components != "vertical and horizontal":
+
+    # Test requires all 3 components.
+    if "only" in db.info.components:
         return
 
     receiver = Receiver(latitude=42.6390, longitude=74.4940)
