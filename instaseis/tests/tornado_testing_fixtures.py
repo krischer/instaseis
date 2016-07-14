@@ -275,6 +275,7 @@ def all_clients(request):
     return create_async_client(request.param,
                                station_coordinates_callback=None)
 
+
 @pytest.fixture(params=[_i for _i in list(DBS.values()) if (
         "db_bwd" in _i and
         "horizontal_only" not in _i and

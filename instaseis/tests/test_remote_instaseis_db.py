@@ -89,27 +89,29 @@ def test_seismogram_extraction(all_remote_dbs):
 
     receiver = instaseis.Receiver(latitude=10., longitude=20., depth_in_m=None)
 
+    components = r_db.available_components
+
     kwargs = {"source": source, "receiver": receiver,
-              "components": ["Z", "N", "E", "R", "T"]}
+              "components": components}
     _compare_streams(r_db, l_db, kwargs)
 
     # Test velocity and acceleration.
     kwargs = {"source": source, "receiver": receiver,
-              "components": ["Z", "N", "E", "R", "T"], "kind": "velocity"}
+              "components": components, "kind": "velocity"}
     _compare_streams(r_db, l_db, kwargs)
     kwargs = {"source": source, "receiver": receiver,
-              "components": ["Z", "N", "E", "R", "T"], "kind": "acceleration"}
+              "components": components, "kind": "acceleration"}
     _compare_streams(r_db, l_db, kwargs)
 
     # Test remove source shift.
     kwargs = {"source": source, "receiver": receiver,
-              "components": ["Z", "N", "E", "R", "T"],
+              "components": components,
               "remove_source_shift": False}
     _compare_streams(r_db, l_db, kwargs)
 
     # Test resampling.
     kwargs = {"source": source, "receiver": receiver,
-              "components": ["Z", "N", "E", "R", "T"],
+              "components": components,
               "dt": 1.0, "kernelwidth": 6}
     _compare_streams(r_db, l_db, kwargs)
 
@@ -129,7 +131,7 @@ def test_seismogram_extraction(all_remote_dbs):
                                   network="BW")
 
     kwargs = {"source": source, "receiver": receiver,
-              "components": ["Z", "N", "E", "R", "T"]}
+              "components": components}
     _compare_streams(r_db, l_db, kwargs)
 
 

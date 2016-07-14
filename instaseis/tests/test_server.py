@@ -86,11 +86,11 @@ def test_info_route(all_clients):
     np.testing.assert_allclose(client_sliprate, db_sliprate)
 
 
-def test_greens_function_error_handling(all_clients):
+def test_greens_function_error_handling(all_greens_clients):
     """
     Tests error handling of the /greens_function route. Very basic for now
     """
-    client = all_clients
+    client = all_greens_clients
 
     basic_parameters = {
         "sourcedepthinmeters": client.source_depth,
@@ -150,12 +150,12 @@ def test_greens_function_error_handling(all_clients):
     assert request.reason == "Source depth should be in [0.0, 371000.0]."
 
 
-def test_greens_function_retrieval(all_clients):
+def test_greens_function_retrieval(all_greens_clients):
     """
     Tests if the greens functions requested from the server are identical to
     the one requested with the local instaseis client.
     """
-    client = all_clients
+    client = all_greens_clients
 
     db = instaseis.open_db(client.filepath)
 
@@ -325,8 +325,8 @@ def test_greens_function_retrieval(all_clients):
 
 
 def test_phase_relative_offsets_but_no_ttimes_callback_greens_function(
-        all_clients):
-    client = all_clients
+        all_greens_clients):
+    client = all_greens_clients
 
     # get_greens_function() only works with reciprocal DBs.
     if not client.is_reciprocal:
@@ -364,12 +364,12 @@ def test_phase_relative_offsets_but_no_ttimes_callback_greens_function(
 
 
 def test_phase_relative_offset_failures_greens_function(
-        all_clients_ttimes_callback):
+        all_greens_clients_ttimes_callback):
     """
     Tests some common failures for the phase relative offsets with the
     greens function route.
     """
-    client = all_clients_ttimes_callback
+    client = all_greens_clients_ttimes_callback
 
     # get_greens_function() only works with reciprocal DBs.
     if not client.is_reciprocal:
@@ -399,14 +399,15 @@ def test_phase_relative_offset_failures_greens_function(
         "large offsets if the database is not long enough.")
 
 
-def test_phase_relative_offsets_greens_function(all_clients_ttimes_callback):
+def test_phase_relative_offsets_greens_function(
+        all_greens_clients_ttimes_callback):
     """
     Test phase relative offsets with the green's function route.
 
     + must be encoded with %2B
     - must be encoded with %2D
     """
-    client = all_clients_ttimes_callback
+    client = all_greens_clients_ttimes_callback
 
     # Only for reciprocal databases.
     if not client.is_reciprocal:
@@ -654,6 +655,7 @@ def test_seismograms_raw_route(all_clients):
     Once again executed for each known test database.
     """
     client = all_clients
+    db = instaseis.open_db(client.filepath, read_on_demand=True)
 
     basic_parameters = {
         "sourcelatitude": 10,
@@ -674,7 +676,7 @@ def test_seismograms_raw_route(all_clients):
     assert request.code == 200
 
     st = obspy.read(request.buffer)
-    assert len(st) == 3
+    assert len(st) == len(db.default_components)
 
     # Assert the MiniSEED file and some basic properties.
     for tr in st:
@@ -688,7 +690,7 @@ def test_seismograms_raw_route(all_clients):
     assert request.code == 200
 
     st = obspy.read(request.buffer)
-    assert len(st) == 3
+    assert len(st) == len(db.default_components)
 
     # Assert the MiniSEED file and some basic properties.
     for tr in st:
@@ -716,6 +718,8 @@ def test_seismograms_raw_route(all_clients):
     # Test different components.
     components = ["NRE", "ZRT", "RT", "Z", "ZNE"]
     for comp in components:
+        if not all([_i in db.available_components for _i in comp]):
+            continue
         params = copy.deepcopy(basic_parameters)
         params.update(mt)
         params["components"] = comp
@@ -736,7 +740,7 @@ def test_seismograms_raw_route(all_clients):
     assert request.code == 200
 
     st = obspy.read(request.buffer)
-    assert len(st) == 3
+    assert len(st) == len(db.default_components)
     for tr in st:
         assert tr.stats.starttime == time
 
@@ -750,7 +754,7 @@ def test_seismograms_raw_route(all_clients):
     assert request.code == 200
 
     st = obspy.read(request.buffer)
-    assert len(st) == 3
+    assert len(st) == len(db.default_components)
     for tr in st:
         assert tr.stats.network == "BW"
         assert tr.stats.station == "ALTM"
@@ -787,6 +791,7 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
     Tests that the correct objects are created for the raw seismogram route.
     """
     client = all_clients
+    db = instaseis.open_db(client.filepath, read_on_demand=True)
 
     basic_parameters = {
         "sourcelatitude": 10,
@@ -822,7 +827,8 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
         assert request.code == 200
 
         assert p.call_count == 1
-        assert p.call_args[1]["components"] == ["Z", "N", "E"]
+        assert sorted(p.call_args[1]["components"]) == sorted(
+            db.default_components)
         assert p.call_args[1]["source"] == instaseis.Source(
             latitude=basic_parameters["sourcelatitude"],
             longitude=basic_parameters["sourcelongitude"],
@@ -848,7 +854,8 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
         assert request.code == 200
 
         assert p.call_count == 1
-        assert p.call_args[1]["components"] == ["Z", "N", "E"]
+        assert sorted(p.call_args[1]["components"]) == sorted(
+            db.default_components)
         assert p.call_args[1]["source"] == instaseis.Source(
             latitude=basic_parameters["sourcelatitude"],
             longitude=basic_parameters["sourcelongitude"],
@@ -869,7 +876,8 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
         assert request.code == 200
 
         assert p.call_count == 1
-        assert p.call_args[1]["components"] == ["Z", "N", "E"]
+        assert sorted(p.call_args[1]["components"]) == sorted(
+            db.default_components)
         assert p.call_args[1]["source"] == \
             instaseis.Source.from_strike_dip_rake(
                 latitude=basic_parameters["sourcelatitude"],
@@ -895,7 +903,8 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
         assert request.code == 200
 
         assert p.call_count == 1
-        assert p.call_args[1]["components"] == ["Z", "N", "E"]
+        assert sorted(p.call_args[1]["components"]) == sorted(
+            db.default_components)
         assert p.call_args[1]["source"] == \
             instaseis.Source.from_strike_dip_rake(
                 latitude=basic_parameters["sourcelatitude"],
@@ -917,7 +926,8 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
             assert request.code == 200
 
             assert p.call_count == 1
-            assert p.call_args[1]["components"] == ["Z", "N", "E"]
+            assert sorted(p.call_args[1]["components"]) == sorted(
+                db.default_components)
             assert p.call_args[1]["source"] == instaseis.ForceSource(
                 latitude=basic_parameters["sourcelatitude"],
                 longitude=basic_parameters["sourcelongitude"],
@@ -943,7 +953,8 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
             assert request.code == 200
 
             assert p.call_count == 1
-            assert p.call_args[1]["components"] == ["Z", "N", "E"]
+            assert sorted(p.call_args[1]["components"]) == sorted(
+                db.default_components)
             assert p.call_args[1]["source"] == instaseis.ForceSource(
                 latitude=basic_parameters["sourcelatitude"],
                 longitude=basic_parameters["sourcelongitude"],
@@ -1095,6 +1106,7 @@ def test_object_creation_for_seismogram_route(all_clients):
     Tests that the correct objects are created for the seismogram route.
     """
     client = all_clients
+    db = instaseis.open_db(client.filepath, read_on_demand=True)
 
     basic_parameters = {
         "sourcelatitude": 10,
@@ -1134,7 +1146,8 @@ def test_object_creation_for_seismogram_route(all_clients):
         assert request.code == 200
 
         assert p.call_count == 1
-        assert p.call_args[1]["components"] == ["Z", "N", "E"]
+        assert sorted(p.call_args[1]["components"]) == \
+            sorted(db.default_components)
         assert p.call_args[1]["source"] == instaseis.Source(
             latitude=basic_parameters["sourcelatitude"],
             longitude=basic_parameters["sourcelongitude"],
@@ -1181,7 +1194,8 @@ def test_object_creation_for_seismogram_route(all_clients):
         assert request.code == 200
 
         assert p.call_count == 1
-        assert p.call_args[1]["components"] == ["Z", "N", "E"]
+        assert sorted(p.call_args[1]["components"]) == \
+            sorted(db.default_components)
         assert p.call_args[1]["source"] == instaseis.Source(
             latitude=basic_parameters["sourcelatitude"],
             longitude=basic_parameters["sourcelongitude"],
@@ -1216,7 +1230,8 @@ def test_object_creation_for_seismogram_route(all_clients):
         assert request.code == 200
 
         assert p.call_count == 1
-        assert p.call_args[1]["components"] == ["Z", "N", "E"]
+        assert sorted(p.call_args[1]["components"]) == \
+            sorted(db.default_components)
         assert p.call_args[1]["source"] == \
             instaseis.Source.from_strike_dip_rake(
                 latitude=basic_parameters["sourcelatitude"],
@@ -1260,7 +1275,8 @@ def test_object_creation_for_seismogram_route(all_clients):
         assert request.code == 200
 
         assert p.call_count == 1
-        assert p.call_args[1]["components"] == ["Z", "N", "E"]
+        assert sorted(p.call_args[1]["components"]) == \
+            sorted(db.default_components)
         assert p.call_args[1]["source"] == \
             instaseis.Source.from_strike_dip_rake(
                 latitude=basic_parameters["sourcelatitude"],
@@ -1295,7 +1311,8 @@ def test_object_creation_for_seismogram_route(all_clients):
         assert request.code == 200
 
         assert p.call_count == 1
-        assert p.call_args[1]["components"] == ["Z", "N", "E"]
+        assert sorted(p.call_args[1]["components"]) == \
+            sorted(db.default_components)
         assert p.call_args[1]["source"] == \
             instaseis.Source.from_strike_dip_rake(
                 latitude=basic_parameters["sourcelatitude"],
@@ -1330,7 +1347,8 @@ def test_object_creation_for_seismogram_route(all_clients):
             assert request.code == 200
 
             assert p.call_count == 1
-            assert p.call_args[1]["components"] == ["Z", "N", "E"]
+            assert sorted(p.call_args[1]["components"]) == \
+                sorted(db.default_components)
             assert p.call_args[1]["source"] == instaseis.ForceSource(
                 latitude=basic_parameters["sourcelatitude"],
                 longitude=basic_parameters["sourcelongitude"],
@@ -1368,7 +1386,8 @@ def test_object_creation_for_seismogram_route(all_clients):
             assert request.code == 200
 
             assert p.call_count == 1
-            assert p.call_args[1]["components"] == ["Z", "N", "E"]
+            assert sorted(p.call_args[1]["components"]) == \
+                sorted(db.default_components)
             assert p.call_args[1]["source"] == instaseis.ForceSource(
                 latitude=basic_parameters["sourcelatitude"],
                 longitude=basic_parameters["sourcelongitude"],
@@ -1396,6 +1415,10 @@ def test_object_creation_for_seismogram_route(all_clients):
             tr.stats.instaseis.mu = 1.234
             tr.stats.starttime = obspy.UTCDateTime(1900, 1, 1) - 7 * dt
             tr.stats.delta = dt
+
+        # From here on only 3 component databases.
+        if db.info.components != "vertical and horizontal":
+            return
 
         params = copy.deepcopy(basic_parameters)
         params["sourcemomenttensor"] = mt_param
@@ -1531,7 +1554,7 @@ def test_seismograms_retrieval(all_clients):
     request = client.fetch(_assemble_url('seismograms', **params))
     st_server = obspy.read(request.buffer)
 
-    components = ["Z", "N", "E"]
+    components = db.available_components
     source = instaseis.Source(
         latitude=basic_parameters["sourcelatitude"],
         longitude=basic_parameters["sourcelongitude"],
@@ -1769,11 +1792,11 @@ def test_seismograms_retrieval(all_clients):
     # Now test other the other parameters.
     params = copy.deepcopy(basic_parameters)
     params["sourcemomenttensor"] = mt_param
-    params["components"] = "RTE"
+    params["components"] = "".join(db.default_components[:1])
     request = client.fetch(_assemble_url('seismograms', **params))
     st_server = obspy.read(request.buffer)
     st_db = db.get_seismograms(source=source, receiver=receiver,
-                               components=["R", "T", "E"])
+                               components=db.default_components[:1])
     for tr_server, tr_db in zip(st_server, st_db):
         # Remove the additional stats from both.
         del tr_server.stats.mseed
@@ -1894,6 +1917,7 @@ def test_output_formats(all_clients):
     archive containing multiple SAC files.
     """
     client = all_clients
+    db = instaseis.open_db(client.filepath, read_on_demand=True)
 
     basic_parameters = {
         "sourcelatitude": 10,
@@ -1968,7 +1992,8 @@ def test_output_formats(all_clients):
         "receiverlatitude": -10,
         "receiverlongitude": -10}
     mt = {"sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
-          "components": "RT", "units": "velocity", "dt": 2, "kernelwidth": 3,
+          "components": "".join(db.default_components[:2]),
+          "units": "velocity", "dt": 2, "kernelwidth": 3,
           "networkcode": "BW", "stationcode": "FURT", "locationcode": "XX"}
     basic_parameters.update(mt)
 
@@ -2296,7 +2321,6 @@ def test_multiple_seismograms_retrieval_no_format_given(
         st_server += obspy.read(io.BytesIO(zip_obj.read(name)))
     st_server.sort()
 
-    components = ["Z", "N", "E"]
     source = instaseis.Source(
         latitude=basic_parameters["sourcelatitude"],
         longitude=basic_parameters["sourcelongitude"],
@@ -2311,13 +2335,11 @@ def test_multiple_seismograms_retrieval_no_format_given(
                            depth_in_m=0.0, network="IU", station="ANMO")]
     st_db = obspy.Stream()
     for receiver in receivers:
-        st_db += db.get_seismograms(source=source, receiver=receiver,
-                                    components=components)
+        st_db += db.get_seismograms(source=source, receiver=receiver)
     st_db.sort()
 
-    # Should now have 6 Stream objects.
-    assert len(st_db) == 6
-    assert len(st_server) == 6
+    assert len(st_db) == len(db.default_components) * 2
+    assert len(st_server) == len(db.default_components) * 2
     for tr_server, tr_db in zip(st_server, st_db):
         # Remove the additional stats from both.
         del tr_server.stats.sac
@@ -2333,13 +2355,12 @@ def test_multiple_seismograms_retrieval_no_format_given(
         np.testing.assert_allclose(tr_server.data, tr_db.data,
                                    atol=1E-10 * tr_server.data.ptp())
 
-    # Strike/dip/rake source, "RT" components
+    # Strike/dip/rake source
     params = copy.deepcopy(basic_parameters)
     params["sourcedoublecouple"] = sdr_param
     # This will return two stations.
     params["network"] = "IU,B*"
     params["station"] = "ANT*,ANM?"
-    params["components"] = "RT"
     # A couple more parameters.
     if client.is_reciprocal is True:
         params["sourcedepthinmeters"] = "5.0"
@@ -2355,7 +2376,6 @@ def test_multiple_seismograms_retrieval_no_format_given(
         st_server += obspy.read(io.BytesIO(zip_obj.read(name)))
     st_server.sort()
 
-    components = ["R", "T"]
     source = instaseis.Source.from_strike_dip_rake(
         latitude=basic_parameters["sourcelatitude"],
         longitude=basic_parameters["sourcelongitude"],
@@ -2368,13 +2388,12 @@ def test_multiple_seismograms_retrieval_no_format_given(
                            depth_in_m=0.0, network="IU", station="ANMO")]
     st_db = obspy.Stream()
     for receiver in receivers:
-        st_db += db.get_seismograms(source=source, receiver=receiver,
-                                    components=components)
+        st_db += db.get_seismograms(source=source, receiver=receiver)
     st_db.sort()
 
     # Should now have only 4 Stream objects.
-    assert len(st_db) == 4
-    assert len(st_server) == 4
+    assert len(st_db) == len(db.default_components) * 2
+    assert len(st_server) == len(db.default_components) * 2
     for tr_server, tr_db in zip(st_server, st_db):
         # Remove the additional stats from both. This also assures both have
         # the  miniseed format.
@@ -2392,14 +2411,14 @@ def test_multiple_seismograms_retrieval_no_format_given(
                                    atol=1E-10 * tr_server.data.ptp())
 
     # Force source only works for displ_only databases.
-    # Force source, all 5 components.
+    # Force source, all components.
     if "displ_only" in client.filepath:
         params = copy.deepcopy(basic_parameters)
         params["sourceforce"] = fs_param
         # This will return two stations.
         params["network"] = "IU,B*"
         params["station"] = "ANT*,ANM?"
-        params["components"] = "NEZRT"
+        params["components"] = "".join(db.available_components)
 
         # Default format is MiniSEED>
         request = client.fetch(_assemble_url('seismograms', **params))
@@ -2411,7 +2430,7 @@ def test_multiple_seismograms_retrieval_no_format_given(
             st_server += obspy.read(io.BytesIO(zip_obj.read(name)))
         st_server.sort()
 
-        components = ["N", "E", "Z", "R", "T"]
+        components = db.available_components
         source = instaseis.ForceSource(
             latitude=basic_parameters["sourcelatitude"],
             longitude=basic_parameters["sourcelongitude"],
@@ -2492,7 +2511,6 @@ def test_multiple_seismograms_retrieval_no_format_given_single_station(
         st_server += obspy.read(io.BytesIO(zip_obj.read(name)))
     st_server.sort()
 
-    components = ["Z", "N", "E"]
     source = instaseis.Source(
         latitude=basic_parameters["sourcelatitude"],
         longitude=basic_parameters["sourcelongitude"],
@@ -2505,13 +2523,11 @@ def test_multiple_seismograms_retrieval_no_format_given_single_station(
                            depth_in_m=0.0, network="IU", station="ANMO")]
     st_db = obspy.Stream()
     for receiver in receivers:
-        st_db += db.get_seismograms(source=source, receiver=receiver,
-                                    components=components)
+        st_db += db.get_seismograms(source=source, receiver=receiver)
     st_db.sort()
 
-    # Should now have 3 Stream objects.
-    assert len(st_db) == 3
-    assert len(st_server) == 3
+    assert len(st_db) == len(db.default_components)
+    assert len(st_server) == len(db.default_components)
     for tr_server, tr_db in zip(st_server, st_db):
         # Remove the additional stats from both.
         del tr_server.stats.sac
@@ -2526,6 +2542,10 @@ def test_multiple_seismograms_retrieval_no_format_given_single_station(
         # small values.
         np.testing.assert_allclose(tr_server.data, tr_db.data,
                                    atol=1E-10 * tr_server.data.ptp())
+
+    # From this point on, only three component databases.
+    if "R" not in db.available_components:
+        return
 
     # Strike/dip/rake source, "RT" components
     params = copy.deepcopy(basic_parameters)
@@ -2672,14 +2692,14 @@ def test_multiple_seismograms_retrieval_mseed_format(
     params["network"] = "IU,B*"
     params["station"] = "ANT*,ANM?"
 
-    # Default format is MiniSEED>
+    # Default format is MiniSEED.
     request = client.fetch(_assemble_url('seismograms', **params))
     assert request.code == 200
     assert request.headers["Content-Type"] == "application/vnd.fdsn.mseed"
     st_server = obspy.read(request.buffer)
     st_server.sort()
 
-    components = ["Z", "N", "E"]
+    components = db.default_components
     source = instaseis.Source(
         latitude=basic_parameters["sourcelatitude"],
         longitude=basic_parameters["sourcelongitude"],
@@ -2697,9 +2717,11 @@ def test_multiple_seismograms_retrieval_mseed_format(
                                     components=components)
     st_db.sort()
 
-    # Should now have 6 Stream objects.
-    assert len(st_db) == 6
-    assert len(st_server) == 6
+    # Should now have a number of streams.
+
+    assert len(st_db) > 1
+    assert len(st_db) == len(st_server)
+
     for tr_server, tr_db in zip(st_server, st_db):
         # Remove the additional stats from both. This also assures both have
         # the  miniseed format.
@@ -2715,6 +2737,11 @@ def test_multiple_seismograms_retrieval_mseed_format(
         # small values.
         np.testing.assert_allclose(tr_server.data, tr_db.data,
                                    atol=1E-10 * tr_server.data.ptp())
+
+    # Execute the rest only for databases that have vertical and horizontal
+    # components.
+    if sorted(db.default_components) != ["E", "N", "Z"]:
+        return
 
     # Strike/dip/rake source, "RT" components
     params = copy.deepcopy(basic_parameters)
@@ -2877,7 +2904,6 @@ def test_multiple_seismograms_retrieval_saczip_format(
         assert tr.stats._format == "SAC"
     st_server.sort()
 
-    components = ["Z", "N", "E"]
     source = instaseis.Source(
         latitude=basic_parameters["sourcelatitude"],
         longitude=basic_parameters["sourcelongitude"],
@@ -2891,13 +2917,13 @@ def test_multiple_seismograms_retrieval_saczip_format(
                            depth_in_m=0.0, network="IU", station="ANMO")]
     st_db = obspy.Stream()
     for receiver in receivers:
-        st_db += db.get_seismograms(source=source, receiver=receiver,
-                                    components=components)
+        st_db += db.get_seismograms(source=source, receiver=receiver)
     st_db.sort()
 
-    # Should now have 6 Stream objects.
-    assert len(st_db) == 6
-    assert len(st_server) == 6
+    # Should now have the number of default components times two (once for
+    # each station)
+    assert len(st_db) == len(db.default_components) * 2
+    assert len(st_server) == len(db.default_components) * 2
     for tr_server, tr_db in zip(st_server, st_db):
         # Remove the additional stats from both.
         del tr_server.stats.sac
@@ -2912,6 +2938,10 @@ def test_multiple_seismograms_retrieval_saczip_format(
         # small values.
         np.testing.assert_allclose(tr_server.data, tr_db.data,
                                    atol=1E-10 * tr_server.data.ptp())
+
+    # From here on only 3C databases
+    if "R" not in db.available_components:
+        return
 
     # Strike/dip/rake source, "RT" components
     params = copy.deepcopy(basic_parameters)
@@ -3606,8 +3636,10 @@ def test_mu_parameter_for_seismograms_and_greens_function_route(
     assert "Instaseis-Mu" in request.headers
     assert isinstance(float(request.headers["Instaseis-Mu"]), float)
 
-    # get_greens_function() only works with reciprocal DBs.
-    if not client.is_reciprocal:
+    # get_greens_function() only works with reciprocal DBs that also must
+    # have all three components.
+    if not client.is_reciprocal or \
+            client.info.components != "vertical and horizontal":
         return
 
     parameters = {
@@ -3624,12 +3656,12 @@ def test_mu_parameter_for_seismograms_and_greens_function_route(
     assert isinstance(float(request.headers["Instaseis-Mu"]), float)
 
 
-def test_label_parameter(all_clients):
+def test_label_parameter(all_greens_clients):
     """
     Test the 'label' parameter of the /seismograms route.
     """
     prefix = "attachment; filename="
-    client = all_clients
+    client = all_greens_clients
 
     params = {
         "sourcelatitude": 10, "sourcelongitude": 10,
@@ -3911,8 +3943,7 @@ def test_phase_relative_offsets(all_clients_ttimes_callback):
         "sourcedepthinmeters": 300000,
         "receiverlatitude": 0, "receiverlongitude": 50,
         "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
-        "components": "Z", "dt": 0.1,
-        "format": "miniseed"}
+        "dt": 0.1, "format": "miniseed"}
 
     # Normal seismogram.
     p = copy.deepcopy(params)
@@ -4048,8 +4079,7 @@ def test_phase_relative_offset_different_time_representations(
         "sourcedepthinmeters": 300000,
         "receiverlatitude": 0, "receiverlongitude": 50,
         "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
-        "components": "Z", "dt": 0.1,
-        "format": "miniseed"}
+        "dt": 0.1, "format": "miniseed"}
 
     # Normal seismogram.
     p = copy.deepcopy(params)
@@ -4208,6 +4238,8 @@ def test_phase_relative_offsets_multiple_stations(all_clients_all_callbacks):
     if not client.is_reciprocal:
         return
 
+    db = instaseis.open_db(client.filepath, read_on_demand=True)
+
     # Now test multiple receiveers.
     # This is constructed in such a way that only one station will have a P
     # phase (due to the distance). So this is tested here.
@@ -4215,13 +4247,12 @@ def test_phase_relative_offsets_multiple_stations(all_clients_all_callbacks):
         "sourcelatitude": -39, "sourcelongitude": 20,
         "sourcedepthinmeters": 300000,
         "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
-        "components": "Z", "dt": 0.1,
-        "format": "miniseed", "network": "IU,B*", "station": "ANT*,ANM?",
-        "starttime": "P%2D10"}
+        "dt": 0.1, "format": "miniseed", "network": "IU,B*",
+        "station": "ANT*,ANM?", "starttime": "P%2D10"}
     request = client.fetch(_assemble_url('seismograms', **params))
     assert request.code == 200
     st = obspy.read(request.buffer)
-    assert len(st) == 1
+    assert len(st) == len(db.default_components)
 
     # This is constructed in such a way that only one station will have a P
     # phase (due to the distance). So this is tested here.
@@ -4229,35 +4260,33 @@ def test_phase_relative_offsets_multiple_stations(all_clients_all_callbacks):
         "sourcelatitude": -39, "sourcelongitude": 20,
         "sourcedepthinmeters": 300000,
         "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
-        "components": "Z", "dt": 0.1,
-        "format": "miniseed", "network": "IU,B*", "station": "ANT*,ANM?",
-        "endtime": "P%2D10"}
+        "dt": 0.1, "format": "miniseed", "network": "IU,B*",
+        "station": "ANT*,ANM?", "endtime": "P%2D10"}
     request = client.fetch(_assemble_url('seismograms', **params))
     assert request.code == 200
     st = obspy.read(request.buffer)
-    assert len(st) == 1
+    assert len(st) == len(db.default_components)
 
     # Now get both.
     params = {
         "sourcelatitude": 39, "sourcelongitude": 20,
         "sourcedepthinmeters": 300000,
         "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
-        "components": "Z", "dt": 0.1,
-        "format": "miniseed", "network": "IU,B*", "station": "ANT*,ANM?",
-        "starttime": "P%2D10"}
+        "dt": 0.1, "format": "miniseed", "network": "IU,B*",
+        "station": "ANT*,ANM?", "starttime": "P%2D10"}
     request = client.fetch(_assemble_url('seismograms', **params))
     assert request.code == 200
     st = obspy.read(request.buffer)
-    assert len(st) == 2
+    # Two stations!
+    assert len(st) == len(db.default_components) * 2
 
     # Or one also does not get any. In that case an error is raised.
     params = {
         "sourcelatitude": 39, "sourcelongitude": 20,
         "sourcedepthinmeters": 300000,
         "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
-        "components": "Z", "dt": 0.1,
-        "format": "miniseed", "network": "IU,B*", "station": "ANT*,ANM?",
-        "starttime": "P%2D10000"}
+        "dt": 0.1, "format": "miniseed", "network": "IU,B*",
+        "station": "ANT*,ANM?", "starttime": "P%2D10000"}
     request = client.fetch(_assemble_url('seismograms', **params))
     assert request.code == 400
     assert request.reason == (
@@ -4272,9 +4301,8 @@ def test_phase_relative_offsets_multiple_stations(all_clients_all_callbacks):
         "sourcelatitude": 39, "sourcelongitude": 20,
         "sourcedepthinmeters": 300000,
         "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
-        "components": "Z", "dt": 0.1,
-        "format": "miniseed", "network": "IU,B*", "station": "ANT*,ANM?",
-        "endtime": "P%2B10000"}
+        "dt": 0.1, "format": "miniseed", "network": "IU,B*",
+        "station": "ANT*,ANM?", "endtime": "P%2B10000"}
     request = client.fetch(_assemble_url('seismograms', **params))
     assert request.code == 400
     assert request.reason == (
@@ -4293,8 +4321,8 @@ def test_various_failure_conditions(all_clients_all_callbacks):
     params = {
         "sourcelatitude": -39, "sourcelongitude": 20,
         "sourcedepthinmeters": 300000,
-        "components": "Z", "dt": 0.1,
-        "format": "miniseed", "network": "IU,B*", "station": "ANT*,ANM?"}
+        "dt": 0.1, "format": "miniseed", "network": "IU,B*",
+        "station": "ANT*,ANM?"}
     request = client.fetch(_assemble_url('seismograms', **params))
     assert request.code == 400
     assert request.reason == (
@@ -4319,8 +4347,8 @@ def test_various_failure_conditions(all_clients_all_callbacks):
         "sourcelatitude": -39, "sourcelongitude": 20,
         "sourcedepthinmeters": 300000,
         "sourcemomenttensor": "100000,100000,100000,100000,100000,bogus",
-        "components": "Z", "dt": 0.1,
-        "format": "miniseed", "network": "IU,B*", "station": "ANT*,ANM?"}
+        "dt": 0.1, "format": "miniseed", "network": "IU,B*",
+        "station": "ANT*,ANM?"}
     request = client.fetch(_assemble_url('seismograms', **params))
     assert request.code == 400
     assert request.reason == (
@@ -4332,8 +4360,8 @@ def test_various_failure_conditions(all_clients_all_callbacks):
         "sourcelatitude": -39, "sourcelongitude": 20,
         "sourcedepthinmeters": 300000,
         "sourcedoublecouple": "100000,100000",
-        "components": "Z", "dt": 0.1,
-        "format": "miniseed", "network": "IU,B*", "station": "ANT*,ANM?"}
+        "dt": 0.1, "format": "miniseed", "network": "IU,B*",
+        "station": "ANT*,ANM?"}
     request = client.fetch(_assemble_url('seismograms', **params))
     assert request.code == 400
     assert request.reason == (
@@ -4345,8 +4373,8 @@ def test_various_failure_conditions(all_clients_all_callbacks):
         "sourcelatitude": -39, "sourcelongitude": 20,
         "sourcedepthinmeters": 300000,
         "sourcedoublecouple": "100000,100000,10,11,12",
-        "components": "Z", "dt": 0.1,
-        "format": "miniseed", "network": "IU,B*", "station": "ANT*,ANM?"}
+        "dt": 0.1, "format": "miniseed", "network": "IU,B*",
+        "station": "ANT*,ANM?"}
     request = client.fetch(_assemble_url('seismograms', **params))
     assert request.code == 400
     assert request.reason == (
@@ -4358,8 +4386,8 @@ def test_various_failure_conditions(all_clients_all_callbacks):
         "sourcelatitude": -39, "sourcelongitude": 20,
         "sourcedepthinmeters": 300000,
         "sourcedoublecouple": "100000,100000,10,bogus",
-        "components": "Z", "dt": 0.1,
-        "format": "miniseed", "network": "IU,B*", "station": "ANT*,ANM?"}
+        "dt": 0.1, "format": "miniseed", "network": "IU,B*",
+        "station": "ANT*,ANM?"}
     request = client.fetch(_assemble_url('seismograms', **params))
     assert request.code == 400
     assert request.reason == (
@@ -4371,8 +4399,8 @@ def test_various_failure_conditions(all_clients_all_callbacks):
         "sourcelatitude": -39, "sourcelongitude": 20,
         "sourcedepthinmeters": 300000,
         "sourceforce": "100000,100000",
-        "components": "Z", "dt": 0.1,
-        "format": "miniseed", "network": "IU,B*", "station": "ANT*,ANM?"}
+        "dt": 0.1, "format": "miniseed", "network": "IU,B*",
+        "station": "ANT*,ANM?"}
     request = client.fetch(_assemble_url('seismograms', **params))
     assert request.code == 400
     assert request.reason == (
@@ -4384,8 +4412,8 @@ def test_various_failure_conditions(all_clients_all_callbacks):
         "sourcelatitude": -39, "sourcelongitude": 20,
         "sourcedepthinmeters": 300000,
         "sourceforce": "100000,100000,bogus",
-        "components": "Z", "dt": 0.1,
-        "format": "miniseed", "network": "IU,B*", "station": "ANT*,ANM?"}
+        "dt": 0.1, "format": "miniseed", "network": "IU,B*",
+        "station": "ANT*,ANM?"}
     request = client.fetch(_assemble_url('seismograms', **params))
     assert request.code == 400
     assert request.reason == (
@@ -4397,8 +4425,8 @@ def test_various_failure_conditions(all_clients_all_callbacks):
         "sourcelatitude": -39, "sourcelongitude": 20,
         "sourcedepthinmeters": 300000,
         "sourcedoublecouple": "100000,100000,10,-10",
-        "components": "Z", "dt": 0.1,
-        "format": "miniseed", "network": "IU,B*", "station": "ANT*,ANM?"}
+        "dt": 0.1, "format": "miniseed", "network": "IU,B*",
+        "station": "ANT*,ANM?"}
     request = client.fetch(_assemble_url('seismograms', **params))
     assert request.code == 400
     assert request.reason == "Seismic moment must not be negative."
@@ -4408,8 +4436,7 @@ def test_various_failure_conditions(all_clients_all_callbacks):
         "sourcelatitude": -39, "sourcelongitude": 20,
         "sourcedepthinmeters": 300000,
         "sourcedoublecouple": "100000,100000,10,10",
-        "components": "Z", "dt": 0.1,
-        "starttime": "P+!A",
+        "dt": 0.1, "starttime": "P+!A",
         "format": "miniseed", "network": "IU,B*", "station": "ANT*,ANM?"}
     request = client.fetch(_assemble_url('seismograms', **params))
     assert request.code == 400
@@ -4423,8 +4450,8 @@ def test_various_failure_conditions(all_clients_all_callbacks):
         "sourcedepthinmeters": 300000,
         "sourcedoublecouple": "100000,100000,10,10",
         "sourceforce": "10,10,10",
-        "components": "Z", "dt": 0.1,
-        "format": "miniseed", "network": "IU,B*", "station": "ANT*,ANM?"}
+        "dt": 0.1, "format": "miniseed", "network": "IU,B*",
+        "station": "ANT*,ANM?"}
     request = client.fetch(_assemble_url('seismograms', **params))
     assert request.code == 400
     assert request.reason == ("Only one of these parameters can be given "
@@ -4439,8 +4466,7 @@ def test_various_failure_conditions(all_clients_all_callbacks):
             "sourcedoublecouple": "10,10,10,10",
             "receiverlatitude": 10, "receiverlongitude": 10,
             "receiverdepthinmeters": 10,
-            "components": "Z", "dt": 0.1,
-            "format": "miniseed"}
+            "dt": 0.1, "format": "miniseed"}
         request = client.fetch(_assemble_url('seismograms', **params))
         assert request.code == 400
         assert request.reason == ("Receiver must be at the surface for "
@@ -4452,8 +4478,7 @@ def test_various_failure_conditions(all_clients_all_callbacks):
             "sourcedepthinmeters": 3E9,
             "sourcedoublecouple": "10,10,10,10",
             "receiverlatitude": 10, "receiverlongitude": 10,
-            "components": "Z", "dt": 0.1,
-            "format": "miniseed"}
+            "dt": 0.1, "format": "miniseed"}
         request = client.fetch(_assemble_url('seismograms', **params))
         assert request.code == 400
         assert request.reason == ("Source depth must be within the database "
@@ -4468,8 +4493,7 @@ def test_various_failure_conditions(all_clients_all_callbacks):
             "sourcedoublecouple": "10,10,10,10",
             "receiverlatitude": 10, "receiverlongitude": 10,
             "receiverdepthinmeters": 10,
-            "components": "Z", "dt": 0.1,
-            "format": "miniseed"}
+            "dt": 0.1, "format": "miniseed"}
         request = client.fetch(_assemble_url('seismograms', **params))
         assert request.code == 400
         assert request.reason == (
@@ -4614,7 +4638,6 @@ def test_scale_parameter(all_clients):
     mt_param = "100000,200000,300000,400000,500000,600000"
 
     # Retrieve reference.
-    components = ["Z", "N", "E"]
     source = instaseis.Source(
         latitude=basic_parameters["sourcelatitude"],
         longitude=basic_parameters["sourcelongitude"],
@@ -4625,8 +4648,7 @@ def test_scale_parameter(all_clients):
         latitude=basic_parameters["receiverlatitude"],
         longitude=basic_parameters["receiverlongitude"],
         depth_in_m=0.0, network="XX", station="SYN", location="SE")
-    st_db = db.get_seismograms(source=source, receiver=receiver,
-                               components=components)
+    st_db = db.get_seismograms(source=source, receiver=receiver)
 
     # Moment tensor source.
     params = copy.deepcopy(basic_parameters)

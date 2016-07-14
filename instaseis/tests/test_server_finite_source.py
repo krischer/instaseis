@@ -366,6 +366,7 @@ def test_more_complex_queries(reciprocal_clients_all_callbacks,
     - must be encoded with %2D
     """
     client = reciprocal_clients_all_callbacks
+    db = instaseis.open_db(client.filepath)
 
     basic_parameters = {
         "receiverlongitude": 11,
@@ -441,6 +442,9 @@ def test_more_complex_queries(reciprocal_clients_all_callbacks,
     # Just make sure they actually do something.
     assert st_2[0].stats.starttime > st[0].stats.starttime
     assert st_2[0].stats.endtime < st[0].stats.endtime
+
+    if "Z" not in db.available_components:
+        return
 
     # Network and station searches.
     params = {
