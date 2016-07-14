@@ -91,15 +91,6 @@ class ReciprocalMergedInstaseisDB(BaseNetCDFInstaseisDB):
         fac_2_map = {"N": lambda x: - np.sin(x),
                      "E": np.cos}
 
-        if "Z" in components:
-            vertical = True
-        else:
-            vertical = False
-        if any(comp in components for comp in ['N', 'E', 'R', 'T']):
-            horizontal = True
-        else:
-            horizontal = False
-
         if isinstance(source, Source):
             if self.info.dump_type == 'displ_only':
                 if ei.axis:
@@ -113,8 +104,7 @@ class ReciprocalMergedInstaseisDB(BaseNetCDFInstaseisDB):
                 strain_x, strain_z = self._get_strain_interp(
                     ei.id_elem, ei.gll_point_ids, G, GT,
                     ei.col_points_xi, ei.col_points_eta, ei.corner_points,
-                    ei.eltype, ei.axis, ei.xi, ei.eta, horizontal=horizontal,
-                    vertical=vertical)
+                    ei.eltype, ei.axis, ei.xi, ei.eta)
             elif (self.info.dump_type == 'fullfields' or
                   self.info.dump_type == 'strain_only'):
                 strain_x, strain_z = self._get_strain(
@@ -242,7 +232,7 @@ class ReciprocalMergedInstaseisDB(BaseNetCDFInstaseisDB):
 
     def _get_strain_interp(self, id_elem, gll_point_ids, G, GT,
                            col_points_xi, col_points_eta, corner_points,
-                           eltype, axis, xi, eta, horizontal, vertical):
+                           eltype, axis, xi, eta):
         mesh = self.meshes.merged
         if id_elem not in mesh.strain_buffer:
             utemp = self._get_and_reorder_utemp(id_elem)
@@ -252,7 +242,11 @@ class ReciprocalMergedInstaseisDB(BaseNetCDFInstaseisDB):
                 "dipole": sem_derivatives.strain_dipole_td,
                 "quadpole": sem_derivatives.strain_quadpole_td}
 
-            if horizontal:
+            # We want the cache to work - thus we always have to
+            # calculate both! Also I/O is the slow part here.
+
+            # Horizontal component is available if we have 3 or 5 components.
+            if utemp.shape[-1] >= 3:
                 utemp_x = utemp[:, :, :, :3]
                 utemp_x = np.require(utemp_x, requirements=["F"],
                                      dtype=np.float64)
@@ -262,7 +256,8 @@ class ReciprocalMergedInstaseisDB(BaseNetCDFInstaseisDB):
             else:
                 strain_x = None
 
-            if vertical:
+            # Vertical component is available if we have 2 or 5 components.
+            if utemp.shape[-1] in (2, 5):
                 # Vertical expects disp_s at index 0 and disp_z at index 2.
                 # Expand if only vertical.
                 _s = list(utemp.shape)
