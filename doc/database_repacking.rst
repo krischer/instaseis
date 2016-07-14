@@ -139,7 +139,8 @@ This, in constrast to the *multi file layout* stores everything in a single
 command. The downside is that many GLL points are duplicated which thus
 increases the file size. On the other hand this layout can easily increase
 the performance by more than an order of magnitude so depending on the use
-case this is the way to go.
+case this is the way to go. Turning on compression can save quite a lot of
+space here but comes at the expense of some speed.
 
 **Expected NetCDF file locations:**
 
@@ -199,9 +200,8 @@ form that AxiSEM produces) to:
 * A transposed version of the same layout - this might improve the
   performance. Running this more than one time will keep transposing the data
   arrays.
-* The merged layout. Conversion can take a very long time. Turning
-  compression on makes it even (A LOT) slower for some reason. Thus best use
-  this with the ``--contiguous`` flag.
+* The merged layout. Conversion can take a very long time. Compression is
+  also able to save a bit of space.
 
 
 .. code-block:: bash

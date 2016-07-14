@@ -355,7 +355,9 @@ def _merge_files(px_in, pz_in, out, contiguous, compression_level, quiet):
     if contiguous:
         chunksizes = None
     else:
+        # Each chunk is exactly the data from one element.
         chunksizes = [_i.size for _i in dims]
+        chunksizes[0] = 1
 
     # We'll called it MergedSnapshots
     x = out.createVariable(
