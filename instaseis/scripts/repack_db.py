@@ -163,11 +163,11 @@ def recursive_copy(src, dst, contiguous, compression_level, transpose, quiet):
                        transpose=transpose)
 
 
-def recursive_copy_no_snapshots_no_seismograms(src, dst, quiet, contiguous,
-                                               compression_level):
+def recursive_copy_no_snapshots_no_seismograms_no_surface(
+        src, dst, quiet, contiguous, compression_level):
     """
     A bit of a copy of the recursive_copy function but it does not copy the
-    snapshots or the seismograms group.
+    Snapshots, Seismograms, or Surface group.
     """
     for attr in src.ncattrs():
         _s = getattr(src, attr)
@@ -183,7 +183,7 @@ def recursive_copy_no_snapshots_no_seismograms(src, dst, quiet, contiguous,
             dimension) if not dimension.isunlimited() else None)
 
     for name, variable in src.variables.items():
-        if name in ["Snapshots", "Seismograms"]:
+        if name in ["Snapshots", "Seismograms", "Surface"]:
             continue
 
         # Use the existing chunking.
@@ -211,10 +211,10 @@ def recursive_copy_no_snapshots_no_seismograms(src, dst, quiet, contiguous,
         dst.variables[x.name][:] = src.variables[x.name][:]
 
     for src_group in src.groups.values():
-        if src_group.name in ["Snapshots", "Seismograms"]:
+        if src_group.name in ["Snapshots", "Seismograms", "Surface"]:
             continue
         dst_group = dst.createGroup(src_group.name)
-        recursive_copy_no_snapshots_no_seismograms(
+        recursive_copy_no_snapshots_no_seismograms_no_surface(
             src=src_group, dst=dst_group, contiguous=contiguous,
             compression_level=compression_level, quiet=quiet)
 
@@ -280,9 +280,41 @@ def _merge_files(px_in, pz_in, out, contiguous, compression_level, quiet):
         c_db = px_in
     else:
         c_db = pz_in
-    recursive_copy_no_snapshots_no_seismograms(
+    recursive_copy_no_snapshots_no_seismograms_no_surface(
         src=c_db, dst=out, quiet=quiet, contiguous=contiguous,
         compression_level=compression_level)
+
+    if contiguous:
+        zlib = False
+    else:
+        zlib = True
+
+    # We need the stf_dump and stf_d_dump datasets. They are either in the
+    # "Snapshots" group or in the "Surface" group.
+    for g in ("Snapshots", "Surface"):
+        if g not in c_db.groups:
+            continue
+        if "stf_dump" not in c_db[g].variables:
+            continue
+        break
+    else:
+        raise Exception("Could not find `stf_dump` array.")
+
+    stf_dump = c_db[g]["stf_dump"]
+    stf_d_dump = c_db[g]["stf_d_dump"]
+
+    for data in [stf_dump, stf_d_dump]:
+        chunksizes = data.shape
+        if contiguous:
+            chunksizes = None
+        d = out.createVariable(
+            varname=data.name,
+            dimensions=["snapshots"],
+            contiguous=contiguous,
+            zlib=zlib,
+            chunksizes=chunksizes,
+            datatype=data.dtype)
+        d[:] = data[:]
 
     # Get all the snapshots from the other databases.
     if px_in and pz_in:
@@ -321,10 +353,8 @@ def _merge_files(px_in, pz_in, out, contiguous, compression_level, quiet):
     dimensions = [_i.name for _i in dims]
 
     if contiguous:
-        zlib = False
         chunksizes = None
     else:
-        zlib = True
         chunksizes = [_i.size for _i in dims]
 
     # We'll called it MergedSnapshots

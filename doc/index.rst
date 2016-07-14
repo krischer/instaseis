@@ -472,3 +472,4 @@ Detailed Documentation
    helpers
    server
    advanced_server_configuration
+   database_repacking

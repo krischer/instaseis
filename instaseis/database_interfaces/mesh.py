@@ -194,7 +194,7 @@ class Mesh(object):
         self.source_shift_samp = self.f.attrs[
             "source shift factor for deltat_coarse"][0]
 
-        possible_stf_groups = ["Surface", "Snapshots"]
+        possible_stf_groups = ["Surface", "Snapshots", "/"]
         found_stf = False
         for g in possible_stf_groups:
             if g not in self.f:  # pragma: no cover
