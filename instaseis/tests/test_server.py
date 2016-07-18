@@ -86,6 +86,32 @@ def test_info_route(all_clients):
     np.testing.assert_allclose(client_sliprate, db_sliprate)
 
 
+def test_greens_function_error_handling_no_reciprocal_db(all_clients):
+    """
+    Tests the error the greens route gives if the database is not reciprocal.
+    """
+    client = all_clients
+
+    params = {
+        "sourcedepthinmeters": 1e3,
+        "sourcedistanceindegrees": 20,
+        "format": "saczip"}
+    request = client.fetch(_assemble_url('greens_function', **params))
+
+    if client.is_reciprocal and \
+            client.info.components == "vertical and horizontal":
+        assert request.code == 200
+    elif client.info.components == "4 elemental moment tensors":
+        assert request.code == 400
+        assert request.reason == ("The database is not reciprocal, so Green's "
+                                  "functions can't be computed.")
+    else:
+        assert request.code == 400
+        assert request.reason == ("Database requires vertical AND horizontal "
+                                  "components to be able to compute Green's "
+                                  "functions.")
+
+
 def test_greens_function_error_handling(all_greens_clients):
     """
     Tests error handling of the /greens_function route. Very basic for now

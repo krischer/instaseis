@@ -108,6 +108,11 @@ class GreensFunctionHandler(InstaseisTimeSeriesHandler):
                    "so Green's functions can't be computed.")
             raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
+        if info.components != "vertical and horizontal":
+            msg = ("Database requires vertical AND horizontal components to "
+                   "be able to compute Green's functions.")
+            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+
         # Make sure that epicentral disance and source depth are in reasonable
         # ranges
         if args.sourcedistanceindegrees is not None and \
