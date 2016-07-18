@@ -26,8 +26,7 @@ before_install:
   # The next couple lines fix a crash with multiprocessing on Travis and are not specific to using Miniconda
   - sudo rm -rf /dev/shm
   - sudo ln -s /run/shm /dev/shm
-  - conda install --yes -c obspy nomkl obspy nose pytest flake8 sphinx h5py tornado click python=$TRAVIS_PYTHON_VERSION
-  - conda install --yes netcdf4>=1.2.4
+  - conda install --yes -c obspy nomkl obspy nose pytest flake8 sphinx h5py tornado click netcdf4 python=$TRAVIS_PYTHON_VERSION
   # Only install the theme for Python 2.7 as it builds the docs.
   - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then pip install sphinx-bootstrap-theme ; fi
   - pip install coveralls

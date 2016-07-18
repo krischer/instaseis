@@ -20,6 +20,8 @@ import netCDF4
 import numpy as np
 from scipy.spatial import cKDTree
 
+__netcdf_version = tuple(int(i) for i in netCDF4.__version__.split("."))
+
 
 @contextlib.contextmanager
 def dummy_progressbar(iterator, *args, **kwargs):
@@ -55,7 +57,12 @@ def recursive_copy(src, dst, contiguous, compression_level, transpose, quiet):
     for attr in src.ncattrs():
         _s = getattr(src, attr)
         if isinstance(_s, str):
-            dst.setncattr_string(attr, _s)
+            # The setncattr_string() was added in version 1.2.3. Before that
+            # it was the default behavior.
+            if __netcdf_version >= (1, 2, 3):
+                dst.setncattr_string(attr, _s)
+            else:
+                dst.setncattr(attr, str(_s))
         else:
             setattr(dst, attr, _s)
 
@@ -173,7 +180,12 @@ def recursive_copy_no_snapshots_no_seismograms_no_surface(
     for attr in src.ncattrs():
         _s = getattr(src, attr)
         if isinstance(_s, str):
-            dst.setncattr_string(attr, _s)
+            # The setncattr_string() was added in version 1.2.3. Before that
+            # it was the default behavior.
+            if __netcdf_version >= (1, 2, 3):
+                dst.setncattr_string(attr, _s)
+            else:
+                dst.setncattr(attr, str(_s))
         else:
             setattr(dst, attr, _s)
 
