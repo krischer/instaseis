@@ -18,6 +18,7 @@ import os
 import click
 import netCDF4
 import numpy as np
+from scipy.spatial import cKDTree
 
 
 @contextlib.contextmanager
@@ -370,11 +371,47 @@ def _merge_files(px_in, pz_in, out, contiguous, compression_level, quiet):
 
     utemp = np.zeros([_i.size for _i in dims[1:]], dtype=dtype, order="C")
 
-    # Now it becomes more interesting and very slow.
-    sem_mesh = c_db["Mesh"]["sem_mesh"]
-    with click.progressbar(range(nelem), length=nelem, label="\t  ") as idx:
-        for gll_idx in idx:
-            gll_point_ids = sem_mesh[gll_idx]
+    # We also re-sort the elements to follow the traversal of a kd-tree in
+    # the same fashion instaseis uses it - this should allow for even faster
+    # I/O for spatially adjacent elements.
+
+    # Get the midpoints for each element.
+    s_mp = c_db["Mesh"]["mp_mesh_S"][:]
+    z_mp = c_db["Mesh"]["mp_mesh_Z"][:]
+
+    # Fill kd-tree.
+    midpoints = np.empty((s_mp.shape[0], 2), dtype=s_mp.dtype)
+    midpoints[:, 0] = s_mp[:]
+    midpoints[:, 1] = z_mp[:]
+    kdtree = cKDTree(data=midpoints)
+
+    # This is now the order in which we will write the indices.
+    inds = kdtree.indices
+
+    # Make sure all indices are available.
+    assert list(range(nelem)) == sorted(inds)
+
+    sem_mesh = c_db["Mesh"]["sem_mesh"][:].copy()
+
+    # Resort and write the new order to the file.
+    out["Mesh"]["sem_mesh"][:] = sem_mesh[inds]
+    out["Mesh"]["fem_mesh"][:] = out["Mesh"]["fem_mesh"][:][inds]
+
+    # We'll also have to resort the midpoints.
+    out["Mesh"]["mp_mesh_S"][:] = c_db["Mesh"]["mp_mesh_S"][:][inds]
+    out["Mesh"]["mp_mesh_Z"][:] = c_db["Mesh"]["mp_mesh_Z"][:][inds]
+    # And a couple of other things.
+    out["Mesh"]["eltype"][:] = out["Mesh"]["eltype"][:][inds]
+    out["Mesh"]["axis"][:] = out["Mesh"]["axis"][:][inds]
+
+    with click.progressbar(range(nelem), length=nelem, label="\t  ") \
+            as indices:
+        for elem_id in indices:
+            # Get the old and new indices.
+            old_index = elem_id
+            new_index = np.where(inds == elem_id)[0][0]
+
+            gll_point_ids = sem_mesh[old_index]
 
             # Load displacement from all GLL points.
             for i, var in enumerate(meshes):
@@ -395,7 +432,7 @@ def _merge_files(px_in, pz_in, out, contiguous, compression_level, quiet):
                             idx = ipol * 5 + jpol
                             utemp[i, jpol, ipol, :] = \
                                 temp[np.argwhere(s_ids == ids[idx])[0][0], :]
-            x[gll_idx] = utemp
+            x[new_index] = utemp
 
 
 @click.command()
