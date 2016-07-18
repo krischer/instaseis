@@ -1,0 +1,364 @@
+
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>instaseis.database_interfaces.syngine_instaseis_db &mdash; instaseis 0.1.1-123-g81d9 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/bootswatch-3.3.6/simplex/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/my-styles.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.1.1-123-g81d9',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../../../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../../../_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../../../_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="instaseis 0.1.1-123-g81d9 documentation" href="../../../index.html" />
+    <link rel="up" title="instaseis" href="../../instaseis.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../index.html">
+          Instaseis</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.1.1-123-g81d9</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="http://axisem.info">AxiSEM</a></li>
+                <li><a href="http://obspy.org">ObsPy</a></li>
+                <li><a href="http://github.com/krischer/instaseis">GitHub</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../instaseis.html">Main Instaseis Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source.html">Sources and Receivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../helpers.html">Utility Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../server.html">Instaseis Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced_server_configuration.html">Advanced Server Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../database_repacking.html">Database Layout and Repacking</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <h1>Source code for instaseis.database_interfaces.syngine_instaseis_db</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Instaseis database class for remote access using the syngine service of IRIS.</span>
+
+<span class="sd">:copyright:</span>
+<span class="sd">    Lion Krischer (krischer@geophysik.uni-muenchen.de), 2015</span>
+<span class="sd">:license:</span>
+<span class="sd">    GNU Lesser General Public License, Version 3 [non-commercial/academic use]</span>
+<span class="sd">    (http://www.gnu.org/copyleft/lgpl.html)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="p">(</span><span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span>
+                        <span class="n">unicode_literals</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">io</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">obspy</span>
+<span class="kn">import</span> <span class="nn">platform</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="kn">from</span> <span class="nn">instaseis</span> <span class="kn">import</span> <span class="p">(</span><span class="n">InstaseisError</span><span class="p">,</span> <span class="n">InstaseisWarning</span><span class="p">,</span> <span class="n">Source</span><span class="p">,</span> <span class="n">ForceSource</span><span class="p">,</span>
+                       <span class="n">__version__</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">instaseis.database_interfaces.base_instaseis_db</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">BaseInstaseisDB</span><span class="p">,</span> <span class="n">DEFAULT_MU</span><span class="p">,</span> <span class="n">STF_MAP</span><span class="p">,</span> <span class="n">INV_KIND_MAP</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">instaseis.helpers</span> <span class="kn">import</span> <span class="n">geocentric_to_elliptic_latitude</span>
+
+<span class="kn">from</span> <span class="nn">future</span> <span class="kn">import</span> <span class="n">standard_library</span>
+<span class="k">with</span> <span class="n">standard_library</span><span class="o">.</span><span class="n">hooks</span><span class="p">():</span>
+    <span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">urlencode</span>
+
+
+<span class="n">USER_AGENT</span> <span class="o">=</span> <span class="s2">&quot;Instaseis </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">, Python </span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">__version__</span><span class="p">,</span>
+                                               <span class="n">platform</span><span class="o">.</span><span class="n">platform</span><span class="p">(),</span>
+                                               <span class="n">platform</span><span class="o">.</span><span class="n">python_version</span><span class="p">())</span>
+<span class="n">HEADERS</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;User-Agent&quot;</span><span class="p">:</span> <span class="n">USER_AGENT</span><span class="p">,</span> <span class="s2">&quot;Accept-Encoding&quot;</span><span class="p">:</span> <span class="s2">&quot;gzip,deflate&quot;</span><span class="p">}</span>
+
+
+<div class="viewcode-block" id="SyngineInstaseisDB"><a class="viewcode-back" href="../../../instaseis.html#instaseis.database_interfaces.syngine_instaseis_db.SyngineInstaseisDB">[docs]</a><span class="k">class</span> <span class="nc">SyngineInstaseisDB</span><span class="p">(</span><span class="n">BaseInstaseisDB</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Remote Instaseis interface connecting with IRIS&#39; syngine service.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span>
+                 <span class="n">base_url</span><span class="o">=</span><span class="s2">&quot;http://service.iris.edu/irisws/syngine/1&quot;</span><span class="p">,</span>
+                 <span class="n">debug</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param model: The model to use.</span>
+<span class="sd">        :type model: str</span>
+<span class="sd">        :param base_url: URL to the root of the syngine service.</span>
+<span class="sd">        :type base_url: str</span>
+<span class="sd">        :param debug: Debug messages on/off.</span>
+<span class="sd">        :type debug: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span> <span class="o">=</span> <span class="n">debug</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_url</span> <span class="o">=</span> <span class="n">base_url</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Download once to make sure it works and the model exists.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span>
+
+        <span class="c1"># Get the version of the service.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">syngine_service_version</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_download_url</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_url</span><span class="p">(</span>
+            <span class="n">path</span><span class="o">=</span><span class="s2">&quot;version&quot;</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_get_seismograms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">receiver</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Z&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;E&quot;</span><span class="p">)):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extract seismograms.</span>
+
+<span class="sd">        :param source: instaseis.Source or instaseis.ForceSource object</span>
+<span class="sd">        :type source: :class:`instaseis.source.Source` or</span>
+<span class="sd">            :class:`instaseis.source.ForceSource`</span>
+<span class="sd">        :param receiver: instaseis.Receiver object</span>
+<span class="sd">        :type receiver: :class:`instaseis.source.Receiver`</span>
+<span class="sd">        :param components: a tuple containing any combination of the</span>
+<span class="sd">            strings ``&quot;Z&quot;``, ``&quot;N&quot;``, ``&quot;E&quot;``, ``&quot;R&quot;``, and ``&quot;T&quot;``</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Collect parameters.</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;components&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">components</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()}</span>
+
+        <span class="n">params</span><span class="p">[</span><span class="s2">&quot;model&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span>
+        <span class="n">params</span><span class="p">[</span><span class="s2">&quot;format&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;miniseed&quot;</span>
+
+        <span class="c1"># Always request in the original units.</span>
+        <span class="n">params</span><span class="p">[</span><span class="s2">&quot;units&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">INV_KIND_MAP</span><span class="p">[</span><span class="n">STF_MAP</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">stf</span><span class="p">]]</span>
+
+        <span class="c1"># No resampling!</span>
+        <span class="n">params</span><span class="p">[</span><span class="s2">&quot;dt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">dt</span>
+
+        <span class="c1"># Carefully set the starttime to get everything. This is a bit</span>
+        <span class="c1"># awkward and we essentially have to undo what the /seismograms</span>
+        <span class="c1"># route is doing...</span>
+        <span class="n">params</span><span class="p">[</span><span class="s2">&quot;origintime&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">obspy</span><span class="o">.</span><span class="n">UTCDateTime</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+        <span class="n">params</span><span class="p">[</span><span class="s2">&quot;starttime&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">obspy</span><span class="o">.</span><span class="n">UTCDateTime</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">src_shift_samples</span>
+        <span class="p">))))</span>
+
+        <span class="c1"># Start with the receiver.</span>
+        <span class="c1"># syngine uses WGS84 coordinates - we assume geocentric ones. Thus</span>
+        <span class="c1"># we have to convert.</span>
+        <span class="n">params</span><span class="p">[</span><span class="s2">&quot;receiverlatitude&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">geocentric_to_elliptic_latitude</span><span class="p">(</span>
+            <span class="n">receiver</span><span class="o">.</span><span class="n">latitude</span><span class="p">)</span>
+        <span class="n">params</span><span class="p">[</span><span class="s2">&quot;receiverlongitude&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">receiver</span><span class="o">.</span><span class="n">longitude</span>
+        <span class="k">if</span> <span class="n">receiver</span><span class="o">.</span><span class="n">depth_in_m</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;The syngine service only services reciprocal &quot;</span>
+                          <span class="s2">&quot;databases thus the receiver depth cannot be &quot;</span>
+                          <span class="s2">&quot;changed.&quot;</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
+        <span class="c1"># The syngine services requires a station code.</span>
+        <span class="n">params</span><span class="p">[</span><span class="s2">&quot;stationcode&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;SYN&quot;</span>
+
+        <span class="c1"># Do the source.</span>
+        <span class="n">params</span><span class="p">[</span><span class="s2">&quot;sourcelatitude&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">geocentric_to_elliptic_latitude</span><span class="p">(</span>
+            <span class="n">source</span><span class="o">.</span><span class="n">latitude</span><span class="p">)</span>
+        <span class="n">params</span><span class="p">[</span><span class="s2">&quot;sourcelongitude&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">longitude</span>
+        <span class="k">if</span> <span class="n">source</span><span class="o">.</span><span class="n">depth_in_m</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;sourcedepthinmeters&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">depth_in_m</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">ForceSource</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The Syngine Instaseis client does currently not &quot;</span>
+                             <span class="s2">&quot;support force sources. You can still download &quot;</span>
+                             <span class="s2">&quot;data from the Syngine service for force &quot;</span>
+                             <span class="s2">&quot;sources manually.&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">Source</span><span class="p">):</span>
+            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;sourcemomenttensor&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="p">[</span>
+                <span class="n">source</span><span class="o">.</span><span class="n">m_rr</span><span class="p">,</span> <span class="n">source</span><span class="o">.</span><span class="n">m_tt</span><span class="p">,</span> <span class="n">source</span><span class="o">.</span><span class="n">m_pp</span><span class="p">,</span> <span class="n">source</span><span class="o">.</span><span class="n">m_rt</span><span class="p">,</span>
+                <span class="n">source</span><span class="o">.</span><span class="n">m_rp</span><span class="p">,</span> <span class="n">source</span><span class="o">.</span><span class="n">m_tp</span><span class="p">]))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_url</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="s2">&quot;query&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Downloading &#39;</span><span class="si">%s</span><span class="s2">&#39; ...&quot;</span> <span class="o">%</span> <span class="n">url</span><span class="p">)</span>
+
+        <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">HEADERS</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Downloaded &#39;</span><span class="si">%s</span><span class="s2">&#39; with status code </span><span class="si">%i</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">url</span><span class="p">,</span>
+                                                            <span class="n">r</span><span class="o">.</span><span class="n">status_code</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+            <span class="c1"># Right now one has to parse the body of the response to get the</span>
+            <span class="c1"># message.</span>
+            <span class="n">reason</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">raise</span> <span class="n">InstaseisError</span><span class="p">(</span>
+                <span class="s2">&quot;Status code </span><span class="si">%i</span><span class="s2"> when downloading &#39;</span><span class="si">%s</span><span class="s2">&#39;. Reason: &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span>
+                    <span class="n">r</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">reason</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="s2">&quot;instaseis-mu&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">r</span><span class="o">.</span><span class="n">headers</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Mu is not passed via the HTTP headers. Maybe some &quot;</span>
+                          <span class="s2">&quot;proxy removed it? Mu is now always the default mu.&quot;</span><span class="p">,</span>
+                          <span class="n">InstaseisWarning</span><span class="p">)</span>
+            <span class="n">mu</span> <span class="o">=</span> <span class="n">DEFAULT_MU</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+            <span class="n">mu</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s2">&quot;instaseis-mu&quot;</span><span class="p">])</span>
+
+        <span class="k">with</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
+            <span class="n">fh</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="n">st</span> <span class="o">=</span> <span class="n">obspy</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">fh</span><span class="p">)</span>
+
+        <span class="c1"># Convert back to dictionary of numpy arrays...this is a bit</span>
+        <span class="c1"># redundant but plays nice with the rest of Instaseis and still</span>
+        <span class="c1"># enables a REST API that serves MiniSEED files.</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;mu&quot;</span><span class="p">:</span> <span class="n">mu</span>
+        <span class="p">}</span>
+
+        <span class="k">for</span> <span class="n">tr</span> <span class="ow">in</span> <span class="n">st</span><span class="p">:</span>
+            <span class="n">data</span><span class="p">[</span><span class="n">tr</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">channel</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()]</span> <span class="o">=</span> <span class="n">tr</span><span class="o">.</span><span class="n">data</span>
+
+        <span class="k">return</span> <span class="n">data</span>
+
+    <span class="k">def</span> <span class="nf">_get_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">/</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_url</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">url</span> <span class="o">+=</span> <span class="s2">&quot;?</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">urlencode</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">url</span>
+
+    <span class="k">def</span> <span class="nf">_download_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">unpack_json</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Helper function downloading data from a URL.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Downloading &#39;</span><span class="si">%s</span><span class="s2">&#39; ...&quot;</span> <span class="o">%</span> <span class="n">url</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">HEADERS</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Downloaded &#39;</span><span class="si">%s</span><span class="s2">&#39; with status code </span><span class="si">%i</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">url</span><span class="p">,</span>
+                                                            <span class="n">r</span><span class="o">.</span><span class="n">status_code</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">400</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+            <span class="k">raise</span> <span class="n">InstaseisError</span><span class="p">(</span><span class="s2">&quot;Model &#39;</span><span class="si">%s</span><span class="s2">&#39; not available on the syngine &quot;</span>
+                                 <span class="s2">&quot;service?&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+            <span class="k">raise</span> <span class="n">InstaseisError</span><span class="p">(</span><span class="s2">&quot;Status code </span><span class="si">%i</span><span class="s2"> when downloading &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span>
+                <span class="n">r</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="n">url</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">unpack_json</span> <span class="ow">is</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">text</span>
+
+    <span class="k">def</span> <span class="nf">_get_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a dictionary with information about the currently loaded</span>
+<span class="sd">        database.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_download_url</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_url</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="s2">&quot;info&quot;</span><span class="p">,</span>
+                                                <span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">),</span>
+                                  <span class="n">unpack_json</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">info</span><span class="p">[</span><span class="s2">&quot;directory&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_url</span>
+        <span class="c1"># Convert types lost in the translation to JSON.</span>
+        <span class="n">info</span><span class="p">[</span><span class="s2">&quot;datetime&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">obspy</span><span class="o">.</span><span class="n">UTCDateTime</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;datetime&quot;</span><span class="p">])</span>
+        <span class="n">info</span><span class="p">[</span><span class="s2">&quot;slip&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;slip&quot;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="n">info</span><span class="p">[</span><span class="s2">&quot;sliprate&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;sliprate&quot;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">info</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">base</span> <span class="o">=</span> <span class="n">BaseInstaseisDB</span><span class="o">.</span><span class="n">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+        <span class="n">base</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Syngine model name:      &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
+        <span class="n">base</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;Syngine service version:  </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">syngine_service_version</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base</span><span class="p">)</span></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2014-2015, Lion Krischer and Martin van Driel.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.<br/>
+    </p>
+  </div>
+</footer>
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-44800463-2', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+  </body>
+</html>

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Instaseis Server &mdash; instaseis 0.1.1-55-ga28c documentation</title>
+    <title>Instaseis Server &mdash; instaseis 0.1.1-123-g81d9 documentation</title>
     
     <link rel="stylesheet" href="_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.1.1-55-ga28c',
+        VERSION:     '0.1.1-123-g81d9',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -31,7 +31,7 @@
     <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.1.1-55-ga28c documentation" href="index.html" />
+    <link rel="top" title="instaseis 0.1.1-123-g81d9 documentation" href="index.html" />
     <link rel="next" title="GET /" href="routes/root.html" />
     <link rel="prev" title="Utility Functions" href="helpers.html" />
 <meta charset='utf-8'>
@@ -53,7 +53,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.1.1-55-ga28c</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.1.1-123-g81d9</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -78,6 +78,7 @@
 <li class="toctree-l1"><a class="reference internal" href="helpers.html">Utility Functions</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Instaseis Server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="advanced_server_configuration.html">Advanced Server Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="database_repacking.html">Database Layout and Repacking</a></li>
 </ul>
 </ul>
 </li>
@@ -126,7 +127,7 @@ local database.</p>
 </div>
 <p>which will launch a webserver and start serving at the specified port. The
 <code class="docutils literal"><span class="pre">buffer_size_in_mb</span></code> argument is passed to the
-<a class="reference internal" href="instaseis.html#instaseis.instaseis_db.InstaseisDB" title="instaseis.instaseis_db.InstaseisDB"><code class="xref py py-class docutils literal"><span class="pre">InstaseisDB</span></code></a> initialization routine. It is
+<code class="xref py py-class docutils literal"><span class="pre">InstaseisDB</span></code> initialization routine. It is
 probably a good idea to choose it as big as your machine allows.
 For a reciprocal database with horizontal and vertical components Instaseis
 will create 4 buffers, each <code class="docutils literal"><span class="pre">buffer_size_in_mb</span></code> in size.</p>

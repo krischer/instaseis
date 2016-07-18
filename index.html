@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Instaseis: Instant Global Seismograms Based on a Broadband Waveform Database &mdash; instaseis 0.1.1-55-ga28c documentation</title>
+    <title>Instaseis: Instant Global Seismograms Based on a Broadband Waveform Database &mdash; instaseis 0.1.1-123-g81d9 documentation</title>
     
     <link rel="stylesheet" href="_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.1.1-55-ga28c',
+        VERSION:     '0.1.1-123-g81d9',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -31,7 +31,7 @@
     <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.1.1-55-ga28c documentation" href="#" />
+    <link rel="top" title="instaseis 0.1.1-123-g81d9 documentation" href="#" />
     <link rel="next" title="Main Instaseis Classes" href="instaseis.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="#">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.1.1-55-ga28c</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.1.1-123-g81d9</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -77,6 +77,7 @@
 <li class="toctree-l1"><a class="reference internal" href="helpers.html">Utility Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="server.html">Instaseis Server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="advanced_server_configuration.html">Advanced Server Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="database_repacking.html">Database Layout and Repacking</a></li>
 </ul>
 </ul>
 </li>
@@ -213,6 +214,7 @@ shared Fortran librarys - pull requests are welcome.</p>
 <li><code class="docutils literal"><span class="pre">tornado</span></code></li>
 <li><code class="docutils literal"><span class="pre">flake8</span></code></li>
 <li><code class="docutils literal"><span class="pre">pytest</span></code></li>
+<li><code class="docutils literal"><span class="pre">pytest-xdist</span></code></li>
 <li><code class="docutils literal"><span class="pre">mock</span></code> <em>(only for Python 2.x, otherwise part of the standard library)</em></li>
 </ul>
 <p>The optional graphical user interface furthermore requires</p>
@@ -245,7 +247,7 @@ Once installed assert that <code class="docutils literal"><span class="pre">pip<
 installation folder (you may need to open a new terminal after installing
 Anaconda).</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>$ conda install -c obspy obspy h5py future requests tornado flake8 pytest mock basemap pyqt pip
-$ pip install responses pyqtgraph
+$ pip install responses pyqtgraph pytest-xdist
 </pre></div>
 </div>
 <p>A possible complication arises <strong>if you are running on a server without a
@@ -257,8 +259,8 @@ sure the following line is part of it:</p>
 </div>
 <p>A fairly recent development is that <code class="docutils literal"><span class="pre">conda</span></code>, on some systems, ships
 <code class="docutils literal"><span class="pre">libgfortran3</span></code> versions incompatible with the system libraries. If you see
-errors like</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>ImportError:
+errors like:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>ImportError:
 /home/travis/miniconda/lib/python2.7/site-packages/scipy/special/../../../../libgfortran.so.3:
 version `GFORTRAN_1.4&#39; not found
 </pre></div>
@@ -294,11 +296,23 @@ $ pip install -v -e .
 </div>
 <div class="section" id="testing">
 <h3><a class="toc-backref" href="#id5">Testing</a><a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h3>
+<p>Many test run without these two packages, but executing the full test suite
+requires two additional packages: <code class="docutils literal"><span class="pre">click</span></code> and <code class="docutils literal"><span class="pre">netcdf4</span></code>. If you don&#8217;t
+already have them, install with</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ conda install click netcdf4
+</pre></div>
+</div>
 <p>To assert that your installation is working properly, execute</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>$ python -m instaseis.tests
 </pre></div>
 </div>
-<p>and make sure all tests pass. Otherwise please contact the developers.</p>
+<p>and make sure all tests pass. Otherwise please contact the developers. To
+speed up the tests they can also be run in parallel with (<code class="docutils literal"><span class="pre">n</span></code> is the
+number of cores):</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> /path/to/instaseis
+$ py.test -n 4
+</pre></div>
+</div>
 </div>
 <div class="section" id="build-the-documentation">
 <h3><a class="toc-backref" href="#id6">Build the Documentation</a><a class="headerlink" href="#build-the-documentation" title="Permalink to this headline">¶</a></h3>
@@ -358,8 +372,8 @@ Instaseis to generate seismograms; if you wish to run an Instaseis server,
 please see the documentation of the <a class="reference internal" href="server.html"><span class="doc">Instaseis Server</span></a>.</p>
 <p>Connecting to either a local or a remote Instaseis database happens with the
 <a class="reference internal" href="instaseis.html#instaseis.open_db" title="instaseis.open_db"><code class="xref py py-func docutils literal"><span class="pre">open_db()</span></code></a> function. It will return either an
-<a class="reference internal" href="instaseis.html#instaseis.instaseis_db.InstaseisDB" title="instaseis.instaseis_db.InstaseisDB"><code class="xref py py-class docutils literal"><span class="pre">InstaseisDB</span></code></a> or a
-<a class="reference internal" href="instaseis.html#instaseis.remote_instaseis_db.RemoteInstaseisDB" title="instaseis.remote_instaseis_db.RemoteInstaseisDB"><code class="xref py py-class docutils literal"><span class="pre">RemoteInstaseisDB</span></code></a> object. Additional
+<code class="xref py py-class docutils literal"><span class="pre">InstaseisDB</span></code> or a
+<code class="xref py py-class docutils literal"><span class="pre">RemoteInstaseisDB</span></code> object. Additional
 arguments and keyword arguments are passed to the the initialization
 function of these objects. Once the database objects are created, usage of
 both is identical. Be aware that the initialization of the database objects
@@ -408,7 +422,7 @@ files and open them.</p>
 <span class="go">generated by AxiSEM version 60945ec at 2014-10-23T21:32:58.000000Z</span>
 </pre></div>
 </div>
-<p>The <a class="reference internal" href="instaseis.html#instaseis.base_instaseis_db.BaseInstaseisDB.get_seismograms" title="instaseis.base_instaseis_db.BaseInstaseisDB.get_seismograms"><code class="xref py py-meth docutils literal"><span class="pre">get_seismograms()</span></code></a>
+<p>The <code class="xref py py-meth docutils literal"><span class="pre">get_seismograms()</span></code>
 method is called to generate seismograms as <a class="reference external" href="http://docs.obspy.org/packages/autogen/obspy.core.stream.Stream.html#obspy.core.stream.Stream" title="(in ObsPy Documentation (1.0.1) v1.0)"><code class="xref py py-class docutils literal"><span class="pre">Stream</span></code></a>
 objects with the waveform data. This enables easy serialization in a large
 selection of formats and facilitates post processing by utilizing ObsPy.</p>
@@ -498,7 +512,10 @@ and the EU-FP7 725 690 <strong>VERCE</strong> project
 <li class="toctree-l1"><a class="reference internal" href="instaseis.html">Main Instaseis Classes</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="instaseis.html#open-db-function">open_db() Function</a></li>
 <li class="toctree-l2"><a class="reference internal" href="instaseis.html#baseinstaseisdb">BaseInstaseisDB</a></li>
-<li class="toctree-l2"><a class="reference internal" href="instaseis.html#instaseisdb">InstaseisDB</a></li>
+<li class="toctree-l2"><a class="reference internal" href="instaseis.html#basenetcdfinstaseisdb">BaseNetCDFInstaseisDB</a></li>
+<li class="toctree-l2"><a class="reference internal" href="instaseis.html#reciprocalinstaseisdb">ReciprocalInstaseisDB</a></li>
+<li class="toctree-l2"><a class="reference internal" href="instaseis.html#reciprocalmergedinstaseisdb">ReciprocalMergedInstaseisDB</a></li>
+<li class="toctree-l2"><a class="reference internal" href="instaseis.html#forwardinstaseisdb">ForwardInstaseisDB</a></li>
 <li class="toctree-l2"><a class="reference internal" href="instaseis.html#remoteinstaseisdb">RemoteInstaseisDB</a></li>
 <li class="toctree-l2"><a class="reference internal" href="instaseis.html#syngineinstaseisdb">SyngineInstaseisDB</a></li>
 </ul>
@@ -525,6 +542,12 @@ and the EU-FP7 725 690 <strong>VERCE</strong> project
 <li class="toctree-l2"><a class="reference internal" href="advanced_server_configuration.html#event-parameters-callback">Event Parameters Callback</a></li>
 <li class="toctree-l2"><a class="reference internal" href="advanced_server_configuration.html#travel-time-callback">Travel Time Callback</a></li>
 <li class="toctree-l2"><a class="reference internal" href="advanced_server_configuration.html#hooking-it-up-to-the-instaseis-server">Hooking it up to the Instaseis Server</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="database_repacking.html">Database Layout and Repacking</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="database_repacking.html#available-layouts">Available Layouts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="database_repacking.html#repacking-script">Repacking Script</a></li>
+<li class="toctree-l2"><a class="reference internal" href="database_repacking.html#comparing-databases">Comparing Databases</a></li>
 </ul>
 </li>
 </ul>
