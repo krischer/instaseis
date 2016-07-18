@@ -195,6 +195,9 @@ def repack_databases():
     }
 
 
+pytest_plugins = ["xdist"]
+
+
 def is_master(config):
     """
     Returns True/False if the current node is the master node.
@@ -220,6 +223,12 @@ def pytest_configure(config):
         config.dbs = pickle.loads(config.slaveinput["dbs"])
 
 
+def pytest_unconfigure(config):
+    if is_master(config) and config.dbs["root_folder"]:
+        if os.path.exists(config.dbs["root_folder"]):
+            shutil.rmtree(config.dbs["root_folder"])
+
+
 def pytest_configure_node(node):
     """
     This is only called on the master - we use it to send the information to
@@ -228,9 +237,3 @@ def pytest_configure_node(node):
     Only applies to if run with pytest-xdist.
     """
     node.slaveinput["dbs"] = pickle.dumps(node.config.dbs)
-
-
-def pytest_unconfigure(config):
-    if is_master(config) and config.dbs["root_folder"]:
-        if os.path.exists(config.dbs["root_folder"]):
-            shutil.rmtree(config.dbs["root_folder"])

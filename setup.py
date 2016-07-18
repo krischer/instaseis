@@ -146,7 +146,7 @@ INSTALL_REQUIRES = ["h5py",
                     "responses"]
 
 EXTRAS_REQUIRE = {
-    'tests': ['click', 'netCDF4']
+    'tests': ['click', 'netCDF4', 'pytest-xdist']
 }
 
 # Add mock for Python 2.x. Starting with Python 3 it is part of the standard

@@ -30,7 +30,7 @@ before_install:
   # Only install the theme for Python 2.7 as it builds the docs.
   - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then pip install sphinx-bootstrap-theme ; fi
   - pip install coveralls
-  - pip install requests responses
+  - pip install requests responses pytest-xdist
 
 install:
   - git version

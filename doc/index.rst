@@ -122,6 +122,7 @@ shared Fortran librarys - pull requests are welcome.
 * ``tornado``
 * ``flake8``
 * ``pytest``
+* ``pytest-xdist``
 * ``mock`` *(only for Python 2.x, otherwise part of the standard library)*
 
 The optional graphical user interface furthermore requires
@@ -162,7 +163,7 @@ Anaconda).
 .. code-block:: bash
 
     $ conda install -c obspy obspy h5py future requests tornado flake8 pytest mock basemap pyqt pip
-    $ pip install responses pyqtgraph
+    $ pip install responses pyqtgraph pytest-xdist
 
 A possible complication arises **if you are running on a server without a
 display**. In that case please edit (on Linux)
@@ -237,7 +238,15 @@ To assert that your installation is working properly, execute
 
     $ python -m instaseis.tests
 
-and make sure all tests pass. Otherwise please contact the developers.
+and make sure all tests pass. Otherwise please contact the developers. To
+speed up the tests they can also be run in parallel with (``n`` is the
+number of cores):
+
+.. code-block:: bash
+
+    $ cd /path/to/instaseis
+    $ py.test -n 4
+
 
 Build the Documentation
 ^^^^^^^^^^^^^^^^^^^^^^^
