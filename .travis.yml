@@ -28,7 +28,7 @@ before_install:
   - sudo ln -s /run/shm /dev/shm
   - conda install --yes -c obspy nomkl obspy nose pytest flake8 sphinx h5py tornado click python=$TRAVIS_PYTHON_VERSION
   # Don't install netcdf for Python 3.3 - the conda packages are just too old.
-  - if [ $TRAVIS_PYTHON_VERSION -ne '3.3' ]; conda install --yes netcdf4 ; fi
+  - if [[ $TRAVIS_PYTHON_VERSION != '3.3' ]]; then conda install --yes netcdf4 ; fi
   # Only install the theme for Python 2.7 as it builds the docs.
   - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then pip install sphinx-bootstrap-theme ; fi
   - pip install coveralls
