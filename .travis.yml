@@ -27,7 +27,7 @@ before_install:
   - sudo rm -rf /dev/shm
   - sudo ln -s /run/shm /dev/shm
   - conda install --yes -c obspy nomkl obspy nose pytest flake8 sphinx h5py tornado click python=$TRAVIS_PYTHON_VERSION
-  - conda install --yes netcdf4
+  - conda install --yes netcdf4>=1.2.4
   # Only install the theme for Python 2.7 as it builds the docs.
   - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then pip install sphinx-bootstrap-theme ; fi
   - pip install coveralls
