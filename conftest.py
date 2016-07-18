@@ -12,6 +12,7 @@ import time
 TEST_DATA = os.path.join(os.path.dirname(__file__), "instaseis", "tests",
                          "data")
 
+
 def repack_databases():
     """
     Repack databases and create a couple of temporary test databases.
@@ -203,7 +204,11 @@ def repack_databases():
     }
 
 
-pytest_plugins = ["xdist"]
+try:
+    import xdist
+except ImportError:
+    raise Exception("pytest-xdist is required to run the tests. Please "
+                    "install with `pip install pytest-xdist`.")
 
 
 def is_master(config):

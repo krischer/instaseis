@@ -14,11 +14,19 @@ Requires click, netCDF4, and numpy.
 import contextlib
 import math
 import os
+import sys
 
 import click
 import netCDF4
 import numpy as np
 from scipy.spatial import cKDTree
+
+
+if sys.version_info.major == 2:
+    str_type = (basestring, str, unicode)  # NOQA
+else:
+    str_type = (bytes, str)
+
 
 __netcdf_version = tuple(int(i) for i in netCDF4.__version__.split("."))
 
@@ -56,7 +64,7 @@ def recursive_copy(src, dst, contiguous, compression_level, transpose, quiet):
 
     for attr in src.ncattrs():
         _s = getattr(src, attr)
-        if isinstance(_s, str):
+        if isinstance(_s, str_type):
             # The setncattr_string() was added in version 1.2.3. Before that
             # it was the default behavior.
             if __netcdf_version >= (1, 2, 3):
@@ -102,7 +110,7 @@ def recursive_copy(src, dst, contiguous, compression_level, transpose, quiet):
             # For non-snapshots, just use the existing chunking.
             chunksizes = variable.chunking()
             # We could infer the chunking here but I'm not sure its worth it.
-            if isinstance(chunksizes, str) and chunksizes == "contiguous":
+            if isinstance(chunksizes, str_type) and chunksizes == "contiguous":
                 chunksizes = None
 
         # For a contiguous output, compression and chunking has to be turned
@@ -179,7 +187,7 @@ def recursive_copy_no_snapshots_no_seismograms_no_surface(
     """
     for attr in src.ncattrs():
         _s = getattr(src, attr)
-        if isinstance(_s, str):
+        if isinstance(_s, str_type):
             # The setncattr_string() was added in version 1.2.3. Before that
             # it was the default behavior.
             if __netcdf_version >= (1, 2, 3):
@@ -202,7 +210,7 @@ def recursive_copy_no_snapshots_no_seismograms_no_surface(
         # Use the existing chunking.
         chunksizes = variable.chunking()
         # We could infer the chunking here but I'm not sure its worth it.
-        if isinstance(chunksizes, str) and chunksizes == "contiguous":
+        if isinstance(chunksizes, str_type) and chunksizes == "contiguous":
             chunksizes = None
 
         # For a contiguous output, compression and chunking has to be turned
