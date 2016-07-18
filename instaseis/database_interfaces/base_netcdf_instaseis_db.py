@@ -302,8 +302,13 @@ class BaseNetCDFInstaseisDB(with_metaclass(ABCMeta, BaseInstaseisDB)):
 
                 if time_axis == 0:
                     strain_temp[:, i] = mesh_dict[var][:, id_elem]
-                else:
-                    strain_temp[:, i] = mesh_dict[var][id_elem, :]
+                else:  # pragma: no cover
+                    # We don't have an example for this yet so we just raise
+                    # here for now - implementing it should just be a matter
+                    # of uncommenting the following line.
+                    #
+                    # strain_temp[:, i] = mesh_dict[var][id_elem, :]
+                    raise NotImplementedError
 
             # transform strain to voigt mapping
             # dsus, dpup, dzuz, dzup, dsuz, dsup
