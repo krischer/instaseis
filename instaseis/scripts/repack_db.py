@@ -404,7 +404,13 @@ def _merge_files(px_in, pz_in, out, contiguous, compression_level, quiet):
     out["Mesh"]["eltype"][:] = out["Mesh"]["eltype"][:][inds]
     out["Mesh"]["axis"][:] = out["Mesh"]["axis"][:][inds]
 
-    with click.progressbar(range(nelem), length=nelem, label="\t  ") \
+    if not quiet:
+        click.echo(click.style("\tCreating '/MergedSnapshots'...", fg="blue"))
+        pbar = click.progressbar
+    else:
+        pbar = dummy_progressbar
+
+    with pbar(range(nelem), length=nelem, label="\t  ") \
             as indices:
         for elem_id in indices:
             # Get the old and new indices.

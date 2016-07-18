@@ -52,6 +52,7 @@ def repack_databases():
     os.makedirs(os.path.dirname(px_tr))
     os.makedirs(os.path.dirname(pz_tr))
 
+    print("Creating transposed test database ...")
     repack_file(input_filename=px, output_filename=px_tr, contiguous=True,
                 compression_level=None, quiet=True, transpose=True)
     repack_file(input_filename=pz, output_filename=pz_tr, contiguous=True,
@@ -67,6 +68,7 @@ def repack_databases():
     os.makedirs(os.path.dirname(px_tr_and_back))
     os.makedirs(os.path.dirname(pz_tr_and_back))
 
+    print("Creating compressed re-transposed test database ...")
     repack_file(input_filename=px_tr, output_filename=px_tr_and_back,
                 contiguous=False, compression_level=4, quiet=True,
                 transpose=True)
@@ -86,6 +88,7 @@ def repack_databases():
     os.makedirs(os.path.dirname(px_r))
     os.makedirs(os.path.dirname(pz_r))
 
+    print("Creating a simple repacked test database ...")
     repack_file(input_filename=px, output_filename=px_r, contiguous=True,
                 compression_level=None, quiet=True, transpose=False)
     repack_file(input_filename=pz, output_filename=pz_r, contiguous=True,
@@ -102,6 +105,7 @@ def repack_databases():
     os.makedirs(os.path.dirname(px_r_tr))
     os.makedirs(os.path.dirname(pz_r_tr))
 
+    print("Creating a simple transposed and repacked test database ...")
     repack_file(input_filename=px_tr, output_filename=px_r_tr, contiguous=True,
                 compression_level=None, quiet=True, transpose=False)
     repack_file(input_filename=pz_tr, output_filename=pz_r_tr, contiguous=True,
@@ -111,33 +115,37 @@ def repack_databases():
     merged_bw_db = os.path.join(
         root_folder, "merged_100s_db_bwd_displ_only")
     os.makedirs(merged_bw_db)
+    print("Creating a merged test database ...")
     merge_files(filenames=[px, pz], output_folder=merged_bw_db,
-                contiguous=True, compression_level=None, quiet=False)
+                contiguous=True, compression_level=None, quiet=True)
 
     # Another merged database but this time originating from a transposed
     # database.
     merged_transposed_bw_db = os.path.join(
         root_folder, "merged_transposed_100s_db_bwd_displ_only")
     os.makedirs(merged_transposed_bw_db)
+    print("Creating a merged transposed test database ...")
     merge_files(filenames=[px_tr, pz_tr],
                 output_folder=merged_transposed_bw_db,
-                contiguous=True, compression_level=None, quiet=False)
+                contiguous=True, compression_level=None, quiet=True)
 
     # Make a horizontal only merged database.
     horizontal_only_merged_db = os.path.join(
         root_folder, "horizontal_only_merged_db")
     os.makedirs(horizontal_only_merged_db)
+    print("Creating a horizontal only merged test database ...")
     merge_files(filenames=[px_tr],
                 output_folder=horizontal_only_merged_db,
-                contiguous=False, compression_level=2, quiet=False)
+                contiguous=False, compression_level=2, quiet=True)
 
     # Make a vertical only merged database.
     vertical_only_merged_db = os.path.join(
         root_folder, "vertical_only_merged_db")
     os.makedirs(vertical_only_merged_db)
+    print("Creating a vertical only merged test database ...")
     merge_files(filenames=[pz_tr],
                 output_folder=vertical_only_merged_db,
-                contiguous=False, compression_level=2, quiet=False)
+                contiguous=False, compression_level=2, quiet=True)
 
     # Actually test the shapes of the fields to see that something happened.
     with h5py.File(pz, mode="r") as f:
@@ -224,6 +232,7 @@ def pytest_configure(config):
 
 
 def pytest_unconfigure(config):
+    print("Deleting all test databases ...")
     if is_master(config) and config.dbs["root_folder"]:
         if os.path.exists(config.dbs["root_folder"]):
             shutil.rmtree(config.dbs["root_folder"])
