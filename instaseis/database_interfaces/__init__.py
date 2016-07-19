@@ -12,8 +12,11 @@ from __future__ import absolute_import, division, print_function
 import collections
 import os
 
+import h5py
+
 from .. import InstaseisError, InstaseisNotFoundError
 from .forward_instaseis_db import ForwardInstaseisDB
+from .forward_merged_instaseis_db import ForwardMergedInstaseisDB
 from .reciprocal_instaseis_db import ReciprocalInstaseisDB
 from .reciprocal_merged_instaseis_db import ReciprocalMergedInstaseisDB
 
@@ -52,8 +55,18 @@ def find_and_open_files(path, *args, **kwargs):
 
     # Catch the merged file first because its easy.
     if len(found_files) == 1 and found_files[0].endswith("merged_output.nc4"):
-        return ReciprocalMergedInstaseisDB(
-            db_path=path, netcdf_file=found_files[0], *args, **kwargs)
+        # Now we have to open the file and find the number of dimensions.
+        with h5py.File(found_files[0], mode="r") as f:
+            dims = f["MergedSnapshots"].shape[1]
+
+        if dims in (2, 3, 5):
+            return ReciprocalMergedInstaseisDB(
+                db_path=path, netcdf_file=found_files[0], *args, **kwargs)
+        elif dims == 10:
+            return ForwardMergedInstaseisDB(
+                db_path=path, netcdf_file=found_files[0], *args, **kwargs)
+        else:  # pragma: no cover
+            raise NotImplementedError
 
     # Parse to find the correct components.
     netcdf_files = collections.defaultdict(list)

@@ -30,10 +30,10 @@ class ReciprocalMergedInstaseisDB(BaseNetCDFInstaseisDB):
     def __init__(self, db_path, netcdf_file, buffer_size_in_mb=100,
                  read_on_demand=False, *args, **kwargs):
         """
-        :param db_path: Path to the Instaseis Database containing
-            subdirectories PZ and/or PX each containing a
-            ``order_output.nc4`` file.
+        :param db_path: Path to the Instaseis Database.
         :type db_path: str
+        :param netcdf_file: The path to the actual netcdf4 file.
+        :type netcdf_file: str
         :param buffer_size_in_mb: Strain and displacement are buffered to
             avoid repeated disc access. Depending on the type of database
             and the number of components of the database, the total buffer
