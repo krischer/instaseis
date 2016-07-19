@@ -245,62 +245,40 @@ def merge_files(filenames, output_folder, contiguous, compression_level,
     """
     Completely unroll and merge both files to a single database.
     """
-    # Find PX and PZ files.
-    assert 1 <= len(filenames) <= 2
-    filenames = [os.path.normpath(_i) for _i in filenames]
-    px = [_i for _i in filenames if "PX" in _i]
-    pz = [_i for _i in filenames if "PZ" in _i]
-    assert len(px) <= 1
-    assert len(pz) <= 1
-    if px:
-        px = px[0]
-        assert os.path.exists(px)
-    else:
-        px = None
-    if pz:
-        pz = pz[0]
-        assert os.path.exists(pz)
-    else:
-        pz = None
+    assert len(filenames) in (1, 2, 4)
 
-    # One must exist.
-    assert px or pz
+    files = {}
+    for file in filenames:
+        for k in ("PX", "PZ", "MXX_P_MYY", "MXY_MXX_M_MYY", "MXZ_MYZ", "MZZ"):
+            if k in file:
+                assert k not in files
+                assert os.path.exists(file)
+                files[k] = file
+
+    # Only a couple of combinations are valid.
+    keys = sorted(files.keys())
+    assert (keys == ["PX"]) or (keys == ["PZ"]) or (keys == ["PX", "PZ"]) or \
+        (keys == ["MXX_P_MYY", "MXY_MXX_M_MYY", "MXZ_MYZ", "MZZ"])
 
     output = os.path.join(output_folder, "merged_output.nc4")
     assert not os.path.exists(output)
 
-    if px and pz:
-        with netCDF4.Dataset(px, "r", format="NETCDF4") as px_in, \
-                netCDF4.Dataset(pz, "r", format="NETCDF4") as pz_in, \
-                netCDF4.Dataset(output, "w", format="NETCDF4") as out:
-
-            _merge_files(px_in=px_in, pz_in=pz_in, out=out,
-                         contiguous=contiguous,
-                         compression_level=compression_level, quiet=quiet)
-    elif pz and not px:
-        with netCDF4.Dataset(pz, "r", format="NETCDF4") as pz_in, \
-                netCDF4.Dataset(output, "w", format="NETCDF4") as out:
-
-            _merge_files(px_in=None, pz_in=pz_in, out=out,
-                         contiguous=contiguous,
-                         compression_level=compression_level, quiet=quiet)
-    elif px and not pz:
-        with netCDF4.Dataset(px, "r", format="NETCDF4") as px_in, \
-                netCDF4.Dataset(output, "w", format="NETCDF4") as out:
-
-            _merge_files(px_in=px_in, pz_in=None, out=out,
-                         contiguous=contiguous,
-                         compression_level=compression_level, quiet=quiet)
-    else:  # pragma: no cover
-        raise NotImplementedError
+    input_files = {}
+    try:
+        for key, value in files.items():
+            input_files[key] = netCDF4.Dataset(value, "r", format="NETCDF4")
+        out = netCDF4.Dataset(output, "w", format="NETCDF4")
+        _merge_files(input=input_files, out=out, contiguous=contiguous,
+                     compression_level=compression_level, quiet=quiet)
+    finally:
+        for filename in input_files.values():
+            filename.close()
+        out.close()
 
 
-def _merge_files(px_in, pz_in, out, contiguous, compression_level, quiet):
+def _merge_files(input, out, contiguous, compression_level, quiet):
     # First copy everything non-snapshot related.
-    if px_in:
-        c_db = px_in
-    else:
-        c_db = pz_in
+    c_db = list(input.values())[0]
     recursive_copy_no_snapshots_no_seismograms_no_surface(
         src=c_db, dst=out, quiet=quiet, contiguous=contiguous,
         compression_level=compression_level)
@@ -338,22 +316,35 @@ def _merge_files(px_in, pz_in, out, contiguous, compression_level, quiet):
         d[:] = data[:]
 
     # Get all the snapshots from the other databases.
-    if px_in and pz_in:
+    if "PX" in input and "PZ" in input:
         meshes = [
-            px_in["Snapshots"]["disp_s"],
-            px_in["Snapshots"]["disp_p"],
-            px_in["Snapshots"]["disp_z"],
-            pz_in["Snapshots"]["disp_s"],
-            pz_in["Snapshots"]["disp_z"]]
-    elif px_in and not pz_in:
+            input["PX"]["Snapshots"]["disp_s"],
+            input["PX"]["Snapshots"]["disp_p"],
+            input["PX"]["Snapshots"]["disp_z"],
+            input["PZ"]["Snapshots"]["disp_s"],
+            input["PZ"]["Snapshots"]["disp_z"]]
+    elif "PX" in input and "PZ" not in input:
         meshes = [
-            px_in["Snapshots"]["disp_s"],
-            px_in["Snapshots"]["disp_p"],
-            px_in["Snapshots"]["disp_z"]]
-    elif pz_in and not px_in:
+            input["PX"]["Snapshots"]["disp_s"],
+            input["PX"]["Snapshots"]["disp_p"],
+            input["PX"]["Snapshots"]["disp_z"]]
+    elif "PZ" in input and "PX" not in input:
         meshes = [
-            pz_in["Snapshots"]["disp_s"],
-            pz_in["Snapshots"]["disp_z"]]
+            input["PZ"]["Snapshots"]["disp_s"],
+            input["PZ"]["Snapshots"]["disp_z"]]
+    elif "MXX_P_MYY" in input and "MXY_MXX_M_MYY" in input and \
+            "MXZ_MYZ" in input and "MZZ" in input:
+        meshes = [
+            input["MZZ"]["Snapshots"]["disp_s"],
+            input["MZZ"]["Snapshots"]["disp_z"],
+            input["MXX_P_MYY"]["Snapshots"]["disp_s"],
+            input["MXX_P_MYY"]["Snapshots"]["disp_z"],
+            input["MXZ_MYZ"]["Snapshots"]["disp_s"],
+            input["MXZ_MYZ"]["Snapshots"]["disp_p"],
+            input["MXZ_MYZ"]["Snapshots"]["disp_z"],
+            input["MXY_MXX_M_MYY"]["Snapshots"]["disp_s"],
+            input["MXY_MXX_M_MYY"]["Snapshots"]["disp_p"],
+            input["MXY_MXX_M_MYY"]["Snapshots"]["disp_z"]]
     else:  # pragma: no cover
         raise NotImplementedError
 
