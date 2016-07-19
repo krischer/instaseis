@@ -1675,6 +1675,8 @@ def test_read_on_demand(database_folder, read_on_demand):
                                td["T"], rtol=1E-7, atol=1E-12)
 
 
+@pytest.mark.skipif("merged_100s_db_fwd" not in pytest.config.dbs["databases"],
+                    reason="requires generated tests databases.")
 def test_merged_forward_database_layout():
     """
     Make sure the merged fwd database layout returns the same result as then
