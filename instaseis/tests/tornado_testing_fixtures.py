@@ -93,7 +93,7 @@ class AsyncClient(object):
 
     def wait(self, condition=None, timeout=None):
         if timeout is None:
-            timeout = 5
+            timeout = 30
 
         if not self.__stopped:
             if timeout:  # pragma: no cover

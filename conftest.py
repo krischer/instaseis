@@ -148,10 +148,10 @@ def repack_databases():
                 output_folder=vertical_only_merged_db,
                 contiguous=False, compression_level=2, quiet=True)
 
-    # Create a merged version of the deep fwd database.
-    fwd_db = os.path.join(TEST_DATA, "100s_db_fwd_deep")
+    # Create a merged version of the fwd database.
+    fwd_db = os.path.join(TEST_DATA, "100s_db_fwd")
     merged_fwd_db = os.path.join(
-        root_folder, "merged_100s_db_fwd_deep")
+        root_folder, "merged_100s_db_fwd")
     os.makedirs(merged_fwd_db)
 
     f = "ordered_output.nc4"
@@ -225,7 +225,7 @@ def repack_databases():
     dbs["vertical_only_merged_database"] = vertical_only_merged_db
 
     # Forward databases.
-    dbs["merged_100s_db_fwd_deep"] = merged_fwd_db
+    dbs["merged_100s_db_fwd"] = merged_fwd_db
 
     return {
         "root_folder": root_folder,

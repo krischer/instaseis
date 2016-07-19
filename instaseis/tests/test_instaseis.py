@@ -61,7 +61,6 @@ for name, path in pytest.config.dbs["databases"].items():
         raise NotImplementedError
     TEST_DATA[path] = test_data
 
-
 BW_DISPL_DBS = [_i for _i in DBS if "_db_bwd_displ_" in _i]
 
 
@@ -1632,6 +1631,10 @@ def test_read_on_demand(database_folder, read_on_demand):
     """
     Make sure that databases work in read_on_demand mode.
     """
+    # The test data is not valid for deep forward DBs.
+    if "fwd_deep" in database_folder:
+        return
+
     db = find_and_open_files(database_folder, read_on_demand=read_on_demand)
 
     # Test requires all 3 components.
@@ -1657,7 +1660,8 @@ def test_read_on_demand(database_folder, read_on_demand):
     st = db.get_seismograms(source=source, receiver=receiver,
                             components=('Z', 'N', 'E', 'R', 'T'))
 
-    td = TEST_DATA[database_folder]
+    if database_folder in TEST_DATA:
+        td = TEST_DATA[database_folder]
 
     np.testing.assert_allclose(st.select(component='Z')[0].data,
                                td["Z"], rtol=1E-7, atol=1E-12)
@@ -1676,8 +1680,8 @@ def test_merged_forward_database_layout():
     Make sure the merged fwd database layout returns the same result as then
     default forward layout.
     """
-    fwd_db = os.path.join(DATA, "100s_db_fwd_deep")
-    fwd_db_m = pytest.config.dbs["databases"]["merged_100s_db_fwd_deep"]
+    fwd_db = os.path.join(DATA, "100s_db_fwd")
+    fwd_db_m = pytest.config.dbs["databases"]["merged_100s_db_fwd"]
     fwd_db = instaseis.open_db(fwd_db)
     fwd_db_m = instaseis.open_db(fwd_db_m)
 
