@@ -87,15 +87,21 @@ class ForwardMergedInstaseisDB(BaseNetCDFInstaseisDB):
         if self.info.dump_type != 'displ_only':
             raise NotImplementedError
 
-        utemp = self.meshes.merged.f["MergedSnapshots"][ei.id_elem]
+        # Get from netcdf file or buffer.
+        if ei.id_elem not in mesh.displ_buffer:
+            utemp = self.meshes.merged.f["MergedSnapshots"][ei.id_elem]
 
-        # utemp is currently (nvars, jpol, ipol, npts)
-        # 1. Roll to (npts, nvar, jpol, ipol)
-        utemp = np.rollaxis(utemp, 3, 0)
-        # 2. Roll to (npts, jpol, nvar, ipol)
-        utemp = np.rollaxis(utemp, 2, 1)
-        # 3. Roll to (npts, jpol, ipol, nvar)
-        utemp = np.rollaxis(utemp, 3, 2)
+            # utemp is currently (nvars, jpol, ipol, npts)
+            # 1. Roll to (npts, nvar, jpol, ipol)
+            utemp = np.rollaxis(utemp, 3, 0)
+            # 2. Roll to (npts, jpol, nvar, ipol)
+            utemp = np.rollaxis(utemp, 2, 1)
+            # 3. Roll to (npts, jpol, ipol, nvar)
+            utemp = np.rollaxis(utemp, 3, 2)
+
+            mesh.displ_buffer.add(ei.id_elem, utemp)
+        else:
+            utemp = mesh.displ_buffer.get(ei.id_elem)
 
         displ_1 = np.zeros((utemp.shape[0], 3), order="F")
         displ_2 = np.zeros((utemp.shape[0], 3), order="F")
