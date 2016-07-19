@@ -57,7 +57,8 @@ def find_and_open_files(path, *args, **kwargs):
     if len(found_files) == 1 and found_files[0].endswith("merged_output.nc4"):
         # Now we have to open the file and find the number of dimensions.
         with h5py.File(found_files[0], mode="r") as f:
-            dims = f["MergedSnapshots"].shape[1]
+            ds = f["/MergedSnapshots"]
+            dims = ds.shape[1]
 
         if dims in (2, 3, 5):
             return ReciprocalMergedInstaseisDB(
