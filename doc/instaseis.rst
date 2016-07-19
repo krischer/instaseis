@@ -56,6 +56,14 @@ ForwardInstaseisDB
 
 ....
 
+ForwardMergedInstaseisDB
+------------------
+
+.. autoclass:: instaseis.database_interfaces.forward_merged_instaseis_db.ForwardMergedInstaseisDB
+:members:
+
+....
+
 RemoteInstaseisDB
 -----------------
 
