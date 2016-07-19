@@ -16,8 +16,7 @@ Available Layouts
 From a high-level view Instaseis supports two database layouts which we will
 call the *multi file layout* and the *merged layout* in the following. Both
 support two components (horizontal + vertical) as well as single component
-databases. The multi file layout optionally also support forward databases
-which are currently not explained in more detail.
+databases. Forward database are also supported by both layouts.
 
 Multi File Layout
 ^^^^^^^^^^^^^^^^^
@@ -33,7 +32,9 @@ The big downside is that, to extract three components seismograms, it needs to
 read all 25 GLL points for a single element from all 3 + 2 displacement
 snapshots. Instaseis is being smart about it and batches adjacent reads but
 worst case this means that 125 single read accesses across two different files
-have to be performed to get data from a single element.
+have to be performed to get data from a single element. For forward databases
+up to 250 read operations across four files are reduced to a single read
+operation.
 
 **Expected NetCDF file locations:**
 
@@ -41,6 +42,9 @@ have to be performed to get data from a single element.
   ``ROOT/../PX/.../axisem_output.nc4``
 * For the vertical data file: ``ROOT/.../PZ/../ordered_output.nc4`` or
   ``ROOT/.../PZ/.../axisem_output.nc4``
+* For the forward databases file:
+  ``ROOT/.../[MZZ,MXX_P_MYY,MXZ_MYZ,MXY_MXX_M_MZZ]/../ordered_output.nc4`` or
+  ``ROOT/.../[MZZ,MXX_P_MYY,MXZ_MYZ,MXY_MXX_M_MZZ]/../axisem_output.nc4``
 
 
 **File layout** (in a commented representation based on the output from
@@ -138,8 +142,8 @@ Merged File Layout
 ^^^^^^^^^^^^^^^^^^
 
 This, in contrast to the *multi file layout* stores everything in a single
-5D array, meaning data from one element can be accessed with a single read
-command. The downside is that many GLL points are duplicated which thus
+2D to 10D array, meaning data from one element can be accessed with a single
+read command. The downside is that many GLL points are duplicated which thus
 increases the file size. On the other hand this layout can easily increase
 the performance by more than an order of magnitude so depending on the use
 case this is the way to go. Turning on compression can save quite a lot of
@@ -190,6 +194,18 @@ Instaseis assumes the following order:
 1. ``disp_s vertical``
 2. ``disp_z vertical``
 
+**10D => forward database:**
+
+1. ``disp_s MZZ``
+2. ``disp_z MZZ``
+3. ``disp_s MXX+MYY``
+4. ``disp_z MXX+MYY``
+5. ``disp_s MXZ/MYZ``
+6. ``disp_p MXZ/MYZ``
+7. ``disp_z MXZ/MYZ``
+8. ``disp_s MXY/MXX-MYY``
+9. ``disp_p MXY/MXX-MYY``
+10. ``disp_z MXY/MXX-MYY``
 
 
 Repacking Script
