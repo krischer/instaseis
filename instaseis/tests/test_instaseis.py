@@ -21,6 +21,7 @@ import os
 import pytest
 import shutil
 
+import instaseis
 from instaseis import InstaseisError, InstaseisNotFoundError
 from instaseis.database_interfaces import find_and_open_files
 from instaseis.database_interfaces.base_instaseis_db import \
@@ -38,6 +39,7 @@ DATA = os.path.join(os.path.dirname(os.path.abspath(
     inspect.getfile(inspect.currentframe()))), "data")
 
 DBS = [os.path.join(DATA, "100s_db_fwd"),
+       os.path.join(DATA, "100s_db_fwd_deep"),
        os.path.join(DATA, "100s_db_bwd_displ_only")]
 
 TEST_DATA = {
@@ -52,6 +54,8 @@ for name, path in pytest.config.dbs["databases"].items():
     if "bwd" in name:
         test_data = BWD_TEST_DATA
     elif "horizontal_only" in name or "vertical_only" in name:
+        test_data = BWD_TEST_DATA
+    elif "fwd" in name:
         test_data = FWD_TEST_DATA
     else:  # pragma: no cover
         raise NotImplementedError
@@ -1665,3 +1669,41 @@ def test_read_on_demand(database_folder, read_on_demand):
                                td["R"], rtol=1E-7, atol=1E-12)
     np.testing.assert_allclose(st.select(component='T')[0].data,
                                td["T"], rtol=1E-7, atol=1E-12)
+
+
+def test_merged_forward_database_layout():
+    """
+    Make sure the merged fwd database layout returns the same result as then
+    default forward layout.
+    """
+    fwd_db = os.path.join(DATA, "100s_db_fwd_deep")
+    fwd_db_m = pytest.config.dbs["databases"]["merged_100s_db_fwd_deep"]
+    fwd_db = instaseis.open_db(fwd_db)
+    fwd_db_m = instaseis.open_db(fwd_db_m)
+
+    depths = [0, 10, 100, 150, 400]
+    lngs = [-50, 0, 50, 100]
+    lats = [-10, 0, 60]
+
+    for rec_d in depths:
+        for lat in lats:
+            for lng in lngs:
+                receiver = Receiver(latitude=10.0, longitude=20.0,
+                                    depth_in_m=rec_d)
+                source = Source(
+                    latitude=lat, longitude=lng,
+                    m_rr=4.710000e+24 / 1E7,
+                    m_tt=3.810000e+22 / 1E7,
+                    m_pp=-4.740000e+24 / 1E7,
+                    m_rt=3.990000e+23 / 1E7,
+                    m_rp=-8.050000e+23 / 1E7,
+                    m_tp=-1.230000e+24 / 1E7)
+
+                st_fwd = fwd_db.get_seismograms(
+                    source=source, receiver=receiver,
+                    components=('Z', 'N', 'E', 'R', 'T'))
+                st_fwd_m = fwd_db_m.get_seismograms(
+                    source=source, receiver=receiver,
+                    components=('Z', 'N', 'E', 'R', 'T'))
+
+                assert st_fwd == st_fwd_m
