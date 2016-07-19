@@ -148,6 +148,27 @@ def repack_databases():
                 output_folder=vertical_only_merged_db,
                 contiguous=False, compression_level=2, quiet=True)
 
+    # Create a merged version of the deep fwd database.
+    fwd_db = os.path.join(TEST_DATA, "100s_db_fwd_deep")
+    merged_fwd_db = os.path.join(
+        root_folder, "merged_100s_db_fwd_deep")
+    os.makedirs(merged_fwd_db)
+
+    f = "ordered_output.nc4"
+    d1 = os.path.join(fwd_db, "MZZ", "Data", f)
+    d2 = os.path.join(fwd_db, "MXX_P_MYY", "Data", f)
+    d3 = os.path.join(fwd_db, "MXZ_MYZ", "Data", f)
+    d4 = os.path.join(fwd_db, "MXY_MXX_M_MYY", "Data", f)
+    assert os.path.exists(d1), d1
+    assert os.path.exists(d2), d2
+    assert os.path.exists(d3), d3
+    assert os.path.exists(d4), d4
+
+    print("Creating a merged forward test database ...")
+    merge_files(filenames=[d1, d2, d3, d4],
+                output_folder=merged_fwd_db, contiguous=False,
+                compression_level=2, quiet=True)
+
     # Actually test the shapes of the fields to see that something happened.
     with h5py.File(pz, mode="r") as f:
         original_shape = f["Snapshots"]["disp_z"].shape
@@ -170,6 +191,9 @@ def repack_databases():
     with h5py.File(os.path.join(vertical_only_merged_db,
                                 "merged_output.nc4"), "r") as f:
         vertical_only_merged_tr_shape = f["MergedSnapshots"].shape
+    with h5py.File(os.path.join(merged_fwd_db,
+                                "merged_output.nc4"), "r") as f:
+        merged_fwd_shape = f["MergedSnapshots"].shape
 
     assert original_shape == tuple(reversed(transposed_shape))
     assert original_shape == transposed_and_back_shape
@@ -181,6 +205,8 @@ def repack_databases():
         str(horizontal_only_merged_tr_shape)
     assert vertical_only_merged_tr_shape == (192, 2, 5, 5, 73), \
         str(vertical_only_merged_tr_shape)
+    assert merged_fwd_shape == (192, 10, 5, 5, 73), \
+        str(merged_fwd_shape)
 
     dbs = collections.OrderedDict()
     # Important is that the name is fairly similar to the original
@@ -197,6 +223,9 @@ def repack_databases():
     # Special databases.
     dbs["horizontal_only_merged_database"] = horizontal_only_merged_db
     dbs["vertical_only_merged_database"] = vertical_only_merged_db
+
+    # Forward databases.
+    dbs["merged_100s_db_fwd_deep"] = merged_fwd_db
 
     return {
         "root_folder": root_folder,
