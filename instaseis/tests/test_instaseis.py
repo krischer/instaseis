@@ -21,9 +21,11 @@ import os
 import pytest
 import shutil
 
-from instaseis.instaseis_db import (InstaseisDB, InstaseisNotFoundError,
-                                    InstaseisError)
-from instaseis.base_instaseis_db import _get_seismogram_times
+import instaseis
+from instaseis import InstaseisError, InstaseisNotFoundError
+from instaseis.database_interfaces import find_and_open_files
+from instaseis.database_interfaces.base_instaseis_db import \
+    _get_seismogram_times
 from instaseis import Source, Receiver, ForceSource
 from instaseis.helpers import (get_band_code, elliptic_to_geocentric_latitude,
                                geocentric_to_elliptic_latitude, sizeof_fmt)
@@ -37,16 +39,38 @@ DATA = os.path.join(os.path.dirname(os.path.abspath(
     inspect.getfile(inspect.currentframe()))), "data")
 
 DBS = [os.path.join(DATA, "100s_db_fwd"),
+       os.path.join(DATA, "100s_db_fwd_deep"),
        os.path.join(DATA, "100s_db_bwd_displ_only")]
 
+TEST_DATA = {
+    os.path.join(DATA, "100s_db_fwd"): FWD_TEST_DATA,
+    os.path.join(DATA, "100s_db_bwd_displ_only"): BWD_TEST_DATA
+}
 
-def test_fwd_vs_bwd():
+
+# Add all automatically created repacked databases to the test suite.
+for name, path in pytest.config.dbs["databases"].items():
+    DBS.append(path)
+    if "bwd" in name:
+        test_data = BWD_TEST_DATA
+    elif "horizontal_only" in name or "vertical_only" in name:
+        test_data = BWD_TEST_DATA
+    elif "fwd" in name:
+        test_data = FWD_TEST_DATA
+    else:  # pragma: no cover
+        raise NotImplementedError
+    TEST_DATA[path] = test_data
+
+BW_DISPL_DBS = [_i for _i in DBS if "_db_bwd_displ_" in _i]
+
+
+@pytest.mark.parametrize("bwd_db", BW_DISPL_DBS)
+def test_fwd_vs_bwd(bwd_db):
     """
     Test fwd against bwd mode
     """
-    instaseis_fwd = InstaseisDB(os.path.join(DATA, "100s_db_fwd"))
-
-    instaseis_bwd = InstaseisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
+    instaseis_fwd = find_and_open_files(os.path.join(DATA, "100s_db_fwd"))
+    instaseis_bwd = find_and_open_files(bwd_db)
 
     source_fwd = Source(latitude=4., longitude=3.0, depth_in_m=None,
                         m_rr=4.71e+17, m_tt=3.81e+17, m_pp=-4.74e+17,
@@ -89,15 +113,15 @@ def test_fwd_vs_bwd():
                                rtol=1E-3, atol=1E-10)
 
 
-def test_fwd_vs_bwd_axial():
+@pytest.mark.parametrize("bwd_db", BW_DISPL_DBS)
+def test_fwd_vs_bwd_axial(bwd_db):
     """
     Test fwd against bwd mode, axial element. Differences are a bit larger then
     in non axial case, presumably because the close source, which is not
     exactly a point source in the SEM representation.
     """
-    instaseis_fwd = InstaseisDB(os.path.join(DATA, "100s_db_fwd_deep"))
-
-    instaseis_bwd = InstaseisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
+    instaseis_fwd = find_and_open_files(os.path.join(DATA, "100s_db_fwd_deep"))
+    instaseis_bwd = find_and_open_files(bwd_db)
 
     source_fwd = Source(latitude=0., longitude=0., depth_in_m=None,
                         m_rr=4.71e+17, m_tt=3.81e+17, m_pp=-4.74e+17,
@@ -144,11 +168,12 @@ def test_fwd_vs_bwd_axial():
                                rtol=1E-2, atol=5E-9)
 
 
-def test_incremental_bwd():
+@pytest.mark.parametrize("bwd_db", BW_DISPL_DBS)
+def test_incremental_bwd(bwd_db):
     """
     incremental tests of bwd mode with displ_only db
     """
-    instaseis_bwd = InstaseisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
+    instaseis_bwd = find_and_open_files(bwd_db)
 
     receiver = Receiver(latitude=42.6390, longitude=74.4940)
     source = Source(
@@ -173,12 +198,14 @@ def test_incremental_bwd():
                                BWD_TEST_DATA["R"], rtol=1E-7, atol=1E-12)
     np.testing.assert_allclose(st_bwd.select(component='T')[0].data,
                                BWD_TEST_DATA["T"], rtol=1E-7, atol=1E-12)
-    assert instaseis_bwd.meshes.px.strain_buffer.efficiency == 0.0
-    assert instaseis_bwd.meshes.pz.strain_buffer.efficiency == 0.0
+    if hasattr(instaseis_bwd.meshes, "px"):
+        assert instaseis_bwd.meshes.px.strain_buffer.efficiency == 0.0
+        assert instaseis_bwd.meshes.pz.strain_buffer.efficiency == 0.0
+    else:
+        assert instaseis_bwd.meshes.merged.strain_buffer.efficiency == 0.0
 
     # read on init
-    instaseis_bwd = InstaseisDB(os.path.join(DATA, "100s_db_bwd_displ_only"),
-                                read_on_demand=False)
+    instaseis_bwd = find_and_open_files(bwd_db, read_on_demand=False)
 
     st_bwd = instaseis_bwd.get_seismograms(
         source=source, receiver=receiver, components=('Z', 'N', 'E', 'R', 'T'))
@@ -193,8 +220,11 @@ def test_incremental_bwd():
                                BWD_TEST_DATA["R"], rtol=1E-7, atol=1E-12)
     np.testing.assert_allclose(st_bwd.select(component='T')[0].data,
                                BWD_TEST_DATA["T"], rtol=1E-7, atol=1E-12)
-    assert instaseis_bwd.meshes.px.strain_buffer.efficiency == 0.0
-    assert instaseis_bwd.meshes.pz.strain_buffer.efficiency == 0.0
+    if hasattr(instaseis_bwd.meshes, "px"):
+        assert instaseis_bwd.meshes.px.strain_buffer.efficiency == 0.0
+        assert instaseis_bwd.meshes.pz.strain_buffer.efficiency == 0.0
+    else:
+        assert instaseis_bwd.meshes.merged.strain_buffer.efficiency == 0.0
 
     # read the same again to test buffer
     st_bwd = instaseis_bwd.get_seismograms(
@@ -209,8 +239,12 @@ def test_incremental_bwd():
                                BWD_TEST_DATA["R"], rtol=1E-7, atol=1E-12)
     np.testing.assert_allclose(st_bwd.select(component='T')[0].data,
                                BWD_TEST_DATA["T"], rtol=1E-7, atol=1E-12)
-    assert instaseis_bwd.meshes.px.strain_buffer.efficiency == 1.0 / 2.0
-    assert instaseis_bwd.meshes.pz.strain_buffer.efficiency == 1.0 / 2.0
+    if hasattr(instaseis_bwd.meshes, "px"):
+        assert instaseis_bwd.meshes.px.strain_buffer.efficiency == 1.0 / 2.0
+        assert instaseis_bwd.meshes.pz.strain_buffer.efficiency == 1.0 / 2.0
+    else:
+        assert instaseis_bwd.meshes.merged.strain_buffer.efficiency == \
+            1.0 / 2.0
 
     # test resampling with a no-op interpolation.
     dt = instaseis_bwd.info.dt
@@ -245,7 +279,7 @@ def test_vertical_only_db(tmpdir):
         m_tp=-1.230000e+24 / 1E7)
 
     # vertical only DB
-    instaseis_bwd = InstaseisDB(tmpdir)
+    instaseis_bwd = find_and_open_files(tmpdir)
 
     st_bwd = instaseis_bwd.get_seismograms(
         source=source, receiver=receiver, components=('Z'))
@@ -278,7 +312,7 @@ def test_horizontal_only_db(tmpdir):
         m_tp=-1.230000e+24 / 1E7)
 
     # vertical only DB
-    instaseis_bwd = InstaseisDB(tmpdir)
+    instaseis_bwd = find_and_open_files(tmpdir)
 
     st_bwd = instaseis_bwd.get_seismograms(
         source=source, receiver=receiver, components=('N'))
@@ -308,7 +342,7 @@ def test_requesting_wrong_component_horizontal(tmpdir):
         m_tp=-1.230000e+24 / 1E7)
 
     # vertical only DB
-    instaseis_bwd = InstaseisDB(tmpdir)
+    instaseis_bwd = find_and_open_files(tmpdir)
 
     with pytest.raises(ValueError):
         instaseis_bwd.get_seismograms(
@@ -336,7 +370,7 @@ def test_requesting_wrong_component_vertical(tmpdir):
         m_tp=-1.230000e+24 / 1E7)
 
     # vertical only DB
-    instaseis_bwd = InstaseisDB(tmpdir)
+    instaseis_bwd = find_and_open_files(tmpdir)
 
     with pytest.raises(ValueError):
         instaseis_bwd.get_seismograms(
@@ -356,7 +390,7 @@ def test_incremental_fwd():
     """
     incremental tests of fwd mode
     """
-    instaseis_fwd = InstaseisDB(os.path.join(DATA, "100s_db_fwd"))
+    instaseis_fwd = find_and_open_files(os.path.join(DATA, "100s_db_fwd"))
 
     receiver = Receiver(latitude=42.6390, longitude=74.4940)
     source = Source(
@@ -409,7 +443,8 @@ def test_incremental_bwd_strain_only():
     """
     incremental tests of bwd mode with strain_only DB
     """
-    instaseis_bwd = InstaseisDB(os.path.join(DATA, "100s_db_bwd_strain_only"))
+    instaseis_bwd = find_and_open_files(
+        os.path.join(DATA, "100s_db_bwd_strain_only"))
 
     receiver = Receiver(latitude=42.6390, longitude=74.4940)
     source = Source(
@@ -441,11 +476,12 @@ def test_incremental_bwd_strain_only():
                                atol=1E-12)
 
 
-def test_incremental_bwd_force_source():
+@pytest.mark.parametrize("db", BW_DISPL_DBS)
+def test_incremental_bwd_force_source(db):
     """
     incremental tests of bwd mode with source force
     """
-    instaseis_bwd = InstaseisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
+    instaseis_bwd = find_and_open_files(db)
 
     receiver = Receiver(latitude=42.6390, longitude=74.4940)
     source = ForceSource(
@@ -470,7 +506,8 @@ def test_incremental_bwd_force_source():
                                BWD_FORCE_TEST_DATA["T"], rtol=1E-7, atol=1E-12)
 
     # Force source does not work with strain databases.
-    db_strain = InstaseisDB(os.path.join(DATA, "100s_db_bwd_strain_only"))
+    db_strain = find_and_open_files(
+        os.path.join(DATA, "100s_db_bwd_strain_only"))
 
     receiver = Receiver(latitude=42.6390, longitude=74.4940)
     source = ForceSource(
@@ -491,11 +528,12 @@ def test_incremental_bwd_force_source():
         assert [tr.stats.channel[-1] for tr in st] == [comp]
 
 
-def test_get_greens_vs_get_seismogram():
+@pytest.mark.parametrize("bwd_db", BW_DISPL_DBS)
+def test_get_greens_vs_get_seismogram(bwd_db):
     """
     Test get_greens_function() against default get_seismograms()
     """
-    db = InstaseisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
+    db = find_and_open_files(bwd_db)
 
     depth_in_m = 1000
     epicentral_distance_degree = 20
@@ -569,11 +607,12 @@ def test_get_greens_vs_get_seismogram():
     assert isinstance(greens_data, dict)
 
 
-def test_greens_function_failures():
+@pytest.mark.parametrize("bwd_db", BW_DISPL_DBS)
+def test_greens_function_failures(bwd_db):
     """
     Tests some failures for the greens function calculation.
     """
-    db = InstaseisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
+    db = find_and_open_files(bwd_db)
 
     depth_in_m = 1000
     epicentral_distance_degree = 20.0
@@ -613,12 +652,13 @@ def test_greens_function_failures():
                                  "vertical and horizontal components")
 
 
-def test_finite_source():
+@pytest.mark.parametrize("bwd_db", BW_DISPL_DBS)
+def test_finite_source(bwd_db):
     """
     incremental tests of bwd mode with source force
     """
     from obspy.signal.filter import lowpass
-    instaseis_bwd = InstaseisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
+    instaseis_bwd = find_and_open_files(bwd_db)
 
     receiver = Receiver(latitude=42.6390, longitude=74.4940)
 
@@ -720,11 +760,12 @@ def test_get_band_code_method():
         assert get_band_code(dt) == letter
 
 
-def test_origin_time_of_resulting_seismograms():
+@pytest.mark.parametrize("bwd_db", BW_DISPL_DBS)
+def test_origin_time_of_resulting_seismograms(bwd_db):
     """
     Makes sure that the origin time is passed to the seismograms.
     """
-    instaseis_bwd = InstaseisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
+    instaseis_bwd = find_and_open_files(bwd_db)
 
     receiver = Receiver(latitude=42.6390, longitude=74.4940)
     source = Source(
@@ -760,7 +801,8 @@ def test_origin_time_of_resulting_seismograms():
     assert st[0].stats.starttime == org_time
 
 
-def test_higher_level_event_and_receiver_parsing():
+@pytest.mark.parametrize("bwd_db", BW_DISPL_DBS)
+def test_higher_level_event_and_receiver_parsing(bwd_db):
     """
     Tests that events and receivers can be parsed from different supported
     formats.
@@ -797,7 +839,7 @@ def test_higher_level_event_and_receiver_parsing():
     inv[0][0].channels = []
 
     # receiver = Receiver(latitude=42.6390, longitude=74.4940)
-    instaseis_bwd = InstaseisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
+    instaseis_bwd = find_and_open_files(bwd_db)
 
     st = instaseis_bwd.get_seismograms(source=event, receiver=inv,
                                        components=('Z'))
@@ -811,12 +853,27 @@ def test_higher_level_event_and_receiver_parsing():
 
 
 @pytest.mark.parametrize("db", DBS)
+def test_available_components_decorator(db):
+    db = find_and_open_files(db)
+    if "vertical" in db.info.components and "horizontal" in db.info.components:
+        assert db.available_components == ["Z", "N", "E", "R", "T"]
+    elif "4 elemental moment tensors" in db.info.components:
+        assert db.available_components == ["Z", "N", "E", "R", "T"]
+    elif "vertical" in db.info.components:
+        assert db.available_components == ["Z"]
+    elif "horizontal" in db.info.components:
+        assert db.available_components == ["N", "E", "R", "T"]
+    else:  # pragma: no cover
+        raise NotImplementedError
+
+
+@pytest.mark.parametrize("db", DBS)
 def test_resampling_and_time_settings(db):
     """
     This tests should assure that the origin time is always the peak of the
     source time function.
     """
-    db = InstaseisDB(db)
+    db = find_and_open_files(db)
 
     origin_time = obspy.UTCDateTime(2015, 1, 1, 1, 1)
 
@@ -829,7 +886,8 @@ def test_resampling_and_time_settings(db):
     # The `remove_source_shift` argument will cut away the first couple of
     # samples. This results in the first sample being the origin time.
     st_r_shift = db.get_seismograms(source=source, receiver=receiver,
-                                    remove_source_shift=True)
+                                    remove_source_shift=True,
+                                    components=db.available_components)
     for tr in st_r_shift:
         assert tr.stats.starttime == origin_time
     length = st_r_shift[0].stats.npts
@@ -837,7 +895,8 @@ def test_resampling_and_time_settings(db):
     # Now if we don't remove it we should have a couple more samples. If we
     # don't resample it should be more or less exact.
     st = db.get_seismograms(source=source, receiver=receiver,
-                            remove_source_shift=False)
+                            remove_source_shift=False,
+                            components=db.available_components)
     for tr in st:
         assert tr.stats.starttime == origin_time - \
             (db.info.src_shift_samples * db.info.dt)
@@ -853,14 +912,16 @@ def test_resampling_and_time_settings(db):
     # source time function.
     st_r_shift = db.get_seismograms(source=source, receiver=receiver,
                                     remove_source_shift=True, dt=12,
-                                    kernelwidth=1)
+                                    kernelwidth=1,
+                                    components=db.available_components)
     for tr in st_r_shift:
         assert tr.stats.starttime == origin_time
     length = st_r_shift[0].stats.npts
 
     st = db.get_seismograms(source=source, receiver=receiver,
                             remove_source_shift=False, dt=12,
-                            kernelwidth=1)
+                            kernelwidth=1,
+                            components=db.available_components)
     for tr in st:
         assert tr.stats.starttime == origin_time - 14 * 12
 
@@ -883,7 +944,7 @@ def test_time_settings_with_resample_stf(db):
 
     origin_time = obspy.UTCDateTime(2015, 1, 1, 1, 1)
 
-    db = InstaseisDB(db)
+    db = find_and_open_files(db)
 
     receiver = Receiver(latitude=42.6390, longitude=74.4940)
     source = Source(
@@ -907,7 +968,7 @@ def test_time_settings_with_resample_stf(db):
     with pytest.raises(ValueError) as err:
         db.get_seismograms(
             source=source, receiver=receiver,
-            components=('Z', 'N', 'E', 'R', 'T'), dt=0.1, reconvolve_stf=True,
+            components=db.available_components, dt=0.1, reconvolve_stf=True,
             remove_source_shift=True)
     assert isinstance(err.value, ValueError)
     assert err.value.args[0] == ("'remove_source_shift' argument not "
@@ -916,21 +977,21 @@ def test_time_settings_with_resample_stf(db):
     # No matter the dt, the first sample will always be set to the origin time.
     st = db.get_seismograms(
         source=source, receiver=receiver,
-        components=('Z', 'N', 'E', 'R', 'T'), reconvolve_stf=True,
+        components=db.available_components, reconvolve_stf=True,
         remove_source_shift=False)
     for tr in st:
         assert tr.stats.starttime == origin_time
 
     st = db.get_seismograms(
         source=source, receiver=receiver,
-        components=('Z', 'N', 'E', 'R', 'T'), reconvolve_stf=True,
+        components=db.available_components, reconvolve_stf=True,
         remove_source_shift=False, dt=0.1)
     for tr in st:
         assert tr.stats.starttime == origin_time
 
     st = db.get_seismograms(
         source=source, receiver=receiver,
-        components=('Z', 'N', 'E', 'R', 'T'), reconvolve_stf=True,
+        components=db.available_components, reconvolve_stf=True,
         remove_source_shift=False, dt=1.0)
     for tr in st:
         assert tr.stats.starttime == origin_time
@@ -942,7 +1003,7 @@ def test_remove_samples_at_end_for_interpolation(db):
     Remove some samples at the end for the resampling to avoid boundary
     effects.
     """
-    db = InstaseisDB(db)
+    db = find_and_open_files(db)
 
     origin_time = obspy.UTCDateTime(2015, 1, 1, 1, 1)
 
@@ -993,7 +1054,7 @@ def test_get_time_information(db):
     Tests the _get_seismogram_times() function. Also make sure it is
     consistent with the actually produces seismograms.
     """
-    db = InstaseisDB(db)
+    db = find_and_open_files(db)
 
     origin_time = obspy.UTCDateTime(2015, 1, 1, 1, 1)
 
@@ -1008,7 +1069,7 @@ def test_get_time_information(db):
            "dt": None,
            "kernelwidth": 5}
     tr = db.get_seismograms(source=source, receiver=receiver,
-                            components=["Z"], **par)[0]
+                            components=db.available_components, **par)[0]
     times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
 
     assert tr.stats.starttime == times["starttime"]
@@ -1027,7 +1088,7 @@ def test_get_time_information(db):
            "dt": None,
            "kernelwidth": 5}
     tr = db.get_seismograms(source=source, receiver=receiver,
-                            components=["Z"], **par)[0]
+                            components=db.available_components, **par)[0]
     times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
 
     assert tr.stats.starttime == times["starttime"]
@@ -1048,7 +1109,7 @@ def test_get_time_information(db):
            "dt": db.info.dt,
            "kernelwidth": 2}
     tr = db.get_seismograms(source=source, receiver=receiver,
-                            components=["Z"], **par)[0]
+                            components=db.available_components, **par)[0]
     times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
 
     assert tr.stats.starttime == times["starttime"]
@@ -1066,7 +1127,7 @@ def test_get_time_information(db):
            "dt": db.info.dt,
            "kernelwidth": 5}
     tr = db.get_seismograms(source=source, receiver=receiver,
-                            components=["Z"], **par)[0]
+                            components=db.available_components, **par)[0]
     times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
 
     assert tr.stats.starttime == times["starttime"]
@@ -1085,7 +1146,7 @@ def test_get_time_information(db):
            "dt": 12.0,
            "kernelwidth": 1}
     tr = db.get_seismograms(source=source, receiver=receiver,
-                            components=["Z"], **par)[0]
+                            components=db.available_components, **par)[0]
     times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
 
     assert tr.stats.starttime == times["starttime"]
@@ -1107,7 +1168,7 @@ def test_get_time_information(db):
            "dt": 12.0,
            "kernelwidth": 2}
     tr = db.get_seismograms(source=source, receiver=receiver,
-                            components=["Z"], **par)[0]
+                            components=db.available_components, **par)[0]
     times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
 
     assert tr.stats.starttime == times["starttime"]
@@ -1129,7 +1190,7 @@ def test_get_time_information(db):
            "dt": 12.0,
            "kernelwidth": 7}
     tr = db.get_seismograms(source=source, receiver=receiver,
-                            components=["Z"], **par)[0]
+                            components=db.available_components, **par)[0]
     times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
 
     assert tr.stats.starttime == times["starttime"]
@@ -1151,7 +1212,7 @@ def test_get_time_information(db):
            "dt": 12.0,
            "kernelwidth": 1}
     tr = db.get_seismograms(source=source, receiver=receiver,
-                            components=["Z"], **par)[0]
+                            components=db.available_components, **par)[0]
     times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
 
     assert tr.stats.starttime == times["starttime"]
@@ -1173,7 +1234,7 @@ def test_get_time_information(db):
            "dt": 12.0,
            "kernelwidth": 2}
     tr = db.get_seismograms(source=source, receiver=receiver,
-                            components=["Z"], **par)[0]
+                            components=db.available_components, **par)[0]
     times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
 
     assert tr.stats.starttime == times["starttime"]
@@ -1195,7 +1256,7 @@ def test_get_time_information(db):
            "dt": 12.0,
            "kernelwidth": 7}
     tr = db.get_seismograms(source=source, receiver=receiver,
-                            components=["Z"], **par)[0]
+                            components=db.available_components, **par)[0]
     times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
 
     assert tr.stats.starttime == times["starttime"]
@@ -1220,7 +1281,7 @@ def test_get_time_information_reconvolve_stf(db):
     In that case time shifts and what not are no longer applied.
     """
     from obspy.signal.filter import lowpass
-    db = InstaseisDB(db)
+    db = find_and_open_files(db)
 
     origin_time = obspy.UTCDateTime(2015, 1, 1, 1, 1)
 
@@ -1251,7 +1312,7 @@ def test_get_time_information_reconvolve_stf(db):
            "dt": None,
            "kernelwidth": 5}
     tr = db.get_seismograms(source=source, receiver=receiver,
-                            components=["Z"], **par)[0]
+                            components=db.available_components, **par)[0]
     times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
 
     # The seismogram will always start with the origin time and the
@@ -1274,7 +1335,7 @@ def test_get_time_information_reconvolve_stf(db):
            "dt": 12.0,
            "kernelwidth": 1}
     tr = db.get_seismograms(source=source, receiver=receiver,
-                            components=["Z"], **par)[0]
+                            components=db.available_components, **par)[0]
     times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
 
     assert tr.stats.starttime == times["starttime"]
@@ -1298,7 +1359,7 @@ def test_get_time_information_reconvolve_stf(db):
            "dt": 12.0,
            "kernelwidth": 2}
     tr = db.get_seismograms(source=source, receiver=receiver,
-                            components=["Z"], **par)[0]
+                            components=db.available_components, **par)[0]
     times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
 
     assert tr.stats.starttime == times["starttime"]
@@ -1321,7 +1382,7 @@ def test_get_time_information_reconvolve_stf(db):
            "dt": 12.0,
            "kernelwidth": 7}
     tr = db.get_seismograms(source=source, receiver=receiver,
-                            components=["Z"], **par)[0]
+                            components=db.available_components, **par)[0]
     times = _get_seismogram_times(info=db.info, origin_time=origin_time, **par)
 
     assert tr.stats.starttime == times["starttime"]
@@ -1412,7 +1473,7 @@ def test_coordinate_conversions_round_trips():
 
 
 def test_receiver_settings():
-    db = InstaseisDB(os.path.join(DATA, "100s_db_fwd"))
+    db = find_and_open_files(os.path.join(DATA, "100s_db_fwd"))
 
     source = Source(latitude=4., longitude=3.0, depth_in_m=None,
                     m_rr=4.71e+17, m_tt=3.81e+17, m_pp=-4.74e+17,
@@ -1448,7 +1509,7 @@ def test_some_failure_conditions():
     """
     Tests some failure conditions.
     """
-    db = InstaseisDB(os.path.join(DATA, "100s_db_fwd"))
+    db = find_and_open_files(os.path.join(DATA, "100s_db_fwd"))
     source = Source(latitude=4., longitude=3.0, depth_in_m=None,
                     m_rr=4.71e+17, m_tt=3.81e+17, m_pp=-4.74e+17,
                     m_rt=3.99e+17, m_rp=-8.05e+17, m_tp=-1.23e+17)
@@ -1505,7 +1566,7 @@ def test_failures_when_opening_databases(tmpdir):
 
     # Nothing there currently.
     with pytest.raises(InstaseisNotFoundError) as err:
-        InstaseisDB(tmpdir.strpath)
+        find_and_open_files(tmpdir.strpath)
     assert err.value.args[0].startswith("No suitable netCDF files")
 
     # Three files are no good.
@@ -1520,14 +1581,14 @@ def test_failures_when_opening_databases(tmpdir):
             fh.write(b" ")
 
     with pytest.raises(InstaseisError) as err:
-        InstaseisDB(tmpdir.strpath)
+        find_and_open_files(tmpdir.strpath)
     assert err.value.args[0].startswith("1, 2 or 4 netCDF must be present in "
                                         "the folder structure.")
 
     # Two netcdf files but in funny places.
     os.remove(f_3)
     with pytest.raises(InstaseisError) as err:
-        InstaseisDB(tmpdir.strpath)
+        find_and_open_files(tmpdir.strpath)
     assert err.value.args[0].startswith(
         "Could not find any suitable netCDF files. Did you pass the correct "
         "directory?")
@@ -1544,7 +1605,7 @@ def test_failures_when_opening_databases(tmpdir):
             fh.write(b" ")
 
     with pytest.raises(InstaseisError) as err:
-        InstaseisDB(tmpdir.strpath)
+        find_and_open_files(tmpdir.strpath)
     assert err.value.args[0].startswith("Found 2 files for component PX:")
 
     # Only two moment tensor components.
@@ -1559,17 +1620,36 @@ def test_failures_when_opening_databases(tmpdir):
             fh.write(b" ")
 
     with pytest.raises(InstaseisError) as err:
-        InstaseisDB(tmpdir.strpath)
+        find_and_open_files(tmpdir.strpath)
     assert err.value.args[0] == ("Expecting all four elemental moment tensor "
                                  "subfolders to be present.")
 
 
-def test_read_on_demand():
-    db = InstaseisDB(os.path.join(DATA, "100s_db_bwd_displ_only"))
+@pytest.mark.parametrize("database_folder", DBS)
+@pytest.mark.parametrize("read_on_demand", [True, False])
+def test_read_on_demand(database_folder, read_on_demand):
+    """
+    Make sure that databases work in read_on_demand mode.
+    """
+    # The test data is not valid for deep forward DBs.
+    if "fwd_deep" in database_folder:
+        return
+
+    db = find_and_open_files(database_folder, read_on_demand=read_on_demand)
+
+    # Test requires all 3 components.
+    if "only" in db.info.components:
+        return
 
     receiver = Receiver(latitude=42.6390, longitude=74.4940)
+
+    if "100s_db_fwd" in database_folder:
+        depth_in_m = None
+    else:
+        depth_in_m = 12000
+
     source = Source(
-        latitude=89.91, longitude=0.0, depth_in_m=12000,
+        latitude=89.91, longitude=0.0, depth_in_m=depth_in_m,
         m_rr=4.710000e+24 / 1E7,
         m_tt=3.810000e+22 / 1E7,
         m_pp=-4.740000e+24 / 1E7,
@@ -1580,41 +1660,56 @@ def test_read_on_demand():
     st = db.get_seismograms(source=source, receiver=receiver,
                             components=('Z', 'N', 'E', 'R', 'T'))
 
-    np.testing.assert_allclose(st.select(component='Z')[0].data,
-                               BWD_TEST_DATA["Z"], rtol=1E-7, atol=1E-12)
-    np.testing.assert_allclose(st.select(component='N')[0].data,
-                               BWD_TEST_DATA["N"], rtol=1E-7, atol=1E-12)
-    np.testing.assert_allclose(st.select(component='E')[0].data,
-                               BWD_TEST_DATA["E"], rtol=1E-7, atol=1E-12)
-    np.testing.assert_allclose(st.select(component='R')[0].data,
-                               BWD_TEST_DATA["R"], rtol=1E-7, atol=1E-12)
-    np.testing.assert_allclose(st.select(component='T')[0].data,
-                               BWD_TEST_DATA["T"], rtol=1E-7, atol=1E-12)
-
-    # Same thing with read-on-demand.
-    db = InstaseisDB(os.path.join(DATA, "100s_db_bwd_displ_only"),
-                     read_on_demand=True)
-
-    receiver = Receiver(latitude=42.6390, longitude=74.4940)
-    source = Source(
-        latitude=89.91, longitude=0.0, depth_in_m=12000,
-        m_rr=4.710000e+24 / 1E7,
-        m_tt=3.810000e+22 / 1E7,
-        m_pp=-4.740000e+24 / 1E7,
-        m_rt=3.990000e+23 / 1E7,
-        m_rp=-8.050000e+23 / 1E7,
-        m_tp=-1.230000e+24 / 1E7)
-
-    st = db.get_seismograms(source=source, receiver=receiver,
-                            components=('Z', 'N', 'E', 'R', 'T'))
+    if database_folder in TEST_DATA:
+        td = TEST_DATA[database_folder]
 
     np.testing.assert_allclose(st.select(component='Z')[0].data,
-                               BWD_TEST_DATA["Z"], rtol=1E-7, atol=1E-12)
+                               td["Z"], rtol=1E-7, atol=1E-12)
     np.testing.assert_allclose(st.select(component='N')[0].data,
-                               BWD_TEST_DATA["N"], rtol=1E-7, atol=1E-12)
+                               td["N"], rtol=1E-7, atol=1E-12)
     np.testing.assert_allclose(st.select(component='E')[0].data,
-                               BWD_TEST_DATA["E"], rtol=1E-7, atol=1E-12)
+                               td["E"], rtol=1E-7, atol=1E-12)
     np.testing.assert_allclose(st.select(component='R')[0].data,
-                               BWD_TEST_DATA["R"], rtol=1E-7, atol=1E-12)
+                               td["R"], rtol=1E-7, atol=1E-12)
     np.testing.assert_allclose(st.select(component='T')[0].data,
-                               BWD_TEST_DATA["T"], rtol=1E-7, atol=1E-12)
+                               td["T"], rtol=1E-7, atol=1E-12)
+
+
+@pytest.mark.skipif("merged_100s_db_fwd" not in pytest.config.dbs["databases"],
+                    reason="requires generated tests databases.")
+def test_merged_forward_database_layout():
+    """
+    Make sure the merged fwd database layout returns the same result as then
+    default forward layout.
+    """
+    fwd_db = os.path.join(DATA, "100s_db_fwd")
+    fwd_db_m = pytest.config.dbs["databases"]["merged_100s_db_fwd"]
+    fwd_db = instaseis.open_db(fwd_db)
+    fwd_db_m = instaseis.open_db(fwd_db_m)
+
+    depths = [0, 10, 100, 150, 400]
+    lngs = [-50, 0, 50, 100]
+    lats = [-10, 0, 60]
+
+    for rec_d in depths:
+        for lat in lats:
+            for lng in lngs:
+                receiver = Receiver(latitude=10.0, longitude=20.0,
+                                    depth_in_m=rec_d)
+                source = Source(
+                    latitude=lat, longitude=lng,
+                    m_rr=4.710000e+24 / 1E7,
+                    m_tt=3.810000e+22 / 1E7,
+                    m_pp=-4.740000e+24 / 1E7,
+                    m_rt=3.990000e+23 / 1E7,
+                    m_rp=-8.050000e+23 / 1E7,
+                    m_tp=-1.230000e+24 / 1E7)
+
+                st_fwd = fwd_db.get_seismograms(
+                    source=source, receiver=receiver,
+                    components=('Z', 'N', 'E', 'R', 'T'))
+                st_fwd_m = fwd_db_m.get_seismograms(
+                    source=source, receiver=receiver,
+                    components=('Z', 'N', 'E', 'R', 'T'))
+
+                assert st_fwd == st_fwd_m

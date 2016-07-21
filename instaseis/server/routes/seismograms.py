@@ -84,7 +84,10 @@ def _forcesource(value):
 class SeismogramsHandler(InstaseisTimeSeriesHandler):
     # Define the arguments for the seismogram endpoint.
     arguments = {
-        "components": {"type": str, "default": "ZNE"},
+        # Default arguments are either 'ZNE', 'Z', or 'NE', depending on
+        # what the database supports. Default argument will be set later when
+        # the database is known.
+        "components": {"type": str},
         "units": {"type": str, "default": "displacement"},
         "dt": {"type": float},
         "kernelwidth": {"type": int, "default": 12},
@@ -140,7 +143,10 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
     default_origin_time = obspy.UTCDateTime(1900, 1, 1)
 
     def __init__(self, *args, **kwargs):
-        super(InstaseisTimeSeriesHandler, self).__init__(*args, **kwargs)
+        super(SeismogramsHandler, self).__init__(*args, **kwargs)
+        # Set the correct default arguments.
+        self.arguments["components"]["default"] = \
+            "".join(self.application.db.default_components)
 
     def validate_parameters(self, args):
         """

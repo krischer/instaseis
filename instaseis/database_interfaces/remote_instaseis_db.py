@@ -18,9 +18,9 @@ import obspy
 import requests
 import warnings
 
-from . import InstaseisError, InstaseisWarning, Source, ForceSource, \
-    __version__
 from .base_instaseis_db import BaseInstaseisDB, DEFAULT_MU
+from .. import InstaseisError, InstaseisWarning, Source, ForceSource, \
+    __version__
 
 from future import standard_library
 with standard_library.hooks():

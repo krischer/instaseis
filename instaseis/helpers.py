@@ -142,6 +142,27 @@ def sizeof_fmt(num):
     return "%3.1f %s" % (num, "TB")
 
 
+def io_chunker(arr):
+    """
+    Assumes arr is an array of indices. Will return indices thus that
+    adjacent items can be read in one go. Much faster for some cases!
+    """
+    idx = []
+    for _i in range(len(arr)):
+        if _i == 0:
+            idx.append(arr[_i])
+            continue
+        diff = arr[_i] - arr[_i - 1]
+        if diff == 1:
+            if isinstance(idx[-1], list):
+                idx[-1][-1] += 1
+            else:
+                idx[-1] = [idx[-1], idx[-1] + 2]
+        else:
+            idx.append(arr[_i])
+    return idx
+
+
 def rfftfreq(n, d=1.0):  # pragma: no cover
     """
     Polyfill for numpy's rfftfreq() for numpy versions that don't have it.

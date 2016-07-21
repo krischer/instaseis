@@ -203,8 +203,8 @@ def test_finite_source_retrieval(reciprocal_clients, usgs_param):
     # One simulating a crash in the underlying function.
     params = copy.deepcopy(basic_parameters)
 
-    with mock.patch("instaseis.base_instaseis_db.BaseInstaseisDB"
-                    ".get_seismograms_finite_source") as p:
+    with mock.patch("instaseis.database_interfaces.base_instaseis_db"
+                    ".BaseInstaseisDB.get_seismograms_finite_source") as p:
         p.side_effect = ValueError("random crash")
         request = client.fetch(_assemble_url('finite_source', **params),
                                method="POST", body=body)
@@ -216,8 +216,8 @@ def test_finite_source_retrieval(reciprocal_clients, usgs_param):
 
     # Simulating a logic error that should not be able to happen.
     params = copy.deepcopy(basic_parameters)
-    with mock.patch("instaseis.base_instaseis_db.BaseInstaseisDB"
-                    ".get_seismograms_finite_source") as p:
+    with mock.patch("instaseis.database_interfaces.base_instaseis_db"
+                    ".BaseInstaseisDB.get_seismograms_finite_source") as p:
         # Longer than the database returned stream thus the endtime is out
         # of bounds.
         st = obspy.read()
@@ -366,11 +366,12 @@ def test_more_complex_queries(reciprocal_clients_all_callbacks,
     - must be encoded with %2D
     """
     client = reciprocal_clients_all_callbacks
+    db = instaseis.open_db(client.filepath)
 
     basic_parameters = {
         "receiverlongitude": 11,
         "receiverlatitude": 22,
-        "components": "Z",
+        "components": "".join(db.available_components),
         "format": "miniseed"}
 
     with io.open(usgs_param, "rb") as fh:
@@ -441,6 +442,9 @@ def test_more_complex_queries(reciprocal_clients_all_callbacks,
     # Just make sure they actually do something.
     assert st_2[0].stats.starttime > st[0].stats.starttime
     assert st_2[0].stats.endtime < st[0].stats.endtime
+
+    if "Z" not in db.available_components:
+        return
 
     # Network and station searches.
     params = {

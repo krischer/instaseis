@@ -145,6 +145,10 @@ INSTALL_REQUIRES = ["h5py",
                     "pytest",
                     "responses"]
 
+EXTRAS_REQUIRE = {
+    'tests': ['click', 'netCDF4', 'pytest-xdist']
+}
+
 # Add mock for Python 2.x. Starting with Python 3 it is part of the standard
 # library.
 if sys.version_info[0] == 2:
@@ -168,6 +172,7 @@ setup_config = dict(
         "non-commercial/academic use",
     platforms="OS Independent",
     install_requires=INSTALL_REQUIRES,
+    extras_require=EXTRAS_REQUIRE,
     ext_package='instaseis.lib',
     ext_modules=[lib],
     # this is needed for "pip install instaseis==dev"

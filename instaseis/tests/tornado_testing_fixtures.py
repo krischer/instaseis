@@ -26,7 +26,7 @@ from obspy import geodetics
 
 import instaseis
 from instaseis.server.app import get_application
-from instaseis.instaseis_db import InstaseisDB
+from instaseis.database_interfaces import find_and_open_files
 
 
 # Most generic way to get the data folder path.
@@ -93,7 +93,7 @@ class AsyncClient(object):
 
     def wait(self, condition=None, timeout=None):
         if timeout is None:
-            timeout = 5
+            timeout = 30
 
         if not self.__stopped:
             if timeout:  # pragma: no cover
@@ -140,6 +140,10 @@ DBS["db_bwd_displ_only"] = os.path.join(DATA, "100s_db_bwd_displ_only")
 DBS["db_bwd_strain_only"] = os.path.join(DATA, "100s_db_bwd_strain_only")
 DBS["db_fwd"] = os.path.join(DATA, "100s_db_fwd")
 DBS["db_fwd_deep"] = os.path.join(DATA, "100s_db_fwd_deep")
+
+# Add all automatically created repacked databases to the server test suite.
+for name, path in pytest.config.dbs["databases"].items():
+    DBS[name] = path
 
 
 def event_info_mock_callback(event_id):
@@ -238,7 +242,7 @@ def create_async_client(path, station_coordinates_callback=None,
                         event_info_callback=None,
                         travel_time_callback=None):
     application = get_application()
-    application.db = InstaseisDB(path)
+    application.db = find_and_open_files(path=path)
     application.station_coordinates_callback = station_coordinates_callback
     application.event_info_callback = event_info_callback
     application.travel_time_callback = travel_time_callback
@@ -252,7 +256,8 @@ def create_async_client(path, station_coordinates_callback=None,
     client.filepath = path
     client.port = port
     # Flag to help deal with forward/backwards databases.
-    if "bwd" in os.path.basename(path):
+    b = os.path.basename(path)
+    if "bwd" in b or "horizontal_only" in b or "vertical_only" in b:
         client.is_reciprocal = True
         client.source_depth = 0.0
     else:
@@ -266,6 +271,18 @@ def create_async_client(path, station_coordinates_callback=None,
 def all_clients(request):
     """
     Fixture returning all clients!
+    """
+    return create_async_client(request.param,
+                               station_coordinates_callback=None)
+
+
+@pytest.fixture(params=[_i for _i in list(DBS.values()) if (
+        "db_bwd" in _i and
+        "horizontal_only" not in _i and
+        "vertical_only" not in _i)])
+def all_greens_clients(request):
+    """
+    Fixture returning all clients compatible with Green's functions!
     """
     return create_async_client(request.param,
                                station_coordinates_callback=None)
@@ -310,7 +327,21 @@ def all_clients_ttimes_callback(request):
         travel_time_callback=get_travel_time)
 
 
-@pytest.fixture(params=[_i for _i in list(DBS.values()) if "db_bwd" in _i])
+@pytest.fixture(params=[_i for _i in list(DBS.values()) if (
+        "db_bwd" in _i and
+        "horizontal_only" not in _i and
+        "vertical_only" not in _i)])
+def all_greens_clients_ttimes_callback(request):
+    """
+    Fixture returning all clients compatible with Green's functions!
+    """
+    return create_async_client(
+        request.param,
+        travel_time_callback=get_travel_time)
+
+
+@pytest.fixture(params=[_i for _i in list(DBS.values()) if
+                        ("db_bwd" in _i or "_only_" in _i)])
 def reciprocal_clients_all_callbacks(request):
     """
     Fixture returning reciprocal clients with all callbacks.

@@ -93,7 +93,7 @@ class GreensFunctionHandler(InstaseisTimeSeriesHandler):
     default_label = "instaseis_greens_function"
 
     def __init__(self, *args, **kwargs):
-        super(InstaseisTimeSeriesHandler, self).__init__(*args, **kwargs)
+        super(GreensFunctionHandler, self).__init__(*args, **kwargs)
 
     def validate_parameters(self, args):
         """
@@ -106,6 +106,11 @@ class GreensFunctionHandler(InstaseisTimeSeriesHandler):
         if not info.is_reciprocal:
             msg = ("The database is not reciprocal, "
                    "so Green's functions can't be computed.")
+            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+
+        if info.components != "vertical and horizontal":
+            msg = ("Database requires vertical AND horizontal components to "
+                   "be able to compute Green's functions.")
             raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
         # Make sure that epicentral disance and source depth are in reasonable

@@ -22,8 +22,8 @@ from ..util import run_async, IOQueue, _validtimesetting, \
 from ..instaseis_request import InstaseisTimeSeriesHandler
 from ...source import USGSParamFileParsingException
 
-from ...base_instaseis_db import (KIND_MAP, STF_MAP, INV_KIND_MAP,
-                                  _diff_and_integrate)
+from ...database_interfaces.base_instaseis_db import (
+    KIND_MAP, STF_MAP, INV_KIND_MAP, _diff_and_integrate)
 
 
 @run_async
@@ -197,7 +197,10 @@ def _parse_and_resample_finite_source(request, db_info, max_size, callback):
 class FiniteSourceSeismogramsHandler(InstaseisTimeSeriesHandler):
     # Define the arguments for the seismogram endpoint.
     arguments = {
-        "components": {"type": str, "default": "ZNE"},
+        # Default arguments are either 'ZNE', 'Z', or 'NE', depending on
+        # what the database supports. Default argument will be set later when
+        # the database is known.
+        "components": {"type": str},
         "units": {"type": str, "default": "displacement"},
         "dt": {"type": float},
         "kernelwidth": {"type": int, "default": 12},
@@ -235,7 +238,10 @@ class FiniteSourceSeismogramsHandler(InstaseisTimeSeriesHandler):
     default_origin_time = obspy.UTCDateTime(1900, 1, 1)
 
     def __init__(self, *args, **kwargs):
-        super(InstaseisTimeSeriesHandler, self).__init__(*args, **kwargs)
+        super(FiniteSourceSeismogramsHandler, self).__init__(*args, **kwargs)
+        # Set the correct default arguments.
+        self.arguments["components"]["default"] = \
+            "".join(self.application.db.default_components)
 
     def validate_parameters(self, args):
         """

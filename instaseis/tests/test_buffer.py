@@ -13,7 +13,7 @@ from __future__ import absolute_import, division
 
 import numpy as np
 
-from instaseis.mesh import Buffer
+from instaseis.database_interfaces.mesh import Buffer
 
 
 def test_buffer():

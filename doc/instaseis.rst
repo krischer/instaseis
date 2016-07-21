@@ -19,15 +19,47 @@ open_db() Function
 BaseInstaseisDB
 ---------------
 
-.. autoclass:: instaseis.base_instaseis_db.BaseInstaseisDB
+.. autoclass:: instaseis.database_interfaces.base_instaseis_db.BaseInstaseisDB
     :members:
 
 ....
 
-InstaseisDB
------------
+BaseNetCDFInstaseisDB
+---------------------
 
-.. autoclass:: instaseis.instaseis_db.InstaseisDB
+.. autoclass:: instaseis.database_interfaces.base_netcdf_instaseis_db.BaseNetCDFInstaseisDB
+    :members:
+
+....
+
+ReciprocalInstaseisDB
+---------------------
+
+.. autoclass:: instaseis.database_interfaces.reciprocal_instaseis_db.ReciprocalInstaseisDB
+    :members:
+
+....
+
+ReciprocalMergedInstaseisDB
+---------------------------
+
+.. autoclass:: instaseis.database_interfaces.reciprocal_merged_instaseis_db.ReciprocalMergedInstaseisDB
+    :members:
+
+....
+
+ForwardInstaseisDB
+------------------
+
+.. autoclass:: instaseis.database_interfaces.forward_instaseis_db.ForwardInstaseisDB
+    :members:
+
+....
+
+ForwardMergedInstaseisDB
+------------------------
+
+.. autoclass:: instaseis.database_interfaces.forward_merged_instaseis_db.ForwardMergedInstaseisDB
     :members:
 
 ....
@@ -35,7 +67,7 @@ InstaseisDB
 RemoteInstaseisDB
 -----------------
 
-.. autoclass:: instaseis.remote_instaseis_db.RemoteInstaseisDB
+.. autoclass:: instaseis.database_interfaces.remote_instaseis_db.RemoteInstaseisDB
     :members:
 
 ....
@@ -43,5 +75,5 @@ RemoteInstaseisDB
 SyngineInstaseisDB
 ------------------
 
-.. autoclass:: instaseis.syngine_instaseis_db.SyngineInstaseisDB
-:members:
+.. autoclass:: instaseis.database_interfaces.syngine_instaseis_db.SyngineInstaseisDB
+    :members:

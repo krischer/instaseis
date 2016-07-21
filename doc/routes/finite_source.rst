@@ -61,8 +61,8 @@ Filetype
 +-----------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
 | ``label``                   | String   | False    |                             | Specify a label to be included in file names and HTTP file name suggestions.         |
 +-----------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
-| ``components``              | String   | False    | ZNE                         | Specify the orientation of the synthetic seismograms as a list of any combination of |
-|                             |          |          |                             | ``Z`` (vertical), ``N`` (north), ``E`` (east), ``R`` (radial), ``T`` (transverse).   |
+| ``components``              | String   | False    | ZNE, Z, or NE (depends on   | Specify the orientation of the synthetic seismograms as a list of any combination of |
+|                             |          |          | what the DB supports)       | ``Z`` (vertical), ``N`` (north), ``E`` (east), ``R`` (radial), ``T`` (transverse).   |
 +-----------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
 | ``units``                   | String   | False    | displacement                | Specify either ``displacement``, ``velocity`` or ``acceleration`` for the synthetics.|
 +-----------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+

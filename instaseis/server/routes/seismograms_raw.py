@@ -66,7 +66,10 @@ def _get_seismogram(db, source, receiver, components, callback):
 class RawSeismogramsHandler(InstaseisTimeSeriesHandler):
     # Define the arguments for the seismogram endpoint.
     arguments = {
-        "components": {"type": str, "default": "ZNE"},
+        # Default arguments are either 'ZNE', 'Z', or 'NE', depending on
+        # what the database supports. Default argument will be set later when
+        # the database is known.
+        "components": {"type": str},
         # Source parameters.
         "sourcelatitude": {"type": float, "required": True},
         "sourcelongitude": {"type": float, "required": True},
@@ -102,6 +105,12 @@ class RawSeismogramsHandler(InstaseisTimeSeriesHandler):
 
     def validate_parameters(self, args):
         pass
+
+    def __init__(self, *args, **kwargs):
+        super(RawSeismogramsHandler, self).__init__(*args, **kwargs)
+        # Set the correct default arguments.
+        self.arguments["components"]["default"] = \
+            "".join(self.application.db.default_components)
 
     @tornado.web.asynchronous
     @tornado.gen.coroutine
