@@ -102,10 +102,13 @@ def recursive_copy(src, dst, contiguous, compression_level, transpose, quiet):
             # Arbitrary limit.
             _c = int(round(32768 / (npts * 4)))
 
-            if time_axis == 0 and transpose:
-                chunksizes = (_c, npts)
-            else:
+            if time_axis == 0:
                 chunksizes = (npts, _c)
+            else:
+                chunksizes = (_c, npts)
+
+            if transpose:
+                chunksizes = list(reversed(chunksizes))
         else:
             # For non-snapshots, just use the existing chunking.
             chunksizes = variable.chunking()
@@ -166,11 +169,11 @@ def recursive_copy(src, dst, contiguous, compression_level, transpose, quiet):
                                 src.variables[x.name][_s, :].T
                     else:
                         if time_axis == 0:
-                            dst.variables[x.name][_s, :] = \
-                                src.variables[x.name][_s, :]
-                        else:
                             dst.variables[x.name][:, _s] = \
                                 src.variables[x.name][:, _s]
+                        else:
+                            dst.variables[x.name][_s, :] = \
+                                src.variables[x.name][_s, :]
 
     for src_group in src.groups.values():
         dst_group = dst.createGroup(src_group.name)
