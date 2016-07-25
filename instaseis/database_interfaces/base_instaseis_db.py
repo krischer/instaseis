@@ -543,9 +543,11 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
             raise ValueError('get_greens_function() needs a DB with both '
                              'vertical and horizontal components')
 
-        if not 0. <= epicentral_distance_degree <= 180.:
+        d = epicentral_distance_degree
+        if not self.info.min_d <= d <= self.info.max_d:
             raise ValueError(
-                'epicentral_distance_degree should be in [0, 180]')
+                'epicentral_distance_degree should be in [%.1f, %.1f]' % (
+                    self.info.min_d, self.info.max_d))
 
         if source_depth_in_m <= 0.:
             raise ValueError('source_depth_in_m should be positive')
