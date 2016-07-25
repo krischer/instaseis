@@ -21,6 +21,7 @@ import warnings
 
 import numpy as np
 from obspy.core import AttribDict, Stream, Trace, UTCDateTime
+from obspy.geodetics import locations2degrees
 from obspy.signal.interpolation import lanczos_interpolation
 from scipy.integrate import cumtrapz
 import scipy.signal
@@ -642,6 +643,13 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
                         rec_radius, self.info.min_radius,
                         self.info.max_radius))
                 raise ValueError(msg)
+
+        d = locations2degrees(source.latitude, source.longitude,
+             receiver.latitude, receiver.longitude)
+        if not self.info.min_d <= d <= self.info.max_d:
+            raise ValueError(
+                'Epicentral distance is %.1f but should be in [%.1f, '
+                '%.1f].' % (d, self.info.min_d, self.info.max_d))
 
         return source, receiver
 

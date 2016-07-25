@@ -1787,3 +1787,30 @@ def test_receiver_too_deep_or_shallow_forward_database():
         "Receiver is too shallow. Receiver would be located at a radius of "
         "6381000.0 meters. The database supports receiver radii from "
         "6000000.0 to 6371000.0 meters.")
+
+
+@pytest.mark.parametrize("bwd_db", BW_DISPL_DBS)
+def test_epicentral_distance_not_in_db(bwd_db):
+    db = find_and_open_files(bwd_db)
+    src = Source(latitude=0.0, longitude=0.0, depth_in_m=10000,
+                 m_rr=4.71e+17, m_tt=3.81e+17, m_pp=-4.74e+17,
+                 m_rt=3.99e+17, m_rp=-8.05e+17, m_tp=-1.23e+17)
+    rec = Receiver(latitude=0.0, longitude=180.0, depth_in_m=0)
+
+    # Works.
+    db.get_seismograms(source=src, receiver=rec)
+
+    # Hack!
+    db.info.max_d = 170.0
+    with pytest.raises(ValueError) as err:
+        db.get_seismograms(source=src, receiver=rec)
+    assert err.value.args[0] == ("Epicentral distance is 180.0 but should be "
+                                 "in [0.0, 170.0].")
+
+    rec.longitude = 10.0
+    db.info.max_d = 180.0
+    db.info.min_d = 20.0
+    with pytest.raises(ValueError) as err:
+        db.get_seismograms(source=src, receiver=rec)
+    assert err.value.args[0] == ("Epicentral distance is 10.0 but should be "
+                                 "in [20.0, 180.0].")
