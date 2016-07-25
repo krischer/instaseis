@@ -4968,6 +4968,7 @@ def test_sourcewidth_parameter(all_clients):
     Tests the sourcewidth parameter.
     """
     client = all_clients
+    db = instaseis.open_db(client.filepath, read_on_demand=True)
 
     basic_parameters = {
         "sourcelatitude": 10,
@@ -4975,7 +4976,7 @@ def test_sourcewidth_parameter(all_clients):
         "sourcedepthinmeters": client.source_depth,
         "receiverlatitude": -10,
         "receiverlongitude": -10,
-        "components": "ZNERT",
+        "components": "".join(db.available_components),
         "format": "miniseed",
         "sourcemomenttensor": "100000,200000,300000,400000,500000,600000"}
 
@@ -4996,12 +4997,14 @@ def test_sourcewidth_parameter(all_clients):
     r = client.fetch(_assemble_url('seismograms', **basic_parameters))
     assert r.code == 200
     st = obspy.read(r.buffer)
+    assert len(st) >= 1
 
     r = client.fetch(_assemble_url('seismograms', sourcewidth=200.0,
                                    **basic_parameters))
     st_re = obspy.read(r.buffer)
+    assert len(st_re) >= 1
 
-    for comp in ["Z", "N", "E", "R", "T"]:
+    for comp in db.available_components:
         d = st.select(component=comp)[0].data
         d_re = st_re.select(component=comp)[0].data
         assert np.abs(np.fft.rfft(d)).sum() > np.abs(np.fft.rfft(d_re)).sum()
