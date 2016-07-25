@@ -1754,3 +1754,36 @@ def test_error_handling_source_too_shallow(bwd_db):
         "Source is too shallow. Source would be located at a radius of "
         "6381000.0 meters. The database supports source radii from "
         "6000000.0 to 6371000.0 meters.")
+
+
+def test_receiver_too_deep_or_shallow_forward_database():
+    """
+    Test error handling for a too deep or too shallow for the forward mode.
+    """
+    db = find_and_open_files(os.path.join(DATA, "100s_db_fwd"))
+
+    src = Source(latitude=4., longitude=3.0, depth_in_m=None,
+                 m_rr=4.71e+17, m_tt=3.81e+17, m_pp=-4.74e+17,
+                 m_rt=3.99e+17, m_rp=-8.05e+17, m_tp=-1.23e+17)
+
+    # Receiver too deep.
+    rec = Receiver(latitude=10., longitude=20., depth_in_m=1000000)
+
+    with pytest.raises(ValueError) as err:
+        db.get_seismograms(source=src, receiver=rec)
+
+    assert err.value.args[0] == (
+        "Receiver too deep. Receiver would be located at a radius of "
+        "5371000.0 meters. The database supports receiver radii from "
+        "6000000.0 to 6371000.0 meters.")
+
+    # Receiver too shallow.
+    rec = Receiver(latitude=10., longitude=20., depth_in_m=-10000)
+
+    with pytest.raises(ValueError) as err:
+        db.get_seismograms(source=src, receiver=rec)
+
+    assert err.value.args[0] == (
+        "Receiver is too shallow. Receiver would be located at a radius of "
+        "6381000.0 meters. The database supports receiver radii from "
+        "6000000.0 to 6371000.0 meters.")

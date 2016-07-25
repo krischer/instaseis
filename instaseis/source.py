@@ -212,7 +212,6 @@ class SourceOrReceiver(object):
             raise ValueError("Invalid longitude value. Longitude must be "
                              "-180 <= x <= 180.")
 
-
     def __eq__(self, other):
         if type(self) != type(other):
             return False

@@ -605,7 +605,7 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
                               'from forward DB. Using depth from the DB.')
 
         # Make sure that the source is within the domain.
-        if source.depth_in_m is not None:
+        if self.info.is_reciprocal and source.depth_in_m is not None:
             src_radius = self.info.planet_radius - source.depth_in_m
             if src_radius < self.info.min_radius:
                 msg = (
@@ -620,6 +620,24 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
                     "radius of %.1f meters. The database supports source "
                     "radii from %.1f to %.1f meters." % (
                         src_radius, self.info.min_radius,
+                        self.info.max_radius))
+                raise ValueError(msg)
+        elif not self.info.is_reciprocal and receiver.depth_in_m is not None:
+            rec_radius = self.info.planet_radius - receiver.depth_in_m
+            if rec_radius < self.info.min_radius:
+                msg = (
+                    "Receiver too deep. Receiver would be located at a radius "
+                    "of %.1f meters. The database supports receiver radii "
+                    "from %.1f to %.1f meters." % (
+                        rec_radius, self.info.min_radius,
+                        self.info.max_radius))
+                raise ValueError(msg)
+            elif rec_radius > self.info.max_radius:
+                msg = (
+                    "Receiver is too shallow. Receiver would be located at a "
+                    "radius of %.1f meters. The database supports receiver "
+                    "radii from %.1f to %.1f meters." % (
+                        rec_radius, self.info.min_radius,
                         self.info.max_radius))
                 raise ValueError(msg)
 
