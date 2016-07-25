@@ -19,18 +19,15 @@ import io
 import numpy as np
 import obspy
 import obspy.core.inventory
-from obspy.geodetics.flinnengdahl import FlinnEngdahl
 from obspy.signal.filter import lowpass
 from obspy.signal.util import next_pow_2
 import obspy.io.xseed.parser
 import os
 from scipy import interp
-import warnings
 
 from . import ReceiverParseError, SourceParseError
 from . import rotations
-from .helpers import (elliptic_to_geocentric_latitude,
-                      geocentric_to_elliptic_latitude, rfftfreq)
+from .helpers import (elliptic_to_geocentric_latitude, rfftfreq)
 
 DEFAULT_MU = 32e9
 
@@ -322,8 +319,7 @@ class Source(SourceOrReceiver):
     def parse(filename_or_obj):
         """
         Attempts to parse anything to a Source object. Can currently read
-        anything ObsPy can read, ObsPy event related objects,
-        and CMTSOLUTION files.
+        anything ObsPy can read, ObsPy event related objects.
 
         For anything ObsPy related, it must contain a full moment tensor,
         otherwise it will raise an error.
@@ -361,11 +357,6 @@ class Source(SourceOrReceiver):
                 pass
             else:
                 return Source.parse(src)
-            # CMT solution file.
-            try:
-                return Source.from_CMTSOLUTION_file(filename_or_obj)
-            except:
-                pass
             raise SourceParseError("Could not parse the given source.")
         elif isinstance(filename_or_obj, obspy.Catalog):
             if len(filename_or_obj) == 0:
@@ -399,61 +390,6 @@ class Source(SourceOrReceiver):
                 m_tp=t.m_tp)
         else:
             raise NotImplementedError
-
-    @classmethod
-    def from_CMTSOLUTION_file(self, filename):
-        """
-        Initialize a source object from a CMTSOLUTION file.
-
-        Coordinates are assumed to be defined on the WGS84 ellipsoid and
-        will be converted to geocentric coordinates.
-
-        :param filename: path to the CMTSOLUTION file
-
-        >>> import instaseis
-        >>> source = instaseis.Source.from_CMTSOLUTION_file('file.cmt')
-        >>> print(source)
-        Instaseis Source:
-            Longitude        : -177.0 deg
-            Latitude         :  -29.2 deg
-            Depth            : 4.8e+01 km
-            Moment Magnitude :   7.32
-            Scalar Moment    :   9.63e+19 Nm
-            Mrr              :   7.68e+19 Nm
-            Mtt              :   9.00e+17 Nm
-            Mpp              :  -7.77e+19 Nm
-            Mrt              :   1.39e+19 Nm
-            Mrp              :   4.52e+19 Nm
-            Mtp              :  -3.26e+19 Nm
-        """
-        with open(filename, "rt") as f:
-            line = f.readline()
-            origin_time = line[4:].strip().split()[:6]
-            values = list(map(int, origin_time[:-1])) + \
-                [float(origin_time[-1])]
-            try:
-                origin_time = obspy.UTCDateTime(*values)
-            except (TypeError, ValueError):  # pragma: no cover
-                warnings.warn("Could not determine origin time from line: %s"
-                              % line)
-                origin_time = obspy.UTCDateTime(0)
-            f.readline()
-            time_shift = float(f.readline().strip().split()[-1])
-            f.readline()
-            latitude = float(f.readline().strip().split()[-1])
-            longitude = float(f.readline().strip().split()[-1])
-            depth_in_m = float(f.readline().strip().split()[-1]) * 1e3
-
-            m_rr = float(f.readline().strip().split()[-1]) / 1e7
-            m_tt = float(f.readline().strip().split()[-1]) / 1e7
-            m_pp = float(f.readline().strip().split()[-1]) / 1e7
-            m_rt = float(f.readline().strip().split()[-1]) / 1e7
-            m_rp = float(f.readline().strip().split()[-1]) / 1e7
-            m_tp = float(f.readline().strip().split()[-1]) / 1e7
-
-        return self(elliptic_to_geocentric_latitude(latitude), longitude,
-                    depth_in_m, m_rr, m_tt, m_pp, m_rt, m_rp, m_tp, time_shift,
-                    origin_time=origin_time)
 
     @classmethod
     def from_strike_dip_rake(self, latitude, longitude, depth_in_m, strike,
@@ -539,52 +475,6 @@ class Source(SourceOrReceiver):
         source.lambd = lambd
 
         return source
-
-    def write_CMTSOLUTION_file(self, filename):
-        """
-        Initialize a source object from a CMTSOLUTION file.
-
-        Coordinates are assumed to be defined in geocentric coordinates and
-        will be coordinates defined on the WGS84 ellipsoid.
-
-        :param filename: path to the CMTSOLUTION file
-        """
-        with open(filename, "w") as f:
-            # Reconstruct the first line as well as possible. All
-            # hypocentral information is missing.
-            f.write('    %4i %2i %2i %2i %2i %5.2f %8.4f %9.4f %5.1f %.1f %.1f'
-                    ' %s\n' % (
-                        self.origin_time.year,
-                        self.origin_time.month,
-                        self.origin_time.day,
-                        self.origin_time.hour,
-                        self.origin_time.minute,
-                        self.origin_time.second +
-                        self.origin_time.microsecond / 1E6,
-                        geocentric_to_elliptic_latitude(self.latitude),
-                        self.longitude,
-                        self.depth_in_m / 1e3,
-                        # Just write the moment magnitude twice...we don't
-                        # have any other.
-                        self.moment_magnitude,
-                        self.moment_magnitude,
-                        FlinnEngdahl().get_region(self.longitude,
-                                                  self.latitude)))
-            f.write('event name:  nn\n')
-            f.write('time shift:     %5.2f\n' % (self.time_shift,))
-            f.write('half duration:  0.0\n')
-            # Convert latitude to WGS84.
-            f.write('latitude:       %7.4f\n' % (
-                geocentric_to_elliptic_latitude(self.latitude),))
-            f.write('longitude:      %7.4f\n' % (self.longitude,))
-            f.write('depth:          %7.4f\n' % (self.depth_in_m / 1e3,))
-
-            f.write('Mrr:            %7.4f\n' % (self.m_rr * 1e7,))
-            f.write('Mtt:            %7.4f\n' % (self.m_tt * 1e7,))
-            f.write('Mpp:            %7.4f\n' % (self.m_pp * 1e7,))
-            f.write('Mrt:            %7.4f\n' % (self.m_rt * 1e7,))
-            f.write('Mrp:            %7.4f\n' % (self.m_rp * 1e7,))
-            f.write('Mtp:            %7.4f\n' % (self.m_tp * 1e7,))
 
     @property
     def M0(self):

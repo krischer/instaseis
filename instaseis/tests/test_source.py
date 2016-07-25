@@ -38,9 +38,10 @@ def test_parse_CMTSOLUTIONS_file(tmpdir):
     """
     filename = os.path.join(str(tmpdir), "CMTSOLUTIONS")
     lines = (
-        "PDEW2011  8 23 17 51  4.60  37.9400  -77.9300   6.0 5.9 5.8 VIRGINIA",
+        " PDE 2011  8 23 17 51  4.60  37.9400  -77.9300   6.0 5.9 5.8 "
+        "VIRGINIA",
         "event name:     201108231751A",
-        "time shift:      1.1100",
+        "time shift:      1.00",
         "half duration:   1.8000",
         "latitude:       37.9100",
         "longitude:     -77.9300",
@@ -54,34 +55,20 @@ def test_parse_CMTSOLUTIONS_file(tmpdir):
     with open(filename, "wt") as fh:
         fh.write("\n".join(lines))
 
-    origin_time = obspy.UTCDateTime(2011, 8, 23, 17, 51, 4.6)
+    # This is the hypocentral time + 1 seconds (the time shift in the
+    # CMTSOLUTION file).
+    origin_time = obspy.UTCDateTime(2011, 8, 23, 17, 51, 5.6)
 
     src = Source.parse(filename)
     src_params = np.array([src.latitude, src.longitude, src.depth_in_m,
                            src.m_rr, src.m_tt, src.m_pp, src.m_rt, src.m_rp,
                            src.m_tp], dtype="float64")
     # Latitude will have assumed to be WGS84 and converted to geocentric
-    # latitude.
+    # latitude. The import machinery should do that.
     np.testing.assert_allclose(src_params, np.array(
         (elliptic_to_geocentric_latitude(37.91), -77.93, 12000, 4.71E17,
          3.81E15, -4.74E17, 3.99E16, -8.05E16,
          -1.23E17), dtype="float64"))
-    assert src.origin_time == origin_time
-
-    # Write again. Reset latitude beforehand.
-    filename = os.path.join(str(tmpdir), "CMTSOLUTIONS2")
-    src.latitude = 37.91
-    src.write_CMTSOLUTION_file(filename)
-
-    # This time there is no need to convert latitudes. Writing will convert
-    # to WGS84 and reading will convert back.
-    src = Source.parse(filename)
-    src_params = np.array([src.latitude, src.longitude, src.depth_in_m,
-                           src.m_rr, src.m_tt, src.m_pp, src.m_rt, src.m_rp,
-                           src.m_tp], dtype="float64")
-    np.testing.assert_allclose(src_params, np.array(
-        (37.91, -77.93, 12000, 4.71E17, 3.81E15, -4.74E17, 3.99E16, -8.05E16,
-         -1.23E17), dtype="float64"), rtol=1E-5)
     assert src.origin_time == origin_time
 
 
