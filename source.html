@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Sources and Receivers &mdash; instaseis 0.1.1-176-gd1fb documentation</title>
+    <title>Sources and Receivers &mdash; instaseis 0.1.1-178-g8658 documentation</title>
     
     <link rel="stylesheet" href="_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.1.1-176-gd1fb',
+        VERSION:     '0.1.1-178-g8658',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -31,7 +31,7 @@
     <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.1.1-176-gd1fb documentation" href="index.html" />
+    <link rel="top" title="instaseis 0.1.1-178-g8658 documentation" href="index.html" />
     <link rel="next" title="Utility Functions" href="helpers.html" />
     <link rel="prev" title="Main Instaseis Classes" href="instaseis.html" />
 <meta charset='utf-8'>
@@ -53,7 +53,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.1.1-176-gd1fb</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.1.1-178-g8658</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -279,39 +279,6 @@ the time of the first sample of the final seismogram.</li>
 </dd></dl>
 
 <dl class="classmethod">
-<dt id="instaseis.source.Source.from_CMTSOLUTION_file">
-<em class="property">classmethod </em><code class="descname">from_CMTSOLUTION_file</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/source.html#Source.from_CMTSOLUTION_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.Source.from_CMTSOLUTION_file" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize a source object from a CMTSOLUTION file.</p>
-<p>Coordinates are assumed to be defined on the WGS84 ellipsoid and
-will be converted to geocentric coordinates.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filename</strong> &#8211; path to the CMTSOLUTION file</td>
-</tr>
-</tbody>
-</table>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">instaseis</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span> <span class="o">=</span> <span class="n">instaseis</span><span class="o">.</span><span class="n">Source</span><span class="o">.</span><span class="n">from_CMTSOLUTION_file</span><span class="p">(</span><span class="s1">&#39;file.cmt&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
-<span class="go">Instaseis Source:</span>
-<span class="go">    Longitude        : -177.0 deg</span>
-<span class="go">    Latitude         :  -29.2 deg</span>
-<span class="go">    Depth            : 4.8e+01 km</span>
-<span class="go">    Moment Magnitude :   7.32</span>
-<span class="go">    Scalar Moment    :   9.63e+19 Nm</span>
-<span class="go">    Mrr              :   7.68e+19 Nm</span>
-<span class="go">    Mtt              :   9.00e+17 Nm</span>
-<span class="go">    Mpp              :  -7.77e+19 Nm</span>
-<span class="go">    Mrt              :   1.39e+19 Nm</span>
-<span class="go">    Mrp              :   4.52e+19 Nm</span>
-<span class="go">    Mtp              :  -3.26e+19 Nm</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="classmethod">
 <dt id="instaseis.source.Source.from_strike_dip_rake">
 <em class="property">classmethod </em><code class="descname">from_strike_dip_rake</code><span class="sig-paren">(</span><em>latitude</em>, <em>longitude</em>, <em>depth_in_m</em>, <em>strike</em>, <em>dip</em>, <em>rake</em>, <em>M0</em>, <em>time_shift=None</em>, <em>sliprate=None</em>, <em>dt=None</em>, <em>origin_time=UTCDateTime(1970</em>, <em>1</em>, <em>1</em>, <em>0</em>, <em>0)</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/source.html#Source.from_strike_dip_rake"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.Source.from_strike_dip_rake" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize a source object from a shear source parameterized by strike,
@@ -379,8 +346,7 @@ the time of the first sample of the final seismogram.</li>
 <dt id="instaseis.source.Source.parse">
 <em class="property">static </em><code class="descname">parse</code><span class="sig-paren">(</span><em>filename_or_obj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/source.html#Source.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.Source.parse" title="Permalink to this definition">¶</a></dt>
 <dd><p>Attempts to parse anything to a Source object. Can currently read
-anything ObsPy can read, ObsPy event related objects,
-and CMTSOLUTION files.</p>
+anything ObsPy can read, ObsPy event related objects.</p>
 <p>For anything ObsPy related, it must contain a full moment tensor,
 otherwise it will raise an error.</p>
 <p>Coordinates are assumed to be defined on the WGS84 ellipsoid and
@@ -501,22 +467,6 @@ normalize it using trapezoidal rule style integration</li>
 <dd><p>List of moment tensor components in theta, phi, r coordinates in Voigt
 notation:
 [m_tt, m_pp, m_rr, m_rp, m_rt, m_tp]</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="instaseis.source.Source.write_CMTSOLUTION_file">
-<code class="descname">write_CMTSOLUTION_file</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/source.html#Source.write_CMTSOLUTION_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.Source.write_CMTSOLUTION_file" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize a source object from a CMTSOLUTION file.</p>
-<p>Coordinates are assumed to be defined in geocentric coordinates and
-will be coordinates defined on the WGS84 ellipsoid.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filename</strong> &#8211; path to the CMTSOLUTION file</td>
-</tr>
-</tbody>
-</table>
 </dd></dl>
 
 </dd></dl>
