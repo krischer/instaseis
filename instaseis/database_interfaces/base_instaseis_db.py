@@ -614,6 +614,13 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
                     "%.1f to %.1f meters." % (src_radius, self.info.min_radius,
                                               self.info.max_radius))
                 raise ValueError(msg)
+            elif src_radius > self.info.min_radius:
+                msg = (
+                    "Source is too shallow. Source would be located at a "
+                    "radius of %.1f meters. The database supports source radii "
+                    "from %.1f to %.1f meters." % (
+                    src_radius, self.info.min_radius, self.info.max_radius))
+                raise ValueError(msg)
 
         return source, receiver
 
