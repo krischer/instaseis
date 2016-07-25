@@ -82,7 +82,7 @@ def launch_io_loop(db_path, port, buffer_size_in_mb, quiet, log_level,
     """
     application = get_application()
     application.db = find_and_open_files(
-        db_path=db_path, buffer_size_in_mb=buffer_size_in_mb)
+        path=db_path, buffer_size_in_mb=buffer_size_in_mb)
     application.station_coordinates_callback = station_coordinates_callback
     application.event_info_callback = event_info_callback
 
