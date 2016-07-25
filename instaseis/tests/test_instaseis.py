@@ -1713,3 +1713,24 @@ def test_merged_forward_database_layout():
                     components=('Z', 'N', 'E', 'R', 'T'))
 
                 assert st_fwd == st_fwd_m
+
+
+@pytest.mark.parametrize("bwd_db", BW_DISPL_DBS)
+def test_error_handling_source_too_deep(bwd_db):
+    """
+    Tests the error handling if the source is too deep.
+    """
+    db = find_and_open_files(bwd_db)
+    # 900 km is deeper than any test database.
+    src = Source(latitude=4., longitude=3.0, depth_in_m=900000,
+                 m_rr=4.71e+17, m_tt=3.81e+17, m_pp=-4.74e+17,
+                 m_rt=3.99e+17, m_rp=-8.05e+17, m_tp=-1.23e+17)
+    rec = Receiver(latitude=10., longitude=20., depth_in_m=0)
+
+    with pytest.raises(ValueError) as err:
+        db.get_seismograms(source=src, receiver=rec)
+
+    assert err.value.args[0] == (
+        "Source too deep. Source would be located at a radius of 5471000.0 "
+        "meters. The database supports source radii from 6000000.0 to "
+        "6371000.0 meters.")

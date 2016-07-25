@@ -604,6 +604,17 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
                 warnings.warn('Source depth cannot be changed when reading '
                               'from forward DB. Using depth from the DB.')
 
+        # Make sure that the source is within the domain.
+        if source.depth_in_m is not None:
+            src_radius = self.info.planet_radius - source.depth_in_m
+            if src_radius < self.info.min_radius:
+                msg = (
+                    "Source too deep. Source would be located at a radius of "
+                    "%.1f meters. The database supports source radii from "
+                    "%.1f to %.1f meters." % (src_radius, self.info.min_radius,
+                                              self.info.max_radius))
+                raise ValueError(msg)
+
         return source, receiver
 
     @property
