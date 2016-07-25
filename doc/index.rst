@@ -114,7 +114,7 @@ shared Fortran librarys - pull requests are welcome.
 * ``gfortran >= 4.7``
 * ``Python 2.7, 3.3, 3.4, or 3.5``
 * ``NumPy >= 1.7``
-* ``ObsPy >= 1.0.0``
+* ``ObsPy >= 1.0.1``
 * ``h5py``
 * ``future``
 * ``requests``
@@ -123,6 +123,7 @@ shared Fortran librarys - pull requests are welcome.
 * ``flake8``
 * ``pytest``
 * ``pytest-xdist``
+* ``jsonschema >= 2.4``
 * ``mock`` *(only for Python 2.x, otherwise part of the standard library)*
 
 The optional graphical user interface furthermore requires
@@ -162,7 +163,7 @@ Anaconda).
 
 .. code-block:: bash
 
-    $ conda install -c obspy obspy h5py future requests tornado flake8 pytest mock basemap pyqt pip
+    $ conda install -c obspy obspy h5py future requests tornado flake8 pytest mock basemap pyqt pip jsonschema
     $ pip install responses pyqtgraph pytest-xdist
 
 A possible complication arises **if you are running on a server without a

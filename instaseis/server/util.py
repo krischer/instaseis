@@ -8,6 +8,7 @@
     (http://www.gnu.org/copyleft/lgpl.html)
 """
 import io
+import math
 import re
 import functools
 import threading
@@ -231,3 +232,44 @@ def _validate_and_write_waveforms(st, callback, starttime, endtime, scale,
                 filename = "%s%s.sac" % (label, tr.id)
                 byte_strings.append((filename, temp.read()))
         callback((byte_strings, mu))
+
+
+def get_gaussian_source_time_function(source_width, dt):
+    """
+    Returns a gaussian source time function.
+
+    :type source_width: float
+    :param source_width: The desired source width in seconds. This is twice
+        the half-duration as used in many waveform solvers.
+    :type dt: float
+    :param dt: The sample interval of the STF.
+
+    Returns a tuple with two things:
+
+    1. The offset from the first sample to the peak of the gaussian in
+        seconds. This is guaranteed to be directly on a sample.
+    2. The actual source time function as a numpy array.
+
+    It is normalized to zero and first and last sample are also guaranteed
+    to be zero.
+    """
+    # We calculate it for twice the source width, and set the
+    # offset to the next sample.
+    x = int(math.ceil(source_width / dt))
+    offset = x * dt
+    t = np.linspace(0, 2 * offset + dt, x * 2 + 2)
+
+    # Sanity check.
+    assert np.isclose(t[1] - t[0], dt)
+
+    a = 1.0 / ((0.25 * source_width) ** 2)
+
+    y = np.exp(-a * (t - offset) ** 2) / (np.sqrt(np.pi) * 0.25 * source_width)
+
+    # Sanity checks and manually set the first and last sample to 0.
+    y_m = y.max()
+    assert y[0] <= 1E-5 * y_m and y[-1] <= 1E-5 * y_m
+    y[0] = 0
+    y[-1] = 0
+
+    return offset, y

@@ -1,0 +1,51 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "http://instaseis.net/source_time_function/1.0",
+  "type": "object",
+  "properties": {
+    "units": {
+      "title": "units",
+      "description": "The units of the given data array. Only moment_rate which seismologists also call the source time function is supported.",
+      "id": "http://instaseis.net/source_time_function/1.0/units",
+      "type": "string",
+      "enum": ["moment_rate"]
+    },
+    "relative_origin_time_in_sec": {
+      "title": "Relative origin time in seconds",
+      "description": "Time in seconds from the first sample which should be considered the origin time of the final seismogram. The min/max restrictions are a bit arbitrary and aim to stabilize the algorithm.",
+      "id": "http://instaseis.net/source_time_function/1.0/relative_origin_time_in_sec",
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 600.0
+    },
+    "sample_spacing_in_sec": {
+      "title": "Sample spacing in seconds (delta)",
+      "description": "The sample interval of the given data.",
+      "id": "http://instaseis.net/source_time_function/1.0/sample_spacing_in_sec",
+      "type": "number",
+      "minimum": 0.00001,
+      "maximum": 200,
+      "exclusiveMaximum": false,
+      "exclusiveMinimum": false
+    },
+    "data": {
+      "title": "Data",
+      "description": "The actual data array.",
+      "id": "http://instaseis.net/source_time_function/1.0/data",
+      "type": "array",
+      "items": {
+        "id": "http://instaseis.net/source_time_function/1.0/data/values",
+        "type": "number"
+      },
+      "minItems": 5,
+      "maxItems": 10000
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "units",
+    "relative_origin_time_in_sec",
+    "sample_spacing_in_sec",
+    "data"
+  ]
+}

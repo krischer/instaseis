@@ -7,16 +7,32 @@
     GNU Lesser General Public License, Version 3 [non-commercial/academic use]
     (http://www.gnu.org/copyleft/lgpl.html)
 """
+import inspect
+import io
+import json
+import os
+import re
 import zipfile
 
+from jsonschema import validate as json_validate
+from jsonschema import ValidationError as JSONValidationError
+import numpy as np
 import obspy
+from obspy.signal.interpolation import lanczos_interpolation
 import tornado.gen
 import tornado.web
 
 from ... import Source, ForceSource, Receiver
 from ..util import run_async, IOQueue, _validtimesetting, \
-    _validate_and_write_waveforms
+    _validate_and_write_waveforms, get_gaussian_source_time_function
 from ..instaseis_request import InstaseisTimeSeriesHandler
+
+
+# Load the JSON schema once.
+DATA = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(
+    inspect.getfile(inspect.currentframe())))), "data")
+with io.open(os.path.join(DATA, "finite_source_schema.json"), "rt") as fh:
+    _json_schema = json.load(fh)
 
 
 @run_async
@@ -42,11 +58,16 @@ def _get_seismogram(db, source, receiver, components, units, dt, kernelwidth,
     :param label: Prefix for the filename within the SAC zip file.
     :param callback: callback function of the coroutine.
     """
+    if source.sliprate is not None:
+        reconvolve_stf = True
+    else:
+        reconvolve_stf = False
+
     try:
         st = db.get_seismograms(
             source=source, receiver=receiver, components=components,
             kind=units, remove_source_shift=False,
-            reconvolve_stf=False, return_obspy_stream=True, dt=dt,
+            reconvolve_stf=reconvolve_stf, return_obspy_stream=True, dt=dt,
             kernelwidth=kernelwidth)
     except Exception:
         msg = ("Could not extract seismogram. Make sure, the components "
@@ -60,6 +81,101 @@ def _get_seismogram(db, source, receiver, components, units, dt, kernelwidth,
                                   scale=scale, source=source,
                                   receiver=receiver, db=db, label=label,
                                   format=format)
+
+
+@run_async
+def _parse_validate_and_resample_stf(request, db_info, callback):
+    """
+    Parses the JSON based STF, validates it, and resamples it.
+
+    :param request: The request.
+    :param db_info: Information about the current database.
+    :param callback: The coroutine's callback.
+    """
+    if not request.body:
+        msg = "The source time function must be given in the body of the " \
+              "POST request."
+        callback(tornado.web.HTTPError(400, log_message=msg, reason=msg))
+        return
+
+    # Try to parse it as a JSON file.
+    with io.BytesIO(request.body) as buf:
+        try:
+            j = json.loads(buf.read().decode())
+        except Exception:
+            msg = "The body of the POST request is not a valid JSON file."
+            callback(tornado.web.HTTPError(400, log_message=msg, reason=msg))
+            return
+
+    # Validate it.
+    try:
+        json_validate(j, _json_schema)
+    except JSONValidationError as e:
+        # Replace the u'' unicode string specifier for consistent error
+        # messages.
+        msg = "Validation Error in JSON file: " + re.sub(r"u'", "'", e.message)
+        callback(tornado.web.HTTPError(400, log_message=msg, reason=msg))
+        return
+
+    # Make sure the sampling rate is ok.
+    if j["sample_spacing_in_sec"] < db_info.dt:
+        msg = "'sample_spacing_in_sec' in the JSON file must not be smaller " \
+              "than the database dt [%.3f seconds]." % db_info.dt
+        callback(tornado.web.HTTPError(400, log_message=msg, reason=msg))
+        return
+
+    # Convert to numpy array.
+    j["data"] = np.array(j["data"], np.float64)
+
+    # A couple more custom validations.
+    message = None
+
+    # Make sure its not all zeros.
+    if np.abs(j["data"]).max() < 1E-20:
+        message = ("All zero (or nearly all zero) source time functions don't "
+                   "make any sense.")
+
+    # The data must begin and end with zero. The user is responsible for the
+    # tapering.
+    if j["data"][0] != 0.0 or j["data"][-1] != 0.0:
+        message = "Must begin and end with zero."
+
+    if message:
+        msg = "STF data did not validate: %s" % message
+        callback(tornado.web.HTTPError(400, log_message=msg, reason=msg))
+        return
+
+    missing_length = db_info.length - (
+        len(j["data"]) - 1) * j["sample_spacing_in_sec"]
+    missing_samples = max(int(missing_length / j["sample_spacing_in_sec"]) + 1,
+                          0)
+
+    # Add a buffer of 20 samples at the beginning and at the end.
+    data = np.concatenate([
+        np.zeros(20), j["data"], np.zeros(missing_samples + 20)])
+
+    # Resample it using sinc reconstruction.
+    data = lanczos_interpolation(
+        data,
+        # Account for the additional samples at the beginning.
+        old_start=-20 * j["sample_spacing_in_sec"],
+        old_dt=j["sample_spacing_in_sec"],
+        new_start=0.0,
+        new_dt=db_info.dt,
+        new_npts=db_info.npts,
+        # The large a is okay because we add zeros at the beginning and the
+        # end.
+        a=12, window="blackman")
+
+    # There is potentially some numerical noise on the first sample.
+    assert data[0] < 1E-10 * np.abs(data.ptp())
+    data[0] = 0.0
+
+    # Normalize the integral to one.
+    data /= np.trapz(np.abs(data), dx=db_info.dt)
+    j["data"] = data
+
+    callback(j)
 
 
 def _tolist(value, count):
@@ -111,6 +227,9 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
         # Scale parameter.
         "scale": {"type": float, "default": 1.0},
 
+        # Source width in seconds. STF will be a gaussian.
+        "sourcewidth": {"type": float},
+
         # Or last but not least by specifying an event id.
         "eventid": {"type": str},
 
@@ -157,6 +276,18 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
             msg = ("A scale of zero means all seismograms have an amplitude "
                    "of zero. No need to get it in the first place.")
             raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+
+        if args.sourcewidth is not None:
+            if args.sourcewidth < self.application.db.info.period:
+                msg = ("The sourcewidth must not be smaller than the mesh "
+                       "period of the database (%.3f seconds)." %
+                       self.application.db.info.period)
+                raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+            # Set some reasonable upper limit to stabilize the logic and
+            # calculations.
+            if args.sourcewidth > 600.0:
+                msg = "The sourcewidth must not be larger than 600 seconds."
+                raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
         self.validate_receiver_parameters(args)
         self.validate_source_parameters(args)
@@ -222,7 +353,7 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
                 raise tornado.web.HTTPError(
                     400, log_message=msg, reason=msg)
 
-    def get_source(self, args, __event):
+    def get_source(self, args, __event, custom_stf=None):
         # Source can be either directly specified or by passing an event id.
         if args.eventid is not None:
             # Use previously extracted event information.
@@ -290,6 +421,13 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
                            "parameters. Check parameters for sanity.")
                     raise tornado.web.HTTPError(400, log_message=msg,
                                                 reason=msg)
+
+        # Add the resampled custom STF to the source object.
+        if custom_stf:
+            source.sliprate = custom_stf["data"]
+            source.dt = self.application.db.info.dt
+            source.time_shift = -custom_stf["relative_origin_time_in_sec"]
+
         return source
 
     def get_receivers(self, args):
@@ -344,10 +482,44 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
 
     @tornado.web.asynchronous
     @tornado.gen.coroutine
-    def get(self):
+    def post(self):
+        if "sourcewidth" in self.request.arguments.keys():
+            msg = "Parameter 'sourcewidth' is not allowed for POST requests."
+            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
+
+        # Coroutine + thread as potentially pretty expensive.
+        response = yield tornado.gen.Task(
+            _parse_validate_and_resample_stf,
+            request=self.request,
+            db_info=self.application.db.info)
+
+        if isinstance(response, Exception):
+            raise response
+
+        yield tornado.gen.Task(
+            self.get,
+            custom_stf=response
+        )
+
+    @tornado.web.asynchronous
+    @tornado.gen.coroutine
+    def get(self, custom_stf=None):
         # Parse the arguments. This will also perform a number of sanity
         # checks.
         args = self.parse_arguments()
+
+        # We'll piggyback the sourcewidth on the implementation of the custom
+        # STF. This is not super clean to be honest but its simple and it
+        # works.
+        if args.sourcewidth:
+            dt = self.application.db.info.dt
+            offset, data = get_gaussian_source_time_function(
+                source_width=args.sourcewidth, dt=dt)
+            custom_stf = {
+                "relative_origin_time_in_sec": offset,
+                "sample_spacing_in_sec": dt,
+                "data": data
+            }
 
         if args.eventid is not None:
             # It has to be extracted here to get the origin time which is
@@ -377,7 +549,7 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
         min_starttime, max_endtime = self.parse_time_settings(args)
         self.set_headers(args)
 
-        source = self.get_source(args, __event)
+        source = self.get_source(args, __event, custom_stf=custom_stf)
 
         # Generating even 100'000 receivers only takes ~150ms so its totally
         # ok to generate them all at once here. The time to generate and

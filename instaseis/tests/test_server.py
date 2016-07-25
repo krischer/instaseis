@@ -18,11 +18,14 @@ import zipfile
 
 import obspy
 import numpy as np
+from scipy.integrate import simps
+import pytest
 from .tornado_testing_fixtures import *  # NOQA
 from .tornado_testing_fixtures import _assemble_url
 
 import instaseis
 from instaseis.helpers import geocentric_to_elliptic_latitude
+from instaseis.server import util
 
 # Conditionally import mock either from the stdlib or as a separate library.
 import sys
@@ -30,6 +33,14 @@ if sys.version_info[0] == 2:  # pragma: no cover
     import mock
 else:  # pragma: no cover
     import unittest.mock as mock
+
+
+def _compare_streams(st1, st2):
+    for tr1, tr2 in zip(st1, st2):
+        assert tr1.stats.__dict__ == tr2.stats.__dict__
+        rtol = 1E-3
+        atol = 1E-4 * max(np.abs(tr1.data).max(), np.abs(tr2.data).max())
+        np.testing.assert_allclose(tr1.data, tr2.data, rtol=rtol, atol=atol)
 
 
 def test_root_route(all_clients):
@@ -4748,3 +4759,252 @@ def test_scale_parameter(all_clients):
     assert request.reason == (
         "A scale of zero means all seismograms have an amplitude "
         "of zero. No need to get it in the first place.")
+
+
+def test_error_handling_custom_stf(all_clients):
+    """
+    Tests the error handling when passing a custom STF for the /seismograms
+    service.
+    """
+    client = all_clients
+
+    # The source time function file parsing happens first so we don't need
+    # to worry about the other parameters for now.
+
+    # Empty request.
+    request = client.fetch(_assemble_url('seismograms'),
+                           method="POST", body=b'')
+    assert request.code == 400
+    assert request.reason == ("The source time function must be given in the "
+                              "body of the POST request.")
+
+    # Not a valid json file.
+    request = client.fetch(_assemble_url('seismograms'),
+                           method="POST", body=b'abcdefg')
+    assert request.code == 400
+    assert request.reason == ("The body of the POST request is not a valid "
+                              "JSON file.")
+
+    # Not a json file that's valid according to the schema.
+    body = {"random": "things"}
+    request = client.fetch(_assemble_url('seismograms'),
+                           method="POST", body=json.dumps(body))
+    assert request.code == 400
+    # This file has many problems thus the error might vary.
+    assert request.reason.startswith("Validation Error in JSON file: ")
+
+    valid_json = {
+        "units": "moment_rate",
+        "relative_origin_time_in_sec": 15.23,
+        "sample_spacing_in_sec": 50.0,
+        "data": [0.0, 4, 25, 5.6, 2.4, 0.0]
+    }
+
+    # Couple more wrong ones.
+    body = copy.deepcopy(valid_json)
+    body["units"] = "random"
+    request = client.fetch(_assemble_url('seismograms'),
+                           method="POST", body=json.dumps(body))
+    assert request.code == 400
+    assert request.reason == (
+        "Validation Error in JSON file: 'random' is not one of "
+        "['moment_rate']")
+
+    body = copy.deepcopy(valid_json)
+    body["sample_spacing_in_sec"] = -0.1
+    request = client.fetch(_assemble_url('seismograms'),
+                           method="POST", body=json.dumps(body))
+    assert request.code == 400
+    assert request.reason == (
+        "Validation Error in JSON file: -0.1 is less than the minimum of "
+        "1e-05")
+
+    body = copy.deepcopy(valid_json)
+    body["data"].append("hello")
+    request = client.fetch(_assemble_url('seismograms'),
+                           method="POST", body=json.dumps(body))
+    assert request.code == 400
+    assert request.reason == (
+        "Validation Error in JSON file: 'hello' is not of type 'number'")
+
+    # Does not start and end with zero.
+    body = copy.deepcopy(valid_json)
+    body["data"][0] = 0.3
+    request = client.fetch(_assemble_url('seismograms'),
+                           method="POST", body=json.dumps(body))
+    assert request.code == 400
+    assert request.reason == (
+        "STF data did not validate: Must begin and end with zero.")
+
+    # The sample spacing must not be smaller than the database sampling.
+    body = copy.deepcopy(valid_json)
+    body["sample_spacing_in_sec"] = 10.0
+    request = client.fetch(_assemble_url('seismograms'),
+                           method="POST", body=json.dumps(body))
+    assert request.code == 400
+    assert request.reason == (
+        "'sample_spacing_in_sec' in the JSON file must not be smaller than "
+        "the database dt [24.725 seconds].")
+
+    # Should raise for an all zeros array.
+    body = copy.deepcopy(valid_json)
+    body["data"] = [0, 0, 0, 0, 0, 0]
+    request = client.fetch(_assemble_url('seismograms'),
+                           method="POST", body=json.dumps(body))
+    assert request.code == 400
+    assert ("All zero (or nearly all zero) source time functions don't "
+            "make any sense.") in request.reason
+
+
+def test_custom_stf(all_clients):
+    """
+    Test the custom STF.
+    """
+    client = all_clients
+    db = instaseis.open_db(client.filepath)
+
+    basic_parameters = {
+        "sourcelatitude": 10,
+        "sourcelongitude": 10,
+        "sourcedepthinmeters": client.source_depth,
+        "receiverlatitude": -10,
+        "receiverlongitude": -10,
+        "format": "miniseed",
+        "sourcemomenttensor": "100000,200000,300000,400000,500000,600000"}
+
+    # First test: Just reconvolve with the sliprate of the database...that
+    # should not change it at all!
+    valid_json = {
+        "units": "moment_rate",
+        "relative_origin_time_in_sec": db.info.src_shift,
+        "sample_spacing_in_sec": db.info.dt,
+        "data": [float(_i) for _i in db.info.sliprate]
+    }
+
+    body = copy.deepcopy(valid_json)
+    r = client.fetch(_assemble_url('seismograms', **basic_parameters),
+                     method="POST", body=json.dumps(body))
+    assert r.code == 200
+    st_custom_stf = obspy.read(r.buffer)
+
+    r = client.fetch(_assemble_url('seismograms', **basic_parameters))
+    assert r.code == 200
+    st_default = obspy.read(r.buffer)
+
+    # Cut of the last couple of samples: the convolution requires a taper at
+    # the end, thus samples at the end WILL be different.
+    for tr in st_default + st_custom_stf:
+        tr.data = tr.data[:-5]
+
+    _compare_streams(st_custom_stf, st_default)
+
+    # Now we try the same thing, but shift it one sample.
+    body = copy.deepcopy(valid_json)
+    body["relative_origin_time_in_sec"] = db.info.src_shift + db.info.dt
+    r = client.fetch(_assemble_url('seismograms', **basic_parameters),
+                     method="POST", body=json.dumps(body))
+    assert r.code == 200
+    st_custom_stf = obspy.read(r.buffer)
+
+    r = client.fetch(_assemble_url('seismograms', **basic_parameters))
+    assert r.code == 200
+    st_default = obspy.read(r.buffer)
+
+    with pytest.raises(AssertionError):
+        _compare_streams(st_custom_stf, st_default)
+
+    # We shifted the reference time of the custom stf seismograms one delta
+    # to the right, thus the actuall seismogram will be shifted one delta to
+    # the left!
+    for tr in st_default:
+        tr.data = tr.data[1:-5]
+    for tr in st_custom_stf:
+        tr.data = tr.data[:-6]
+
+    # Now they should be identical again.
+    _compare_streams(st_custom_stf, st_default)
+
+    # Parameter "sourcewidth" not compatible with POST requests.
+    body = copy.deepcopy(valid_json)
+    body["relative_origin_time_in_sec"] = db.info.src_shift + db.info.dt
+    r = client.fetch(_assemble_url('seismograms', sourcewidth=1.0,
+                                   **basic_parameters),
+                     method="POST", body=json.dumps(body))
+    assert r.code == 400
+    assert r.reason == ("Parameter 'sourcewidth' is not allowed for POST "
+                        "requests.")
+
+
+def test_gaussian_source_time_function_calculation():
+    """
+    Tests the calculation of a Gaussian source time function.
+    """
+    # Test the integral. More accurate for smaller deltas.
+    _, y = util.get_gaussian_source_time_function(4, 1.2)
+    assert np.isclose(simps(y, dx=1.2), 1.0, rtol=1E-2)
+    _, y = util.get_gaussian_source_time_function(4, 1.0)
+    assert np.isclose(simps(y, dx=1.0), 1.0, rtol=1E-3)
+    _, y = util.get_gaussian_source_time_function(4, 0.1)
+    assert np.isclose(simps(y, dx=0.1), 1.0, rtol=1E-6)
+    _, y = util.get_gaussian_source_time_function(4, 0.01)
+    assert np.isclose(simps(y, dx=0.01), 1.0, rtol=1E-7)
+
+    # Test the offset. Always has to be larger then the chosen source width
+    # and at a sample.
+    assert util.get_gaussian_source_time_function(4, 1.0)[0] == 4.0
+    assert util.get_gaussian_source_time_function(4, 1.1)[0] == 4.4
+    assert util.get_gaussian_source_time_function(4, 1.2)[0] == 4.8
+    assert util.get_gaussian_source_time_function(4, 2.0)[0] == 4.0
+
+    # Test a known good solution.
+    np.testing.assert_allclose(
+        util.get_gaussian_source_time_function(4, 2.5)[1],
+        [0.0, 1.089142E-3, 5.641895E-1, 1.089142E-3, 7.835433E-12, 0],
+        rtol=1E-5)
+
+
+def test_sourcewidth_parameter(all_clients):
+    """
+    Tests the sourcewidth parameter.
+    """
+    client = all_clients
+    db = instaseis.open_db(client.filepath, read_on_demand=True)
+
+    basic_parameters = {
+        "sourcelatitude": 10,
+        "sourcelongitude": 10,
+        "sourcedepthinmeters": client.source_depth,
+        "receiverlatitude": -10,
+        "receiverlongitude": -10,
+        "components": "".join(db.available_components),
+        "format": "miniseed",
+        "sourcemomenttensor": "100000,200000,300000,400000,500000,600000"}
+
+    r = client.fetch(_assemble_url('seismograms', sourcewidth=1.0,
+                                   **basic_parameters))
+    assert r.code == 400
+    assert r.reason == ("The sourcewidth must not be smaller than the mesh "
+                        "period of the database (100.000 seconds).")
+
+    r = client.fetch(_assemble_url('seismograms', sourcewidth=601.0,
+                                   **basic_parameters))
+    assert r.code == 400
+    assert r.reason == "The sourcewidth must not be larger than 600 seconds."
+
+    # This is unfortunately really hard to test - so we'll just take the FFT
+    # of a normal and a reconvolved one and make sure the reconvolved one
+    # has less energy.
+    r = client.fetch(_assemble_url('seismograms', **basic_parameters))
+    assert r.code == 200
+    st = obspy.read(r.buffer)
+    assert len(st) >= 1
+
+    r = client.fetch(_assemble_url('seismograms', sourcewidth=200.0,
+                                   **basic_parameters))
+    st_re = obspy.read(r.buffer)
+    assert len(st_re) >= 1
+
+    for comp in db.available_components:
+        d = st.select(component=comp)[0].data
+        d_re = st_re.select(component=comp)[0].data
+        assert np.abs(np.fft.rfft(d)).sum() > np.abs(np.fft.rfft(d_re)).sum()
