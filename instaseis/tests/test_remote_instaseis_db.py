@@ -174,3 +174,46 @@ def test_initialization_failures():
 
     assert len(w) == 1
     assert w[0].message.args[0].startswith('Instaseis versions on server')
+
+
+@responses.activate
+def test_source_depth_error_handling(all_remote_dbs):
+    """
+    Test the seismogram extraction from local and remote databases.
+    """
+    db = all_remote_dbs
+
+    # Skip forward databases.
+    if "100s_db_fwd" in db._client.filepath:
+        return
+
+    # Mock responses to get the tornado testing to work.
+    _add_callback(db._client)
+
+    # 900 km is deeper than any test database.
+    src = instaseis.Source(latitude=4., longitude=3.0, depth_in_m=900000,
+                           m_rr=4.71e+17, m_tt=3.81e+17, m_pp=-4.74e+17,
+                           m_rt=3.99e+17, m_rp=-8.05e+17, m_tp=-1.23e+17)
+    rec = instaseis.Receiver(latitude=10., longitude=20., depth_in_m=0)
+
+    with pytest.raises(ValueError) as err:
+        db.get_seismograms(source=src, receiver=rec)
+
+    assert err.value.args[0] == (
+        "Source too deep. Source would be located at a radius of 5471000.0 "
+        "meters. The database supports source radii from 6000000.0 to "
+        "6371000.0 meters.")
+
+    # Too shallow.
+    src = instaseis.Source(latitude=4., longitude=3.0, depth_in_m=-10000,
+                           m_rr=4.71e+17, m_tt=3.81e+17, m_pp=-4.74e+17,
+                           m_rt=3.99e+17, m_rp=-8.05e+17, m_tp=-1.23e+17)
+    rec = instaseis.Receiver(latitude=10., longitude=20., depth_in_m=0)
+
+    with pytest.raises(ValueError) as err:
+        db.get_seismograms(source=src, receiver=rec)
+
+    assert err.value.args[0] == (
+        "Source is too shallow. Source would be located at a radius of "
+        "6381000.0 meters. The database supports source radii from "
+        "6000000.0 to 6371000.0 meters.")
