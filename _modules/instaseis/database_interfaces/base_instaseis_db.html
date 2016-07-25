@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>instaseis.database_interfaces.base_instaseis_db &mdash; instaseis 0.1.1-175-g5922 documentation</title>
+    <title>instaseis.database_interfaces.base_instaseis_db &mdash; instaseis 0.1.1-177-ged20 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.1.1-175-g5922',
+        VERSION:     '0.1.1-177-ged20',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -31,7 +31,7 @@
     <script type="text/javascript" src="../../../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../../../_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../../../_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.1.1-175-g5922 documentation" href="../../../index.html" />
+    <link rel="top" title="instaseis 0.1.1-177-ged20 documentation" href="../../../index.html" />
     <link rel="up" title="instaseis" href="../../instaseis.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="../../../index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.1.1-175-g5922</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.1.1-177-ged20</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -223,7 +223,7 @@
             <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_get_greens_seiscomp_sanity_checks</span><span class="p">(</span><span class="n">epicentral_distance_in_degree</span><span class="p">,</span>
-                                                <span class="n">source_depth_in_m</span><span class="p">,</span> <span class="n">kind</span><span class="p">)</span>
+                                                <span class="n">source_depth_in_m</span><span class="p">,</span> <span class="n">kind</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">)</span>
 
         <span class="n">src_latitude</span><span class="p">,</span> <span class="n">src_longitude</span> <span class="o">=</span> <span class="mf">90.</span><span class="p">,</span> <span class="mf">0.</span>
         <span class="n">rec_latitude</span><span class="p">,</span> <span class="n">rec_longitude</span> <span class="o">=</span> <span class="mf">90.</span> <span class="o">-</span> <span class="n">epicentral_distance_in_degree</span><span class="p">,</span> <span class="mf">0.</span>
@@ -358,7 +358,8 @@
             <span class="n">components</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_components</span>
 
         <span class="n">source</span><span class="p">,</span> <span class="n">receiver</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_seismograms_sanity_checks</span><span class="p">(</span>
-            <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">receiver</span><span class="o">=</span><span class="n">receiver</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="n">components</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="n">kind</span><span class="p">)</span>
+            <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">receiver</span><span class="o">=</span><span class="n">receiver</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="n">components</span><span class="p">,</span>
+            <span class="n">kind</span><span class="o">=</span><span class="n">kind</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">)</span>
 
         <span class="c1"># Call the _get_seismograms() method of the respective implementation.</span>
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_seismograms</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">receiver</span><span class="o">=</span><span class="n">receiver</span><span class="p">,</span>
@@ -631,7 +632,7 @@
         <span class="k">return</span> <span class="n">st</span></div>
 
     <span class="k">def</span> <span class="nf">_get_greens_seiscomp_sanity_checks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epicentral_distance_degree</span><span class="p">,</span>
-                                           <span class="n">source_depth_in_m</span><span class="p">,</span> <span class="n">kind</span><span class="p">):</span>
+                                           <span class="n">source_depth_in_m</span><span class="p">,</span> <span class="n">kind</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Common sanity checks for the get_greens_seiscomp method.</span>
 
@@ -643,6 +644,16 @@
 <span class="sd">            ``&quot;displacement&quot;``, ``&quot;velocity&quot;``, or ``&quot;acceleration&quot;``.</span>
 <span class="sd">        :type kind: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">dt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">dt</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;dt must be bigger than 0.&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">dt</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">dt</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;The database is sampled with a sample spacing of </span><span class="si">%.3f</span><span class="s2"> &quot;</span>
+                    <span class="s2">&quot;seconds. You must not pass a &#39;dt&#39; larger than that as &quot;</span>
+                    <span class="s2">&quot;that would be a downsampling operation which Instaseis &quot;</span>
+                    <span class="s2">&quot;does not do.&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="n">kind</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;displacement&#39;</span><span class="p">,</span> <span class="s1">&#39;velocity&#39;</span><span class="p">,</span> <span class="s1">&#39;acceleration&#39;</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;unknown kind &#39;</span><span class="si">%s</span><span class="s2">&#39;.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">kind</span><span class="p">,))</span>
 
@@ -679,7 +690,7 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_get_seismograms_sanity_checks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">receiver</span><span class="p">,</span> <span class="n">components</span><span class="p">,</span>
-                                       <span class="n">kind</span><span class="p">):</span>
+                                       <span class="n">kind</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Common sanity checks for the get_seismograms method. Also parses</span>
 <span class="sd">        source and receiver objects if necessary.</span>
@@ -693,6 +704,16 @@
 <span class="sd">            strings ``&quot;Z&quot;``, ``&quot;N&quot;``, ``&quot;E&quot;``, ``&quot;R&quot;``, and ``&quot;T&quot;``</span>
 <span class="sd">        :param kind: &#39;displacement&#39;, &#39;velocity&#39; or &#39;acceleration&#39;</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">dt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">dt</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;dt must be bigger than 0.&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">dt</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">dt</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;The database is sampled with a sample spacing of </span><span class="si">%.3f</span><span class="s2"> &quot;</span>
+                    <span class="s2">&quot;seconds. You must not pass a &#39;dt&#39; larger than that as &quot;</span>
+                    <span class="s2">&quot;that would be a downsampling operation which Instaseis &quot;</span>
+                    <span class="s2">&quot;does not do.&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
+
         <span class="c1"># Attempt to parse them if the types are not correct.</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">Source</span><span class="p">)</span> <span class="ow">and</span> \
                 <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">ForceSource</span><span class="p">):</span>
