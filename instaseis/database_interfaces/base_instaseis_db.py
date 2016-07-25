@@ -113,7 +113,7 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
             raise NotImplementedError
 
         self._get_greens_seiscomp_sanity_checks(epicentral_distance_in_degree,
-                                                source_depth_in_m, kind)
+                                                source_depth_in_m, kind, dt=dt)
 
         src_latitude, src_longitude = 90., 0.
         rec_latitude, rec_longitude = 90. - epicentral_distance_in_degree, 0.
@@ -248,7 +248,8 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
             components = self.default_components
 
         source, receiver = self._get_seismograms_sanity_checks(
-            source=source, receiver=receiver, components=components, kind=kind)
+            source=source, receiver=receiver, components=components,
+            kind=kind, dt=dt)
 
         # Call the _get_seismograms() method of the respective implementation.
         data = self._get_seismograms(source=source, receiver=receiver,
@@ -521,7 +522,7 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
         return st
 
     def _get_greens_seiscomp_sanity_checks(self, epicentral_distance_degree,
-                                           source_depth_in_m, kind):
+                                           source_depth_in_m, kind, dt):
         """
         Common sanity checks for the get_greens_seiscomp method.
 
@@ -533,6 +534,16 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
             ``"displacement"``, ``"velocity"``, or ``"acceleration"``.
         :type kind: str
         """
+        if dt is not None:
+            if dt <= 0.0:
+                raise ValueError("dt must be bigger than 0.")
+            elif dt > self.info.dt:
+                raise ValueError(
+                    "The database is sampled with a sample spacing of %.3f "
+                    "seconds. You must not pass a 'dt' larger than that as "
+                    "that would be a downsampling operation which Instaseis "
+                    "does not do." % self.info.dt)
+
         if kind not in ['displacement', 'velocity', 'acceleration']:
             raise ValueError("unknown kind '%s'." % (kind,))
 
@@ -569,7 +580,7 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
             raise ValueError(msg)
 
     def _get_seismograms_sanity_checks(self, source, receiver, components,
-                                       kind):
+                                       kind, dt):
         """
         Common sanity checks for the get_seismograms method. Also parses
         source and receiver objects if necessary.
@@ -583,6 +594,16 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
             strings ``"Z"``, ``"N"``, ``"E"``, ``"R"``, and ``"T"``
         :param kind: 'displacement', 'velocity' or 'acceleration'
         """
+        if dt is not None:
+            if dt <= 0.0:
+                raise ValueError("dt must be bigger than 0.")
+            elif dt > self.info.dt:
+                raise ValueError(
+                    "The database is sampled with a sample spacing of %.3f "
+                    "seconds. You must not pass a 'dt' larger than that as "
+                    "that would be a downsampling operation which Instaseis "
+                    "does not do." % self.info.dt)
+
         # Attempt to parse them if the types are not correct.
         if not isinstance(source, Source) and \
                 not isinstance(source, ForceSource):

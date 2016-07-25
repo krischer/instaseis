@@ -32,9 +32,11 @@ def _get_seismogram(db, source, receiver, components, callback):
     """
     # Get the most barebones seismograms possible.
     try:
+        # We extract seismograms at the database sampling rate - thus
+        # setting it to None is alright here.
         db._get_seismograms_sanity_checks(
             source=source, receiver=receiver, components=components,
-            kind="displacement")
+            kind="displacement", dt=None)
         data = db._get_seismograms(
             source=source, receiver=receiver, components=components)
     except Exception:

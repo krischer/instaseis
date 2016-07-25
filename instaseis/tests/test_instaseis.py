@@ -1852,3 +1852,81 @@ def test_source_depth_greens_function_error_handling(bwd_db):
         "Source is too shallow. Source would be located at a radius of "
         "6381000.0 meters. The database supports source radii from "
         "6000000.0 to 6371000.0 meters.")
+
+
+@pytest.mark.parametrize("bwd_db", BW_DISPL_DBS)
+def test_dt_must_be_larger_than_zero(bwd_db):
+    """
+    dt must be larger than zero!
+    """
+    db = find_and_open_files(bwd_db)
+
+    src = Source(latitude=4., longitude=3.0, depth_in_m=0,
+                 m_rr=4.71e+17, m_tt=3.81e+17, m_pp=-4.74e+17,
+                 m_rt=3.99e+17, m_rp=-8.05e+17, m_tp=-1.23e+17)
+    rec = Receiver(latitude=10., longitude=20., depth_in_m=0)
+
+    with pytest.raises(ValueError) as err:
+        db.get_seismograms(source=src, receiver=rec, dt=0)
+    assert err.value.args[0] == "dt must be bigger than 0."
+
+    with pytest.raises(ValueError) as err:
+        db.get_seismograms(source=src, receiver=rec, dt=-1.0)
+    assert err.value.args[0] == "dt must be bigger than 0."
+
+    with pytest.raises(ValueError) as err:
+        db.get_greens_function(epicentral_distance_in_degree=10.0,
+                               source_depth_in_m=0,
+                               definition="seiscomp", dt=0)
+    assert err.value.args[0] == "dt must be bigger than 0."
+    with pytest.raises(ValueError) as err:
+        db.get_greens_function(epicentral_distance_in_degree=10.0,
+                               source_depth_in_m=0,
+                               definition="seiscomp", dt=-1.0)
+    assert err.value.args[0] == "dt must be bigger than 0."
+
+
+@pytest.mark.parametrize("bwd_db", BW_DISPL_DBS)
+def test_no_downsampling(bwd_db):
+    """
+    Make sure downsampling is not possible.
+    """
+    db = find_and_open_files(bwd_db)
+
+    src = Source(latitude=4., longitude=3.0, depth_in_m=0,
+                 m_rr=4.71e+17, m_tt=3.81e+17, m_pp=-4.74e+17,
+                 m_rt=3.99e+17, m_rp=-8.05e+17, m_tp=-1.23e+17)
+    rec = Receiver(latitude=10., longitude=20., depth_in_m=0)
+
+    dt = db.info.dt
+
+    # Same dt works.
+    db.get_seismograms(source=src, receiver=rec, dt=dt)
+
+    # A smaller one as well - this is an upsampling operation.
+    db.get_seismograms(source=src, receiver=rec, dt=dt / 1.1)
+
+    # But a larger one should raise.
+    with pytest.raises(ValueError) as err:
+        db.get_seismograms(source=src, receiver=rec, dt=dt * 1.1)
+    assert err.value.args[0] == (
+        "The database is sampled with a sample spacing of 24.725 seconds. You "
+        "must not pass a 'dt' larger than that as that would be a "
+        "downsampling operation which Instaseis does not do.")
+
+    # Same with the greens functions.
+    db.get_greens_function(epicentral_distance_in_degree=10.0,
+                           source_depth_in_m=0,
+                           definition="seiscomp", dt=dt)
+    db.get_greens_function(epicentral_distance_in_degree=10.0,
+                           source_depth_in_m=0,
+                           definition="seiscomp", dt=dt / 1.1)
+    # But a larger one should raise.
+    with pytest.raises(ValueError) as err:
+        db.get_greens_function(epicentral_distance_in_degree=10.0,
+                               source_depth_in_m=0,
+                               definition="seiscomp", dt=dt * 1.1)
+    assert err.value.args[0] == (
+        "The database is sampled with a sample spacing of 24.725 seconds. You "
+        "must not pass a 'dt' larger than that as that would be a "
+        "downsampling operation which Instaseis does not do.")
