@@ -230,3 +230,22 @@ def test_error_handling_when_parsing_station_files(tmpdir):
     with pytest.raises(ValueError) as err:
         Receiver.parse("random_string")
     assert err.value.args[0] == "'random_string' could not be parsed."
+
+
+def test_invalid_lat_lng_values():
+    """
+    Tests invalid latitude/longitude values
+    """
+    Receiver(latitude=10, longitude=10)
+
+    with pytest.raises(ValueError):
+        Receiver(latitude=100, longitude=10)
+
+    with pytest.raises(ValueError):
+        Receiver(latitude=-100, longitude=10)
+
+    with pytest.raises(ValueError):
+        Receiver(latitude=10, longitude=200)
+
+    with pytest.raises(ValueError):
+        Receiver(latitude=10, longitude=-200)
