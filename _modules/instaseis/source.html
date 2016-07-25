@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>instaseis.source &mdash; instaseis 0.1.1-136-g8410 documentation</title>
+    <title>instaseis.source &mdash; instaseis 0.1.1-163-gd886 documentation</title>
     
     <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.1.1-136-g8410',
+        VERSION:     '0.1.1-163-gd886',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -31,7 +31,7 @@
     <script type="text/javascript" src="../../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../../_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../../_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.1.1-136-g8410 documentation" href="../../index.html" />
+    <link rel="top" title="instaseis 0.1.1-163-gd886 documentation" href="../../index.html" />
     <link rel="up" title="instaseis" href="../instaseis.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.1.1-136-g8410</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.1.1-163-gd886</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -822,6 +822,7 @@
 <span class="sd">        peak of the source time function used to generate the database.</span>
 <span class="sd">        If you reconvolve with another source time function this time is</span>
 <span class="sd">        the time of the first sample of the final seismogram.</span>
+<span class="sd">    :param sliprate: normalized source time function (sliprate)</span>
 
 
 <span class="sd">    &gt;&gt;&gt; import instaseis</span>
@@ -836,12 +837,13 @@
 <span class="sd">        Fp        :   0.00e+00 N</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="p">,</span> <span class="n">depth_in_m</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">f_r</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">f_t</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span>
-                 <span class="n">f_p</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">origin_time</span><span class="o">=</span><span class="n">obspy</span><span class="o">.</span><span class="n">UTCDateTime</span><span class="p">(</span><span class="mi">0</span><span class="p">)):</span>
+                 <span class="n">f_p</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">origin_time</span><span class="o">=</span><span class="n">obspy</span><span class="o">.</span><span class="n">UTCDateTime</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">sliprate</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ForceSource</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="p">,</span> <span class="n">depth_in_m</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">f_r</span> <span class="o">=</span> <span class="n">f_r</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">f_t</span> <span class="o">=</span> <span class="n">f_t</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">f_p</span> <span class="o">=</span> <span class="n">f_p</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">origin_time</span> <span class="o">=</span> <span class="n">origin_time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span> <span class="o">=</span> <span class="n">sliprate</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">force_tpr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
