@@ -20,7 +20,7 @@ import imp
 import inspect
 from mpl_toolkits.basemap import Basemap
 import numpy as np
-from obspy.imaging.mopad_wrapper import Beach
+from obspy.imaging.mopad_wrapper import beach
 from obspy import geodetics
 from obspy.taup import TauPyModel
 import os
@@ -152,7 +152,7 @@ class Window(QtGui.QMainWindow):
 
         fm = self.focmec
         fm = [_i / 1e16 for _i in fm]
-        self.bb = Beach(fm, xy=(0, 0), width=200, linewidth=1,
+        self.bb = beach(fm, xy=(0, 0), width=200, linewidth=1,
                         facecolor="red")
         self.mpl_mt_ax.add_collection(self.bb)
         self.mpl_mt_ax.set_xlim(-105, 105)
@@ -178,7 +178,7 @@ class Window(QtGui.QMainWindow):
         except:
             pass
 
-        self.bb_finite = Beach(self.finite_source.CMT.tensor / 1e16,
+        self.bb_finite = beach(self.finite_source.CMT.tensor / 1e16,
                                xy=(0, 0), width=200, linewidth=1,
                                facecolor="red")
         self.mpl_mt_finite_ax.add_collection(self.bb_finite)
@@ -418,7 +418,7 @@ class Window(QtGui.QMainWindow):
                 st_cmt = self.instaseis_db.get_seismograms(
                     source=self.finite_source.CMT, receiver=self.receiver,
                     dt=dt, components=components_map[components_choice],
-                    reconvolve_stf=True)
+                    reconvolve_stf=True, remove_source_shift=False)
             else:
                 st_cmt = None
 
