@@ -627,12 +627,15 @@ def test_greens_function_failures(bwd_db):
     with pytest.raises(ValueError) as err:
         db.get_greens_function(1000.0, depth_in_m, definition="seiscomp")
     assert err.value.args[0] == ("epicentral_distance_degree should be in "
-                                 "[0, 180]")
+                                 "[0.0, 180.0]")
 
     # Source depth has to be positive.
     with pytest.raises(ValueError) as err:
         db.get_greens_function(100.0, -20, definition="seiscomp")
-    assert err.value.args[0] == "source_depth_in_m should be positive"
+    assert err.value.args[0] == (
+        "Source is too shallow. Source would be located at a radius of "
+        "6371020.0 meters. The database supports source radii from 6000000.0 "
+        "to 6371000.0 meters.")
 
     # Requires a reciprocal database.
     db.info.is_reciprocal = False
@@ -1814,3 +1817,38 @@ def test_epicentral_distance_not_in_db(bwd_db):
         db.get_seismograms(source=src, receiver=rec)
     assert err.value.args[0] == ("Epicentral distance is 10.0 but should be "
                                  "in [20.0, 180.0].")
+
+
+@pytest.mark.parametrize("bwd_db", BW_DISPL_DBS)
+def test_source_depth_greens_function_error_handling(bwd_db):
+    """
+    Tests the error handling for the greens functions for too deep or too
+    shallow sources.
+    """
+    db = find_and_open_files(bwd_db)
+
+    # all good.
+    db.get_greens_function(epicentral_distance_in_degree=10.0,
+                           source_depth_in_m=100.0, definition="seiscomp")
+
+    # too deep.
+    with pytest.raises(ValueError) as err:
+        db.get_greens_function(epicentral_distance_in_degree=10.0,
+                               source_depth_in_m=900000.0,
+                               definition="seiscomp")
+
+    assert err.value.args[0] == (
+        "Source too deep. Source would be located at a radius of 5471000.0 "
+        "meters. The database supports source radii from 6000000.0 to "
+        "6371000.0 meters.")
+
+    # too shallow.
+    with pytest.raises(ValueError) as err:
+        db.get_greens_function(epicentral_distance_in_degree=10.0,
+                               source_depth_in_m=-10000.0,
+                               definition="seiscomp")
+
+    assert err.value.args[0] == (
+        "Source is too shallow. Source would be located at a radius of "
+        "6381000.0 meters. The database supports source radii from "
+        "6000000.0 to 6371000.0 meters.")

@@ -550,8 +550,23 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
                 'epicentral_distance_degree should be in [%.1f, %.1f]' % (
                     self.info.min_d, self.info.max_d))
 
-        if source_depth_in_m <= 0.:
-            raise ValueError('source_depth_in_m should be positive')
+        # Check source depth.
+        src_radius = self.info.planet_radius - source_depth_in_m
+        if src_radius < self.info.min_radius:
+            msg = (
+                "Source too deep. Source would be located at a radius of "
+                "%.1f meters. The database supports source radii from "
+                "%.1f to %.1f meters." % (src_radius, self.info.min_radius,
+                                          self.info.max_radius))
+            raise ValueError(msg)
+        elif src_radius > self.info.max_radius:
+            msg = (
+                "Source is too shallow. Source would be located at a "
+                "radius of %.1f meters. The database supports source "
+                "radii from %.1f to %.1f meters." % (
+                    src_radius, self.info.min_radius,
+                    self.info.max_radius))
+            raise ValueError(msg)
 
     def _get_seismograms_sanity_checks(self, source, receiver, components,
                                        kind):
@@ -645,7 +660,7 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
                 raise ValueError(msg)
 
         d = locations2degrees(source.latitude, source.longitude,
-             receiver.latitude, receiver.longitude)
+                              receiver.latitude, receiver.longitude)
         if not self.info.min_d <= d <= self.info.max_d:
             raise ValueError(
                 'Epicentral distance is %.1f but should be in [%.1f, '
