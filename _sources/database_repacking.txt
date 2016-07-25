@@ -223,6 +223,34 @@ form that AxiSEM produces directly) to:
   also able to save quite a bit of space.
 
 
+Where to execute this?
+^^^^^^^^^^^^^^^^^^^^^^
+
+Make sure to execute this **at the top-level of all the NetCDF files**. E.g.
+the script (assuming the merge method is chosen), will transform this
+
+.. code-block:: bash
+
+    input_database
+    ├── PX
+    │   └── Data
+    │       └── ordered_output.nc4
+    └── PZ
+        └── Data
+            └── ordered_output.nc4
+
+into this
+
+.. code-block:: bash
+
+    merged_database
+    └── merged_output.nc4
+
+
+Usage
+^^^^^
+
+
 .. code-block:: bash
 
 
