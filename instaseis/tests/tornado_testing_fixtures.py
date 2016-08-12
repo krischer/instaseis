@@ -129,7 +129,7 @@ def bind_unused_port():
     Binds a server socket to an available port on localhost.
     Returns a tuple (socket, port).
     """
-    [sock] = netutil.bind_sockets(None, 'localhost', family=socket.AF_INET)
+    sock = netutil.bind_sockets(None, 'localhost', family=socket.AF_INET)[0]
     port = sock.getsockname()[1]
     return sock, port
 
