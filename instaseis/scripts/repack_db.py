@@ -275,8 +275,14 @@ def merge_files(filenames, output_folder, contiguous, compression_level,
                      compression_level=compression_level, quiet=quiet)
     finally:
         for filename in input_files.values():
-            filename.close()
-        out.close()
+            try:
+                filename.close()
+            except:
+                pass
+        try:
+            out.close()
+        except:
+            pass
 
 
 def _merge_files(input, out, contiguous, compression_level, quiet):
