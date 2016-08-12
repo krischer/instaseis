@@ -163,8 +163,7 @@ Anaconda).
 
 .. code-block:: bash
 
-    $ conda install -c obspy obspy h5py future requests tornado flake8 pytest mock basemap pyqt pip jsonschema
-    $ pip install responses pyqtgraph pytest-xdist
+    $ conda install -c conda-forge obspy h5py future requests tornado flake8 pytest mock basemap pyqt pip jsonschema responses pyqtgraph pytest-xdist
 
 A possible complication arises **if you are running on a server without a
 display**. In that case please edit (on Linux)
