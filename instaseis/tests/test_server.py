@@ -4565,6 +4565,10 @@ def test_sac_headers(all_clients):
         assert tr.stats.sac.kt8.strip() == "I" + instaseis.__version__[:7]
         assert tr.stats.sac.user0 == 0.5
 
+        # Test two more headers. Regression test for #45.
+        assert tr.stats.sac.lpspol == 1
+        assert tr.stats.sac.lcalda == 0
+
 
 def test_dt_settings(all_clients):
     """

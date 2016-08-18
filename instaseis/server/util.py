@@ -213,6 +213,10 @@ def _validate_and_write_waveforms(st, callback, starttime, endtime, scale,
                 lat2=receiver.latitude,
                 long2=receiver.longitude)
 
+            # Set two more headers. See #45.
+            tr.stats.sac.lpspol = 1
+            tr.stats.sac.lcalda = 0
+
             # Some provenance.
             tr.stats.sac.kuser0 = "InstSeis"
             tr.stats.sac.kuser1 = db.info.velocity_model[:8]
