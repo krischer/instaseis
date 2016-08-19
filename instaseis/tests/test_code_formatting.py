@@ -5,24 +5,46 @@ Tests all Python files of the project with flake8. This ensure PEP8 conformance
 and some other sanity checks as well.
 
 :copyright:
-    Lion Krischer (krischer@geophysik.uni-muenchen.de), 2013-2014
+    Lion Krischer (krischer@geophysik.uni-muenchen.de), 2013-2016
 :license:
     GNU Lesser General Public License, Version 3 [non-commercial/academic use]
     (http://www.gnu.org/copyleft/lgpl.html)
 """
-import flake8
-import flake8.engine
-import flake8.main
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
+
 import inspect
 import os
-import warnings
+import re
+
+import pytest
+
+import instaseis
 
 
+try:
+    import flake8
+except:
+    HAS_FLAKE8_AT_LEAST_VERSION_3 = False
+else:
+    if int(flake8.__version__.split(".")[0]) >= 3:
+        HAS_FLAKE8_AT_LEAST_VERSION_3 = True
+    else:
+        HAS_FLAKE8_AT_LEAST_VERSION_3 = False
+
+
+# Skip tests for release builds identified by a clean version number.
+_pattern = re.compile(r"^\d+\.\d+\.\d+$")
+CLEAN_VERSION_NUMBER = bool(_pattern.match(instaseis.__version__))
+
+
+@pytest.mark.skipif(
+    CLEAN_VERSION_NUMBER,
+    reason="Code formatting test skipped for release builds.")
+@pytest.mark.skipif(
+    not HAS_FLAKE8_AT_LEAST_VERSION_3,
+    reason="Formatting test requires at least flake8 version 3.0.")
 def test_flake8():
-    if flake8.__version__ <= "2":  # pragma: no cover
-        msg = ("Module was designed to be tested with flake8 >= 2.0. "
-               "Please update.")
-        warnings.warn(msg)
     test_dir = os.path.dirname(os.path.abspath(inspect.getfile(
         inspect.currentframe())))
     instaseis_dir = os.path.dirname(test_dir)
@@ -42,13 +64,11 @@ def test_flake8():
                 continue
             files.append(full_path)
 
-    # Get the style checker with the default style.
-    flake8_style = flake8.engine.get_style_guide(
-        parse_argv=False, config_file=flake8.main.DEFAULT_CONFIG)
+    # Import the legacy API as flake8 3.0 currently has not official
+    # public API - this has to be changed at some point.
+    from flake8.api import legacy as flake8
+    style_guide = flake8.get_style_guide()
+    report = style_guide.check_files(files)
 
-    report = flake8_style.check_files(files)
-
-    # Make sure at least 10 files are tested.
-    assert report.counters["files"] > 10
-    # And no errors occured.
-    assert report.get_count() == 0
+    # Make sure no error occured.
+    assert report.total_errors == 0
