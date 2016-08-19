@@ -9,8 +9,7 @@ import tempfile
 import time
 
 
-TEST_DATA = os.path.join(os.path.dirname(__file__), "instaseis", "tests",
-                         "data")
+TEST_DATA = os.path.join(os.path.dirname(__file__), "tests", "data")
 
 
 def repack_databases():
@@ -22,8 +21,8 @@ def repack_databases():
     work with a number of different database layouts.
     """
     try:
-        import netCDF4
-        import click
+        import netCDF4  # NOQA
+        import click  # NOQA
     except ImportError:
         print("\nSkipping database repacking tests which require `click` and "
               "`netCDF4` to be installed.\n")
@@ -234,7 +233,7 @@ def repack_databases():
 
 
 try:
-    import xdist
+    import xdist  # NOQA
 except ImportError:
     raise Exception("pytest-xdist is required to run the tests. Please "
                     "install with `pip install pytest-xdist`.")
