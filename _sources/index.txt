@@ -205,7 +205,8 @@ Installing Instaseis
 User Installation
 ~~~~~~~~~~~~~~~~~
 
-**Once released (not yet!)**, installation of Instaseis is as easy as
+After the prerequisites are fulfilled, installation of the latest stable
+Instaseis version is as easy as:
 
 .. code-block:: bash
 
