@@ -142,11 +142,11 @@ INSTALL_REQUIRES = ["h5py",
                     "future",
                     "tornado>=4.0.0",
                     "requests",
-                    "responses",
                     "jsonschema >= 2.4.0"]
 
 EXTRAS_REQUIRE = {
-    'tests': ['click', 'netCDF4', 'pytest-xdist', 'flake8>=3', 'pytest']
+    'tests': ['click', 'netCDF4', 'pytest-xdist', 'flake8>=3', 'pytest',
+              'responses']
 }
 
 # Add mock for Python 2.x. Starting with Python 3 it is part of the standard
