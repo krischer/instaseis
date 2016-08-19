@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>instaseis.database_interfaces.base_instaseis_db &mdash; instaseis 0.1.1-183-ga3df documentation</title>
+    <title>instaseis.database_interfaces.base_instaseis_db &mdash; instaseis 1.0.0 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.1.1-183-ga3df',
+        VERSION:     '1.0.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -31,7 +31,7 @@
     <script type="text/javascript" src="../../../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../../../_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../../../_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.1.1-183-ga3df documentation" href="../../../index.html" />
+    <link rel="top" title="instaseis 1.0.0 documentation" href="../../../index.html" />
     <link rel="up" title="instaseis" href="../../instaseis.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="../../../index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.1.1-183-ga3df</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>1.0.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -120,27 +120,27 @@
 <span class="sd">    GNU Lesser General Public License, Version 3 [non-commercial/academic use]</span>
 <span class="sd">    (http://www.gnu.org/copyleft/lgpl.html)</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="p">(</span><span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="p">(</span><span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span>
                         <span class="n">unicode_literals</span><span class="p">)</span>
 
-<span class="kn">from</span> <span class="nn">future.utils</span> <span class="kn">import</span> <span class="n">with_metaclass</span>
+<span class="kn">from</span> <span class="nn">future.utils</span> <span class="k">import</span> <span class="n">with_metaclass</span>
 
-<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABCMeta</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="k">import</span> <span class="n">ABCMeta</span><span class="p">,</span> <span class="n">abstractmethod</span>
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">obspy.core</span> <span class="kn">import</span> <span class="n">AttribDict</span><span class="p">,</span> <span class="n">Stream</span><span class="p">,</span> <span class="n">Trace</span><span class="p">,</span> <span class="n">UTCDateTime</span>
-<span class="kn">from</span> <span class="nn">obspy.geodetics</span> <span class="kn">import</span> <span class="n">locations2degrees</span>
-<span class="kn">from</span> <span class="nn">obspy.signal.interpolation</span> <span class="kn">import</span> <span class="n">lanczos_interpolation</span>
-<span class="kn">from</span> <span class="nn">scipy.integrate</span> <span class="kn">import</span> <span class="n">cumtrapz</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">obspy.core</span> <span class="k">import</span> <span class="n">AttribDict</span><span class="p">,</span> <span class="n">Stream</span><span class="p">,</span> <span class="n">Trace</span><span class="p">,</span> <span class="n">UTCDateTime</span>
+<span class="kn">from</span> <span class="nn">obspy.geodetics</span> <span class="k">import</span> <span class="n">locations2degrees</span>
+<span class="kn">from</span> <span class="nn">obspy.signal.interpolation</span> <span class="k">import</span> <span class="n">lanczos_interpolation</span>
+<span class="kn">from</span> <span class="nn">scipy.integrate</span> <span class="k">import</span> <span class="n">cumtrapz</span>
 <span class="kn">import</span> <span class="nn">scipy.signal</span>
 
-<span class="kn">from</span> <span class="nn">..source</span> <span class="kn">import</span> <span class="n">Source</span><span class="p">,</span> <span class="n">ForceSource</span><span class="p">,</span> <span class="n">Receiver</span>
-<span class="kn">from</span> <span class="nn">..helpers</span> <span class="kn">import</span> <span class="n">get_band_code</span><span class="p">,</span> <span class="n">sizeof_fmt</span><span class="p">,</span> <span class="n">rfftfreq</span>
+<span class="kn">from</span> <span class="nn">..source</span> <span class="k">import</span> <span class="n">Source</span><span class="p">,</span> <span class="n">ForceSource</span><span class="p">,</span> <span class="n">Receiver</span>
+<span class="kn">from</span> <span class="nn">..helpers</span> <span class="k">import</span> <span class="n">get_band_code</span><span class="p">,</span> <span class="n">sizeof_fmt</span><span class="p">,</span> <span class="n">rfftfreq</span>
 
 
-<span class="n">DEFAULT_MU</span> <span class="o">=</span> <span class="mf">32e9</span>
+<span class="n">DEFAULT_MU</span> <span class="o">=</span> <span class="mi">32</span><span class="n">e9</span>
 
 
 <span class="n">KIND_MAP</span> <span class="o">=</span> <span class="p">{</span>
@@ -177,8 +177,8 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 <div class="viewcode-block" id="BaseInstaseisDB.get_greens_function"><a class="viewcode-back" href="../../../instaseis.html#instaseis.database_interfaces.base_instaseis_db.BaseInstaseisDB.get_greens_function">[docs]</a>    <span class="k">def</span> <span class="nf">get_greens_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epicentral_distance_in_degree</span><span class="p">,</span>
                             <span class="n">source_depth_in_m</span><span class="p">,</span> <span class="n">origin_time</span><span class="o">=</span><span class="n">UTCDateTime</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
-                            <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;displacement&#39;</span><span class="p">,</span> <span class="n">return_obspy_stream</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-                            <span class="n">dt</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">kernelwidth</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">definition</span><span class="o">=</span><span class="s1">&#39;seiscomp&#39;</span><span class="p">):</span>
+                            <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;displacement&#39;</span><span class="p">,</span> <span class="n">return_obspy_stream</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                            <span class="n">dt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">kernelwidth</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">definition</span><span class="o">=</span><span class="s1">&#39;seiscomp&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Extract Green&#39;s function from the Green&#39;s function database.</span>
 
@@ -262,7 +262,7 @@
                 <span class="s1">&#39;dt&#39;</span><span class="p">:</span> <span class="n">dt</span><span class="p">,</span>
                 <span class="s1">&#39;kind&#39;</span><span class="p">:</span> <span class="n">kind</span><span class="p">,</span>
                 <span class="s1">&#39;kernelwidth&#39;</span><span class="p">:</span> <span class="n">kernelwidth</span><span class="p">,</span>
-                <span class="s1">&#39;return_obspy_stream&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">}</span>
+                <span class="s1">&#39;return_obspy_stream&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
 
         <span class="c1"># Collect data arrays a dictionary.</span>
         <span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
@@ -296,7 +296,7 @@
             <span class="n">source</span><span class="o">=</span><span class="n">m6</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="s1">&#39;R&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">args</span><span class="p">)[</span><span class="s1">&#39;R&#39;</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="n">return_obspy_stream</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">dt</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">dt</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">dt_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">dt</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">dt_out</span> <span class="o">=</span> <span class="n">dt</span>
@@ -305,14 +305,14 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_to_stream</span><span class="p">(</span>
                 <span class="n">receiver</span><span class="o">=</span><span class="n">receiver</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="n">components</span><span class="p">,</span>
                 <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">dt_out</span><span class="o">=</span><span class="n">dt_out</span><span class="p">,</span> <span class="n">starttime</span><span class="o">=</span><span class="n">UTCDateTime</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
-                <span class="n">add_band_code</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+                <span class="n">add_band_code</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">data</span></div>
 
-<div class="viewcode-block" id="BaseInstaseisDB.get_seismograms"><a class="viewcode-back" href="../../../instaseis.html#instaseis.database_interfaces.base_instaseis_db.BaseInstaseisDB.get_seismograms">[docs]</a>    <span class="k">def</span> <span class="nf">get_seismograms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">receiver</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                        <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;displacement&#39;</span><span class="p">,</span> <span class="n">remove_source_shift</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-                        <span class="n">reconvolve_stf</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">return_obspy_stream</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-                        <span class="n">dt</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">kernelwidth</span><span class="o">=</span><span class="mi">12</span><span class="p">):</span>
+<div class="viewcode-block" id="BaseInstaseisDB.get_seismograms"><a class="viewcode-back" href="../../../instaseis.html#instaseis.database_interfaces.base_instaseis_db.BaseInstaseisDB.get_seismograms">[docs]</a>    <span class="k">def</span> <span class="nf">get_seismograms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">receiver</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;displacement&#39;</span><span class="p">,</span> <span class="n">remove_source_shift</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="n">reconvolve_stf</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">return_obspy_stream</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="n">dt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">kernelwidth</span><span class="o">=</span><span class="mi">12</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Extract seismograms from the Green&#39;s function database.</span>
 
@@ -354,7 +354,7 @@
 <span class="sd">        :rtype: A :class:`obspy.core.stream.Stream` object or a dictionary</span>
 <span class="sd">            with NumPy arrays as values.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">components</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">components</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">components</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_components</span>
 
         <span class="n">source</span><span class="p">,</span> <span class="n">receiver</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_seismograms_sanity_checks</span><span class="p">(</span>
@@ -365,7 +365,7 @@
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_seismograms</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">receiver</span><span class="o">=</span><span class="n">receiver</span><span class="p">,</span>
                                      <span class="n">components</span><span class="o">=</span><span class="n">components</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">dt</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">dt</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">dt_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">dt</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">dt_out</span> <span class="o">=</span> <span class="n">dt</span>
@@ -395,7 +395,7 @@
                 <span class="c1"># We assume here that the sliprate is well-behaved,</span>
                 <span class="c1"># e.g. zeros at the boundaries and no energy above the mesh</span>
                 <span class="c1"># resolution.</span>
-                <span class="k">if</span> <span class="n">source</span><span class="o">.</span><span class="n">dt</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">source</span><span class="o">.</span><span class="n">sliprate</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">source</span><span class="o">.</span><span class="n">dt</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">source</span><span class="o">.</span><span class="n">sliprate</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;source has no source time function&quot;</span><span class="p">)</span>
 
                 <span class="k">if</span> <span class="n">STF_MAP</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">stf</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]:</span>
@@ -407,15 +407,15 @@
                     <span class="n">stf_deconv_map</span><span class="p">[</span><span class="n">STF_MAP</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">stf</span><span class="p">]],</span>
                     <span class="n">n</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">nfft</span><span class="p">)</span>
 
-                <span class="k">if</span> <span class="nb">abs</span><span class="p">((</span><span class="n">source</span><span class="o">.</span><span class="n">dt</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1e-7</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">abs</span><span class="p">((</span><span class="n">source</span><span class="o">.</span><span class="n">dt</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">7</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;dt of the source not compatible&quot;</span><span class="p">)</span>
 
                 <span class="n">stf_conv_f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfft</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">sliprate</span><span class="p">,</span>
                                          <span class="n">n</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">nfft</span><span class="p">)</span>
 
-                <span class="k">if</span> <span class="n">source</span><span class="o">.</span><span class="n">time_shift</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">source</span><span class="o">.</span><span class="n">time_shift</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">stf_conv_f</span> <span class="o">*=</span> \
-                        <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span> <span class="mi">1j</span> <span class="o">*</span> <span class="n">rfftfreq</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">nfft</span><span class="p">)</span> <span class="o">*</span>
+                        <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">rfftfreq</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">nfft</span><span class="p">)</span> <span class="o">*</span>
                                <span class="mf">2.</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">source</span><span class="o">.</span><span class="n">time_shift</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
 
                 <span class="c1"># Apply a 5 percent, at least 5 samples taper at the end.</span>
@@ -430,11 +430,11 @@
                 <span class="n">_l</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">stf_deconv_f</span><span class="p">)</span>
                 <span class="n">_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">_l</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">)</span>
                 <span class="n">f</span><span class="p">[</span><span class="n">_idx</span><span class="p">]</span> <span class="o">/=</span> <span class="n">stf_deconv_f</span><span class="p">[</span><span class="n">_idx</span><span class="p">]</span>
-                <span class="n">f</span><span class="p">[</span><span class="n">_l</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span> <span class="o">+</span> <span class="mi">0j</span>
+                <span class="n">f</span><span class="p">[</span><span class="n">_l</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span> <span class="o">+</span> <span class="mi">0</span><span class="n">j</span>
 
                 <span class="n">data</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">irfft</span><span class="p">(</span><span class="n">dataf</span> <span class="o">*</span> <span class="n">f</span><span class="p">)[:</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">npts</span><span class="p">]</span>
 
-            <span class="k">if</span> <span class="n">dt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">dt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">data</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">=</span> <span class="n">lanczos_interpolation</span><span class="p">(</span>
                     <span class="n">data</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">require</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">comp</span><span class="p">],</span> <span class="n">requirements</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;C&quot;</span><span class="p">]),</span>
                     <span class="n">old_start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">old_dt</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span>
@@ -466,7 +466,7 @@
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_convert_to_stream</span><span class="p">(</span><span class="n">receiver</span><span class="p">,</span> <span class="n">components</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">dt_out</span><span class="p">,</span> <span class="n">starttime</span><span class="p">,</span>
-                           <span class="n">add_band_code</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+                           <span class="n">add_band_code</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="c1"># Convert to an ObsPy Stream object.</span>
         <span class="n">st</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
         <span class="n">band_code</span> <span class="o">=</span> <span class="n">get_band_code</span><span class="p">(</span><span class="n">dt_out</span><span class="p">)</span>
@@ -507,10 +507,10 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 
 <div class="viewcode-block" id="BaseInstaseisDB.get_seismograms_finite_source"><a class="viewcode-back" href="../../../instaseis.html#instaseis.database_interfaces.base_instaseis_db.BaseInstaseisDB.get_seismograms_finite_source">[docs]</a>    <span class="k">def</span> <span class="nf">get_seismograms_finite_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sources</span><span class="p">,</span> <span class="n">receiver</span><span class="p">,</span>
-                                      <span class="n">components</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                                      <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;displacement&#39;</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                                      <span class="n">kernelwidth</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">correct_mu</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
-                                      <span class="n">progress_callback</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+                                      <span class="n">components</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                      <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;displacement&#39;</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                      <span class="n">kernelwidth</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">correct_mu</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                      <span class="n">progress_callback</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Extract seismograms for a finite source from an Instaseis database.</span>
 
@@ -548,7 +548,7 @@
 <span class="sd">        :returns: Multi component finite source seismogram.</span>
 <span class="sd">        :rtype: :class:`obspy.core.stream.Stream`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">components</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">components</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">components</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_components</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">is_reciprocal</span><span class="p">:</span>
@@ -560,10 +560,10 @@
             <span class="c1"># Don&#39;t perform the diff/integration here, but after the</span>
             <span class="c1"># resampling later on.</span>
             <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_seismograms</span><span class="p">(</span>
-                <span class="n">source</span><span class="p">,</span> <span class="n">receiver</span><span class="p">,</span> <span class="n">components</span><span class="p">,</span> <span class="n">reconvolve_stf</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                <span class="n">source</span><span class="p">,</span> <span class="n">receiver</span><span class="p">,</span> <span class="n">components</span><span class="p">,</span> <span class="n">reconvolve_stf</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="c1"># Effectively results in nothing happening.</span>
                 <span class="n">kind</span><span class="o">=</span><span class="n">INV_KIND_MAP</span><span class="p">[</span><span class="n">STF_MAP</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">stf</span><span class="p">]],</span>
-                <span class="n">return_obspy_stream</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">remove_source_shift</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+                <span class="n">return_obspy_stream</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">remove_source_shift</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">correct_mu</span><span class="p">:</span>
                 <span class="n">corr_fac</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;mu&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">DEFAULT_MU</span><span class="p">,</span>
@@ -579,9 +579,9 @@
             <span class="k">if</span> <span class="n">progress_callback</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
                 <span class="n">cancel</span> <span class="o">=</span> <span class="n">progress_callback</span><span class="p">(</span><span class="n">_i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">count</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">cancel</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="bp">None</span>
+                    <span class="k">return</span> <span class="kc">None</span>
 
-        <span class="k">if</span> <span class="n">dt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">dt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">components</span><span class="p">:</span>
                 <span class="c1"># We don&#39;t need to align a sample to the peak of the source</span>
                 <span class="c1"># time function here.</span>
@@ -605,7 +605,7 @@
                     <span class="n">data_summed</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">=</span> \
                         <span class="n">data_summed</span><span class="p">[</span><span class="n">comp</span><span class="p">][:</span><span class="o">-</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">affected_area</span> <span class="o">/</span> <span class="n">dt</span><span class="p">))]</span>
 
-        <span class="k">if</span> <span class="n">dt</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">dt</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">dt_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">dt</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">dt_out</span> <span class="o">=</span> <span class="n">dt</span>
@@ -644,7 +644,7 @@
 <span class="sd">            ``&quot;displacement&quot;``, ``&quot;velocity&quot;``, or ``&quot;acceleration&quot;``.</span>
 <span class="sd">        :type kind: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">dt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">dt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">dt</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;dt must be bigger than 0.&quot;</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">dt</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">dt</span><span class="p">:</span>
@@ -704,7 +704,7 @@
 <span class="sd">            strings ``&quot;Z&quot;``, ``&quot;N&quot;``, ``&quot;E&quot;``, ``&quot;R&quot;``, and ``&quot;T&quot;``</span>
 <span class="sd">        :param kind: &#39;displacement&#39;, &#39;velocity&#39; or &#39;acceleration&#39;</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">dt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">dt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">dt</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;dt must be bigger than 0.&quot;</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">dt</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">dt</span><span class="p">:</span>
@@ -737,7 +737,7 @@
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid component: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">comp</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">is_reciprocal</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">receiver</span><span class="o">.</span><span class="n">depth_in_m</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">receiver</span><span class="o">.</span><span class="n">depth_in_m</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Receiver depth cannot be changed when reading &#39;</span>
                               <span class="s1">&#39;from reciprocal DB. Using depth from the DB.&#39;</span><span class="p">)</span>
 
@@ -749,12 +749,12 @@
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;horizontal component only DB&quot;</span><span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">source</span><span class="o">.</span><span class="n">depth_in_m</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">source</span><span class="o">.</span><span class="n">depth_in_m</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Source depth cannot be changed when reading &#39;</span>
                               <span class="s1">&#39;from forward DB. Using depth from the DB.&#39;</span><span class="p">)</span>
 
         <span class="c1"># Make sure that the source is within the domain.</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">is_reciprocal</span> <span class="ow">and</span> <span class="n">source</span><span class="o">.</span><span class="n">depth_in_m</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">is_reciprocal</span> <span class="ow">and</span> <span class="n">source</span><span class="o">.</span><span class="n">depth_in_m</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">src_radius</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">planet_radius</span> <span class="o">-</span> <span class="n">source</span><span class="o">.</span><span class="n">depth_in_m</span>
             <span class="k">if</span> <span class="n">src_radius</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">min_radius</span><span class="p">:</span>
                 <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
@@ -771,7 +771,7 @@
                         <span class="n">src_radius</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">min_radius</span><span class="p">,</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">max_radius</span><span class="p">))</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">is_reciprocal</span> <span class="ow">and</span> <span class="n">receiver</span><span class="o">.</span><span class="n">depth_in_m</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">is_reciprocal</span> <span class="ow">and</span> <span class="n">receiver</span><span class="o">.</span><span class="n">depth_in_m</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">rec_radius</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">planet_radius</span> <span class="o">-</span> <span class="n">receiver</span><span class="o">.</span><span class="n">depth_in_m</span>
             <span class="k">if</span> <span class="n">rec_radius</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">min_radius</span><span class="p">:</span>
                 <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
@@ -815,38 +815,38 @@
         <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span>
 
         <span class="n">return_str</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="s2">&quot;{db} {reciprocal} Green&#39;s function Database (v{&quot;</span>
+            <span class="s2">&quot;</span><span class="si">{db}</span><span class="s2"> </span><span class="si">{reciprocal}</span><span class="s2"> Green&#39;s function Database (v{&quot;</span>
             <span class="s2">&quot;format_version}) &quot;</span>
             <span class="s2">&quot;generated with these parameters:</span><span class="se">\n</span><span class="s2">&quot;</span>
-            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">components           : {components}</span><span class="se">\n</span><span class="s2">&quot;</span>
-            <span class="s2">&quot;{source_depth}&quot;</span>
-            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">velocity model       : {velocity_model}</span><span class="se">\n</span><span class="s2">&quot;</span>
-            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">attenuation          : {attenuation}</span><span class="se">\n</span><span class="s2">&quot;</span>
-            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">dominant period      : {period:.3f} s</span><span class="se">\n</span><span class="s2">&quot;</span>
-            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">dump type            : {dump_type}</span><span class="se">\n</span><span class="s2">&quot;</span>
-            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">excitation type      : {excitation_type}</span><span class="se">\n</span><span class="s2">&quot;</span>
-            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">time step            : {dt:.3f} s</span><span class="se">\n</span><span class="s2">&quot;</span>
-            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">sampling rate        : {sampling_rate:.3f} Hz</span><span class="se">\n</span><span class="s2">&quot;</span>
-            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">number of samples    : {npts}</span><span class="se">\n</span><span class="s2">&quot;</span>
-            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">seismogram length    : {length:.1f} s</span><span class="se">\n</span><span class="s2">&quot;</span>
-            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">source time function : {stf}</span><span class="se">\n</span><span class="s2">&quot;</span>
-            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">source shift         : {src_shift:.3f} s</span><span class="se">\n</span><span class="s2">&quot;</span>
-            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">spatial order        : {spatial_order}</span><span class="se">\n</span><span class="s2">&quot;</span>
-            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">min/max radius       : {min_radius:.1f} - {max_radius:.1f} km</span><span class="se">\n</span><span class="s2">&quot;</span>
-            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Planet radius        : {planet_radius:.1f} km</span><span class="se">\n</span><span class="s2">&quot;</span>
-            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">min/max distance     : {min_d:.1f} - {max_d:.1f} deg</span><span class="se">\n</span><span class="s2">&quot;</span>
-            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">time stepping scheme : {time_scheme}</span><span class="se">\n</span><span class="s2">&quot;</span>
-            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">compiler/user        : {compiler} by {user}</span><span class="se">\n</span><span class="s2">&quot;</span>
-            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">directory/url        : {directory}</span><span class="se">\n</span><span class="s2">&quot;</span>
-            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">size of netCDF files : {filesize}</span><span class="se">\n</span><span class="s2">&quot;</span>
-            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">generated by AxiSEM version {axisem_version} at {datetime}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">components           : </span><span class="si">{components}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;</span><span class="si">{source_depth}</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">velocity model       : </span><span class="si">{velocity_model}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">attenuation          : </span><span class="si">{attenuation}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">dominant period      : </span><span class="si">{period:.3f}</span><span class="s2"> s</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">dump type            : </span><span class="si">{dump_type}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">excitation type      : </span><span class="si">{excitation_type}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">time step            : </span><span class="si">{dt:.3f}</span><span class="s2"> s</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">sampling rate        : </span><span class="si">{sampling_rate:.3f}</span><span class="s2"> Hz</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">number of samples    : </span><span class="si">{npts}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">seismogram length    : </span><span class="si">{length:.1f}</span><span class="s2"> s</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">source time function : </span><span class="si">{stf}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">source shift         : </span><span class="si">{src_shift:.3f}</span><span class="s2"> s</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">spatial order        : </span><span class="si">{spatial_order}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">min/max radius       : </span><span class="si">{min_radius:.1f}</span><span class="s2"> - </span><span class="si">{max_radius:.1f}</span><span class="s2"> km</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Planet radius        : </span><span class="si">{planet_radius:.1f}</span><span class="s2"> km</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">min/max distance     : </span><span class="si">{min_d:.1f}</span><span class="s2"> - </span><span class="si">{max_d:.1f}</span><span class="s2"> deg</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">time stepping scheme : </span><span class="si">{time_scheme}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">compiler/user        : </span><span class="si">{compiler}</span><span class="s2"> by </span><span class="si">{user}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">directory/url        : </span><span class="si">{directory}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">size of netCDF files : </span><span class="si">{filesize}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">generated by AxiSEM version </span><span class="si">{axisem_version}</span><span class="s2"> at </span><span class="si">{datetime}</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
             <span class="n">db</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span>
             <span class="n">reciprocal</span><span class="o">=</span><span class="s2">&quot;reciprocal&quot;</span> <span class="k">if</span> <span class="n">info</span><span class="o">.</span><span class="n">is_reciprocal</span> <span class="k">else</span> <span class="s2">&quot;forward&quot;</span><span class="p">,</span>
             <span class="n">components</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">components</span><span class="p">,</span>
             <span class="n">source_depth</span><span class="o">=</span><span class="p">(</span>
                 <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">source depth         : </span><span class="si">%.2f</span><span class="s2"> km</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span>
-                <span class="n">info</span><span class="o">.</span><span class="n">source_depth</span><span class="p">)</span> <span class="k">if</span> <span class="n">info</span><span class="o">.</span><span class="n">source_depth</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                <span class="n">info</span><span class="o">.</span><span class="n">source_depth</span><span class="p">)</span> <span class="k">if</span> <span class="n">info</span><span class="o">.</span><span class="n">source_depth</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
             <span class="n">velocity_model</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">velocity_model</span><span class="p">,</span>
             <span class="n">attenuation</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">attenuation</span><span class="p">,</span>
             <span class="n">period</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">period</span><span class="p">,</span>
@@ -908,7 +908,7 @@
 
 
 <span class="k">def</span> <span class="nf">_get_seismogram_times</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="n">origin_time</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">kernelwidth</span><span class="p">,</span>
-                          <span class="n">remove_source_shift</span><span class="p">,</span> <span class="n">reconvolve_stf</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+                          <span class="n">remove_source_shift</span><span class="p">,</span> <span class="n">reconvolve_stf</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Helper function to calculate the final times of seismograms.</span>
 
@@ -948,7 +948,7 @@
     <span class="n">ti</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">ti</span><span class="p">[</span><span class="s2">&quot;samples_cut_at_end&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
 
-    <span class="k">if</span> <span class="n">dt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">dt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">reconvolve_stf</span><span class="p">:</span>
             <span class="c1"># This is a bit tricky. We want to resample but we also want</span>
             <span class="c1"># to make sure that that the peak of the source time</span>
@@ -1026,7 +1026,7 @@
     </p>
     <p>
         &copy; Copyright 2014-2015, Lion Krischer and Martin van Driel.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.5.<br/>
     </p>
   </div>
 </footer>

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>instaseis &mdash; instaseis 0.1.1-183-ga3df documentation</title>
+    <title>instaseis &mdash; instaseis 1.0.0 documentation</title>
     
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.1.1-183-ga3df',
+        VERSION:     '1.0.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -31,7 +31,7 @@
     <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.1.1-183-ga3df documentation" href="../index.html" />
+    <link rel="top" title="instaseis 1.0.0 documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.1.1-183-ga3df</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>1.0.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -109,13 +109,13 @@
       
   <h1>Source code for instaseis</h1><div class="highlight"><pre>
 <span></span><span class="ch">#!/usr/bin/env python</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="p">(</span><span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="p">(</span><span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span>
                         <span class="n">unicode_literals</span><span class="p">)</span>
 
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 
-<span class="kn">from</span> <span class="nn">.version</span> <span class="kn">import</span> <span class="n">get_git_version</span>
+<span class="kn">from</span> <span class="nn">.version</span> <span class="k">import</span> <span class="n">get_git_version</span>
 
 
 <span class="k">class</span> <span class="nc">InstaseisError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
@@ -191,14 +191,14 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;syngine://&quot;</span><span class="p">):</span>
         <span class="n">model</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">&quot;syngine://&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-        <span class="kn">from</span> <span class="nn">instaseis.database_interfaces</span> <span class="kn">import</span> <span class="n">syngine_instaseis_db</span>
+        <span class="kn">from</span> <span class="nn">instaseis.database_interfaces</span> <span class="k">import</span> <span class="n">syngine_instaseis_db</span>
         <span class="k">return</span> <span class="n">syngine_instaseis_db</span><span class="o">.</span><span class="n">SyngineInstaseisDB</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span>
                                                        <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">elif</span> <span class="s2">&quot;://&quot;</span> <span class="ow">in</span> <span class="n">path</span><span class="p">:</span>
-        <span class="kn">from</span> <span class="nn">.database_interfaces</span> <span class="kn">import</span> <span class="n">remote_instaseis_db</span>
+        <span class="kn">from</span> <span class="nn">.database_interfaces</span> <span class="k">import</span> <span class="n">remote_instaseis_db</span>
         <span class="k">return</span> <span class="n">remote_instaseis_db</span><span class="o">.</span><span class="n">RemoteInstaseisDB</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="kn">from</span> <span class="nn">.database_interfaces</span> <span class="kn">import</span> <span class="n">find_and_open_files</span>
+        <span class="kn">from</span> <span class="nn">.database_interfaces</span> <span class="k">import</span> <span class="n">find_and_open_files</span>
         <span class="k">return</span> <span class="n">find_and_open_files</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
@@ -210,7 +210,7 @@
                   <span class="s2">&quot;release or install from git.&quot;</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
 
 
-<span class="kn">from</span> <span class="nn">.source</span> <span class="kn">import</span> <span class="n">Source</span><span class="p">,</span> <span class="n">Receiver</span><span class="p">,</span> <span class="n">ForceSource</span><span class="p">,</span> <span class="n">FiniteSource</span>  <span class="c1"># NoQa</span>
+<span class="kn">from</span> <span class="nn">.source</span> <span class="k">import</span> <span class="n">Source</span><span class="p">,</span> <span class="n">Receiver</span><span class="p">,</span> <span class="n">ForceSource</span><span class="p">,</span> <span class="n">FiniteSource</span>  <span class="c1"># NoQa</span>
 </pre></div>
 
     </div>
@@ -226,7 +226,7 @@
     </p>
     <p>
         &copy; Copyright 2014-2015, Lion Krischer and Martin van Driel.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.5.<br/>
     </p>
   </div>
 </footer>

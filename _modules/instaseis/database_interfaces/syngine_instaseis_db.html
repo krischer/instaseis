@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>instaseis.database_interfaces.syngine_instaseis_db &mdash; instaseis 0.1.1-183-ga3df documentation</title>
+    <title>instaseis.database_interfaces.syngine_instaseis_db &mdash; instaseis 1.0.0 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.1.1-183-ga3df',
+        VERSION:     '1.0.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -31,7 +31,7 @@
     <script type="text/javascript" src="../../../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../../../_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../../../_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 0.1.1-183-ga3df documentation" href="../../../index.html" />
+    <link rel="top" title="instaseis 1.0.0 documentation" href="../../../index.html" />
     <link rel="up" title="instaseis" href="../../instaseis.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="../../../index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.1.1-183-ga3df</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>1.0.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -119,26 +119,26 @@
 <span class="sd">    GNU Lesser General Public License, Version 3 [non-commercial/academic use]</span>
 <span class="sd">    (http://www.gnu.org/copyleft/lgpl.html)</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="p">(</span><span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="p">(</span><span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span>
                         <span class="n">unicode_literals</span><span class="p">)</span>
 
 <span class="kn">import</span> <span class="nn">io</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">obspy</span>
 <span class="kn">import</span> <span class="nn">platform</span>
 <span class="kn">import</span> <span class="nn">requests</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 
-<span class="kn">from</span> <span class="nn">instaseis</span> <span class="kn">import</span> <span class="p">(</span><span class="n">InstaseisError</span><span class="p">,</span> <span class="n">InstaseisWarning</span><span class="p">,</span> <span class="n">Source</span><span class="p">,</span> <span class="n">ForceSource</span><span class="p">,</span>
+<span class="kn">from</span> <span class="nn">instaseis</span> <span class="k">import</span> <span class="p">(</span><span class="n">InstaseisError</span><span class="p">,</span> <span class="n">InstaseisWarning</span><span class="p">,</span> <span class="n">Source</span><span class="p">,</span> <span class="n">ForceSource</span><span class="p">,</span>
                        <span class="n">__version__</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">instaseis.database_interfaces.base_instaseis_db</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">instaseis.database_interfaces.base_instaseis_db</span> <span class="k">import</span> <span class="p">(</span>
     <span class="n">BaseInstaseisDB</span><span class="p">,</span> <span class="n">DEFAULT_MU</span><span class="p">,</span> <span class="n">STF_MAP</span><span class="p">,</span> <span class="n">INV_KIND_MAP</span><span class="p">)</span>
 
-<span class="kn">from</span> <span class="nn">instaseis.helpers</span> <span class="kn">import</span> <span class="n">geocentric_to_elliptic_latitude</span>
+<span class="kn">from</span> <span class="nn">instaseis.helpers</span> <span class="k">import</span> <span class="n">geocentric_to_elliptic_latitude</span>
 
-<span class="kn">from</span> <span class="nn">future</span> <span class="kn">import</span> <span class="n">standard_library</span>
+<span class="kn">from</span> <span class="nn">future</span> <span class="k">import</span> <span class="n">standard_library</span>
 <span class="k">with</span> <span class="n">standard_library</span><span class="o">.</span><span class="n">hooks</span><span class="p">():</span>
-    <span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">urlencode</span>
+    <span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="k">import</span> <span class="n">urlencode</span>
 
 
 <span class="n">USER_AGENT</span> <span class="o">=</span> <span class="s2">&quot;Instaseis </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">, Python </span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">__version__</span><span class="p">,</span>
@@ -153,7 +153,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span>
                  <span class="n">base_url</span><span class="o">=</span><span class="s2">&quot;http://service.iris.edu/irisws/syngine/1&quot;</span><span class="p">,</span>
-                 <span class="n">debug</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+                 <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param model: The model to use.</span>
 <span class="sd">        :type model: str</span>
@@ -222,7 +222,7 @@
         <span class="n">params</span><span class="p">[</span><span class="s2">&quot;sourcelatitude&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">geocentric_to_elliptic_latitude</span><span class="p">(</span>
             <span class="n">source</span><span class="o">.</span><span class="n">latitude</span><span class="p">)</span>
         <span class="n">params</span><span class="p">[</span><span class="s2">&quot;sourcelongitude&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">longitude</span>
-        <span class="k">if</span> <span class="n">source</span><span class="o">.</span><span class="n">depth_in_m</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">source</span><span class="o">.</span><span class="n">depth_in_m</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">params</span><span class="p">[</span><span class="s2">&quot;sourcedepthinmeters&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">depth_in_m</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">ForceSource</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The Syngine Instaseis client does currently not &quot;</span>
@@ -239,12 +239,12 @@
         <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_url</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="s2">&quot;query&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
-            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Downloading &#39;</span><span class="si">%s</span><span class="s2">&#39; ...&quot;</span> <span class="o">%</span> <span class="n">url</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Downloading &#39;</span><span class="si">%s</span><span class="s2">&#39; ...&quot;</span> <span class="o">%</span> <span class="n">url</span><span class="p">)</span>
 
         <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">HEADERS</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
-            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Downloaded &#39;</span><span class="si">%s</span><span class="s2">&#39; with status code </span><span class="si">%i</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">url</span><span class="p">,</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Downloaded &#39;</span><span class="si">%s</span><span class="s2">&#39; with status code </span><span class="si">%i</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">url</span><span class="p">,</span>
                                                             <span class="n">r</span><span class="o">.</span><span class="n">status_code</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
@@ -287,15 +287,15 @@
             <span class="n">url</span> <span class="o">+=</span> <span class="s2">&quot;?</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">urlencode</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">url</span>
 
-    <span class="k">def</span> <span class="nf">_download_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">unpack_json</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_download_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">unpack_json</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Helper function downloading data from a URL.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
-            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Downloading &#39;</span><span class="si">%s</span><span class="s2">&#39; ...&quot;</span> <span class="o">%</span> <span class="n">url</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Downloading &#39;</span><span class="si">%s</span><span class="s2">&#39; ...&quot;</span> <span class="o">%</span> <span class="n">url</span><span class="p">)</span>
         <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">HEADERS</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
-            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Downloaded &#39;</span><span class="si">%s</span><span class="s2">&#39; with status code </span><span class="si">%i</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">url</span><span class="p">,</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Downloaded &#39;</span><span class="si">%s</span><span class="s2">&#39; with status code </span><span class="si">%i</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">url</span><span class="p">,</span>
                                                             <span class="n">r</span><span class="o">.</span><span class="n">status_code</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">400</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
             <span class="k">raise</span> <span class="n">InstaseisError</span><span class="p">(</span><span class="s2">&quot;Model &#39;</span><span class="si">%s</span><span class="s2">&#39; not available on the syngine &quot;</span>
@@ -303,7 +303,7 @@
         <span class="k">elif</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
             <span class="k">raise</span> <span class="n">InstaseisError</span><span class="p">(</span><span class="s2">&quot;Status code </span><span class="si">%i</span><span class="s2"> when downloading &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span>
                 <span class="n">r</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="n">url</span><span class="p">))</span>
-        <span class="k">if</span> <span class="n">unpack_json</span> <span class="ow">is</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">unpack_json</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">text</span>
@@ -315,7 +315,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_download_url</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_url</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="s2">&quot;info&quot;</span><span class="p">,</span>
                                                 <span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">),</span>
-                                  <span class="n">unpack_json</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+                                  <span class="n">unpack_json</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">info</span><span class="p">[</span><span class="s2">&quot;directory&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_url</span>
         <span class="c1"># Convert types lost in the translation to JSON.</span>
         <span class="n">info</span><span class="p">[</span><span class="s2">&quot;datetime&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">obspy</span><span class="o">.</span><span class="n">UTCDateTime</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;datetime&quot;</span><span class="p">])</span>
@@ -345,7 +345,7 @@
     </p>
     <p>
         &copy; Copyright 2014-2015, Lion Krischer and Martin van Driel.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.5.<br/>
     </p>
   </div>
 </footer>
