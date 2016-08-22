@@ -2,7 +2,6 @@ language: python
 
 python:
   - "2.7"
-  - "3.3"
   - "3.4"
   - "3.5"
 
@@ -29,8 +28,6 @@ before_install:
   - conda install --yes -c conda-forge nomkl obspy nose pytest sphinx h5py tornado click python=$TRAVIS_PYTHON_VERSION jsonschema
   # Always install latest flake8.
   - pip install flake8
-  # Don't install netcdf for Python 3.3 - the conda packages are just too old.
-  - if [[ $TRAVIS_PYTHON_VERSION != '3.3' ]]; then conda install --yes netcdf4 ; fi
   # Only install the theme for Python 2.7 as it builds the docs.
   - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then pip install sphinx-bootstrap-theme ; fi
   - pip install coveralls
