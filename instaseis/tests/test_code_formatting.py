@@ -24,12 +24,12 @@ import instaseis
 
 try:
     import flake8
-except:
+except:  # pragma: no cover
     HAS_FLAKE8_AT_LEAST_VERSION_3 = False
 else:
     if int(flake8.__version__.split(".")[0]) >= 3:
         HAS_FLAKE8_AT_LEAST_VERSION_3 = True
-    else:
+    else:  # pragma: no cover
         HAS_FLAKE8_AT_LEAST_VERSION_3 = False
 
 
@@ -60,7 +60,7 @@ def test_flake8():
             continue
         for py_file in filenames:
             full_path = os.path.join(dirpath, py_file)
-            if full_path in ignore_files:
+            if full_path in ignore_files:  # pragma: no cover
                 continue
             files.append(full_path)
 
