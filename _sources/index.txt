@@ -102,6 +102,20 @@ planets such as Mars.
 Installation
 ------------
 
+.. admonition:: Installation using conda-forge
+
+    By far the easiest way to install Instaseis is to `download
+    Anaconda/Miniconda <https://www.continuum.io/downloads>`_, install it and
+    then run
+
+    .. code-block:: bash
+
+        $ conda install -c conda-forge instaseis
+
+    This will download and install Instaseis including all its dependencies.
+    For other options, please keep on reading.
+
+
 Requirements
 ^^^^^^^^^^^^
 
