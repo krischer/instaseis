@@ -445,6 +445,9 @@ def test_event_parsing_failure_states():
     # Event with no moment tensor.
     ev = event.copy()
     ev.focal_mechanisms[0].moment_tensor = None
+    # Force this to None to prevent the resource id mechanism to "resurrect"
+    # the focal mechanism.
+    ev.preferred_focal_mechanism_id = None
     with pytest.raises(SourceParseError) as err:
         Source.parse(ev)
     assert err.value.args[0] == "Event must contain a moment tensor."
