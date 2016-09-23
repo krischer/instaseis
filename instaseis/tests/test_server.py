@@ -2160,7 +2160,7 @@ def test_cors_headers(all_clients_all_callbacks):
     request = client.fetch(
         "/ttimes?sourcelatitude=50&sourcelongitude=10&"
         "sourcedepthinmeters=%i&receiverlatitude=40&receiverlongitude=90&"
-        "receiverdepthinmeters=0&phase=P" % client.source_depth)
+        "receiverdepthinmeters=0&phases=P" % client.source_depth)
     assert request.code == 200
     assert "Access-Control-Allow-Origin" in request.headers
     assert request.headers["Access-Control-Allow-Origin"] == "*"
@@ -2233,7 +2233,7 @@ def test_cors_headers_failing_requests(all_clients_all_callbacks):
 
 def test_gzipped_responses(all_clients_all_callbacks):
     """
-    The JSON responses should all be gzipped if requests.
+    The JSON responses should all be gzipped if requested.
 
     Starting with tornado 4.3 responses smaller than 1000 bytes do no longer
     get compressed. Thus we can also test some responses here.
@@ -2250,7 +2250,7 @@ def test_gzipped_responses(all_clients_all_callbacks):
     request = client.fetch(
         "/ttimes?sourcelatitude=50&sourcelongitude=10&"
         "sourcedepthinmeters=%i&receiverlatitude=40&receiverlongitude=90&"
-        "receiverdepthinmeters=0&phase=P" % client.source_depth)
+        "receiverdepthinmeters=0&phases=P" % client.source_depth)
     assert request.code == 200
     assert "X-Consumed-Content-Encoding" not in request.headers
 
@@ -3783,21 +3783,21 @@ def test_ttimes_route(all_clients_ttimes_callback):
     assert request.code == 400
     assert request.reason == (
         "The following required parameters are missing: "
-        "'phase', 'receiverdepthinmeters'")
+        "'phases', 'receiverdepthinmeters'")
 
     # Invalid phase name
     request = client.fetch(
         "/ttimes?sourcelatitude=50&sourcelongitude=10&"
         "sourcedepthinmeters=0&receiverlatitude=40&receiverlongitude=90&"
-        "receiverdepthinmeters=0&phase=bogs")
+        "receiverdepthinmeters=0&phases=bogs")
     assert request.code == 400
-    assert request.reason == "Invalid phase name."
+    assert request.reason == "Invalid phase name 'bogs'."
 
     # Other error, e.g. negative depth.
     request = client.fetch(
         "/ttimes?sourcelatitude=50&sourcelongitude=10&"
         "sourcedepthinmeters=-200&receiverlatitude=40&receiverlongitude=90&"
-        "receiverdepthinmeters=0&phase=P")
+        "receiverdepthinmeters=0&phases=P")
     assert request.code == 400
     assert request.reason == ("Failed to calculate travel time due to: No "
                               "layer contains this depth")
@@ -3806,15 +3806,16 @@ def test_ttimes_route(all_clients_ttimes_callback):
     request = client.fetch(
         "/ttimes?sourcelatitude=50&sourcelongitude=10&"
         "sourcedepthinmeters=0&receiverlatitude=40&receiverlongitude=90&"
-        "receiverdepthinmeters=0&phase=Pdiff")
+        "receiverdepthinmeters=0&phases=Pdiff")
     assert request.code == 404
-    assert request.reason == "No ray for the given geometry and phase found."
+    assert request.reason == \
+        "No ray for the given geometry and any of the phases found."
 
     # Many implementations will not have a receiverdepth. This one does not.
     request = client.fetch(
         "/ttimes?sourcelatitude=50&sourcelongitude=10&"
         "sourcedepthinmeters=0&receiverlatitude=40&receiverlongitude=90&"
-        "receiverdepthinmeters=20&phase=Pdiff")
+        "receiverdepthinmeters=20&phases=Pdiff")
     assert request.code == 400
     assert request.reason == ("Failed to calculate travel time due to: This "
                               "travel time implementation cannot calculate "
@@ -3824,29 +3825,43 @@ def test_ttimes_route(all_clients_ttimes_callback):
     request = client.fetch(
         "/ttimes?sourcelatitude=0&sourcelongitude=0&"
         "sourcedepthinmeters=300000&receiverlatitude=0&receiverlongitude=50&"
-        "receiverdepthinmeters=0&phase=P")
+        "receiverdepthinmeters=0&phases=P")
     assert request.code == 200
     result = json.loads(str(request.body.decode("utf8")))
-    assert list(result.keys()) == ["travel_time"]
-    assert abs(result["travel_time"] - 504.357 < 1E-2)
+    assert list(result.keys()) == ["travel_times"]
+    assert abs(result["travel_times"]["P"] - 504.357 < 1E-2)
 
     request = client.fetch(
         "/ttimes?sourcelatitude=0&sourcelongitude=0&"
         "sourcedepthinmeters=300000&receiverlatitude=0&receiverlongitude=50&"
-        "receiverdepthinmeters=0&phase=PP")
+        "receiverdepthinmeters=0&phases=PP")
     assert request.code == 200
     result = json.loads(str(request.body.decode("utf8")))
-    assert list(result.keys()) == ["travel_time"]
-    assert abs(result["travel_time"] - 622.559 < 1E-2)
+    assert list(result.keys()) == ["travel_times"]
+    assert abs(result["travel_times"]["PP"] - 622.559 < 1E-2)
 
     request = client.fetch(
         "/ttimes?sourcelatitude=0&sourcelongitude=0&"
         "sourcedepthinmeters=300000&receiverlatitude=0&receiverlongitude=50&"
-        "receiverdepthinmeters=0&phase=sPKiKP")
+        "receiverdepthinmeters=0&phases=sPKiKP")
     assert request.code == 200
     result = json.loads(str(request.body.decode("utf8")))
-    assert list(result.keys()) == ["travel_time"]
-    assert abs(result["travel_time"] - 1090.081 < 1E-2)
+    assert list(result.keys()) == ["travel_times"]
+    assert abs(result["travel_times"]["sPKiKP"] - 1090.081 < 1E-2)
+
+    # Multiple phases at once with one phase not existing at hte distance.
+    request = client.fetch(
+        "/ttimes?sourcelatitude=0&sourcelongitude=0&"
+        "sourcedepthinmeters=300000&receiverlatitude=0&receiverlongitude=50&"
+        "receiverdepthinmeters=0&phases=sPKiKP,P,PP,Sdiff")
+    assert request.code == 200
+    result = json.loads(str(request.body.decode("utf8")))
+    assert list(result.keys()) == ["travel_times"]
+    assert sorted(list(result["travel_times"].keys())) == [
+        "P", "PP", "sPKiKP"]
+    assert abs(result["travel_times"]["P"] - 504.357 < 1E-2)
+    assert abs(result["travel_times"]["PP"] - 622.559 < 1E-2)
+    assert abs(result["travel_times"]["sPKiKP"] - 1090.081 < 1E-2)
 
 
 def test_network_and_station_code_settings(all_clients):
