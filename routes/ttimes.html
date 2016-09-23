@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>GET /ttimes &#8212; instaseis 1.0.1 documentation</title>
+    <title>GET /ttimes &#8212; instaseis 1.0.1-2-g749b documentation</title>
     
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.0.1',
+        VERSION:     '1.0.1-2-g749b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -31,7 +31,7 @@
     <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 1.0.1 documentation" href="../index.html" />
+    <link rel="top" title="instaseis 1.0.1-2-g749b documentation" href="../index.html" />
     <link rel="up" title="Instaseis Server" href="../server.html" />
     <link rel="next" title="GET /seismograms_raw" href="seismograms_raw.html" />
     <link rel="prev" title="GET /event" href="event.html" />
@@ -54,7 +54,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>1.0.1</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>1.0.1-2-g749b</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -118,12 +118,18 @@
 </div>
 <dl class="docutils">
 <dt>Description</dt>
-<dd>Get theoretical arrival times through a 1D Earth model if the server has been configured with that capability.</dd>
+<dd>Get theoretical arrival times through a 1D Earth model if the server has been configured with that capability. For each phase name
+it will only return a single time - multiple arrivals of the same phase are thus not visible. The exact returned arrival depends
+on the used callback function - a sensible choice is the first arriving one.</dd>
 <dt>Content-Type</dt>
 <dd>application/json; charset=UTF-8</dd>
 <dt>Example Response</dt>
 <dd><div class="first last highlight-json"><div class="highlight"><pre><span></span><span class="p">{</span>
-    <span class="nt">&quot;travel_time&quot;</span><span class="p">:</span> <span class="mf">570.8677703798731</span>
+    <span class="nt">&quot;travel_times&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;P&quot;</span><span class="p">:</span> <span class="mf">504.357</span><span class="p">,</span>
+        <span class="nt">&quot;PP&quot;</span><span class="p">:</span> <span class="mf">622.559</span><span class="p">,</span>
+        <span class="nt">&quot;sPKiKP&quot;</span><span class="p">:</span> <span class="mf">1090.081</span>
+    <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -175,10 +181,10 @@
 <td>Depth of the receiver in meters. Many implementations will raise an error if this is not zero as they cannot
 deal with buried receivers.</td>
 </tr>
-<tr class="row-even"><td><code class="docutils literal"><span class="pre">phase</span></code></td>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">phases</span></code></td>
 <td>Float</td>
 <td>True</td>
-<td>The phase name. Depending on the travel time implementation this can be very flexible.</td>
+<td>Comma separated phase names. Depending on the travel time implementation this can be very flexible.</td>
 </tr>
 </tbody>
 </table>

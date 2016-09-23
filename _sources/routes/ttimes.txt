@@ -7,7 +7,9 @@ GET /ttimes
     :doc:`../advanced_server_configuration` for details.
 
 Description
-    Get theoretical arrival times through a 1D Earth model if the server has been configured with that capability.
+    Get theoretical arrival times through a 1D Earth model if the server has been configured with that capability. For each phase name
+    it will only return a single time - multiple arrivals of the same phase are thus not visible. The exact returned arrival depends
+    on the used callback function - a sensible choice is the first arriving one.
 
 Content-Type
     application/json; charset=UTF-8
@@ -16,7 +18,11 @@ Example Response
     .. code-block:: json
 
         {
-            "travel_time": 570.8677703798731
+            "travel_times": {
+                "P": 504.357,
+                "PP": 622.559,
+                "sPKiKP": 1090.081
+            }
         }
 
 +--------------------------+----------+----------+--------------------------------------------------------------------------------------------------------------+
@@ -35,5 +41,5 @@ Example Response
 | ``receiverdepthinmeters``| Float    | True     | Depth of the receiver in meters. Many implementations will raise an error if this is not zero as they cannot |
 |                          |          |          | deal with buried receivers.                                                                                  |
 +--------------------------+----------+----------+--------------------------------------------------------------------------------------------------------------+
-| ``phase``                | Float    | True     | The phase name. Depending on the travel time implementation this can be very flexible.                       |
+| ``phases``               | Float    | True     | Comma separated phase names. Depending on the travel time implementation this can be very flexible.          |
 +--------------------------+----------+----------+--------------------------------------------------------------------------------------------------------------+
