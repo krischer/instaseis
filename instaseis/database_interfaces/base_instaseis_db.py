@@ -147,57 +147,43 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
 
         receiver = Receiver(rec_latitude, rec_longitude)
 
-        # same kwarguments for many callse
+        # Extract all seismograms - leverage the logic of the
+        # get_seismograms() method as much as possible.
         args = {'receiver': receiver,
                 'dt': dt,
                 'kind': kind,
                 'kernelwidth': kernelwidth,
-                'return_obspy_stream': False}
+                'return_obspy_stream': return_obspy_stream}
 
-        # Collect data arrays a dictionary.
-        data = {}
-        # on first call extract mu as well
-        tmp_dict = self.get_seismograms(
-            source=m1, components='T', **args)
-        data['mu'] = tmp_dict['mu']
-        data['TSS'] = tmp_dict['T']
-
-        data['ZSS'] = self.get_seismograms(
-            source=m2, components='Z', **args)['Z']
-        data['RSS'] = self.get_seismograms(
-            source=m2, components='R', **args)['R']
-
-        data['TDS'] = self.get_seismograms(
-            source=m3, components='T', **args)['T']
-
-        data['ZDS'] = self.get_seismograms(
-            source=m4, components='Z', **args)['Z']
-        data['RDS'] = self.get_seismograms(
-            source=m4, components='R', **args)['R']
-
-        data['ZDD'] = self.get_seismograms(
-            source=cl, components='Z', **args)['Z']
-        data['RDD'] = self.get_seismograms(
-            source=cl, components='R', **args)['R']
-
-        data['ZEP'] = self.get_seismograms(
-            source=m6, components='Z', **args)['Z']
-        data['REP'] = self.get_seismograms(
-            source=m6, components='R', **args)['R']
+        items = [
+            ("TSS", m1, "T"),
+            ("ZSS", m2, "Z"),
+            ("RSS", m2, "R"),
+            ("TDS", m3, "T"),
+            ("ZDS", m4, "Z"),
+            ("RDS", m4, "R"),
+            ("ZDD", cl, "Z"),
+            ("RDD", cl, "R"),
+            ("ZEP", m6, "Z"),
+            ("REP", m6, "R")]
 
         if return_obspy_stream:
-            if dt is None:
-                dt_out = self.info.dt
-            else:
-                dt_out = dt
-            components = list(data.keys())
-            components.remove('mu')
-            return self._convert_to_stream(
-                receiver=receiver, components=components,
-                data=data, dt_out=dt_out, starttime=UTCDateTime(0),
-                add_band_code=False)
+            st = Stream()
         else:
-            return data
+            st = {}
+
+        for name, src, comp in items:
+            tr = self.get_seismograms(
+                source=src, components=comp, **args)
+            if return_obspy_stream:
+                tr = tr[0]
+                tr.stats.channel = name
+                st.append(tr)
+            else:
+                st["mu"] = tr["mu"]
+                st[name] = tr[comp]
+
+        return st
 
     def get_seismograms(self, source, receiver, components=None,
                         kind='displacement', remove_source_shift=True,

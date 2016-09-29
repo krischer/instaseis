@@ -196,6 +196,7 @@ def test_greens_function_retrieval(all_greens_clients):
 
     # default parameters
     params = copy.deepcopy(basic_parameters)
+    params["origintime"] = str(time)
     request = client.fetch(_assemble_url('greens_function', **params))
     assert request.code == 200
     # ObsPy needs the filename to be able to directly unpack zip files. We
@@ -230,6 +231,7 @@ def test_greens_function_retrieval(all_greens_clients):
     # miniseed
     params = copy.deepcopy(basic_parameters)
     params["format"] = "miniseed"
+    params["origintime"] = str(time)
     request = client.fetch(_assemble_url('greens_function', **params))
     assert request.code == 200
     st_server = obspy.read(request.buffer)
@@ -261,6 +263,7 @@ def test_greens_function_retrieval(all_greens_clients):
     params = copy.deepcopy(basic_parameters)
     params["format"] = "miniseed"
     params["label"] = "random_things"
+    params["origintime"] = str(time)
     request = client.fetch(_assemble_url('greens_function', **params))
     assert request.code == 200
 
@@ -274,6 +277,7 @@ def test_greens_function_retrieval(all_greens_clients):
     params["dt"] = 0.1
     params["kernelwidth"] = 2
     params["units"] = "acceleration"
+    params["origintime"] = str(time)
     request = client.fetch(_assemble_url('greens_function', **params))
     assert request.code == 200
     st_server = obspy.read(request.buffer)
@@ -516,6 +520,67 @@ def test_phase_relative_offsets_greens_function(
 
     assert tr.stats.starttime == starttime + 10
     assert abs((tr.stats.endtime) - (starttime + 622.559 + 15)) < 0.1
+
+
+def test_greens_function_start_and_origintime(all_greens_clients):
+    client = all_greens_clients
+
+    basic_parameters = {
+        "sourcedepthinmeters": 1e3,
+        "sourcedistanceindegrees": 20,
+        "format": "miniseed"}
+
+    # default parameters
+    params = copy.deepcopy(basic_parameters)
+    request = client.fetch(_assemble_url('greens_function', **params))
+    assert request.code == 200
+    st = obspy.read(request.buffer)
+    assert st[0].stats.starttime == obspy.UTCDateTime(0)
+
+    # Just setting the origin time.
+    time = obspy.UTCDateTime(2016, 1, 1)
+    p = copy.deepcopy(basic_parameters)
+    p["origintime"] = str(time)
+    request = client.fetch(_assemble_url('greens_function', **p))
+    assert request.code == 200
+    st = obspy.read(request.buffer)
+    assert st[0].stats.starttime == time
+
+    # Setting it to something early.
+    time = obspy.UTCDateTime(1990, 1, 1)
+    p = copy.deepcopy(basic_parameters)
+    p["origintime"] = str(time)
+    request = client.fetch(_assemble_url('greens_function', **p))
+    assert request.code == 200
+    st = obspy.read(request.buffer)
+    assert st[0].stats.starttime == time
+
+    # Setting it to something early.
+    time = obspy.UTCDateTime(1990, 1, 1)
+    p = copy.deepcopy(basic_parameters)
+    p["origintime"] = str(time)
+    p["starttime"] = str(time - 60 * 30)
+    request = client.fetch(_assemble_url('greens_function', **p))
+    assert request.code == 200
+    st_new = obspy.read(request.buffer)
+    # This should be about 30 mins.
+    assert abs(st_new[0].stats.starttime - (time - 60 * 30)) < 60
+    # The endtime should not change compared to the previous entry. Floating
+    # point math and funny sampling rates result in some inaccuracies.
+    assert abs(st_new[0].stats.endtime - st[0].stats.endtime) < 0.01
+
+    # Also check the endtime.
+    time = obspy.UTCDateTime(1990, 1, 1)
+    p = copy.deepcopy(basic_parameters)
+    p["origintime"] = str(time)
+    p["starttime"] = str(time - 60 * 30)
+    p["endtime"] = str(time + 20 * 60)
+    request = client.fetch(_assemble_url('greens_function', **p))
+    assert request.code == 200
+    st_new = obspy.read(request.buffer)
+    # This should be about 30 mins.
+    assert abs(st_new[0].stats.starttime - (time - 60 * 30)) < 60
+    assert abs(st_new[0].stats.endtime - (time + 60 * 20)) < 60
 
 
 def test_raw_seismograms_error_handling(all_clients):
