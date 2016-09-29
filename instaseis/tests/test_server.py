@@ -341,7 +341,7 @@ def test_greens_function_retrieval(all_greens_clients):
                     ".BaseInstaseisDB.get_greens_function") as p:
         st = obspy.read()
         for tr in st:
-            tr.stats.starttime = obspy.UTCDateTime(0)
+            tr.stats.starttime = obspy.UTCDateTime(1900, 1, 1)
             tr.stats.delta = 0.0001
 
         p.return_value = st
@@ -535,7 +535,7 @@ def test_greens_function_start_and_origintime(all_greens_clients):
     request = client.fetch(_assemble_url('greens_function', **params))
     assert request.code == 200
     st = obspy.read(request.buffer)
-    assert st[0].stats.starttime == obspy.UTCDateTime(0)
+    assert st[0].stats.starttime == obspy.UTCDateTime(1900, 1, 1)
 
     # Just setting the origin time.
     time = obspy.UTCDateTime(2016, 1, 1)
