@@ -212,6 +212,9 @@ def test_greens_function_retrieval(all_greens_clients):
         epicentral_distance_in_degree=params['sourcedistanceindegrees'],
         source_depth_in_m=params['sourcedepthinmeters'], origin_time=time,
         definition="seiscomp")
+    for tr in st_db:
+        tr.stats.network = "XX"
+        tr.stats.station = "GF001"
 
     for tr_server, tr_db in zip(st_server, st_db):
         # Remove the additional stats from both.
@@ -243,6 +246,9 @@ def test_greens_function_retrieval(all_greens_clients):
         epicentral_distance_in_degree=params['sourcedistanceindegrees'],
         source_depth_in_m=params['sourcedepthinmeters'], origin_time=time,
         definition="seiscomp")
+    for tr in st_db:
+        tr.stats.network = "XX"
+        tr.stats.station = "GF001"
 
     for tr_server, tr_db in zip(st_server, st_db):
         # Remove the additional stats from both.
@@ -286,6 +292,9 @@ def test_greens_function_retrieval(all_greens_clients):
         epicentral_distance_in_degree=params['sourcedistanceindegrees'],
         source_depth_in_m=params['sourcedepthinmeters'], origin_time=time,
         definition="seiscomp", dt=0.1, kernelwidth=2, kind="acceleration")
+    for tr in st_db:
+        tr.stats.network = "XX"
+        tr.stats.station = "GF001"
 
     for tr_server, tr_db in zip(st_server, st_db):
         # Remove the additional stats from both.

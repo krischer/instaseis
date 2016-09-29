@@ -62,6 +62,10 @@ def _get_greens(db, epicentral_distance_degree, source_depth_in_m, units, dt,
     receiver = Receiver(latitude=90.0 - epicentral_distance_degree,
                         longitude=0.0, depth_in_m=0.0)
 
+    for tr in st:
+        tr.stats.network = "XX"
+        tr.stats.station = "GF001"
+
     _validate_and_write_waveforms(st=st, callback=callback,
                                   starttime=starttime, endtime=endtime,
                                   scale=1.0, source=source, receiver=receiver,
@@ -74,7 +78,7 @@ class GreensFunctionHandler(InstaseisTimeSeriesHandler):
         "units": {"type": str, "default": "displacement"},
         "dt": {"type": float},
         "kernelwidth": {"type": int, "default": 12},
-        "label": {"type": str},
+        "label": {"type": str, "default": "greensfunction"},
 
         # Source parameters.
         "sourcedistanceindegrees": {"type": float, "required": True},
