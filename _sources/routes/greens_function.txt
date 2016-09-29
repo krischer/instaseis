@@ -56,7 +56,7 @@ Filetype
 | ``format``                  | String   | False    | saczip                      | Specify output file to be either MiniSEED or a ZIP archive of SAC files, either      |
 |                             |          |          |                             | ``miniseed`` or ``saczip``.                                                          |
 +-----------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
-| ``label``                   | String   | False    |                             | Specify a label to be included in file names and HTTP file name suggestions.         |
+| ``label``                   | String   | False    | greensfunction              | Specify a label to be included in file names and HTTP file name suggestions.         |
 +-----------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
 | ``units``                   | String   | False    | displacement                | Specify either ``displacement``, ``velocity`` or ``acceleration`` for the synthetics.|
 +-----------------------------+----------+----------+-----------------------------+--------------------------------------------------------------------------------------+
