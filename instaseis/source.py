@@ -351,7 +351,13 @@ class Source(SourceOrReceiver):
             Mrp              :  -2.25e+16 Nm
             Mtp              :   1.92e+16 Nm
         """
-        if isinstance(filename_or_obj, (str, bytes)):
+        # py2/py3 compatibility.
+        try:  # pragma: no cover
+            str_types = (str, bytes, unicode)  # NOQA
+        except:  # pragma: no cover
+            str_types = (str, bytes)
+
+        if isinstance(filename_or_obj, str_types):
             # Anything ObsPy can read.
             try:
                 src = obspy.read_events(filename_or_obj)
