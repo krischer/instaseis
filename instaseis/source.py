@@ -289,11 +289,12 @@ class Source(SourceOrReceiver):
         ...     latitude=89.91, longitude=0.0, depth_in_m=12000,
         ...     m_rr = 4.71e+17, m_tt = 3.81e+15, m_pp =-4.74e+17,
         ...     m_rt = 3.99e+16, m_rp =-8.05e+16, m_tp =-1.23e+17)
-        >>> print(source)
+        >>> print(source)  # doctest: +NORMALIZE_WHITESPACE
         Instaseis Source:
+            Origin Time      : 1970-01-01T00:00:00.000000Z
             Longitude        :    0.0 deg
             Latitude         :   89.9 deg
-            Depth            : 1.2e+01 km
+            Depth            : 1.2e+01 km km
             Moment Magnitude :   5.80
             Scalar Moment    :   4.96e+17 Nm
             Mrr              :   4.71e+17 Nm
@@ -334,20 +335,21 @@ class Source(SourceOrReceiver):
         :class:`~instaseis.source.Source` object.
 
         >>> import instaseis
-        >>> source = instaseis.Source.parse("quake.xml")
-        >>> print(source)
+        >>> source = instaseis.Source.parse(quakeml_file)
+        >>> print(source)  # doctest: +NORMALIZE_WHITESPACE
         Instaseis Source:
-            Longitude        :   -3.5 deg
-            Latitude         :   37.0 deg
-            Depth            : 6.1e+02 km
-            Moment Magnitude :   6.41
-            Scalar Moment    :   4.16e+18 Nm
-            Mrr              :  -2.16e+18 Nm
-            Mtt              :   5.36e+17 Nm
-            Mpp              :   1.62e+18 Nm
-            Mrt              :   1.30e+16 Nm
-            Mrp              :   3.23e+18 Nm
-            Mtp              :   1.75e+18 Nm
+            Origin Time      : 2010-03-24T14:11:31.000000Z
+            Longitude        :   40.1 deg
+            Latitude         :   38.6 deg
+            Depth            : 4.5e+00 km km
+            Moment Magnitude :   5.15
+            Scalar Moment    :   5.37e+16 Nm
+            Mrr              :   5.47e+15 Nm
+            Mtt              :  -4.11e+16 Nm
+            Mpp              :   3.56e+16 Nm
+            Mrt              :   2.26e+16 Nm
+            Mrp              :  -2.25e+16 Nm
+            Mtp              :   1.92e+16 Nm
         """
         if isinstance(filename_or_obj, (str, bytes)):
             # Anything ObsPy can read.
@@ -420,11 +422,12 @@ class Source(SourceOrReceiver):
         >>> source = instaseis.Source.from_strike_dip_rake(
         ...     latitude=10.0, longitude=12.0, depth_in_m=1000, strike=79,
         ...     dip=10, rake=20, M0=1E17)
-        >>> print(source)
+        >>> print(source)  # doctest: +NORMALIZE_WHITESPACE
         Instaseis Source:
+            Origin Time      : 1970-01-01T00:00:00.000000Z
             Longitude        :   12.0 deg
             Latitude         :   10.0 deg
-            Depth            : 1.0e+00 km
+            Depth            : 1.0e+00 km km
             Moment Magnitude :   5.33
             Scalar Moment    :   1.00e+17 Nm
             Mrr              :   1.17e+16 Nm
@@ -573,7 +576,7 @@ class Source(SourceOrReceiver):
 
     def __str__(self):
         return_str = 'Instaseis Source:\n'
-        return_str += '\torigin time      : %s\n' % (self.origin_time,)
+        return_str += '\tOrigin Time      : %s\n' % (self.origin_time,)
         return_str += '\tLongitude        : %6.1f deg\n' % (self.longitude,)
         return_str += '\tLatitude         : %6.1f deg\n' % (self.latitude,)
         return_str += '\tDepth            : %s km\n' % (
@@ -613,10 +616,11 @@ class ForceSource(SourceOrReceiver):
     >>> import instaseis
     >>> source = instaseis.ForceSource(latitude=12.34, longitude=12.34,
     ...                                f_r=1E10)
-    >>> print(source)
+    >>> print(source)  # doctest: +NORMALIZE_WHITESPACE
     Instaseis Force Source:
-        longitude :   12.3 deg
-        latitude  :   12.3 deg
+        Origin Time      : 1970-01-01T00:00:00.000000Z
+        Longitude :   12.3 deg
+        Latitude  :   12.3 deg
         Fr        :   1.00e+10 N
         Ft        :   0.00e+00 N
         Fp        :   0.00e+00 N
@@ -648,9 +652,9 @@ class ForceSource(SourceOrReceiver):
 
     def __str__(self):
         return_str = 'Instaseis Force Source:\n'
-        return_str += '\torigin time      : %s\n' % (self.origin_time,)
-        return_str += '\tlongitude : %6.1f deg\n' % (self.longitude)
-        return_str += '\tlatitude  : %6.1f deg\n' % (self.latitude)
+        return_str += '\tOrigin Time      : %s\n' % (self.origin_time,)
+        return_str += '\tLongitude : %6.1f deg\n' % (self.longitude)
+        return_str += '\tLatitude  : %6.1f deg\n' % (self.latitude)
         return_str += '\tFr        : %10.2e N\n' % (self.f_r)
         return_str += '\tFt        : %10.2e N\n' % (self.f_t)
         return_str += '\tFp        : %10.2e N\n' % (self.f_p)
@@ -678,13 +682,13 @@ class Receiver(SourceOrReceiver):
     >>> from instaseis import Receiver
     >>> rec = Receiver(latitude=12.34, longitude=56.78, network="AB",
     ...                station="CDE", location="SY")
-    >>> print(rec)
+    >>> print(rec)  # doctest: +NORMALIZE_WHITESPACE
     Instaseis Receiver:
-    longitude :   56.8 deg
-    latitude  :   12.3 deg
-    network   : AB
-    station   : CDE
-    location  : SY
+        Longitude :   56.8 deg
+        Latitude  :   12.3 deg
+        Network   : AB
+        Station   : CDE
+        Location  : SY
     """
     def __init__(self, latitude, longitude, network=None, station=None,
                  location=None, depth_in_m=None):
@@ -704,11 +708,11 @@ class Receiver(SourceOrReceiver):
 
     def __str__(self):
         return_str = 'Instaseis Receiver:\n'
-        return_str += '\tlongitude : %6.1f deg\n' % (self.longitude)
-        return_str += '\tlatitude  : %6.1f deg\n' % (self.latitude)
-        return_str += '\tnetwork   : %s\n' % (self.network)
-        return_str += '\tstation   : %s\n' % (self.station)
-        return_str += '\tlocation  : %s\n' % (self.location)
+        return_str += '\tLongitude : %6.1f deg\n' % (self.longitude)
+        return_str += '\tLatitude  : %6.1f deg\n' % (self.latitude)
+        return_str += '\tNetwork   : %s\n' % (self.network)
+        return_str += '\tStation   : %s\n' % (self.station)
+        return_str += '\tLocation  : %s\n' % (self.location)
 
         return return_str
 
@@ -738,7 +742,7 @@ class Receiver(SourceOrReceiver):
         :class:`~instaseis.source.Receiver` objects.
 
         >>> import instaseis
-        >>> print(instaseis.Receiver.parse("TA.Q56A..BH.xml"))
+        >>> print(instaseis.Receiver.parse(stationxml_file))
         [<instaseis.source.Receiver object at 0x...>]
         """
         receivers = []
@@ -949,23 +953,23 @@ class FiniteSource(object):
         :type normalize: bool, optional
 
         >>> import instaseis
-        >>> source = instaseis.FiniteSource.from_srf_file("filename.srf")
-        >>> print(source)
+        >>> source = instaseis.FiniteSource.from_srf_file(srf_file)
+        >>> print(source)  # doctest: +NORMALIZE_WHITESPACE
         Instaseis Finite Source:
-            Moment Magnitude     : 7.09
-            scalar Moment        : 6.67e+20 Nm
-            #point sources       : 117414
-            rupture duration     :  131.5 s
-            time shift           :    0.7 s
-            min depth            :   24.3 m
-            max depth            : 18170.8 m
-            hypocenter depth     : 18170.8 m
-            min latitude         :   23.3 deg
-            max latitude         :   24.7 deg
-            hypocenter latitude  :   23.3 deg
-            min longitude        : -148.5 deg
-            max longitude        : -145.7 deg
-            hypocenter longitude : -145.7 deg
+            Moment Magnitude     : 7.67
+            Scalar Moment        :   3.20e+20 Nm
+            #Point Sources       : 10
+            Rupture Duration     :  222.2 s
+            Time Shift           :    0.0 s
+            Min Depth            : 50000.0 m
+            Max Depth            : 50000.0 m
+            Hypocenter Depth     : 50000.0 m
+            Min Latitude         :    0.0 deg
+            Max Latitude         :    0.0 deg
+            Hypocenter Latitude  :    0.0 deg
+            Min Longitude        :    0.0 deg
+            Max Longitude        :    9.0 deg
+            Hypocenter Longitude :    0.0 deg
         """
         with open(filename, "rt") as f:
             # go to POINTS block
@@ -1055,23 +1059,23 @@ class FiniteSource(object):
         :type trise_min: float
 
         >>> import instaseis
-        >>> source = instaseis.FiniteSource.from_srf_file("filename.param")
-        >>> print(source)
+        >>> source = instaseis.FiniteSource.from_usgs_param_file(param_file)
+        >>> print(source)  # doctest: +NORMALIZE_WHITESPACE
         Instaseis Finite Source:
-            Moment Magnitude     : 7.09
-            scalar Moment        : 6.67e+20 Nm
-            #point sources       : 117414
-            rupture duration     :  131.5 s
-            time shift           :    0.7 s
-            min depth            :   24.3 m
-            max depth            : 18170.8 m
-            hypocenter depth     : 18170.8 m
-            min latitude         :   23.3 deg
-            max latitude         :   24.7 deg
-            hypocenter latitude  :   23.3 deg
-            min longitude        : -148.5 deg
-            max longitude        : -145.7 deg
-            hypocenter longitude : -145.7 deg
+            Moment Magnitude     : 7.94
+            Scalar Moment        :   8.06e+20 Nm
+            #Point Sources       : 121
+            Rupture Duration     :  107.6 s
+            Time Shift           :    0.0 s
+            Min Depth            :  860.1 m
+            Max Depth            : 26907.3 m
+            Hypocenter Depth     : 26907.3 m
+            Min Latitude         :   26.7 deg
+            Max Latitude         :   28.7 deg
+            Hypocenter Latitude  :   27.9 deg
+            Min Longitude        :   84.1 deg
+            Max Longitude        :   86.6 deg
+            Hypocenter Longitude :   84.8 deg
         """
         if hasattr(filename_or_obj, "readline"):
             return cls._from_usgs_param_file(
@@ -1444,34 +1448,34 @@ class FiniteSource(object):
         return_str = 'Instaseis Finite Source:\n'
         return_str += '\tMoment Magnitude     : %4.2f\n' \
                       % (self.moment_magnitude)
-        return_str += '\tscalar Moment        : %10.2e Nm\n' \
+        return_str += '\tScalar Moment        : %10.2e Nm\n' \
                       % (self.M0)
-        return_str += '\t#point sources       : %d\n' \
+        return_str += '\t#Point Sources       : %d\n' \
                       % (self.npointsources)
-        return_str += '\trupture duration     : %6.1f s\n' \
+        return_str += '\tRupture Duration     : %6.1f s\n' \
                       % (self.rupture_duration)
-        return_str += '\ttime shift           : %6.1f s\n' \
+        return_str += '\tTime Shift           : %6.1f s\n' \
                       % (self.time_shift)
 
-        return_str += '\tmin depth            : %6.1f m\n' \
+        return_str += '\tMin Depth            : %6.1f m\n' \
                       % (self.min_depth_in_m)
-        return_str += '\tmax depth            : %6.1f m\n' \
+        return_str += '\tMax Depth            : %6.1f m\n' \
                       % (self.max_depth_in_m)
-        return_str += '\thypocenter depth     : %6.1f m\n' \
+        return_str += '\tHypocenter Depth     : %6.1f m\n' \
                       % (self.max_depth_in_m)
 
-        return_str += '\tmin latitude         : %6.1f deg\n' \
+        return_str += '\tMin Latitude         : %6.1f deg\n' \
                       % (self.min_latitude)
-        return_str += '\tmax latitude         : %6.1f deg\n' \
+        return_str += '\tMax Latitude         : %6.1f deg\n' \
                       % (self.max_latitude)
-        return_str += '\thypocenter latitude  : %6.1f deg\n' \
+        return_str += '\tHypocenter Latitude  : %6.1f deg\n' \
                       % (self.hypocenter_latitude)
 
-        return_str += '\tmin longitude        : %6.1f deg\n' \
+        return_str += '\tMin Longitude        : %6.1f deg\n' \
                       % (self.min_longitude)
-        return_str += '\tmax longitude        : %6.1f deg\n' \
+        return_str += '\tMax Longitude        : %6.1f deg\n' \
                       % (self.max_longitude)
-        return_str += '\thypocenter longitude : %6.1f deg\n' \
+        return_str += '\tHypocenter Longitude : %6.1f deg\n' \
                       % (self.hypocenter_longitude)
 
         return return_str

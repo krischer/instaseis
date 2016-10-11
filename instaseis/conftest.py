@@ -8,8 +8,25 @@ import shutil
 import tempfile
 import time
 
+import pytest
+
 
 TEST_DATA = os.path.join(os.path.dirname(__file__), "tests", "data")
+
+
+@pytest.fixture(autouse=True)
+def add_test_files(doctest_namespace):
+    """
+    Add some files into the doctest namespace so they can be used within.
+    """
+    doctest_namespace['srf_file'] = os.path.join(
+        TEST_DATA, "strike_slip_eq_10pts.srf")
+    doctest_namespace['stationxml_file'] = os.path.join(
+        TEST_DATA, "TA.Q56A..BH.xml")
+    doctest_namespace['param_file'] = os.path.join(
+        TEST_DATA, "nepal.param")
+    doctest_namespace['quakeml_file'] = os.path.join(
+        TEST_DATA, "quake.xml")
 
 
 def repack_databases():

@@ -502,7 +502,7 @@ def test_str_method_of_src():
     src = Source(latitude=0.0, longitude=90.0)
     assert str(src) == (
         "Instaseis Source:\n"
-        "\torigin time      : 1970-01-01T00:00:00.000000Z\n"
+        "\tOrigin Time      : 1970-01-01T00:00:00.000000Z\n"
         "\tLongitude        :   90.0 deg\n"
         "\tLatitude         :    0.0 deg\n"
         "\tDepth            :  not set km\n"
@@ -520,9 +520,9 @@ def test_str_method_of_force_source():
     src = ForceSource(latitude=0.0, longitude=0.0, f_r=1.0, f_t=2.0, f_p=3.0)
     assert str(src) == (
         "Instaseis Force Source:\n"
-        "\torigin time      : 1970-01-01T00:00:00.000000Z\n"
-        "\tlongitude :    0.0 deg\n"
-        "\tlatitude  :    0.0 deg\n"
+        "\tOrigin Time      : 1970-01-01T00:00:00.000000Z\n"
+        "\tLongitude :    0.0 deg\n"
+        "\tLatitude  :    0.0 deg\n"
         "\tFr        :   1.00e+00 N\n"
         "\tFt        :   2.00e+00 N\n"
         "\tFp        :   3.00e+00 N\n")
@@ -533,19 +533,19 @@ def test_str_method_of_finite_source():
     assert str(finitesource) == (
             "Instaseis Finite Source:\n"
             "\tMoment Magnitude     : 7.67\n"
-            "\tscalar Moment        :   3.20e+20 Nm\n"
-            "\t#point sources       : 10\n"
-            "\trupture duration     :  222.2 s\n"
-            "\ttime shift           :    0.0 s\n"
-            "\tmin depth            : 50000.0 m\n"
-            "\tmax depth            : 50000.0 m\n"
-            "\thypocenter depth     : 50000.0 m\n"
-            "\tmin latitude         :    0.0 deg\n"
-            "\tmax latitude         :    0.0 deg\n"
-            "\thypocenter latitude  :    0.0 deg\n"
-            "\tmin longitude        :    0.0 deg\n"
-            "\tmax longitude        :    9.0 deg\n"
-            "\thypocenter longitude :    0.0 deg\n"
+            "\tScalar Moment        :   3.20e+20 Nm\n"
+            "\t#Point Sources       : 10\n"
+            "\tRupture Duration     :  222.2 s\n"
+            "\tTime Shift           :    0.0 s\n"
+            "\tMin Depth            : 50000.0 m\n"
+            "\tMax Depth            : 50000.0 m\n"
+            "\tHypocenter Depth     : 50000.0 m\n"
+            "\tMin Latitude         :    0.0 deg\n"
+            "\tMax Latitude         :    0.0 deg\n"
+            "\tHypocenter Latitude  :    0.0 deg\n"
+            "\tMin Longitude        :    0.0 deg\n"
+            "\tMax Longitude        :    9.0 deg\n"
+            "\tHypocenter Longitude :    0.0 deg\n"
     )
 
 
@@ -589,7 +589,7 @@ def test_print_regressions():
         M0=1e+21, strike=32., dip=62., rake=90.)
     assert(str(src)) == (
         "Instaseis Source:\n"
-        "\torigin time      : 1970-01-01T00:00:00.000000Z\n"
+        "\tOrigin Time      : 1970-01-01T00:00:00.000000Z\n"
         "\tLongitude        :   85.4 deg\n"
         "\tLatitude         :   27.8 deg\n"
         "\tDepth            : 1.2e+01 km km\n"

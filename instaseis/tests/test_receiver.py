@@ -175,11 +175,11 @@ def test_str_method_of_receiver():
     rec = Receiver(latitude=1.0, longitude=2.0, network="BW", station="ALTM")
     assert str(rec) == (
         "Instaseis Receiver:\n"
-        "\tlongitude :    2.0 deg\n"
-        "\tlatitude  :    1.0 deg\n"
-        "\tnetwork   : BW\n"
-        "\tstation   : ALTM\n"
-        "\tlocation  : \n"
+        "\tLongitude :    2.0 deg\n"
+        "\tLatitude  :    1.0 deg\n"
+        "\tNetwork   : BW\n"
+        "\tStation   : ALTM\n"
+        "\tLocation  : \n"
     )
 
 

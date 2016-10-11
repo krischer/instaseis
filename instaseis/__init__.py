@@ -45,8 +45,8 @@ def open_db(path, *args, **kwargs):
     If a directory is passed, it will return a local Instaseis database:
 
     >>> import instaseis
-    >>> db = instaseis.open_db("/path/to/DB")
-    >>> print(db)
+    >>> db = instaseis.open_db("/path/to/DB")  # doctest: +SKIP
+    >>> print(db)  # doctest: +SKIP
     InstaseisDB reciprocal Green's function Database (v7) generated ...
         components           : vertical and horizontal
         velocity model       : ak135f
@@ -54,8 +54,8 @@ def open_db(path, *args, **kwargs):
 
     For an HTTP URL it will return a remote Instaseis database:
 
-    >>> db = instaseis.open_db("http://webadress.com:8765")
-    >>> print(db)
+    >>> db = instaseis.open_db("http://webadress.com:8765")  # doctest: +SKIP
+    >>> print(db)  # doctest: +SKIP
     RemoteInstaseisDB reciprocal Green's function Database (v7) generated ...
         components           : vertical and horizontal
         velocity model       : ak135f
@@ -63,8 +63,8 @@ def open_db(path, *args, **kwargs):
     The special syntax ``syngine://MODEL_NAME`` will connect to the IRIS
     syngine web service for the specified model.
 
-    >>> db = instaseis.open_db("syngine://ak135f")
-    >>> print(db)
+    >>> db = instaseis.open_db("syngine://ak135f")  # doctest: +SKIP
+    >>> print(db)  # doctest: +SKIP
     SyngineInstaseisDB reciprocal Green's function Database (v7) ...
     Syngine model name:      'ak135f'
     Syngine service version:  0.0.2

@@ -145,8 +145,8 @@ INSTALL_REQUIRES = ["h5py",
                     "jsonschema >= 2.4.0"]
 
 EXTRAS_REQUIRE = {
-    'tests': ['click', 'netCDF4', 'pytest-xdist', 'flake8>=3', 'pytest',
-              'responses']
+    'tests': ['click', 'netCDF4', 'pytest-xdist', 'flake8>=3',
+              'pytest>=3.0', 'responses']
 }
 
 # Add mock for Python 2.x. Starting with Python 3 it is part of the standard
