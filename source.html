@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Sources and Receivers &#8212; instaseis 1.0.1-6-g59b0 documentation</title>
+    <title>Sources and Receivers &#8212; instaseis 1.0.1-9-gc6ff documentation</title>
     
     <link rel="stylesheet" href="_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.0.1-6-g59b0',
+        VERSION:     '1.0.1-9-gc6ff',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -31,7 +31,9 @@
     <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="instaseis 1.0.1-6-g59b0 documentation" href="index.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="instaseis 1.0.1-9-gc6ff documentation" href="index.html" />
     <link rel="next" title="Utility Functions" href="helpers.html" />
     <link rel="prev" title="Main Instaseis Classes" href="instaseis.html" />
 <meta charset='utf-8'>
@@ -53,7 +55,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>1.0.1-6-g59b0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>1.0.1-9-gc6ff</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -165,13 +167,13 @@ source/receiver objects are again in geocentric coordinates.</li>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">instaseis</span> <span class="k">import</span> <span class="n">Receiver</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">rec</span> <span class="o">=</span> <span class="n">Receiver</span><span class="p">(</span><span class="n">latitude</span><span class="o">=</span><span class="mf">12.34</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="mf">56.78</span><span class="p">,</span> <span class="n">network</span><span class="o">=</span><span class="s2">&quot;AB&quot;</span><span class="p">,</span>
 <span class="gp">... </span>               <span class="n">station</span><span class="o">=</span><span class="s2">&quot;CDE&quot;</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="s2">&quot;SY&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">rec</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">rec</span><span class="p">)</span>  
 <span class="go">Instaseis Receiver:</span>
-<span class="go">longitude :   56.8 deg</span>
-<span class="go">latitude  :   12.3 deg</span>
-<span class="go">network   : AB</span>
-<span class="go">station   : CDE</span>
-<span class="go">location  : SY</span>
+<span class="go">    Longitude :   56.8 deg</span>
+<span class="go">    Latitude  :   12.3 deg</span>
+<span class="go">    Network   : AB</span>
+<span class="go">    Station   : CDE</span>
+<span class="go">    Location  : SY</span>
 </pre></div>
 </div>
 <dl class="staticmethod">
@@ -206,7 +208,7 @@ objects. Likely only needed for the recursive part of this method.</li>
 <p>The following example parses a StationXML file to a list of
 <a class="reference internal" href="#instaseis.source.Receiver" title="instaseis.source.Receiver"><code class="xref py py-class docutils literal"><span class="pre">Receiver</span></code></a> objects.</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">instaseis</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">instaseis</span><span class="o">.</span><span class="n">Receiver</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s2">&quot;TA.Q56A..BH.xml&quot;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">instaseis</span><span class="o">.</span><span class="n">Receiver</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">stationxml_file</span><span class="p">))</span>
 <span class="go">[&lt;instaseis.source.Receiver object at 0x...&gt;]</span>
 </pre></div>
 </div>
@@ -257,11 +259,12 @@ the time of the first sample of the final seismogram.</li>
 <span class="gp">... </span>    <span class="n">latitude</span><span class="o">=</span><span class="mf">89.91</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">depth_in_m</span><span class="o">=</span><span class="mi">12000</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">m_rr</span> <span class="o">=</span> <span class="mf">4.71e+17</span><span class="p">,</span> <span class="n">m_tt</span> <span class="o">=</span> <span class="mf">3.81e+15</span><span class="p">,</span> <span class="n">m_pp</span> <span class="o">=-</span><span class="mf">4.74e+17</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">m_rt</span> <span class="o">=</span> <span class="mf">3.99e+16</span><span class="p">,</span> <span class="n">m_rp</span> <span class="o">=-</span><span class="mf">8.05e+16</span><span class="p">,</span> <span class="n">m_tp</span> <span class="o">=-</span><span class="mf">1.23e+17</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>  
 <span class="go">Instaseis Source:</span>
+<span class="go">    Origin Time      : 1970-01-01T00:00:00.000000Z</span>
 <span class="go">    Longitude        :    0.0 deg</span>
 <span class="go">    Latitude         :   89.9 deg</span>
-<span class="go">    Depth            : 1.2e+01 km</span>
+<span class="go">    Depth            : 1.2e+01 km km</span>
 <span class="go">    Moment Magnitude :   5.80</span>
 <span class="go">    Scalar Moment    :   4.96e+17 Nm</span>
 <span class="go">    Mrr              :   4.71e+17 Nm</span>
@@ -313,11 +316,12 @@ the time of the first sample of the final seismogram.</li>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">source</span> <span class="o">=</span> <span class="n">instaseis</span><span class="o">.</span><span class="n">Source</span><span class="o">.</span><span class="n">from_strike_dip_rake</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="n">latitude</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="mf">12.0</span><span class="p">,</span> <span class="n">depth_in_m</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">strike</span><span class="o">=</span><span class="mi">79</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">dip</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">rake</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">M0</span><span class="o">=</span><span class="mi">1</span><span class="n">E17</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>  
 <span class="go">Instaseis Source:</span>
+<span class="go">    Origin Time      : 1970-01-01T00:00:00.000000Z</span>
 <span class="go">    Longitude        :   12.0 deg</span>
 <span class="go">    Latitude         :   10.0 deg</span>
-<span class="go">    Depth            : 1.0e+00 km</span>
+<span class="go">    Depth            : 1.0e+00 km km</span>
 <span class="go">    Moment Magnitude :   5.33</span>
 <span class="go">    Scalar Moment    :   1.00e+17 Nm</span>
 <span class="go">    Mrr              :   1.17e+16 Nm</span>
@@ -362,20 +366,21 @@ will be converted to geocentric coordinates.</p>
 <p>The following example will read a local QuakeML file and return a
 <a class="reference internal" href="#instaseis.source.Source" title="instaseis.source.Source"><code class="xref py py-class docutils literal"><span class="pre">Source</span></code></a> object.</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">instaseis</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span> <span class="o">=</span> <span class="n">instaseis</span><span class="o">.</span><span class="n">Source</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s2">&quot;quake.xml&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span> <span class="o">=</span> <span class="n">instaseis</span><span class="o">.</span><span class="n">Source</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">quakeml_file</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>  
 <span class="go">Instaseis Source:</span>
-<span class="go">    Longitude        :   -3.5 deg</span>
-<span class="go">    Latitude         :   37.0 deg</span>
-<span class="go">    Depth            : 6.1e+02 km</span>
-<span class="go">    Moment Magnitude :   6.41</span>
-<span class="go">    Scalar Moment    :   4.16e+18 Nm</span>
-<span class="go">    Mrr              :  -2.16e+18 Nm</span>
-<span class="go">    Mtt              :   5.36e+17 Nm</span>
-<span class="go">    Mpp              :   1.62e+18 Nm</span>
-<span class="go">    Mrt              :   1.30e+16 Nm</span>
-<span class="go">    Mrp              :   3.23e+18 Nm</span>
-<span class="go">    Mtp              :   1.75e+18 Nm</span>
+<span class="go">    Origin Time      : 2010-03-24T14:11:31.000000Z</span>
+<span class="go">    Longitude        :   40.1 deg</span>
+<span class="go">    Latitude         :   38.6 deg</span>
+<span class="go">    Depth            : 4.5e+00 km km</span>
+<span class="go">    Moment Magnitude :   5.15</span>
+<span class="go">    Scalar Moment    :   5.37e+16 Nm</span>
+<span class="go">    Mrr              :   5.47e+15 Nm</span>
+<span class="go">    Mtt              :  -4.11e+16 Nm</span>
+<span class="go">    Mpp              :   3.56e+16 Nm</span>
+<span class="go">    Mrt              :   2.26e+16 Nm</span>
+<span class="go">    Mrp              :  -2.25e+16 Nm</span>
+<span class="go">    Mtp              :   1.92e+16 Nm</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -504,10 +509,11 @@ the time of the first sample of the final seismogram.</li>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">instaseis</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">source</span> <span class="o">=</span> <span class="n">instaseis</span><span class="o">.</span><span class="n">ForceSource</span><span class="p">(</span><span class="n">latitude</span><span class="o">=</span><span class="mf">12.34</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="mf">12.34</span><span class="p">,</span>
 <span class="gp">... </span>                               <span class="n">f_r</span><span class="o">=</span><span class="mi">1</span><span class="n">E10</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>  
 <span class="go">Instaseis Force Source:</span>
-<span class="go">    longitude :   12.3 deg</span>
-<span class="go">    latitude  :   12.3 deg</span>
+<span class="go">    Origin Time      : 1970-01-01T00:00:00.000000Z</span>
+<span class="go">    Longitude :   12.3 deg</span>
+<span class="go">    Latitude  :   12.3 deg</span>
 <span class="go">    Fr        :   1.00e+10 N</span>
 <span class="go">    Ft        :   0.00e+00 N</span>
 <span class="go">    Fp        :   0.00e+00 N</span>
@@ -629,23 +635,23 @@ will be converted to geocentric coordinates.</p>
 </tbody>
 </table>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">instaseis</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span> <span class="o">=</span> <span class="n">instaseis</span><span class="o">.</span><span class="n">FiniteSource</span><span class="o">.</span><span class="n">from_srf_file</span><span class="p">(</span><span class="s2">&quot;filename.srf&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span> <span class="o">=</span> <span class="n">instaseis</span><span class="o">.</span><span class="n">FiniteSource</span><span class="o">.</span><span class="n">from_srf_file</span><span class="p">(</span><span class="n">srf_file</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>  
 <span class="go">Instaseis Finite Source:</span>
-<span class="go">    Moment Magnitude     : 7.09</span>
-<span class="go">    scalar Moment        : 6.67e+20 Nm</span>
-<span class="go">    #point sources       : 117414</span>
-<span class="go">    rupture duration     :  131.5 s</span>
-<span class="go">    time shift           :    0.7 s</span>
-<span class="go">    min depth            :   24.3 m</span>
-<span class="go">    max depth            : 18170.8 m</span>
-<span class="go">    hypocenter depth     : 18170.8 m</span>
-<span class="go">    min latitude         :   23.3 deg</span>
-<span class="go">    max latitude         :   24.7 deg</span>
-<span class="go">    hypocenter latitude  :   23.3 deg</span>
-<span class="go">    min longitude        : -148.5 deg</span>
-<span class="go">    max longitude        : -145.7 deg</span>
-<span class="go">    hypocenter longitude : -145.7 deg</span>
+<span class="go">    Moment Magnitude     : 7.67</span>
+<span class="go">    Scalar Moment        :   3.20e+20 Nm</span>
+<span class="go">    #Point Sources       : 10</span>
+<span class="go">    Rupture Duration     :  222.2 s</span>
+<span class="go">    Time Shift           :    0.0 s</span>
+<span class="go">    Min Depth            : 50000.0 m</span>
+<span class="go">    Max Depth            : 50000.0 m</span>
+<span class="go">    Hypocenter Depth     : 50000.0 m</span>
+<span class="go">    Min Latitude         :    0.0 deg</span>
+<span class="go">    Max Latitude         :    0.0 deg</span>
+<span class="go">    Hypocenter Latitude  :    0.0 deg</span>
+<span class="go">    Min Longitude        :    0.0 deg</span>
+<span class="go">    Max Longitude        :    9.0 deg</span>
+<span class="go">    Hypocenter Longitude :    0.0 deg</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -678,23 +684,23 @@ Mostly meant to handle zero rise times in some USGS files.</li>
 </tbody>
 </table>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">instaseis</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span> <span class="o">=</span> <span class="n">instaseis</span><span class="o">.</span><span class="n">FiniteSource</span><span class="o">.</span><span class="n">from_srf_file</span><span class="p">(</span><span class="s2">&quot;filename.param&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span> <span class="o">=</span> <span class="n">instaseis</span><span class="o">.</span><span class="n">FiniteSource</span><span class="o">.</span><span class="n">from_usgs_param_file</span><span class="p">(</span><span class="n">param_file</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>  
 <span class="go">Instaseis Finite Source:</span>
-<span class="go">    Moment Magnitude     : 7.09</span>
-<span class="go">    scalar Moment        : 6.67e+20 Nm</span>
-<span class="go">    #point sources       : 117414</span>
-<span class="go">    rupture duration     :  131.5 s</span>
-<span class="go">    time shift           :    0.7 s</span>
-<span class="go">    min depth            :   24.3 m</span>
-<span class="go">    max depth            : 18170.8 m</span>
-<span class="go">    hypocenter depth     : 18170.8 m</span>
-<span class="go">    min latitude         :   23.3 deg</span>
-<span class="go">    max latitude         :   24.7 deg</span>
-<span class="go">    hypocenter latitude  :   23.3 deg</span>
-<span class="go">    min longitude        : -148.5 deg</span>
-<span class="go">    max longitude        : -145.7 deg</span>
-<span class="go">    hypocenter longitude : -145.7 deg</span>
+<span class="go">    Moment Magnitude     : 7.94</span>
+<span class="go">    Scalar Moment        :   8.06e+20 Nm</span>
+<span class="go">    #Point Sources       : 121</span>
+<span class="go">    Rupture Duration     :  107.6 s</span>
+<span class="go">    Time Shift           :    0.0 s</span>
+<span class="go">    Min Depth            :  860.1 m</span>
+<span class="go">    Max Depth            : 26907.3 m</span>
+<span class="go">    Hypocenter Depth     : 26907.3 m</span>
+<span class="go">    Min Latitude         :   26.7 deg</span>
+<span class="go">    Max Latitude         :   28.7 deg</span>
+<span class="go">    Hypocenter Latitude  :   27.9 deg</span>
+<span class="go">    Min Longitude        :   84.1 deg</span>
+<span class="go">    Max Longitude        :   86.6 deg</span>
+<span class="go">    Hypocenter Longitude :   84.8 deg</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -790,7 +796,7 @@ interpolation for all pointsources in the finite source.</p>
     </p>
     <p>
         &copy; Copyright 2014-2015, Lion Krischer and Martin van Driel.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.6.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.<br/>
     </p>
   </div>
 </footer>
