@@ -635,13 +635,34 @@ class ForceSource(SourceOrReceiver):
         Fp        :   0.00e+00 N
     """
     def __init__(self, latitude, longitude, depth_in_m=None, f_r=0., f_t=0.,
-                 f_p=0., origin_time=obspy.UTCDateTime(0), sliprate=None):
+                 f_p=0., origin_time=obspy.UTCDateTime(0), sliprate=None,
+                 time_shift=None, dt=None):
+        """
+        :param latitude: geocentric latitude of the source in degree
+        :param longitude: longitude of the source in degree
+        :param depth_in_m: source depth in m
+        :param f_r: force components in r, theta, phi in N
+        :param f_t: force components in r, theta, phi in N
+        :param f_p: force components in r, theta, phi in N
+        :param origin_time: The origin time of the source. If you don't
+            reconvolve with another source time function this time is the
+            peak of the source time function used to generate the database.
+            If you reconvolve with another source time function this time is
+            the time of the first sample of the final seismogram.
+        :param sliprate: normalized source time function (sliprate)
+        :param time_shift: correction of the origin time in seconds. Useful
+            in the context of finite source or user defined source time
+            functions.
+        :param dt: sampling of the source time function
+        """
         super(ForceSource, self).__init__(latitude, longitude, depth_in_m)
         self.f_r = f_r
         self.f_t = f_t
         self.f_p = f_p
         self.origin_time = origin_time
-        self.sliprate = sliprate
+        self.time_shift = time_shift
+        self.sliprate = np.array(sliprate) if sliprate is not None else None
+        self.dt = dt
 
     @property
     def force_tpr(self):
