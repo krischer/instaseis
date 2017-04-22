@@ -481,7 +481,7 @@ def _merge_files(input, out, contiguous, compression_level, quiet):
 def repack_database(input_folder, output_folder, contiguous,
                     compression_level, method):
     found_filenames = []
-    for root, _, filenames in os.walk(input_folder):
+    for root, _, filenames in os.walk(input_folder, followlinks=True):
         for filename in sorted(filenames, reverse=True):
             if filename not in ["ordered_output.nc4", "axisem_output.nc4"]:
                 continue
@@ -490,7 +490,11 @@ def repack_database(input_folder, output_folder, contiguous,
 
     assert found_filenames, "No files named `ordered_output.nc4` found."
 
-    os.makedirs(output_folder)
+    if input_folder == output_folder:
+        if "ordered_output.nc4" in found_filenames:
+            raise FileExistsError()
+    else:
+        os.makedirs(output_folder)
 
     if method in ["transpose", "repack"]:
         for _i, filename in enumerate(found_filenames):
@@ -505,7 +509,8 @@ def repack_database(input_folder, output_folder, contiguous,
             output_filename = output_filename.replace(
                 "axisem_output.nc4", "ordered_output.nc4")
 
-            os.makedirs(os.path.dirname(output_filename))
+            if not input_folder == output_folder:
+                os.makedirs(os.path.dirname(output_filename))
 
             if method == "transpose":
                 transpose = True
