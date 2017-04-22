@@ -490,8 +490,12 @@ def repack_database(input_folder, output_folder, contiguous,
 
     assert found_filenames, "No files named `ordered_output.nc4` found."
 
+    input_folder = os.path.normpath(os.path.realpath(input_folder))
+    output_folder = os.path.normpath(os.path.realpath(output_folder))
+
     if input_folder == output_folder:
-        if "ordered_output.nc4" in found_filenames:
+        if "ordered_output.nc4" in [os.path.basename(_i) for _i in
+                                    found_filenames]:
             raise FileExistsError()
     else:
         os.makedirs(output_folder)
