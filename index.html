@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Instaseis: Instant Global Seismograms Based on a Broadband Waveform Database &#8212; instaseis 1.1.0 documentation</title>
+    <title>Instaseis: Instant Global Seismograms Based on a Broadband Waveform Database &#8212; instaseis 1.1.1 documentation</title>
     
     <link rel="stylesheet" href="_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -17,23 +17,23 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.1.0',
+        VERSION:     '1.1.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="top" title="instaseis 1.1.0 documentation" href="#" />
     <link rel="next" title="Main Instaseis Classes" href="instaseis.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
@@ -54,7 +54,7 @@
         </button>
         <a class="navbar-brand" href="#">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>1.1.0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>1.1.1</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -130,7 +130,7 @@ include 2D structure in the source receiver plane and readily includes other
 planets such as Mars.</p>
 </div><div class="admonition-for-more-information-please-read-our-paper admonition">
 <p class="first admonition-title">For more information, please read our paper:</p>
-<table border="1" class="last docutils">
+<table border="1" class="colwidths-given last docutils">
 <colgroup>
 <col width="100%" />
 </colgroup>
@@ -327,7 +327,7 @@ already have them, install with</p>
 speed up the tests they can also be run in parallel with (<code class="docutils literal"><span class="pre">n</span></code> is the
 number of cores):</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> /path/to/instaseis
-$ py.test -n 4
+$ py.test -n <span class="m">4</span>
 </pre></div>
 </div>
 </div>
@@ -440,7 +440,7 @@ files and open them.</p>
 </pre></div>
 </div>
 <p>The <code class="xref py py-meth docutils literal"><span class="pre">get_seismograms()</span></code>
-method is called to generate seismograms as <a class="reference external" href="http://docs.obspy.org/packages/autogen/obspy.core.stream.Stream.html#obspy.core.stream.Stream" title="(in ObsPy Documentation (1.0.2) v1.0)"><code class="xref py py-class docutils literal"><span class="pre">Stream</span></code></a>
+method is called to generate seismograms as <a class="reference external" href="http://docs.obspy.org/packages/autogen/obspy.core.stream.Stream.html#obspy.core.stream.Stream" title="(in ObsPy Documentation (1.0.3) v1.0)"><code class="xref py py-class docutils literal"><span class="pre">Stream</span></code></a>
 objects with the waveform data. This enables easy serialization in a large
 selection of formats and facilitates post processing by utilizing ObsPy.</p>
 <p>To generate seismograms source information must be given either as a
@@ -587,7 +587,7 @@ and the EU-FP7 725 690 <strong>VERCE</strong> project
     </p>
     <p>
         &copy; Copyright 2014-2015, Lion Krischer and Martin van Driel.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.<br/>
     </p>
   </div>
 </footer>

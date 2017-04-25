@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>GET /greens_function &#8212; instaseis 1.1.0 documentation</title>
+    <title>GET /greens_function &#8212; instaseis 1.1.1 documentation</title>
     
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -17,24 +17,23 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.1.0',
+        VERSION:     '1.1.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="top" title="instaseis 1.1.0 documentation" href="../index.html" />
-    <link rel="up" title="Instaseis Server" href="../server.html" />
     <link rel="next" title="POST /finite_source" href="finite_source.html" />
     <link rel="prev" title="GET/POST /seismograms" href="seismograms.html" />
 <meta charset='utf-8'>
@@ -56,7 +55,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>1.1.0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>1.1.1</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -186,13 +185,13 @@ encoding format 4 (IEEE floating point).</p>
 <tr class="row-odd"><td><code class="docutils literal"><span class="pre">sourcedepthinmeters</span></code></td>
 <td>Float</td>
 <td>True</td>
-<td>&nbsp;</td>
+<td>&#160;</td>
 <td>The source depth in meters.</td>
 </tr>
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">sourcedistanceindegrees</span></code></td>
 <td>Float</td>
 <td>True</td>
-<td>&nbsp;</td>
+<td>&#160;</td>
 <td>The epicentral disctance of source - receiver in degrees (computed on the surface
 of a sphere).</td>
 </tr>
@@ -220,7 +219,7 @@ of a sphere).</td>
 <tr class="row-odd"><td><code class="docutils literal"><span class="pre">dt</span></code></td>
 <td>Float</td>
 <td>False</td>
-<td>&nbsp;</td>
+<td>&#160;</td>
 <td>If given, seismograms will be resampled to the desired sample spacing.</td>
 </tr>
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">kernelwidth</span></code></td>
@@ -243,7 +242,7 @@ source time function.</td>
 <tr class="row-odd"><td><code class="docutils literal"><span class="pre">starttime</span></code></td>
 <td>Datetime</td>
 <td>False</td>
-<td>&nbsp;</td>
+<td>&#160;</td>
 <td><p class="first">Specifies the desired start time for the synthetic trace(s). This may be specified
 as either:</p>
 <ul class="simple">
@@ -261,7 +260,7 @@ seconds, from the origin time.</p>
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">endtime</span></code></td>
 <td>Datetime</td>
 <td>False</td>
-<td>&nbsp;</td>
+<td>&#160;</td>
 <td><p class="first">Specifies the desired end time for the synthetic trace(s). This may be specified
 as either:</p>
 <ul class="simple">
@@ -294,7 +293,7 @@ seconds, from the start time.</p>
     </p>
     <p>
         &copy; Copyright 2014-2015, Lion Krischer and Martin van Driel.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.<br/>
     </p>
   </div>
 </footer>

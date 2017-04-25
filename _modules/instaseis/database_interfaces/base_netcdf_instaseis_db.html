@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>instaseis.database_interfaces.base_netcdf_instaseis_db &#8212; instaseis 1.1.0 documentation</title>
+    <title>instaseis.database_interfaces.base_netcdf_instaseis_db &#8212; instaseis 1.1.1 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -17,24 +17,23 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.1.0',
+        VERSION:     '1.1.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../../../_static/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="../../../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../../../_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../../../_static/bootstrap-sphinx.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="top" title="instaseis 1.1.0 documentation" href="../../../index.html" />
-    <link rel="up" title="instaseis" href="../../instaseis.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
@@ -54,7 +53,7 @@
         </button>
         <a class="navbar-brand" href="../../../index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>1.1.0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>1.1.1</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -219,7 +218,7 @@
 
                 <span class="n">isin</span><span class="p">,</span> <span class="n">xi</span><span class="p">,</span> <span class="n">eta</span> <span class="o">=</span> <span class="n">finite_elem_mapping</span><span class="o">.</span><span class="n">inside_element</span><span class="p">(</span>
                     <span class="n">coordinates</span><span class="o">.</span><span class="n">s</span><span class="p">,</span> <span class="n">coordinates</span><span class="o">.</span><span class="n">z</span><span class="p">,</span> <span class="n">corner_points</span><span class="p">,</span> <span class="n">eltype</span><span class="p">,</span>
-                    <span class="n">tolerance</span><span class="o">=</span><span class="mi">1</span><span class="n">E</span><span class="o">-</span><span class="mi">3</span><span class="p">)</span>
+                    <span class="n">tolerance</span><span class="o">=</span><span class="mf">1E-3</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">isin</span><span class="p">:</span>
                     <span class="n">id_elem</span> <span class="o">=</span> <span class="n">idx</span>
                     <span class="k">break</span>
@@ -543,8 +542,8 @@
             <span class="n">slip</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">stf_norm</span><span class="p">,</span>
             <span class="n">sliprate</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">stf_d_norm</span><span class="p">,</span>
             <span class="n">spatial_order</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">npol</span><span class="p">),</span>
-            <span class="n">min_radius</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">kwf_rmin</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1</span><span class="n">e3</span><span class="p">,</span>
-            <span class="n">max_radius</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">kwf_rmax</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1</span><span class="n">e3</span><span class="p">,</span>
+            <span class="n">min_radius</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">kwf_rmin</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1e3</span><span class="p">,</span>
+            <span class="n">max_radius</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">kwf_rmax</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1e3</span><span class="p">,</span>
             <span class="n">planet_radius</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">planet_radius</span><span class="p">),</span>
             <span class="n">min_d</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">kwf_colatmin</span><span class="p">),</span>
             <span class="n">max_d</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">kwf_colatmax</span><span class="p">),</span>
@@ -572,7 +571,7 @@
     </p>
     <p>
         &copy; Copyright 2014-2015, Lion Krischer and Martin van Driel.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.<br/>
     </p>
   </div>
 </footer>

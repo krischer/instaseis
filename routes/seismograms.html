@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>GET/POST /seismograms &#8212; instaseis 1.1.0 documentation</title>
+    <title>GET/POST /seismograms &#8212; instaseis 1.1.1 documentation</title>
     
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -17,24 +17,23 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.1.0',
+        VERSION:     '1.1.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="top" title="instaseis 1.1.0 documentation" href="../index.html" />
-    <link rel="up" title="Instaseis Server" href="../server.html" />
     <link rel="next" title="GET /greens_function" href="greens_function.html" />
     <link rel="prev" title="GET /seismograms_raw" href="seismograms_raw.html" />
 <meta charset='utf-8'>
@@ -56,7 +55,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>1.1.0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>1.1.1</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -201,7 +200,7 @@ normalized in any case.</p>
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">label</span></code></td>
 <td>String</td>
 <td>False</td>
-<td>&nbsp;</td>
+<td>&#160;</td>
 <td>Specify a label to be included in file names and HTTP file name suggestions.</td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal"><span class="pre">components</span></code></td>
@@ -221,7 +220,7 @@ what the DB supports)</td>
 <tr class="row-odd"><td><code class="docutils literal"><span class="pre">dt</span></code></td>
 <td>Float</td>
 <td>False</td>
-<td>&nbsp;</td>
+<td>&#160;</td>
 <td>If given, seismograms will be resampled to the desired sample spacing.</td>
 </tr>
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">scale</span></code></td>
@@ -259,7 +258,7 @@ source time function.</td>
 <tr class="row-odd"><td><code class="docutils literal"><span class="pre">starttime</span></code></td>
 <td>Datetime</td>
 <td>False</td>
-<td>&nbsp;</td>
+<td>&#160;</td>
 <td><p class="first">Specifies the desired start time for the synthetic trace(s). This may be specified
 as either:</p>
 <ul class="simple">
@@ -277,7 +276,7 @@ seconds, from the origin time.</p>
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">endtime</span></code></td>
 <td>Datetime</td>
 <td>False</td>
-<td>&nbsp;</td>
+<td>&#160;</td>
 <td><p class="first">Specifies the desired end time for the synthetic trace(s). This may be specified
 as either:</p>
 <ul class="simple">
@@ -299,13 +298,13 @@ seconds, from the start time.</p>
 <tr class="row-odd"><td><code class="docutils literal"><span class="pre">receiverlatitude</span></code></td>
 <td>Float</td>
 <td>True</td>
-<td>&nbsp;</td>
+<td>&#160;</td>
 <td>The geocentric latitude of the receiver.</td>
 </tr>
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">receiverlongitude</span></code></td>
 <td>Float</td>
 <td>True</td>
-<td>&nbsp;</td>
+<td>&#160;</td>
 <td>The longitude of the receiver.</td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal"><span class="pre">receiverdepthinmeters</span></code></td>
@@ -337,13 +336,13 @@ seconds, from the start time.</p>
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">network</span></code></td>
 <td>String</td>
 <td>False</td>
-<td>&nbsp;</td>
+<td>&#160;</td>
 <td>Wildcarded network codes, e.g. <code class="docutils literal"><span class="pre">I*,B?,AU</span></code>.</td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal"><span class="pre">station</span></code></td>
 <td>String</td>
 <td>False</td>
-<td>&nbsp;</td>
+<td>&#160;</td>
 <td>Wildcarded station codes, e.g. <code class="docutils literal"><span class="pre">A*,ANMO</span></code>.</td>
 </tr>
 <tr class="row-even"><td colspan="5"><strong>Source Parameters</strong></td>
@@ -353,7 +352,7 @@ seconds, from the start time.</p>
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">event_id</span></code></td>
 <td>String</td>
 <td>False</td>
-<td>&nbsp;</td>
+<td>&#160;</td>
 <td>The id of the event to use.</td>
 </tr>
 <tr class="row-odd"><td colspan="5">... or by specify the source parameters in a variety of ways.</td>
@@ -361,13 +360,13 @@ seconds, from the start time.</p>
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">sourcelatitude</span></code></td>
 <td>Float</td>
 <td>True</td>
-<td>&nbsp;</td>
+<td>&#160;</td>
 <td>The geocentric latitude of the source.</td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal"><span class="pre">sourcelongitude</span></code></td>
 <td>Float</td>
 <td>True</td>
-<td>&nbsp;</td>
+<td>&#160;</td>
 <td>The longitude of the source.</td>
 </tr>
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">sourcedepthinmeters</span></code></td>
@@ -381,7 +380,7 @@ seconds, from the start time.</p>
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">sourcemomenttensor</span></code></td>
 <td>List</td>
 <td>False</td>
-<td>&nbsp;</td>
+<td>&#160;</td>
 <td><p class="first">Specify a source in moment tensor components as a list: <code class="docutils literal"><span class="pre">Mrr,Mtt,Mpp,Mrt,Mrp,Mtp</span></code>
 with values in Newton meters (Nm).</p>
 <p class="last">Example: <code class="docutils literal"><span class="pre">1.04e22,-0.039e22,-1e22,0.304e22,-1.52e22,-0.119e22</span></code></p>
@@ -392,7 +391,7 @@ with values in Newton meters (Nm).</p>
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">sourcedoublecouple</span></code></td>
 <td>List</td>
 <td>False</td>
-<td>&nbsp;</td>
+<td>&#160;</td>
 <td><p class="first">Specify a source as a double couple. The list of values are <code class="docutils literal"><span class="pre">strike,dip,rake[,M0]</span></code>,
 where strike, dip and rake are in degrees and M0 is the scalar seismic moment in
 Newton meters (Nm). If not specified, a value of <em>1e19</em> will be used as the scalar
@@ -405,7 +404,7 @@ moment.</p>
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">sourceforce</span></code></td>
 <td>List</td>
 <td>False</td>
-<td>&nbsp;</td>
+<td>&#160;</td>
 <td><p class="first">Specify a force source as a list of <code class="docutils literal"><span class="pre">Fr,Ft,Fp</span></code> in units of Newtons (N).</p>
 <p class="last">example: <code class="docutils literal"><span class="pre">1e22,1e22,1e22</span></code></p>
 </td>
@@ -428,7 +427,7 @@ moment.</p>
     </p>
     <p>
         &copy; Copyright 2014-2015, Lion Krischer and Martin van Driel.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.<br/>
     </p>
   </div>
 </footer>

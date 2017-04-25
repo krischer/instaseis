@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>POST /finite_source &#8212; instaseis 1.1.0 documentation</title>
+    <title>POST /finite_source &#8212; instaseis 1.1.1 documentation</title>
     
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -17,24 +17,23 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.1.0',
+        VERSION:     '1.1.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="top" title="instaseis 1.1.0 documentation" href="../index.html" />
-    <link rel="up" title="Instaseis Server" href="../server.html" />
     <link rel="next" title="Advanced Server Configuration" href="../advanced_server_configuration.html" />
     <link rel="prev" title="GET /greens_function" href="greens_function.html" />
 <meta charset='utf-8'>
@@ -56,7 +55,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>1.1.0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>1.1.1</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -195,7 +194,7 @@ encoding format 4 (IEEE floating point).</p>
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">label</span></code></td>
 <td>String</td>
 <td>False</td>
-<td>&nbsp;</td>
+<td>&#160;</td>
 <td>Specify a label to be included in file names and HTTP file name suggestions.</td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal"><span class="pre">components</span></code></td>
@@ -215,7 +214,7 @@ what the DB supports)</td>
 <tr class="row-odd"><td><code class="docutils literal"><span class="pre">dt</span></code></td>
 <td>Float</td>
 <td>False</td>
-<td>&nbsp;</td>
+<td>&#160;</td>
 <td>If given, seismograms will be resampled to the desired sample spacing.</td>
 </tr>
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">scale</span></code></td>
@@ -244,7 +243,7 @@ absolute date and time. <strong>This time conincides will be the onset time of t
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">starttime</span></code></td>
 <td>Datetime</td>
 <td>False</td>
-<td>&nbsp;</td>
+<td>&#160;</td>
 <td><p class="first">Specifies the desired start time for the synthetic trace(s). This may be specified
 as either:</p>
 <ul class="simple">
@@ -262,7 +261,7 @@ seconds, from the origin time. Arrival times are always relative to the origin t
 <tr class="row-odd"><td><code class="docutils literal"><span class="pre">endtime</span></code></td>
 <td>Datetime</td>
 <td>False</td>
-<td>&nbsp;</td>
+<td>&#160;</td>
 <td><p class="first">Specifies the desired end time for the synthetic trace(s). This may be specified
 as either:</p>
 <ul class="simple">
@@ -284,13 +283,13 @@ seconds, from the start time. Arrival times are always relative to the origin ti
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">receiverlatitude</span></code></td>
 <td>Float</td>
 <td>True</td>
-<td>&nbsp;</td>
+<td>&#160;</td>
 <td>The geocentric latitude of the receiver.</td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal"><span class="pre">receiverlongitude</span></code></td>
 <td>Float</td>
 <td>True</td>
-<td>&nbsp;</td>
+<td>&#160;</td>
 <td>The longitude of the receiver.</td>
 </tr>
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">networkcode</span></code></td>
@@ -316,13 +315,13 @@ seconds, from the start time. Arrival times are always relative to the origin ti
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">network</span></code></td>
 <td>String</td>
 <td>False</td>
-<td>&nbsp;</td>
+<td>&#160;</td>
 <td>Wildcarded network codes, e.g. <code class="docutils literal"><span class="pre">I*,B?,AU</span></code>.</td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal"><span class="pre">station</span></code></td>
 <td>String</td>
 <td>False</td>
-<td>&nbsp;</td>
+<td>&#160;</td>
 <td>Wildcarded station codes, e.g. <code class="docutils literal"><span class="pre">A*,ANMO</span></code>.</td>
 </tr>
 </tbody>
@@ -343,7 +342,7 @@ seconds, from the start time. Arrival times are always relative to the origin ti
     </p>
     <p>
         &copy; Copyright 2014-2015, Lion Krischer and Martin van Driel.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.<br/>
     </p>
   </div>
 </footer>
