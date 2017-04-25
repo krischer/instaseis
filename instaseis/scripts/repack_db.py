@@ -496,7 +496,7 @@ def repack_database(input_folder, output_folder, contiguous,
     if input_folder == output_folder:
         if "ordered_output.nc4" in [os.path.basename(_i) for _i in
                                     found_filenames]:
-            raise FileExistsError()
+            raise ValueError("ordered_output.nc4 already exists.")
     else:
         os.makedirs(output_folder)
 
