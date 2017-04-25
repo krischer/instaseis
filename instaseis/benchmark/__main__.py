@@ -407,6 +407,7 @@ def get_subclasses(cls):
 
     return subclasses
 
+
 benchmarks = [i(path, args.time, args.save, args.seed, args.count) for i in
               get_subclasses(InstaseisBenchmark)]
 benchmarks.sort(key=lambda x: x.description)

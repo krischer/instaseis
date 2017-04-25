@@ -42,7 +42,7 @@ import sys
 path = os.path.join(os.path.abspath(os.path.dirname(inspect.getfile(
     inspect.currentframe()))), "instaseis")
 sys.path.insert(0, path)
-from version import get_git_version
+from version import get_git_version  # noqa
 
 
 # Monkey patch the compilers to treat Fortran files like C files.
@@ -88,6 +88,8 @@ def _compile(self, obj, src, ext, cc_args, extra_postargs, pp_opts):
                    extra_postargs)
     except DistutilsExecError as msg:
         raise CompileError(msg)
+
+
 UnixCCompiler._compile = _compile
 
 

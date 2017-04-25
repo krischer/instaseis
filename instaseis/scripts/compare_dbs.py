@@ -78,5 +78,6 @@ def compare_dbs(seed, databases):
             print(_j.info.directory, ":", ref == _i)
             assert ref == _i, str(source) + "\n" + str(receiver)
 
+
 if __name__ == "__main__":
     compare_dbs()
