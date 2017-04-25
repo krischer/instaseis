@@ -16,7 +16,7 @@ from __future__ import (absolute_import, division, print_function,
 from future.utils import with_metaclass
 
 from abc import ABCMeta, abstractmethod
-from distutil import LooseVersion
+from distutils.version import LooseVersion
 import math
 import warnings
 
