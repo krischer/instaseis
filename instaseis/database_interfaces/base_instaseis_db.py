@@ -16,6 +16,7 @@ from __future__ import (absolute_import, division, print_function,
 from future.utils import with_metaclass
 
 from abc import ABCMeta, abstractmethod
+from distutil import LooseVersion
 import math
 import warnings
 
@@ -53,7 +54,12 @@ STF_MAP = {
 
 def _diff_and_integrate(n_derivative, data, comp, dt_out):
     for _ in np.arange(n_derivative):
-        data[comp] = np.gradient(data[comp], [dt_out])
+        # In some numpy version there is an incompatibility here - 1.11
+        # works for both so we branch here.
+        if LooseVersion(np.__version__) >= LooseVersion("1.11.0"):
+            data[comp] = np.gradient(data[comp], dt_out)
+        else:  # pragma: no cover
+            data[comp] = np.gradient(data[comp], [dt_out])
 
     # Cannot happen currently - maybe with other source time functions?
     for _ in np.arange(-n_derivative):  # pragma: no cover
