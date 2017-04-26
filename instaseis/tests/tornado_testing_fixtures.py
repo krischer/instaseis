@@ -57,6 +57,9 @@ class AsyncClient(object):
         self.httpserver = httpserver
         self.httpclient = httpclient
 
+    def __del__(self):
+        self.httpserver.stop()
+
     def _get_port(self):
         # This seems a bit fragile. How else to get the dynamic port number?
         return list(self.httpserver._sockets.values())[0].getsockname()[1]
