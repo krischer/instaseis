@@ -100,7 +100,7 @@ def recursive_copy(src, dst, contiguous, compression_level, transpose, quiet):
             num_elems = max(shape)
             time_axis = np.argmin(shape)
             # Arbitrary limit.
-            _c = int(round(32768 / (npts * 4)))
+            _c = max(int(round(32768 / (npts * 4))), 1)
 
             if time_axis == 0:
                 chunksizes = (npts, _c)
