@@ -217,7 +217,24 @@ class Window(QtGui.QMainWindow):
 
         self.map.drawmapboundary(fill_color='#cccccc')
         if self.instaseis_db and self.instaseis_db.info.planet_radius < 5e6:
-            imfile = os.path.join(DATA, 'mola_texture_shifted_800.jpg')
+            radii_planets = {'Titan': 2575e3,
+                             'Europa': 1561e3,
+                             'Enceladus': 252e3,
+                             'Ganymede': 2631e3,
+                             'Mars': 3389.5e3,
+                             'Venus': 6051.8e3}
+            imfiles = {'Titan': 'titan_radar_colored_800.jpg',
+                       'Europa': 'europa_comp_800.jpg',
+                       'Enceladus': 'enceladus_jpl_800.jpg',
+                       'Ganymede': 'ganymede_usgs_800.jpg',
+                       'Mars': 'mola_texture_shifted_800.jpg',
+                       'Venus': 'venus_magellan_800.jpg'}
+            print(self.instaseis_db.info.planet_radius)
+            for key, value in radii_planets.items():
+                print(key, value,
+                      abs(self.instaseis_db.info.planet_radius - value))
+                if abs(self.instaseis_db.info.planet_radius - value) < 10e3:
+                    imfile = os.path.join(DATA, imfiles[key])
             self.map.warpimage(image=imfile, zorder=0)
         else:
             self.map.fillcontinents(color='white', lake_color='#cccccc',
