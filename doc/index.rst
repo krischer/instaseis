@@ -134,6 +134,7 @@ shared Fortran librarys - pull requests are welcome.
 * ``requests``
 * ``tornado``
 * ``jsonschema >= 2.4``
+* ``geographiclib``
 
 To run the tests, please also install:
 
