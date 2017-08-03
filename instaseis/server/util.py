@@ -251,9 +251,8 @@ def _validate_and_write_waveforms(st, callback, starttime, endtime, scale,
                 # Cannot really happen
                 else:  # pragma: no cover
                     raise NotImplementedError
-            # Anything else should result from the greens function
-            else:
-                raise NotImplementedError(_c + str(st))
+            else:  # pragma: no cover
+                raise NotImplementedError
 
             # Some provenance.
             tr.stats.sac.kuser0 = "InstSeis"
