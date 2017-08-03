@@ -4659,6 +4659,94 @@ def test_sac_headers(all_clients):
         assert tr.stats.sac.lcalda == 0
 
 
+def test_sac_headers_azimuth_and_incidence(all_clients):
+    """
+    Tests azimuth and component inclination sac headers.
+    """
+    client = all_clients
+    db = instaseis.open_db(client.filepath)
+
+    if db.info.components != "vertical and horizontal":
+        return
+
+    def _run_test(rec_latitude, rec_longitude, az_inc_map):
+        params = {
+            "sourcelatitude": 0, "sourcelongitude": 0,
+            "sourcedepthinmeters": client.source_depth,
+            "sourcemomenttensor": "1E15,1E15,1E15,1E15,1E15,1E15",
+            "origintime": obspy.UTCDateTime(0), "scale": 0.5,
+            "dt": 0.1, "starttime": "-1.5", "receiverlatitude": rec_latitude,
+            "receiverlongitude": rec_longitude, "format": "saczip",
+            "components": "ZNERT"}
+        request = client.fetch(_assemble_url('seismograms', **params))
+        assert request.code == 200
+        st = obspy.Stream()
+        zip_obj = zipfile.ZipFile(request.buffer)
+        for name in zip_obj.namelist():
+            st += obspy.read(io.BytesIO(zip_obj.read(name)))
+
+        for c, values in az_inc_map.items():
+            h = st.select(component=c)[0].stats.sac
+            # Assert azimuth an incidence angle.
+            assert h.cmpaz == values[0]
+            assert h.cmpinc == values[1]
+
+    # The source is always at 0/0.
+    # First value is azimuth, second incidence angle.
+    _run_test(rec_latitude=0.0, rec_longitude=90.0, az_inc_map={
+        "Z": (0.0, 0.0),
+        "N": (0.0, 90.0),
+        "E": (90.0, 90.0),
+        "R": (90.0, 90.0),
+        "T": (0.0, 90.0)})
+
+    _run_test(rec_latitude=0.0, rec_longitude=-90.0, az_inc_map={
+        "Z": (0.0, 0.0),
+        "N": (0.0, 90.0),
+        "E": (90.0, 90.0),
+        "R": (270.0, 90.0),
+        "T": (180.0, 90.0)})
+
+    _run_test(rec_latitude=45.0, rec_longitude=0.0, az_inc_map={
+        "Z": (0.0, 0.0),
+        "N": (0.0, 90.0),
+        "E": (90.0, 90.0),
+        "R": (0.0, 90.0),
+        "T": (270.0, 90.0)})
+
+    _run_test(rec_latitude=-45.0, rec_longitude=0.0, az_inc_map={
+        "Z": (0.0, 0.0),
+        "N": (0.0, 90.0),
+        "E": (90.0, 90.0),
+        "R": (180.0, 90.0),
+        "T": (90.0, 90.0)})
+
+
+def test_sac_headers_azimuth_and_incidence_greens_route(all_greens_clients):
+    """
+    Same thing but for the greens route - in this case nothing should be set
+    as its not really defined on non-geographic systems.
+    """
+    client = all_greens_clients
+
+    params = {
+        "sourcedepthinmeters": client.source_depth,
+        "sourcedistanceindegrees": 20,
+        "format": "saczip"}
+
+    request = client.fetch(_assemble_url('greens_function', **params))
+    assert request.code == 200
+    st = obspy.Stream()
+    zip_obj = zipfile.ZipFile(request.buffer)
+    for name in zip_obj.namelist():
+        st += obspy.read(io.BytesIO(zip_obj.read(name)))
+
+    for tr in st:
+        # Make sure they are not set.
+        assert "cmpinc" not in tr.stats.sac
+        assert "cmpaz" not in tr.stats.sac
+
+
 def test_dt_settings(all_clients):
     """
     Cannot downsample nor sample to more than 100 Hz.
