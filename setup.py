@@ -144,6 +144,7 @@ INSTALL_REQUIRES = ["h5py",
                     "future",
                     "tornado>=4.0.0",
                     "requests",
+                    "geographiclib",
                     "jsonschema >= 2.4.0"]
 
 EXTRAS_REQUIRE = {
