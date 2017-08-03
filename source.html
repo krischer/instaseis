@@ -1,23 +1,16 @@
 
 <!DOCTYPE html>
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>Sources and Receivers &#8212; instaseis 1.1.1-5-g7836 documentation</title>
-    
-    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/bootswatch-3.3.6/simplex/bootstrap.min.css" type="text/css" />
+    <title>Sources and Receivers &#8212; instaseis 1.1.1-6-g4f52 documentation</title>
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
-    <link rel="stylesheet" href="_static/my-styles.css" type="text/css" />
-    
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.1.1-5-g7836',
+        VERSION:     '1.1.1-6-g4f52',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -27,10 +20,10 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
-    <script type="text/javascript" src="_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -42,7 +35,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 
   </head>
-  <body role="document">
+  <body>
 
   <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
     <div class="container">
@@ -55,7 +48,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>1.1.1-5-g7836</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>1.1.1-6-g4f52</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -129,7 +122,7 @@ can savely ignore</strong>.</p>
 <p>The ruleset within Instaseis is simple:</p>
 <ol class="last arabic simple">
 <li>Source and receiver objects are always in geocentric coordinates.</li>
-<li>If parsed from any outside file (QuakeML/SEED/SAC/StationXML/...) the
+<li>If parsed from any outside file (QuakeML/SEED/SAC/StationXML/…) the
 coordinates are assumed to be WGS84 and will be converted so the
 source/receiver objects are again in geocentric coordinates.</li>
 </ol>
@@ -153,12 +146,12 @@ source/receiver objects are again in geocentric coordinates.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>latitude</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; The geocentric latitude of the receiver in degree.</li>
-<li><strong>longitude</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; The longitude of the receiver in degree.</li>
-<li><strong>depth_in_m</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; The depth of the receiver in meters. Only</li>
-<li><strong>network</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; The network id of the receiver.</li>
-<li><strong>station</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; The station id of the receiver.</li>
-<li><strong>location</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; The location code of the receiver.</li>
+<li><strong>latitude</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) – The geocentric latitude of the receiver in degree.</li>
+<li><strong>longitude</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) – The longitude of the receiver in degree.</li>
+<li><strong>depth_in_m</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) – The depth of the receiver in meters. Only</li>
+<li><strong>network</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em>, </em><em>optional</em>) – The network id of the receiver.</li>
+<li><strong>station</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em>, </em><em>optional</em>) – The station id of the receiver.</li>
+<li><strong>location</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – The location code of the receiver.</li>
 </ul>
 </td>
 </tr>
@@ -186,7 +179,7 @@ meant as a single entry point for receiver information from any source.</p>
 <p>Supports StationXML, the custom STATIONS fileformat, SAC files,
 SEED files, and a number of ObsPy objects. This method can
 furthermore work with anything ObsPy can deal with (filename, URL,
-memory files, ...).</p>
+memory files, …).</p>
 <p>Coordinates are assumed to be defined on the WGS84 ellipsoid and
 will be converted to geocentric coordinates.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -194,8 +187,8 @@ will be converted to geocentric coordinates.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>filename_or_obj</strong> &#8211; Filename/URL/Python object</li>
-<li><strong>network_code</strong> &#8211; Network code needed to parse ObsPy station
+<li><strong>filename_or_obj</strong> – Filename/URL/Python object</li>
+<li><strong>network_code</strong> – Network code needed to parse ObsPy station
 objects. Likely only needed for the recursive part of this method.</li>
 </ul>
 </td>
@@ -230,21 +223,21 @@ function.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>latitude</strong> &#8211; geocentric latitude of the source in degree</li>
-<li><strong>longitude</strong> &#8211; longitude of the source in degree</li>
-<li><strong>depth_in_m</strong> &#8211; source depth in m</li>
-<li><strong>m_rr</strong> &#8211; moment tensor components in r, theta, phi in Nm</li>
-<li><strong>m_tt</strong> &#8211; moment tensor components in r, theta, phi in Nm</li>
-<li><strong>m_pp</strong> &#8211; moment tensor components in r, theta, phi in Nm</li>
-<li><strong>m_rt</strong> &#8211; moment tensor components in r, theta, phi in Nm</li>
-<li><strong>m_rp</strong> &#8211; moment tensor components in r, theta, phi in Nm</li>
-<li><strong>m_tp</strong> &#8211; moment tensor components in r, theta, phi in Nm</li>
-<li><strong>time_shift</strong> &#8211; correction of the origin time in seconds. Useful
+<li><strong>latitude</strong> – geocentric latitude of the source in degree</li>
+<li><strong>longitude</strong> – longitude of the source in degree</li>
+<li><strong>depth_in_m</strong> – source depth in m</li>
+<li><strong>m_rr</strong> – moment tensor components in r, theta, phi in Nm</li>
+<li><strong>m_tt</strong> – moment tensor components in r, theta, phi in Nm</li>
+<li><strong>m_pp</strong> – moment tensor components in r, theta, phi in Nm</li>
+<li><strong>m_rt</strong> – moment tensor components in r, theta, phi in Nm</li>
+<li><strong>m_rp</strong> – moment tensor components in r, theta, phi in Nm</li>
+<li><strong>m_tp</strong> – moment tensor components in r, theta, phi in Nm</li>
+<li><strong>time_shift</strong> – correction of the origin time in seconds. Useful
 in the context of finite source or user defined source time
 functions.</li>
-<li><strong>sliprate</strong> &#8211; normalized source time function (sliprate)</li>
-<li><strong>dt</strong> &#8211; sampling of the source time function</li>
-<li><strong>origin_time</strong> &#8211; The origin time of the source. If you don&#8217;t
+<li><strong>sliprate</strong> – normalized source time function (sliprate)</li>
+<li><strong>dt</strong> – sampling of the source time function</li>
+<li><strong>origin_time</strong> – The origin time of the source. If you don’t
 reconvolve with another source time function this time is the
 peak of the source time function used to generate the database.
 If you reconvolve with another source time function this time is
@@ -291,18 +284,18 @@ dip and rake.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>latitude</strong> &#8211; geocentric latitude of the source in degree</li>
-<li><strong>longitude</strong> &#8211; longitude of the source in degree</li>
-<li><strong>depth_in_m</strong> &#8211; source depth in m</li>
-<li><strong>strike</strong> &#8211; strike of the fault in degree</li>
-<li><strong>dip</strong> &#8211; dip of the fault in degree</li>
-<li><strong>rake</strong> &#8211; rake of the fault in degree</li>
-<li><strong>M0</strong> &#8211; scalar moment</li>
-<li><strong>time_shift</strong> &#8211; correction of the origin time in seconds. only
+<li><strong>latitude</strong> – geocentric latitude of the source in degree</li>
+<li><strong>longitude</strong> – longitude of the source in degree</li>
+<li><strong>depth_in_m</strong> – source depth in m</li>
+<li><strong>strike</strong> – strike of the fault in degree</li>
+<li><strong>dip</strong> – dip of the fault in degree</li>
+<li><strong>rake</strong> – rake of the fault in degree</li>
+<li><strong>M0</strong> – scalar moment</li>
+<li><strong>time_shift</strong> – correction of the origin time in seconds. only
 useful in the context of finite sources</li>
-<li><strong>sliprate</strong> &#8211; normalized source time function (sliprate)</li>
-<li><strong>dt</strong> &#8211; sampling of the source time function</li>
-<li><strong>origin_time</strong> &#8211; The origin time of the source. If you don&#8217;t
+<li><strong>sliprate</strong> – normalized source time function (sliprate)</li>
+<li><strong>dt</strong> – sampling of the source time function</li>
+<li><strong>origin_time</strong> – The origin time of the source. If you don’t
 reconvolve with another source time function this time is the
 peak of the source time function used to generate the database.
 If you reconvolve with another source time function this time is
@@ -359,7 +352,7 @@ will be converted to geocentric coordinates.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filename_or_obj</strong> &#8211; The object or filename to parse.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filename_or_obj</strong> – The object or filename to parse.</td>
 </tr>
 </tbody>
 </table>
@@ -396,8 +389,8 @@ interpolation.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>dt</strong> &#8211; desired sampling</li>
-<li><strong>nsamp</strong> &#8211; desired number of samples</li>
+<li><strong>dt</strong> – desired sampling</li>
+<li><strong>nsamp</strong> – desired number of samples</li>
 </ul>
 </td>
 </tr>
@@ -414,9 +407,9 @@ interpolation.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>sliprate</strong> &#8211; (normalized) sliprate</li>
-<li><strong>dt</strong> &#8211; sampling of the sliprate</li>
-<li><strong>normalize</strong> &#8211; if sliprate is not normalized, set this to true to
+<li><strong>sliprate</strong> – (normalized) sliprate</li>
+<li><strong>dt</strong> – sampling of the sliprate</li>
+<li><strong>normalize</strong> – if sliprate is not normalized, set this to true to
 normalize it using trapezoidal rule style integration</li>
 </ul>
 </td>
@@ -433,8 +426,8 @@ normalize it using trapezoidal rule style integration</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>dt</strong> &#8211; desired sampling</li>
-<li><strong>nsamp</strong> &#8211; desired number of samples</li>
+<li><strong>dt</strong> – desired sampling</li>
+<li><strong>nsamp</strong> – desired number of samples</li>
 </ul>
 </td>
 </tr>
@@ -450,8 +443,8 @@ normalize it using trapezoidal rule style integration</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>dt</strong> &#8211; desired sampling</li>
-<li><strong>nsamp</strong> &#8211; desired number of samples</li>
+<li><strong>dt</strong> – desired sampling</li>
+<li><strong>nsamp</strong> – desired number of samples</li>
 </ul>
 </td>
 </tr>
@@ -489,18 +482,18 @@ notation:
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>latitude</strong> &#8211; geocentric latitude of the source in degree</li>
-<li><strong>longitude</strong> &#8211; longitude of the source in degree</li>
-<li><strong>depth_in_m</strong> &#8211; source depth in m</li>
-<li><strong>f_r</strong> &#8211; force components in r, theta, phi in N</li>
-<li><strong>f_t</strong> &#8211; force components in r, theta, phi in N</li>
-<li><strong>f_p</strong> &#8211; force components in r, theta, phi in N</li>
-<li><strong>origin_time</strong> &#8211; The origin time of the source. If you don&#8217;t
+<li><strong>latitude</strong> – geocentric latitude of the source in degree</li>
+<li><strong>longitude</strong> – longitude of the source in degree</li>
+<li><strong>depth_in_m</strong> – source depth in m</li>
+<li><strong>f_r</strong> – force components in r, theta, phi in N</li>
+<li><strong>f_t</strong> – force components in r, theta, phi in N</li>
+<li><strong>f_p</strong> – force components in r, theta, phi in N</li>
+<li><strong>origin_time</strong> – The origin time of the source. If you don’t
 reconvolve with another source time function this time is the
 peak of the source time function used to generate the database.
 If you reconvolve with another source time function this time is
 the time of the first sample of the final seismogram.</li>
-<li><strong>sliprate</strong> &#8211; normalized source time function (sliprate)</li>
+<li><strong>sliprate</strong> – normalized source time function (sliprate)</li>
 </ul>
 </td>
 </tr>
@@ -548,13 +541,13 @@ the time of the first sample of the final seismogram.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>pointsources</strong> (list of <a class="reference internal" href="#instaseis.source.Source" title="instaseis.source.Source"><code class="xref py py-class docutils literal"><span class="pre">Source</span></code></a> objects) &#8211; The points sources making up the finite source.</li>
-<li><strong>CMT</strong> (<a class="reference internal" href="#instaseis.source.Source" title="instaseis.source.Source"><code class="xref py py-class docutils literal"><span class="pre">Source</span></code></a>, optional) &#8211; The centroid of the finite source.</li>
-<li><strong>magnitude</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em>, </em><em>optional</em>) &#8211; The total moment magnitude of the source.</li>
-<li><strong>event_duration</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em>, </em><em>optional</em>) &#8211; The event duration in seconds.</li>
-<li><strong>hypocenter_longitude</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em>, </em><em>optional</em>) &#8211; The hypocentral longitude.</li>
-<li><strong>hypocenter_latitude</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em>, </em><em>optional</em>) &#8211; The hypocentral latitude.</li>
-<li><strong>hypocenter_depth_in_m</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em>, </em><em>optional</em>) &#8211; The hypocentral depth in m.</li>
+<li><strong>pointsources</strong> (list of <a class="reference internal" href="#instaseis.source.Source" title="instaseis.source.Source"><code class="xref py py-class docutils literal"><span class="pre">Source</span></code></a> objects) – The points sources making up the finite source.</li>
+<li><strong>CMT</strong> (<a class="reference internal" href="#instaseis.source.Source" title="instaseis.source.Source"><code class="xref py py-class docutils literal"><span class="pre">Source</span></code></a>, optional) – The centroid of the finite source.</li>
+<li><strong>magnitude</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em>, </em><em>optional</em>) – The total moment magnitude of the source.</li>
+<li><strong>event_duration</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em>, </em><em>optional</em>) – The event duration in seconds.</li>
+<li><strong>hypocenter_longitude</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em>, </em><em>optional</em>) – The hypocentral longitude.</li>
+<li><strong>hypocenter_latitude</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em>, </em><em>optional</em>) – The hypocentral latitude.</li>
+<li><strong>hypocenter_depth_in_m</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em>, </em><em>optional</em>) – The hypocentral depth in m.</li>
 </ul>
 </td>
 </tr>
@@ -590,24 +583,24 @@ dip and rake.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>latitude</strong> &#8211; geocentric latitude of the source centroid in degree</li>
-<li><strong>longitude</strong> &#8211; longitude of the source centroid in degree</li>
-<li><strong>depth_in_m</strong> &#8211; source centroid depth in m</li>
-<li><strong>strike</strong> &#8211; strike of the fault in degree</li>
-<li><strong>dip</strong> &#8211; dip of the fault in degree</li>
-<li><strong>rake</strong> &#8211; rake of the fault in degree</li>
-<li><strong>M0</strong> &#8211; scalar moment</li>
-<li><strong>fault_length</strong> &#8211; fault length in m</li>
-<li><strong>fault_width</strong> &#8211; fault width in m</li>
-<li><strong>rupture_velocity</strong> &#8211; rupture velocity in m / s. Use negative value
+<li><strong>latitude</strong> – geocentric latitude of the source centroid in degree</li>
+<li><strong>longitude</strong> – longitude of the source centroid in degree</li>
+<li><strong>depth_in_m</strong> – source centroid depth in m</li>
+<li><strong>strike</strong> – strike of the fault in degree</li>
+<li><strong>dip</strong> – dip of the fault in degree</li>
+<li><strong>rake</strong> – rake of the fault in degree</li>
+<li><strong>M0</strong> – scalar moment</li>
+<li><strong>fault_length</strong> – fault length in m</li>
+<li><strong>fault_width</strong> – fault width in m</li>
+<li><strong>rupture_velocity</strong> – rupture velocity in m / s. Use negative value
 to propagate the rupture in negative rake direction.</li>
-<li><strong>nl</strong> &#8211; number of point sources along strike direction</li>
-<li><strong>nw</strong> &#8211; number of point sources perpendicular strike direction</li>
-<li><strong>trise</strong> &#8211; rise time</li>
-<li><strong>tfall</strong> &#8211; fall time</li>
-<li><strong>dt</strong> &#8211; sampling of the source time function</li>
-<li><strong>planet_radius</strong> &#8211; radius of the planet, default to Earth.</li>
-<li><strong>origin_time</strong> &#8211; The origin time of the first patch breaking.</li>
+<li><strong>nl</strong> – number of point sources along strike direction</li>
+<li><strong>nw</strong> – number of point sources perpendicular strike direction</li>
+<li><strong>trise</strong> – rise time</li>
+<li><strong>tfall</strong> – fall time</li>
+<li><strong>dt</strong> – sampling of the source time function</li>
+<li><strong>planet_radius</strong> – radius of the planet, default to Earth.</li>
+<li><strong>origin_time</strong> – The origin time of the first patch breaking.</li>
 </ul>
 </td>
 </tr>
@@ -618,7 +611,7 @@ to propagate the rupture in negative rake direction.</li>
 <dl class="classmethod">
 <dt id="instaseis.source.FiniteSource.from_srf_file">
 <em class="property">classmethod </em><code class="descname">from_srf_file</code><span class="sig-paren">(</span><em>filename</em>, <em>normalize=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/source.html#FiniteSource.from_srf_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.FiniteSource.from_srf_file" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize a finite source object from a &#8216;standard rupture format&#8217;
+<dd><p>Initialize a finite source object from a ‘standard rupture format’
 (.srf) file</p>
 <p>Coordinates are assumed to be defined on the WGS84 ellipsoid and
 will be converted to geocentric coordinates.</p>
@@ -627,8 +620,8 @@ will be converted to geocentric coordinates.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; path to the .srf file</li>
-<li><strong>normalize</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; normalize the sliprate to 1</li>
+<li><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – path to the .srf file</li>
+<li><strong>normalize</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a><em>, </em><em>optional</em>) – normalize the sliprate to 1</li>
 </ul>
 </td>
 </tr>
@@ -668,14 +661,14 @@ will be converted to geocentric coordinates.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>filename_or_obj</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; path to the .param file</li>
-<li><strong>npts</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; number of samples for the source time functions. Should be
+<li><strong>filename_or_obj</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – path to the .param file</li>
+<li><strong>npts</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) – number of samples for the source time functions. Should be
 enough to accommodate long rise times plus optional filter
 responses.</li>
-<li><strong>dt</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; sample interval for the source time functions. Needs to be
+<li><strong>dt</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) – sample interval for the source time functions. Needs to be
 small enough to sample short rise times and can then be low pass
 filtered and downsampled before extracting seismograms.</li>
-<li><strong>trise_min</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; minimum rise time. If rise time or fall time is
+<li><strong>trise_min</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) – minimum rise time. If rise time or fall time is
 smaller than this value, it is replaced by the minimum value.
 Mostly meant to handle zero rise times in some USGS files.</li>
 </ul>
@@ -734,8 +727,8 @@ interpolation for all pointsources in the finite source.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>dt</strong> &#8211; desired sampling</li>
-<li><strong>nsamp</strong> &#8211; desired number of samples</li>
+<li><strong>dt</strong> – desired sampling</li>
+<li><strong>nsamp</strong> – desired number of samples</li>
 </ul>
 </td>
 </tr>
@@ -751,8 +744,8 @@ interpolation for all pointsources in the finite source.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>dt</strong> &#8211; desired sampling</li>
-<li><strong>nsamp</strong> &#8211; desired number of samples</li>
+<li><strong>dt</strong> – desired sampling</li>
+<li><strong>nsamp</strong> – desired number of samples</li>
 </ul>
 </td>
 </tr>
@@ -768,8 +761,8 @@ interpolation for all pointsources in the finite source.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>dt</strong> &#8211; desired sampling</li>
-<li><strong>nsamp</strong> &#8211; desired number of samples</li>
+<li><strong>dt</strong> – desired sampling</li>
+<li><strong>nsamp</strong> – desired number of samples</li>
 </ul>
 </td>
 </tr>
@@ -796,7 +789,7 @@ interpolation for all pointsources in the finite source.</p>
     </p>
     <p>
         &copy; Copyright 2014-2015, Lion Krischer and Martin van Driel.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.<br/>
     </p>
   </div>
 </footer>

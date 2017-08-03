@@ -1,23 +1,16 @@
 
 <!DOCTYPE html>
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>GET/POST /seismograms &#8212; instaseis 1.1.1-5-g7836 documentation</title>
-    
-    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/bootswatch-3.3.6/simplex/bootstrap.min.css" type="text/css" />
+    <title>GET/POST /seismograms &#8212; instaseis 1.1.1-6-g4f52 documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/my-styles.css" type="text/css" />
-    
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.1.1-5-g7836',
+        VERSION:     '1.1.1-6-g4f52',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -27,10 +20,10 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
-    <script type="text/javascript" src="../_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -42,7 +35,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 
   </head>
-  <body role="document">
+  <body>
 
   <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
     <div class="container">
@@ -55,7 +48,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>1.1.1-5-g7836</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>1.1.1-6-g4f52</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -115,7 +108,7 @@
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">Some parts of this route require an advanced server setup. Please view the
-<a class="reference internal" href="../advanced_server_configuration.html"><span class="doc">Advanced Server Configuration</span></a> for details. The parts that don&#8217;t
+<a class="reference internal" href="../advanced_server_configuration.html"><span class="doc">Advanced Server Configuration</span></a> for details. The parts that don’t
 will keep working even with a normal configuration.</p>
 </div>
 <dl class="docutils">
@@ -141,7 +134,7 @@ sure your proxy, if any, does not filter it.</dd>
 encoding format 4 (IEEE floating point).</p>
 <p>SAC files will have the following user defined variables set:</p>
 <ul class="last simple">
-<li><code class="docutils literal"><span class="pre">KUSER0</span></code>: &#8220;InstSeis&#8221;</li>
+<li><code class="docutils literal"><span class="pre">KUSER0</span></code>: “InstSeis”</li>
 <li><code class="docutils literal"><span class="pre">KUSER1</span></code>: The first eight letters of the used velocity model.</li>
 <li><code class="docutils literal"><span class="pre">KT7</span></code>: The first seven letters of the AxiSEM version number used to generate the model. Prefixed with <code class="docutils literal"><span class="pre">A</span></code>.</li>
 <li><code class="docutils literal"><span class="pre">KT8</span></code>: The first seven letters of the Instaseis version number used to generate the seismogram. Prefixed with <code class="docutils literal"><span class="pre">I</span></code>.</li>
@@ -293,7 +286,7 @@ seconds, from the start time.</p>
 </tr>
 <tr class="row-odd"><td colspan="5"><strong>Receiver Parameters</strong></td>
 </tr>
-<tr class="row-even"><td colspan="5">Directly specify coordinates and network/station codes ...</td>
+<tr class="row-even"><td colspan="5">Directly specify coordinates and network/station codes …</td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal"><span class="pre">receiverlatitude</span></code></td>
 <td>Float</td>
@@ -331,7 +324,7 @@ seconds, from the start time.</p>
 <td>SE</td>
 <td>Specify the location code of the final seismograms. Maximum of two letters.</td>
 </tr>
-<tr class="row-odd"><td colspan="5">... or use wildcard searches over network and station codes. Potentially returns multiple stations.</td>
+<tr class="row-odd"><td colspan="5">… or use wildcard searches over network and station codes. Potentially returns multiple stations.</td>
 </tr>
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">network</span></code></td>
 <td>String</td>
@@ -347,7 +340,7 @@ seconds, from the start time.</p>
 </tr>
 <tr class="row-even"><td colspan="5"><strong>Source Parameters</strong></td>
 </tr>
-<tr class="row-odd"><td colspan="5">The source can by set by specifying an event id if the server has been set-up for this ...</td>
+<tr class="row-odd"><td colspan="5">The source can by set by specifying an event id if the server has been set-up for this …</td>
 </tr>
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">event_id</span></code></td>
 <td>String</td>
@@ -355,7 +348,7 @@ seconds, from the start time.</p>
 <td>&#160;</td>
 <td>The id of the event to use.</td>
 </tr>
-<tr class="row-odd"><td colspan="5">... or by specify the source parameters in a variety of ways.</td>
+<tr class="row-odd"><td colspan="5">… or by specify the source parameters in a variety of ways.</td>
 </tr>
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">sourcelatitude</span></code></td>
 <td>Float</td>
@@ -427,7 +420,7 @@ moment.</p>
     </p>
     <p>
         &copy; Copyright 2014-2015, Lion Krischer and Martin van Driel.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.<br/>
     </p>
   </div>
 </footer>

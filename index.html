@@ -1,23 +1,16 @@
 
 <!DOCTYPE html>
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>Instaseis: Instant Global Seismograms Based on a Broadband Waveform Database &#8212; instaseis 1.1.1-5-g7836 documentation</title>
-    
-    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/bootswatch-3.3.6/simplex/bootstrap.min.css" type="text/css" />
+    <title>Instaseis: Instant Global Seismograms Based on a Broadband Waveform Database &#8212; instaseis 1.1.1-6-g4f52 documentation</title>
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
-    <link rel="stylesheet" href="_static/my-styles.css" type="text/css" />
-    
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.1.1-5-g7836',
+        VERSION:     '1.1.1-6-g4f52',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -27,10 +20,10 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
-    <script type="text/javascript" src="_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -41,7 +34,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 
   </head>
-  <body role="document">
+  <body>
 
   <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
     <div class="container">
@@ -54,7 +47,7 @@
         </button>
         <a class="navbar-brand" href="#">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>1.1.1-5-g7836</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>1.1.1-6-g4f52</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -114,7 +107,7 @@
 </div><div class="section" id="instaseis-instant-global-seismograms-based-on-a-broadband-waveform-database">
 <h1>Instaseis: Instant Global Seismograms Based on a Broadband Waveform Database<a class="headerlink" href="#instaseis-instant-global-seismograms-based-on-a-broadband-waveform-database" title="Permalink to this headline">¶</a></h1>
 <div class="clearfix"></div>
-<div style="float: none; padding-top: 20px" class="col-md-12"><p>Instaseis calculates broadband seismograms from Green&#8217;s function databases
+<div style="float: none; padding-top: 20px" class="col-md-12"><p>Instaseis calculates broadband seismograms from Green’s function databases
 generated with <a class="reference external" href="http://axisem.info">AxiSEM</a>  and allows for near
 instantaneous (on the order of milliseconds) extraction of seismograms. Using
 the 2.5D axisymmetric spectral element method, the generation of these
@@ -243,7 +236,7 @@ shared Fortran librarys - pull requests are welcome.</p>
 </ul>
 <div class="section" id="fortran-compiler">
 <h4>Fortran Compiler<a class="headerlink" href="#fortran-compiler" title="Permalink to this headline">¶</a></h4>
-<p>If you don&#8217;t have <code class="docutils literal"><span class="pre">gfortran</span></code>, please install it (on Linux) with</p>
+<p>If you don’t have <code class="docutils literal"><span class="pre">gfortran</span></code>, please install it (on Linux) with</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>$ sudo apt-get install gfortran
 </pre></div>
 </div>
@@ -314,7 +307,7 @@ $ pip install -v -e .
 <div class="section" id="testing">
 <h3><a class="toc-backref" href="#id5">Testing</a><a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h3>
 <p>Many test run without these two packages, but executing the full test suite
-requires two additional packages: <code class="docutils literal"><span class="pre">click</span></code> and <code class="docutils literal"><span class="pre">netcdf4</span></code>. If you don&#8217;t
+requires two additional packages: <code class="docutils literal"><span class="pre">click</span></code> and <code class="docutils literal"><span class="pre">netcdf4</span></code>. If you don’t
 already have them, install with</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>$ conda install click netcdf4
 </pre></div>
@@ -381,7 +374,7 @@ example databases (please note that they may only be available temporarily):</p>
 <div class="section" id="using-instaseis">
 <h3><a class="toc-backref" href="#id10">Using Instaseis</a><a class="headerlink" href="#using-instaseis" title="Permalink to this headline">¶</a></h3>
 <p>To use Instaseis you first have to open a connection to an Instaseis database.
-Instaseis supports connections to local and remote Green&#8217;s function databases; a
+Instaseis supports connections to local and remote Green’s function databases; a
 local database consists of up to four NetCDF files on the filesystem whereas a
 remote database requires an Instaseis server answering queries. The usage and
 capabilities of both are completely equivalent. This section deals with using
@@ -587,7 +580,7 @@ and the EU-FP7 725 690 <strong>VERCE</strong> project
     </p>
     <p>
         &copy; Copyright 2014-2015, Lion Krischer and Martin van Driel.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.<br/>
     </p>
   </div>
 </footer>

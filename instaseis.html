@@ -1,23 +1,16 @@
 
 <!DOCTYPE html>
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>Main Instaseis Classes &#8212; instaseis 1.1.1-5-g7836 documentation</title>
-    
-    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/bootswatch-3.3.6/simplex/bootstrap.min.css" type="text/css" />
+    <title>Main Instaseis Classes &#8212; instaseis 1.1.1-6-g4f52 documentation</title>
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
-    <link rel="stylesheet" href="_static/my-styles.css" type="text/css" />
-    
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.1.1-5-g7836',
+        VERSION:     '1.1.1-6-g4f52',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -27,10 +20,10 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
-    <script type="text/javascript" src="_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -42,7 +35,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 
   </head>
-  <body role="document">
+  <body>
 
   <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
     <div class="container">
@@ -55,7 +48,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>1.1.1-5-g7836</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>1.1.1-6-g4f52</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -141,7 +134,7 @@ keyword arguments are passed to the underlying
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Filepath or URL. Instaseis will determine if it is a local
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – Filepath or URL. Instaseis will determine if it is a local
 file path or a HTTP URL and delegate to the corresponding class.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">An initialized database object.</td>
@@ -214,7 +207,7 @@ routines.</p>
 <dl class="method">
 <dt id="instaseis.database_interfaces.base_instaseis_db.BaseInstaseisDB.get_greens_function">
 <code class="descname">get_greens_function</code><span class="sig-paren">(</span><em>epicentral_distance_in_degree</em>, <em>source_depth_in_m</em>, <em>origin_time=UTCDateTime(1970</em>, <em>1</em>, <em>1</em>, <em>0</em>, <em>0)</em>, <em>kind=u'displacement'</em>, <em>return_obspy_stream=True</em>, <em>dt=None</em>, <em>kernelwidth=12</em>, <em>definition=u'seiscomp'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/database_interfaces/base_instaseis_db.html#BaseInstaseisDB.get_greens_function"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.database_interfaces.base_instaseis_db.BaseInstaseisDB.get_greens_function" title="Permalink to this definition">¶</a></dt>
-<dd><p>Extract Green&#8217;s function from the Green&#8217;s function database.</p>
+<dd><p>Extract Green’s function from the Green’s function database.</p>
 <p>Currently only one definition is implemented: the one assumed by
 Seiscomp, i.e. the components <code class="docutils literal"><span class="pre">TSS</span></code>, <code class="docutils literal"><span class="pre">ZSS</span></code>, <code class="docutils literal"><span class="pre">RSS</span></code>, <code class="docutils literal"><span class="pre">TDS</span></code>,
 <code class="docutils literal"><span class="pre">ZDS</span></code>, <code class="docutils literal"><span class="pre">RDS</span></code>, <code class="docutils literal"><span class="pre">ZDD</span></code>, <code class="docutils literal"><span class="pre">RDD</span></code>, <code class="docutils literal"><span class="pre">ZEP</span></code>, <code class="docutils literal"><span class="pre">REP</span></code> as defined in</p>
@@ -238,18 +231,18 @@ Seiscomp, i.e. the components <code class="docutils literal"><span class="pre">T
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>epicentral_distance_in_degree</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; The epicentral distance in
+<li><strong>epicentral_distance_in_degree</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) – The epicentral distance in
 degree.</li>
-<li><strong>source_depth_in_m</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; The source depth in m below the surface.</li>
-<li><strong>origin_time</strong> (<a class="reference external" href="http://docs.obspy.org/packages/autogen/obspy.core.utcdatetime.UTCDateTime.html#obspy.core.utcdatetime.UTCDateTime" title="(in ObsPy Documentation (1.0.3) v1.0)"><code class="xref py py-class docutils literal"><span class="pre">obspy.core.utcdatetime.UTCDateTime</span></code></a>) &#8211; Origin time of the source.</li>
-<li><strong>kind</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; The desired units of the seismogram:
+<li><strong>source_depth_in_m</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) – The source depth in m below the surface.</li>
+<li><strong>origin_time</strong> (<a class="reference external" href="http://docs.obspy.org/packages/autogen/obspy.core.utcdatetime.UTCDateTime.html#obspy.core.utcdatetime.UTCDateTime" title="(in ObsPy Documentation (1.0.3) v1.0)"><code class="xref py py-class docutils literal"><span class="pre">obspy.core.utcdatetime.UTCDateTime</span></code></a>) – Origin time of the source.</li>
+<li><strong>kind</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – The desired units of the seismogram:
 <code class="docutils literal"><span class="pre">&quot;displacement&quot;</span></code>, <code class="docutils literal"><span class="pre">&quot;velocity&quot;</span></code>, or <code class="docutils literal"><span class="pre">&quot;acceleration&quot;</span></code>.</li>
-<li><strong>dt</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; Desired sampling rate of the Green&#8217;s functions. Resampling
+<li><strong>dt</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) – Desired sampling rate of the Green’s functions. Resampling
 is done using a Lanczos kernel.</li>
-<li><strong>kernelwidth</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; The width of the sinc kernel used for resampling in
+<li><strong>kernelwidth</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) – The width of the sinc kernel used for resampling in
 terms of the original sampling interval. Best choose something
 between 10 and 20.</li>
-<li><strong>definition</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; The desired Green&#8217;s function definition.</li>
+<li><strong>definition</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – The desired Green’s function definition.</li>
 </ul>
 </td>
 </tr>
@@ -267,34 +260,34 @@ with NumPy arrays as values.</p>
 <dl class="method">
 <dt id="instaseis.database_interfaces.base_instaseis_db.BaseInstaseisDB.get_seismograms">
 <code class="descname">get_seismograms</code><span class="sig-paren">(</span><em>source</em>, <em>receiver</em>, <em>components=None</em>, <em>kind=u'displacement'</em>, <em>remove_source_shift=True</em>, <em>reconvolve_stf=False</em>, <em>return_obspy_stream=True</em>, <em>dt=None</em>, <em>kernelwidth=12</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/database_interfaces/base_instaseis_db.html#BaseInstaseisDB.get_seismograms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.database_interfaces.base_instaseis_db.BaseInstaseisDB.get_seismograms" title="Permalink to this definition">¶</a></dt>
-<dd><p>Extract seismograms from the Green&#8217;s function database.</p>
+<dd><p>Extract seismograms from the Green’s function database.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>source</strong> (<a class="reference internal" href="source.html#instaseis.source.Source" title="instaseis.source.Source"><code class="xref py py-class docutils literal"><span class="pre">instaseis.source.Source</span></code></a> or
-<a class="reference internal" href="source.html#instaseis.source.ForceSource" title="instaseis.source.ForceSource"><code class="xref py py-class docutils literal"><span class="pre">instaseis.source.ForceSource</span></code></a>) &#8211; The source definition.</li>
-<li><strong>receiver</strong> (<a class="reference internal" href="source.html#instaseis.source.Receiver" title="instaseis.source.Receiver"><code class="xref py py-class docutils literal"><span class="pre">instaseis.source.Receiver</span></code></a>) &#8211; The seismic receiver.</li>
-<li><strong>components</strong> (<em>tuple of str</em><em>, </em><em>optional</em>) &#8211; Which components to calculate. Must be a tuple
+<a class="reference internal" href="source.html#instaseis.source.ForceSource" title="instaseis.source.ForceSource"><code class="xref py py-class docutils literal"><span class="pre">instaseis.source.ForceSource</span></code></a>) – The source definition.</li>
+<li><strong>receiver</strong> (<a class="reference internal" href="source.html#instaseis.source.Receiver" title="instaseis.source.Receiver"><code class="xref py py-class docutils literal"><span class="pre">instaseis.source.Receiver</span></code></a>) – The seismic receiver.</li>
+<li><strong>components</strong> (<em>tuple of str</em><em>, </em><em>optional</em>) – Which components to calculate. Must be a tuple
 containing any combination of <code class="docutils literal"><span class="pre">&quot;Z&quot;</span></code>, <code class="docutils literal"><span class="pre">&quot;N&quot;</span></code>, <code class="docutils literal"><span class="pre">&quot;E&quot;</span></code>,
 <code class="docutils literal"><span class="pre">&quot;R&quot;</span></code>, and <code class="docutils literal"><span class="pre">&quot;T&quot;</span></code>. Defaults to <code class="docutils literal"><span class="pre">[&quot;Z&quot;,</span> <span class="pre">&quot;N&quot;,</span> <span class="pre">&quot;E&quot;]</span></code> for two
 component databases, to <code class="docutils literal"><span class="pre">[&quot;N&quot;,</span> <span class="pre">&quot;E&quot;]</span></code> for horizontal only
 databases, and to <code class="docutils literal"><span class="pre">[&quot;Z&quot;]</span></code> for vertical only databases.</li>
-<li><strong>kind</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; The desired units of the seismogram:
+<li><strong>kind</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em>, </em><em>optional</em>) – The desired units of the seismogram:
 <code class="docutils literal"><span class="pre">&quot;displacement&quot;</span></code>, <code class="docutils literal"><span class="pre">&quot;velocity&quot;</span></code>, or <code class="docutils literal"><span class="pre">&quot;acceleration&quot;</span></code>.</li>
-<li><strong>remove_source_shift</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; Cut all samples before the peak of the
+<li><strong>remove_source_shift</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Cut all samples before the peak of the
 source time function. This has the effect that the first sample
 is the origin time of the source.</li>
-<li><strong>reconvolve_stf</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; Deconvolve the source time function used in
+<li><strong>reconvolve_stf</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Deconvolve the source time function used in
 the AxiSEM run and convolve with the STF attached to the source.
 For this to be stable, the new STF needs to bandlimited.</li>
-<li><strong>return_obspy_stream</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; Return format is either an
+<li><strong>return_obspy_stream</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Return format is either an
 <a class="reference external" href="http://docs.obspy.org/packages/autogen/obspy.core.stream.Stream.html#obspy.core.stream.Stream" title="(in ObsPy Documentation (1.0.3) v1.0)"><code class="xref py py-class docutils literal"><span class="pre">obspy.core.stream.Stream</span></code></a> object or a dictionary
 containing the raw NumPy arrays.</li>
-<li><strong>dt</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em>, </em><em>optional</em>) &#8211; Desired sampling rate of the seismograms. Resampling is done
+<li><strong>dt</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em>, </em><em>optional</em>) – Desired sampling rate of the seismograms. Resampling is done
 using a Lanczos kernel.</li>
-<li><strong>kernelwidth</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a><em>, </em><em>optional</em>) &#8211; The width of the sinc kernel used for resampling in
+<li><strong>kernelwidth</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a><em>, </em><em>optional</em>) – The width of the sinc kernel used for resampling in
 terms of the original sampling interval. Best choose something
 between 10 and 20.</li>
 </ul>
@@ -321,23 +314,23 @@ with NumPy arrays as values.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>sources</strong> (<a class="reference internal" href="source.html#instaseis.source.FiniteSource" title="instaseis.source.FiniteSource"><code class="xref py py-class docutils literal"><span class="pre">FiniteSource</span></code></a> or list of
-<a class="reference internal" href="source.html#instaseis.source.Source" title="instaseis.source.Source"><code class="xref py py-class docutils literal"><span class="pre">Source</span></code></a> objects.) &#8211; A collection of point sources.</li>
-<li><strong>receiver</strong> (<a class="reference internal" href="source.html#instaseis.source.Receiver" title="instaseis.source.Receiver"><code class="xref py py-class docutils literal"><span class="pre">instaseis.source.Receiver</span></code></a>) &#8211; The seismic receiver.</li>
-<li><strong>components</strong> (<em>tuple of str</em><em>, </em><em>optional</em>) &#8211; Which components to calculate. Must be a tuple
+<a class="reference internal" href="source.html#instaseis.source.Source" title="instaseis.source.Source"><code class="xref py py-class docutils literal"><span class="pre">Source</span></code></a> objects.) – A collection of point sources.</li>
+<li><strong>receiver</strong> (<a class="reference internal" href="source.html#instaseis.source.Receiver" title="instaseis.source.Receiver"><code class="xref py py-class docutils literal"><span class="pre">instaseis.source.Receiver</span></code></a>) – The seismic receiver.</li>
+<li><strong>components</strong> (<em>tuple of str</em><em>, </em><em>optional</em>) – Which components to calculate. Must be a tuple
 containing any combination of <code class="docutils literal"><span class="pre">&quot;Z&quot;</span></code>, <code class="docutils literal"><span class="pre">&quot;N&quot;</span></code>, <code class="docutils literal"><span class="pre">&quot;E&quot;</span></code>,
 <code class="docutils literal"><span class="pre">&quot;R&quot;</span></code>, and <code class="docutils literal"><span class="pre">&quot;T&quot;</span></code>. Defaults to <code class="docutils literal"><span class="pre">[&quot;Z&quot;,</span> <span class="pre">&quot;N&quot;,</span> <span class="pre">&quot;E&quot;]</span></code> for two
 component databases, to <code class="docutils literal"><span class="pre">[&quot;N&quot;,</span> <span class="pre">&quot;E&quot;]</span></code> for horizontal only
 databases, and to <code class="docutils literal"><span class="pre">[&quot;Z&quot;]</span></code> for vertical only databases.</li>
-<li><strong>kind</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; The desired units of the seismogram:
+<li><strong>kind</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em>, </em><em>optional</em>) – The desired units of the seismogram:
 <code class="docutils literal"><span class="pre">&quot;displacement&quot;</span></code>, <code class="docutils literal"><span class="pre">&quot;velocity&quot;</span></code>, or <code class="docutils literal"><span class="pre">&quot;acceleration&quot;</span></code>.</li>
-<li><strong>dt</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em>, </em><em>optional</em>) &#8211; Desired sampling rate of the seismograms. Resampling is done
+<li><strong>dt</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em>, </em><em>optional</em>) – Desired sampling rate of the seismograms. Resampling is done
 using a Lanczos kernel.</li>
-<li><strong>kernelwidth</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a><em>, </em><em>optional</em>) &#8211; The width of the sinc kernel used for resampling in
+<li><strong>kernelwidth</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a><em>, </em><em>optional</em>) – The width of the sinc kernel used for resampling in
 terms of the original sampling interval. Best choose something
 between 10 and 20.</li>
-<li><strong>correct_mu</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; Correct the source magnitude for the actual shear
+<li><strong>correct_mu</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Correct the source magnitude for the actual shear
 modulus from the model.</li>
-<li><strong>progress_callback</strong> (<em>function</em><em>, </em><em>optional</em>) &#8211; Optional callback function that will be
+<li><strong>progress_callback</strong> (<em>function</em><em>, </em><em>optional</em>) – Optional callback function that will be
 called with current source number and the number of total
 sources for each calculated source. Useful for integration into
 user interfaces to provide some kind of progress information. If
@@ -371,15 +364,15 @@ database.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>db_path</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Path to the Instaseis Database containing
+<li><strong>db_path</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – Path to the Instaseis Database containing
 subdirectories PZ and/or PX each containing a
 <code class="docutils literal"><span class="pre">order_output.nc4</span></code> file.</li>
-<li><strong>buffer_size_in_mb</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a><em>, </em><em>optional</em>) &#8211; Strain and displacement are buffered to
+<li><strong>buffer_size_in_mb</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a><em>, </em><em>optional</em>) – Strain and displacement are buffered to
 avoid repeated disc access. Depending on the type of database
 and the number of components of the database, the total buffer
 memory can be up to four times this number. The optimal value is
 highly application and system dependent.</li>
-<li><strong>read_on_demand</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; Read several global fields on demand (faster
+<li><strong>read_on_demand</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Read several global fields on demand (faster
 initialization) or on initialization (slower
 initialization, faster in individual seismogram extraction,
 useful e.g. for finite sources, default).</li>
@@ -403,15 +396,15 @@ useful e.g. for finite sources, default).</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>db_path</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Path to the Instaseis Database containing
+<li><strong>db_path</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – Path to the Instaseis Database containing
 subdirectories PZ and/or PX each containing a
 <code class="docutils literal"><span class="pre">order_output.nc4</span></code> file.</li>
-<li><strong>buffer_size_in_mb</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a><em>, </em><em>optional</em>) &#8211; Strain and displacement are buffered to
+<li><strong>buffer_size_in_mb</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a><em>, </em><em>optional</em>) – Strain and displacement are buffered to
 avoid repeated disc access. Depending on the type of database
 and the number of components of the database, the total buffer
 memory can be up to four times this number. The optimal value is
 highly application and system dependent.</li>
-<li><strong>read_on_demand</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; Read several global fields on demand (faster
+<li><strong>read_on_demand</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Read several global fields on demand (faster
 initialization) or on initialization (slower
 initialization, faster in individual seismogram extraction,
 useful e.g. for finite sources, default).</li>
@@ -435,14 +428,14 @@ useful e.g. for finite sources, default).</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>db_path</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Path to the Instaseis Database.</li>
-<li><strong>netcdf_file</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; The path to the actual netcdf4 file.</li>
-<li><strong>buffer_size_in_mb</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a><em>, </em><em>optional</em>) &#8211; Strain and displacement are buffered to
+<li><strong>db_path</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – Path to the Instaseis Database.</li>
+<li><strong>netcdf_file</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – The path to the actual netcdf4 file.</li>
+<li><strong>buffer_size_in_mb</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a><em>, </em><em>optional</em>) – Strain and displacement are buffered to
 avoid repeated disc access. Depending on the type of database
 and the number of components of the database, the total buffer
 memory can be up to four times this number. The optimal value is
 highly application and system dependent.</li>
-<li><strong>read_on_demand</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; Read several global fields on demand (faster
+<li><strong>read_on_demand</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Read several global fields on demand (faster
 initialization) or on initialization (slower
 initialization, faster in individual seismogram extraction,
 useful e.g. for finite sources, default).</li>
@@ -466,15 +459,15 @@ useful e.g. for finite sources, default).</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>db_path</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Path to the Instaseis Database containing
+<li><strong>db_path</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – Path to the Instaseis Database containing
 subdirectories PZ and/or PX each containing a
 <code class="docutils literal"><span class="pre">order_output.nc4</span></code> file.</li>
-<li><strong>buffer_size_in_mb</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a><em>, </em><em>optional</em>) &#8211; Strain and displacement are buffered to
+<li><strong>buffer_size_in_mb</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a><em>, </em><em>optional</em>) – Strain and displacement are buffered to
 avoid repeated disc access. Depending on the type of database
 and the number of components of the database, the total buffer
 memory can be up to four times this number. The optimal value is
 highly application and system dependent.</li>
-<li><strong>read_on_demand</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; Read several global fields on demand (faster
+<li><strong>read_on_demand</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Read several global fields on demand (faster
 initialization) or on initialization (slower
 initialization, faster in individual seismogram extraction,
 useful e.g. for finite sources, default).</li>
@@ -498,14 +491,14 @@ useful e.g. for finite sources, default).</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>db_path</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Path to the Instaseis Database.</li>
-<li><strong>netcdf_file</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; The path to the actual netcdf4 file.</li>
-<li><strong>buffer_size_in_mb</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a><em>, </em><em>optional</em>) &#8211; Strain and displacement are buffered to
+<li><strong>db_path</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – Path to the Instaseis Database.</li>
+<li><strong>netcdf_file</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – The path to the actual netcdf4 file.</li>
+<li><strong>buffer_size_in_mb</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a><em>, </em><em>optional</em>) – Strain and displacement are buffered to
 avoid repeated disc access. Depending on the type of database
 and the number of components of the database, the total buffer
 memory can be up to four times this number. The optimal value is
 highly application and system dependent.</li>
-<li><strong>read_on_demand</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; Read several global fields on demand (faster
+<li><strong>read_on_demand</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Read several global fields on demand (faster
 initialization) or on initialization (slower
 initialization, faster in individual seismogram extraction,
 useful e.g. for finite sources, default).</li>
@@ -528,7 +521,7 @@ useful e.g. for finite sources, default).</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>url</strong> &#8211; URL to the remote Instaseis server.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>url</strong> – URL to the remote Instaseis server.</td>
 </tr>
 </tbody>
 </table>
@@ -541,15 +534,15 @@ useful e.g. for finite sources, default).</li>
 <dl class="class">
 <dt id="instaseis.database_interfaces.syngine_instaseis_db.SyngineInstaseisDB">
 <em class="property">class </em><code class="descclassname">instaseis.database_interfaces.syngine_instaseis_db.</code><code class="descname">SyngineInstaseisDB</code><span class="sig-paren">(</span><em>model</em>, <em>base_url=u'http://service.iris.edu/irisws/syngine/1'</em>, <em>debug=False</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/database_interfaces/syngine_instaseis_db.html#SyngineInstaseisDB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.database_interfaces.syngine_instaseis_db.SyngineInstaseisDB" title="Permalink to this definition">¶</a></dt>
-<dd><p>Remote Instaseis interface connecting with IRIS&#8217; syngine service.</p>
+<dd><p>Remote Instaseis interface connecting with IRIS’ syngine service.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>model</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; The model to use.</li>
-<li><strong>base_url</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; URL to the root of the syngine service.</li>
-<li><strong>debug</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; Debug messages on/off.</li>
+<li><strong>model</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – The model to use.</li>
+<li><strong>base_url</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – URL to the root of the syngine service.</li>
+<li><strong>debug</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – Debug messages on/off.</li>
 </ul>
 </td>
 </tr>
@@ -574,7 +567,7 @@ useful e.g. for finite sources, default).</li>
     </p>
     <p>
         &copy; Copyright 2014-2015, Lion Krischer and Martin van Driel.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.<br/>
     </p>
   </div>
 </footer>
