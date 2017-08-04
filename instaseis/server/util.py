@@ -13,6 +13,10 @@ import re
 import functools
 import threading
 
+# This is needed for the gps2dist_azimuth() function to always be stable. We
+# thus enforce an import here.
+import geographiclib  # noqa
+
 import numpy as np
 import obspy
 from obspy.geodetics import gps2dist_azimuth, locations2degrees
@@ -22,6 +26,7 @@ import tornado.web
 from .. import ForceSource, FiniteSource
 from ..helpers import geocentric_to_elliptic_latitude
 from .. import __version__
+
 
 # Valid phase offset pattern including capture groups.
 PHASE_OFFSET_PATTERN = re.compile(r"(^[A-Za-z0-9^]+)([\+-])([\deE\.\-\+]+$)")

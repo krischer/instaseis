@@ -4601,6 +4601,47 @@ def test_various_failure_conditions(all_clients_all_callbacks):
             "Source depth must be: %.1f km" % db.info.source_depth)
 
 
+def test_sac_dist_header_edge_case(all_clients):
+    """
+    Regression test for https://github.com/krischer/instaseis/issues/55.
+    """
+    client = all_clients
+
+    params = {
+        "sourcelatitude": 0.0, "sourcelongitude": 0.0,
+        "sourcedepthinmeters": client.source_depth,
+        "sourcemomenttensor": "1E15,1E15,1E15,1E15,1E15,1E15",
+        "receiverlatitude": 0.0, "receiverlongitude": 10.0,
+        "format": "saczip"}
+    request = client.fetch(_assemble_url('seismograms', **params))
+    assert request.code == 200
+    st = obspy.Stream()
+    zip_obj = zipfile.ZipFile(request.buffer)
+    for name in zip_obj.namelist():
+        st += obspy.read(io.BytesIO(zip_obj.read(name)))
+    for tr in st:
+        assert tr.stats._format == "SAC"
+        # Checked with http://www.fai.org/distance_calculation
+        assert abs(tr.stats.sac.dist - 1113.194907792064) < 1E-4
+
+    params = {
+        "sourcelatitude": 0.0, "sourcelongitude": 100.0,
+        "sourcedepthinmeters": client.source_depth,
+        "sourcemomenttensor": "1E15,1E15,1E15,1E15,1E15,1E15",
+        "receiverlatitude": 0.0, "receiverlongitude": 105.0,
+        "format": "saczip"}
+    request = client.fetch(_assemble_url('seismograms', **params))
+    assert request.code == 200
+    st = obspy.Stream()
+    zip_obj = zipfile.ZipFile(request.buffer)
+    for name in zip_obj.namelist():
+        st += obspy.read(io.BytesIO(zip_obj.read(name)))
+    for tr in st:
+        assert tr.stats._format == "SAC"
+        # Checked with http://www.fai.org/distance_calculation
+        assert abs(tr.stats.sac.dist - 556.5974538960322) < 1E-4
+
+
 def test_sac_headers(all_clients):
     """
     Tests the sac headers.
@@ -4641,10 +4682,10 @@ def test_sac_headers(all_clients):
         assert abs(tr.stats.sac.o - 1.5) < 1E-6
 
         # Distances, az and baz
-        assert (tr.stats.sac.dist - 4183.4302) < 1E-5
-        assert (tr.stats.sac.az - 53.691647) < 1E-5
-        assert (tr.stats.sac.baz - 240.38969) < 1E-5
-        assert (tr.stats.sac.gcarc - 37.560081) < 1E-5
+        assert abs(tr.stats.sac.dist - 4180.436) < 1E-4
+        assert abs(tr.stats.sac.az - 53.691647) < 1E-4
+        assert abs(tr.stats.sac.baz - 240.38969) < 1E-4
+        assert abs(tr.stats.sac.gcarc - 37.560081) < 1E-4
 
         # Test the "provenance".
         assert tr.stats.sac.kuser0 == "InstSeis"
