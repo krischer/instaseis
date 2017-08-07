@@ -222,6 +222,43 @@ def _validate_and_write_waveforms(st, callback, starttime, endtime, scale,
             tr.stats.sac.lpspol = 1
             tr.stats.sac.lcalda = 0
 
+            # Add cmpinc and cmpaz headers.
+            #
+            # From the SAC format manual:
+            # CMPAZ: Component azimuth (degrees clockwise from north).
+            # CMPINC: Component incident angle (degrees from vertical).
+            #
+            # I guess "degrees from vertical" means degrees from vertical up.
+            # So the vertical channel would have a CMPINC of 0 and all
+            # others a CMPINC of 90. This is different from the dip used in
+            # SEED.
+            _c = tr.stats.channel[-1]
+
+            # Special case handling for the green's function route. Don't
+            # assign it here as we don't operate in geographical coordinates.
+            if len(st) == 10:
+                pass
+            elif _c == "Z":
+                tr.stats.sac.cmpinc = 0.0
+                # Zero seems reasonable.
+                tr.stats.sac.cmpaz = 0.0
+            # Explicitly handle the other cases to not run into surprises.
+            elif _c in ["E", "N", "R", "T"]:
+                tr.stats.sac.cmpinc = 90.0
+                if _c == "E":
+                    tr.stats.sac.cmpaz = 90.0
+                elif _c == "N":
+                    tr.stats.sac.cmpaz = 0.0
+                elif _c == "R":
+                    tr.stats.sac.cmpaz = (baz - 180.0) % 360.0
+                elif _c == "T":
+                    tr.stats.sac.cmpaz = (baz - 270.0) % 360.0
+                # Cannot really happen
+                else:  # pragma: no cover
+                    raise NotImplementedError
+            else:  # pragma: no cover
+                raise NotImplementedError
+
             # Some provenance.
             tr.stats.sac.kuser0 = "InstSeis"
             tr.stats.sac.kuser1 = db.info.velocity_model[:8]
