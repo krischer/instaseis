@@ -4739,28 +4739,28 @@ def test_sac_headers_azimuth_and_incidence(all_clients):
         "N": (0.0, 90.0),
         "E": (90.0, 90.0),
         "R": (90.0, 90.0),
-        "T": (0.0, 90.0)})
+        "T": (180.0, 90.0)})
 
     _run_test(rec_latitude=0.0, rec_longitude=-90.0, az_inc_map={
         "Z": (0.0, 0.0),
         "N": (0.0, 90.0),
         "E": (90.0, 90.0),
         "R": (270.0, 90.0),
-        "T": (180.0, 90.0)})
+        "T": (0.0, 90.0)})
 
     _run_test(rec_latitude=45.0, rec_longitude=0.0, az_inc_map={
         "Z": (0.0, 0.0),
         "N": (0.0, 90.0),
         "E": (90.0, 90.0),
         "R": (0.0, 90.0),
-        "T": (270.0, 90.0)})
+        "T": (90.0, 90.0)})
 
     _run_test(rec_latitude=-45.0, rec_longitude=0.0, az_inc_map={
         "Z": (0.0, 0.0),
         "N": (0.0, 90.0),
         "E": (90.0, 90.0),
         "R": (180.0, 90.0),
-        "T": (90.0, 90.0)})
+        "T": (270.0, 90.0)})
 
 
 def test_sac_headers_azimuth_and_incidence_greens_route(all_greens_clients):

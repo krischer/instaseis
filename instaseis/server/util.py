@@ -252,7 +252,7 @@ def _validate_and_write_waveforms(st, callback, starttime, endtime, scale,
                 elif _c == "R":
                     tr.stats.sac.cmpaz = (baz - 180.0) % 360.0
                 elif _c == "T":
-                    tr.stats.sac.cmpaz = (baz - 270.0) % 360.0
+                    tr.stats.sac.cmpaz = (baz - 90.0) % 360.0
                 # Cannot really happen
                 else:  # pragma: no cover
                     raise NotImplementedError
