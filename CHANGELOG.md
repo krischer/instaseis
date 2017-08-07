@@ -7,7 +7,7 @@
 * Forcing installation of `geographiclib` (see #57).
 * Setting `CMPINC` and `CMPAZ` headers in SAC files for the server routes.
 
-## [1.1.0] - 2017-04-25
+## [1.1.1] - 2017-04-25
 * Compatibility with `numpy` 1.12
 
 ## [1.1.0] - 2016-11-07
