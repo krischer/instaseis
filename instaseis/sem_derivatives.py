@@ -23,13 +23,14 @@ from .helpers import load_lib
 lib = load_lib()
 
 
-def _strain_td(u, G, GT, xi, eta, npol, nsamp, nodes, element_type, axial,
-               fct):
+def _strain_td(u, G, GT, xi, eta, npol, nsamp, nodes, element_type,  # NOQA
+               axial, fct):
     strain_tensor = np.zeros((nsamp, npol + 1, npol + 1, 6), np.float64,
                              order="F")
     u = np.require(u, dtype=np.float64, requirements=["F_CONTIGUOUS"])
-    G = np.require(G, dtype=np.float64, requirements=["F_CONTIGUOUS"])
-    GT = np.require(GT, dtype=np.float64, requirements=["F_CONTIGUOUS"])
+    G = np.require(G, dtype=np.float64, requirements=["F_CONTIGUOUS"])  # NOQA
+    GT = np.require(GT, dtype=np.float64,  # NOQA
+                    requirements=["F_CONTIGUOUS"])
     xi = np.require(xi, dtype=np.float64, requirements=["F_CONTIGUOUS"])
     eta = np.require(eta, dtype=np.float64, requirements=["F_CONTIGUOUS"])
     nodes = np.require(nodes, dtype=np.float64, requirements=["F_CONTIGUOUS"])
@@ -50,19 +51,19 @@ def _strain_td(u, G, GT, xi, eta, npol, nsamp, nodes, element_type, axial,
     return strain_tensor
 
 
-def strain_monopole_td(u, G, GT, xi, eta, npol, nsamp, nodes, element_type,
-                       axial):
+def strain_monopole_td(u, G, GT, xi, eta, npol, nsamp, nodes,  # NOQA
+                       element_type, axial):
     return _strain_td(u, G, GT, xi, eta, npol, nsamp, nodes, element_type,
                       axial, lib.strain_monopole_td)
 
 
-def strain_dipole_td(u, G, GT, xi, eta, npol, nsamp, nodes, element_type,
-                     axial):
+def strain_dipole_td(u, G, GT, xi, eta, npol, nsamp, nodes,  # NOQA
+                     element_type, axial):
     return _strain_td(u, G, GT, xi, eta, npol, nsamp, nodes, element_type,
                       axial, lib.strain_dipole_td)
 
 
-def strain_quadpole_td(u, G, GT, xi, eta, npol, nsamp, nodes, element_type,
-                       axial):  # pragma: no cover
+def strain_quadpole_td(u, G, GT, xi, eta, npol, nsamp, nodes,  # NOQA
+                       element_type, axial):  # pragma: no cover
     return _strain_td(u, G, GT, xi, eta, npol, nsamp, nodes, element_type,
                       axial, lib.strain_quadpole_td)

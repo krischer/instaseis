@@ -97,11 +97,11 @@ class ReciprocalMergedInstaseisDB(BaseNetCDFInstaseisDB):
         if isinstance(source, Source):
             if self.info.dump_type == 'displ_only':
                 if ei.axis:
-                    G = self.parsed_mesh.G2
-                    GT = self.parsed_mesh.G1T
+                    G = self.parsed_mesh.G2  # NOQA
+                    GT = self.parsed_mesh.G1T  # NOQA
                 else:
-                    G = self.parsed_mesh.G2
-                    GT = self.parsed_mesh.G2T
+                    G = self.parsed_mesh.G2  # NOQA
+                    GT = self.parsed_mesh.G2T  # NOQA
 
             if self.info.dump_type == 'displ_only':
                 strain_x, strain_z = self._get_strain_interp(
@@ -237,9 +237,9 @@ class ReciprocalMergedInstaseisDB(BaseNetCDFInstaseisDB):
 
         return utemp
 
-    def _get_strain_interp(self, id_elem, gll_point_ids, G, GT,
-                           col_points_xi, col_points_eta, corner_points,
-                           eltype, axis, xi, eta):
+    def _get_strain_interp(  # NOQA
+            self, id_elem, gll_point_ids, G, GT, col_points_xi, col_points_eta,
+            corner_points, eltype, axis, xi, eta):
         mesh = self.meshes.merged
         if id_elem not in mesh.strain_buffer:
             utemp = self._get_and_reorder_utemp(id_elem)

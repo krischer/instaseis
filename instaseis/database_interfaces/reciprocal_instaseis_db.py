@@ -131,11 +131,11 @@ class ReciprocalInstaseisDB(BaseNetCDFInstaseisDB):
         if isinstance(source, Source):
             if self.info.dump_type == 'displ_only':
                 if ei.axis:
-                    G = self.parsed_mesh.G2
-                    GT = self.parsed_mesh.G1T
+                    G = self.parsed_mesh.G2  # NOQA
+                    GT = self.parsed_mesh.G1T  # NOQA
                 else:
-                    G = self.parsed_mesh.G2
-                    GT = self.parsed_mesh.G2T
+                    G = self.parsed_mesh.G2  # NOQA
+                    GT = self.parsed_mesh.G2T  # NOQA
 
             strain_x = None
             strain_z = None

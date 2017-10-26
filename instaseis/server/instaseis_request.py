@@ -77,7 +77,7 @@ class InstaseisTimeSeriesHandler(with_metaclass(ABCMeta,
             if "required" in properties:
                 try:
                     value = self.get_argument(name)
-                except:
+                except Exception:
                     msg = "Required parameter '%s' not given." % name
                     raise tornado.web.HTTPError(400, log_message=msg,
                                                 reason=msg)
@@ -90,7 +90,7 @@ class InstaseisTimeSeriesHandler(with_metaclass(ABCMeta,
             if value is not None:
                 try:
                     value = properties["type"](value)
-                except:
+                except Exception:
                     if "format" in properties:
                         msg = "Parameter '%s' must be formatted as: '%s'" % (
                             name, properties["format"])
@@ -258,7 +258,7 @@ class InstaseisTimeSeriesHandler(with_metaclass(ABCMeta,
             content_type = "application/zip"
         self.set_header("Content-Type", content_type)
 
-        FILE_ENDINGS_MAP = {
+        file_endings_map = {
             "miniseed": "mseed",
             "saczip": "zip"}
 
@@ -270,7 +270,7 @@ class InstaseisTimeSeriesHandler(with_metaclass(ABCMeta,
         filename = "%s_%s.%s" % (
             label,
             str(obspy.UTCDateTime()).replace(":", "_"),
-            FILE_ENDINGS_MAP[format])
+            file_endings_map[format])
 
         self.set_header("Content-Disposition",
                         "attachment; filename=%s" % filename)
@@ -409,7 +409,7 @@ class InstaseisTimeSeriesHandler(with_metaclass(ABCMeta,
                                     station=args.stationcode,
                                     location=args.locationcode,
                                     depth_in_m=rec_depth)
-            except:
+            except Exception:
                 msg = ("Could not construct receiver with passed parameters. "
                        "Check parameters for sanity.")
                 raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
@@ -435,7 +435,7 @@ class InstaseisTimeSeriesHandler(with_metaclass(ABCMeta,
                         network=station["network"],
                         station=station["station"],
                         depth_in_m=0))
-                except:
+                except Exception:
                     msg = ("Station coordinate query returned invalid "
                            "coordinates.")
                     raise tornado.web.HTTPError(400, log_message=msg,

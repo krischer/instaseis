@@ -685,7 +685,7 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
     def info(self):
         try:
             return self.__cached_info
-        except:
+        except Exception:
             pass
         self.__cached_info = AttribDict(self._get_info())
         return self.__cached_info

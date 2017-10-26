@@ -53,7 +53,7 @@ def rotate_symm_tensor_voigt_xyz_earth_to_xyz_src(mt, phi, theta):
     compute and ouput in voigt notation:
     Rt.A.R
     """
-    A = np.array([[mt[0], mt[5], mt[4]],
+    A = np.array([[mt[0], mt[5], mt[4]],  # NOQA
                   [mt[5], mt[1], mt[3]],
                   [mt[4], mt[3], mt[2]]])
 
@@ -62,17 +62,17 @@ def rotate_symm_tensor_voigt_xyz_earth_to_xyz_src(mt, phi, theta):
     st = np.sin(theta)
     sp = np.sin(phi)
 
-    R = np.array([[ct * cp, -sp, st * cp],
+    R = np.array([[ct * cp, -sp, st * cp],  # NOQA
                   [ct * sp, cp, st * sp],
                   [-st, 0, ct]])
 
     # This double matrix product involves number that might differ by 20
     # orders of magnitudes which makes it numerically tricky. Thus we employ
     # quad precision numbers to make it a bit more stable and reproducable.
-    R = np.require(R, dtype=np.float128)
-    A = np.require(A, dtype=np.float128)
+    R = np.require(R, dtype=np.float128)  # NOQA
+    A = np.require(A, dtype=np.float128)  # NOQA
 
-    B = np.dot(np.dot(R.T, A), R)
+    B = np.dot(np.dot(R.T, A), R)  # NOQA
 
     # Convert back to single precision.
     return np.require(
@@ -94,7 +94,7 @@ def rotate_symm_tensor_voigt_xyz_src_to_xyz_earth(mt, phi, theta):
     compute and ouput in voigt notation:
     R.A.Rt
     """
-    A = np.array([[mt[0], mt[5], mt[4]],
+    A = np.array([[mt[0], mt[5], mt[4]],  # NOQA
                   [mt[5], mt[1], mt[3]],
                   [mt[4], mt[3], mt[2]]])
 
@@ -103,11 +103,11 @@ def rotate_symm_tensor_voigt_xyz_src_to_xyz_earth(mt, phi, theta):
     st = np.sin(theta)
     sp = np.sin(phi)
 
-    R = np.array([[ct * cp, -sp, st * cp],
+    R = np.array([[ct * cp, -sp, st * cp],  # NOQA
                   [ct * sp, cp, st * sp],
                   [-st, 0, ct]])
 
-    B = np.dot(np.dot(R, A), R.T)
+    B = np.dot(np.dot(R, A), R.T)  # NOQA
     return np.array([B[0, 0], B[1, 1], B[2, 2], B[1, 2], B[0, 2], B[0, 1]])
 
 
@@ -125,16 +125,16 @@ def rotate_symm_tensor_voigt_xyz_to_src(mt, phi):
     compute and ouput in voigt notation:
     R.A.Rt
     """
-    A = np.array([[mt[0], mt[5], mt[4]],
+    A = np.array([[mt[0], mt[5], mt[4]],  # NOQA
                   [mt[5], mt[1], mt[3]],
                   [mt[4], mt[3], mt[2]]])
 
     cp = np.cos(phi)
     sp = np.sin(phi)
 
-    R = np.array([[cp, sp, 0.], [-sp, cp, 0], [0, 0, 1.]])
+    R = np.array([[cp, sp, 0.], [-sp, cp, 0], [0, 0, 1.]])  # NOQA
 
-    B = np.dot(np.dot(R, A), R.T)
+    B = np.dot(np.dot(R, A), R.T)  # NOQA
     return np.array([B[0, 0], B[1, 1], B[2, 2], B[1, 2], B[0, 2], B[0, 1]])
 
 
@@ -180,7 +180,8 @@ def rotate_vector_src_to_xyz(vec, phi):
                      vec[2]])
 
 
-def rotate_vector_src_to_NEZ(vec, phi, srclon, srccolat, reclon, reccolat):
+def rotate_vector_src_to_NEZ(  # NOQA
+        vec, phi, srclon, srccolat, reclon, reccolat):
     rotmat = np.eye(3)
     rotmat = rotate_vector_src_to_xyz(rotmat, phi)
     rotmat = rotate_vector_xyz_src_to_xyz_earth(rotmat, srclon, srccolat)

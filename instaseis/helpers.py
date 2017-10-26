@@ -84,7 +84,7 @@ def elliptic_to_geocentric_latitude(lat, axis_a=6378137.0,
     -44.80757678401642
     """
     _f = (axis_a - axis_b) / axis_a
-    E_2 = 2 * _f - _f ** 2
+    e_2 = 2 * _f - _f ** 2
 
     # Singularities close to the pole and the equator. Just return the value
     # in that case.
@@ -92,7 +92,7 @@ def elliptic_to_geocentric_latitude(lat, axis_a=6378137.0,
             abs(lat + 90.0) < 1E-6:
         return lat
 
-    return math.degrees(math.atan((1 - E_2) * math.tan(math.radians(lat))))
+    return math.degrees(math.atan((1 - e_2) * math.tan(math.radians(lat))))
 
 
 def geocentric_to_elliptic_latitude(lat, axis_a=6378137.0,
@@ -118,7 +118,7 @@ def geocentric_to_elliptic_latitude(lat, axis_a=6378137.0,
     -45.19242321598358
     """
     _f = (axis_a - axis_b) / axis_a
-    E_2 = 2 * _f - _f ** 2
+    e_2 = 2 * _f - _f ** 2
 
     # Singularities close to the pole and the equator. Just return the value
     # in that case.
@@ -126,7 +126,7 @@ def geocentric_to_elliptic_latitude(lat, axis_a=6378137.0,
             abs(lat + 90.0) < 1E-6:
         return lat
 
-    return math.degrees(math.atan(math.tan(math.radians(lat)) / (1 - E_2)))
+    return math.degrees(math.atan(math.tan(math.radians(lat)) / (1 - e_2)))
 
 
 def sizeof_fmt(num):
@@ -171,6 +171,6 @@ def rfftfreq(n, d=1.0):  # pragma: no cover
         return np.fft.rfftfreq(n=n, d=d)
 
     val = 1.0 / (n * d)
-    N = n // 2 + 1
+    N = n // 2 + 1  # NOQA
     results = np.arange(0, N, dtype=int)
     return results * val

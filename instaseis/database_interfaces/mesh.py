@@ -67,7 +67,7 @@ class Buffer(object):
         # Works with single arrays and iterables of arrays.
         try:
             return value.nbytes
-        except:
+        except Exception:
             return sum(_i.nbytes for _i in value if _i is not None)
 
     def add(self, key, value):
@@ -140,7 +140,7 @@ class Mesh(object):
             attr = attr[0]
         try:
             return attr.decode()
-        except:
+        except Exception:
             return attr
 
     def _find_time_axis(self):

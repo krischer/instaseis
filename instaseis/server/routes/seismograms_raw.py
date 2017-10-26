@@ -141,7 +141,7 @@ class RawSeismogramsHandler(InstaseisTimeSeriesHandler):
                                     m_pp=args.mpp, m_rt=args.mrt,
                                     m_rp=args.mrp, m_tp=args.mtp,
                                     origin_time=args.origintime)
-                except:
+                except Exception:
                     msg = ("Could not construct moment tensor source with "
                            "passed parameters. Check parameters for sanity.")
                     raise tornado.web.HTTPError(400, log_message=msg,
@@ -155,7 +155,7 @@ class RawSeismogramsHandler(InstaseisTimeSeriesHandler):
                         depth_in_m=args.sourcedepthinmeters,
                         strike=args.strike, dip=args.dip, rake=args.rake,
                         M0=args.M0, origin_time=args.origintime)
-                except:
+                except Exception:
                     msg = ("Could not construct the source from the passed "
                            "strike/dip/rake parameters. Check parameter for "
                            "sanity.")
@@ -170,7 +170,7 @@ class RawSeismogramsHandler(InstaseisTimeSeriesHandler):
                                          f_r=args.fr, f_t=args.ft,
                                          f_p=args.fp,
                                          origin_time=args.origintime)
-                except:
+                except Exception:
                     msg = ("Could not construct force source with passed "
                            "parameters. Check parameters for sanity.")
                     raise tornado.web.HTTPError(400, log_message=msg,
@@ -191,7 +191,7 @@ class RawSeismogramsHandler(InstaseisTimeSeriesHandler):
                                 station=args.stationcode,
                                 location=args.locationcode,
                                 depth_in_m=args.receiverdepthinmeters)
-        except:
+        except Exception:
             msg = ("Could not construct receiver with passed parameters. "
                    "Check parameters for sanity.")
             raise tornado.web.HTTPError(400, log_message=msg, reason=msg)

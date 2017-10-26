@@ -374,7 +374,7 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
                                     m_pp=m[2], m_rt=m[3],
                                     m_rp=m[4], m_tp=m[5],
                                     origin_time=args.origintime)
-                except:
+                except Exception:
                     msg = ("Could not construct moment tensor source with "
                            "passed parameters. Check parameters for "
                            "sanity.")
@@ -401,7 +401,7 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
                         depth_in_m=args.sourcedepthinmeters,
                         strike=m[0], dip=m[1], rake=m[2],
                         M0=m0, origin_time=args.origintime)
-                except:
+                except Exception:
                     msg = ("Could not construct the source from the "
                            "passed strike/dip/rake parameters. Check "
                            "parameter for sanity.")
@@ -416,7 +416,7 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
                         depth_in_m=args.sourcedepthinmeters,
                         f_r=m[0], f_t=m[1], f_p=m[2],
                         origin_time=args.origintime)
-                except:
+                except Exception:
                     msg = ("Could not construct force source with passed "
                            "parameters. Check parameters for sanity.")
                     raise tornado.web.HTTPError(400, log_message=msg,
@@ -447,7 +447,7 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
                                     station=args.stationcode,
                                     location=args.locationcode,
                                     depth_in_m=args.receiverdepthinmeters)
-            except:
+            except Exception:
                 msg = ("Could not construct receiver with passed parameters. "
                        "Check parameters for sanity.")
                 raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
@@ -473,7 +473,7 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
                         network=station["network"],
                         station=station["station"],
                         depth_in_m=0))
-                except:
+                except Exception:
                     msg = ("Could not construct receiver with passed "
                            "parameters. Check parameters for sanity.")
                     raise tornado.web.HTTPError(400, log_message=msg,

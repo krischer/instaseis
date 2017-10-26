@@ -277,11 +277,11 @@ def merge_files(filenames, output_folder, contiguous, compression_level,
         for filename in input_files.values():
             try:
                 filename.close()
-            except:
+            except Exception:
                 pass
         try:
             out.close()
-        except:
+        except Exception:
             pass
 
 

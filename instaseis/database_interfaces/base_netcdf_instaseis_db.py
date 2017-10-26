@@ -193,9 +193,9 @@ class BaseNetCDFInstaseisDB(with_metaclass(ABCMeta, BaseInstaseisDB)):
             source=source, receiver=receiver, components=components,
             coordinates=coordinates, element_info=element_info)
 
-    def _get_strain_interp(self, mesh, id_elem, gll_point_ids, G, GT,
-                           col_points_xi, col_points_eta, corner_points,
-                           eltype, axis, xi, eta):
+    def _get_strain_interp(  # NOQA
+            self, mesh, id_elem, gll_point_ids, G, GT, col_points_xi,
+            col_points_eta, corner_points, eltype, axis, xi, eta):
         if id_elem not in mesh.strain_buffer:
             # Single precision in the NetCDF files but the later interpolation
             # routines require double precision. Assignment to this array will

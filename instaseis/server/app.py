@@ -106,8 +106,8 @@ def launch_io_loop(db_path, port, buffer_size_in_mb, quiet, log_level,
         # Console log handler.
         ch = logging.StreamHandler()
         # Add formatter
-        FORMAT = "[%(asctime)s] - %(name)s - %(levelname)s: %(message)s"
-        formatter = logging.Formatter(FORMAT)
+        _format = "[%(asctime)s] - %(name)s - %(levelname)s: %(message)s"
+        formatter = logging.Formatter(_format)
         ch.setFormatter(formatter)
 
         log_level = getattr(logging, log_level)
