@@ -23,7 +23,7 @@ from .helpers import load_lib
 lib = load_lib()
 
 
-def lagrange_interpol_2D_td(points1, points2, coefficients, x1, x2):
+def lagrange_interpol_2D_td(points1, points2, coefficients, x1, x2):  # NOQA
     points1 = np.require(points1, dtype=np.float64,
                          requirements=["F_CONTIGUOUS"])
     points2 = np.require(points2, dtype=np.float64,
@@ -35,13 +35,13 @@ def lagrange_interpol_2D_td(points1, points2, coefficients, x1, x2):
     # seismograms.
     assert len(points1) == len(points2)
 
-    N = len(points1) - 1
+    n = len(points1) - 1
     nsamp = coefficients.shape[0]
 
     interpolant = np.zeros(nsamp, dtype="float64", order="F")
 
     lib.lagrange_interpol_2D_td(
-        C.c_int(N),
+        C.c_int(n),
         C.c_int(nsamp),
         points1.ctypes.data_as(C.POINTER(C.c_double)),
         points2.ctypes.data_as(C.POINTER(C.c_double)),

@@ -56,7 +56,7 @@ def _purge_duplicates(f):
     return wrapper
 
 
-def moment2magnitude(M0):
+def moment2magnitude(M0):  # NOQA
     """
     Convert seismic moment M0 to moment magnitude Mw
 
@@ -68,7 +68,7 @@ def moment2magnitude(M0):
     return 2.0 / 3.0 * np.log10(M0) - 6.0
 
 
-def magnitude2moment(Mw):
+def magnitude2moment(Mw):  # NOQA
     """
     Convert moment magnitude Mw to seismic moment M0
 
@@ -98,7 +98,7 @@ def fault_vectors_lmn(strike, dip, rake):
     delta = np.deg2rad(dip)
     lambd = np.deg2rad(rake)
 
-    l = np.empty(3)
+    l = np.empty(3)  # NOQA
     m = np.empty(3)
     n = np.empty(3)
 
@@ -122,7 +122,7 @@ def fault_vectors_lmn(strike, dip, rake):
     # here we use geocentric, i.e. t,p,r
 
     transform = np.array([-1., 1., -1.])
-    l *= transform
+    l *= transform  # NOQA
     m *= transform
     n *= transform
 
@@ -354,14 +354,14 @@ class Source(SourceOrReceiver):
         # py2/py3 compatibility.
         try:  # pragma: no cover
             str_types = (str, bytes, unicode)  # NOQA
-        except:  # pragma: no cover
+        except Exception:  # pragma: no cover
             str_types = (str, bytes)
 
         if isinstance(filename_or_obj, str_types):
             # Anything ObsPy can read.
             try:
                 src = obspy.read_events(filename_or_obj)
-            except:
+            except Exception:
                 pass
             else:
                 return Source.parse(src)
@@ -400,9 +400,10 @@ class Source(SourceOrReceiver):
             raise NotImplementedError
 
     @classmethod
-    def from_strike_dip_rake(self, latitude, longitude, depth_in_m, strike,
-                             dip, rake, M0, time_shift=None, sliprate=None,
-                             dt=None, origin_time=obspy.UTCDateTime(0)):
+    def from_strike_dip_rake(  # NOQA
+        cls, latitude, longitude, depth_in_m, strike, dip, rake, M0,
+        time_shift=None, sliprate=None, dt=None,
+        origin_time=obspy.UTCDateTime(0)):
         """
         Initialize a source object from a shear source parameterized by strike,
         dip and rake.
@@ -474,9 +475,9 @@ class Source(SourceOrReceiver):
                 np.sin(2. * delta) * np.sin(2. * phi) * np.sin(lambd) / 2.) * \
             M0
 
-        source = self(latitude, longitude, depth_in_m, m_rr, m_tt, m_pp, m_rt,
-                      m_rp, m_tp, time_shift, sliprate, dt,
-                      origin_time=origin_time)
+        source = cls(latitude, longitude, depth_in_m, m_rr, m_tt, m_pp, m_rt,
+                     m_rp, m_tp, time_shift, sliprate, dt,
+                     origin_time=origin_time)
 
         # storing strike, dip and rake for plotting purposes
         source.phi = phi
@@ -486,7 +487,7 @@ class Source(SourceOrReceiver):
         return source
 
     @property
-    def M0(self):
+    def M0(self):  # NOQA
         """
         Scalar Moment M0 in Nm
         """
@@ -758,7 +759,7 @@ class Receiver(SourceOrReceiver):
                 os.path.exists(filename_or_obj):
             try:
                 return Receiver._parse_stations_file(filename_or_obj)
-            except:
+            except Exception:
                 pass
         # ObsPy inventory.
         elif isinstance(filename_or_obj, obspy.core.inventory.Inventory):
@@ -843,7 +844,7 @@ class Receiver(SourceOrReceiver):
             return Receiver.parse(obspy.read_inventory(filename_or_obj))
         except ReceiverParseError as e:
             raise e
-        except:
+        except Exception:
             pass
 
         # SAC files contain station coordinates.
@@ -851,7 +852,7 @@ class Receiver(SourceOrReceiver):
             return Receiver.parse(obspy.read(filename_or_obj))
         except ReceiverParseError as e:
             raise e
-        except:
+        except Exception:
             pass
 
         # Last but not least try to parse it as a SEED file.
@@ -860,7 +861,7 @@ class Receiver(SourceOrReceiver):
                 obspy.io.xseed.parser.Parser(filename_or_obj))
         except ReceiverParseError as e:
             raise e
-        except:
+        except Exception:
             pass
 
         raise ValueError("%s could not be parsed." % repr(filename_or_obj))
@@ -907,7 +908,7 @@ class FiniteSource(object):
     :param hypocenter_depth_in_m: The hypocentral depth in m.
     :type hypocenter_depth_in_m: float, optional
     """
-    def __init__(self, pointsources=None, CMT=None, magnitude=None,
+    def __init__(self, pointsources=None, CMT=None, magnitude=None,  # NOQA
                  event_duration=None, hypocenter_longitude=None,
                  hypocenter_latitude=None, hypocenter_depth_in_m=None):
         self.pointsources = pointsources
@@ -945,7 +946,7 @@ class FiniteSource(object):
         return self.pointsources[index]
 
     @classmethod
-    def from_srf_file(self, filename, normalize=False):
+    def from_srf_file(cls, filename, normalize=False):
         """
         Initialize a finite source object from a 'standard rupture format'
         (.srf) file
@@ -1012,11 +1013,11 @@ class FiniteSource(object):
                     if normalize:
                         stf /= np.trapz(stf, dx=dt)
 
-                    M0 = area * DEFAULT_MU * slip1
+                    m0 = area * DEFAULT_MU * slip1
 
                     sources.append(
                         Source.from_strike_dip_rake(
-                            lat, lon, dep, stk, dip, rake, M0,
+                            lat, lon, dep, stk, dip, rake, m0,
                             time_shift=tinit, sliprate=stf, dt=dt))
 
                 if nt2 > 0:
@@ -1027,17 +1028,17 @@ class FiniteSource(object):
                     if normalize:
                         stf /= np.trapz(stf, dx=dt)
 
-                    M0 = area * DEFAULT_MU * slip2
+                    m0 = area * DEFAULT_MU * slip2
 
                     sources.append(
                         Source.from_strike_dip_rake(
-                            lat, lon, dep, stk, dip, rake, M0,
+                            lat, lon, dep, stk, dip, rake, m0,
                             time_shift=tinit, sliprate=stf, dt=dt))
 
                 if nt3 > 0:
                     raise NotImplementedError('Slip along u3 axis')
 
-            return self(pointsources=sources)
+            return cls(pointsources=sources)
 
     @classmethod
     def from_usgs_param_file(cls, filename_or_obj, npts=10000, dt=0.1,
@@ -1166,10 +1167,11 @@ class FiniteSource(object):
         return cls(pointsources=sources)
 
     @classmethod
-    def from_Haskell(self, latitude, longitude, depth_in_m, strike, dip, rake,
-                     M0, fault_length, fault_width, rupture_velocity, nl=100,
-                     nw=1, trise=1., tfall=None, dt=0.1, planet_radius=6371e3,
-                     origin_time=obspy.UTCDateTime(0)):
+    def from_Haskell(  # NOQA
+            self, latitude, longitude, depth_in_m, strike, dip, rake, M0,
+            fault_length, fault_width, rupture_velocity, nl=100, nw=1,
+            trise=1., tfall=None, dt=0.1, planet_radius=6371e3,
+            origin_time=obspy.UTCDateTime(0)):
         """
         Initialize a source object from a shear source parameterized by strike,
         dip and rake.
@@ -1334,7 +1336,7 @@ class FiniteSource(object):
         x = 0.0
         y = 0.0
         z = 0.0
-        finite_M0 = self.M0
+        finite_m0 = self.M0
         finite_mij = np.zeros(6)
         finite_time_shift = 0.0  # time shift is now included in the sliprate
 
@@ -1352,11 +1354,11 @@ class FiniteSource(object):
         self.resample_sliprate(dt, nsamp)
 
         for ps in self.pointsources:
-            x += ps.x(planet_radius) * ps.M0 / finite_M0
-            y += ps.y(planet_radius) * ps.M0 / finite_M0
-            z += ps.z(planet_radius) * ps.M0 / finite_M0
+            x += ps.x(planet_radius) * ps.M0 / finite_m0
+            y += ps.y(planet_radius) * ps.M0 / finite_m0
+            z += ps.z(planet_radius) * ps.M0 / finite_m0
 
-            # finite_time_shift += ps.time_shift * ps.M0 / finite_M0
+            # finite_time_shift += ps.time_shift * ps.M0 / finite_m0
 
             mij = rotations.rotate_symm_tensor_voigt_xyz_src_to_xyz_earth(
                 ps.tensor_voigt, np.deg2rad(ps.longitude),
@@ -1368,7 +1370,7 @@ class FiniteSource(object):
             sliprate_f *= np.exp(- 1j * rfftfreq(nfft) *
                                  2. * np.pi * ps.time_shift / dt)
             finite_sliprate += np.fft.irfft(sliprate_f)[:nsamp] \
-                * ps.M0 / finite_M0
+                * ps.M0 / finite_m0
 
         longitude = np.rad2deg(np.arctan2(y, x))
         colatitude = np.rad2deg(
@@ -1387,7 +1389,7 @@ class FiniteSource(object):
                           sliprate=finite_sliprate, dt=dt)
 
     @property
-    def M0(self):
+    def M0(self):  # NOQA
         """
         Scalar Moment M0 in Nm
         """

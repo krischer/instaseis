@@ -555,16 +555,16 @@ def test_get_greens_vs_get_seismogram(bwd_db):
     st_greens = db.get_greens_function(epicentral_distance_degree,
                                        depth_in_m, definition="seiscomp")
 
-    TSS = st_greens.select(channel="TSS")[0].data
-    ZSS = st_greens.select(channel="ZSS")[0].data
-    RSS = st_greens.select(channel="RSS")[0].data
-    TDS = st_greens.select(channel="TDS")[0].data
-    ZDS = st_greens.select(channel="ZDS")[0].data
-    RDS = st_greens.select(channel="RDS")[0].data
-    ZDD = st_greens.select(channel="ZDD")[0].data
-    RDD = st_greens.select(channel="RDD")[0].data
-    ZEP = st_greens.select(channel="ZEP")[0].data
-    REP = st_greens.select(channel="REP")[0].data
+    TSS = st_greens.select(channel="TSS")[0].data  # NOQA
+    ZSS = st_greens.select(channel="ZSS")[0].data  # NOQA
+    RSS = st_greens.select(channel="RSS")[0].data  # NOQA
+    TDS = st_greens.select(channel="TDS")[0].data  # NOQA
+    ZDS = st_greens.select(channel="ZDS")[0].data  # NOQA
+    RDS = st_greens.select(channel="RDS")[0].data  # NOQA
+    ZDD = st_greens.select(channel="ZDD")[0].data  # NOQA
+    RDD = st_greens.select(channel="RDD")[0].data  # NOQA
+    ZEP = st_greens.select(channel="ZEP")[0].data  # NOQA
+    REP = st_greens.select(channel="REP")[0].data  # NOQA
 
     az = np.deg2rad(azimuth)
     # eq (6) in Minson & Dreger, 2008

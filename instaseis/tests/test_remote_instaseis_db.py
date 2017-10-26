@@ -169,7 +169,7 @@ def test_initialization_failures():
                                 "version": "test version"}
             try:
                 instaseis.open_db("http://localhost:8765432")
-            except:
+            except Exception:
                 pass
 
     assert len(w) == 1

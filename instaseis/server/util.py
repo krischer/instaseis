@@ -79,12 +79,12 @@ class IOQueue(object):
 def _validtimesetting(value):
     try:
         return obspy.UTCDateTime(value)
-    except:
+    except Exception:
         pass
 
     try:
         return float(value)
-    except:
+    except Exception:
         pass
 
     m = PHASE_OFFSET_PATTERN.match(value)

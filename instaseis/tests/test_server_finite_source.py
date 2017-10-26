@@ -92,7 +92,7 @@ def test_triggering_random_error_during_parsing(reciprocal_clients):
                               "Incorrect USGS param file?")
 
 
-def test_sending_non_USGS_file(reciprocal_clients):
+def test_sending_non_usgs_file(reciprocal_clients):
     """
     Tests error if a non-USGS file is sent.
     """

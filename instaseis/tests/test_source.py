@@ -32,7 +32,7 @@ USGS_PARAM_FILE2 = os.path.join(DATA, "chile.param")
 USGS_PARAM_FILE_EMPTY = os.path.join(DATA, "empty.param")
 
 
-def test_parse_CMTSOLUTIONS_file(tmpdir):
+def test_parse_cmtsolutions_file(tmpdir):
     """
     Tests parsing from a CMTSOLUTIONS file.
     """
@@ -86,7 +86,7 @@ def _assert_src(src):
     assert src.origin_time == obspy.UTCDateTime("2010-04-11T22:08:12.800000Z")
 
 
-def test_parse_QuakeML():
+def test_parse_quakeml():
     """
     Tests parsing from a QuakeML file.
     """
@@ -193,13 +193,13 @@ def test_parse_usgs_param_file_from_bytes_io_and_open_files():
     assert finitesource.npointsources == 400
 
 
-def test_Haskell():
+def test_haskell():
     """
     Tests Haskell source.
     """
     latitude, longitude, depth_in_m = 89.9999, 0., 10000.
     strike, dip, rake = 90., 90., 0.
-    M0 = 1e20
+    M0 = 1e20  # NOQA
     fault_length, fault_width = 1000e3, 200.
     rupture_velocity = 1000.
     nl, nw = 3, 3
@@ -274,31 +274,31 @@ def test_min_max_functions():
     assert finitesource.rupture_duration == 222.22222
 
 
-def test_M0():
+def test_m0():
     """
     Tests computation of scalar Moment.
     """
     strike = 10.
     dip = 20.
     rake = 30.
-    M0 = 1e16
-    source = Source.from_strike_dip_rake(0., 0., 0., strike, dip, rake, M0)
+    m0 = 1e16
+    source = Source.from_strike_dip_rake(0., 0., 0., strike, dip, rake, m0)
 
-    assert source.M0 == M0
+    assert source.M0 == m0
 
 
 def test_moment2magnitude():
     """
     Tests computation of magnitude
     """
-    M0 = 1e22
-    Mw = moment2magnitude(M0)
-    M0_calc = magnitude2moment(Mw)
+    m0 = 1e22
+    mw = moment2magnitude(m0)
+    m0_calc = magnitude2moment(mw)
 
-    assert M0_calc == M0
+    assert m0_calc == m0
 
 
-def test_M0_finite_source():
+def test_m0_finite_source():
     """
     Tests computation of scalar Moment.
     """
@@ -308,7 +308,7 @@ def test_M0_finite_source():
     np.testing.assert_allclose(np.array([finitesource.M0]), np.array([3.2e20]))
 
 
-def test_CMT_finite_source():
+def test_cmt_finite_source():
     """
     Tests computation of CMT solution
     """

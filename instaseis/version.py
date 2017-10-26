@@ -57,7 +57,7 @@ def call_git_describe(abbrev=4):  # pragma: no cover
         p.stderr.close()
         path = p.stdout.readline().decode().strip()
         p.stdout.close()
-    except:
+    except Exception:
         return None
     if os.path.normpath(path) != INSTASEIS_ROOT:
         return None
@@ -73,7 +73,7 @@ def call_git_describe(abbrev=4):  # pragma: no cover
         if "-" not in line and "." not in line:
             line = "0.0.0-g%s" % line
         return line.strip()
-    except:
+    except Exception:
         return None
 
 
@@ -82,7 +82,7 @@ def read_release_version():  # pragma: no cover
         with io.open(VERSION_FILE, "rt") as fh:
             version = fh.readline()
         return version.strip()
-    except:
+    except Exception:
         return None
 
 

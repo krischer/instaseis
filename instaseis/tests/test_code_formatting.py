@@ -24,7 +24,7 @@ import instaseis
 
 try:
     import flake8
-except:  # pragma: no cover
+except ImportError:  # pragma: no cover
     HAS_FLAKE8_AT_LEAST_VERSION_3 = False
 else:
     if int(flake8.__version__.split(".")[0]) >= 3:
