@@ -66,7 +66,7 @@ def find_and_open_files(path, *args, **kwargs):
             # have to look into alternative solutions.
             try:
                 f.close()
-            except:
+            except:  # pragma: no cover
                 pass
 
         if dims in (2, 3, 5):

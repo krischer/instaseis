@@ -40,7 +40,7 @@ def repack_databases():
     try:
         import netCDF4  # NOQA
         import click  # NOQA
-    except ImportError:
+    except ImportError:  # pragma: no cover
         print("\nSkipping database repacking tests which require `click` and "
               "`netCDF4` to be installed.\n")
         return {
@@ -263,7 +263,7 @@ def is_master(config):
     Only applies to if run with pytest-xdist.
     """
     # This attribute is only set on slaves.
-    if hasattr(config, "slaveinput"):
+    if hasattr(config, "slaveinput"):  # pragma: no cover
         return False
     else:
         return True
@@ -272,7 +272,7 @@ def is_master(config):
 def pytest_configure(config):
     if is_master(config):
         config.dbs = repack_databases()
-    else:
+    else:  # pragma: no cover
         while True:
             if "dbs" not in config.slaveinput:
                 time.sleep(0.01)
@@ -288,7 +288,7 @@ def pytest_unconfigure(config):
             shutil.rmtree(config.dbs["root_folder"])
 
 
-def pytest_configure_node(node):
+def pytest_configure_node(node):  # pragma: no cover
     """
     This is only called on the master - we use it to send the information to
     all the slaves.
