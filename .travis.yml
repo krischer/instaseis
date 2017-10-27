@@ -33,6 +33,8 @@ before_install:
   - pip install coveralls
   - pip install requests responses pytest-xdist
   - conda list
+  # Try to force an agg backend.
+  - echo "backend: agg" > `python -c "from __future__ import print_function;import matplotlib;print(matplotlib.matplotlib_fname())"`
 
 install:
   - git version
