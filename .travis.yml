@@ -32,6 +32,7 @@ before_install:
   - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then pip install sphinx-bootstrap-theme ; fi
   - pip install coveralls
   - pip install requests responses pytest-xdist
+  - conda list
 
 install:
   - git version
