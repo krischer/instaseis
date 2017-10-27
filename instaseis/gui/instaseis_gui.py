@@ -147,7 +147,7 @@ class Window(QtGui.QMainWindow):
 
         try:
             self.bb.remove()
-        except:
+        except Exception:
             pass
 
         fm = self.focmec
@@ -175,7 +175,7 @@ class Window(QtGui.QMainWindow):
 
         try:
             self.bb_finite.remove()
-        except:
+        except Exception:
             pass
 
         self.bb_finite = beach(self.finite_source.CMT.tensor / 1e16,
@@ -774,7 +774,7 @@ class Window(QtGui.QMainWindow):
                     tooltipstr = 'Mouse at %6.2f s, closest phase = %s, ' \
                         'arriving at %6.2f s' % \
                         (tt, closest_phase.name, closest_phase.time)
-                except:
+                except Exception:
                     tooltipstr = ''
 
                 self.ui.z_graph.setToolTip(tooltipstr)
