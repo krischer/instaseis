@@ -35,6 +35,8 @@ before_install:
   - conda list
   # Try to force an agg backend.
   - touch `python -c "from __future__ import print_function;import matplotlib;print(matplotlib.matplotlib_fname())"`
+  - ls -l `python -c "from __future__ import print_function;import matplotlib;print(matplotlib.matplotlib_fname())"`
+  - echo `python -c "from __future__ import print_function;import matplotlib;print(matplotlib.matplotlib_fname())"`
   - echo "backend: agg" > `python -c "from __future__ import print_function;import matplotlib;print(matplotlib.matplotlib_fname())"`
 
 install:
