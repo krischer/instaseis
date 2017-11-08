@@ -32,12 +32,6 @@ before_install:
   - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then pip install sphinx-bootstrap-theme ; fi
   - pip install coveralls
   - pip install requests responses pytest-xdist
-  - conda list
-  # Try to force an agg backend.
-  - touch `python -c "from __future__ import print_function;import matplotlib;print(matplotlib.matplotlib_fname())"`
-  - ls -l `python -c "from __future__ import print_function;import matplotlib;print(matplotlib.matplotlib_fname())"`
-  - echo `python -c "from __future__ import print_function;import matplotlib;print(matplotlib.matplotlib_fname())"`
-  - echo "backend: agg" > `python -c "from __future__ import print_function;import matplotlib;print(matplotlib.matplotlib_fname())"`
 
 install:
   - git version
