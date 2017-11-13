@@ -65,7 +65,7 @@ def moment2magnitude(M0):  # NOQA
     :return Mw: moment magnitude
     :type Mw: float
     """
-    return 2.0 / 3.0 * np.log10(M0) - 6.0
+    return 2.0 / 3.0 * (np.log10(M0) - 9.1)
 
 
 def magnitude2moment(Mw):  # NOQA
@@ -77,7 +77,7 @@ def magnitude2moment(Mw):  # NOQA
     :return M0: seismic moment in Nm
     :type M0: float
     """
-    return 10.0 ** ((Mw + 6.0) / 2.0 * 3.0)
+    return 10.0 ** ((Mw / 2.0 * 3.0 + 9.1))
 
 
 def fault_vectors_lmn(strike, dip, rake):
