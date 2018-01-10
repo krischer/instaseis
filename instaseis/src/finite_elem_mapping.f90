@@ -93,10 +93,7 @@ subroutine inside_element(s, z, nodes, element_type, tolerance, in_element, xi, 
   real(c_double), intent(in), value             :: tolerance
   logical(c_bool), intent(out)                  :: in_element
   real(c_double), intent(out)                   :: xi, eta
-  real(c_double)                                :: tolerance_loc
   real(c_double)                                :: inv_mapping(2)
-
-  tolerance_loc = tolerance
 
   select case(element_type)
      case(0)
@@ -112,10 +109,10 @@ subroutine inside_element(s, z, nodes, element_type, tolerance, in_element, xi, 
         stop
   end select
 
-  in_element = (inv_mapping(1) >= -1 - tolerance_loc .and. &
-                inv_mapping(1) <=  1 + tolerance_loc .and. &
-                inv_mapping(2) >= -1 - tolerance_loc .and. &
-                inv_mapping(2) <=  1 + tolerance_loc)
+  in_element = (inv_mapping(1) >= -1 - tolerance .and. &
+                inv_mapping(1) <=  1 + tolerance .and. &
+                inv_mapping(2) >= -1 - tolerance .and. &
+                inv_mapping(2) <=  1 + tolerance)
 
   xi = inv_mapping(1)
   eta = inv_mapping(2)
@@ -341,16 +338,19 @@ pure function mapping_semino(xi, eta, nodes)
   real(kind=dp), intent(in) :: nodes(4,2)
   real(kind=dp)             :: mapping_semino(2)
 
-  real(kind=dp)             :: a_top, b_top
-  real(kind=dp)             :: thetabartop, dthetatop
-  real(kind=dp)             :: s_bot, z_bot, s_top, z_top
+  real(kind=dp)             :: theta(4), r(4), s(4), z(4)
 
-  call compute_parameters_semino(nodes, a_top, b_top, thetabartop, dthetatop)
-  call compute_sz_xi_sline_no(s_bot, z_bot, xi, nodes)
-  call compute_sz_xi(s_top, z_top, xi, a_top, b_top, thetabartop, dthetatop)
+  call compute_theta_r(theta, r, nodes)
+  s(:) = nodes(:,1)
+  z(:) = nodes(:,2)
 
-  mapping_semino(1) = (s_bot + s_top) / 2 + eta * (s_top - s_bot) / 2
-  mapping_semino(2) = (z_bot + z_top) / 2 + eta * (z_top - z_bot) / 2
+  mapping_semino(1) &
+    = (1 + eta) * r(4) / 2 * dsin(((1 - xi) * theta(4) + (1 + xi) * theta(3)) / 2) &
+    + (1 - eta) / 4 * ((1 - xi) * s(1) + (1 + xi) * s(2))
+
+  mapping_semino(2) &
+    = (1 + eta) * r(4) / 2 * dcos(((1 - xi) * theta(4) + (1 + xi) * theta(3)) / 2) &
+    + (1 - eta) / 4 * ((1 - xi) * z(1) + (1 + xi) * z(2))
 
 end function mapping_semino
 !-----------------------------------------------------------------------------------------
@@ -364,16 +364,19 @@ pure function mapping_semiso(xi, eta, nodes)
   real(kind=dp), intent(in) :: nodes(4,2)
   real(kind=dp)             :: mapping_semiso(2)
 
-  real(kind=dp)             :: a_bot, b_bot
-  real(kind=dp)             :: thetabarbot, dthetabot
-  real(kind=dp)             :: s_bot, z_bot, s_top, z_top
+  real(kind=dp)             :: theta(4), r(4), s(4), z(4)
 
-  call compute_parameters_semiso(nodes, a_bot, b_bot, thetabarbot, dthetabot)
-  call compute_sz_xi_sline_so(s_top, z_top, xi, nodes)
-  call compute_sz_xi(s_bot, z_bot, xi, a_bot, b_bot, thetabarbot, dthetabot)
+  call compute_theta_r(theta, r, nodes)
+  s(:) = nodes(:,1)
+  z(:) = nodes(:,2)
 
-  mapping_semiso(1) = (s_bot + s_top) / 2 + eta * (s_top - s_bot) / 2
-  mapping_semiso(2) = (z_bot + z_top) / 2 + eta * (z_top - z_bot) / 2
+  mapping_semiso(1) &
+    = (1 + eta) / 4 * ((1 - xi) * s(4) + (1 + xi) * s(3)) &
+    + (1 - eta) * r(1) / 2 * dsin(((1 - xi) * theta(1) + (1 + xi) * theta(2)) / 2)
+
+  mapping_semiso(2) &
+    = (1 + eta) / 4 * ((1 - xi) * z(4) + (1 + xi) * z(3)) &
+    + (1 - eta) * r(1) / 2 * dcos(((1 - xi) * theta(1) + (1 + xi) * theta(2)) / 2)
 
 end function mapping_semiso
 !-----------------------------------------------------------------------------------------
@@ -384,27 +387,29 @@ pure function jacobian_semino(xi, eta, nodes)
 
   real(kind=dp), intent(in)  :: xi, eta, nodes(4,2)
   real(kind=dp)              :: jacobian_semino(2,2)
+  real(kind=dp)              :: theta(4), r(4), s(4), z(4)
 
-  real(kind=dp) :: a_top, b_top
-  real(kind=dp) :: thetabar_top, dtheta_top
-  real(kind=dp) :: s_bot, z_bot, s_top, z_top
-  real(kind=dp) :: ds_botdxi, dz_botdxi
-  real(kind=dp) :: ds_topdxi, dz_topdxi
+  call compute_theta_r(theta, r, nodes)
+  s(:) = nodes(:,1)
+  z(:) = nodes(:,2)
 
-  call compute_parameters_semino(nodes, a_top, b_top, thetabar_top, dtheta_top)
+  jacobian_semino(1,1) &
+    = (1 + eta) * r(4) * (theta(3) - theta(4)) / 4  &
+         * dcos(((1 - xi) * theta(4) + (1 + xi) * theta(3)) / 2) &
+    + (1 - eta) / 4 * (s(2) - s(1))
 
-  call compute_sz_xi_sline_no(s_bot, z_bot, xi, nodes)
-  call compute_sz_xi(s_top, z_top, xi, a_top, b_top, thetabar_top, dtheta_top)
+  jacobian_semino(1,2) &
+    = r(4) / 2 * dsin(((1 - xi) * theta(4) + (1 + xi) * theta(3)) / 2) &
+    - 1.0 / 4 * ((1 - xi) * s(1) + (1 + xi) * s(2))
 
-  call compute_dsdxi_dzdxi_sline_no(ds_botdxi, dz_botdxi, nodes)
-  call compute_dsdxi_dzdxi(ds_topdxi, dz_topdxi, xi, a_top, b_top, &
-                           thetabar_top, dtheta_top)
+  jacobian_semino(2,1) &
+    = - (1 + eta) * r(4) * (theta(3) - theta(4)) / 4 &
+       * dsin(((1 - xi) * theta(4) + (1 + xi) * theta(3)) / 2) &
+    + (1 - eta) / 4 * (z(2) - z(1))
 
-  jacobian_semino(1,1) = (ds_botdxi + ds_topdxi) / 2 + eta * (ds_topdxi - ds_botdxi) / 2
-  jacobian_semino(1,2) = (s_top - s_bot) / 2
-
-  jacobian_semino(2,1) = (dz_botdxi + dz_topdxi) / 2 + eta * (dz_topdxi - dz_botdxi) / 2
-  jacobian_semino(2,2) = (z_top - z_bot) / 2
+  jacobian_semino(2,2) &
+    = r(4) / 2 * dcos(((1 - xi) * theta(4) + (1 + xi) * theta(3)) / 2) &
+    - 1.0 / 4 * ((1 - xi) * z(1) + (1 + xi) * z(2))
 
 end function jacobian_semino
 !-----------------------------------------------------------------------------------------
@@ -415,26 +420,29 @@ pure function jacobian_semiso(xi, eta, nodes)
 
   real(kind=dp), intent(in)  :: xi, eta, nodes(4,2)
   real(kind=dp)              :: jacobian_semiso(2,2)
+  real(kind=dp)              :: theta(4), r(4), s(4), z(4)
 
-  real(kind=dp) :: a_bot, b_bot
-  real(kind=dp) :: thetabar_bot, dtheta_bot
-  real(kind=dp) :: s_bot, z_bot, s_top, z_top
-  real(kind=dp) :: ds_topdxi, dz_topdxi
-  real(kind=dp) :: ds_botdxi, dz_botdxi
+  call compute_theta_r(theta, r, nodes)
+  s(:) = nodes(:,1)
+  z(:) = nodes(:,2)
 
-  call compute_parameters_semiso(nodes, a_bot, b_bot, thetabar_bot, dtheta_bot)
-  call compute_sz_xi_sline_so(s_top, z_top, xi, nodes)
-  call compute_sz_xi(s_bot, z_bot, xi, a_bot, b_bot, thetabar_bot, dtheta_bot)
+  jacobian_semiso(1,1) &
+    = (1 + eta) / 4 * (s(3) - s(4)) &
+    + (1 - eta) * r(1) * (theta(2) - theta(1)) / 4  &
+         * dcos(((1 - xi) * theta(1) + (1 + xi) * theta(2)) / 2)
 
-  call compute_dsdxi_dzdxi(ds_botdxi, dz_botdxi, xi, a_bot, b_bot, &
-                           thetabar_bot, dtheta_bot)
-  call compute_dsdxi_dzdxi_sline_so(ds_topdxi, dz_topdxi, nodes)
+  jacobian_semiso(1,2) &
+    = 1.0 / 4 * ((1 - xi) * s(4) + (1 + xi) * s(3)) &
+    - r(1) / 2 * dsin(((1 - xi) * theta(1) + (1 + xi) * theta(2)) / 2)
 
-  jacobian_semiso(1,1) = (ds_botdxi + ds_topdxi) / 2 + eta * (ds_topdxi - ds_botdxi) / 2
-  jacobian_semiso(1,2) = (s_top - s_bot) / 2
+  jacobian_semiso(2,1) &
+    = - (1 - eta) * r(1) * (theta(2) - theta(1)) / 4 &
+       * dsin(((1 - xi) * theta(1) + (1 + xi) * theta(2)) / 2) &
+    + (1 + eta) / 4 * (z(3) - z(4))
 
-  jacobian_semiso(2,1) = (dz_botdxi + dz_topdxi) / 2 + eta * (dz_topdxi - dz_botdxi) / 2
-  jacobian_semiso(2,2) = (z_top - z_bot) / 2
+  jacobian_semiso(2,2) &
+    = -r(1) / 2 * dcos(((1 - xi) * theta(1) + (1 + xi) * theta(2)) / 2) &
+    + 1.0 / 4 * ((1 - xi) * z(4) + (1 + xi) * z(3))
 
 end function jacobian_semiso
 !-----------------------------------------------------------------------------------------
@@ -473,143 +481,6 @@ pure function inv_jacobian_semiso(xi, eta, nodes)
   inv_jacobian_semiso(2,2) =   jacobian(1,1) / jacobian_det
 
 end function inv_jacobian_semiso
-!-----------------------------------------------------------------------------------------
-
-!-----------------------------------------------------------------------------------------
-pure subroutine compute_dsdxi_dzdxi(dsdxi, dzdxi, xi, a, b, thetabar, dtheta)
-
-  real(kind=dp), intent(out) :: dsdxi, dzdxi
-  real(kind=dp), intent(in)  :: xi, a, b, thetabar, dtheta
-
-  dsdxi = -a * dtheta * dsin(thetabar + xi * dtheta / 2) / 2
-  dzdxi =  b * dtheta * dcos(thetabar + xi * dtheta / 2) / 2
-
-end subroutine compute_dsdxi_dzdxi
-!-----------------------------------------------------------------------------------------
-
-!-----------------------------------------------------------------------------------------
-pure subroutine compute_dsdxi_dzdxi_sline_no(dsdxi, dzdxi, nodes)
-
-  real(kind=dp), intent(out) :: dsdxi, dzdxi
-  real(kind=dp), intent(in)  :: nodes(4,2)
-
-  dsdxi = (nodes(2,1) - nodes(1,1)) / 2
-  dzdxi = (nodes(2,2) - nodes(1,2)) / 2
-
-end subroutine compute_dsdxi_dzdxi_sline_no
-!-----------------------------------------------------------------------------------------
-
-!-----------------------------------------------------------------------------------------
-pure subroutine compute_dsdxi_dzdxi_sline_so(dsdxi, dzdxi, nodes)
-
-  real(kind=dp), intent(out) :: dsdxi, dzdxi
-  real(kind=dp), intent(in)  :: nodes(4,2)
-
-  dsdxi = (nodes(3,1) - nodes(4,1)) / 2
-  dzdxi = (nodes(3,2) - nodes(4,2)) / 2
-
-end subroutine compute_dsdxi_dzdxi_sline_so
-!-----------------------------------------------------------------------------------------
-
-!-----------------------------------------------------------------------------------------
-pure subroutine compute_sz_xi_sline_no(s, z, xi, nodes)
-
-  real(kind=dp), intent(out) :: s,z
-  real(kind=dp), intent(in)  :: xi, nodes(4,2)
-
-  s = ((1 + xi) * nodes(2,1) + (1 - xi) * nodes(1,1)) / 2
-  z = ((1 + xi) * nodes(2,2) + (1 - xi) * nodes(1,2)) / 2
-
-end subroutine compute_sz_xi_sline_no
-!-----------------------------------------------------------------------------------------
-
-!-----------------------------------------------------------------------------------------
-pure subroutine compute_sz_xi_sline_so(s, z, xi, nodes)
-
-  real(kind=dp), intent(out) :: s, z
-  real(kind=dp), intent(in)  :: xi, nodes(4,2)
-
-  s = ((1 + xi) * nodes(3,1) + (1 - xi) * nodes(4,1)) / 2
-  z = ((1 + xi) * nodes(3,2) + (1 - xi) * nodes(4,2)) / 2
-
-end subroutine compute_sz_xi_sline_so
-!-----------------------------------------------------------------------------------------
-
-!-----------------------------------------------------------------------------------------
-pure subroutine compute_sz_xi(s, z, xi, a, b, thetabar, dtheta)
-
-  real(kind=dp), intent(out) :: s,z
-  real(kind=dp), intent(in)  :: xi, a, b, thetabar, dtheta
-
-  s = a * dcos(thetabar + xi * dtheta / 2)
-  z = b * dsin(thetabar + xi * dtheta / 2)
-
-end subroutine compute_sz_xi
-!-----------------------------------------------------------------------------------------
-
-!-----------------------------------------------------------------------------------------
-pure subroutine compute_parameters_semino(nodes, atop, btop, thetabartop, dthetatop)
-
-  real(kind=dp), intent(in)  :: nodes(4,2)
-  real(kind=dp), intent(out) :: atop, btop
-  real(kind=dp), intent(out) :: thetabartop, dthetatop
-  real(kind=dp)              :: theta3, theta4
-
-  call compute_ab(atop, btop, nodes(4,1), nodes(4,2), nodes(3,1), nodes(3,2))
-  theta3 = compute_theta(nodes(3,1), nodes(3,2), atop, btop)
-  theta4 = compute_theta(nodes(4,1), nodes(4,2), atop, btop)
-
-  thetabartop = (theta4 + theta3) / 2
-  dthetatop = theta3 - theta4
-
-end subroutine compute_parameters_semino
-!-----------------------------------------------------------------------------------------
-
-!-----------------------------------------------------------------------------------------
-pure subroutine compute_parameters_semiso(nodes, abot, bbot, thetabarbot, dthetabot)
-
-  real(kind=dp), intent(in)  :: nodes(4,2)
-  real(kind=dp), intent(out) :: abot, bbot
-  real(kind=dp), intent(out) :: thetabarbot, dthetabot
-  real(kind=dp)              :: theta1, theta2
-
-  call compute_ab(abot, bbot, nodes(1,1), nodes(1,2), nodes(2,1), nodes(2,2))
-  theta2 = compute_theta(nodes(2,1), nodes(2,2), abot, bbot)
-  theta1 = compute_theta(nodes(1,1), nodes(1,2), abot, bbot)
-
-  thetabarbot = (theta1 + theta2) / 2
-  dthetabot = theta2 - theta1
-
-end subroutine compute_parameters_semiso
-!-----------------------------------------------------------------------------------------
-
-!-----------------------------------------------------------------------------------------
-pure subroutine compute_ab(a, b, s1, z1, s2, z2)
-
-  real(kind=dp), intent(out) :: a, b
-  real(kind=dp), intent(in)  :: s1, z1, s2, z2
-
-  a = dsqrt(dabs((s2**2 * z1**2 - z2**2 * s1**2) / (z1**2 - z2**2)))
-  b = dsqrt(dabs((z1**2 * s2**2 - z2**2 * s1**2) / (s2**2 - s1**2)))
-
-end subroutine compute_ab
-!-----------------------------------------------------------------------------------------
-
-!-----------------------------------------------------------------------------------------
-pure function compute_theta(s, z, a, b)
-!	This routine returns the latitude theta, given s and z.
-
-  real(kind=dp), intent(in)  :: s, z, a, b
-  real(kind=dp)              :: compute_theta
-
-  if (s >= 0d0) then
-     compute_theta = datan2(z*a, s*b)
-  else
-     if (z > 0) compute_theta =  pi / 2
-     if (z < 0) compute_theta = -pi / 2
-  end if
-
-end function compute_theta
 !-----------------------------------------------------------------------------------------
 
 !!!!!!! SPHEROIDAL MAPPING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -727,26 +598,6 @@ pure function inv_jacobian_spheroid(xi, eta, nodes)
   inv_jacobian_spheroid(2,2) =   jacobian(1,1) / jacobian_det
 
 end function inv_jacobian_spheroid
-!-----------------------------------------------------------------------------------------
-
-!-----------------------------------------------------------------------------------------
-pure subroutine compute_theta_r(theta, r, nodes)
-
-  real(kind=dp), dimension(4,2), intent(in) :: nodes
-  real(kind=dp), dimension(4), intent(out)  :: theta, r
-  integer                                   :: i
-
-  do i=1,4
-    r(i) = sqrt(nodes(i,1)**2 + nodes(i,2)**2)
-
-    if (r(i) /= 0) then
-       theta(i) = dacos(nodes(i,2) / r(i))
-    else
-       theta(i) = 0
-    end if
-  enddo
-
-end subroutine compute_theta_r
 !-----------------------------------------------------------------------------------------
 
 
@@ -928,6 +779,25 @@ pure function shp4der(xi, eta)
 end function shp4der
 !-----------------------------------------------------------------------------------------
 
+!-----------------------------------------------------------------------------------------
+pure subroutine compute_theta_r(theta, r, nodes)
+
+  real(kind=dp), dimension(4,2), intent(in) :: nodes
+  real(kind=dp), dimension(4), intent(out)  :: theta, r
+  integer                                   :: i
+
+  do i=1,4
+    r(i) = sqrt(nodes(i,1)**2 + nodes(i,2)**2)
+
+    if (r(i) /= 0) then
+       theta(i) = dacos(nodes(i,2) / r(i))
+    else
+       theta(i) = 0
+    end if
+  enddo
+
+end subroutine compute_theta_r
+!-----------------------------------------------------------------------------------------
 
 end module
 !=========================================================================================
