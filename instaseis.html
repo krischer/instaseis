@@ -4,13 +4,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Main Instaseis Classes &#8212; instaseis 1.2.0-1-gd841 documentation</title>
+    <title>Main Instaseis Classes &#8212; instaseis 1.2.0-13-g04a2 documentation</title>
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.2.0-1-gd841',
+        VERSION:     '1.2.0-13-g04a2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -48,7 +48,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>1.2.0-1-gd841</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>1.2.0-13-g04a2</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -234,7 +234,7 @@ Seiscomp, i.e. the components <code class="docutils literal"><span class="pre">T
 <li><strong>epicentral_distance_in_degree</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) – The epicentral distance in
 degree.</li>
 <li><strong>source_depth_in_m</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) – The source depth in m below the surface.</li>
-<li><strong>origin_time</strong> (<a class="reference external" href="http://docs.obspy.org/packages/autogen/obspy.core.utcdatetime.UTCDateTime.html#obspy.core.utcdatetime.UTCDateTime" title="(in ObsPy Documentation (1.0.3) v1.0)"><code class="xref py py-class docutils literal"><span class="pre">obspy.core.utcdatetime.UTCDateTime</span></code></a>) – Origin time of the source.</li>
+<li><strong>origin_time</strong> (<a class="reference external" href="http://docs.obspy.org/packages/autogen/obspy.core.utcdatetime.UTCDateTime.html#obspy.core.utcdatetime.UTCDateTime" title="(in ObsPy Documentation (1.1.0) v1.1)"><code class="xref py py-class docutils literal"><span class="pre">obspy.core.utcdatetime.UTCDateTime</span></code></a>) – Origin time of the source.</li>
 <li><strong>kind</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – The desired units of the seismogram:
 <code class="docutils literal"><span class="pre">&quot;displacement&quot;</span></code>, <code class="docutils literal"><span class="pre">&quot;velocity&quot;</span></code>, or <code class="docutils literal"><span class="pre">&quot;acceleration&quot;</span></code>.</li>
 <li><strong>dt</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) – Desired sampling rate of the Green’s functions. Resampling
@@ -249,7 +249,7 @@ between 10 and 20.</li>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Multi component seismograms.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">A <a class="reference external" href="http://docs.obspy.org/packages/autogen/obspy.core.stream.Stream.html#obspy.core.stream.Stream" title="(in ObsPy Documentation (1.0.3) v1.0)"><code class="xref py py-class docutils literal"><span class="pre">obspy.core.stream.Stream</span></code></a> object or a dictionary
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">A <a class="reference external" href="http://docs.obspy.org/packages/autogen/obspy.core.stream.Stream.html#obspy.core.stream.Stream" title="(in ObsPy Documentation (1.1.0) v1.1)"><code class="xref py py-class docutils literal"><span class="pre">obspy.core.stream.Stream</span></code></a> object or a dictionary
 with NumPy arrays as values.</p>
 </td>
 </tr>
@@ -283,7 +283,7 @@ is the origin time of the source.</li>
 the AxiSEM run and convolve with the STF attached to the source.
 For this to be stable, the new STF needs to bandlimited.</li>
 <li><strong>return_obspy_stream</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Return format is either an
-<a class="reference external" href="http://docs.obspy.org/packages/autogen/obspy.core.stream.Stream.html#obspy.core.stream.Stream" title="(in ObsPy Documentation (1.0.3) v1.0)"><code class="xref py py-class docutils literal"><span class="pre">obspy.core.stream.Stream</span></code></a> object or a dictionary
+<a class="reference external" href="http://docs.obspy.org/packages/autogen/obspy.core.stream.Stream.html#obspy.core.stream.Stream" title="(in ObsPy Documentation (1.1.0) v1.1)"><code class="xref py py-class docutils literal"><span class="pre">obspy.core.stream.Stream</span></code></a> object or a dictionary
 containing the raw NumPy arrays.</li>
 <li><strong>dt</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em>, </em><em>optional</em>) – Desired sampling rate of the seismograms. Resampling is done
 using a Lanczos kernel.</li>
@@ -296,7 +296,7 @@ between 10 and 20.</li>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Multi component seismograms.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">A <a class="reference external" href="http://docs.obspy.org/packages/autogen/obspy.core.stream.Stream.html#obspy.core.stream.Stream" title="(in ObsPy Documentation (1.0.3) v1.0)"><code class="xref py py-class docutils literal"><span class="pre">obspy.core.stream.Stream</span></code></a> object or a dictionary
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">A <a class="reference external" href="http://docs.obspy.org/packages/autogen/obspy.core.stream.Stream.html#obspy.core.stream.Stream" title="(in ObsPy Documentation (1.1.0) v1.1)"><code class="xref py py-class docutils literal"><span class="pre">obspy.core.stream.Stream</span></code></a> object or a dictionary
 with NumPy arrays as values.</p>
 </td>
 </tr>
@@ -341,7 +341,7 @@ the callback returns <code class="docutils literal"><span class="pre">True</span
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Multi component finite source seismogram.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="http://docs.obspy.org/packages/autogen/obspy.core.stream.Stream.html#obspy.core.stream.Stream" title="(in ObsPy Documentation (1.0.3) v1.0)"><code class="xref py py-class docutils literal"><span class="pre">obspy.core.stream.Stream</span></code></a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="http://docs.obspy.org/packages/autogen/obspy.core.stream.Stream.html#obspy.core.stream.Stream" title="(in ObsPy Documentation (1.1.0) v1.1)"><code class="xref py py-class docutils literal"><span class="pre">obspy.core.stream.Stream</span></code></a></p>
 </td>
 </tr>
 </tbody>
@@ -567,7 +567,7 @@ useful e.g. for finite sources, default).</li>
     </p>
     <p>
         &copy; Copyright 2014-2015, Lion Krischer and Martin van Driel.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.<br/>
     </p>
   </div>
 </footer>
