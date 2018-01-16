@@ -107,7 +107,7 @@ class BaseNetCDFInstaseisDB(with_metaclass(ABCMeta, BaseInstaseisDB)):
 
                 isin, xi, eta = finite_elem_mapping.inside_element(
                     coordinates.s, coordinates.z, corner_points, eltype,
-                    tolerance=1E-3)
+                    tolerance=1E-2)
                 if isin:
                     id_elem = idx
                     break
