@@ -81,35 +81,48 @@ class BaseNetCDFInstaseisDB(with_metaclass(ABCMeta, BaseInstaseisDB)):
         # Find the element containing the point of interest.
         mesh = self.parsed_mesh.f["Mesh"]
         if self.info.dump_type == 'displ_only':
-            for idx in nextpoints[1]:
-                corner_points = np.empty((4, 2), dtype="float64")
+            # Loop over multiple tolerances - this is mainly needed for
+            # legacy regional databases that have small elements far from the
+            # core.
+            # These databases store coordinates in single precision which
+            # results in accuracy issues for large numbers.
+            # For good databases this should only always choose the first
+            # tolerance thus there is not runtime cost.
+            id_elem = None
+            for tolerance in [1e-3, 1e-2, 5e-2, 8e-2]:
+                for idx in nextpoints[1]:
+                    corner_points = np.empty((4, 2), dtype="float64")
 
-                if not self.read_on_demand:
-                    corner_point_ids = self.parsed_mesh.fem_mesh[idx][:4]
-                    eltype = self.parsed_mesh.eltypes[idx]
-                    corner_points[:, 0] = \
-                        self.parsed_mesh.mesh_S[corner_point_ids]
-                    corner_points[:, 1] = \
-                        self.parsed_mesh.mesh_Z[corner_point_ids]
-                else:
-                    corner_point_ids = mesh["fem_mesh"][idx][:4]
+                    if not self.read_on_demand:
+                        corner_point_ids = self.parsed_mesh.fem_mesh[idx][:4]
+                        eltype = self.parsed_mesh.eltypes[idx]
+                        corner_points[:, 0] = \
+                            self.parsed_mesh.mesh_S[corner_point_ids]
+                        corner_points[:, 1] = \
+                            self.parsed_mesh.mesh_Z[corner_point_ids]
+                    else:
+                        corner_point_ids = mesh["fem_mesh"][idx][:4]
 
-                    # When reading from a netcdf file, the indices must be
-                    # sorted for newer netcdf versions. The double argsort()
-                    # gives the indices in the sorted array to restore the
-                    # original order.
-                    eltype = mesh["eltype"][idx]
+                        # When reading from a netcdf file, the indices must be
+                        # sorted for newer netcdf versions. The double
+                        # argsort() gives the indices in the sorted array to
+                        # restore the original order.
+                        eltype = mesh["eltype"][idx]
 
-                    m_s = mesh["mesh_S"]
-                    m_z = mesh["mesh_Z"]
-                    corner_points[:, 0] = [m_s[_i] for _i in corner_point_ids]
-                    corner_points[:, 1] = [m_z[_i] for _i in corner_point_ids]
+                        m_s = mesh["mesh_S"]
+                        m_z = mesh["mesh_Z"]
+                        corner_points[:, 0] = \
+                            [m_s[_i] for _i in corner_point_ids]
+                        corner_points[:, 1] = \
+                            [m_z[_i] for _i in corner_point_ids]
 
-                isin, xi, eta = finite_elem_mapping.inside_element(
-                    coordinates.s, coordinates.z, corner_points, eltype,
-                    tolerance=1E-2)
-                if isin:
-                    id_elem = idx
+                    isin, xi, eta = finite_elem_mapping.inside_element(
+                        coordinates.s, coordinates.z, corner_points, eltype,
+                        tolerance=tolerance)
+                    if isin:
+                        id_elem = idx
+                        break
+                if id_elem is not None:
                     break
             else:  # pragma: no cover
                 raise ValueError("Element not found")
