@@ -4,13 +4,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>instaseis.database_interfaces.base_netcdf_instaseis_db &#8212; instaseis 1.2.0-13-g04a2 documentation</title>
+    <title>instaseis.database_interfaces.base_netcdf_instaseis_db &#8212; instaseis 1.2.0-14-ga84a documentation</title>
     <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.2.0-13-g04a2',
+        VERSION:     '1.2.0-14-ga84a',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -46,7 +46,7 @@
         </button>
         <a class="navbar-brand" href="../../../index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>1.2.0-13-g04a2</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>1.2.0-14-ga84a</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -185,35 +185,48 @@
         <span class="c1"># Find the element containing the point of interest.</span>
         <span class="n">mesh</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="s2">&quot;Mesh&quot;</span><span class="p">]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">dump_type</span> <span class="o">==</span> <span class="s1">&#39;displ_only&#39;</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">nextpoints</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
-                <span class="n">corner_points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float64&quot;</span><span class="p">)</span>
+            <span class="c1"># Loop over multiple tolerances - this is mainly needed for</span>
+            <span class="c1"># legacy regional databases that have small elements far from the</span>
+            <span class="c1"># core.</span>
+            <span class="c1"># These databases store coordinates in single precision which</span>
+            <span class="c1"># results in accuracy issues for large numbers.</span>
+            <span class="c1"># For good databases this should only always choose the first</span>
+            <span class="c1"># tolerance thus there is not runtime cost.</span>
+            <span class="n">id_elem</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">for</span> <span class="n">tolerance</span> <span class="ow">in</span> <span class="p">[</span><span class="mf">1e-3</span><span class="p">,</span> <span class="mf">1e-2</span><span class="p">,</span> <span class="mf">5e-2</span><span class="p">,</span> <span class="mf">8e-2</span><span class="p">]:</span>
+                <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">nextpoints</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                    <span class="n">corner_points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float64&quot;</span><span class="p">)</span>
 
-                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_on_demand</span><span class="p">:</span>
-                    <span class="n">corner_point_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">fem_mesh</span><span class="p">[</span><span class="n">idx</span><span class="p">][:</span><span class="mi">4</span><span class="p">]</span>
-                    <span class="n">eltype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">eltypes</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
-                    <span class="n">corner_points</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> \
-                        <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">mesh_S</span><span class="p">[</span><span class="n">corner_point_ids</span><span class="p">]</span>
-                    <span class="n">corner_points</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> \
-                        <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">mesh_Z</span><span class="p">[</span><span class="n">corner_point_ids</span><span class="p">]</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">corner_point_ids</span> <span class="o">=</span> <span class="n">mesh</span><span class="p">[</span><span class="s2">&quot;fem_mesh&quot;</span><span class="p">][</span><span class="n">idx</span><span class="p">][:</span><span class="mi">4</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_on_demand</span><span class="p">:</span>
+                        <span class="n">corner_point_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">fem_mesh</span><span class="p">[</span><span class="n">idx</span><span class="p">][:</span><span class="mi">4</span><span class="p">]</span>
+                        <span class="n">eltype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">eltypes</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+                        <span class="n">corner_points</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> \
+                            <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">mesh_S</span><span class="p">[</span><span class="n">corner_point_ids</span><span class="p">]</span>
+                        <span class="n">corner_points</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> \
+                            <span class="bp">self</span><span class="o">.</span><span class="n">parsed_mesh</span><span class="o">.</span><span class="n">mesh_Z</span><span class="p">[</span><span class="n">corner_point_ids</span><span class="p">]</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">corner_point_ids</span> <span class="o">=</span> <span class="n">mesh</span><span class="p">[</span><span class="s2">&quot;fem_mesh&quot;</span><span class="p">][</span><span class="n">idx</span><span class="p">][:</span><span class="mi">4</span><span class="p">]</span>
 
-                    <span class="c1"># When reading from a netcdf file, the indices must be</span>
-                    <span class="c1"># sorted for newer netcdf versions. The double argsort()</span>
-                    <span class="c1"># gives the indices in the sorted array to restore the</span>
-                    <span class="c1"># original order.</span>
-                    <span class="n">eltype</span> <span class="o">=</span> <span class="n">mesh</span><span class="p">[</span><span class="s2">&quot;eltype&quot;</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span>
+                        <span class="c1"># When reading from a netcdf file, the indices must be</span>
+                        <span class="c1"># sorted for newer netcdf versions. The double</span>
+                        <span class="c1"># argsort() gives the indices in the sorted array to</span>
+                        <span class="c1"># restore the original order.</span>
+                        <span class="n">eltype</span> <span class="o">=</span> <span class="n">mesh</span><span class="p">[</span><span class="s2">&quot;eltype&quot;</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span>
 
-                    <span class="n">m_s</span> <span class="o">=</span> <span class="n">mesh</span><span class="p">[</span><span class="s2">&quot;mesh_S&quot;</span><span class="p">]</span>
-                    <span class="n">m_z</span> <span class="o">=</span> <span class="n">mesh</span><span class="p">[</span><span class="s2">&quot;mesh_Z&quot;</span><span class="p">]</span>
-                    <span class="n">corner_points</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">m_s</span><span class="p">[</span><span class="n">_i</span><span class="p">]</span> <span class="k">for</span> <span class="n">_i</span> <span class="ow">in</span> <span class="n">corner_point_ids</span><span class="p">]</span>
-                    <span class="n">corner_points</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">m_z</span><span class="p">[</span><span class="n">_i</span><span class="p">]</span> <span class="k">for</span> <span class="n">_i</span> <span class="ow">in</span> <span class="n">corner_point_ids</span><span class="p">]</span>
+                        <span class="n">m_s</span> <span class="o">=</span> <span class="n">mesh</span><span class="p">[</span><span class="s2">&quot;mesh_S&quot;</span><span class="p">]</span>
+                        <span class="n">m_z</span> <span class="o">=</span> <span class="n">mesh</span><span class="p">[</span><span class="s2">&quot;mesh_Z&quot;</span><span class="p">]</span>
+                        <span class="n">corner_points</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> \
+                            <span class="p">[</span><span class="n">m_s</span><span class="p">[</span><span class="n">_i</span><span class="p">]</span> <span class="k">for</span> <span class="n">_i</span> <span class="ow">in</span> <span class="n">corner_point_ids</span><span class="p">]</span>
+                        <span class="n">corner_points</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> \
+                            <span class="p">[</span><span class="n">m_z</span><span class="p">[</span><span class="n">_i</span><span class="p">]</span> <span class="k">for</span> <span class="n">_i</span> <span class="ow">in</span> <span class="n">corner_point_ids</span><span class="p">]</span>
 
-                <span class="n">isin</span><span class="p">,</span> <span class="n">xi</span><span class="p">,</span> <span class="n">eta</span> <span class="o">=</span> <span class="n">finite_elem_mapping</span><span class="o">.</span><span class="n">inside_element</span><span class="p">(</span>
-                    <span class="n">coordinates</span><span class="o">.</span><span class="n">s</span><span class="p">,</span> <span class="n">coordinates</span><span class="o">.</span><span class="n">z</span><span class="p">,</span> <span class="n">corner_points</span><span class="p">,</span> <span class="n">eltype</span><span class="p">,</span>
-                    <span class="n">tolerance</span><span class="o">=</span><span class="mf">1E-2</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">isin</span><span class="p">:</span>
-                    <span class="n">id_elem</span> <span class="o">=</span> <span class="n">idx</span>
+                    <span class="n">isin</span><span class="p">,</span> <span class="n">xi</span><span class="p">,</span> <span class="n">eta</span> <span class="o">=</span> <span class="n">finite_elem_mapping</span><span class="o">.</span><span class="n">inside_element</span><span class="p">(</span>
+                        <span class="n">coordinates</span><span class="o">.</span><span class="n">s</span><span class="p">,</span> <span class="n">coordinates</span><span class="o">.</span><span class="n">z</span><span class="p">,</span> <span class="n">corner_points</span><span class="p">,</span> <span class="n">eltype</span><span class="p">,</span>
+                        <span class="n">tolerance</span><span class="o">=</span><span class="n">tolerance</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">isin</span><span class="p">:</span>
+                        <span class="n">id_elem</span> <span class="o">=</span> <span class="n">idx</span>
+                        <span class="k">break</span>
+                <span class="k">if</span> <span class="n">id_elem</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="k">break</span>
             <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Element not found&quot;</span><span class="p">)</span>
