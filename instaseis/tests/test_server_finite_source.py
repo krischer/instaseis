@@ -408,11 +408,11 @@ def test_more_complex_queries(reciprocal_clients_all_callbacks,
     assert request.code == 200
     st_2 = obspy.read(request.buffer)
 
-    assert st_2[0].stats.endtime == st[0].stats.starttime + 20
+    assert st_2[0].stats.endtime == st[0].stats.starttime + 18
 
     # The rest of data should still be identical.
     np.testing.assert_allclose(
-        st.slice(endtime=st[0].stats.starttime + 20)[0].data,
+        st.slice(endtime=st[0].stats.starttime + 18)[0].data,
         st_2[0].data)
 
     # Phase relative start and endtimes.

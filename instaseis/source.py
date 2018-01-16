@@ -831,7 +831,7 @@ class Receiver(SourceOrReceiver):
                 if len(set(value)) != 1:
                     raise ReceiverParseError(
                         "The coordinates of the channels of station '%s.%s' "
-                        "are not identical" % key)
+                        "are not identical." % key)
                 receivers.append(Receiver(
                     latitude=elliptic_to_geocentric_latitude(value[0][0]),
                     longitude=value[0][1],

@@ -141,7 +141,7 @@ lib = MyExtension('instaseis',
 
 INSTALL_REQUIRES = ["h5py",
                     "numpy",
-                    "obspy >= 1.0.2",
+                    "obspy >= 1.1.0",
                     "future",
                     "tornado>=4.0.0",
                     "requests",
