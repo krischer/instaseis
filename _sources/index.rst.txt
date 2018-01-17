@@ -57,6 +57,32 @@ planets such as Mars.
            | *Solid Earth*, 6, 701-717
            | http://dx.doi.org/10.5194/se-6-701-2015
 
+
+Syngine - Instaseis databases hosted by the IRIS DMC
+----------------------------------------------------
+
+Please note that the IRIS DMC hosts a large collection of Instaseis databases
+that also supports the dynamic extraction of seismograms. Thus no database must
+actually reside on your PC - Syngine will extract them for you and send the
+resulting seismograms over HTTP. Additionally Syngine can be used as a database
+backend from within Instaseis.
+
+* Syngine Product Page: http://ds.iris.edu/ds/products/syngine/
+* Syngine Documentation: http://service.iris.edu/irisws/syngine/1
+
+.. admonition:: There is also a paper for this:
+
+    .. list-table::
+      :widths: 1
+
+      *  - | Krischer, L., Hutko, A. R., Driel, M. van, Stähler, S., Trabant, C., and Nissen-Meyer, T. (2017).
+           | **On-demand custom broadband synthetic seismograms.**
+           | *Seismological Research Letters*, 88(4)
+           | https://doi.org/10.1785/0220160210
+
+
+
+
 .. only:: html
 
     Teaser Video
@@ -86,6 +112,9 @@ planets such as Mars.
     :local:
     :depth: 2
 
+
+Contact Us
+----------
 
 .. admonition:: Contact Us
 
