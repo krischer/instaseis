@@ -63,6 +63,7 @@ def get_package_data():
         inspect.getfile(inspect.currentframe()))), "instaseis")
     # Recursively include all files in these folders:
     folders = [os.path.join(root_dir, "tests", "data"),
+               os.path.join(root_dir, "gui", "data"),
                os.path.join(root_dir, "server", "data")]
     for folder in folders:
         for directory, _, files in os.walk(folder):
