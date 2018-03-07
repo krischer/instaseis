@@ -498,6 +498,27 @@ def test_sliprate_convenience_methods_finite_source():
     np.testing.assert_allclose(np.ones(5), src.sliprate)
 
 
+def test_sliprate_convenience_methods_force_source():
+    """
+    Tests some convenience methods of sliprates for force sources.
+    """
+    src = ForceSource(latitude=0.0, longitude=90.0)
+    src.set_sliprate_dirac(2.0, 5)
+    np.testing.assert_allclose(np.array([0.5, 0, 0, 0, 0]), src.sliprate)
+
+    src = ForceSource(latitude=0.0, longitude=90.0)
+    src.set_sliprate_lp(2.0, 5, 0.1)
+    np.testing.assert_allclose(np.array(
+        [0.023291, 0.111382, 0.211022, 0.186723, 0.045481]), src.sliprate,
+        rtol=1E-3)
+
+    src = ForceSource(latitude=0.0, longitude=90.0)
+    src.sliprate = np.ones(5)
+    src.dt = 0.25
+    src.normalize_sliprate()
+    np.testing.assert_allclose(np.ones(5), src.sliprate)
+
+
 def test_str_method_of_src():
     src = Source(latitude=0.0, longitude=90.0)
     assert str(src) == (

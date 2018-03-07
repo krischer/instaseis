@@ -691,6 +691,66 @@ class ForceSource(SourceOrReceiver):
 
         return return_str
 
+    def set_sliprate(self, sliprate, dt, time_shift=None, normalize=True):
+        """
+        Add a source time function (sliprate) to a initialized source object.
+
+        :param sliprate: (normalized) sliprate
+        :param dt: sampling of the sliprate
+        :param normalize: if sliprate is not normalized, set this to true to
+            normalize it using trapezoidal rule style integration
+        """
+        self.sliprate = np.array(sliprate)
+        if normalize:
+            self.sliprate /= np.trapz(sliprate, dx=dt)
+        self.dt = dt
+        self.time_shift = time_shift
+
+    def resample_sliprate(self, dt, nsamp):
+        """
+        For convolution, the sliprate is needed at the sampling of the fields
+        in the database. This function resamples the sliprate using linear
+        interpolation.
+
+        :param dt: desired sampling
+        :param nsamp: desired number of samples
+        """
+        t_new = np.linspace(0, nsamp * dt, nsamp, endpoint=False)
+        t_old = np.linspace(0, self.dt * len(self.sliprate),
+                            len(self.sliprate), endpoint=False)
+
+        self.sliprate = interp(t_new, t_old, self.sliprate)
+        self.dt = dt
+
+    def set_sliprate_dirac(self, dt, nsamp):
+        """
+        :param dt: desired sampling
+        :param nsamp: desired number of samples
+        """
+        self.sliprate = np.zeros(nsamp)
+        self.sliprate[0] = 1.0 / dt
+        self.dt = dt
+
+    def set_sliprate_lp(self, dt, nsamp, freq, corners=4, zerophase=False):
+        """
+        :param dt: desired sampling
+        :param nsamp: desired number of samples
+        """
+        self.sliprate = np.zeros(nsamp)
+        self.sliprate[0] = 1.0 / dt
+        self.sliprate = lowpass(self.sliprate, freq, 1./dt, corners, zerophase)
+        self.dt = dt
+
+    def normalize_sliprate(self):
+        """
+        normalize the sliprate using trapezoidal rule
+        """
+        self.sliprate /= np.trapz(self.sliprate, dx=self.dt)
+
+    def lp_sliprate(self, freq, corners=4, zerophase=False):
+        self.sliprate = lowpass(self.sliprate, freq, 1./self.dt, corners,
+                                zerophase)
+
 
 class Receiver(SourceOrReceiver):
     """
