@@ -65,6 +65,8 @@ def moment2magnitude(M0):  # NOQA
     :return Mw: moment magnitude
     :type Mw: float
     """
+    if M0 <= 0.0:
+        return -np.inf
     return 2.0 / 3.0 * (np.log10(M0) - 9.1)
 
 
