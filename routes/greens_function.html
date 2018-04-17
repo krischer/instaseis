@@ -3,20 +3,12 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>GET /greens_function &#8212; instaseis 1.2.0-16-gd08d8 documentation</title>
+    <title>GET /greens_function &#8212; instaseis 1.2.0-19-g26f3 documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '1.2.0-16-gd08d8',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
@@ -34,8 +26,7 @@
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
 
-  </head>
-  <body>
+  </head><body>
 
   <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
     <div class="container">
@@ -48,7 +39,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>1.2.0-16-gd08d8</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>1.2.0-19-g26f3</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -115,7 +106,7 @@ will keep working even with a normal configuration.</p>
 <dt>Description</dt>
 <dd><p class="first">Returns Instaseis Greens’s function, that is seimograms for contraction with the
 decomposition of the Momenttensor as in Minson &amp; Dreger (2008). Several convenience
-function of the <code class="docutils literal"><span class="pre">/seismograms</span></code> route are replicated here to make it suitable to be
+function of the <code class="docutils literal notranslate"><span class="pre">/seismograms</span></code> route are replicated here to make it suitable to be
 queried by any program able to use HTTP.</p>
 <table border="1" class="last docutils">
 <colgroup>
@@ -135,12 +126,12 @@ queried by any program able to use HTTP.</p>
 </dd>
 <dt>Content-Type</dt>
 <dd><ul class="first last simple">
-<li><code class="docutils literal"><span class="pre">application/zip</span></code> (if zipped SAC data is requested)</li>
-<li><code class="docutils literal"><span class="pre">application/vnd.fdsn.mseed</span></code> (if MiniSEED data is requested)</li>
+<li><code class="docutils literal notranslate"><span class="pre">application/zip</span></code> (if zipped SAC data is requested)</li>
+<li><code class="docutils literal notranslate"><span class="pre">application/vnd.fdsn.mseed</span></code> (if MiniSEED data is requested)</li>
 </ul>
 </dd>
 <dt>Special Response Headers</dt>
-<dd><code class="docutils literal"><span class="pre">Instaseis-Mu</span></code>: This transports the mu of the model for the given
+<dd><code class="docutils literal notranslate"><span class="pre">Instaseis-Mu</span></code>: This transports the mu of the model for the given
 seismogram which is needed for some finite source calculations. Please make
 sure your proxy does not filter it.</dd>
 <dt>Filetype</dt>
@@ -148,11 +139,11 @@ sure your proxy does not filter it.</dd>
 encoding format 4 (IEEE floating point).</p>
 <p>SAC files will have the following user defined variables set:</p>
 <ul class="last simple">
-<li><code class="docutils literal"><span class="pre">KUSER0</span></code>: “InstSeis”</li>
-<li><code class="docutils literal"><span class="pre">KUSER1</span></code>: The first eight letters of the used velocity model.</li>
-<li><code class="docutils literal"><span class="pre">KT7</span></code>: The first seven letters of the AxiSEM version number used to generate the model. Prefixed with <code class="docutils literal"><span class="pre">A</span></code>.</li>
-<li><code class="docutils literal"><span class="pre">KT8</span></code>: The first seven letters of the Instaseis version number used to generate the seismogram. Prefixed with <code class="docutils literal"><span class="pre">I</span></code>.</li>
-<li><code class="docutils literal"><span class="pre">USER0</span></code>: The scale factor used to generate the waveforms.</li>
+<li><code class="docutils literal notranslate"><span class="pre">KUSER0</span></code>: “InstSeis”</li>
+<li><code class="docutils literal notranslate"><span class="pre">KUSER1</span></code>: The first eight letters of the used velocity model.</li>
+<li><code class="docutils literal notranslate"><span class="pre">KT7</span></code>: The first seven letters of the AxiSEM version number used to generate the model. Prefixed with <code class="docutils literal notranslate"><span class="pre">A</span></code>.</li>
+<li><code class="docutils literal notranslate"><span class="pre">KT8</span></code>: The first seven letters of the Instaseis version number used to generate the seismogram. Prefixed with <code class="docutils literal notranslate"><span class="pre">I</span></code>.</li>
+<li><code class="docutils literal notranslate"><span class="pre">USER0</span></code>: The scale factor used to generate the waveforms.</li>
 </ul>
 </dd>
 </dl>
@@ -175,13 +166,13 @@ encoding format 4 (IEEE floating point).</p>
 <tbody valign="top">
 <tr class="row-even"><td colspan="5"><strong>Source/Receiver Parameters</strong></td>
 </tr>
-<tr class="row-odd"><td><code class="docutils literal"><span class="pre">sourcedepthinmeters</span></code></td>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">sourcedepthinmeters</span></code></td>
 <td>Float</td>
 <td>True</td>
 <td>&#160;</td>
 <td>The source depth in meters.</td>
 </tr>
-<tr class="row-even"><td><code class="docutils literal"><span class="pre">sourcedistanceindegrees</span></code></td>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">sourcedistanceindegrees</span></code></td>
 <td>Float</td>
 <td>True</td>
 <td>&#160;</td>
@@ -190,32 +181,32 @@ of a sphere).</td>
 </tr>
 <tr class="row-odd"><td colspan="5"><strong>Output parameters</strong></td>
 </tr>
-<tr class="row-even"><td><code class="docutils literal"><span class="pre">format</span></code></td>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">format</span></code></td>
 <td>String</td>
 <td>False</td>
 <td>saczip</td>
 <td>Specify output file to be either MiniSEED or a ZIP archive of SAC files, either
-<code class="docutils literal"><span class="pre">miniseed</span></code> or <code class="docutils literal"><span class="pre">saczip</span></code>.</td>
+<code class="docutils literal notranslate"><span class="pre">miniseed</span></code> or <code class="docutils literal notranslate"><span class="pre">saczip</span></code>.</td>
 </tr>
-<tr class="row-odd"><td><code class="docutils literal"><span class="pre">label</span></code></td>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">label</span></code></td>
 <td>String</td>
 <td>False</td>
 <td>greensfunction</td>
 <td>Specify a label to be included in file names and HTTP file name suggestions.</td>
 </tr>
-<tr class="row-even"><td><code class="docutils literal"><span class="pre">units</span></code></td>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">units</span></code></td>
 <td>String</td>
 <td>False</td>
 <td>displacement</td>
-<td>Specify either <code class="docutils literal"><span class="pre">displacement</span></code>, <code class="docutils literal"><span class="pre">velocity</span></code> or <code class="docutils literal"><span class="pre">acceleration</span></code> for the synthetics.</td>
+<td>Specify either <code class="docutils literal notranslate"><span class="pre">displacement</span></code>, <code class="docutils literal notranslate"><span class="pre">velocity</span></code> or <code class="docutils literal notranslate"><span class="pre">acceleration</span></code> for the synthetics.</td>
 </tr>
-<tr class="row-odd"><td><code class="docutils literal"><span class="pre">dt</span></code></td>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">dt</span></code></td>
 <td>Float</td>
 <td>False</td>
 <td>&#160;</td>
 <td>If given, seismograms will be resampled to the desired sample spacing.</td>
 </tr>
-<tr class="row-even"><td><code class="docutils literal"><span class="pre">kernelwidth</span></code></td>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">kernelwidth</span></code></td>
 <td>Integer</td>
 <td>False</td>
 <td>12</td>
@@ -224,7 +215,7 @@ interval in terms of the original sampling interval.</td>
 </tr>
 <tr class="row-odd"><td colspan="5"><strong>Time Parameters</strong></td>
 </tr>
-<tr class="row-even"><td><code class="docutils literal"><span class="pre">origintime</span></code></td>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">origintime</span></code></td>
 <td>Datetime</td>
 <td>False</td>
 <td>1900-01-01T00:00:00.000000Z</td>
@@ -232,7 +223,7 @@ interval in terms of the original sampling interval.</td>
 absolute date and time. This time coincides with the peak of the
 source time function.</td>
 </tr>
-<tr class="row-odd"><td><code class="docutils literal"><span class="pre">starttime</span></code></td>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">starttime</span></code></td>
 <td>Datetime</td>
 <td>False</td>
 <td>&#160;</td>
@@ -244,13 +235,13 @@ as either:</p>
 <li>an offset from origin time in seconds</li>
 </ul>
 <p class="last">If the value is recognized as a date and time, it is interpreted as an absolute time.
-If the value is in the form <code class="docutils literal"><span class="pre">phase[+-]offset</span></code> it is interpreted as a
-phase-relative time, for example <code class="docutils literal"><span class="pre">P-10</span></code> (meaning P-wave arrival time minus 10
+If the value is in the form <code class="docutils literal notranslate"><span class="pre">phase[+-]offset</span></code> it is interpreted as a
+phase-relative time, for example <code class="docutils literal notranslate"><span class="pre">P-10</span></code> (meaning P-wave arrival time minus 10
 seconds). If the value is a numerical value it is interpreted as an offset, in
 seconds, from the origin time.</p>
 </td>
 </tr>
-<tr class="row-even"><td><code class="docutils literal"><span class="pre">endtime</span></code></td>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">endtime</span></code></td>
 <td>Datetime</td>
 <td>False</td>
 <td>&#160;</td>
@@ -262,8 +253,8 @@ as either:</p>
 <li>an offset (duration) from start time in seconds</li>
 </ul>
 <p class="last">If the value is recognized as a date and time, it is interpreted as an absolute time.
-If the value is in the form <code class="docutils literal"><span class="pre">phase[+-]offset</span></code> it is interpreted as a
-phase-relative time, for example <code class="docutils literal"><span class="pre">P-10</span></code> (meaning P-wave arrival time minus 10
+If the value is in the form <code class="docutils literal notranslate"><span class="pre">phase[+-]offset</span></code> it is interpreted as a
+phase-relative time, for example <code class="docutils literal notranslate"><span class="pre">P-10</span></code> (meaning P-wave arrival time minus 10
 seconds). If the value is a numerical value it is interpreted as an offset, in
 seconds, from the start time.</p>
 </td>
@@ -286,7 +277,7 @@ seconds, from the start time.</p>
     </p>
     <p>
         &copy; Copyright 2014-2015, Lion Krischer and Martin van Driel.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.2.<br/>
     </p>
   </div>
 </footer>

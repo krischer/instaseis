@@ -3,20 +3,12 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Sources and Receivers &#8212; instaseis 1.2.0-16-gd08d8 documentation</title>
+    <title>Sources and Receivers &#8212; instaseis 1.2.0-19-g26f3 documentation</title>
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '1.2.0-16-gd08d8',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
@@ -34,8 +26,7 @@
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
 
-  </head>
-  <body>
+  </head><body>
 
   <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
     <div class="container">
@@ -48,7 +39,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>1.2.0-16-gd08d8</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>1.2.0-19-g26f3</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -106,10 +97,10 @@
   <div class="section" id="sources-and-receivers">
 <h1>Sources and Receivers<a class="headerlink" href="#sources-and-receivers" title="Permalink to this headline">¶</a></h1>
 <p>Instaseis uses objects to represent seismic receivers and different types of
-sources. <a class="reference internal" href="#instaseis.source.Source" title="instaseis.source.Source"><code class="xref py py-class docutils literal"><span class="pre">Source</span></code></a> objects are standard moment tensor
-or double couple sources, <a class="reference internal" href="#instaseis.source.ForceSource" title="instaseis.source.ForceSource"><code class="xref py py-class docutils literal"><span class="pre">ForceSource</span></code></a> object are
+sources. <a class="reference internal" href="#instaseis.source.Source" title="instaseis.source.Source"><code class="xref py py-class docutils literal notranslate"><span class="pre">Source</span></code></a> objects are standard moment tensor
+or double couple sources, <a class="reference internal" href="#instaseis.source.ForceSource" title="instaseis.source.ForceSource"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForceSource</span></code></a> object are
 (as the name implies) force sources, and finite source are represented by the
-<a class="reference internal" href="#instaseis.source.FiniteSource" title="instaseis.source.FiniteSource"><code class="xref py py-class docutils literal"><span class="pre">FiniteSource</span></code></a> class.</p>
+<a class="reference internal" href="#instaseis.source.FiniteSource" title="instaseis.source.FiniteSource"><code class="xref py py-class docutils literal notranslate"><span class="pre">FiniteSource</span></code></a> class.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>Instaseis works with geocentric coordinates. Coordinates in for example
@@ -146,18 +137,18 @@ source/receiver objects are again in geocentric coordinates.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>latitude</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) – The geocentric latitude of the receiver in degree.</li>
-<li><strong>longitude</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) – The longitude of the receiver in degree.</li>
-<li><strong>depth_in_m</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) – The depth of the receiver in meters. Only</li>
-<li><strong>network</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em>, </em><em>optional</em>) – The network id of the receiver.</li>
-<li><strong>station</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em>, </em><em>optional</em>) – The station id of the receiver.</li>
-<li><strong>location</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – The location code of the receiver.</li>
+<li><strong>latitude</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – The geocentric latitude of the receiver in degree.</li>
+<li><strong>longitude</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – The longitude of the receiver in degree.</li>
+<li><strong>depth_in_m</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – The depth of the receiver in meters. Only</li>
+<li><strong>network</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – The network id of the receiver.</li>
+<li><strong>station</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – The station id of the receiver.</li>
+<li><strong>location</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The location code of the receiver.</li>
 </ul>
 </td>
 </tr>
 </tbody>
 </table>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">instaseis</span> <span class="k">import</span> <span class="n">Receiver</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">instaseis</span> <span class="k">import</span> <span class="n">Receiver</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">rec</span> <span class="o">=</span> <span class="n">Receiver</span><span class="p">(</span><span class="n">latitude</span><span class="o">=</span><span class="mf">12.34</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="mf">56.78</span><span class="p">,</span> <span class="n">network</span><span class="o">=</span><span class="s2">&quot;AB&quot;</span><span class="p">,</span>
 <span class="gp">... </span>               <span class="n">station</span><span class="o">=</span><span class="s2">&quot;CDE&quot;</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="s2">&quot;SY&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">rec</span><span class="p">)</span>  
@@ -171,9 +162,9 @@ source/receiver objects are again in geocentric coordinates.</li>
 </div>
 <dl class="staticmethod">
 <dt id="instaseis.source.Receiver.parse">
-<em class="property">static </em><code class="descname">parse</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwds</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/source.html#Receiver.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.Receiver.parse" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">parse</code><span class="sig-paren">(</span><em>**kwds</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/source.html#Receiver.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.Receiver.parse" title="Permalink to this definition">¶</a></dt>
 <dd><p>Attempts to parse anything to a list of
-<a class="reference internal" href="#instaseis.source.Receiver" title="instaseis.source.Receiver"><code class="xref py py-class docutils literal"><span class="pre">Receiver</span></code></a> objects. Always
+<a class="reference internal" href="#instaseis.source.Receiver" title="instaseis.source.Receiver"><code class="xref py py-class docutils literal notranslate"><span class="pre">Receiver</span></code></a> objects. Always
 returns a list, even if it only contains a single element. It is
 meant as a single entry point for receiver information from any source.</p>
 <p>Supports StationXML, the custom STATIONS fileformat, SAC files,
@@ -193,14 +184,14 @@ objects. Likely only needed for the recursive part of this method.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">List of <a class="reference internal" href="#instaseis.source.Receiver" title="instaseis.source.Receiver"><code class="xref py py-class docutils literal"><span class="pre">Receiver</span></code></a> objects.</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">List of <a class="reference internal" href="#instaseis.source.Receiver" title="instaseis.source.Receiver"><code class="xref py py-class docutils literal notranslate"><span class="pre">Receiver</span></code></a> objects.</p>
 </td>
 </tr>
 </tbody>
 </table>
 <p>The following example parses a StationXML file to a list of
-<a class="reference internal" href="#instaseis.source.Receiver" title="instaseis.source.Receiver"><code class="xref py py-class docutils literal"><span class="pre">Receiver</span></code></a> objects.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">instaseis</span>
+<a class="reference internal" href="#instaseis.source.Receiver" title="instaseis.source.Receiver"><code class="xref py py-class docutils literal notranslate"><span class="pre">Receiver</span></code></a> objects.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">instaseis</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">instaseis</span><span class="o">.</span><span class="n">Receiver</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">stationxml_file</span><span class="p">))</span>
 <span class="go">[&lt;instaseis.source.Receiver object at 0x...&gt;]</span>
 </pre></div>
@@ -247,7 +238,7 @@ the time of the first sample of the final seismogram.</li>
 </tr>
 </tbody>
 </table>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">instaseis</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">instaseis</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">source</span> <span class="o">=</span> <span class="n">instaseis</span><span class="o">.</span><span class="n">Source</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="n">latitude</span><span class="o">=</span><span class="mf">89.91</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">depth_in_m</span><span class="o">=</span><span class="mi">12000</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">m_rr</span> <span class="o">=</span> <span class="mf">4.71e+17</span><span class="p">,</span> <span class="n">m_tt</span> <span class="o">=</span> <span class="mf">3.81e+15</span><span class="p">,</span> <span class="n">m_pp</span> <span class="o">=-</span><span class="mf">4.74e+17</span><span class="p">,</span>
@@ -305,7 +296,7 @@ the time of the first sample of the final seismogram.</li>
 </tr>
 </tbody>
 </table>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">instaseis</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">instaseis</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">source</span> <span class="o">=</span> <span class="n">instaseis</span><span class="o">.</span><span class="n">Source</span><span class="o">.</span><span class="n">from_strike_dip_rake</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="n">latitude</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="mf">12.0</span><span class="p">,</span> <span class="n">depth_in_m</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">strike</span><span class="o">=</span><span class="mi">79</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">dip</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">rake</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">M0</span><span class="o">=</span><span class="mf">1E17</span><span class="p">)</span>
@@ -341,7 +332,7 @@ the time of the first sample of the final seismogram.</li>
 
 <dl class="staticmethod">
 <dt id="instaseis.source.Source.parse">
-<em class="property">static </em><code class="descname">parse</code><span class="sig-paren">(</span><em>filename_or_obj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/source.html#Source.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.Source.parse" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">parse</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/source.html#Source.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.Source.parse" title="Permalink to this definition">¶</a></dt>
 <dd><p>Attempts to parse anything to a Source object. Can currently read
 anything ObsPy can read, ObsPy event related objects.</p>
 <p>For anything ObsPy related, it must contain a full moment tensor,
@@ -357,8 +348,8 @@ will be converted to geocentric coordinates.</p>
 </tbody>
 </table>
 <p>The following example will read a local QuakeML file and return a
-<a class="reference internal" href="#instaseis.source.Source" title="instaseis.source.Source"><code class="xref py py-class docutils literal"><span class="pre">Source</span></code></a> object.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">instaseis</span>
+<a class="reference internal" href="#instaseis.source.Source" title="instaseis.source.Source"><code class="xref py py-class docutils literal notranslate"><span class="pre">Source</span></code></a> object.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">instaseis</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">source</span> <span class="o">=</span> <span class="n">instaseis</span><span class="o">.</span><span class="n">Source</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">quakeml_file</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>  
 <span class="go">Instaseis Source:</span>
@@ -499,7 +490,7 @@ the time of the first sample of the final seismogram.</li>
 </tr>
 </tbody>
 </table>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">instaseis</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">instaseis</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">source</span> <span class="o">=</span> <span class="n">instaseis</span><span class="o">.</span><span class="n">ForceSource</span><span class="p">(</span><span class="n">latitude</span><span class="o">=</span><span class="mf">12.34</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="mf">12.34</span><span class="p">,</span>
 <span class="gp">... </span>                               <span class="n">f_r</span><span class="o">=</span><span class="mf">1E10</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>  
@@ -541,13 +532,13 @@ the time of the first sample of the final seismogram.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>pointsources</strong> (list of <a class="reference internal" href="#instaseis.source.Source" title="instaseis.source.Source"><code class="xref py py-class docutils literal"><span class="pre">Source</span></code></a> objects) – The points sources making up the finite source.</li>
-<li><strong>CMT</strong> (<a class="reference internal" href="#instaseis.source.Source" title="instaseis.source.Source"><code class="xref py py-class docutils literal"><span class="pre">Source</span></code></a>, optional) – The centroid of the finite source.</li>
-<li><strong>magnitude</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em>, </em><em>optional</em>) – The total moment magnitude of the source.</li>
-<li><strong>event_duration</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em>, </em><em>optional</em>) – The event duration in seconds.</li>
-<li><strong>hypocenter_longitude</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em>, </em><em>optional</em>) – The hypocentral longitude.</li>
-<li><strong>hypocenter_latitude</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em>, </em><em>optional</em>) – The hypocentral latitude.</li>
-<li><strong>hypocenter_depth_in_m</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em>, </em><em>optional</em>) – The hypocentral depth in m.</li>
+<li><strong>pointsources</strong> (list of <a class="reference internal" href="#instaseis.source.Source" title="instaseis.source.Source"><code class="xref py py-class docutils literal notranslate"><span class="pre">Source</span></code></a> objects) – The points sources making up the finite source.</li>
+<li><strong>CMT</strong> (<a class="reference internal" href="#instaseis.source.Source" title="instaseis.source.Source"><code class="xref py py-class docutils literal notranslate"><span class="pre">Source</span></code></a>, optional) – The centroid of the finite source.</li>
+<li><strong>magnitude</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) – The total moment magnitude of the source.</li>
+<li><strong>event_duration</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) – The event duration in seconds.</li>
+<li><strong>hypocenter_longitude</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) – The hypocentral longitude.</li>
+<li><strong>hypocenter_latitude</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) – The hypocentral latitude.</li>
+<li><strong>hypocenter_depth_in_m</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) – The hypocentral depth in m.</li>
 </ul>
 </td>
 </tr>
@@ -620,14 +611,14 @@ will be converted to geocentric coordinates.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – path to the .srf file</li>
-<li><strong>normalize</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a><em>, </em><em>optional</em>) – normalize the sliprate to 1</li>
+<li><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – path to the .srf file</li>
+<li><strong>normalize</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – normalize the sliprate to 1</li>
 </ul>
 </td>
 </tr>
 </tbody>
 </table>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">instaseis</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">instaseis</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">source</span> <span class="o">=</span> <span class="n">instaseis</span><span class="o">.</span><span class="n">FiniteSource</span><span class="o">.</span><span class="n">from_srf_file</span><span class="p">(</span><span class="n">srf_file</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>  
 <span class="go">Instaseis Finite Source:</span>
@@ -661,14 +652,14 @@ will be converted to geocentric coordinates.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>filename_or_obj</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – path to the .param file</li>
-<li><strong>npts</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) – number of samples for the source time functions. Should be
+<li><strong>filename_or_obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – path to the .param file</li>
+<li><strong>npts</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – number of samples for the source time functions. Should be
 enough to accommodate long rise times plus optional filter
 responses.</li>
-<li><strong>dt</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) – sample interval for the source time functions. Needs to be
+<li><strong>dt</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – sample interval for the source time functions. Needs to be
 small enough to sample short rise times and can then be low pass
 filtered and downsampled before extracting seismograms.</li>
-<li><strong>trise_min</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) – minimum rise time. If rise time or fall time is
+<li><strong>trise_min</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – minimum rise time. If rise time or fall time is
 smaller than this value, it is replaced by the minimum value.
 Mostly meant to handle zero rise times in some USGS files.</li>
 </ul>
@@ -676,7 +667,7 @@ Mostly meant to handle zero rise times in some USGS files.</li>
 </tr>
 </tbody>
 </table>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">instaseis</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">instaseis</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">source</span> <span class="o">=</span> <span class="n">instaseis</span><span class="o">.</span><span class="n">FiniteSource</span><span class="o">.</span><span class="n">from_usgs_param_file</span><span class="p">(</span><span class="n">param_file</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>  
 <span class="go">Instaseis Finite Source:</span>
@@ -789,7 +780,7 @@ interpolation for all pointsources in the finite source.</p>
     </p>
     <p>
         &copy; Copyright 2014-2015, Lion Krischer and Martin van Driel.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.2.<br/>
     </p>
   </div>
 </footer>

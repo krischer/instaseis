@@ -3,20 +3,12 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Instaseis Server &#8212; instaseis 1.2.0-16-gd08d8 documentation</title>
+    <title>Instaseis Server &#8212; instaseis 1.2.0-19-g26f3 documentation</title>
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '1.2.0-16-gd08d8',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
@@ -34,8 +26,7 @@
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
 
-  </head>
-  <body>
+  </head><body>
 
   <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
     <div class="container">
@@ -48,7 +39,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>1.2.0-16-gd08d8</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>1.2.0-19-g26f3</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -117,15 +108,15 @@ local database.</p>
 <div class="section" id="starting-a-server">
 <h2>Starting a Server<a class="headerlink" href="#starting-a-server" title="Permalink to this headline">¶</a></h2>
 <p>To launch a server, just execute</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>$ python -m instaseis.server --port <span class="m">8765</span> --buffer_size_in_mb <span class="m">100</span> /path/to/db
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ python -m instaseis.server --port <span class="m">8765</span> --buffer_size_in_mb <span class="m">100</span> /path/to/db
 </pre></div>
 </div>
 <p>which will launch a webserver and start serving at the specified port. The
-<code class="docutils literal"><span class="pre">buffer_size_in_mb</span></code> argument is passed to the
-<code class="xref py py-class docutils literal"><span class="pre">InstaseisDB</span></code> initialization routine. It is
+<code class="docutils literal notranslate"><span class="pre">buffer_size_in_mb</span></code> argument is passed to the
+<code class="xref py py-class docutils literal notranslate"><span class="pre">InstaseisDB</span></code> initialization routine. It is
 probably a good idea to choose it as big as your machine allows.
 For a reciprocal database with horizontal and vertical components Instaseis
-will create 4 buffers, each <code class="docutils literal"><span class="pre">buffer_size_in_mb</span></code> in size.</p>
+will create 4 buffers, each <code class="docutils literal notranslate"><span class="pre">buffer_size_in_mb</span></code> in size.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">Some functionality requires an advanced server setup. Please view the
@@ -136,7 +127,7 @@ will create 4 buffers, each <code class="docutils literal"><span class="pre">buf
 <h2>Connecting to a Server<a class="headerlink" href="#connecting-to-a-server" title="Permalink to this headline">¶</a></h2>
 <p>Connecting works by simply opening a connection to said machine, e.g. if
 the server is running on the same machine:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">instaseis</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">instaseis</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">instaseis</span><span class="o">.</span><span class="n">open_db</span><span class="p">(</span><span class="s2">&quot;http://127.0.0.1:8765&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
 <span class="go">RemoteInstaseisDB reciprocal Green&#39;s function Database (v7) generated with these parameters:</span>
@@ -189,7 +180,7 @@ system to system but it should not be hard to find.</p>
 <p>Supervisor takes care to start, monitor, and restart the Instaseis server
 making sure it runs all the time. A very minimal supervisor configuration
 that launches two Instaseis server instances serving two different databases:</p>
-<div class="highlight-ini"><div class="highlight"><pre><span></span><span class="k">[program:instaseis_20s]</span>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[program:instaseis_20s]</span>
 <span class="na">command</span><span class="o">=</span><span class="s">/path/to/python -m instaseis.server --port=8765 --buffer_size_in_mb=50 /path/to/20s_PREM_ANI_FORCES</span>
 <span class="na">autostart</span><span class="o">=</span><span class="s">true</span>
 <span class="na">autorestart</span><span class="o">=</span><span class="s">true</span>
@@ -208,10 +199,10 @@ that launches two Instaseis server instances serving two different databases:</p
 URLs. Also make sure to block all ports that you don’t need with your
 system’s firewall. The following example configuration will map both
 Instaseis server instances started with supervisor to
-<code class="docutils literal"><span class="pre">http://site-name.org:8080/20s_PREM_ANI_FORCES</span></code> and
-<code class="docutils literal"><span class="pre">http://site-name.org:8080/10s_PREM_ANI_FORCES</span></code>. One can easily imaging
+<code class="docutils literal notranslate"><span class="pre">http://site-name.org:8080/20s_PREM_ANI_FORCES</span></code> and
+<code class="docutils literal notranslate"><span class="pre">http://site-name.org:8080/10s_PREM_ANI_FORCES</span></code>. One can easily imaging
 this being done for a number of models at various frequencies.</p>
-<div class="highlight-nginx"><div class="highlight"><pre><span></span><span class="k">server</span> <span class="p">{</span>
+<div class="highlight-nginx notranslate"><div class="highlight"><pre><span></span><span class="k">server</span> <span class="p">{</span>
     <span class="kn">listen</span> <span class="mi">8080</span><span class="p">;</span>
     <span class="kn">server_name</span> <span class="s">localhost</span><span class="p">;</span>
     <span class="kn">location</span> <span class="s">/20s_PREM_ANI_FORCES/</span> <span class="p">{</span>
@@ -233,12 +224,12 @@ issues it is a potential solution.</p>
 <div class="section" id="logging">
 <h2>Logging<a class="headerlink" href="#logging" title="Permalink to this headline">¶</a></h2>
 <p>The Instaseis server starting script</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>$ python -m instaseis.server
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ python -m instaseis.server
 </pre></div>
 </div>
 <p>offers basic functionality to log to standard out. By default it logs at the
-<code class="docutils literal"><span class="pre">INFO</span></code> level. The <code class="docutils literal"><span class="pre">--quiet</span></code> flag can be given to deactivate all logging
-output and the <code class="docutils literal"><span class="pre">--log-level</span></code> argument modifies said level. Please read up on
+<code class="docutils literal notranslate"><span class="pre">INFO</span></code> level. The <code class="docutils literal notranslate"><span class="pre">--quiet</span></code> flag can be given to deactivate all logging
+output and the <code class="docutils literal notranslate"><span class="pre">--log-level</span></code> argument modifies said level. Please read up on
 <a class="reference external" href="https://docs.python.org/3.4/library/logging.html">Python logging</a> for more
 details.</p>
 <p>The Instaseis server is based on the <a class="reference external" href="http://www.tornadoweb.org/">Tornado</a>
@@ -282,7 +273,7 @@ with currently nine endpoints.</p>
     </p>
     <p>
         &copy; Copyright 2014-2015, Lion Krischer and Martin van Driel.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.2.<br/>
     </p>
   </div>
 </footer>
