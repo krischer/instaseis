@@ -7,6 +7,7 @@
     GNU Lesser General Public License, Version 3 [non-commercial/academic use]
     (http://www.gnu.org/copyleft/lgpl.html)
 """
+import concurrent.futures
 import inspect
 import io
 import json
@@ -23,9 +24,12 @@ import tornado.gen
 import tornado.web
 
 from ... import Source, ForceSource, Receiver
-from ..util import run_async, IOQueue, _validtimesetting, \
+from ..util import IOQueue, _validtimesetting, \
     _validate_and_write_waveforms, get_gaussian_source_time_function
 from ..instaseis_request import InstaseisTimeSeriesHandler
+
+
+executor = concurrent.futures.ThreadPoolExecutor(12)
 
 
 # Load the JSON schema once.
@@ -35,9 +39,8 @@ with io.open(os.path.join(DATA, "finite_source_schema.json"), "rt") as fh:
     _json_schema = json.load(fh)
 
 
-@run_async
 def _get_seismogram(db, source, receiver, components, units, dt, kernelwidth,
-                    starttime, endtime, scale, format, label, callback):
+                    starttime, endtime, scale, format, label):
     """
     Extract a seismogram from the passed db and write it either to a MiniSEED
     or a SACZIP file.
@@ -56,7 +59,6 @@ def _get_seismogram(db, source, receiver, components, units, dt, kernelwidth,
         with.
     :param format: The output format. Either "miniseed" or "saczip".
     :param label: Prefix for the filename within the SAC zip file.
-    :param callback: callback function of the coroutine.
     """
     if source.sliprate is not None:
         reconvolve_stf = True
@@ -72,31 +74,24 @@ def _get_seismogram(db, source, receiver, components, units, dt, kernelwidth,
     except Exception:
         msg = ("Could not extract seismogram. Make sure, the components "
                "are valid, and the depth settings are correct.")
-        callback((tornado.web.HTTPError(400, log_message=msg, reason=msg),
-                  None))
-        return
+        return tornado.web.HTTPError(400, log_message=msg, reason=msg), None
 
-    _validate_and_write_waveforms(st=st, callback=callback,
-                                  starttime=starttime, endtime=endtime,
-                                  scale=scale, source=source,
-                                  receiver=receiver, db=db, label=label,
-                                  format=format)
+    return _validate_and_write_waveforms(
+        st=st, starttime=starttime, endtime=endtime, scale=scale,
+        source=source, receiver=receiver, db=db, label=label, format=format)
 
 
-@run_async
-def _parse_validate_and_resample_stf(request, db_info, callback):
+def _parse_validate_and_resample_stf(request, db_info):
     """
     Parses the JSON based STF, validates it, and resamples it.
 
     :param request: The request.
     :param db_info: Information about the current database.
-    :param callback: The coroutine's callback.
     """
     if not request.body:
         msg = "The source time function must be given in the body of the " \
               "POST request."
-        callback(tornado.web.HTTPError(400, log_message=msg, reason=msg))
-        return
+        return tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
     # Try to parse it as a JSON file.
     with io.BytesIO(request.body) as buf:
@@ -104,8 +99,7 @@ def _parse_validate_and_resample_stf(request, db_info, callback):
             j = json.loads(buf.read().decode())
         except Exception:
             msg = "The body of the POST request is not a valid JSON file."
-            callback(tornado.web.HTTPError(400, log_message=msg, reason=msg))
-            return
+            return tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
     # Validate it.
     try:
@@ -114,15 +108,13 @@ def _parse_validate_and_resample_stf(request, db_info, callback):
         # Replace the u'' unicode string specifier for consistent error
         # messages.
         msg = "Validation Error in JSON file: " + re.sub(r"u'", "'", e.message)
-        callback(tornado.web.HTTPError(400, log_message=msg, reason=msg))
-        return
+        return tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
     # Make sure the sampling rate is ok.
     if j["sample_spacing_in_sec"] < db_info.dt:
         msg = "'sample_spacing_in_sec' in the JSON file must not be smaller " \
               "than the database dt [%.3f seconds]." % db_info.dt
-        callback(tornado.web.HTTPError(400, log_message=msg, reason=msg))
-        return
+        return tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
     # Convert to numpy array.
     j["data"] = np.array(j["data"], np.float64)
@@ -142,8 +134,7 @@ def _parse_validate_and_resample_stf(request, db_info, callback):
 
     if message:
         msg = "STF data did not validate: %s" % message
-        callback(tornado.web.HTTPError(400, log_message=msg, reason=msg))
-        return
+        return tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
     missing_length = db_info.length - (
         len(j["data"]) - 1) * j["sample_spacing_in_sec"]
@@ -175,7 +166,7 @@ def _parse_validate_and_resample_stf(request, db_info, callback):
     data /= np.trapz(np.abs(data), dx=db_info.dt)
     j["data"] = data
 
-    callback(j)
+    return j
 
 
 def _tolist(value, count):
@@ -488,7 +479,7 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
             raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
         # Coroutine + thread as potentially pretty expensive.
-        response = yield tornado.gen.Task(
+        response = yield executor.submit(
             _parse_validate_and_resample_stf,
             request=self.request,
             db_info=self.application.db.info)
@@ -496,14 +487,17 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
         if isinstance(response, Exception):
             raise response
 
-        yield tornado.gen.Task(
-            self.get,
-            custom_stf=response
-        )
+        yield executor.submit(self.get, custom_stf=response,
+                              nested_executor=True)
 
     @tornado.web.asynchronous
     @tornado.gen.coroutine
-    def get(self, custom_stf=None):
+    def get(self, custom_stf=None, nested_executor=False):
+        """
+        :param nested_exectuor: Will not launch another executor, if true.
+            Somehow tornado >= 5.0 does not like nested threads. Might be a
+            good idea performance wise in any case.
+        """
         # Parse the arguments. This will also perform a number of sanity
         # checks.
         args = self.parse_arguments()
@@ -595,13 +589,21 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
 
             # Yield from the task. This enables a context switch and thus
             # async behaviour.
-            response, mu = yield tornado.gen.Task(
-                _get_seismogram,
-                db=self.application.db, source=source, receiver=receiver,
-                components=list(args.components), units=args.units, dt=args.dt,
-                kernelwidth=args.kernelwidth, starttime=starttime,
-                endtime=endtime, scale=args.scale, format=args.format,
-                label=args.label)
+            if not nested_executor:
+                response, mu = yield executor.submit(
+                    _get_seismogram, db=self.application.db, source=source,
+                    receiver=receiver, components=list(args.components),
+                    units=args.units, dt=args.dt,
+                    kernelwidth=args.kernelwidth, starttime=starttime,
+                    endtime=endtime, scale=args.scale, format=args.format,
+                    label=args.label)
+            else:
+                response, mu = _get_seismogram(
+                    db=self.application.db, source=source, receiver=receiver,
+                    components=list(args.components), units=args.units,
+                    dt=args.dt, kernelwidth=args.kernelwidth,
+                    starttime=starttime, endtime=endtime, scale=args.scale,
+                    format=args.format, label=args.label)
 
             # Check connection once again.
             if self.connection_closed:  # pragma: no cover

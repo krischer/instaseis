@@ -8,6 +8,7 @@
     GNU Lesser General Public License, Version 3 [non-commercial/academic use]
     (http://www.gnu.org/copyleft/lgpl.html)
 """
+import concurrent.futures
 import io
 import zipfile
 
@@ -16,14 +17,15 @@ import tornado.gen
 import tornado.web
 
 from ... import Source, Receiver, ForceSource
-from ..util import run_async, _validtimesetting, _validate_and_write_waveforms
+from ..util import _validtimesetting, _validate_and_write_waveforms
 from ..instaseis_request import InstaseisTimeSeriesHandler
 
 
-@run_async
+executor = concurrent.futures.ThreadPoolExecutor(12)
+
+
 def _get_greens(db, epicentral_distance_degree, source_depth_in_m, units, dt,
-                kernelwidth, origintime, starttime, endtime, format, label,
-                callback):
+                kernelwidth, origintime, starttime, endtime, format, label):
     """
     Extract a Green's function from the passed db and write it either to a
     MiniSEED or a SACZIP file.
@@ -39,7 +41,6 @@ def _get_greens(db, epicentral_distance_degree, source_depth_in_m, units, dt,
     :param endtime: The desired end time of the seismogram.
     :param format: The output format. Either "miniseed" or "saczip".
     :param label: Prefix for the filename within the SAC zip file.
-    :param callback: callback function of the coroutine.
     """
     try:
         st = db.get_greens_function(
@@ -50,9 +51,7 @@ def _get_greens(db, epicentral_distance_degree, source_depth_in_m, units, dt,
     except Exception:
         msg = ("Could not extract Green's function. Make sure, the parameters "
                "are valid, and the depth settings are correct.")
-        callback((tornado.web.HTTPError(400, log_message=msg, reason=msg),
-                  None))
-        return
+        return tornado.web.HTTPError(400, log_message=msg, reason=msg), None
 
     # Fake source and receiver to be able to reuse the generic waveform
     # serializer.
@@ -66,10 +65,9 @@ def _get_greens(db, epicentral_distance_degree, source_depth_in_m, units, dt,
         tr.stats.network = "XX"
         tr.stats.station = "GF001"
 
-    _validate_and_write_waveforms(st=st, callback=callback,
-                                  starttime=starttime, endtime=endtime,
-                                  scale=1.0, source=source, receiver=receiver,
-                                  db=db, label=label, format=format)
+    return _validate_and_write_waveforms(
+        st=st, starttime=starttime, endtime=endtime, scale=1.0,
+        source=source, receiver=receiver, db=db, label=label, format=format)
 
 
 class GreensFunctionHandler(InstaseisTimeSeriesHandler):
@@ -173,7 +171,7 @@ class GreensFunctionHandler(InstaseisTimeSeriesHandler):
 
         # Yield from the task. This enables a context switch and thus
         # async behaviour.
-        response, mu = yield tornado.gen.Task(
+        response, mu = yield executor.submit(
             _get_greens,
             db=self.application.db,
             epicentral_distance_degree=args.sourcedistanceindegrees,

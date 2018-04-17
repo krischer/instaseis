@@ -7,6 +7,7 @@
     GNU Lesser General Public License, Version 3 [non-commercial/academic use]
     (http://www.gnu.org/copyleft/lgpl.html)
 """
+import concurrent.futures
 import io
 import math
 import numpy as np
@@ -17,7 +18,7 @@ import tornado.gen
 import tornado.web
 
 from ... import FiniteSource
-from ..util import run_async, IOQueue, _validtimesetting, \
+from ..util import IOQueue, _validtimesetting, \
     _validate_and_write_waveforms
 from ..instaseis_request import InstaseisTimeSeriesHandler
 from ...source import USGSParamFileParsingException
@@ -26,11 +27,12 @@ from ...database_interfaces.base_instaseis_db import (
     KIND_MAP, STF_MAP, INV_KIND_MAP, _diff_and_integrate)
 
 
-@run_async
+executor = concurrent.futures.ThreadPoolExecutor(12)
+
+
 def _get_finite_source(db, finite_source, receiver, components, units, dt,
                        kernelwidth, scale, starttime, endtime,
-                       time_of_first_sample, format, label,
-                       callback):
+                       time_of_first_sample, format, label):
     """
     Extract a seismogram from the passed db and write it either to a MiniSEED
     or a SACZIP file.
@@ -48,7 +50,6 @@ def _get_finite_source(db, finite_source, receiver, components, units, dt,
     :param time_of_first_sample: The time of the first sample.
     :param format: The output format. Either "miniseed" or "saczip".
     :param label: Prefix for the filename within the SAC zip file.
-    :param callback: callback function of the coroutine.
     """
     try:
         st = db.get_seismograms_finite_source(
@@ -59,9 +60,7 @@ def _get_finite_source(db, finite_source, receiver, components, units, dt,
     except Exception:
         msg = ("Could not extract finite source seismograms. Make sure, "
                "the parameters are valid, and the depth settings are correct.")
-        callback((tornado.web.HTTPError(400, log_message=msg, reason=msg),
-                  None))
-        return
+        return tornado.web.HTTPError(400, log_message=msg, reason=msg), None
 
     for tr in st:
         tr.stats.starttime = time_of_first_sample
@@ -90,14 +89,13 @@ def _get_finite_source(db, finite_source, receiver, components, units, dt,
                                 dt_out=tr.stats.delta)
             tr.data = data_summed["A"]
 
-    _validate_and_write_waveforms(st=st, callback=callback, scale=scale,
-                                  starttime=starttime, endtime=endtime,
-                                  source=finite_source, receiver=receiver,
-                                  db=db, label=label, format=format)
+    return _validate_and_write_waveforms(
+        st=st, scale=scale, starttime=starttime, endtime=endtime,
+        source=finite_source, receiver=receiver, db=db, label=label,
+        format=format)
 
 
-@run_async
-def _parse_and_resample_finite_source(request, db_info, max_size, callback):
+def _parse_and_resample_finite_source(request, db_info, max_size):
     try:
         with io.BytesIO(request.body) as buf:
             # We get 10.000 samples for each source sampled at 10 Hz. This is
@@ -110,22 +108,19 @@ def _parse_and_resample_finite_source(request, db_info, max_size, callback):
     except USGSParamFileParsingException as e:
         msg = ("The body contents could not be parsed as an USGS param file "
                "due to: %s" % str(e))
-        callback(tornado.web.HTTPError(400, log_message=msg, reason=msg))
-        return
+        return tornado.web.HTTPError(400, log_message=msg, reason=msg)
     # Don't forward the exception message as it might be anything and could
     # thus compromise security.
     except Exception:
         msg = ("Could not parse the body contents. Incorrect USGS param "
                "file?")
-        callback(tornado.web.HTTPError(400, log_message=msg, reason=msg))
-        return
+        return tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
     if max_size is not None and finite_source.npointsources > max_size:
         msg = ("The server only allows finite sources with at most %i points "
                "sources. The source in question has %i points." % (
                 max_size, finite_source.npointsources))
-        callback(tornado.web.HTTPError(400, log_message=msg, reason=msg))
-        return
+        return tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
     # Check the bounds of the finite source and make sure they can be
     # calculated with the current database.
@@ -143,16 +138,14 @@ def _parse_and_resample_finite_source(request, db_info, max_size, callback):
                "from %.1f km to %.1f km." % (
                 min_depth / 1000.0, db_min_depth / 1000.0,
                 db_max_depth / 1000.0))
-        callback(tornado.web.HTTPError(400, log_message=msg, reason=msg))
-        return
+        return tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
     if not (db_min_depth <= max_depth <= db_max_depth):
         msg = ("The deepest point source in the given finite source is %.1f "
                "km deep. The database only has a depth range from %.1f km to "
                "%.1f km." % (max_depth / 1000.0, db_min_depth / 1000.0,
                              db_max_depth / 1000.0))
-        callback(tornado.web.HTTPError(400, log_message=msg, reason=msg))
-        return
+        return tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
     dominant_period = db_info.period
 
@@ -190,8 +183,7 @@ def _parse_and_resample_finite_source(request, db_info, max_size, callback):
 
     # Will set the hypocentral coordinates.
     finite_source.find_hypocenter()
-
-    callback(finite_source)
+    return finite_source
 
 
 class FiniteSourceSeismogramsHandler(InstaseisTimeSeriesHandler):
@@ -336,7 +328,7 @@ class FiniteSourceSeismogramsHandler(InstaseisTimeSeriesHandler):
         self.set_headers(args)
 
         # Coroutine + thread as potentially pretty expensive.
-        response = yield tornado.gen.Task(
+        response = yield executor.submit(
             _parse_and_resample_finite_source,
             request=self.request,
             max_size=self.application.max_size_of_finite_sources,
@@ -395,7 +387,7 @@ class FiniteSourceSeismogramsHandler(InstaseisTimeSeriesHandler):
 
             # Yield from the task. This enables a context switch and thus
             # async behaviour.
-            response, _ = yield tornado.gen.Task(
+            response, _ = yield executor.submit(
                 _get_finite_source,
                 db=self.application.db, finite_source=finite_source,
                 receiver=receiver, components=list(args.components),
