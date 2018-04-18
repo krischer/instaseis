@@ -256,7 +256,69 @@ class SourceOrReceiver(object):
             self.radius_in_m(planet_radius=planet_radius)
 
 
-class Source(SourceOrReceiver):
+class SourceTimeFunction(object):
+    def set_sliprate(self, sliprate, dt, time_shift=None, normalize=True):
+        """
+        Add a source time function (sliprate) to a initialized source object.
+
+        :param sliprate: (normalized) sliprate
+        :param dt: sampling of the sliprate
+        :param normalize: if sliprate is not normalized, set this to true to
+            normalize it using trapezoidal rule style integration
+        """
+        self.sliprate = np.array(sliprate)
+        if normalize:
+            self.sliprate /= np.trapz(sliprate, dx=dt)
+        self.dt = dt
+        self.time_shift = time_shift
+
+    def resample_sliprate(self, dt, nsamp):
+        """
+        For convolution, the sliprate is needed at the sampling of the fields
+        in the database. This function resamples the sliprate using linear
+        interpolation.
+
+        :param dt: desired sampling
+        :param nsamp: desired number of samples
+        """
+        t_new = np.linspace(0, nsamp * dt, nsamp, endpoint=False)
+        t_old = np.linspace(0, self.dt * len(self.sliprate),
+                            len(self.sliprate), endpoint=False)
+
+        self.sliprate = interp(t_new, t_old, self.sliprate)
+        self.dt = dt
+
+    def set_sliprate_dirac(self, dt, nsamp):
+        """
+        :param dt: desired sampling
+        :param nsamp: desired number of samples
+        """
+        self.sliprate = np.zeros(nsamp)
+        self.sliprate[0] = 1.0 / dt
+        self.dt = dt
+
+    def set_sliprate_lp(self, dt, nsamp, freq, corners=4, zerophase=False):
+        """
+        :param dt: desired sampling
+        :param nsamp: desired number of samples
+        """
+        self.sliprate = np.zeros(nsamp)
+        self.sliprate[0] = 1.0 / dt
+        self.sliprate = lowpass(self.sliprate, freq, 1./dt, corners, zerophase)
+        self.dt = dt
+
+    def normalize_sliprate(self):
+        """
+        normalize the sliprate using trapezoidal rule
+        """
+        self.sliprate /= np.trapz(self.sliprate, dx=self.dt)
+
+    def lp_sliprate(self, freq, corners=4, zerophase=False):
+        self.sliprate = lowpass(self.sliprate, freq, 1./self.dt, corners,
+                                zerophase)
+
+
+class Source(SourceOrReceiver, SourceTimeFunction):
     """
     Class to handle a seismic moment tensor source including a source time
     function.
@@ -523,66 +585,6 @@ class Source(SourceOrReceiver):
         return np.array([self.m_tt, self.m_pp, self.m_rr, self.m_rp, self.m_rt,
                          self.m_tp])
 
-    def set_sliprate(self, sliprate, dt, time_shift=None, normalize=True):
-        """
-        Add a source time function (sliprate) to a initialized source object.
-
-        :param sliprate: (normalized) sliprate
-        :param dt: sampling of the sliprate
-        :param normalize: if sliprate is not normalized, set this to true to
-            normalize it using trapezoidal rule style integration
-        """
-        self.sliprate = np.array(sliprate)
-        if normalize:
-            self.sliprate /= np.trapz(sliprate, dx=dt)
-        self.dt = dt
-        self.time_shift = time_shift
-
-    def resample_sliprate(self, dt, nsamp):
-        """
-        For convolution, the sliprate is needed at the sampling of the fields
-        in the database. This function resamples the sliprate using linear
-        interpolation.
-
-        :param dt: desired sampling
-        :param nsamp: desired number of samples
-        """
-        t_new = np.linspace(0, nsamp * dt, nsamp, endpoint=False)
-        t_old = np.linspace(0, self.dt * len(self.sliprate),
-                            len(self.sliprate), endpoint=False)
-
-        self.sliprate = interp(t_new, t_old, self.sliprate)
-        self.dt = dt
-
-    def set_sliprate_dirac(self, dt, nsamp):
-        """
-        :param dt: desired sampling
-        :param nsamp: desired number of samples
-        """
-        self.sliprate = np.zeros(nsamp)
-        self.sliprate[0] = 1.0 / dt
-        self.dt = dt
-
-    def set_sliprate_lp(self, dt, nsamp, freq, corners=4, zerophase=False):
-        """
-        :param dt: desired sampling
-        :param nsamp: desired number of samples
-        """
-        self.sliprate = np.zeros(nsamp)
-        self.sliprate[0] = 1.0 / dt
-        self.sliprate = lowpass(self.sliprate, freq, 1./dt, corners, zerophase)
-        self.dt = dt
-
-    def normalize_sliprate(self):
-        """
-        normalize the sliprate using trapezoidal rule
-        """
-        self.sliprate /= np.trapz(self.sliprate, dx=self.dt)
-
-    def lp_sliprate(self, freq, corners=4, zerophase=False):
-        self.sliprate = lowpass(self.sliprate, freq, 1./self.dt, corners,
-                                zerophase)
-
     def __str__(self):
         return_str = 'Instaseis Source:\n'
         return_str += '\tOrigin Time      : %s\n' % (self.origin_time,)
@@ -604,7 +606,7 @@ class Source(SourceOrReceiver):
         return return_str
 
 
-class ForceSource(SourceOrReceiver):
+class ForceSource(SourceOrReceiver, SourceTimeFunction):
     """
     Class to handle a seismic force source.
 
@@ -635,13 +637,34 @@ class ForceSource(SourceOrReceiver):
         Fp        :   0.00e+00 N
     """
     def __init__(self, latitude, longitude, depth_in_m=None, f_r=0., f_t=0.,
-                 f_p=0., origin_time=obspy.UTCDateTime(0), sliprate=None):
+                 f_p=0., origin_time=obspy.UTCDateTime(0), sliprate=None,
+                 time_shift=None, dt=None):
+        """
+        :param latitude: geocentric latitude of the source in degree
+        :param longitude: longitude of the source in degree
+        :param depth_in_m: source depth in m
+        :param f_r: force components in r, theta, phi in N
+        :param f_t: force components in r, theta, phi in N
+        :param f_p: force components in r, theta, phi in N
+        :param origin_time: The origin time of the source. If you don't
+            reconvolve with another source time function this time is the
+            peak of the source time function used to generate the database.
+            If you reconvolve with another source time function this time is
+            the time of the first sample of the final seismogram.
+        :param sliprate: normalized source time function (sliprate)
+        :param time_shift: correction of the origin time in seconds. Useful
+            in the context of finite source or user defined source time
+            functions.
+        :param dt: sampling of the source time function
+        """
         super(ForceSource, self).__init__(latitude, longitude, depth_in_m)
         self.f_r = f_r
         self.f_t = f_t
         self.f_p = f_p
         self.origin_time = origin_time
-        self.sliprate = sliprate
+        self.time_shift = time_shift
+        self.sliprate = np.array(sliprate) if sliprate is not None else None
+        self.dt = dt
 
     @property
     def force_tpr(self):
