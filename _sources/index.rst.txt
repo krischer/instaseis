@@ -85,26 +85,67 @@ backend from within Instaseis.
 
 .. only:: html
 
-    Teaser Video
-    ------------
-
-    Get a first impression of the things Instaseis can do by taking a short
-    video tour of our graphical user interface (:ref:`gui-label`). Make sure
-    to watch it in HD!
+    Videos
+    ------
 
     .. raw:: html
 
         <div class="container">
-            <div class="row">
-                <div class="embed-responsive embed-responsive-4by3
-                            center-block div_style">
-                    <iframe
-                        class="embed-responsive-item"
-                        src="https://www.youtube.com/embed/539R2_ArzLE?hd=1&vq=hd720"
-                        frameborder="0" allowfullscreen>
-                    </iframe>
+
+            <div class="container" style="padding:10px">
+            This section shows two videos about Instaseis. One is a webinar
+            hosted by CIG giving an introduction to AxiSEM and Instaseis. The
+            second one is a quick demo of Instaseis' GUI.
+            </div>
+
+            <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation" class="active"><a href="#webinar" aria-controls="webinar" role="tab" data-toggle="tab">Webinar</a></li>
+                <li role="presentation"><a href="#gui_teaser" aria-controls="gui_teaser" role="tab" data-toggle="tab">GUI Teaser</a></li>
+            </ul>
+
+            <!-- Tab panes -->
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active" id="webinar">
+                    <div class="container" style="padding:10px">
+                        This video is a one hour long webinar hosted by CIG
+                        containing an introduction to AxiSEM and Instaseis.
+                        It explains the basic concepts behind both and
+                        additional demonstrates how to calculate databases
+                        with AxiSEM and how to use Instaseis at a basic level.
+                    </div>
+
+                    <div class="row" style="margin-left:25px; margin-right:25px">
+                        <div class="embed-responsive embed-responsive-16by9
+                                    center-block div_style">
+                            <iframe
+                                class="embed-response-item"
+                                src="https://www.youtube.com/embed/ZaZx7bwL3RI"
+                                frameborder="0" allow="autoplay; encrypted-media" allowfullscreen>
+                            </iframe>
+                        </div>
+                    </div>
+                </div>
+                <div role="tabpanel" class="tab-pane" id="gui_teaser">
+
+                    <div class="container" style="padding:10px">
+                        Get a first impression of the things Instaseis can do by taking a short
+                        video tour of our graphical user interface (:ref:`gui-label`). Make sure
+                        to watch it in HD!
+                    </div>
+
+                    <div class="row" style="margin-left:25px; margin-right:25px">
+                        <div class="embed-responsive embed-responsive-16by9
+                                    center-block div_style">
+                            <iframe
+                                class="embed-responsive-item"
+                                src="https://www.youtube.com/embed/539R2_ArzLE?hd=1&vq=hd720"
+                                frameborder="0" allowfullscreen>
+                            </iframe>
+                        </div>
+                    </div>
                 </div>
             </div>
+
         </div>
 
 
