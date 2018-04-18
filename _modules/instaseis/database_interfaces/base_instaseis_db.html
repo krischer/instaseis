@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>instaseis.database_interfaces.base_instaseis_db &#8212; instaseis 1.2.0-32-gede7 documentation</title>
+    <title>instaseis.database_interfaces.base_instaseis_db &#8212; instaseis 1.2.0-29-g35b3 documentation</title>
     <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
@@ -37,7 +37,7 @@
         </button>
         <a class="navbar-brand" href="../../../index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>1.2.0-32-gede7</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>1.2.0-29-g35b3</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -122,7 +122,7 @@
 <span class="kn">from</span> <span class="nn">scipy.integrate</span> <span class="k">import</span> <span class="n">cumtrapz</span>
 <span class="kn">import</span> <span class="nn">scipy.signal</span>
 
-<span class="kn">from</span> <span class="nn">..source</span> <span class="k">import</span> <span class="n">Source</span><span class="p">,</span> <span class="n">ForceSource</span><span class="p">,</span> <span class="n">Receiver</span><span class="p">,</span> <span class="n">FiniteSource</span>
+<span class="kn">from</span> <span class="nn">..source</span> <span class="k">import</span> <span class="n">Source</span><span class="p">,</span> <span class="n">ForceSource</span><span class="p">,</span> <span class="n">Receiver</span>
 <span class="kn">from</span> <span class="nn">..helpers</span> <span class="k">import</span> <span class="n">get_band_code</span><span class="p">,</span> <span class="n">sizeof_fmt</span><span class="p">,</span> <span class="n">rfftfreq</span>
 
 
@@ -690,11 +690,6 @@
                     <span class="s2">&quot;seconds. You must not pass a &#39;dt&#39; larger than that as &quot;</span>
                     <span class="s2">&quot;that would be a downsampling operation which Instaseis &quot;</span>
                     <span class="s2">&quot;does not do.&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">FiniteSource</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="s2">&quot;Please use the `get_seismograms_finite_source()` method to &quot;</span>
-                <span class="s2">&quot;compute seisomgrams with finite sources.&quot;</span><span class="p">)</span>
 
         <span class="c1"># Attempt to parse them if the types are not correct.</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">Source</span><span class="p">)</span> <span class="ow">and</span> \
