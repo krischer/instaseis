@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>instaseis.source &#8212; instaseis 1.2.0-27-g45b4 documentation</title>
+    <title>instaseis.source &#8212; instaseis 1.2.0-32-gede7 documentation</title>
     <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" src="../../_static/documentation_options.js"></script>
@@ -37,7 +37,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>1.2.0-27-g45b4</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>1.2.0-32-gede7</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -351,7 +351,69 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">radius_in_m</span><span class="p">(</span><span class="n">planet_radius</span><span class="o">=</span><span class="n">planet_radius</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="Source"><a class="viewcode-back" href="../../source.html#instaseis.source.Source">[docs]</a><span class="k">class</span> <span class="nc">Source</span><span class="p">(</span><span class="n">SourceOrReceiver</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">SourceTimeFunction</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">set_sliprate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sliprate</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">time_shift</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add a source time function (sliprate) to a initialized source object.</span>
+
+<span class="sd">        :param sliprate: (normalized) sliprate</span>
+<span class="sd">        :param dt: sampling of the sliprate</span>
+<span class="sd">        :param normalize: if sliprate is not normalized, set this to true to</span>
+<span class="sd">            normalize it using trapezoidal rule style integration</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sliprate</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">normalize</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">trapz</span><span class="p">(</span><span class="n">sliprate</span><span class="p">,</span> <span class="n">dx</span><span class="o">=</span><span class="n">dt</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="n">dt</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time_shift</span> <span class="o">=</span> <span class="n">time_shift</span>
+
+    <span class="k">def</span> <span class="nf">resample_sliprate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">nsamp</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        For convolution, the sliprate is needed at the sampling of the fields</span>
+<span class="sd">        in the database. This function resamples the sliprate using linear</span>
+<span class="sd">        interpolation.</span>
+
+<span class="sd">        :param dt: desired sampling</span>
+<span class="sd">        :param nsamp: desired number of samples</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">t_new</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">nsamp</span> <span class="o">*</span> <span class="n">dt</span><span class="p">,</span> <span class="n">nsamp</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">t_old</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span><span class="p">),</span>
+                            <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span><span class="p">),</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span> <span class="o">=</span> <span class="n">interp</span><span class="p">(</span><span class="n">t_new</span><span class="p">,</span> <span class="n">t_old</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="n">dt</span>
+
+    <span class="k">def</span> <span class="nf">set_sliprate_dirac</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">nsamp</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param dt: desired sampling</span>
+<span class="sd">        :param nsamp: desired number of samples</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nsamp</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">dt</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="n">dt</span>
+
+    <span class="k">def</span> <span class="nf">set_sliprate_lp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">nsamp</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">corners</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">zerophase</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param dt: desired sampling</span>
+<span class="sd">        :param nsamp: desired number of samples</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nsamp</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">dt</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span> <span class="o">=</span> <span class="n">lowpass</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="mf">1.</span><span class="o">/</span><span class="n">dt</span><span class="p">,</span> <span class="n">corners</span><span class="p">,</span> <span class="n">zerophase</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="n">dt</span>
+
+    <span class="k">def</span> <span class="nf">normalize_sliprate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        normalize the sliprate using trapezoidal rule</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">trapz</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span><span class="p">,</span> <span class="n">dx</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">lp_sliprate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">corners</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">zerophase</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span> <span class="o">=</span> <span class="n">lowpass</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="mf">1.</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span> <span class="n">corners</span><span class="p">,</span>
+                                <span class="n">zerophase</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Source"><a class="viewcode-back" href="../../source.html#instaseis.source.Source">[docs]</a><span class="k">class</span> <span class="nc">Source</span><span class="p">(</span><span class="n">SourceOrReceiver</span><span class="p">,</span> <span class="n">SourceTimeFunction</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class to handle a seismic moment tensor source including a source time</span>
 <span class="sd">    function.</span>
@@ -618,66 +680,6 @@
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">m_tt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_pp</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_rr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_rp</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_rt</span><span class="p">,</span>
                          <span class="bp">self</span><span class="o">.</span><span class="n">m_tp</span><span class="p">])</span>
 
-<div class="viewcode-block" id="Source.set_sliprate"><a class="viewcode-back" href="../../source.html#instaseis.source.Source.set_sliprate">[docs]</a>    <span class="k">def</span> <span class="nf">set_sliprate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sliprate</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">time_shift</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Add a source time function (sliprate) to a initialized source object.</span>
-
-<span class="sd">        :param sliprate: (normalized) sliprate</span>
-<span class="sd">        :param dt: sampling of the sliprate</span>
-<span class="sd">        :param normalize: if sliprate is not normalized, set this to true to</span>
-<span class="sd">            normalize it using trapezoidal rule style integration</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sliprate</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">normalize</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">trapz</span><span class="p">(</span><span class="n">sliprate</span><span class="p">,</span> <span class="n">dx</span><span class="o">=</span><span class="n">dt</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="n">dt</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">time_shift</span> <span class="o">=</span> <span class="n">time_shift</span></div>
-
-<div class="viewcode-block" id="Source.resample_sliprate"><a class="viewcode-back" href="../../source.html#instaseis.source.Source.resample_sliprate">[docs]</a>    <span class="k">def</span> <span class="nf">resample_sliprate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">nsamp</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        For convolution, the sliprate is needed at the sampling of the fields</span>
-<span class="sd">        in the database. This function resamples the sliprate using linear</span>
-<span class="sd">        interpolation.</span>
-
-<span class="sd">        :param dt: desired sampling</span>
-<span class="sd">        :param nsamp: desired number of samples</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">t_new</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">nsamp</span> <span class="o">*</span> <span class="n">dt</span><span class="p">,</span> <span class="n">nsamp</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="n">t_old</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span><span class="p">),</span>
-                            <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span><span class="p">),</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span> <span class="o">=</span> <span class="n">interp</span><span class="p">(</span><span class="n">t_new</span><span class="p">,</span> <span class="n">t_old</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="n">dt</span></div>
-
-<div class="viewcode-block" id="Source.set_sliprate_dirac"><a class="viewcode-back" href="../../source.html#instaseis.source.Source.set_sliprate_dirac">[docs]</a>    <span class="k">def</span> <span class="nf">set_sliprate_dirac</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">nsamp</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param dt: desired sampling</span>
-<span class="sd">        :param nsamp: desired number of samples</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nsamp</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">dt</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="n">dt</span></div>
-
-<div class="viewcode-block" id="Source.set_sliprate_lp"><a class="viewcode-back" href="../../source.html#instaseis.source.Source.set_sliprate_lp">[docs]</a>    <span class="k">def</span> <span class="nf">set_sliprate_lp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">nsamp</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">corners</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">zerophase</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param dt: desired sampling</span>
-<span class="sd">        :param nsamp: desired number of samples</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nsamp</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">dt</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span> <span class="o">=</span> <span class="n">lowpass</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="mf">1.</span><span class="o">/</span><span class="n">dt</span><span class="p">,</span> <span class="n">corners</span><span class="p">,</span> <span class="n">zerophase</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="n">dt</span></div>
-
-<div class="viewcode-block" id="Source.normalize_sliprate"><a class="viewcode-back" href="../../source.html#instaseis.source.Source.normalize_sliprate">[docs]</a>    <span class="k">def</span> <span class="nf">normalize_sliprate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        normalize the sliprate using trapezoidal rule</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">trapz</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span><span class="p">,</span> <span class="n">dx</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span></div>
-
-    <span class="k">def</span> <span class="nf">lp_sliprate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">corners</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">zerophase</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span> <span class="o">=</span> <span class="n">lowpass</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="mf">1.</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span> <span class="n">corners</span><span class="p">,</span>
-                                <span class="n">zerophase</span><span class="p">)</span>
-
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">return_str</span> <span class="o">=</span> <span class="s1">&#39;Instaseis Source:</span><span class="se">\n</span><span class="s1">&#39;</span>
         <span class="n">return_str</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Origin Time      : </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">origin_time</span><span class="p">,)</span>
@@ -699,7 +701,7 @@
         <span class="k">return</span> <span class="n">return_str</span></div>
 
 
-<div class="viewcode-block" id="ForceSource"><a class="viewcode-back" href="../../source.html#instaseis.source.ForceSource">[docs]</a><span class="k">class</span> <span class="nc">ForceSource</span><span class="p">(</span><span class="n">SourceOrReceiver</span><span class="p">):</span>
+<div class="viewcode-block" id="ForceSource"><a class="viewcode-back" href="../../source.html#instaseis.source.ForceSource">[docs]</a><span class="k">class</span> <span class="nc">ForceSource</span><span class="p">(</span><span class="n">SourceOrReceiver</span><span class="p">,</span> <span class="n">SourceTimeFunction</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class to handle a seismic force source.</span>
 
@@ -730,13 +732,34 @@
 <span class="sd">        Fp        :   0.00e+00 N</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="p">,</span> <span class="n">depth_in_m</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">f_r</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">f_t</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span>
-                 <span class="n">f_p</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">origin_time</span><span class="o">=</span><span class="n">obspy</span><span class="o">.</span><span class="n">UTCDateTime</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">sliprate</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+                 <span class="n">f_p</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">origin_time</span><span class="o">=</span><span class="n">obspy</span><span class="o">.</span><span class="n">UTCDateTime</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">sliprate</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">time_shift</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param latitude: geocentric latitude of the source in degree</span>
+<span class="sd">        :param longitude: longitude of the source in degree</span>
+<span class="sd">        :param depth_in_m: source depth in m</span>
+<span class="sd">        :param f_r: force components in r, theta, phi in N</span>
+<span class="sd">        :param f_t: force components in r, theta, phi in N</span>
+<span class="sd">        :param f_p: force components in r, theta, phi in N</span>
+<span class="sd">        :param origin_time: The origin time of the source. If you don&#39;t</span>
+<span class="sd">            reconvolve with another source time function this time is the</span>
+<span class="sd">            peak of the source time function used to generate the database.</span>
+<span class="sd">            If you reconvolve with another source time function this time is</span>
+<span class="sd">            the time of the first sample of the final seismogram.</span>
+<span class="sd">        :param sliprate: normalized source time function (sliprate)</span>
+<span class="sd">        :param time_shift: correction of the origin time in seconds. Useful</span>
+<span class="sd">            in the context of finite source or user defined source time</span>
+<span class="sd">            functions.</span>
+<span class="sd">        :param dt: sampling of the source time function</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ForceSource</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="p">,</span> <span class="n">depth_in_m</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">f_r</span> <span class="o">=</span> <span class="n">f_r</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">f_t</span> <span class="o">=</span> <span class="n">f_t</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">f_p</span> <span class="o">=</span> <span class="n">f_p</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">origin_time</span> <span class="o">=</span> <span class="n">origin_time</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span> <span class="o">=</span> <span class="n">sliprate</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time_shift</span> <span class="o">=</span> <span class="n">time_shift</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sliprate</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sliprate</span><span class="p">)</span> <span class="k">if</span> <span class="n">sliprate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="n">dt</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">force_tpr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
