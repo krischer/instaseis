@@ -3,7 +3,7 @@
 """
 Base Instaseis Request handler currently only settings default headers.
 
-:copyright:
+    :copyright:
     Lion Krischer (krischer@geophysik.uni-muenchen.de), 2015
 :license:
     GNU Lesser General Public License, Version 3 [non-commercial/academic use]

@@ -252,7 +252,7 @@ def create_async_client(path, station_coordinates_callback=None,
     application.max_size_of_finite_sources = 1000
     # Build server as in testing:311
     sock, port = bind_unused_port()
-    server = HTTPServer(application, io_loop=IOLoop.instance())
+    server = HTTPServer(application)
     server.add_sockets([sock])
     client = AsyncClient(server, AsyncHTTPClient())
     client.application = application

@@ -7,6 +7,7 @@
     GNU Lesser General Public License, Version 3 [non-commercial/academic use]
     (http://www.gnu.org/copyleft/lgpl.html)
 """
+import concurrent.futures
 import io
 
 import numpy as np
@@ -15,11 +16,11 @@ import tornado.web
 
 from ... import Source, ForceSource, Receiver
 from ..instaseis_request import InstaseisTimeSeriesHandler
-from ..util import run_async
+
+executor = concurrent.futures.ThreadPoolExecutor(12)
 
 
-@run_async
-def _get_seismogram(db, source, receiver, components, callback):
+def _get_seismogram(db, source, receiver, components):
     """
     Extract a seismogram from the passed db and write it either to a MiniSEED
     or a SACZIP file.
@@ -42,7 +43,7 @@ def _get_seismogram(db, source, receiver, components, callback):
     except Exception:
         msg = ("Could not extract seismogram. Make sure, the components "
                "are valid, and the depth settings are correct.")
-        callback(tornado.web.HTTPError(400, log_message=msg, reason=msg))
+        return tornado.web.HTTPError(400, log_message=msg, reason=msg)
         return
 
     try:
@@ -51,8 +52,7 @@ def _get_seismogram(db, source, receiver, components, callback):
             data=data, dt_out=db.info.dt, starttime=source.origin_time)
     except Exception:
         msg = ("Could not convert seismogram to a Stream object.")
-        callback(tornado.web.HTTPError(500, log_message=msg, reason=msg))
-        return
+        return tornado.web.HTTPError(500, log_message=msg, reason=msg)
 
     # Half the filesize but definitely sufficiently accurate.
     for tr in st:
@@ -62,7 +62,7 @@ def _get_seismogram(db, source, receiver, components, callback):
         st.write(fh, format="mseed")
         fh.seek(0, 0)
         binary_data = fh.read()
-    callback((binary_data, st[0].stats.instaseis.mu))
+    return binary_data, st[0].stats.instaseis.mu
 
 
 class RawSeismogramsHandler(InstaseisTimeSeriesHandler):
@@ -196,7 +196,7 @@ class RawSeismogramsHandler(InstaseisTimeSeriesHandler):
                    "Check parameters for sanity.")
             raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
-        response = yield tornado.gen.Task(
+        response = yield executor.submit(
             _get_seismogram, db=self.application.db, source=source,
             receiver=receiver, components=components)
 

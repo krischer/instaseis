@@ -4675,7 +4675,7 @@ def test_sac_headers(all_clients):
                    geocentric_to_elliptic_latitude(1)) < 1E-6
         assert abs(tr.stats.sac.evlo - 12) < 1E-6
         assert abs(tr.stats.sac.evdp - client.source_depth) < 1E-6
-        assert abs(tr.stats.sac.mag - 4.22) < 1E-2
+        assert abs(tr.stats.sac.mag - 4.151) < 1E-2
         # Thats what SPECFEM uses for a moment magnitude....
         assert tr.stats.sac.imagtyp == 55
         # Assume the reference time is the starttime.

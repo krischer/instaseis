@@ -152,13 +152,13 @@ def test_parse_usgs_param_file():
     # single segment file
     finitesource = FiniteSource.from_usgs_param_file(USGS_PARAM_FILE1)
     np.testing.assert_almost_equal(finitesource.moment_magnitude,
-                                   7.9374427577095901)
+                                   7.87077609)
     assert finitesource.npointsources == 121
 
     # multi segment file
     finitesource = FiniteSource.from_usgs_param_file(USGS_PARAM_FILE2)
     np.testing.assert_almost_equal(finitesource.moment_magnitude,
-                                   8.26413197488)
+                                   8.1974653082088)
     assert finitesource.npointsources == 400
 
 
@@ -169,27 +169,27 @@ def test_parse_usgs_param_file_from_bytes_io_and_open_files():
     with io.open(USGS_PARAM_FILE1, "rb") as fh:
         finitesource = FiniteSource.from_usgs_param_file(fh)
     np.testing.assert_almost_equal(finitesource.moment_magnitude,
-                                   7.9374427577095901)
+                                   7.8707760910429236)
     assert finitesource.npointsources == 121
 
     with io.open(USGS_PARAM_FILE1, "rb") as fh:
         with io.BytesIO(fh.read()) as buf:
             finitesource = FiniteSource.from_usgs_param_file(buf)
     np.testing.assert_almost_equal(finitesource.moment_magnitude,
-                                   7.9374427577095901)
+                                   7.87077609)
     assert finitesource.npointsources == 121
 
     with io.open(USGS_PARAM_FILE2, "rb") as fh:
         finitesource = FiniteSource.from_usgs_param_file(fh)
     np.testing.assert_almost_equal(finitesource.moment_magnitude,
-                                   8.26413197488)
+                                   8.1974653082088)
     assert finitesource.npointsources == 400
 
     with io.open(USGS_PARAM_FILE2, "rb") as fh:
         with io.BytesIO(fh.read()) as buf:
             finitesource = FiniteSource.from_usgs_param_file(buf)
     np.testing.assert_almost_equal(finitesource.moment_magnitude,
-                                   8.26413197488)
+                                   8.19746530820887)
     assert finitesource.npointsources == 400
 
 
@@ -207,7 +207,7 @@ def test_haskell():
         latitude, longitude, depth_in_m, strike, dip, rake, M0, fault_length,
         fault_width, rupture_velocity, nl=nl, nw=nw)
     np.testing.assert_almost_equal(finitesource.moment_magnitude,
-                                   7.33333333333333)
+                                   7.26666666666)
 
     # Should raise an error if above ground.
     with pytest.raises(ValueError) as err:
@@ -222,7 +222,7 @@ def test_haskell():
         latitude, longitude, depth_in_m, strike, dip, rake, M0, fault_length,
         fault_width, rupture_velocity, nl=nl, nw=nw, trise=1.0, tfall=1.0)
     np.testing.assert_almost_equal(finitesource.moment_magnitude,
-                                   7.33333333333333)
+                                   7.26666666666666666)
 
 
 def test_resample_stf():
@@ -532,7 +532,7 @@ def test_str_method_of_finite_source():
     finitesource = FiniteSource.from_srf_file(SRF_FILE, True)
     assert str(finitesource) == (
             "Instaseis Finite Source:\n"
-            "\tMoment Magnitude     : 7.67\n"
+            "\tMoment Magnitude     : 7.60\n"
             "\tScalar Moment        :   3.20e+20 Nm\n"
             "\t#Point Sources       : 10\n"
             "\tRupture Duration     :  222.2 s\n"
@@ -593,7 +593,7 @@ def test_print_regressions():
         "\tLongitude        :   85.4 deg\n"
         "\tLatitude         :   27.8 deg\n"
         "\tDepth            : 1.2e+01 km km\n"
-        "\tMoment Magnitude :   8.00\n"
+        "\tMoment Magnitude :   7.93\n"
         "\tScalar Moment    :   1.00e+21 Nm\n"
         "\tMrr              :   8.29e+20 Nm\n"
         "\tMtt              :  -2.33e+20 Nm\n"

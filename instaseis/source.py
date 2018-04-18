@@ -65,6 +65,8 @@ def moment2magnitude(M0):  # NOQA
     :return Mw: moment magnitude
     :type Mw: float
     """
+    if M0 <= 0.0:
+        return -np.inf
     return 2.0 / 3.0 * (np.log10(M0) - 9.1)
 
 
@@ -295,7 +297,7 @@ class Source(SourceOrReceiver):
             Longitude        :    0.0 deg
             Latitude         :   89.9 deg
             Depth            : 1.2e+01 km km
-            Moment Magnitude :   5.80
+            Moment Magnitude :   5.73
             Scalar Moment    :   4.96e+17 Nm
             Mrr              :   4.71e+17 Nm
             Mtt              :   3.81e+15 Nm
@@ -342,7 +344,7 @@ class Source(SourceOrReceiver):
             Longitude        :   40.1 deg
             Latitude         :   38.6 deg
             Depth            : 4.5e+00 km km
-            Moment Magnitude :   5.15
+            Moment Magnitude :   5.09
             Scalar Moment    :   5.37e+16 Nm
             Mrr              :   5.47e+15 Nm
             Mtt              :  -4.11e+16 Nm
@@ -435,7 +437,7 @@ class Source(SourceOrReceiver):
             Longitude        :   12.0 deg
             Latitude         :   10.0 deg
             Depth            : 1.0e+00 km km
-            Moment Magnitude :   5.33
+            Moment Magnitude :   5.27
             Scalar Moment    :   1.00e+17 Nm
             Mrr              :   1.17e+16 Nm
             Mtt              :  -1.74e+16 Nm
@@ -831,7 +833,7 @@ class Receiver(SourceOrReceiver):
                 if len(set(value)) != 1:
                     raise ReceiverParseError(
                         "The coordinates of the channels of station '%s.%s' "
-                        "are not identical" % key)
+                        "are not identical." % key)
                 receivers.append(Receiver(
                     latitude=elliptic_to_geocentric_latitude(value[0][0]),
                     longitude=value[0][1],
@@ -963,7 +965,7 @@ class FiniteSource(object):
         >>> source = instaseis.FiniteSource.from_srf_file(srf_file)
         >>> print(source)  # doctest: +NORMALIZE_WHITESPACE
         Instaseis Finite Source:
-            Moment Magnitude     : 7.67
+            Moment Magnitude     : 7.60
             Scalar Moment        :   3.20e+20 Nm
             #Point Sources       : 10
             Rupture Duration     :  222.2 s
@@ -1069,7 +1071,7 @@ class FiniteSource(object):
         >>> source = instaseis.FiniteSource.from_usgs_param_file(param_file)
         >>> print(source)  # doctest: +NORMALIZE_WHITESPACE
         Instaseis Finite Source:
-            Moment Magnitude     : 7.94
+            Moment Magnitude     : 7.87
             Scalar Moment        :   8.06e+20 Nm
             #Point Sources       : 121
             Rupture Duration     :  107.6 s

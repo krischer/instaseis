@@ -216,7 +216,7 @@ def test_error_handling_when_parsing_station_files(tmpdir):
     with pytest.raises(ReceiverParseError) as err:
         Receiver.parse(p)
     assert err.value.args[0] == ("The coordinates of the channels of station "
-                                 "'BW.FURT' are not identical")
+                                 "'BW.FURT' are not identical.")
 
     # Same thing but this time with a file.
     tmpfile = os.path.join(tmpdir.strpath, "temp.seed")
@@ -224,7 +224,7 @@ def test_error_handling_when_parsing_station_files(tmpdir):
     with pytest.raises(ReceiverParseError) as err:
         Receiver.parse(tmpfile)
     assert err.value.args[0] == ("The coordinates of the channels of station "
-                                 "'BW.FURT' are not identical")
+                                 "'BW.FURT' are not identical.")
 
     # Parsing random string.
     with pytest.raises(ValueError) as err:

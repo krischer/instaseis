@@ -10,8 +10,6 @@
 import io
 import math
 import re
-import functools
-import threading
 
 # This is needed for the gps2dist_azimuth() function to always be stable. We
 # thus enforce an import here.
@@ -30,20 +28,6 @@ from .. import __version__
 
 # Valid phase offset pattern including capture groups.
 PHASE_OFFSET_PATTERN = re.compile(r"(^[A-Za-z0-9^]+)([\+-])([\deE\.\-\+]+$)")
-
-
-def run_async(func):
-    """
-    Decorator executing a function in a thread.
-
-    Adapted from http://stackoverflow.com/a/15952516/1657047
-    """
-    @functools.wraps(func)
-    def async_func(*args, **kwargs):
-        func_hl = threading.Thread(target=func, args=args, kwargs=kwargs)
-        func_hl.start()
-        return func_hl
-    return async_func
 
 
 class IOQueue(object):
@@ -111,7 +95,7 @@ def _format_utc_datetime(dt):
     return dt.datetime.isoformat() + "Z"
 
 
-def _validate_and_write_waveforms(st, callback, starttime, endtime, scale,
+def _validate_and_write_waveforms(st, starttime, endtime, scale,
                                   source, receiver, db, label, format):
     if not label:
         label = ""
@@ -133,15 +117,12 @@ def _validate_and_write_waveforms(st, callback, starttime, endtime, scale,
                "largest db endtime=%s" % (
                 _format_utc_datetime(endtime),
                 _format_utc_datetime(st[0].stats.endtime)))
-        callback((tornado.web.HTTPError(500, log_message=msg, reason=msg),
-                  None))
-        return
+        return tornado.web.HTTPError(500, log_message=msg, reason=msg), None
+
     if starttime < st[0].stats.starttime - 3600.0:
         msg = ("Starttime more than one hour before the starttime of the "
                "seismograms.")
-        callback((tornado.web.HTTPError(500, log_message=msg, reason=msg),
-                  None))
-        return
+        return tornado.web.HTTPError(500, log_message=msg, reason=msg), None
 
     if isinstance(source, FiniteSource):
         mu = None
@@ -159,7 +140,7 @@ def _validate_and_write_waveforms(st, callback, starttime, endtime, scale,
             st.write(fh, format="mseed")
             fh.seek(0, 0)
             binary_data = fh.read()
-        callback((binary_data, mu))
+        return binary_data, mu
     # Write a number of SAC files into an archive.
     elif format == "saczip":
         byte_strings = []
@@ -277,7 +258,7 @@ def _validate_and_write_waveforms(st, callback, starttime, endtime, scale,
                 temp.seek(0, 0)
                 filename = "%s%s.sac" % (label, tr.id)
                 byte_strings.append((filename, temp.read()))
-        callback((byte_strings, mu))
+        return byte_strings, mu
 
 
 def get_gaussian_source_time_function(source_width, dt):
