@@ -27,7 +27,7 @@ from obspy.signal.interpolation import lanczos_interpolation
 from scipy.integrate import cumtrapz
 import scipy.signal
 
-from ..source import Source, ForceSource, Receiver
+from ..source import Source, ForceSource, Receiver, FiniteSource
 from ..helpers import get_band_code, sizeof_fmt, rfftfreq
 
 
@@ -595,6 +595,11 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
                     "seconds. You must not pass a 'dt' larger than that as "
                     "that would be a downsampling operation which Instaseis "
                     "does not do." % self.info.dt)
+
+        if isinstance(source, FiniteSource):
+            raise TypeError(
+                "Please use the `get_seismograms_finite_source()` method to "
+                "compute seisomgrams with finite sources.")
 
         # Attempt to parse them if the types are not correct.
         if not isinstance(source, Source) and \
