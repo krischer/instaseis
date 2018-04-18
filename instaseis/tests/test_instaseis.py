@@ -26,7 +26,7 @@ from instaseis import InstaseisError, InstaseisNotFoundError
 from instaseis.database_interfaces import find_and_open_files
 from instaseis.database_interfaces.base_instaseis_db import \
     _get_seismogram_times
-from instaseis import Source, Receiver, ForceSource
+from instaseis import Source, Receiver, ForceSource, FiniteSource
 from instaseis.helpers import (get_band_code, elliptic_to_geocentric_latitude,
                                geocentric_to_elliptic_latitude, sizeof_fmt)
 
@@ -1930,3 +1930,20 @@ def test_no_downsampling(bwd_db):
         "The database is sampled with a sample spacing of 24.725 seconds. You "
         "must not pass a 'dt' larger than that as that would be a "
         "downsampling operation which Instaseis does not do.")
+
+
+@pytest.mark.parametrize("db", BW_DISPL_DBS)
+def test_exception_when_using_a_finite_source_instead_of_a_normal_source(db):
+    """
+    Tests that a sensible error message is raised.
+    """
+    db = find_and_open_files(db)
+    src = FiniteSource()
+    rec = Receiver(latitude=10., longitude=20.)
+
+    with pytest.raises(TypeError) as err:
+        db.get_seismograms(source=src, receiver=rec)
+
+    assert err.value.args[0] == (
+        "Please use the `get_seismograms_finite_source()` method to compute "
+        "seisomgrams with finite sources.")
