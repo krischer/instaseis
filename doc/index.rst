@@ -169,6 +169,13 @@ Contact Us
     `instaseis+subscribe@googlegroups.com <instaseis+subscribe@googlegroups.com>`_.
 
 
+Changelog
+---------
+
+The most recent changelog can always be found
+`here <https://github.com/krischer/instaseis/blob/master/CHANGELOG.md>`_.
+
+
 Installation
 ------------
 
