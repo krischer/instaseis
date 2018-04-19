@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.3.0] - 2018-04-19
+* Updated to support the latest versions of `ObsPy` and `tornado`.
+* Now uses the NMSOP recommended definition of the moment magnitude.
+  (see #58)
+* Stable finite element mappings also for local/regional scale databases.
+  (see #61)
+* Source time functions for force sources (see #49).
+* Some other small distribution fixes and improved error messages.
+
 ## [1.2.0] - 2017-08-07
 * Closing sockets after each test case ran (see #48).
 * GUI can now display map backgrounds for many planets/moons in the solar
