@@ -225,7 +225,7 @@ The optional graphical user interface furthermore requires
 
 * ``PyQt4``
 * ``pyqtgraph``
-* ``matplolitb``
+* ``matplotlib``
 * ``basemap``
 
 Fortran Compiler
