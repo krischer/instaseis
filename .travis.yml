@@ -1,10 +1,22 @@
 language: python
 
-python:
-  - "2.7"
-  - "3.5"
-  - "3.6"
-  - "3.7"
+matrix:
+  include:
+    - python: 2.7
+      dist: xenial
+      sudo: true
+    - python: 3.5
+      dist: xenial
+      sudo: true
+    - python: 3.6
+      dist: xenial
+      sudo: true
+    - python: 3.7
+      dist: xenial
+      sudo: true
+
+before_install:
+  - sudo apt-get install gfortran
 
 env:
   global:
@@ -19,7 +31,7 @@ before_install:
   - conda create --yes -n condaenv python=$TRAVIS_PYTHON_VERSION
   - conda install --yes -n condaenv pip
   - source activate condaenv
-  - conda install --yes -c conda-forge nomkl scipy matplotlib lxml nose pytest sphinx h5py tornado click python=$TRAVIS_PYTHON_VERSION jsonschema netcdf4 geographiclib gfortran_linux-64
+  - conda install --yes -c conda-forge nomkl scipy matplotlib lxml nose pytest sphinx h5py tornado click python=$TRAVIS_PYTHON_VERSION jsonschema netcdf4 geographiclib
   # concurrent.futures backport for Python 2.7
   - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then pip install futures ; fi
   # Always install latest flake8 and obspy.
