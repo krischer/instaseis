@@ -1,1 +1,3 @@
 include instaseis/RELEASE-VERSION
+exclude instaseis/lib/*.so
+exclude instaseis/lib/*.dylib

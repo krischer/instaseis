@@ -64,12 +64,16 @@ def get_package_data():
     # Recursively include all files in these folders:
     folders = [os.path.join(root_dir, "tests", "data"),
                os.path.join(root_dir, "gui", "data"),
+               os.path.join(root_dir, "lib"),
                os.path.join(root_dir, "server", "data")]
     for folder in folders:
         for directory, _, files in os.walk(folder):
             for filename in files:
                 # Exclude hidden files.
-                if filename.startswith("."):
+                if filename.startswith(".") and filename != ".keep":
+                    continue
+                # Exclude libraries.
+                if filename.endswith(".so") or filename.endswith(".dylib"):
                     continue
                 filenames.append(os.path.relpath(
                     os.path.join(directory, filename),
