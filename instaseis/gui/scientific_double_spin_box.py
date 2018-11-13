@@ -73,5 +73,5 @@ class ScientificDoubleSpinBox(QtGui.QDoubleSpinBox):
 def format_float(value):
     """Modified form of the 'g' format specifier."""
     string = "{:g}".format(value).replace("e+", "e")
-    string = re.sub("e(-?)0*(\d+)", r"e\1\2", string)
+    string = re.sub(r"e(-?)0*(\d+)", r"e\1\2", string)
     return string
