@@ -15,14 +15,12 @@ matrix:
       dist: xenial
       sudo: true
 
-before_install:
-  - sudo apt-get install gfortran
-
 env:
   global:
     secure: omFMs9SEGjhu4q4oVpF08LaPhh8q9ytaerRVyo1TrAdWsxNGfqjgUFHEFUN56AecmP31atwcA0EdBc+qmbxH/fHQIlQAU38vlfn6b9VuAW8h2pjhimxYuz6eAob47nLyPxMDqKeJSpNhmj1CN+fxWL2SxZWIsWHqq4jGlkn+Ft0=
 
 before_install:
+  - sudo apt-get install gfortran
   - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
   - chmod +x miniconda.sh
   - ./miniconda.sh -b -p $HOME/miniconda
