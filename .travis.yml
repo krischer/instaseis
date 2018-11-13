@@ -4,16 +4,13 @@ python:
   - "2.7"
   - "3.5"
   - "3.6"
+  - "3.7"
 
 env:
   global:
     secure: omFMs9SEGjhu4q4oVpF08LaPhh8q9ytaerRVyo1TrAdWsxNGfqjgUFHEFUN56AecmP31atwcA0EdBc+qmbxH/fHQIlQAU38vlfn6b9VuAW8h2pjhimxYuz6eAob47nLyPxMDqKeJSpNhmj1CN+fxWL2SxZWIsWHqq4jGlkn+Ft0=
 
 before_install:
-  # Unfortunately necessary for now (Jan 2016). It slows down the builds quite a bit.
-  # See here for more details: https://github.com/travis-ci/travis-ci/issues/5221
-  - sudo apt-get update
-  - sudo apt-get install -qq gfortran
   - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
   - chmod +x miniconda.sh
   - ./miniconda.sh -b -p $HOME/miniconda
@@ -22,14 +19,11 @@ before_install:
   - conda create --yes -n condaenv python=$TRAVIS_PYTHON_VERSION
   - conda install --yes -n condaenv pip
   - source activate condaenv
-  # The next couple lines fix a crash with multiprocessing on Travis and are not specific to using Miniconda
-  - sudo rm -rf /dev/shm
-  - sudo ln -s /run/shm /dev/shm
-  - conda install --yes -c conda-forge nomkl obspy nose pytest sphinx h5py tornado click python=$TRAVIS_PYTHON_VERSION jsonschema netcdf4 geographiclib
+  - conda install --yes -c conda-forge nomkl scipy matplotlib lxml nose pytest sphinx h5py tornado click python=$TRAVIS_PYTHON_VERSION jsonschema netcdf4 geographiclib gfortran_linux-64
   # concurrent.futures backport for Python 2.7
   - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then pip install futures ; fi
-  # Always install latest flake8.
-  - pip install flake8
+  # Always install latest flake8 and obspy.
+  - pip install flake8 obspy
   # Only install the theme for Python 2.7 as it builds the docs.
   - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then pip install sphinx-bootstrap-theme ; fi
   - pip install coveralls
