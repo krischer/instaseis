@@ -10,6 +10,7 @@
 import io
 import math
 import re
+import sys
 
 # This is needed for the gps2dist_azimuth() function to always be stable. We
 # thus enforce an import here.
@@ -57,7 +58,10 @@ class IOQueue(object):
         for _i in self.data:
             yield _i
         self.data = []
-        return
+        if sys.version_info.major == 2:
+            raise StopIteration
+        else:
+            return
 
 
 def _validtimesetting(value):
