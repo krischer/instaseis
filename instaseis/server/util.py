@@ -57,7 +57,7 @@ class IOQueue(object):
         for _i in self.data:
             yield _i
         self.data = []
-        raise StopIteration
+        return
 
 
 def _validtimesetting(value):
