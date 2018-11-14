@@ -190,7 +190,7 @@ setup_config = dict(
     classifiers=[
         # complete classifier list:
         # http://pypi.python.org/pypi?%3Aaction=list_classifiers
-        "Development Status :: 4 - Beta",
+        "Development Status :: 6 - Mature",
         "Intended Audience :: Science/Research",
         "Operating System :: Unix",
         "Operating System :: POSIX",
@@ -198,10 +198,9 @@ setup_config = dict(
         "Programming Language :: Python",
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.3",
-        "Programming Language :: Python :: 3.4",
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: Implementation :: CPython",
         "Topic :: Scientific/Engineering",
         "Topic :: Scientific/Engineering :: Physics"
