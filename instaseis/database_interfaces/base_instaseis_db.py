@@ -121,8 +121,8 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
                                        source_depth_in_m, origin_time)
 
         # collect receiver information
-        receiver = Receiver(rec_latitude, rec_longitude)
         rec_latitude, rec_longitude = 90. - epicentral_distance_in_degree, 0.
+        receiver = Receiver(rec_latitude, rec_longitude)
 
         if return_obspy_stream:
             st = Stream()
