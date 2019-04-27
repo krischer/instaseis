@@ -78,9 +78,8 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
         """
         Extract Green's function from the Green's function database.
 
-        Currently only one definition is implemented: the one assumed by
-        Seiscomp, i.e. the components ``TSS``, ``ZSS``, ``RSS``, ``TDS``,
-        ``ZDS``, ``RDS``, ``ZDD``, ``RDD``, ``ZEP``, ``REP`` as defined in
+        Currently several definition are implemented, all based to some 
+        extent on the following reference:
 
         .. list-table::
 
