@@ -113,71 +113,31 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
         :rtype: A :class:`obspy.core.stream.Stream` object or a dictionary
             with NumPy arrays as values.
         """
-        # Currently only the seiscomp definition is implemented. Other
-        # implementations will require a refactoring of this method.
-        if definition.lower() != "seiscomp":
-            raise NotImplementedError
-
         self._get_greens_seiscomp_sanity_checks(epicentral_distance_in_degree,
                                                 source_depth_in_m, kind, dt=dt)
 
+        # collect source information
         src_latitude, src_longitude = 90., 0.
-        rec_latitude, rec_longitude = 90. - epicentral_distance_in_degree, 0.
+        items = self._get_greens_items(definition, src_latitude, src_longitude,
+                                       source_depth_in_m, origin_time)
 
-        # sources according to https://github.com/krischer/instaseis/issues/8
-        # transformed to r, theta, phi
-        #
-        # Mtt =  Mxx, Mpp = Myy, Mrr =  Mzz
-        # Mrp = -Myz, Mrt = Mxz, Mtp = -Mxy
-        #
-        # Mrr   Mtt   Mpp    Mrt    Mrp    Mtp
-        #  0     0     0      0      0     -1.0    m1
-        #  0     1.0  -1.0    0      0      0      m2
-        #  0     0     0      0     -1.0    0      m3
-        #  0     0     0      1.0    0      0      m4
-        #  1.0   1.0   1.0    0      0      0      m6
-        #  2.0  -1.0  -1.0    0      0      0      cl
-
-        m1 = Source(src_latitude, src_longitude, source_depth_in_m,
-                    m_tp=-1.0, origin_time=origin_time)
-        m2 = Source(src_latitude, src_longitude, source_depth_in_m,
-                    m_tt=1.0, m_pp=-1.0, origin_time=origin_time)
-        m3 = Source(src_latitude, src_longitude, source_depth_in_m,
-                    m_rp=-1.0, origin_time=origin_time)
-        m4 = Source(src_latitude, src_longitude, source_depth_in_m,
-                    m_rt=1.0, origin_time=origin_time)
-        m6 = Source(src_latitude, src_longitude, source_depth_in_m,
-                    m_rr=1.0, m_tt=1.0, m_pp=1.0, origin_time=origin_time)
-        cl = Source(src_latitude, src_longitude, source_depth_in_m,
-                    m_rr=2.0, m_tt=-1.0, m_pp=-1.0, origin_time=origin_time)
-
+        # collect receiver information
         receiver = Receiver(rec_latitude, rec_longitude)
-
-        # Extract all seismograms - leverage the logic of the
-        # get_seismograms() method as much as possible.
-        args = {'receiver': receiver,
-                'dt': dt,
-                'kind': kind,
-                'kernelwidth': kernelwidth,
-                'return_obspy_stream': return_obspy_stream}
-
-        items = [
-            ("TSS", m1, "T"),
-            ("ZSS", m2, "Z"),
-            ("RSS", m2, "R"),
-            ("TDS", m3, "T"),
-            ("ZDS", m4, "Z"),
-            ("RDS", m4, "R"),
-            ("ZDD", cl, "Z"),
-            ("RDD", cl, "R"),
-            ("ZEP", m6, "Z"),
-            ("REP", m6, "R")]
+        rec_latitude, rec_longitude = 90. - epicentral_distance_in_degree, 0.
 
         if return_obspy_stream:
             st = Stream()
         else:
             st = {}
 
+        args = {'receiver': receiver,
+                'dt': dt,
+                'kind': kind,
+                'kernelwidth': kernelwidth,
+                'return_obspy_stream': return_obspy_stream}
+
+        # Extract all seismograms - leverage the logic of the
+        # get_seismograms() method as much as possible.
         for name, src, comp in items:
             tr = self.get_seismograms(
                 source=src, components=comp, **args)
@@ -190,6 +150,131 @@ class BaseInstaseisDB(with_metaclass(ABCMeta)):
                 st[name] = tr[comp]
 
         return st
+
+
+    def _get_greens_items(self, definition, src_latitude, src_longitude,
+                          source_depth_in_m, origin_time):
+        """ Helper function for get_greens_function
+        """
+
+        #Which Green's functions are required to describe the impulse response
+        #of a radially-symmetric medium?
+        #
+        #For both the vertical and raidal components, four time series are
+        #required. For the tranverse component, two time series are required. 
+        #Thus there are ten independent Green's functions altogether, which is
+        #fewer than in the case of a general inhomogeneous medium
+
+        if definition.lower()=='seiscomp':
+            # sources according to https://github.com/krischer/instaseis/issues/8
+            # transformed to r, theta, phi (up, south, east)
+            #
+            # Mtt =  Mxx, Mpp = Myy, Mrr =  Mzz
+            # Mrp = -Myz, Mrt = Mxz, Mtp = -Mxy
+            #
+            # Mrr   Mtt   Mpp    Mrt    Mrp    Mtp
+            #  0     0     0      0      0     -1.0    m1
+            #  0     1.0  -1.0    0      0      0      m2
+            #  0     0     0      0     -1.0    0      m3
+            #  0     0     0      1.0    0      0      m4
+            #  1.0   1.0   1.0    0      0      0      m6
+            #  2.0  -1.0  -1.0    0      0      0      cl
+
+            m1 = Source(src_latitude, src_longitude, source_depth_in_m,
+                        m_tp=-1.0, origin_time=origin_time)
+            m2 = Source(src_latitude, src_longitude, source_depth_in_m,
+                        m_tt=1.0, m_pp=-1.0, origin_time=origin_time)
+            m3 = Source(src_latitude, src_longitude, source_depth_in_m,
+                        m_rp=-1.0, origin_time=origin_time)
+            m4 = Source(src_latitude, src_longitude, source_depth_in_m,
+                        m_rt=1.0, origin_time=origin_time)
+            m6 = Source(src_latitude, src_longitude, source_depth_in_m,
+                        m_rr=1.0, m_tt=1.0, m_pp=1.0, origin_time=origin_time)
+            cl = Source(src_latitude, src_longitude, source_depth_in_m,
+                    m_rr=2.0, m_tt=-1.0, m_pp=-1.0, origin_time=origin_time)
+
+            items = [
+                ("TSS", m1, "T"),
+                ("ZSS", m2, "Z"),
+                ("RSS", m2, "R"),
+                ("TDS", m3, "T"),
+                ("ZDS", m4, "Z"),
+                ("RDS", m4, "R"),
+                ("ZDD", cl, "Z"),
+                ("RDD", cl, "R"),
+                ("ZEP", m6, "Z"),
+                ("REP", m6, "R")]
+
+
+        elif definition.lower()=='minson_dregor_2008':
+            # sources according to https://github.com/krischer/instaseis/issues/66
+            #
+            # if we assume that Minson&Dregor2008 use a North-East-Down 
+            # basis convention, then we get the following definitions, which 
+            # differ from the seiscomp convention
+
+            m1 = Source(src_latitude, src_longitude, source_depth_in_m,
+                        m_tp=1.0, origin_time=origin_time)
+            m2 = Source(src_latitude, src_longitude, source_depth_in_m,
+                        m_tt=1.0, m_pp=-1.0, origin_time=origin_time)
+            m3 = Source(src_latitude, src_longitude, source_depth_in_m,
+                        m_rp=-1.0, origin_time=origin_time)
+            m4 = Source(src_latitude, src_longitude, source_depth_in_m,
+                        m_rt=-1.0, origin_time=origin_time)
+            m6 = Source(src_latitude, src_longitude, source_depth_in_m,
+                        m_rr=1.0, m_tt=1.0, m_pp=1.0, origin_time=origin_time)
+            cl = Source(src_latitude, src_longitude, source_depth_in_m,
+                    m_rr=2.0, m_tt=-1.0, m_pp=-1.0, origin_time=origin_time)
+
+            items = [
+                ("TSS", m1, "T"),
+                ("ZSS", m2, "Z"),
+                ("RSS", m2, "R"),
+                ("TDS", m3, "T"),
+                ("ZDS", m4, "Z"),
+                ("RDS", m4, "R"),
+                ("ZDD", cl, "Z"),
+                ("RDD", cl, "R"),
+                ("ZEP", m6, "Z"),
+                ("REP", m6, "R")]
+
+
+        elif definition.lower()=='fk':
+            # sources according to https://github.com/krischer/instaseis/issues/66
+            #
+            # this convention matches Lupei Zhu's FK package
+
+            m1 = Source(src_latitude, src_longitude, source_depth_in_m,
+                        m_tp=1.0, origin_time=origin_time)
+            m2 = Source(src_latitude, src_longitude, source_depth_in_m,
+                        m_tt=1.0, m_pp=-1.0, origin_time=origin_time)
+            m3 = Source(src_latitude, src_longitude, source_depth_in_m,
+                        m_rp=1.0, origin_time=origin_time)
+            m4 = Source(src_latitude, src_longitude, source_depth_in_m,
+                        m_rt=1.0, origin_time=origin_time)
+            m6 = Source(src_latitude, src_longitude, source_depth_in_m,
+                        m_rr=1.0, m_tt=1.0, m_pp=1.0, origin_time=origin_time)
+            cl = Source(src_latitude, src_longitude, source_depth_in_m,
+                    m_rr=2.0, m_tt=-1.0, m_pp=-1.0, origin_time=origin_time)
+
+            items = [
+                ("TSS", m1, "T"),
+                ("ZSS", m2, "Z"),
+                ("RSS", m2, "R"),
+                ("TDS", m3, "T"),
+                ("ZDS", m4, "Z"),
+                ("RDS", m4, "R"),
+                ("ZDD", cl, "Z"),
+                ("RDD", cl, "R"),
+                ("ZEP", m6, "Z"),
+                ("REP", m6, "R")]
+
+        else:
+            raise NotImplementedError("Unrecognized Green's function convention")
+
+
+        return items
+
 
     def get_seismograms(self, source, receiver, components=None,
                         kind='displacement', remove_source_shift=True,
