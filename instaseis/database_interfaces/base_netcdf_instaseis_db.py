@@ -71,7 +71,7 @@ class BaseNetCDFInstaseisDB(with_metaclass(ABCMeta, BaseInstaseisDB)):
         Find and collect/calculate information about the element containing
         the given coordinates.
         """
-        k_map = {"displ_only": 6,
+        k_map = {"displ_only": 10,
                  "strain_only": 1,
                  "fullfields": 1}
 
