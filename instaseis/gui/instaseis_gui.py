@@ -12,7 +12,8 @@ Graphical user interface for Instaseis.
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore
+from PyQt5.QtWidgets import QApplication
 import pyqtgraph as pg
 
 from glob import iglob
@@ -56,7 +57,7 @@ def compile_and_import_ui_files():
         py_ui_file = os.path.splitext(ui_file)[0] + os.path.extsep + 'py'
         if not os.path.exists(py_ui_file) or \
                 (os.path.getmtime(ui_file) >= os.path.getmtime(py_ui_file)):
-            from PyQt4 import uic
+            from PyQt5 import uic
             print("Compiling ui file: %s" % ui_file)
             with open(py_ui_file, 'w') as open_file:
                 uic.compileUi(ui_file, open_file)
@@ -789,7 +790,7 @@ def launch():
     compile_and_import_ui_files()
 
     # Launch and open the window.
-    app = QtGui.QApplication(sys.argv, QtGui.QApplication.GuiClient)
+    app = QApplication(sys.argv)
     window = Window()
 
     # Show and bring window to foreground.
