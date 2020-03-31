@@ -10,6 +10,8 @@ import time
 
 import pytest
 
+import instaseis
+
 
 TEST_DATA = os.path.join(os.path.dirname(__file__), "tests", "data")
 
@@ -279,6 +281,13 @@ def pytest_configure(config):
                 continue
             break
         config.dbs = pickle.loads(config.slaveinput["dbs"])
+
+    # This is a bit of silly hack. pytest >= 5.0 removed the global
+    # pytest.config variable.
+    #
+    # So instead of refactoring everything to proper fixtures which would be
+    # the correct way we just add a new global object to instaseis itsself.
+    instaseis._test_dbs = config.dbs
 
 
 def pytest_unconfigure(config):

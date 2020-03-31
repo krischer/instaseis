@@ -319,7 +319,6 @@ class FiniteSourceSeismogramsHandler(InstaseisTimeSeriesHandler):
 
         return time_of_first_sample, earliest_starttime, latest_endtime
 
-    @tornado.web.asynchronous
     @tornado.gen.coroutine
     def post(self):
         # Parse the arguments. This will also perform a number of sanity

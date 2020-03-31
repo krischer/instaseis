@@ -133,7 +133,6 @@ class GreensFunctionHandler(InstaseisTimeSeriesHandler):
                    min_depth, max_depth))
             raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
-    @tornado.web.asynchronous
     @tornado.gen.coroutine
     def get(self):
         # Parse the arguments. This will also perform a number of sanity

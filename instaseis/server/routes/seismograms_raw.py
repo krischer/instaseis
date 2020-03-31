@@ -114,7 +114,6 @@ class RawSeismogramsHandler(InstaseisTimeSeriesHandler):
         self.arguments["components"]["default"] = \
             "".join(self.application.db.default_components)
 
-    @tornado.web.asynchronous
     @tornado.gen.coroutine
     def get(self):
         args = self.parse_arguments()

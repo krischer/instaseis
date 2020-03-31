@@ -471,7 +471,6 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
                                                 reason=msg)
         return receivers
 
-    @tornado.web.asynchronous
     @tornado.gen.coroutine
     def post(self):
         if "sourcewidth" in self.request.arguments.keys():
@@ -490,7 +489,6 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
         yield executor.submit(self.get, custom_stf=response,
                               nested_executor=True)
 
-    @tornado.web.asynchronous
     @tornado.gen.coroutine
     def get(self, custom_stf=None, nested_executor=False):
         """

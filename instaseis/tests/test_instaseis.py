@@ -47,9 +47,10 @@ TEST_DATA = {
     os.path.join(DATA, "100s_db_bwd_displ_only"): BWD_TEST_DATA
 }
 
+_CONFIG_DBS = instaseis._test_dbs
 
 # Add all automatically created repacked databases to the test suite.
-for name, path in pytest.config.dbs["databases"].items():
+for name, path in _CONFIG_DBS["databases"].items():
     DBS.append(path)
     if "bwd" in name:
         test_data = BWD_TEST_DATA
@@ -1678,7 +1679,7 @@ def test_read_on_demand(database_folder, read_on_demand):
                                td["T"], rtol=1E-7, atol=1E-12)
 
 
-@pytest.mark.skipif("merged_100s_db_fwd" not in pytest.config.dbs["databases"],
+@pytest.mark.skipif("merged_100s_db_fwd" not in _CONFIG_DBS["databases"],
                     reason="requires generated tests databases.")
 def test_merged_forward_database_layout():
     """
@@ -1686,7 +1687,7 @@ def test_merged_forward_database_layout():
     default forward layout.
     """
     fwd_db = os.path.join(DATA, "100s_db_fwd")
-    fwd_db_m = pytest.config.dbs["databases"]["merged_100s_db_fwd"]
+    fwd_db_m = _CONFIG_DBS["databases"]["merged_100s_db_fwd"]
     fwd_db = instaseis.open_db(fwd_db)
     fwd_db_m = instaseis.open_db(fwd_db_m)
 

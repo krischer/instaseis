@@ -183,6 +183,7 @@ setup_config = dict(
     # this is needed for "pip install instaseis==dev"
     download_url=("https://github.com/krischer/instaseis/zipball/master"
                   "#egg=instaseis=dev"),
+    python_requires=">=3.6",
     classifiers=[
         # complete classifier list:
         # http://pypi.python.org/pypi?%3Aaction=list_classifiers
@@ -192,12 +193,9 @@ setup_config = dict(
         "Operating System :: POSIX",
         "Operating System :: MacOS",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.3",
-        "Programming Language :: Python :: 3.4",
-        "Programming Language :: Python :: 3.5",
-        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: Implementation :: CPython",
         "Topic :: Scientific/Engineering",
         "Topic :: Scientific/Engineering :: Physics"
