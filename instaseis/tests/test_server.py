@@ -42,6 +42,7 @@ def _compare_streams(st1, st2):
         atol = 1E-4 * max(np.abs(tr1.data).max(), np.abs(tr2.data).max())
         np.testing.assert_allclose(tr1.data, tr2.data, rtol=rtol, atol=atol)
 
+
 def fetch_sync(client, url, **kwargs):
     """
     Helper function to call an async test client in a sync test case.

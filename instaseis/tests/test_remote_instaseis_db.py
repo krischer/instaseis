@@ -30,7 +30,6 @@ else:  # pragma: no cover
 
 
 @responses.activate
-@pytest.mark.gen_test
 def test_info(all_remote_dbs):
     """
     Make sure the info is identical no matter if it comes from a local or
