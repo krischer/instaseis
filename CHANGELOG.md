@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.4.1] - 2020-04-01
+
+- Updating all copyright notices.
+
 ## [1.4.0] - 2020-04-01
 
 - Dropping support for Python < 3.7.
