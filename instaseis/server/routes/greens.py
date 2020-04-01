@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 """
 :copyright:
-    Martin van Driel (vandriel@erdw.ethz.ch), 2015
-    Lion Krischer (krischer@geophysik.uni-muenchen.de), 2015
+    Martin van Driel (vandriel@erdw.ethz.ch), 2020
+    Lion Krischer (lion.krischer@gmail.com), 2020
 :license:
     GNU Lesser General Public License, Version 3 [non-commercial/academic use]
     (http://www.gnu.org/copyleft/lgpl.html)

@@ -6,7 +6,7 @@ Repacking Instaseis databases.
 Requires click, netCDF4, and numpy.
 
 :copyright:
-    Lion Krischer (krischer@geophysik.uni-muenchen.de), 2016
+    Lion Krischer (lion.krischer@gmail.com), 2020
 :license:
     GNU Lesser General Public License, Version 3 [non-commercial/academic use]
     (http://www.gnu.org/copyleft/lgpl.html)

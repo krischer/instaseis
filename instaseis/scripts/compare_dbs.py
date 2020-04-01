@@ -22,7 +22,7 @@ In this example ``DB2``  and ``DB3`` will both be compared the ``DB1``.
 Requires click, Instaseis, and ObsPy.
 
 :copyright:
-    Lion Krischer (krischer@geophysik.uni-muenchen.de), 2016
+    Lion Krischer (lion.krischer@gmail.com), 2020
 :license:
     GNU Lesser General Public License, Version 3 [non-commercial/academic use]
     (http://www.gnu.org/copyleft/lgpl.html)

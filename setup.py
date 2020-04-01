@@ -21,7 +21,7 @@ readily includes other planets such as Mars.
 For more information visit http://www.instaseis.net.
 
 :copyright:
-    The Instaseis Development Team (instaseis@googlegroups.com), 2014-2016
+    The Instaseis Development Team (instaseis@googlegroups.com), 2014-2020
 :license:
     GNU Lesser General Public License, Version 3 [non-commercial/academic use]
     (http://www.gnu.org/copyleft/lgpl.html)
