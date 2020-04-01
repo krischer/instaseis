@@ -39,6 +39,18 @@ USGS_PARAM_FILE_DEEP = os.path.join(DATA, "deep.param")
 USGS_PARAM_FILE_AIR = os.path.join(DATA, "airquakes.param")
 USGS_PARAM_FILE_LONG = os.path.join(DATA, "long_source.param")
 
+def fetch_sync(client, url, **kwargs):
+    """
+    Helper function to call an async test client in a sync test case.
+    """
+    async def f():
+        try:
+            response = await client.fetch(f"http://localhost:{client.port}{url}", **kwargs)
+        except Exception as e:
+            response = e.response
+        return response
+
+    return client.io_loop.run_sync(f)
 
 def _parse_finite_source(filename):
     """
@@ -84,7 +96,7 @@ def test_triggering_random_error_during_parsing(reciprocal_clients):
     with mock.patch("instaseis.source.FiniteSource"
                     ".from_usgs_param_file") as p:
         p.side_effect = ValueError("random crash")
-        request = client.fetch(_assemble_url('finite_source', **params),
+        request = fetch_sync(client, _assemble_url('finite_source', **params),
                                method="POST", body=body)
 
     assert request.code == 400
@@ -105,7 +117,7 @@ def test_sending_non_usgs_file(reciprocal_clients):
     params = {
         "receiverlongitude": 11,
         "receiverlatitude": 22}
-    request = client.fetch(_assemble_url('finite_source', **params),
+    request = fetch_sync(client, _assemble_url('finite_source', **params),
                            method="POST", body=body)
     assert request.code == 400
     assert request.reason == ("The body contents could not be parsed as an "
@@ -135,7 +147,7 @@ def test_finite_source_retrieval(reciprocal_clients, usgs_param):
 
     # default parameters
     params = copy.deepcopy(basic_parameters)
-    request = client.fetch(_assemble_url('finite_source', **params),
+    request = fetch_sync(client, _assemble_url('finite_source', **params),
                            method="POST", body=body)
     assert request.code == 200
     st_server = obspy.read(request.buffer)
@@ -168,7 +180,7 @@ def test_finite_source_retrieval(reciprocal_clients, usgs_param):
     # Once again but this time request a SAC file.
     params = copy.deepcopy(basic_parameters)
     params["format"] = "saczip"
-    request = client.fetch(_assemble_url('finite_source', **params),
+    request = fetch_sync(client, _assemble_url('finite_source', **params),
                            method="POST", body=body)
     assert request.code == 200
     st_server = obspy.Stream()
@@ -192,7 +204,7 @@ def test_finite_source_retrieval(reciprocal_clients, usgs_param):
     # One with a label.
     params = copy.deepcopy(basic_parameters)
     params["label"] = "random_things"
-    request = client.fetch(_assemble_url('finite_source', **params),
+    request = fetch_sync(client, _assemble_url('finite_source', **params),
                            method="POST", body=body)
     assert request.code == 200
 
@@ -206,7 +218,7 @@ def test_finite_source_retrieval(reciprocal_clients, usgs_param):
     with mock.patch("instaseis.database_interfaces.base_instaseis_db"
                     ".BaseInstaseisDB.get_seismograms_finite_source") as p:
         p.side_effect = ValueError("random crash")
-        request = client.fetch(_assemble_url('finite_source', **params),
+        request = fetch_sync(client, _assemble_url('finite_source', **params),
                                method="POST", body=body)
 
     assert request.code == 400
@@ -223,7 +235,7 @@ def test_finite_source_retrieval(reciprocal_clients, usgs_param):
         st = obspy.read()
 
         p.return_value = st
-        request = client.fetch(_assemble_url('finite_source', **params),
+        request = fetch_sync(client, _assemble_url('finite_source', **params),
                                method="POST", body=body)
 
     assert request.code == 500
@@ -248,7 +260,7 @@ def test_finite_source_retrieval(reciprocal_clients, usgs_param):
         tr.data = tr.data[100:]
         tr.stats.starttime = obspy.UTCDateTime(1900, 1, 1)
 
-    request = client.fetch(_assemble_url('finite_source', **params),
+    request = fetch_sync(client, _assemble_url('finite_source', **params),
                            method="POST", body=body)
     assert request.code == 200
     st_server = obspy.read(request.buffer)
@@ -281,7 +293,7 @@ def test_finite_source_retrieval(reciprocal_clients, usgs_param):
     # Testing network and station code parameters.
     # Default values.
     params = copy.deepcopy(basic_parameters)
-    request = client.fetch(_assemble_url('finite_source', **params),
+    request = fetch_sync(client, _assemble_url('finite_source', **params),
                            method="POST", body=body)
     assert request.code == 200
     st_server = obspy.read(request.buffer)
@@ -295,7 +307,7 @@ def test_finite_source_retrieval(reciprocal_clients, usgs_param):
     params["networkcode"] = "AA"
     params["stationcode"] = "BB"
     params["locationcode"] = "CC"
-    request = client.fetch(_assemble_url('finite_source', **params),
+    request = fetch_sync(client, _assemble_url('finite_source', **params),
                            method="POST", body=body)
     assert request.code == 200
     st_server = obspy.read(request.buffer)
@@ -307,7 +319,7 @@ def test_finite_source_retrieval(reciprocal_clients, usgs_param):
     # Setting only the location code.
     params = copy.deepcopy(basic_parameters)
     params["locationcode"] = "AA"
-    request = client.fetch(_assemble_url('finite_source', **params),
+    request = fetch_sync(client, _assemble_url('finite_source', **params),
                            method="POST", body=body)
     assert request.code == 200
     st_server = obspy.read(request.buffer)
@@ -319,7 +331,7 @@ def test_finite_source_retrieval(reciprocal_clients, usgs_param):
     # Test the scale parameter.
     params = copy.deepcopy(basic_parameters)
     params["scale"] = 33.33
-    request = client.fetch(_assemble_url('finite_source', **params),
+    request = fetch_sync(client, _assemble_url('finite_source', **params),
                            method="POST", body=body)
     assert request.code == 200
     st_server = obspy.read(request.buffer)
@@ -380,7 +392,7 @@ def test_more_complex_queries(reciprocal_clients_all_callbacks,
     # default parameters
     params = copy.deepcopy(basic_parameters)
     params["dt"] = 2
-    request = client.fetch(_assemble_url('finite_source', **params),
+    request = fetch_sync(client, _assemble_url('finite_source', **params),
                            method="POST", body=body)
     assert request.code == 200
     st = obspy.read(request.buffer)
@@ -389,7 +401,7 @@ def test_more_complex_queries(reciprocal_clients_all_callbacks,
     params = copy.deepcopy(basic_parameters)
     params["starttime"] = 10
     params["dt"] = 2
-    request = client.fetch(_assemble_url('finite_source', **params),
+    request = fetch_sync(client, _assemble_url('finite_source', **params),
                            method="POST", body=body)
     assert request.code == 200
     st_2 = obspy.read(request.buffer)
@@ -403,7 +415,7 @@ def test_more_complex_queries(reciprocal_clients_all_callbacks,
     params = copy.deepcopy(basic_parameters)
     params["endtime"] = 20
     params["dt"] = 2
-    request = client.fetch(_assemble_url('finite_source', **params),
+    request = fetch_sync(client, _assemble_url('finite_source', **params),
                            method="POST", body=body)
     assert request.code == 200
     st_2 = obspy.read(request.buffer)
@@ -420,7 +432,7 @@ def test_more_complex_queries(reciprocal_clients_all_callbacks,
     params["starttime"] = "P%2D5"
     params["endtime"] = "P%2B5"
     params["dt"] = 2
-    request = client.fetch(_assemble_url('finite_source', **params),
+    request = fetch_sync(client, _assemble_url('finite_source', **params),
                            method="POST", body=body)
     assert request.code == 200
     st_2 = obspy.read(request.buffer)
@@ -434,7 +446,7 @@ def test_more_complex_queries(reciprocal_clients_all_callbacks,
     params["starttime"] = "P%2D5"
     params["endtime"] = "50"
     params["dt"] = 2
-    request = client.fetch(_assemble_url('finite_source', **params),
+    request = fetch_sync(client, _assemble_url('finite_source', **params),
                            method="POST", body=body)
     assert request.code == 200
     st_2 = obspy.read(request.buffer)
@@ -452,7 +464,7 @@ def test_more_complex_queries(reciprocal_clients_all_callbacks,
         "station": "ANT*,ANM?",
         "components": "Z",
         "format": "miniseed"}
-    request = client.fetch(_assemble_url('finite_source', **params),
+    request = fetch_sync(client, _assemble_url('finite_source', **params),
                            method="POST", body=body)
     assert request.code == 200
     st_2 = obspy.read(request.buffer)
@@ -480,7 +492,7 @@ def test_various_failure_conditions(reciprocal_clients_all_callbacks,
     # Starttime too large.
     params = copy.deepcopy(basic_parameters)
     params["starttime"] = 200000
-    request = client.fetch(_assemble_url('finite_source', **params),
+    request = fetch_sync(client, _assemble_url('finite_source', **params),
                            method="POST", body=body)
     assert request.code == 400
     assert request.reason == ("The `starttime` must be before the seismogram "
@@ -489,7 +501,7 @@ def test_various_failure_conditions(reciprocal_clients_all_callbacks,
     # Starttime too early.
     params = copy.deepcopy(basic_parameters)
     params["starttime"] = -10000
-    request = client.fetch(_assemble_url('finite_source', **params),
+    request = fetch_sync(client, _assemble_url('finite_source', **params),
                            method="POST", body=body)
     assert request.code == 400
     assert request.reason == ("The seismogram can start at the maximum one "
@@ -498,7 +510,7 @@ def test_various_failure_conditions(reciprocal_clients_all_callbacks,
     # Endtime too small.
     params = copy.deepcopy(basic_parameters)
     params["endtime"] = -200000
-    request = client.fetch(_assemble_url('finite_source', **params),
+    request = fetch_sync(client, _assemble_url('finite_source', **params),
                            method="POST", body=body)
     assert request.code == 400
     assert request.reason == ("The end time of the seismograms lies outside "
@@ -508,7 +520,7 @@ def test_various_failure_conditions(reciprocal_clients_all_callbacks,
     # range of the example files.
     params = copy.deepcopy(basic_parameters)
     params["starttime"] = "Pdiff%2D5"
-    request = client.fetch(_assemble_url('finite_source', **params),
+    request = fetch_sync(client, _assemble_url('finite_source', **params),
                            method="POST", body=body)
     assert request.code == 400
     assert request.reason == ("No seismograms found for the given phase "
@@ -521,7 +533,7 @@ def test_various_failure_conditions(reciprocal_clients_all_callbacks,
     # Scale of zero.
     params = copy.deepcopy(basic_parameters)
     params["scale"] = 0.0
-    request = client.fetch(_assemble_url('finite_source', **params),
+    request = fetch_sync(client, _assemble_url('finite_source', **params),
                            method="POST", body=body)
     assert request.code == 400
     assert request.reason.startswith("A scale of zero means")
@@ -529,7 +541,7 @@ def test_various_failure_conditions(reciprocal_clients_all_callbacks,
     # Invalid receiver coordinates.
     params = copy.deepcopy(basic_parameters)
     params["receiverlatitude"] = 1E9
-    request = client.fetch(_assemble_url('finite_source', **params),
+    request = fetch_sync(client, _assemble_url('finite_source', **params),
                            method="POST", body=body)
     assert request.code == 400
     assert request.reason == ("Could not construct receiver with passed "
@@ -541,7 +553,7 @@ def test_various_failure_conditions(reciprocal_clients_all_callbacks,
     del params["receiverlongitude"]
     params["network"] = "XX"
     params["station"] = "DUMMY"
-    request = client.fetch(_assemble_url('finite_source', **params),
+    request = fetch_sync(client, _assemble_url('finite_source', **params),
                            method="POST", body=body)
     assert request.code == 400
     assert request.reason == ("Station coordinate query returned invalid "
@@ -553,7 +565,7 @@ def test_various_failure_conditions(reciprocal_clients_all_callbacks,
     del params["receiverlongitude"]
     params["network"] = "UN"
     params["station"] = "KNOWN"
-    request = client.fetch(_assemble_url('finite_source', **params),
+    request = fetch_sync(client, _assemble_url('finite_source', **params),
                            method="POST", body=body)
     assert request.code == 404
     assert request.reason == "No coordinates found satisfying the query."
@@ -575,7 +587,7 @@ def test_uploading_empty_usgs_file(reciprocal_clients):
         body = fh.read()
 
     # Starttime too large.
-    request = client.fetch(_assemble_url('finite_source', **params),
+    request = fetch_sync(client, _assemble_url('finite_source', **params),
                            method="POST", body=body)
     assert request.code == 400
     assert request.reason == (
@@ -600,7 +612,7 @@ def test_uploading_deep_usgs_file(reciprocal_clients):
         body = fh.read()
 
     # Starttime too large.
-    request = client.fetch(_assemble_url('finite_source', **params),
+    request = fetch_sync(client, _assemble_url('finite_source', **params),
                            method="POST", body=body)
     assert request.code == 400
     assert request.reason == ("The deepest point source in the given finite "
@@ -625,7 +637,7 @@ def test_uploading_usgs_file_with_airquakes(reciprocal_clients):
         body = fh.read()
 
     # Starttime too large.
-    request = client.fetch(_assemble_url('finite_source', **params),
+    request = fetch_sync(client, _assemble_url('finite_source', **params),
                            method="POST", body=body)
     assert request.code == 400
     assert request.reason == ("The shallowest point source in the given "
@@ -651,7 +663,7 @@ def test_uploading_usgs_file_with_long_rise_or_fall_times(reciprocal_clients):
         body = fh.read()
 
     # Starttime too large.
-    request = client.fetch(_assemble_url('finite_source', **params),
+    request = fetch_sync(client, _assemble_url('finite_source', **params),
                            method="POST", body=body)
     assert request.code == 400
     assert request.reason == ("The body contents could not be parsed as an "
@@ -679,7 +691,7 @@ def test_uploading_file_with_too_many_sources(reciprocal_clients):
         body = fh.read()
 
     # Starttime too large.
-    request = client.fetch(_assemble_url('finite_source', **params),
+    request = fetch_sync(client, _assemble_url('finite_source', **params),
                            method="POST", body=body)
     assert request.code == 400
     assert request.reason == ("The server only allows finite sources with at "
