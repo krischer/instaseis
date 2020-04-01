@@ -24,8 +24,16 @@ class ForwardMergedInstaseisDB(BaseNetCDFInstaseisDB):
     """
     Merged forward Instaseis database.
     """
-    def __init__(self, db_path, netcdf_file, buffer_size_in_mb=100,
-                 read_on_demand=False, *args, **kwargs):
+
+    def __init__(
+        self,
+        db_path,
+        netcdf_file,
+        buffer_size_in_mb=100,
+        read_on_demand=False,
+        *args,
+        **kwargs,
+    ):
         """
         :param db_path: Path to the Instaseis Database.
         :type db_path: str
@@ -44,26 +52,37 @@ class ForwardMergedInstaseisDB(BaseNetCDFInstaseisDB):
         :type read_on_demand: bool, optional
         """
         BaseNetCDFInstaseisDB.__init__(
-            self, db_path=db_path, buffer_size_in_mb=buffer_size_in_mb,
-            read_on_demand=read_on_demand, *args, **kwargs)
+            self,
+            db_path=db_path,
+            buffer_size_in_mb=buffer_size_in_mb,
+            read_on_demand=read_on_demand,
+            *args,
+            **kwargs,
+        )
         self._parse_mesh(netcdf_file)
 
     def _parse_mesh(self, filename):
 
         MeshCollection_merged = collections.namedtuple(
-            "MeshCollection_merged", ["merged"])
+            "MeshCollection_merged", ["merged"]
+        )
 
-        self.meshes = MeshCollection_merged(mesh.Mesh(
-            filename, full_parse=True,
-            strain_buffer_size_in_mb=self.buffer_size_in_mb,
-            displ_buffer_size_in_mb=self.buffer_size_in_mb,
-            read_on_demand=self.read_on_demand))
+        self.meshes = MeshCollection_merged(
+            mesh.Mesh(
+                filename,
+                full_parse=True,
+                strain_buffer_size_in_mb=self.buffer_size_in_mb,
+                displ_buffer_size_in_mb=self.buffer_size_in_mb,
+                read_on_demand=self.read_on_demand,
+            )
+        )
         self.parsed_mesh = self.meshes.merged
 
         self._is_reciprocal = False
 
-    def _get_data(self, source, receiver, components, coordinates,
-                  element_info):
+    def _get_data(
+        self, source, receiver, components, coordinates, element_info
+    ):
         ei = element_info
         # Collect data arrays and mu in a dictionary.
         data = {}
@@ -81,7 +100,7 @@ class ForwardMergedInstaseisDB(BaseNetCDFInstaseisDB):
 
         if not isinstance(source, Source):
             raise NotImplementedError
-        if self.info.dump_type != 'displ_only':
+        if self.info.dump_type != "displ_only":
             raise NotImplementedError
 
         # Get from netcdf file or buffer.
@@ -109,41 +128,81 @@ class ForwardMergedInstaseisDB(BaseNetCDFInstaseisDB):
         # displ_1 is generated from MZZ which has only two displacement
         # components.
         displ_1[:, 0] = spectral_basis.lagrange_interpol_2D_td(
-            points1=ei.col_points_xi, points2=ei.col_points_eta,
-            coefficients=utemp[:, :, :, 0], x1=ei.xi, x2=ei.eta)
+            points1=ei.col_points_xi,
+            points2=ei.col_points_eta,
+            coefficients=utemp[:, :, :, 0],
+            x1=ei.xi,
+            x2=ei.eta,
+        )
         displ_1[:, 2] = spectral_basis.lagrange_interpol_2D_td(
-            points1=ei.col_points_xi, points2=ei.col_points_eta,
-            coefficients=utemp[:, :, :, 1], x1=ei.xi, x2=ei.eta)
+            points1=ei.col_points_xi,
+            points2=ei.col_points_eta,
+            coefficients=utemp[:, :, :, 1],
+            x1=ei.xi,
+            x2=ei.eta,
+        )
         # displ_2 is generated from MXX+MYY which has only two displacement
         # components.
         displ_2[:, 0] = spectral_basis.lagrange_interpol_2D_td(
-            points1=ei.col_points_xi, points2=ei.col_points_eta,
-            coefficients=utemp[:, :, :, 2], x1=ei.xi, x2=ei.eta)
+            points1=ei.col_points_xi,
+            points2=ei.col_points_eta,
+            coefficients=utemp[:, :, :, 2],
+            x1=ei.xi,
+            x2=ei.eta,
+        )
         displ_2[:, 2] = spectral_basis.lagrange_interpol_2D_td(
-            points1=ei.col_points_xi, points2=ei.col_points_eta,
-            coefficients=utemp[:, :, :, 3], x1=ei.xi, x2=ei.eta)
+            points1=ei.col_points_xi,
+            points2=ei.col_points_eta,
+            coefficients=utemp[:, :, :, 3],
+            x1=ei.xi,
+            x2=ei.eta,
+        )
         # displ_3 is generated from MXZ/MYZ which has three displacement
         # components.
         displ_3[:, 0] = spectral_basis.lagrange_interpol_2D_td(
-            points1=ei.col_points_xi, points2=ei.col_points_eta,
-            coefficients=utemp[:, :, :, 4], x1=ei.xi, x2=ei.eta)
+            points1=ei.col_points_xi,
+            points2=ei.col_points_eta,
+            coefficients=utemp[:, :, :, 4],
+            x1=ei.xi,
+            x2=ei.eta,
+        )
         displ_3[:, 1] = spectral_basis.lagrange_interpol_2D_td(
-            points1=ei.col_points_xi, points2=ei.col_points_eta,
-            coefficients=utemp[:, :, :, 5], x1=ei.xi, x2=ei.eta)
+            points1=ei.col_points_xi,
+            points2=ei.col_points_eta,
+            coefficients=utemp[:, :, :, 5],
+            x1=ei.xi,
+            x2=ei.eta,
+        )
         displ_3[:, 2] = spectral_basis.lagrange_interpol_2D_td(
-            points1=ei.col_points_xi, points2=ei.col_points_eta,
-            coefficients=utemp[:, :, :, 6], x1=ei.xi, x2=ei.eta)
+            points1=ei.col_points_xi,
+            points2=ei.col_points_eta,
+            coefficients=utemp[:, :, :, 6],
+            x1=ei.xi,
+            x2=ei.eta,
+        )
         # displ_3 is generated from MXY/MXX-MYY which has three displacement
         # components.
         displ_4[:, 0] = spectral_basis.lagrange_interpol_2D_td(
-            points1=ei.col_points_xi, points2=ei.col_points_eta,
-            coefficients=utemp[:, :, :, 7], x1=ei.xi, x2=ei.eta)
+            points1=ei.col_points_xi,
+            points2=ei.col_points_eta,
+            coefficients=utemp[:, :, :, 7],
+            x1=ei.xi,
+            x2=ei.eta,
+        )
         displ_4[:, 1] = spectral_basis.lagrange_interpol_2D_td(
-            points1=ei.col_points_xi, points2=ei.col_points_eta,
-            coefficients=utemp[:, :, :, 8], x1=ei.xi, x2=ei.eta)
+            points1=ei.col_points_xi,
+            points2=ei.col_points_eta,
+            coefficients=utemp[:, :, :, 8],
+            x1=ei.xi,
+            x2=ei.eta,
+        )
         displ_4[:, 2] = spectral_basis.lagrange_interpol_2D_td(
-            points1=ei.col_points_xi, points2=ei.col_points_eta,
-            coefficients=utemp[:, :, :, 9], x1=ei.xi, x2=ei.eta)
+            points1=ei.col_points_xi,
+            points2=ei.col_points_eta,
+            coefficients=utemp[:, :, :, 9],
+            x1=ei.xi,
+            x2=ei.eta,
+        )
 
         mij = source.tensor / self.parsed_mesh.amplitude
         # mij is [m_rr, m_tt, m_pp, m_rt, m_rp, m_tp]
@@ -156,19 +215,23 @@ class ForwardMergedInstaseisDB(BaseNetCDFInstaseisDB):
         final[:, 0] += displ_2[:, 0] * (mij[1] + mij[2])
         final[:, 2] += displ_2[:, 2] * (mij[1] + mij[2])
 
-        fac_1 = mij[3] * np.cos(coordinates.phi) + \
-            mij[4] * np.sin(coordinates.phi)
-        fac_2 = -mij[3] * np.sin(coordinates.phi) + \
-            mij[4] * np.cos(coordinates.phi)
+        fac_1 = mij[3] * np.cos(coordinates.phi) + mij[4] * np.sin(
+            coordinates.phi
+        )
+        fac_2 = -mij[3] * np.sin(coordinates.phi) + mij[4] * np.cos(
+            coordinates.phi
+        )
 
         final[:, 0] += displ_3[:, 0] * fac_1
         final[:, 1] += displ_3[:, 1] * fac_2
         final[:, 2] += displ_3[:, 2] * fac_1
 
-        fac_1 = (mij[1] - mij[2]) * np.cos(2 * coordinates.phi) \
-            + 2 * mij[5] * np.sin(2 * coordinates.phi)
-        fac_2 = -(mij[1] - mij[2]) * np.sin(2 * coordinates.phi) \
-            + 2 * mij[5] * np.cos(2 * coordinates.phi)
+        fac_1 = (mij[1] - mij[2]) * np.cos(2 * coordinates.phi) + 2 * mij[
+            5
+        ] * np.sin(2 * coordinates.phi)
+        fac_2 = -(mij[1] - mij[2]) * np.sin(2 * coordinates.phi) + 2 * mij[
+            5
+        ] * np.cos(2 * coordinates.phi)
 
         final[:, 0] += displ_4[:, 0] * fac_1
         final[:, 1] += displ_4[:, 1] * fac_2
@@ -182,16 +245,21 @@ class ForwardMergedInstaseisDB(BaseNetCDFInstaseisDB):
             data["T"] = -final[:, 1]
 
         if "R" in components:
-            data["R"] = final[:, 0] * np.cos(rotmesh_colat) \
-                        - final[:, 2] * np.sin(rotmesh_colat)
+            data["R"] = final[:, 0] * np.cos(rotmesh_colat) - final[
+                :, 2
+            ] * np.sin(rotmesh_colat)
 
         if "N" in components or "E" in components or "Z" in components:
             # transpose needed because rotations assume different slicing
             # (ugly)
             final = rotations.rotate_vector_src_to_NEZ(
-                final.T, coordinates.phi,
-                source.longitude_rad, source.colatitude_rad,
-                receiver.longitude_rad, receiver.colatitude_rad).T
+                final.T,
+                coordinates.phi,
+                source.longitude_rad,
+                source.colatitude_rad,
+                receiver.longitude_rad,
+                receiver.colatitude_rad,
+            ).T
 
             if "N" in components:
                 data["N"] = final[:, 0]

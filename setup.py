@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-u"""
+"""
 Instaseis: Instant Global Broadband Seismograms Based on a Waveform Database
 
 Instaseis calculates broadband seismograms from Green’s function databases
@@ -39,14 +39,16 @@ import sys
 
 
 # Import the version string.
-path = os.path.join(os.path.abspath(os.path.dirname(inspect.getfile(
-    inspect.currentframe()))), "instaseis")
+path = os.path.join(
+    os.path.abspath(os.path.dirname(inspect.getfile(inspect.currentframe()))),
+    "instaseis",
+)
 sys.path.insert(0, path)
 from version import get_git_version  # noqa
 
 
 # Monkey patch the compilers to treat Fortran files like C files.
-CCompiler.language_map['.f90'] = "c"
+CCompiler.language_map[".f90"] = "c"
 UnixCCompiler.src_extensions.append(".f90")
 
 DOCSTRING = __doc__.strip().split("\n")
@@ -59,21 +61,29 @@ def get_package_data():
     """
     filenames = []
     # The lasif root dir.
-    root_dir = os.path.join(os.path.dirname(os.path.abspath(
-        inspect.getfile(inspect.currentframe()))), "instaseis")
+    root_dir = os.path.join(
+        os.path.dirname(
+            os.path.abspath(inspect.getfile(inspect.currentframe()))
+        ),
+        "instaseis",
+    )
     # Recursively include all files in these folders:
-    folders = [os.path.join(root_dir, "tests", "data"),
-               os.path.join(root_dir, "gui", "data"),
-               os.path.join(root_dir, "server", "data")]
+    folders = [
+        os.path.join(root_dir, "tests", "data"),
+        os.path.join(root_dir, "gui", "data"),
+        os.path.join(root_dir, "server", "data"),
+    ]
     for folder in folders:
         for directory, _, files in os.walk(folder):
             for filename in files:
                 # Exclude hidden files.
                 if filename.startswith("."):
                     continue
-                filenames.append(os.path.relpath(
-                    os.path.join(directory, filename),
-                    root_dir))
+                filenames.append(
+                    os.path.relpath(
+                        os.path.join(directory, filename), root_dir
+                    )
+                )
     filenames.append("RELEASE-VERSION")
     return filenames
 
@@ -81,12 +91,11 @@ def get_package_data():
 def _compile(self, obj, src, ext, cc_args, extra_postargs, pp_opts):
     compiler_so = self.compiler_so
     if ext == ".f90":
-        if sys.platform == 'darwin' or sys.platform == 'linux2':
+        if sys.platform == "darwin" or sys.platform == "linux2":
             compiler_so = ["gfortran"]
             cc_args = ["-O", "-fPIC", "-c", "-ffree-form"]
     try:
-        self.spawn(compiler_so + cc_args + [src, '-o', obj] +
-                   extra_postargs)
+        self.spawn(compiler_so + cc_args + [src, "-o", obj] + extra_postargs)
     except DistutilsExecError as msg:
         raise CompileError(msg)
 
@@ -115,8 +124,11 @@ def get_libgfortran_dir():
     """
     for ending in [".3.dylib", ".dylib", ".3.so", ".so"]:
         try:
-            p = Popen(['gfortran', "-print-file-name=libgfortran" + ending],
-                      stdout=PIPE, stderr=PIPE)
+            p = Popen(
+                ["gfortran", "-print-file-name=libgfortran" + ending],
+                stdout=PIPE,
+                stderr=PIPE,
+            )
             p.stderr.close()
             line = p.stdout.readline().decode().strip()
             p.stdout.close()
@@ -127,29 +139,39 @@ def get_libgfortran_dir():
         return []
 
 
-src = os.path.join('instaseis', 'src')
-lib = MyExtension('instaseis',
-                  libraries=["gfortran"],
-                  library_dirs=get_libgfortran_dir(),
-                  # Be careful with the order.
-                  sources=[
-                      os.path.join(src, "global_parameters.f90"),
-                      os.path.join(src, "finite_elem_mapping.f90"),
-                      os.path.join(src, "spectral_basis.f90"),
-                      os.path.join(src, "sem_derivatives.f90")
-                  ])
+src = os.path.join("instaseis", "src")
+lib = MyExtension(
+    "instaseis",
+    libraries=["gfortran"],
+    library_dirs=get_libgfortran_dir(),
+    # Be careful with the order.
+    sources=[
+        os.path.join(src, "global_parameters.f90"),
+        os.path.join(src, "finite_elem_mapping.f90"),
+        os.path.join(src, "spectral_basis.f90"),
+        os.path.join(src, "sem_derivatives.f90"),
+    ],
+)
 
-INSTALL_REQUIRES = ["h5py",
-                    "numpy",
-                    "obspy >= 1.2.1",
-                    "tornado>=6.0.0",
-                    "requests",
-                    "geographiclib",
-                    "jsonschema >= 2.4.0"]
+INSTALL_REQUIRES = [
+    "h5py",
+    "numpy",
+    "obspy >= 1.2.1",
+    "tornado>=6.0.0",
+    "requests",
+    "geographiclib",
+    "jsonschema >= 2.4.0",
+]
 
 EXTRAS_REQUIRE = {
-    'tests': ['click', 'netCDF4', 'pytest-xdist', 'flake8>=3',
-              'pytest>=5.0', 'responses']
+    "tests": [
+        "click",
+        "netCDF4",
+        "pytest-xdist",
+        "flake8>=3",
+        "pytest>=5.0",
+        "responses",
+    ]
 }
 
 # Add mock for Python 2.x. Starting with Python 3 it is part of the standard
@@ -162,25 +184,27 @@ setup_config = dict(
     version=get_git_version(),
     description=DOCSTRING[0],
     long_description="\n".join(DOCSTRING[2:]),
-    author=u"Lion Krischer, Martin van Driel, and Simon Stähler",
+    author="Lion Krischer, Martin van Driel, and Simon Stähler",
     author_email="lion.krischer@gmail.com",
     url="http://instaseis.net",
     packages=find_packages(),
     package_data={
-        "instaseis":
-            [os.path.join("lib", "instaseis.so")] +
-            [os.path.join("gui", "qt_window.ui")] +
-            get_package_data()},
+        "instaseis": [os.path.join("lib", "instaseis.so")]
+        + [os.path.join("gui", "qt_window.ui")]
+        + get_package_data()
+    },
     license="GNU Lesser General Public License, version 3 (LGPLv3) for "
-        "non-commercial/academic use",
+    "non-commercial/academic use",
     platforms="OS Independent",
     install_requires=INSTALL_REQUIRES,
     extras_require=EXTRAS_REQUIRE,
-    ext_package='instaseis.lib',
+    ext_package="instaseis.lib",
     ext_modules=[lib],
     # this is needed for "pip install instaseis==dev"
-    download_url=("https://github.com/krischer/instaseis/zipball/master"
-                  "#egg=instaseis=dev"),
+    download_url=(
+        "https://github.com/krischer/instaseis/zipball/master"
+        "#egg=instaseis=dev"
+    ),
     python_requires=">=3.6",
     classifiers=[
         # complete classifier list:
@@ -196,16 +220,20 @@ setup_config = dict(
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: Implementation :: CPython",
         "Topic :: Scientific/Engineering",
-        "Topic :: Scientific/Engineering :: Physics"
-        ],
+        "Topic :: Scientific/Engineering :: Physics",
+    ],
 )
 
 if __name__ == "__main__":
     setup(**setup_config)
 
     # Attempt to remove the mod files once again.
-    for filename in ["finite_elem_mapping.mod", "global_parameters.mod",
-                     "sem_derivatives.mod", "spectral_basis.mod"]:
+    for filename in [
+        "finite_elem_mapping.mod",
+        "global_parameters.mod",
+        "sem_derivatives.mod",
+        "spectral_basis.mod",
+    ]:
         try:
             os.remove(filename)
         except:

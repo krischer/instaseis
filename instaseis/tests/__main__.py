@@ -5,6 +5,10 @@ if __name__ == "__main__":
     import os
     import pytest
     import sys
-    PATH = os.path.dirname(os.path.dirname(os.path.abspath(
-        inspect.getfile(inspect.currentframe()))))
+
+    PATH = os.path.dirname(
+        os.path.dirname(
+            os.path.abspath(inspect.getfile(inspect.currentframe()))
+        )
+    )
     sys.exit(pytest.main([PATH]))

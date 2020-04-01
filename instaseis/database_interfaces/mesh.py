@@ -36,6 +36,7 @@ class Buffer(object):
     recently accessed items. Thus the "stalest" items are removed first once
     the memory limit it reached.
     """
+
     def __init__(self, max_size_in_mb=100):
         self._max_size_in_bytes = max_size_in_mb * 1024 ** 2
         self._total_size = 0
@@ -101,28 +102,38 @@ def get_time_axis(ds, ndumps):
     Helper function to determine the time axis of the mesh.
     """
     if ds.shape[0] == ds.shape[1]:
-        raise NotImplementedError("Both dimensions in the dataset "
-                                  "are identical. This is currently "
-                                  "not supported.")
+        raise NotImplementedError(
+            "Both dimensions in the dataset "
+            "are identical. This is currently "
+            "not supported."
+        )
     elif ds.shape[0] == ndumps:
         return 0
     elif ds.shape[1] == ndumps:
         return 1
     else:  # pragma: no cover
-        raise ValueError("Could not determine the time axis in the "
-                         "2D array. It has an incompatible shape.")
+        raise ValueError(
+            "Could not determine the time axis in the "
+            "2D array. It has an incompatible shape."
+        )
 
 
 class Mesh(object):
     """
     A class to handle the actual netCDF files written by AxiSEM.
     """
+
     # Minimal acceptable version of the netCDF database files.
     MIN_FILE_VERSION = 7
 
-    def __init__(self, filename, full_parse=False,
-                 strain_buffer_size_in_mb=0, displ_buffer_size_in_mb=0,
-                 read_on_demand=True):
+    def __init__(
+        self,
+        filename,
+        full_parse=False,
+        strain_buffer_size_in_mb=0,
+        displ_buffer_size_in_mb=0,
+        read_on_demand=True,
+    ):
         self.f = h5py.File(filename, "r")
         self.filename = filename
         self.read_on_demand = read_on_demand
@@ -155,10 +166,13 @@ class Mesh(object):
 
     def _parse(self, full_parse=False):
         self.dump_type = self._get_str_attr(
-            "dump type (displ_only, displ_velo, fullfields)")
-        if (self.dump_type != "displ_only" and
-                self.dump_type != "fullfields" and
-                self.dump_type != "strain_only"):
+            "dump type (displ_only, displ_velo, fullfields)"
+        )
+        if (
+            self.dump_type != "displ_only"
+            and self.dump_type != "fullfields"
+            and self.dump_type != "strain_only"
+        ):
             raise NotImplementedError
 
         self.npol = self.f.attrs["npol"][0]
@@ -166,14 +180,18 @@ class Mesh(object):
         try:
             self.file_version = self.f.attrs["file version"][0]
         except AttributeError:  # pragma: no cover
-            raise ValueError("Database file so old that it does not even have "
-                             "a version number. Please update AxiSEM or get "
-                             "new databases.")
+            raise ValueError(
+                "Database file so old that it does not even have "
+                "a version number. Please update AxiSEM or get "
+                "new databases."
+            )
 
         if self.file_version < self.MIN_FILE_VERSION:  # pragma: no cover
-            raise ValueError("Database file too old. Minimum file version "
-                             "expected: %d, found: %d." %
-                             (self.MIN_FILE_VERSION, self.file_version))
+            raise ValueError(
+                "Database file too old. Minimum file version "
+                "expected: %d, found: %d."
+                % (self.MIN_FILE_VERSION, self.file_version)
+            )
 
         self.ndumps = self.f.attrs["number of strain dumps"][0]
         self.excitation_type = self._get_str_attr("excitation type")
@@ -189,7 +207,8 @@ class Mesh(object):
         self.dt = self.f.attrs["strain dump sampling rate in sec"][0]
         self.source_shift = self.f.attrs["source shift factor in sec"][0]
         self.source_shift_samp = self.f.attrs[
-            "source shift factor for deltat_coarse"][0]
+            "source shift factor for deltat_coarse"
+        ][0]
 
         # Search /Snapshots first - then the root group and then the legacy
         # /Surface group.
@@ -200,25 +219,30 @@ class Mesh(object):
                 continue
             group = self.f[g]
 
-            if "stf_d_dump" not in group or \
-                    "stf_dump" not in group:  # pragma: no cover
+            if (
+                "stf_d_dump" not in group or "stf_dump" not in group
+            ):  # pragma: no cover
                 continue
 
             stf_d_dump = group["stf_d_dump"][:]
             stf_dump = group["stf_dump"][:]
 
-            if np.ma.is_masked(stf_d_dump) or \
-                    np.ma.is_masked(stf_dump) or \
-                    np.isnan(np.sum(stf_d_dump)) or \
-                    np.isnan(np.sum(stf_dump)):  # pragma: no cover
+            if (
+                np.ma.is_masked(stf_d_dump)
+                or np.ma.is_masked(stf_dump)
+                or np.isnan(np.sum(stf_d_dump))
+                or np.isnan(np.sum(stf_dump))
+            ):  # pragma: no cover
                 continue
 
             found_stf = True
             break
 
         if found_stf is False:  # pragma: no cover
-            raise ValueError("Could not extract valid slip and sliprates "
-                             "from the netcdf files.")
+            raise ValueError(
+                "Could not extract valid slip and sliprates "
+                "from the netcdf files."
+            )
 
         self.stf_d = stf_d_dump
         self.stf = stf_dump
@@ -230,13 +254,14 @@ class Mesh(object):
 
         self.background_model = self._get_str_attr("background model")
         if self.file_version >= 8:  # pragma: no cover
-            self.external_model_name = \
-                self._get_str_attr("external model name")
+            self.external_model_name = self._get_str_attr(
+                "external model name"
+            )
         else:
-            if self.background_model == 'external':  # pragma: no cover
-                self.external_model_name = 'unknown'
+            if self.background_model == "external":  # pragma: no cover
+                self.external_model_name = "unknown"
             else:
-                self.external_model_name = ''
+                self.external_model_name = ""
         self.attenuation = bool(self.f.attrs["attenuation"][0])
         self.planet_radius = self.f.attrs["planet radius"][0] * 1e3
         self.dominant_period = self.f.attrs["dominant source period"][0]
@@ -244,10 +269,12 @@ class Mesh(object):
         self.creation_time = UTCDateTime(self._get_str_attr("datetime"))
         self.axisem_compiler = "%s %s" % (
             self._get_str_attr("compiler brand"),
-            self._get_str_attr("compiler version"))
+            self._get_str_attr("compiler version"),
+        )
         self.axisem_user = "%s on %s" % (
             self._get_str_attr("user name"),
-            self._get_str_attr("host name"))
+            self._get_str_attr("host name"),
+        )
 
         self.kwf_rmin = self.f.attrs["kernel wavefield rmin"][0]
         self.kwf_rmax = self.f.attrs["kernel wavefield rmax"][0]
@@ -264,17 +291,20 @@ class Mesh(object):
             self.G1 = self.f["Mesh"]["G1"][:].T
             self.G2 = self.f["Mesh"]["G2"][:].T
 
-            self.G1T = np.require(self.G1.transpose(),
-                                  requirements=["F_CONTIGUOUS"])
-            self.G2T = np.require(self.G2.transpose(),
-                                  requirements=["F_CONTIGUOUS"])
+            self.G1T = np.require(
+                self.G1.transpose(), requirements=["F_CONTIGUOUS"]
+            )
+            self.G2T = np.require(
+                self.G2.transpose(), requirements=["F_CONTIGUOUS"]
+            )
 
             # Build a kdtree of the element midpoints.
             self.s_mp = self.f["Mesh"]["mp_mesh_S"]
             self.z_mp = self.f["Mesh"]["mp_mesh_Z"]
 
-            self.mesh = np.empty((self.s_mp.shape[0], 2),
-                                 dtype=self.s_mp.dtype)
+            self.mesh = np.empty(
+                (self.s_mp.shape[0], 2), dtype=self.s_mp.dtype
+            )
             self.mesh[:, 0] = self.s_mp[:]
             self.mesh[:, 1] = self.z_mp[:]
 
@@ -297,8 +327,9 @@ class Mesh(object):
             self.mesh_S = self.f["Mesh"]["mesh_S"]
             self.mesh_Z = self.f["Mesh"]["mesh_Z"]
 
-            self.mesh = np.empty((self.mesh_S.shape[0], 2),
-                                 dtype=self.mesh_S.dtype)
+            self.mesh = np.empty(
+                (self.mesh_S.shape[0], 2), dtype=self.mesh_S.dtype
+            )
             self.mesh[:, 0] = self.mesh_S[:]
             self.mesh[:, 1] = self.mesh_Z[:]
 

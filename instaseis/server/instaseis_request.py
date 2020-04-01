@@ -43,18 +43,20 @@ class InstaseisTimeSeriesHandler(InstaseisRequestHandler, metaclass=ABCMeta):
 
     def parse_arguments(self):
         # Make sure that no additional arguments are passed.
-        unknown_arguments = set(self.request.arguments.keys()).difference(set(
-            self.arguments.keys()))
+        unknown_arguments = set(self.request.arguments.keys()).difference(
+            set(self.arguments.keys())
+        )
 
         # Remove the body arguments as they don't count.
-        unknown_arguments = unknown_arguments.difference(set(
-            self.request.body_arguments.keys()))
+        unknown_arguments = unknown_arguments.difference(
+            set(self.request.body_arguments.keys())
+        )
 
         if unknown_arguments:
             msg = "The following unknown parameters have been passed: %s" % (
-                ", ".join("'%s'" % _i for _i in sorted(unknown_arguments)))
-            raise tornado.web.HTTPError(400, log_message=msg,
-                                        reason=msg)
+                ", ".join("'%s'" % _i for _i in sorted(unknown_arguments))
+            )
+            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
         # Check for duplicates.
         duplicates = []
@@ -65,9 +67,9 @@ class InstaseisTimeSeriesHandler(InstaseisRequestHandler, metaclass=ABCMeta):
                 duplicates.append(key)
         if duplicates:
             msg = "Duplicate parameters: %s" % (
-                ", ".join("'%s'" % _i for _i in sorted(duplicates)))
-            raise tornado.web.HTTPError(400, log_message=msg,
-                                        reason=msg)
+                ", ".join("'%s'" % _i for _i in sorted(duplicates))
+            )
+            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
         args = obspy.core.AttribDict()
         for name, properties in self.arguments.items():
@@ -76,8 +78,9 @@ class InstaseisTimeSeriesHandler(InstaseisRequestHandler, metaclass=ABCMeta):
                     value = self.get_argument(name)
                 except Exception:
                     msg = "Required parameter '%s' not given." % name
-                    raise tornado.web.HTTPError(400, log_message=msg,
-                                                reason=msg)
+                    raise tornado.web.HTTPError(
+                        400, log_message=msg, reason=msg
+                    )
             else:
                 if "default" in properties:
                     default = properties["default"]
@@ -90,13 +93,16 @@ class InstaseisTimeSeriesHandler(InstaseisRequestHandler, metaclass=ABCMeta):
                 except Exception:
                     if "format" in properties:
                         msg = "Parameter '%s' must be formatted as: '%s'" % (
-                            name, properties["format"])
+                            name,
+                            properties["format"],
+                        )
                     else:
-                        msg = ("Parameter '%s' could not be converted to "
-                               "'%s'.") % (
-                            name, str(properties["type"].__name__))
-                    raise tornado.web.HTTPError(400, log_message=msg,
-                                                reason=msg)
+                        msg = (
+                            "Parameter '%s' could not be converted to " "'%s'."
+                        ) % (name, str(properties["type"].__name__))
+                    raise tornado.web.HTTPError(
+                        400, log_message=msg, reason=msg
+                    )
             setattr(args, name, value)
 
         # Validate some of them right here.
@@ -117,29 +123,33 @@ class InstaseisTimeSeriesHandler(InstaseisRequestHandler, metaclass=ABCMeta):
                 raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
             if not args.components:
-                msg = ("A request with no components will not return "
-                       "anything...")
+                msg = (
+                    "A request with no components will not return "
+                    "anything..."
+                )
                 raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
         # Make sure the unit arguments is valid.
         if "units" in self.arguments:
             args.units = args.units.lower()
             if args.units not in ["displacement", "velocity", "acceleration"]:
-                msg = ("Unit must be one of 'displacement', 'velocity', "
-                       "or 'acceleration'")
+                msg = (
+                    "Unit must be one of 'displacement', 'velocity', "
+                    "or 'acceleration'"
+                )
                 raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
         # Make sure the output format is valid.
         if "format" in self.arguments:
             args.format = args.format.lower()
             if args.format not in ("miniseed", "saczip"):
-                msg = ("Format must either be 'miniseed' or 'saczip'.")
+                msg = "Format must either be 'miniseed' or 'saczip'."
                 raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
         # If its essentially equal to the internal sampling rate just set it
         # to equal to ease the following comparisons.
         if "dt" in self.arguments:
-            if args.dt and abs(args.dt - info.dt) / args.dt < 1E-7:
+            if args.dt and abs(args.dt - info.dt) / args.dt < 1e-7:
                 args.dt = info.dt
 
             # Make sure that dt, if given is larger then 0.01. This should
@@ -147,23 +157,29 @@ class InstaseisTimeSeriesHandler(InstaseisRequestHandler, metaclass=ABCMeta):
             # having to send massive amounts of data in the case of user
             # errors.
             if args.dt is not None and args.dt < 0.01:
-                msg = ("The smallest possible dt is 0.01. Please choose a "
-                       "smaller value and resample locally if needed.")
+                msg = (
+                    "The smallest possible dt is 0.01. Please choose a "
+                    "smaller value and resample locally if needed."
+                )
                 raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
             # Also make sure it does not downsample.
             if args.dt is not None and args.dt > info.dt:
-                msg = ("Cannot downsample. The sampling interval of the "
-                       "database is %.5f seconds. Make sure to choose a "
-                       "smaller or equal one." % info.dt)
+                msg = (
+                    "Cannot downsample. The sampling interval of the "
+                    "database is %.5f seconds. Make sure to choose a "
+                    "smaller or equal one." % info.dt
+                )
                 raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
         if "kernelwidth" in self.arguments:
             # Make sure the interpolation kernel width is sensible. Don't allow
             # values smaller than 1 or larger than 20.
             if not (1 <= args.kernelwidth <= 20):
-                msg = ("`kernelwidth` must not be smaller than 1 or larger "
-                       "than 20.")
+                msg = (
+                    "`kernelwidth` must not be smaller than 1 or larger "
+                    "than 20."
+                )
                 raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
     @abstractmethod
@@ -212,9 +228,13 @@ class InstaseisTimeSeriesHandler(InstaseisRequestHandler, metaclass=ABCMeta):
 
         # Figure out the maximum temporal range of the seismograms.
         ti = _get_seismogram_times(
-            info=self.application.db.info, origin_time=args.origintime,
-            dt=args.dt, kernelwidth=args.kernelwidth,
-            remove_source_shift=False, reconvolve_stf=False)
+            info=self.application.db.info,
+            origin_time=args.origintime,
+            dt=args.dt,
+            kernelwidth=args.kernelwidth,
+            remove_source_shift=False,
+            reconvolve_stf=False,
+        )
 
         # If the endtime is not set, do it here.
         if args.endtime is None:
@@ -225,20 +245,24 @@ class InstaseisTimeSeriesHandler(InstaseisRequestHandler, metaclass=ABCMeta):
             # The desired seismogram start time must be before the end time of
             # the seismograms.
             if args.starttime >= ti["endtime"]:
-                msg = ("The `starttime` must be before the seismogram ends.")
+                msg = "The `starttime` must be before the seismogram ends."
                 raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
             # Arbitrary limit: The starttime can be at max one hour before the
             # origin time.
             if args.starttime < (ti["starttime"] - 3600):
-                msg = ("The seismogram can start at the maximum one hour "
-                       "before the origin time.")
+                msg = (
+                    "The seismogram can start at the maximum one hour "
+                    "before the origin time."
+                )
                 raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
         if isinstance(args.endtime, obspy.UTCDateTime):
             # The endtime must be within the seismogram window
             if not (ti["starttime"] <= args.endtime <= ti["endtime"]):
-                msg = ("The end time of the seismograms lies outside the "
-                       "allowed range.")
+                msg = (
+                    "The end time of the seismograms lies outside the "
+                    "allowed range."
+                )
                 raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
         return ti["starttime"], ti["endtime"]
@@ -255,9 +279,7 @@ class InstaseisTimeSeriesHandler(InstaseisRequestHandler, metaclass=ABCMeta):
             content_type = "application/zip"
         self.set_header("Content-Type", content_type)
 
-        file_endings_map = {
-            "miniseed": "mseed",
-            "saczip": "zip"}
+        file_endings_map = {"miniseed": "mseed", "saczip": "zip"}
 
         if "label" in args and args.label:
             label = args.label
@@ -267,16 +289,17 @@ class InstaseisTimeSeriesHandler(InstaseisRequestHandler, metaclass=ABCMeta):
         filename = "%s_%s.%s" % (
             label,
             str(obspy.UTCDateTime()).replace(":", "_"),
-            file_endings_map[format])
+            file_endings_map[format],
+        )
 
-        self.set_header("Content-Disposition",
-                        "attachment; filename=%s" % filename)
+        self.set_header(
+            "Content-Disposition", "attachment; filename=%s" % filename
+        )
 
     def get_ttime(self, source, receiver, phase):
         if self.application.travel_time_callback is None:
             msg = "Server does not support travel time calculations."
-            raise tornado.web.HTTPError(
-                404, log_message=msg, reason=msg)
+            raise tornado.web.HTTPError(404, log_message=msg, reason=msg)
 
         # Finite sources will perform these calculations with the hypocenter.
         if isinstance(source, FiniteSource):
@@ -298,7 +321,8 @@ class InstaseisTimeSeriesHandler(InstaseisRequestHandler, metaclass=ABCMeta):
                 receiverlongitude=receiver.longitude,
                 receiverdepthinmeters=receiver.depth_in_m,
                 phase_name=phase,
-                db_info=self.application.db.info)
+                db_info=self.application.db.info,
+            )
         except ValueError as e:
             err_msg = str(e)
             if err_msg.lower().startswith("invalid phase name"):
@@ -328,29 +352,36 @@ class InstaseisTimeSeriesHandler(InstaseisRequestHandler, metaclass=ABCMeta):
             # Receiver must be at the surface.
             if receiver.depth_in_m is not None:
                 if receiver.depth_in_m != 0.0:
-                    msg = "Receiver must be at the surface for reciprocal " \
-                          "databases."
-                    raise tornado.web.HTTPError(400, log_message=msg,
-                                                reason=msg)
+                    msg = (
+                        "Receiver must be at the surface for reciprocal "
+                        "databases."
+                    )
+                    raise tornado.web.HTTPError(
+                        400, log_message=msg, reason=msg
+                    )
             # Source depth must be within the allowed range.
-            if not ((info.planet_radius - info.max_radius) <=
-                    src_depth_in_m <=
-                    (info.planet_radius - info.min_radius)):
-                msg = ("Source depth must be within the database range: %.1f "
-                       "- %.1f meters.") % (
-                        info.planet_radius - info.max_radius,
-                        info.planet_radius - info.min_radius)
-                raise tornado.web.HTTPError(400, log_message=msg,
-                                            reason=msg)
+            if not (
+                (info.planet_radius - info.max_radius)
+                <= src_depth_in_m
+                <= (info.planet_radius - info.min_radius)
+            ):
+                msg = (
+                    "Source depth must be within the database range: %.1f "
+                    "- %.1f meters."
+                ) % (
+                    info.planet_radius - info.max_radius,
+                    info.planet_radius - info.min_radius,
+                )
+                raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
         else:
             # The source depth must coincide with the one in the database.
             if src_depth_in_m != info.source_depth * 1000:
-                    msg = "Source depth must be: %.1f km" % info.source_depth
-                    raise tornado.web.HTTPError(400, log_message=msg,
-                                                reason=msg)
+                msg = "Source depth must be: %.1f km" % info.source_depth
+                raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
-    def get_phase_relative_times(self, args, source, receiver, min_starttime,
-                                 max_endtime):
+    def get_phase_relative_times(
+        self, args, source, receiver, min_starttime, max_endtime
+    ):
         """
         Helper function getting the times for each receiver for
         phase-relative offsets.
@@ -359,8 +390,9 @@ class InstaseisTimeSeriesHandler(InstaseisRequestHandler, metaclass=ABCMeta):
         requested distance or it arrives too late, early for other settings.
         """
         if isinstance(args.starttime, obspy.core.AttribDict):
-            tt = self.get_ttime(source=source, receiver=receiver,
-                                phase=args.starttime["phase"])
+            tt = self.get_ttime(
+                source=source, receiver=receiver, phase=args.starttime["phase"]
+            )
             if tt is None:
                 return
             starttime = args.origintime + tt + args.starttime["offset"]
@@ -371,8 +403,9 @@ class InstaseisTimeSeriesHandler(InstaseisRequestHandler, metaclass=ABCMeta):
             return
 
         if isinstance(args.endtime, obspy.core.AttribDict):
-            tt = self.get_ttime(source=source, receiver=receiver,
-                                phase=args.endtime["phase"])
+            tt = self.get_ttime(
+                source=source, receiver=receiver, phase=args.endtime["phase"]
+            )
             if tt is None:
                 return
             endtime = args.origintime + tt + args.endtime["offset"]
@@ -389,9 +422,10 @@ class InstaseisTimeSeriesHandler(InstaseisRequestHandler, metaclass=ABCMeta):
 
     def get_receivers(self, args):
         # Already checked before - just make sure the settings are valid.
-        assert (args.receiverlatitude is not None and
-                args.receiverlongitude is not None) or \
-               (args.network and args.station)
+        assert (
+            args.receiverlatitude is not None
+            and args.receiverlongitude is not None
+        ) or (args.network and args.station)
 
         receivers = []
 
@@ -400,15 +434,19 @@ class InstaseisTimeSeriesHandler(InstaseisRequestHandler, metaclass=ABCMeta):
         # Construct either a single receiver object.
         if args.receiverlatitude is not None:
             try:
-                receiver = Receiver(latitude=args.receiverlatitude,
-                                    longitude=args.receiverlongitude,
-                                    network=args.networkcode,
-                                    station=args.stationcode,
-                                    location=args.locationcode,
-                                    depth_in_m=rec_depth)
+                receiver = Receiver(
+                    latitude=args.receiverlatitude,
+                    longitude=args.receiverlongitude,
+                    network=args.networkcode,
+                    station=args.stationcode,
+                    location=args.locationcode,
+                    depth_in_m=rec_depth,
+                )
             except Exception:
-                msg = ("Could not construct receiver with passed parameters. "
-                       "Check parameters for sanity.")
+                msg = (
+                    "Could not construct receiver with passed parameters. "
+                    "Check parameters for sanity."
+                )
                 raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
             receivers.append(receiver)
         # Or a list of receivers.
@@ -417,26 +455,32 @@ class InstaseisTimeSeriesHandler(InstaseisRequestHandler, metaclass=ABCMeta):
             stations = args.station.split(",")
 
             coordinates = self.application.station_coordinates_callback(
-                networks=networks, stations=stations)
+                networks=networks, stations=stations
+            )
 
             if not coordinates:
                 msg = "No coordinates found satisfying the query."
-                raise tornado.web.HTTPError(
-                    404, log_message=msg, reason=msg)
+                raise tornado.web.HTTPError(404, log_message=msg, reason=msg)
 
             for station in coordinates:
                 try:
-                    receivers.append(Receiver(
-                        latitude=station["latitude"],
-                        longitude=station["longitude"],
-                        network=station["network"],
-                        station=station["station"],
-                        depth_in_m=0))
+                    receivers.append(
+                        Receiver(
+                            latitude=station["latitude"],
+                            longitude=station["longitude"],
+                            network=station["network"],
+                            station=station["station"],
+                            depth_in_m=0,
+                        )
+                    )
                 except Exception:
-                    msg = ("Station coordinate query returned invalid "
-                           "coordinates.")
-                    raise tornado.web.HTTPError(400, log_message=msg,
-                                                reason=msg)
+                    msg = (
+                        "Station coordinate query returned invalid "
+                        "coordinates."
+                    )
+                    raise tornado.web.HTTPError(
+                        400, log_message=msg, reason=msg
+                    )
         return receivers
 
     def validate_receiver_parameters(self, args):
@@ -461,16 +505,21 @@ class InstaseisTimeSeriesHandler(InstaseisRequestHandler, metaclass=ABCMeta):
         # Figure out who the station coordinates are specified.
         direct_receiver_settings = [
             i is not None
-            for i in (args.receiverlatitude, args.receiverlongitude)]
+            for i in (args.receiverlatitude, args.receiverlongitude)
+        ]
         query_receivers = [i is not None for i in (args.network, args.station)]
         if any(direct_receiver_settings) and any(query_receivers):
-            msg = ("Receiver coordinates can either be specified by passing "
-                   "the coordinates, or by specifying query parameters, "
-                   "but not both.")
+            msg = (
+                "Receiver coordinates can either be specified by passing "
+                "the coordinates, or by specifying query parameters, "
+                "but not both."
+            )
             raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
-        elif not(all(direct_receiver_settings) or all(query_receivers)):
-            msg = ("Must specify a full set of coordinates or a full set of "
-                   "receiver parameters.")
+        elif not (all(direct_receiver_settings) or all(query_receivers)):
+            msg = (
+                "Must specify a full set of coordinates or a full set of "
+                "receiver parameters."
+            )
             raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
         # Should not happen.
@@ -478,8 +527,12 @@ class InstaseisTimeSeriesHandler(InstaseisRequestHandler, metaclass=ABCMeta):
 
         # Make sure that the station coordinates callback is available if
         # needed. Otherwise raise a 404.
-        if all(query_receivers) and \
-                not self.application.station_coordinates_callback:
-            msg = ("Server does not support station coordinates and thus no "
-                   "station queries.")
+        if (
+            all(query_receivers)
+            and not self.application.station_coordinates_callback
+        ):
+            msg = (
+                "Server does not support station coordinates and thus no "
+                "station queries."
+            )
             raise tornado.web.HTTPError(404, log_message=msg, reason=msg)

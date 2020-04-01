@@ -17,15 +17,20 @@ import requests
 import warnings
 
 from .base_instaseis_db import BaseInstaseisDB, DEFAULT_MU
-from .. import InstaseisError, InstaseisWarning, Source, ForceSource, \
-    __version__
-
+from .. import (
+    InstaseisError,
+    InstaseisWarning,
+    Source,
+    ForceSource,
+    __version__,
+)
 
 
 class RemoteInstaseisDB(BaseInstaseisDB):
     """
     Remote Instaseis database interface.
     """
+
     def __init__(self, url, *args, **kwargs):
         """
         :param url: URL to the remote Instaseis server.
@@ -39,19 +44,25 @@ class RemoteInstaseisDB(BaseInstaseisDB):
         try:
             root = self._download_url(self._get_url(path=""))
         except Exception as e:
-            raise InstaseisError("Failed to connect to remote Instaseis "
-                                 "server due to: %s" % (str(e)))
+            raise InstaseisError(
+                "Failed to connect to remote Instaseis "
+                "server due to: %s" % (str(e))
+            )
 
         # XXX: Add Instaseis version checks! Make sure server and client are
         # on the same version!
         if "type" not in root or root["type"] != "Instaseis Remote Server":
-            raise InstaseisError("Instaseis server responded with invalid "
-                                 "response: %s" % (str(root)))
+            raise InstaseisError(
+                "Instaseis server responded with invalid "
+                "response: %s" % (str(root))
+            )
 
         if root["version"] != __version__:
-            msg = ("Instaseis versions on server (%s) and on your local "
-                   "client (%s) differ and thus things might not work as "
-                   "expected." % (root["version"], __version__))
+            msg = (
+                "Instaseis versions on server (%s) and on your local "
+                "client (%s) differ and thus things might not work as "
+                "expected." % (root["version"], __version__)
+            )
             warnings.warn(msg, InstaseisWarning)
         self._get_info()
 
@@ -104,9 +115,11 @@ class RemoteInstaseisDB(BaseInstaseisDB):
 
         r = requests.get(url)
         if "Instaseis-Mu" not in r.headers:  # pragma: no cover
-            warnings.warn("Mu is not passed via the HTTP headers. Maybe some "
-                          "proxy removed it? Mu is now always the default mu.",
-                          InstaseisWarning)
+            warnings.warn(
+                "Mu is not passed via the HTTP headers. Maybe some "
+                "proxy removed it? Mu is now always the default mu.",
+                InstaseisWarning,
+            )
             mu = DEFAULT_MU
         else:
             mu = float(r.headers["Instaseis-Mu"])
@@ -118,9 +131,7 @@ class RemoteInstaseisDB(BaseInstaseisDB):
         # Convert back to dictionary of numpy arrays...this is a bit
         # redundant but plays nice with the rest of Instaseis and still
         # enables a REST API that serves MiniSEED files.
-        data = {
-            "mu": mu
-        }
+        data = {"mu": mu}
 
         for tr in st:
             data[tr.stats.channel[-1].upper()] = tr.data
@@ -148,8 +159,9 @@ class RemoteInstaseisDB(BaseInstaseisDB):
         # Not tested in test suite as it would be awkward to do. Manually
         # tested and should be good.
         if r.status_code != 200:  # pragma: no cover
-            raise InstaseisError("Status code %i when downloading '%s'" % (
-                r.status_code, url))
+            raise InstaseisError(
+                "Status code %i when downloading '%s'" % (r.status_code, url)
+            )
         return r.json()
 
     def _get_info(self):

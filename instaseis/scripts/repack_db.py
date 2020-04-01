@@ -36,8 +36,14 @@ def dummy_progressbar(iterator, *args, **kwargs):
     yield iterator
 
 
-def repack_file(input_filename, output_filename, contiguous,
-                compression_level, transpose, quiet=False):
+def repack_file(
+    input_filename,
+    output_filename,
+    contiguous,
+    compression_level,
+    transpose,
+    quiet=False,
+):
     """
     Transposes all data in the "/Snapshots" group.
 
@@ -47,11 +53,19 @@ def repack_file(input_filename, output_filename, contiguous,
     assert os.path.exists(input_filename)
     assert not os.path.exists(output_filename)
 
-    with netCDF4.Dataset(input_filename, "r", format="NETCDF4") as f_in, \
-            netCDF4.Dataset(output_filename, "w", format="NETCDF4") as f_out:
-        recursive_copy(src=f_in, dst=f_out, contiguous=contiguous,
-                       compression_level=compression_level, quiet=quiet,
-                       transpose=transpose)
+    with netCDF4.Dataset(
+        input_filename, "r", format="NETCDF4"
+    ) as f_in, netCDF4.Dataset(
+        output_filename, "w", format="NETCDF4"
+    ) as f_out:
+        recursive_copy(
+            src=f_in,
+            dst=f_out,
+            contiguous=contiguous,
+            compression_level=compression_level,
+            quiet=quiet,
+            transpose=transpose,
+        )
 
 
 def recursive_copy(src, dst, contiguous, compression_level, transpose, quiet):
@@ -86,8 +100,9 @@ def recursive_copy(src, dst, contiguous, compression_level, transpose, quiet):
         items = list(reversed(items))
 
     for name, dimension in items:
-        dst.createDimension(name, len(
-            dimension) if not dimension.isunlimited() else None)
+        dst.createDimension(
+            name, len(dimension) if not dimension.isunlimited() else None
+        )
 
     _j = 0
     for name, variable in src.variables.items():
@@ -128,24 +143,42 @@ def recursive_copy(src, dst, contiguous, compression_level, transpose, quiet):
         if is_snap and transpose:
             dimensions = list(reversed(dimensions))
 
-        x = dst.createVariable(name, variable.datatype, dimensions,
-                               chunksizes=chunksizes, contiguous=contiguous,
-                               zlib=zlib, complevel=compression_level)
+        x = dst.createVariable(
+            name,
+            variable.datatype,
+            dimensions,
+            chunksizes=chunksizes,
+            contiguous=contiguous,
+            zlib=zlib,
+            complevel=compression_level,
+        )
         # Non-snapshots variables are just copied in a single go.
         if not is_snap or not name.startswith("disp_"):
             if not quiet:
-                click.echo(click.style("\tCopying group '%s'..." % name,
-                                       fg="blue"))
+                click.echo(
+                    click.style("\tCopying group '%s'..." % name, fg="blue")
+                )
             dst.variables[x.name][:] = src.variables[x.name][:]
         # The snapshots variables are incrementally copied and transposed.
         else:
             if not quiet:
-                click.echo(click.style(
-                    "\tCopying 'Snapshots/%s' (%i of %i)..." % (
-                        name, _j,
-                        len([_i for _i in src.variables
-                             if _i.startswith("disp_")])),
-                    fg="blue"))
+                click.echo(
+                    click.style(
+                        "\tCopying 'Snapshots/%s' (%i of %i)..."
+                        % (
+                            name,
+                            _j,
+                            len(
+                                [
+                                    _i
+                                    for _i in src.variables
+                                    if _i.startswith("disp_")
+                                ]
+                            ),
+                        ),
+                        fg="blue",
+                    )
+                )
 
             # Copy around 8 Megabytes at a time. This seems to be the
             # sweet spot at least on my laptop.
@@ -162,28 +195,38 @@ def recursive_copy(src, dst, contiguous, compression_level, transpose, quiet):
                     _s = slice(_i * factor, _i * factor + factor)
                     if transpose:
                         if time_axis == 0:
-                            dst.variables[x.name][_s, :] = \
-                                src.variables[x.name][:, _s].T
+                            dst.variables[x.name][_s, :] = src.variables[
+                                x.name
+                            ][:, _s].T
                         else:
-                            dst.variables[x.name][:, _s] = \
-                                src.variables[x.name][_s, :].T
+                            dst.variables[x.name][:, _s] = src.variables[
+                                x.name
+                            ][_s, :].T
                     else:
                         if time_axis == 0:
-                            dst.variables[x.name][:, _s] = \
-                                src.variables[x.name][:, _s]
+                            dst.variables[x.name][:, _s] = src.variables[
+                                x.name
+                            ][:, _s]
                         else:
-                            dst.variables[x.name][_s, :] = \
-                                src.variables[x.name][_s, :]
+                            dst.variables[x.name][_s, :] = src.variables[
+                                x.name
+                            ][_s, :]
 
     for src_group in src.groups.values():
         dst_group = dst.createGroup(src_group.name)
-        recursive_copy(src=src_group, dst=dst_group, contiguous=contiguous,
-                       compression_level=compression_level, quiet=quiet,
-                       transpose=transpose)
+        recursive_copy(
+            src=src_group,
+            dst=dst_group,
+            contiguous=contiguous,
+            compression_level=compression_level,
+            quiet=quiet,
+            transpose=transpose,
+        )
 
 
 def recursive_copy_no_snapshots_no_seismograms_no_surface(
-        src, dst, quiet, contiguous, compression_level):
+    src, dst, quiet, contiguous, compression_level
+):
     """
     A bit of a copy of the recursive_copy function but it does not copy the
     Snapshots, Seismograms, or Surface group.
@@ -203,8 +246,9 @@ def recursive_copy_no_snapshots_no_seismograms_no_surface(
     items = list(src.dimensions.items())
 
     for name, dimension in items:
-        dst.createDimension(name, len(
-            dimension) if not dimension.isunlimited() else None)
+        dst.createDimension(
+            name, len(dimension) if not dimension.isunlimited() else None
+        )
 
     for name, variable in src.variables.items():
         if name in ["Snapshots", "Seismograms", "Surface"]:
@@ -226,12 +270,19 @@ def recursive_copy_no_snapshots_no_seismograms_no_surface(
 
         dimensions = variable.dimensions
 
-        x = dst.createVariable(name, variable.datatype, dimensions,
-                               chunksizes=chunksizes, contiguous=contiguous,
-                               zlib=zlib, complevel=compression_level)
+        x = dst.createVariable(
+            name,
+            variable.datatype,
+            dimensions,
+            chunksizes=chunksizes,
+            contiguous=contiguous,
+            zlib=zlib,
+            complevel=compression_level,
+        )
         if not quiet:
-            click.echo(click.style("\tCopying group '%s'..." % name,
-                                   fg="blue"))
+            click.echo(
+                click.style("\tCopying group '%s'..." % name, fg="blue")
+            )
         dst.variables[x.name][:] = src.variables[x.name][:]
 
     for src_group in src.groups.values():
@@ -239,12 +290,17 @@ def recursive_copy_no_snapshots_no_seismograms_no_surface(
             continue
         dst_group = dst.createGroup(src_group.name)
         recursive_copy_no_snapshots_no_seismograms_no_surface(
-            src=src_group, dst=dst_group, contiguous=contiguous,
-            compression_level=compression_level, quiet=quiet)
+            src=src_group,
+            dst=dst_group,
+            contiguous=contiguous,
+            compression_level=compression_level,
+            quiet=quiet,
+        )
 
 
-def merge_files(filenames, output_folder, contiguous, compression_level,
-                quiet):
+def merge_files(
+    filenames, output_folder, contiguous, compression_level, quiet
+):
     """
     Completely unroll and merge both files to a single database.
     """
@@ -260,8 +316,12 @@ def merge_files(filenames, output_folder, contiguous, compression_level,
 
     # Only a couple of combinations are valid.
     keys = sorted(files.keys())
-    assert (keys == ["PX"]) or (keys == ["PZ"]) or (keys == ["PX", "PZ"]) or \
-        (keys == ["MXX_P_MYY", "MXY_MXX_M_MYY", "MXZ_MYZ", "MZZ"])
+    assert (
+        (keys == ["PX"])
+        or (keys == ["PZ"])
+        or (keys == ["PX", "PZ"])
+        or (keys == ["MXX_P_MYY", "MXY_MXX_M_MYY", "MXZ_MYZ", "MZZ"])
+    )
 
     output = os.path.join(output_folder, "merged_output.nc4")
     assert not os.path.exists(output)
@@ -271,8 +331,13 @@ def merge_files(filenames, output_folder, contiguous, compression_level,
         for key, value in files.items():
             input_files[key] = netCDF4.Dataset(value, "r", format="NETCDF4")
         out = netCDF4.Dataset(output, "w", format="NETCDF4")
-        _merge_files(input=input_files, out=out, contiguous=contiguous,
-                     compression_level=compression_level, quiet=quiet)
+        _merge_files(
+            input=input_files,
+            out=out,
+            contiguous=contiguous,
+            compression_level=compression_level,
+            quiet=quiet,
+        )
     finally:
         for filename in input_files.values():
             try:
@@ -289,8 +354,12 @@ def _merge_files(input, out, contiguous, compression_level, quiet):
     # First copy everything non-snapshot related.
     c_db = list(input.values())[0]
     recursive_copy_no_snapshots_no_seismograms_no_surface(
-        src=c_db, dst=out, quiet=quiet, contiguous=contiguous,
-        compression_level=compression_level)
+        src=c_db,
+        dst=out,
+        quiet=quiet,
+        contiguous=contiguous,
+        compression_level=compression_level,
+    )
 
     if contiguous:
         zlib = False
@@ -321,7 +390,8 @@ def _merge_files(input, out, contiguous, compression_level, quiet):
             contiguous=contiguous,
             zlib=zlib,
             chunksizes=chunksizes,
-            datatype=data.dtype)
+            datatype=data.dtype,
+        )
         d[:] = data[:]
 
     # Get all the snapshots from the other databases.
@@ -331,18 +401,25 @@ def _merge_files(input, out, contiguous, compression_level, quiet):
             input["PX"]["Snapshots"]["disp_p"],
             input["PX"]["Snapshots"]["disp_z"],
             input["PZ"]["Snapshots"]["disp_s"],
-            input["PZ"]["Snapshots"]["disp_z"]]
+            input["PZ"]["Snapshots"]["disp_z"],
+        ]
     elif "PX" in input and "PZ" not in input:
         meshes = [
             input["PX"]["Snapshots"]["disp_s"],
             input["PX"]["Snapshots"]["disp_p"],
-            input["PX"]["Snapshots"]["disp_z"]]
+            input["PX"]["Snapshots"]["disp_z"],
+        ]
     elif "PZ" in input and "PX" not in input:
         meshes = [
             input["PZ"]["Snapshots"]["disp_s"],
-            input["PZ"]["Snapshots"]["disp_z"]]
-    elif "MXX_P_MYY" in input and "MXY_MXX_M_MYY" in input and \
-            "MXZ_MYZ" in input and "MZZ" in input:
+            input["PZ"]["Snapshots"]["disp_z"],
+        ]
+    elif (
+        "MXX_P_MYY" in input
+        and "MXY_MXX_M_MYY" in input
+        and "MXZ_MYZ" in input
+        and "MZZ" in input
+    ):
         meshes = [
             input["MZZ"]["Snapshots"]["disp_s"],
             input["MZZ"]["Snapshots"]["disp_z"],
@@ -353,7 +430,8 @@ def _merge_files(input, out, contiguous, compression_level, quiet):
             input["MXZ_MYZ"]["Snapshots"]["disp_z"],
             input["MXY_MXX_M_MYY"]["Snapshots"]["disp_s"],
             input["MXY_MXX_M_MYY"]["Snapshots"]["disp_p"],
-            input["MXY_MXX_M_MYY"]["Snapshots"]["disp_z"]]
+            input["MXY_MXX_M_MYY"]["Snapshots"]["disp_z"],
+        ]
     else:  # pragma: no cover
         raise NotImplementedError
 
@@ -369,8 +447,13 @@ def _merge_files(input, out, contiguous, compression_level, quiet):
     dim_elements = out.createDimension("elements", nelem)
 
     # New dimensions for the 5D Array.
-    dims = (dim_elements, dim_nvars, dim_jpol, dim_ipol,
-            out.dimensions["snapshots"])
+    dims = (
+        dim_elements,
+        dim_nvars,
+        dim_jpol,
+        dim_ipol,
+        out.dimensions["snapshots"],
+    )
     dimensions = [_i.name for _i in dims]
 
     if contiguous:
@@ -387,7 +470,8 @@ def _merge_files(input, out, contiguous, compression_level, quiet):
         contiguous=contiguous,
         zlib=zlib,
         chunksizes=chunksizes,
-        datatype=dtype)
+        datatype=dtype,
+    )
 
     utemp = np.zeros([_i.size for _i in dims[1:]], dtype=dtype, order="C")
 
@@ -430,8 +514,7 @@ def _merge_files(input, out, contiguous, compression_level, quiet):
     else:
         pbar = dummy_progressbar
 
-    with pbar(range(nelem), length=nelem, label="\t  ") \
-            as indices:
+    with pbar(range(nelem), length=nelem, label="\t  ") as indices:
         for elem_id in indices:
             # Get the old and new indices.
             old_index = elem_id
@@ -449,37 +532,51 @@ def _merge_files(input, out, contiguous, compression_level, quiet):
                     for jpol in range(dim_jpol.size):
                         for ipol in range(dim_ipol.size):
                             idx = ipol * 5 + jpol
-                            utemp[i, jpol, ipol, :] = \
-                                temp[:, np.argwhere(s_ids == ids[idx])[0][0]]
+                            utemp[i, jpol, ipol, :] = temp[
+                                :, np.argwhere(s_ids == ids[idx])[0][0]
+                            ]
                 else:
                     temp = var[s_ids, :]
                     for jpol in range(dim_jpol.size):
                         for ipol in range(dim_ipol.size):
                             idx = ipol * 5 + jpol
-                            utemp[i, jpol, ipol, :] = \
-                                temp[np.argwhere(s_ids == ids[idx])[0][0], :]
+                            utemp[i, jpol, ipol, :] = temp[
+                                np.argwhere(s_ids == ids[idx])[0][0], :
+                            ]
             x[new_index] = utemp
 
 
 @click.command()
-@click.argument("input_folder", type=click.Path(exists=True, file_okay=False,
-                                                dir_okay=True))
+@click.argument(
+    "input_folder",
+    type=click.Path(exists=True, file_okay=False, dir_okay=True),
+)
 @click.argument("output_folder", type=click.Path(exists=False))
-@click.option("--contiguous", is_flag=True,
-              help="Write a contiguous array - will turn off chunking and "
-                   "compression")
-@click.option("--compression_level",
-              type=click.IntRange(1, 9), default=2,
-              help="Compression level from 1 (fast) to 9 (slow).")
-@click.option('--method', type=click.Choice(["transpose", "repack", "merge"]),
-              required=True,
-              help="`transpose` will transpose the data arrays which "
-                   "oftentimes results in faster extraction times. `repack` "
-                   "will just repack the data and solve some compatibility "
-                   "issues. `merge` will create a single much larger file "
-                   "which is much quicker to read but will take more space.")
-def repack_database(input_folder, output_folder, contiguous,
-                    compression_level, method):
+@click.option(
+    "--contiguous",
+    is_flag=True,
+    help="Write a contiguous array - will turn off chunking and "
+    "compression",
+)
+@click.option(
+    "--compression_level",
+    type=click.IntRange(1, 9),
+    default=2,
+    help="Compression level from 1 (fast) to 9 (slow).",
+)
+@click.option(
+    "--method",
+    type=click.Choice(["transpose", "repack", "merge"]),
+    required=True,
+    help="`transpose` will transpose the data arrays which "
+    "oftentimes results in faster extraction times. `repack` "
+    "will just repack the data and solve some compatibility "
+    "issues. `merge` will create a single much larger file "
+    "which is much quicker to read but will take more space.",
+)
+def repack_database(
+    input_folder, output_folder, contiguous, compression_level, method
+):
     found_filenames = []
     for root, _, filenames in os.walk(input_folder, followlinks=True):
         for filename in sorted(filenames, reverse=True):
@@ -494,24 +591,30 @@ def repack_database(input_folder, output_folder, contiguous,
     output_folder = os.path.normpath(os.path.realpath(output_folder))
 
     if input_folder == output_folder:
-        if "ordered_output.nc4" in [os.path.basename(_i) for _i in
-                                    found_filenames]:
+        if "ordered_output.nc4" in [
+            os.path.basename(_i) for _i in found_filenames
+        ]:
             raise ValueError("ordered_output.nc4 already exists.")
     else:
         os.makedirs(output_folder)
 
     if method in ["transpose", "repack"]:
         for _i, filename in enumerate(found_filenames):
-            click.echo(click.style(
-                "--> Processing file %i of %i: %s" %
-                (_i + 1, len(found_filenames), filename), fg="green"))
+            click.echo(
+                click.style(
+                    "--> Processing file %i of %i: %s"
+                    % (_i + 1, len(found_filenames), filename),
+                    fg="green",
+                )
+            )
 
             output_filename = os.path.join(
-                output_folder,
-                os.path.relpath(filename, input_folder))
+                output_folder, os.path.relpath(filename, input_folder)
+            )
 
             output_filename = output_filename.replace(
-                "axisem_output.nc4", "ordered_output.nc4")
+                "axisem_output.nc4", "ordered_output.nc4"
+            )
 
             if not input_folder == output_folder:
                 os.makedirs(os.path.dirname(output_filename))
@@ -521,15 +624,21 @@ def repack_database(input_folder, output_folder, contiguous,
             else:
                 transpose = False
 
-            repack_file(input_filename=filename,
-                        output_filename=output_filename,
-                        contiguous=contiguous,
-                        transpose=transpose,
-                        compression_level=compression_level)
+            repack_file(
+                input_filename=filename,
+                output_filename=output_filename,
+                contiguous=contiguous,
+                transpose=transpose,
+                compression_level=compression_level,
+            )
     elif method == "merge":
-        merge_files(filenames=found_filenames, output_folder=output_folder,
-                    contiguous=contiguous, compression_level=compression_level,
-                    quiet=False)
+        merge_files(
+            filenames=found_filenames,
+            output_folder=output_folder,
+            contiguous=contiguous,
+            compression_level=compression_level,
+            quiet=False,
+        )
     else:
         raise NotImplementedError
 

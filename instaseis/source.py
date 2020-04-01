@@ -24,7 +24,7 @@ from numpy import interp
 
 from . import ReceiverParseError, SourceParseError
 from . import rotations
-from .helpers import (elliptic_to_geocentric_latitude, rfftfreq)
+from .helpers import elliptic_to_geocentric_latitude, rfftfreq
 
 DEFAULT_MU = 32e9
 
@@ -33,6 +33,7 @@ class USGSParamFileParsingException(Exception):
     """
     Custom exception for nice and hopefully save exception passing.
     """
+
     pass
 
 
@@ -41,6 +42,7 @@ def _purge_duplicates(f):
     Simple decorator removing duplicates in the returned list. Preserves the
     order and will remove duplicates occuring later in the list.
     """
+
     @functools.wraps(f)
     def wrapper(*args, **kwds):
         ret_val = f(*args, **kwds)
@@ -50,6 +52,7 @@ def _purge_duplicates(f):
                 continue
             new_list.append(item)
         return new_list
+
     return wrapper
 
 
@@ -101,26 +104,30 @@ def fault_vectors_lmn(strike, dip, rake):
     m = np.empty(3)
     n = np.empty(3)
 
-    l[0] = np.cos(lambd) * np.cos(phi) \
-        + np.cos(delta) * np.sin(lambd) * np.sin(phi)
-    l[1] = np.cos(lambd) * np.sin(phi) \
-        - np.cos(delta) * np.sin(lambd) * np.cos(phi)
-    l[2] = - np.sin(delta) * np.sin(lambd)
+    l[0] = np.cos(lambd) * np.cos(phi) + np.cos(delta) * np.sin(
+        lambd
+    ) * np.sin(phi)
+    l[1] = np.cos(lambd) * np.sin(phi) - np.cos(delta) * np.sin(
+        lambd
+    ) * np.cos(phi)
+    l[2] = -np.sin(delta) * np.sin(lambd)
 
-    m[0] = - np.sin(lambd) * np.cos(phi) \
-        + np.cos(delta) * np.cos(lambd) * np.sin(phi)
-    m[1] = - np.sin(lambd) * np.sin(phi) \
-        - np.cos(delta) * np.cos(lambd) * np.cos(phi)
-    m[2] = - np.sin(delta) * np.cos(lambd)
+    m[0] = -np.sin(lambd) * np.cos(phi) + np.cos(delta) * np.cos(
+        lambd
+    ) * np.sin(phi)
+    m[1] = -np.sin(lambd) * np.sin(phi) - np.cos(delta) * np.cos(
+        lambd
+    ) * np.cos(phi)
+    m[2] = -np.sin(delta) * np.cos(lambd)
 
-    n[0] = - np.sin(delta) * np.sin(phi)
+    n[0] = -np.sin(delta) * np.sin(phi)
     n[1] = np.sin(delta) * np.cos(phi)
-    n[2] = - np.cos(delta)
+    n[2] = -np.cos(delta)
 
     # Udias 16.99 - 16.104 is in geographic coordinates (North, East, Down),
     # here we use geocentric, i.e. t,p,r
 
-    transform = np.array([-1., 1., -1.])
+    transform = np.array([-1.0, 1.0, -1.0])
     l *= transform  # NOQA
     m *= transform
     n *= transform
@@ -146,13 +153,16 @@ def strike_dip_rake_from_ln(l, n):
     # and the second for dip = 90
     if delta > 0.1:
         lambd = np.arctan2(
-            l_norm[2], np.sin(delta) * (-l_norm[0] * np.cos(phi) +
-                                        l_norm[1] * np.sin(phi)))
+            l_norm[2],
+            np.sin(delta)
+            * (-l_norm[0] * np.cos(phi) + l_norm[1] * np.sin(phi)),
+        )
     else:
         lambd = np.arctan2(
             (-l_norm[0] * np.sin(phi) - l_norm[1] * np.cos(phi)),
-            np.cos(delta) * (-l_norm[0] * np.cos(phi) +
-                             l_norm[1] * np.sin(phi)))
+            np.cos(delta)
+            * (-l_norm[0] * np.cos(phi) + l_norm[1] * np.sin(phi)),
+        )
 
     strike = np.rad2deg(phi)
     dip = np.rad2deg(delta)
@@ -181,12 +191,12 @@ def asymmetric_cosine(trise, tfall=None, npts=10000, dt=0.1):
     asc = np.zeros(npts)
 
     # build slices
-    slrise = (t <= trise)
+    slrise = t <= trise
     slfall = np.logical_and(t > trise, t <= trise + tfall)
 
     # compute stf
-    asc[slrise] = (1. - np.cos(np.pi * t[slrise] / trise))
-    asc[slfall] = (1. - np.cos(np.pi * (t[slfall] - trise + tfall) / tfall))
+    asc[slrise] = 1.0 - np.cos(np.pi * t[slrise] / trise)
+    asc[slfall] = 1.0 - np.cos(np.pi * (t[slfall] - trise + tfall) / tfall)
 
     # normalize
     asc /= trise + tfall
@@ -201,12 +211,15 @@ class SourceOrReceiver(object):
         self.depth_in_m = float(depth_in_m) if depth_in_m is not None else None
 
         if not (-90 <= self.latitude <= 90):
-            raise ValueError("Invalid latitude value. Latitude must be "
-                             "-90 <= x <= 90.")
+            raise ValueError(
+                "Invalid latitude value. Latitude must be " "-90 <= x <= 90."
+            )
 
         if not (-180 <= self.longitude <= 180.0):
-            raise ValueError("Invalid longitude value. Longitude must be "
-                             "-180 <= x <= 180.")
+            raise ValueError(
+                "Invalid longitude value. Longitude must be "
+                "-180 <= x <= 180."
+            )
 
     def __eq__(self, other):
         if type(self) != type(other):
@@ -239,18 +252,23 @@ class SourceOrReceiver(object):
             return planet_radius - self.depth_in_m
 
     def x(self, planet_radius=6371e3):
-        return np.cos(np.deg2rad(self.latitude)) * \
-            np.cos(np.deg2rad(self.longitude)) * \
-            self.radius_in_m(planet_radius=planet_radius)
+        return (
+            np.cos(np.deg2rad(self.latitude))
+            * np.cos(np.deg2rad(self.longitude))
+            * self.radius_in_m(planet_radius=planet_radius)
+        )
 
     def y(self, planet_radius=6371e3):
-        return np.cos(np.deg2rad(self.latitude)) * \
-            np.sin(np.deg2rad(self.longitude)) * \
-            self.radius_in_m(planet_radius=planet_radius)
+        return (
+            np.cos(np.deg2rad(self.latitude))
+            * np.sin(np.deg2rad(self.longitude))
+            * self.radius_in_m(planet_radius=planet_radius)
+        )
 
     def z(self, planet_radius=6371e3):
-        return np.sin(np.deg2rad(self.latitude)) * \
-            self.radius_in_m(planet_radius=planet_radius)
+        return np.sin(np.deg2rad(self.latitude)) * self.radius_in_m(
+            planet_radius=planet_radius
+        )
 
 
 class SourceTimeFunction(object):
@@ -279,8 +297,9 @@ class SourceTimeFunction(object):
         :param nsamp: desired number of samples
         """
         t_new = np.linspace(0, nsamp * dt, nsamp, endpoint=False)
-        t_old = np.linspace(0, self.dt * len(self.sliprate),
-                            len(self.sliprate), endpoint=False)
+        t_old = np.linspace(
+            0, self.dt * len(self.sliprate), len(self.sliprate), endpoint=False
+        )
 
         self.sliprate = interp(t_new, t_old, self.sliprate)
         self.dt = dt
@@ -301,7 +320,9 @@ class SourceTimeFunction(object):
         """
         self.sliprate = np.zeros(nsamp)
         self.sliprate[0] = 1.0 / dt
-        self.sliprate = lowpass(self.sliprate, freq, 1./dt, corners, zerophase)
+        self.sliprate = lowpass(
+            self.sliprate, freq, 1.0 / dt, corners, zerophase
+        )
         self.dt = dt
 
     def normalize_sliprate(self):
@@ -311,8 +332,9 @@ class SourceTimeFunction(object):
         self.sliprate /= np.trapz(self.sliprate, dx=self.dt)
 
     def lp_sliprate(self, freq, corners=4, zerophase=False):
-        self.sliprate = lowpass(self.sliprate, freq, 1./self.dt, corners,
-                                zerophase)
+        self.sliprate = lowpass(
+            self.sliprate, freq, 1.0 / self.dt, corners, zerophase
+        )
 
 
 class Source(SourceOrReceiver, SourceTimeFunction):
@@ -320,10 +342,23 @@ class Source(SourceOrReceiver, SourceTimeFunction):
     Class to handle a seismic moment tensor source including a source time
     function.
     """
-    def __init__(self, latitude, longitude, depth_in_m=None, m_rr=0.0,
-                 m_tt=0.0, m_pp=0.0, m_rt=0.0, m_rp=0.0, m_tp=0.0,
-                 time_shift=None, sliprate=None, dt=None,
-                 origin_time=obspy.UTCDateTime(0)):
+
+    def __init__(
+        self,
+        latitude,
+        longitude,
+        depth_in_m=None,
+        m_rr=0.0,
+        m_tt=0.0,
+        m_pp=0.0,
+        m_rt=0.0,
+        m_rp=0.0,
+        m_tp=0.0,
+        time_shift=None,
+        sliprate=None,
+        dt=None,
+        origin_time=obspy.UTCDateTime(0),
+    ):
         """
         :param latitude: geocentric latitude of the source in degree
         :param longitude: longitude of the source in degree
@@ -433,7 +468,8 @@ class Source(SourceOrReceiver, SourceTimeFunction):
             elif len(filename_or_obj) > 1:
                 raise SourceParseError(
                     "Event catalog contains %i events. Only one is allowed. "
-                    "Please parse seperately." % len(filename_or_obj))
+                    "Please parse seperately." % len(filename_or_obj)
+                )
             return Source.parse(filename_or_obj[0])
         elif isinstance(filename_or_obj, obspy.core.event.Event):
             ev = filename_or_obj
@@ -456,15 +492,26 @@ class Source(SourceOrReceiver, SourceTimeFunction):
                 m_pp=t.m_pp,
                 m_rt=t.m_rt,
                 m_rp=t.m_rp,
-                m_tp=t.m_tp)
+                m_tp=t.m_tp,
+            )
         else:
             raise NotImplementedError
 
     @classmethod
     def from_strike_dip_rake(  # NOQA
-        cls, latitude, longitude, depth_in_m, strike, dip, rake, M0,
-        time_shift=None, sliprate=None, dt=None,
-        origin_time=obspy.UTCDateTime(0)):
+        cls,
+        latitude,
+        longitude,
+        depth_in_m,
+        strike,
+        dip,
+        rake,
+        M0,
+        time_shift=None,
+        sliprate=None,
+        dt=None,
+        origin_time=obspy.UTCDateTime(0),
+    ):
         """
         Initialize a source object from a shear source parameterized by strike,
         dip and rake.
@@ -518,27 +565,48 @@ class Source(SourceOrReceiver, SourceTimeFunction):
         delta = np.deg2rad(dip)
         lambd = np.deg2rad(rake)
 
-        m_tt = (- np.sin(delta) * np.cos(lambd) * np.sin(2. * phi) -
-                np.sin(2. * delta) * np.sin(phi)**2. * np.sin(lambd)) * M0
+        m_tt = (
+            -np.sin(delta) * np.cos(lambd) * np.sin(2.0 * phi)
+            - np.sin(2.0 * delta) * np.sin(phi) ** 2.0 * np.sin(lambd)
+        ) * M0
 
-        m_pp = (np.sin(delta) * np.cos(lambd) * np.sin(2. * phi) -
-                np.sin(2. * delta) * np.cos(phi)**2. * np.sin(lambd)) * M0
+        m_pp = (
+            np.sin(delta) * np.cos(lambd) * np.sin(2.0 * phi)
+            - np.sin(2.0 * delta) * np.cos(phi) ** 2.0 * np.sin(lambd)
+        ) * M0
 
-        m_rr = (np.sin(2. * delta) * np.sin(lambd)) * M0
+        m_rr = (np.sin(2.0 * delta) * np.sin(lambd)) * M0
 
-        m_rp = (- np.cos(phi) * np.sin(lambd) * np.cos(2. * delta) +
-                np.cos(delta) * np.cos(lambd) * np.sin(phi)) * M0
+        m_rp = (
+            -np.cos(phi) * np.sin(lambd) * np.cos(2.0 * delta)
+            + np.cos(delta) * np.cos(lambd) * np.sin(phi)
+        ) * M0
 
-        m_rt = (- np.sin(lambd) * np.sin(phi) * np.cos(2. * delta) -
-                np.cos(delta) * np.cos(lambd) * np.cos(phi)) * M0
+        m_rt = (
+            -np.sin(lambd) * np.sin(phi) * np.cos(2.0 * delta)
+            - np.cos(delta) * np.cos(lambd) * np.cos(phi)
+        ) * M0
 
-        m_tp = (- np.sin(delta) * np.cos(lambd) * np.cos(2. * phi) -
-                np.sin(2. * delta) * np.sin(2. * phi) * np.sin(lambd) / 2.) * \
-            M0
+        m_tp = (
+            -np.sin(delta) * np.cos(lambd) * np.cos(2.0 * phi)
+            - np.sin(2.0 * delta) * np.sin(2.0 * phi) * np.sin(lambd) / 2.0
+        ) * M0
 
-        source = cls(latitude, longitude, depth_in_m, m_rr, m_tt, m_pp, m_rt,
-                     m_rp, m_tp, time_shift, sliprate, dt,
-                     origin_time=origin_time)
+        source = cls(
+            latitude,
+            longitude,
+            depth_in_m,
+            m_rr,
+            m_tt,
+            m_pp,
+            m_rt,
+            m_rp,
+            m_tp,
+            time_shift,
+            sliprate,
+            dt,
+            origin_time=origin_time,
+        )
 
         # storing strike, dip and rake for plotting purposes
         source.phi = phi
@@ -552,9 +620,14 @@ class Source(SourceOrReceiver, SourceTimeFunction):
         """
         Scalar Moment M0 in Nm
         """
-        return (self.m_rr ** 2 + self.m_tt ** 2 + self.m_pp ** 2 +
-                2 * self.m_rt ** 2 + 2 * self.m_rp ** 2 +
-                2 * self.m_tp ** 2) ** 0.5 * 0.5 ** 0.5
+        return (
+            self.m_rr ** 2
+            + self.m_tt ** 2
+            + self.m_pp ** 2
+            + 2 * self.m_rt ** 2
+            + 2 * self.m_rp ** 2
+            + 2 * self.m_tp ** 2
+        ) ** 0.5 * 0.5 ** 0.5
 
     @property
     def moment_magnitude(self):
@@ -569,8 +642,9 @@ class Source(SourceOrReceiver, SourceTimeFunction):
         List of moment tensor components in r, theta, phi coordinates:
         [m_rr, m_tt, m_pp, m_rt, m_rp, m_tp]
         """
-        return np.array([self.m_rr, self.m_tt, self.m_pp, self.m_rt, self.m_rp,
-                         self.m_tp])
+        return np.array(
+            [self.m_rr, self.m_tt, self.m_pp, self.m_rt, self.m_rp, self.m_tp]
+        )
 
     @property
     def tensor_voigt(self):
@@ -579,26 +653,30 @@ class Source(SourceOrReceiver, SourceTimeFunction):
         notation:
         [m_tt, m_pp, m_rr, m_rp, m_rt, m_tp]
         """
-        return np.array([self.m_tt, self.m_pp, self.m_rr, self.m_rp, self.m_rt,
-                         self.m_tp])
+        return np.array(
+            [self.m_tt, self.m_pp, self.m_rr, self.m_rp, self.m_rt, self.m_tp]
+        )
 
     def __str__(self):
-        return_str = 'Instaseis Source:\n'
-        return_str += '\tOrigin Time      : %s\n' % (self.origin_time,)
-        return_str += '\tLongitude        : %6.1f deg\n' % (self.longitude,)
-        return_str += '\tLatitude         : %6.1f deg\n' % (self.latitude,)
-        return_str += '\tDepth            : %s km\n' % (
+        return_str = "Instaseis Source:\n"
+        return_str += "\tOrigin Time      : %s\n" % (self.origin_time,)
+        return_str += "\tLongitude        : %6.1f deg\n" % (self.longitude,)
+        return_str += "\tLatitude         : %6.1f deg\n" % (self.latitude,)
+        return_str += "\tDepth            : %s km\n" % (
             "%6.1e km" % (self.depth_in_m / 1e3)
-            if self.depth_in_m is not None else " not set")
-        return_str += '\tMoment Magnitude :   %4.2f\n' \
-                      % (self.moment_magnitude,)
-        return_str += '\tScalar Moment    : %10.2e Nm\n' % (self.M0,)
-        return_str += '\tMrr              : %10.2e Nm\n' % (self.m_rr,)
-        return_str += '\tMtt              : %10.2e Nm\n' % (self.m_tt,)
-        return_str += '\tMpp              : %10.2e Nm\n' % (self.m_pp,)
-        return_str += '\tMrt              : %10.2e Nm\n' % (self.m_rt,)
-        return_str += '\tMrp              : %10.2e Nm\n' % (self.m_rp,)
-        return_str += '\tMtp              : %10.2e Nm\n' % (self.m_tp,)
+            if self.depth_in_m is not None
+            else " not set"
+        )
+        return_str += "\tMoment Magnitude :   %4.2f\n" % (
+            self.moment_magnitude,
+        )
+        return_str += "\tScalar Moment    : %10.2e Nm\n" % (self.M0,)
+        return_str += "\tMrr              : %10.2e Nm\n" % (self.m_rr,)
+        return_str += "\tMtt              : %10.2e Nm\n" % (self.m_tt,)
+        return_str += "\tMpp              : %10.2e Nm\n" % (self.m_pp,)
+        return_str += "\tMrt              : %10.2e Nm\n" % (self.m_rt,)
+        return_str += "\tMrp              : %10.2e Nm\n" % (self.m_rp,)
+        return_str += "\tMtp              : %10.2e Nm\n" % (self.m_tp,)
 
         return return_str
 
@@ -633,9 +711,20 @@ class ForceSource(SourceOrReceiver, SourceTimeFunction):
         Ft        :   0.00e+00 N
         Fp        :   0.00e+00 N
     """
-    def __init__(self, latitude, longitude, depth_in_m=None, f_r=0., f_t=0.,
-                 f_p=0., origin_time=obspy.UTCDateTime(0), sliprate=None,
-                 time_shift=None, dt=None):
+
+    def __init__(
+        self,
+        latitude,
+        longitude,
+        depth_in_m=None,
+        f_r=0.0,
+        f_t=0.0,
+        f_p=0.0,
+        origin_time=obspy.UTCDateTime(0),
+        sliprate=None,
+        time_shift=None,
+        dt=None,
+    ):
         """
         :param latitude: geocentric latitude of the source in degree
         :param longitude: longitude of the source in degree
@@ -680,13 +769,13 @@ class ForceSource(SourceOrReceiver, SourceTimeFunction):
         return np.array([self.f_r, self.f_t, self.f_p])
 
     def __str__(self):
-        return_str = 'Instaseis Force Source:\n'
-        return_str += '\tOrigin Time      : %s\n' % (self.origin_time,)
-        return_str += '\tLongitude : %6.1f deg\n' % (self.longitude)
-        return_str += '\tLatitude  : %6.1f deg\n' % (self.latitude)
-        return_str += '\tFr        : %10.2e N\n' % (self.f_r)
-        return_str += '\tFt        : %10.2e N\n' % (self.f_t)
-        return_str += '\tFp        : %10.2e N\n' % (self.f_p)
+        return_str = "Instaseis Force Source:\n"
+        return_str += "\tOrigin Time      : %s\n" % (self.origin_time,)
+        return_str += "\tLongitude : %6.1f deg\n" % (self.longitude)
+        return_str += "\tLatitude  : %6.1f deg\n" % (self.latitude)
+        return_str += "\tFr        : %10.2e N\n" % (self.f_r)
+        return_str += "\tFt        : %10.2e N\n" % (self.f_t)
+        return_str += "\tFp        : %10.2e N\n" % (self.f_p)
 
         return return_str
 
@@ -719,10 +808,19 @@ class Receiver(SourceOrReceiver):
         Station   : CDE
         Location  : SY
     """
-    def __init__(self, latitude, longitude, network=None, station=None,
-                 location=None, depth_in_m=None):
-        super(Receiver, self).__init__(latitude, longitude,
-                                       depth_in_m=depth_in_m)
+
+    def __init__(
+        self,
+        latitude,
+        longitude,
+        network=None,
+        station=None,
+        location=None,
+        depth_in_m=None,
+    ):
+        super(Receiver, self).__init__(
+            latitude, longitude, depth_in_m=depth_in_m
+        )
         self.network = network or ""
         self.network = self.network.strip()
         assert len(self.network) <= 2
@@ -736,12 +834,12 @@ class Receiver(SourceOrReceiver):
         assert len(self.location) <= 2
 
     def __str__(self):
-        return_str = 'Instaseis Receiver:\n'
-        return_str += '\tLongitude : %6.1f deg\n' % (self.longitude)
-        return_str += '\tLatitude  : %6.1f deg\n' % (self.latitude)
-        return_str += '\tNetwork   : %s\n' % (self.network)
-        return_str += '\tStation   : %s\n' % (self.station)
-        return_str += '\tLocation  : %s\n' % (self.location)
+        return_str = "Instaseis Receiver:\n"
+        return_str += "\tLongitude : %6.1f deg\n" % (self.longitude)
+        return_str += "\tLatitude  : %6.1f deg\n" % (self.latitude)
+        return_str += "\tNetwork   : %s\n" % (self.network)
+        return_str += "\tStation   : %s\n" % (self.station)
+        return_str += "\tLocation  : %s\n" % (self.location)
 
         return return_str
 
@@ -777,8 +875,9 @@ class Receiver(SourceOrReceiver):
         receivers = []
 
         # STATIONS file.
-        if isinstance(filename_or_obj, (str, bytes)) and \
-                os.path.exists(filename_or_obj):
+        if isinstance(filename_or_obj, (str, bytes)) and os.path.exists(
+            filename_or_obj
+        ):
             try:
                 return Receiver._parse_stations_file(filename_or_obj)
             except Exception:
@@ -791,36 +890,48 @@ class Receiver(SourceOrReceiver):
         # ObsPy network.
         elif isinstance(filename_or_obj, obspy.core.inventory.Network):
             for station in filename_or_obj:
-                receivers.extend(Receiver.parse(
-                    station, network_code=filename_or_obj.code))
+                receivers.extend(
+                    Receiver.parse(station, network_code=filename_or_obj.code)
+                )
             return receivers
         # ObsPy station.
         elif isinstance(filename_or_obj, obspy.core.inventory.Station):
             # If there are no channels, use the station coordinates.
             if not filename_or_obj.channels:
-                return [Receiver(
-                    latitude=elliptic_to_geocentric_latitude(
-                        filename_or_obj.latitude),
-                    longitude=filename_or_obj.longitude,
-                    network=network_code, station=filename_or_obj.code)]
+                return [
+                    Receiver(
+                        latitude=elliptic_to_geocentric_latitude(
+                            filename_or_obj.latitude
+                        ),
+                        longitude=filename_or_obj.longitude,
+                        network=network_code,
+                        station=filename_or_obj.code,
+                    )
+                ]
             # Otherwise use the channel information. Raise an error if the
             # coordinates are not identical for each channel. Only parse
             # latitude and longitude, as the DB currently cannot deal with
             # varying receiver heights.
             else:
-                coords = set((_i.latitude, _i.longitude) for _i in
-                             filename_or_obj.channels)
+                coords = set(
+                    (_i.latitude, _i.longitude)
+                    for _i in filename_or_obj.channels
+                )
                 if len(coords) != 1:
                     raise ReceiverParseError(
                         "The coordinates of the channels of station '%s.%s' "
-                        "are not identical." % (network_code,
-                                                filename_or_obj.code))
+                        "are not identical."
+                        % (network_code, filename_or_obj.code)
+                    )
                 coords = coords.pop()
-                return [Receiver(
-                    latitude=elliptic_to_geocentric_latitude(coords[0]),
-                    longitude=coords[1],
-                    network=network_code,
-                    station=filename_or_obj.code)]
+                return [
+                    Receiver(
+                        latitude=elliptic_to_geocentric_latitude(coords[0]),
+                        longitude=coords[1],
+                        network=network_code,
+                        station=filename_or_obj.code,
+                    )
+                ]
         # ObsPy Stream (SAC files contain coordinates).
         elif isinstance(filename_or_obj, obspy.Stream):
             for tr in filename_or_obj:
@@ -828,20 +939,29 @@ class Receiver(SourceOrReceiver):
             return receivers
         elif isinstance(filename_or_obj, obspy.Trace):
             if not hasattr(filename_or_obj.stats, "sac"):
-                raise ReceiverParseError("ObsPy Trace must have an sac "
-                                         "attribute.")
-            if "stla" not in filename_or_obj.stats.sac or \
-                    "stlo" not in filename_or_obj.stats.sac:
                 raise ReceiverParseError(
-                    "SAC file does not contain coordinates for channel '%s'" %
-                    filename_or_obj.id)
-            coords = (filename_or_obj.stats.sac.stla,
-                      filename_or_obj.stats.sac.stlo)
-            return [Receiver(
-                latitude=elliptic_to_geocentric_latitude(coords[0]),
-                longitude=coords[1],
-                network=filename_or_obj.stats.network,
-                station=filename_or_obj.stats.station)]
+                    "ObsPy Trace must have an sac " "attribute."
+                )
+            if (
+                "stla" not in filename_or_obj.stats.sac
+                or "stlo" not in filename_or_obj.stats.sac
+            ):
+                raise ReceiverParseError(
+                    "SAC file does not contain coordinates for channel '%s'"
+                    % filename_or_obj.id
+                )
+            coords = (
+                filename_or_obj.stats.sac.stla,
+                filename_or_obj.stats.sac.stlo,
+            )
+            return [
+                Receiver(
+                    latitude=elliptic_to_geocentric_latitude(coords[0]),
+                    longitude=coords[1],
+                    network=filename_or_obj.stats.network,
+                    station=filename_or_obj.stats.station,
+                )
+            ]
         elif isinstance(filename_or_obj, obspy.io.xseed.parser.Parser):
             inv = filename_or_obj.get_inventory()
             stations = collections.defaultdict(list)
@@ -853,12 +973,16 @@ class Receiver(SourceOrReceiver):
                 if len(set(value)) != 1:
                     raise ReceiverParseError(
                         "The coordinates of the channels of station '%s.%s' "
-                        "are not identical." % key)
-                receivers.append(Receiver(
-                    latitude=elliptic_to_geocentric_latitude(value[0][0]),
-                    longitude=value[0][1],
-                    network=key[0],
-                    station=key[1]))
+                        "are not identical." % key
+                    )
+                receivers.append(
+                    Receiver(
+                        latitude=elliptic_to_geocentric_latitude(value[0][0]),
+                        longitude=value[0][1],
+                        network=key[0],
+                        station=key[1],
+                    )
+                )
             return receivers
 
         # Check if its anything ObsPy can read and recurse.
@@ -880,7 +1004,8 @@ class Receiver(SourceOrReceiver):
         # Last but not least try to parse it as a SEED file.
         try:
             return Receiver.parse(
-                obspy.io.xseed.parser.Parser(filename_or_obj))
+                obspy.io.xseed.parser.Parser(filename_or_obj)
+            )
         except ReceiverParseError as e:
             raise e
         except Exception:
@@ -899,7 +1024,7 @@ class Receiver(SourceOrReceiver):
         :param filename: Filename
         :return: List of :class:`~instaseis.source.Receiver` objects.
         """
-        with open(filename, 'rt') as f:
+        with open(filename, "rt") as f:
             receivers = []
 
             for line in f:
@@ -930,9 +1055,17 @@ class FiniteSource(object):
     :param hypocenter_depth_in_m: The hypocentral depth in m.
     :type hypocenter_depth_in_m: float, optional
     """
-    def __init__(self, pointsources=None, CMT=None, magnitude=None,  # NOQA
-                 event_duration=None, hypocenter_longitude=None,
-                 hypocenter_latitude=None, hypocenter_depth_in_m=None):
+
+    def __init__(
+        self,
+        pointsources=None,
+        CMT=None,
+        magnitude=None,  # NOQA
+        event_duration=None,
+        hypocenter_longitude=None,
+        hypocenter_latitude=None,
+        hypocenter_depth_in_m=None,
+    ):
         self.pointsources = pointsources
         self.CMT = CMT
         self.magnitude = magnitude
@@ -956,7 +1089,7 @@ class FiniteSource(object):
 
     def __next__(self):
         if self.pointsources is None:
-            raise ValueError('FiniteSource not Initialized')
+            raise ValueError("FiniteSource not Initialized")
         if self.current > len(self.pointsources) - 1:
             self.current = 0
             raise StopIteration
@@ -1003,24 +1136,26 @@ class FiniteSource(object):
         with open(filename, "rt") as f:
             # go to POINTS block
             line = f.readline()
-            while 'POINTS' not in line:
+            while "POINTS" not in line:
                 line = f.readline()
 
             npoints = int(line.split()[1])
             sources = []
 
             for _ in np.arange(npoints):
-                lon, lat, dep, stk, dip, area, tinit, dt = \
-                    map(float, f.readline().split())
+                lon, lat, dep, stk, dip, area, tinit, dt = map(
+                    float, f.readline().split()
+                )
 
                 # Convert latitude to a geocentric latitude.
                 lat = elliptic_to_geocentric_latitude(lat)
 
-                rake, slip1, nt1, slip2, nt2, slip3, nt3 = \
-                    map(float, f.readline().split())
+                rake, slip1, nt1, slip2, nt2, slip3, nt3 = map(
+                    float, f.readline().split()
+                )
 
-                dep *= 1e3     # km   > m
-                area *= 1e-4   # cm^2 > m^2
+                dep *= 1e3  # km   > m
+                area *= 1e-4  # cm^2 > m^2
                 slip1 *= 1e-2  # cm   > m
                 slip2 *= 1e-2  # cm   > m
                 # slip3 *= 1e-2  # cm   > m
@@ -1039,8 +1174,18 @@ class FiniteSource(object):
 
                     sources.append(
                         Source.from_strike_dip_rake(
-                            lat, lon, dep, stk, dip, rake, m0,
-                            time_shift=tinit, sliprate=stf, dt=dt))
+                            lat,
+                            lon,
+                            dep,
+                            stk,
+                            dip,
+                            rake,
+                            m0,
+                            time_shift=tinit,
+                            sliprate=stf,
+                            dt=dt,
+                        )
+                    )
 
                 if nt2 > 0:
                     line = f.readline()
@@ -1054,17 +1199,28 @@ class FiniteSource(object):
 
                     sources.append(
                         Source.from_strike_dip_rake(
-                            lat, lon, dep, stk, dip, rake, m0,
-                            time_shift=tinit, sliprate=stf, dt=dt))
+                            lat,
+                            lon,
+                            dep,
+                            stk,
+                            dip,
+                            rake,
+                            m0,
+                            time_shift=tinit,
+                            sliprate=stf,
+                            dt=dt,
+                        )
+                    )
 
                 if nt3 > 0:
-                    raise NotImplementedError('Slip along u3 axis')
+                    raise NotImplementedError("Slip along u3 axis")
 
             return cls(pointsources=sources)
 
     @classmethod
-    def from_usgs_param_file(cls, filename_or_obj, npts=10000, dt=0.1,
-                             trise_min=1.0):
+    def from_usgs_param_file(
+        cls, filename_or_obj, npts=10000, dt=0.1, trise_min=1.0
+    ):
         """
         Initialize a finite source object from a (.param) file available from
         the USGS website
@@ -1108,11 +1264,13 @@ class FiniteSource(object):
         """
         if hasattr(filename_or_obj, "readline"):
             return cls._from_usgs_param_file(
-                fh=filename_or_obj, npts=npts, dt=dt, trise_min=trise_min)
+                fh=filename_or_obj, npts=npts, dt=dt, trise_min=trise_min
+            )
 
         with io.open(filename_or_obj, "rb") as fh:
-            return cls._from_usgs_param_file(fh=fh, npts=npts, dt=dt,
-                                             trise_min=trise_min)
+            return cls._from_usgs_param_file(
+                fh=fh, npts=npts, dt=dt, trise_min=trise_min
+            )
 
     @classmethod
     def _from_usgs_param_file(cls, fh, npts, dt, trise_min):
@@ -1133,18 +1291,29 @@ class FiniteSource(object):
             # got to point source segment
             for line in fh:
                 line = line.decode()
-                if '#Lat. Lon. depth' in line:
+                if "#Lat. Lon. depth" in line:
                     break
 
             # read all point sources until reaching next segment
             for line in fh:
                 line = line.decode()
-                if '#Fault_segment' in line:
+                if "#Fault_segment" in line:
                     break
 
                 # Lat. Lon. depth slip rake strike dip t_rup t_ris t_fal mo
-                (lat, lon, dep, slip, rake, stk, dip, tinit, trise, tfall,
-                    M0) = map(float, line.split())
+                (
+                    lat,
+                    lon,
+                    dep,
+                    slip,
+                    rake,
+                    stk,
+                    dip,
+                    tinit,
+                    trise,
+                    tfall,
+                    M0,
+                ) = map(float, line.split())
 
                 # Negative rupture times are not supported with the current
                 # logic.
@@ -1152,7 +1321,8 @@ class FiniteSource(object):
                     raise USGSParamFileParsingException(
                         "File contains a negative rupture time "
                         "which Instaseis cannot currently deal "
-                        "with.")
+                        "with."
+                    )
 
                 # Calculate the end time.
                 endtime = trise + tfall
@@ -1160,14 +1330,15 @@ class FiniteSource(object):
                     raise USGSParamFileParsingException(
                         "Rise + fall time are longer than the "
                         "total length of calculated slip. "
-                        "Please use more samples.")
+                        "Please use more samples."
+                    )
 
                 # Convert latitude to a geocentric latitude.
                 lat = elliptic_to_geocentric_latitude(lat)
 
-                dep *= 1e3    # km > m
+                dep *= 1e3  # km > m
                 slip *= 1e-2  # cm > m
-                M0 *= 1e-7    # dyn / cm > N * m
+                M0 *= 1e-7  # dyn / cm > N * m
 
                 # These checks also take care of negative times.
                 if trise < trise_min:
@@ -1179,21 +1350,47 @@ class FiniteSource(object):
                 stf = asymmetric_cosine(trise, tfall, npts, dt)
                 sources.append(
                     Source.from_strike_dip_rake(
-                        lat, lon, dep, stk, dip, rake, M0,
-                        time_shift=tinit, sliprate=stf, dt=dt))
+                        lat,
+                        lon,
+                        dep,
+                        stk,
+                        dip,
+                        rake,
+                        M0,
+                        time_shift=tinit,
+                        sliprate=stf,
+                        dt=dt,
+                    )
+                )
 
         if not sources:
             raise USGSParamFileParsingException(
-                "No point sources found in the file.")
+                "No point sources found in the file."
+            )
 
         return cls(pointsources=sources)
 
     @classmethod
     def from_Haskell(  # NOQA
-            self, latitude, longitude, depth_in_m, strike, dip, rake, M0,
-            fault_length, fault_width, rupture_velocity, nl=100, nw=1,
-            trise=1., tfall=None, dt=0.1, planet_radius=6371e3,
-            origin_time=obspy.UTCDateTime(0)):
+        self,
+        latitude,
+        longitude,
+        depth_in_m,
+        strike,
+        dip,
+        rake,
+        M0,
+        fault_length,
+        fault_width,
+        rupture_velocity,
+        nl=100,
+        nw=1,
+        trise=1.0,
+        tfall=None,
+        dt=0.1,
+        planet_radius=6371e3,
+        origin_time=obspy.UTCDateTime(0),
+    ):
         """
         Initialize a source object from a shear source parameterized by strike,
         dip and rake.
@@ -1222,53 +1419,78 @@ class FiniteSource(object):
         sources = []
         nsources = nl * nw
 
-        colatitude = 90. - latitude
+        colatitude = 90.0 - latitude
         longitude_rad = np.radians(longitude)
         # latitude_rad = np.radians(latitude)
         colatitude_rad = np.radians(colatitude)
 
         # centroid in global cartesian coordinates
         centroid_xyz = rotations.coord_transform_lat_lon_depth_to_xyz(
-            latitude, longitude, depth_in_m, planet_radius)
+            latitude, longitude, depth_in_m, planet_radius
+        )
 
         # compute fault vectors and transform to global cartesian system
         l_src, m_src, n_src = fault_vectors_lmn(strike, dip, rake)
         l_xyz = rotations.rotate_vector_xyz_src_to_xyz_earth(
-            l_src, longitude_rad, colatitude_rad)
+            l_src, longitude_rad, colatitude_rad
+        )
         m_xyz = rotations.rotate_vector_xyz_src_to_xyz_earth(
-            m_src, longitude_rad, colatitude_rad)
+            m_src, longitude_rad, colatitude_rad
+        )
         n_xyz = rotations.rotate_vector_xyz_src_to_xyz_earth(
-            n_src, longitude_rad, colatitude_rad)
+            n_src, longitude_rad, colatitude_rad
+        )
 
         # make a mesh centered on patch centers, xi1 and xi2 as defined by Aki
         # and Richards, Fig 10.2
-        xi1, step = np.linspace(-.5 * fault_length, .5 * fault_length, nl,
-                                endpoint=False, retstep=True)
-        xi1 = xi1 + step / 2.
+        xi1, step = np.linspace(
+            -0.5 * fault_length,
+            0.5 * fault_length,
+            nl,
+            endpoint=False,
+            retstep=True,
+        )
+        xi1 = xi1 + step / 2.0
 
-        xi2, step = np.linspace(-.5 * fault_width, .5 * fault_width, nw,
-                                endpoint=False, retstep=True)
-        xi2 = xi2 + step / 2.
+        xi2, step = np.linspace(
+            -0.5 * fault_width,
+            0.5 * fault_width,
+            nw,
+            endpoint=False,
+            retstep=True,
+        )
+        xi2 = xi2 + step / 2.0
 
         xi1_mesh, xi2_mesh = np.meshgrid(xi1, xi2)
         xi1_mesh = xi1_mesh.flatten()
         xi2_mesh = xi2_mesh.flatten()
 
         # create point sources in cartesian coordinates
-        src_xyz = centroid_xyz.repeat(nsources).reshape((3, nsources)) \
-            + np.outer(l_xyz, xi1_mesh) + np.outer(m_xyz, xi2_mesh)
+        src_xyz = (
+            centroid_xyz.repeat(nsources).reshape((3, nsources))
+            + np.outer(l_xyz, xi1_mesh)
+            + np.outer(m_xyz, xi2_mesh)
+        )
 
         # transform to lat, lon, depth
-        src_lat, src_lon, src_depth = \
-            rotations.coord_transform_xyz_to_lat_lon_depth(
-                src_xyz[0, :], src_xyz[1, :], src_xyz[2, :],
-                planet_radius=planet_radius)
-        src_colat = 90. - src_lat
+        (
+            src_lat,
+            src_lon,
+            src_depth,
+        ) = rotations.coord_transform_xyz_to_lat_lon_depth(
+            src_xyz[0, :],
+            src_xyz[1, :],
+            src_xyz[2, :],
+            planet_radius=planet_radius,
+        )
+        src_colat = 90.0 - src_lat
 
         # make sure all points are inside the planet
         if np.any(src_depth < 0):
-            raise ValueError('At least one source point outside planet, '
-                             'maximum height in m: %f' % (-src_depth.min(),))
+            raise ValueError(
+                "At least one source point outside planet, "
+                "maximum height in m: %f" % (-src_depth.min(),)
+            )
 
         # compute time shifts as distance along xi1
         time_shift = xi1_mesh / rupture_velocity
@@ -1286,16 +1508,27 @@ class FiniteSource(object):
             # compute strike dip and rake in the coordinate system of each
             # source point
             l_src = rotations.rotate_vector_xyz_earth_to_xyz_src(
-                l_xyz, np.deg2rad(src_lon[i]), np.deg2rad(src_colat[i]))
+                l_xyz, np.deg2rad(src_lon[i]), np.deg2rad(src_colat[i])
+            )
             n_src = rotations.rotate_vector_xyz_earth_to_xyz_src(
-                n_xyz, np.deg2rad(src_lon[i]), np.deg2rad(src_colat[i]))
+                n_xyz, np.deg2rad(src_lon[i]), np.deg2rad(src_colat[i])
+            )
             strik, dip, rake = strike_dip_rake_from_ln(l_src, n_src)
 
             # initialize point source
             src = Source.from_strike_dip_rake(
-                src_lat[i], src_lon[i], src_depth[i], strike, dip, rake,
-                M0 / nsources, time_shift=time_shift[i],
-                origin_time=origin_time, dt=dt, sliprate=stf)
+                src_lat[i],
+                src_lon[i],
+                src_depth[i],
+                strike,
+                dip,
+                rake,
+                M0 / nsources,
+                time_shift=time_shift[i],
+                origin_time=origin_time,
+                dt=dt,
+                sliprate=stf,
+            )
             sources.append(src)
 
         # return as FiniteSource
@@ -1383,32 +1616,47 @@ class FiniteSource(object):
             # finite_time_shift += ps.time_shift * ps.M0 / finite_m0
 
             mij = rotations.rotate_symm_tensor_voigt_xyz_src_to_xyz_earth(
-                ps.tensor_voigt, np.deg2rad(ps.longitude),
-                np.deg2rad(ps.colatitude))
+                ps.tensor_voigt,
+                np.deg2rad(ps.longitude),
+                np.deg2rad(ps.colatitude),
+            )
             finite_mij += mij
 
             # sum sliprates with time shift applied
             sliprate_f = np.fft.rfft(ps.sliprate, n=nfft)
-            sliprate_f *= np.exp(- 1j * rfftfreq(nfft) *
-                                 2. * np.pi * ps.time_shift / dt)
-            finite_sliprate += np.fft.irfft(sliprate_f)[:nsamp] \
-                * ps.M0 / finite_m0
+            sliprate_f *= np.exp(
+                -1j * rfftfreq(nfft) * 2.0 * np.pi * ps.time_shift / dt
+            )
+            finite_sliprate += (
+                np.fft.irfft(sliprate_f)[:nsamp] * ps.M0 / finite_m0
+            )
 
         longitude = np.rad2deg(np.arctan2(y, x))
         colatitude = np.rad2deg(
-            np.arccos(z / np.sqrt(x ** 2 + y ** 2 + z ** 2)))
+            np.arccos(z / np.sqrt(x ** 2 + y ** 2 + z ** 2))
+        )
         latitude = 90.0 - colatitude
 
         depth_in_m = planet_radius - (x ** 2 + y ** 2 + z ** 2) ** 0.5
 
         finite_mij = rotations.rotate_symm_tensor_voigt_xyz_earth_to_xyz_src(
-            finite_mij, np.deg2rad(longitude), np.deg2rad(colatitude))
+            finite_mij, np.deg2rad(longitude), np.deg2rad(colatitude)
+        )
 
-        self.CMT = Source(latitude, longitude, depth_in_m, m_rr=finite_mij[2],
-                          m_tt=finite_mij[0], m_pp=finite_mij[1],
-                          m_rt=finite_mij[4], m_rp=finite_mij[3],
-                          m_tp=finite_mij[5], time_shift=finite_time_shift,
-                          sliprate=finite_sliprate, dt=dt)
+        self.CMT = Source(
+            latitude,
+            longitude,
+            depth_in_m,
+            m_rr=finite_mij[2],
+            m_tt=finite_mij[0],
+            m_pp=finite_mij[1],
+            m_rt=finite_mij[4],
+            m_rp=finite_mij[3],
+            m_tp=finite_mij[5],
+            time_shift=finite_time_shift,
+            sliprate=finite_sliprate,
+            dt=dt,
+        )
 
     @property
     def M0(self):  # NOQA
@@ -1471,41 +1719,50 @@ class FiniteSource(object):
         return len(self.pointsources)
 
     def __str__(self):
-        if (self.hypocenter_latitude is None and
-                self.hypocenter_longitude) is None:
+        if (
+            self.hypocenter_latitude is None and self.hypocenter_longitude
+        ) is None:
             self.find_hypocenter()
 
-        return_str = 'Instaseis Finite Source:\n'
-        return_str += '\tMoment Magnitude     : %4.2f\n' \
-                      % (self.moment_magnitude)
-        return_str += '\tScalar Moment        : %10.2e Nm\n' \
-                      % (self.M0)
-        return_str += '\t#Point Sources       : %d\n' \
-                      % (self.npointsources)
-        return_str += '\tRupture Duration     : %6.1f s\n' \
-                      % (self.rupture_duration)
-        return_str += '\tTime Shift           : %6.1f s\n' \
-                      % (self.time_shift)
+        return_str = "Instaseis Finite Source:\n"
+        return_str += "\tMoment Magnitude     : %4.2f\n" % (
+            self.moment_magnitude
+        )
+        return_str += "\tScalar Moment        : %10.2e Nm\n" % (self.M0)
+        return_str += "\t#Point Sources       : %d\n" % (self.npointsources)
+        return_str += "\tRupture Duration     : %6.1f s\n" % (
+            self.rupture_duration
+        )
+        return_str += "\tTime Shift           : %6.1f s\n" % (self.time_shift)
 
-        return_str += '\tMin Depth            : %6.1f m\n' \
-                      % (self.min_depth_in_m)
-        return_str += '\tMax Depth            : %6.1f m\n' \
-                      % (self.max_depth_in_m)
-        return_str += '\tHypocenter Depth     : %6.1f m\n' \
-                      % (self.max_depth_in_m)
+        return_str += "\tMin Depth            : %6.1f m\n" % (
+            self.min_depth_in_m
+        )
+        return_str += "\tMax Depth            : %6.1f m\n" % (
+            self.max_depth_in_m
+        )
+        return_str += "\tHypocenter Depth     : %6.1f m\n" % (
+            self.max_depth_in_m
+        )
 
-        return_str += '\tMin Latitude         : %6.1f deg\n' \
-                      % (self.min_latitude)
-        return_str += '\tMax Latitude         : %6.1f deg\n' \
-                      % (self.max_latitude)
-        return_str += '\tHypocenter Latitude  : %6.1f deg\n' \
-                      % (self.hypocenter_latitude)
+        return_str += "\tMin Latitude         : %6.1f deg\n" % (
+            self.min_latitude
+        )
+        return_str += "\tMax Latitude         : %6.1f deg\n" % (
+            self.max_latitude
+        )
+        return_str += "\tHypocenter Latitude  : %6.1f deg\n" % (
+            self.hypocenter_latitude
+        )
 
-        return_str += '\tMin Longitude        : %6.1f deg\n' \
-                      % (self.min_longitude)
-        return_str += '\tMax Longitude        : %6.1f deg\n' \
-                      % (self.max_longitude)
-        return_str += '\tHypocenter Longitude : %6.1f deg\n' \
-                      % (self.hypocenter_longitude)
+        return_str += "\tMin Longitude        : %6.1f deg\n" % (
+            self.min_longitude
+        )
+        return_str += "\tMax Longitude        : %6.1f deg\n" % (
+            self.max_longitude
+        )
+        return_str += "\tHypocenter Longitude : %6.1f deg\n" % (
+            self.hypocenter_longitude
+        )
 
         return return_str

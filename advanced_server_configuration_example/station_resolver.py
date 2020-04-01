@@ -79,19 +79,21 @@ def parse_station_file(filename):
     c = conn.cursor()
 
     # Create table
-    c.execute('''
+    c.execute(
+        """
     CREATE TABLE coordinates (
         network text COLLATE NOCASE,
         station text COLLATE NOCASE,
         latitude real,
         longitude real
     );
-    ''')
-    c.execute('CREATE INDEX network_index ON coordinates(network);')
-    c.execute('CREATE INDEX station_index ON coordinates(station);')
+    """
+    )
+    c.execute("CREATE INDEX network_index ON coordinates(network);")
+    c.execute("CREATE INDEX station_index ON coordinates(station);")
 
-    with io.open(filename, mode='rt', newline='') as csvfile:
-        stationreader = csv.reader(csvfile, delimiter='|')
+    with io.open(filename, mode="rt", newline="") as csvfile:
+        stationreader = csv.reader(csvfile, delimiter="|")
         # Skip header.
         next(stationreader, None)
         # Create a dictionary as a cheap way to ensure a unique network +
@@ -100,11 +102,14 @@ def parse_station_file(filename):
         # which is probably what we want.
         stations = {(i[0], i[1]): i[:4] for i in stationreader}
         # Put into database
-        c.executemany('''
+        c.executemany(
+            """
         INSERT INTO coordinates
             ('network', 'station', 'latitude', 'longitude')
             VALUES (?, ?, ?, ?);
-        ''', (i[:4] for i in stations.values()))
+        """,
+            (i[:4] for i in stations.values()),
+        )
         conn.commit()
 
     return conn, c
@@ -133,22 +138,30 @@ def get_coordinates(cursor, networks=(), stations=(), debug=False):
 
     if network_queries:
         query = query + " ({network_queries})".format(
-            network_queries=" OR ".join(network_queries))
+            network_queries=" OR ".join(network_queries)
+        )
 
     if network_queries and station_queries:
         query += " AND"
 
     if station_queries:
         query = query + " ({station_queries})".format(
-            station_queries=" OR ".join(station_queries))
+            station_queries=" OR ".join(station_queries)
+        )
 
     if debug:
         print("Constructed query: %s" % query)
 
     # Convert to geocentric coordinates.
-    return [{"network": i[0], "station": i[1],
-             "latitude": elliptic_to_geocentric_latitude(i[2]), "longitude": i[3]}
-            for i in cursor.execute(query).fetchall()]
+    return [
+        {
+            "network": i[0],
+            "station": i[1],
+            "latitude": elliptic_to_geocentric_latitude(i[2]),
+            "longitude": i[3],
+        }
+        for i in cursor.execute(query).fetchall()
+    ]
 
 
 if __name__ == "__main__":
@@ -157,11 +170,11 @@ if __name__ == "__main__":
     FILENAME = "station_list.txt"
     conn, cursor = parse_station_file(FILENAME)
 
-    coords = get_coordinates(cursor,
-                             networks=["I*", "T?", "GR"],
-                             stations=["A*"],
-                             debug=True)
+    coords = get_coordinates(
+        cursor, networks=["I*", "T?", "GR"], stations=["A*"], debug=True
+    )
     conn.close()
 
     import pprint
+
     pprint.pprint(coords)

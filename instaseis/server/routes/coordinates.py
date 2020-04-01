@@ -16,8 +16,7 @@ class CoordinatesHandler(InstaseisRequestHandler):
     def get(self):
         if self.application.station_coordinates_callback is None:
             msg = "Server does not support station coordinates."
-            raise tornado.web.HTTPError(
-                404, log_message=msg, reason=msg)
+            raise tornado.web.HTTPError(404, log_message=msg, reason=msg)
 
         networks = self.get_argument("network", [])
         stations = self.get_argument("station", [])
@@ -25,19 +24,18 @@ class CoordinatesHandler(InstaseisRequestHandler):
         # Manually raise to get prettier errors.
         if not networks or not stations:
             msg = "Parameters 'network' and 'station' must be given."
-            raise tornado.web.HTTPError(
-                400, log_message=msg, reason=msg)
+            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
         networks = networks.split(",")
         stations = stations.split(",")
 
         coordinates = self.application.station_coordinates_callback(
-            networks=networks, stations=stations)
+            networks=networks, stations=stations
+        )
 
         if not coordinates:
             msg = "No coordinates found satisfying the query."
-            raise tornado.web.HTTPError(
-                404, log_message=msg, reason=msg)
+            raise tornado.web.HTTPError(404, log_message=msg, reason=msg)
 
         features = []
         for station in coordinates:
@@ -46,13 +44,15 @@ class CoordinatesHandler(InstaseisRequestHandler):
                     "type": "Feature",
                     "geometry": {
                         "type": "Point",
-                        "coordinates": [station["longitude"],
-                                        station["latitude"]]
+                        "coordinates": [
+                            station["longitude"],
+                            station["latitude"],
+                        ],
                     },
                     "properties": {
                         "network_code": station["network"],
-                        "station_code": station["station"]
-                    }
+                        "station_code": station["station"],
+                    },
                 }
             )
 

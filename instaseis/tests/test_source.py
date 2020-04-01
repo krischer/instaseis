@@ -15,12 +15,20 @@ import os
 import numpy as np
 import pytest
 
-from instaseis import (Source, FiniteSource, Receiver, SourceParseError,
-                       ForceSource)
+from instaseis import (
+    Source,
+    FiniteSource,
+    Receiver,
+    SourceParseError,
+    ForceSource,
+)
 from instaseis.helpers import elliptic_to_geocentric_latitude
 from instaseis.source import moment2magnitude, magnitude2moment
-from instaseis.source import (fault_vectors_lmn, strike_dip_rake_from_ln,
-                              USGSParamFileParsingException)
+from instaseis.source import (
+    fault_vectors_lmn,
+    strike_dip_rake_from_ln,
+    USGSParamFileParsingException,
+)
 
 DATA = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 EVENT_FILE = os.path.join(DATA, "GCMT_event_STRAIT_OF_GIBRALTAR.xml")
@@ -49,7 +57,8 @@ def test_parse_cmtsolutions_file(tmpdir):
         "Mpp:      -4.740000e+24",
         "Mrt:       3.990000e+23",
         "Mrp:      -8.050000e+23",
-        "Mtp:      -1.230000e+24")
+        "Mtp:      -1.230000e+24",
+    )
     with open(filename, "wt") as fh:
         fh.write("\n".join(lines))
 
@@ -58,15 +67,39 @@ def test_parse_cmtsolutions_file(tmpdir):
     origin_time = obspy.UTCDateTime(2011, 8, 23, 17, 51, 5.6)
 
     src = Source.parse(filename)
-    src_params = np.array([src.latitude, src.longitude, src.depth_in_m,
-                           src.m_rr, src.m_tt, src.m_pp, src.m_rt, src.m_rp,
-                           src.m_tp], dtype="float64")
+    src_params = np.array(
+        [
+            src.latitude,
+            src.longitude,
+            src.depth_in_m,
+            src.m_rr,
+            src.m_tt,
+            src.m_pp,
+            src.m_rt,
+            src.m_rp,
+            src.m_tp,
+        ],
+        dtype="float64",
+    )
     # Latitude will have assumed to be WGS84 and converted to geocentric
     # latitude. The import machinery should do that.
-    np.testing.assert_allclose(src_params, np.array(
-        (elliptic_to_geocentric_latitude(37.91), -77.93, 12000, 4.71E17,
-         3.81E15, -4.74E17, 3.99E16, -8.05E16,
-         -1.23E17), dtype="float64"))
+    np.testing.assert_allclose(
+        src_params,
+        np.array(
+            (
+                elliptic_to_geocentric_latitude(37.91),
+                -77.93,
+                12000,
+                4.71e17,
+                3.81e15,
+                -4.74e17,
+                3.99e16,
+                -8.05e16,
+                -1.23e17,
+            ),
+            dtype="float64",
+        ),
+    )
     assert src.origin_time == origin_time
 
 
@@ -75,10 +108,27 @@ def _assert_src(src):
     We constantly test the same event in various configurations.
     """
     # Latitude will have been assumed to be WGS84 and converted to geocentric!
-    assert (src.latitude, src.longitude, src.depth_in_m, src.m_rr, src.m_tt,
-            src.m_pp, src.m_rt, src.m_rp, src.m_tp) == \
-           (elliptic_to_geocentric_latitude(36.97), -3.54, 609800.0, -2.16E18,
-            5.36E17, 1.62E18, 1.3E16, 3.23E18, 1.75E18)
+    assert (
+        src.latitude,
+        src.longitude,
+        src.depth_in_m,
+        src.m_rr,
+        src.m_tt,
+        src.m_pp,
+        src.m_rt,
+        src.m_rp,
+        src.m_tp,
+    ) == (
+        elliptic_to_geocentric_latitude(36.97),
+        -3.54,
+        609800.0,
+        -2.16e18,
+        5.36e17,
+        1.62e18,
+        1.3e16,
+        3.23e18,
+        1.75e18,
+    )
 
     # Also check the time!
     assert src.origin_time == obspy.UTCDateTime("2010-04-11T22:08:12.800000Z")
@@ -109,25 +159,57 @@ def test_parse_srf_file(tmpdir):
     """
     finitesource = FiniteSource.from_srf_file(SRF_FILE, True)
     assert finitesource.npointsources == 10
-    longitudes = np.array([0.0, 0.99925, 1.99849, 2.99774, 3.99698, 4.99623,
-                           5.99548, 6.99472, 7.99397, 8.99322])
+    longitudes = np.array(
+        [
+            0.0,
+            0.99925,
+            1.99849,
+            2.99774,
+            3.99698,
+            4.99623,
+            5.99548,
+            6.99472,
+            7.99397,
+            8.99322,
+        ]
+    )
 
     for isrc, src in enumerate(finitesource):
-        src_params = np.array([src.latitude, src.longitude, src.depth_in_m,
-                               src.m_rr, src.m_tt, src.m_pp, src.m_rt,
-                               src.m_rp, src.m_tp], dtype="float64")
+        src_params = np.array(
+            [
+                src.latitude,
+                src.longitude,
+                src.depth_in_m,
+                src.m_rr,
+                src.m_tt,
+                src.m_pp,
+                src.m_rt,
+                src.m_rp,
+                src.m_tp,
+            ],
+            dtype="float64",
+        )
 
-        src_params_ref = np.array([
-            0.00000000e+00, longitudes[isrc], 5.00000000e+04, 0.00000000e+00,
-            -3.91886976e+03, 3.91886976e+03, -1.19980783e-13, 1.95943488e+03,
-            3.20000000e+19])
+        src_params_ref = np.array(
+            [
+                0.00000000e00,
+                longitudes[isrc],
+                5.00000000e04,
+                0.00000000e00,
+                -3.91886976e03,
+                3.91886976e03,
+                -1.19980783e-13,
+                1.95943488e03,
+                3.20000000e19,
+            ]
+        )
         np.testing.assert_allclose(src_params, src_params_ref)
 
     # Try parsing it again, but this time with a couple of empty lines in
     # front of it.
     filename = os.path.join(tmpdir.strpath, "temp.srf")
     with io.open(SRF_FILE, "rt") as fh_1, io.open(filename, "wt") as fh_2:
-        fh_2.write(u"\n\n\n\n")
+        fh_2.write("\n\n\n\n")
         fh_2.write(fh_1.read())
     finitesource_2 = FiniteSource.from_srf_file(filename, True)
     assert finitesource_2.npointsources == 10
@@ -140,7 +222,7 @@ def test_parsing_empty_usgs_file():
     with pytest.raises(USGSParamFileParsingException) as e:
         FiniteSource.from_usgs_param_file(USGS_PARAM_FILE_EMPTY)
 
-    assert e.value.args[0] == 'No point sources found in the file.'
+    assert e.value.args[0] == "No point sources found in the file."
 
 
 def test_parse_usgs_param_file():
@@ -149,14 +231,14 @@ def test_parse_usgs_param_file():
     """
     # single segment file
     finitesource = FiniteSource.from_usgs_param_file(USGS_PARAM_FILE1)
-    np.testing.assert_almost_equal(finitesource.moment_magnitude,
-                                   7.87077609)
+    np.testing.assert_almost_equal(finitesource.moment_magnitude, 7.87077609)
     assert finitesource.npointsources == 121
 
     # multi segment file
     finitesource = FiniteSource.from_usgs_param_file(USGS_PARAM_FILE2)
-    np.testing.assert_almost_equal(finitesource.moment_magnitude,
-                                   8.1974653082088)
+    np.testing.assert_almost_equal(
+        finitesource.moment_magnitude, 8.1974653082088
+    )
     assert finitesource.npointsources == 400
 
 
@@ -166,28 +248,30 @@ def test_parse_usgs_param_file_from_bytes_io_and_open_files():
     """
     with io.open(USGS_PARAM_FILE1, "rb") as fh:
         finitesource = FiniteSource.from_usgs_param_file(fh)
-    np.testing.assert_almost_equal(finitesource.moment_magnitude,
-                                   7.8707760910429236)
+    np.testing.assert_almost_equal(
+        finitesource.moment_magnitude, 7.8707760910429236
+    )
     assert finitesource.npointsources == 121
 
     with io.open(USGS_PARAM_FILE1, "rb") as fh:
         with io.BytesIO(fh.read()) as buf:
             finitesource = FiniteSource.from_usgs_param_file(buf)
-    np.testing.assert_almost_equal(finitesource.moment_magnitude,
-                                   7.87077609)
+    np.testing.assert_almost_equal(finitesource.moment_magnitude, 7.87077609)
     assert finitesource.npointsources == 121
 
     with io.open(USGS_PARAM_FILE2, "rb") as fh:
         finitesource = FiniteSource.from_usgs_param_file(fh)
-    np.testing.assert_almost_equal(finitesource.moment_magnitude,
-                                   8.1974653082088)
+    np.testing.assert_almost_equal(
+        finitesource.moment_magnitude, 8.1974653082088
+    )
     assert finitesource.npointsources == 400
 
     with io.open(USGS_PARAM_FILE2, "rb") as fh:
         with io.BytesIO(fh.read()) as buf:
             finitesource = FiniteSource.from_usgs_param_file(buf)
-    np.testing.assert_almost_equal(finitesource.moment_magnitude,
-                                   8.19746530820887)
+    np.testing.assert_almost_equal(
+        finitesource.moment_magnitude, 8.19746530820887
+    )
     assert finitesource.npointsources == 400
 
 
@@ -195,32 +279,68 @@ def test_haskell():
     """
     Tests Haskell source.
     """
-    latitude, longitude, depth_in_m = 89.9999, 0., 10000.
-    strike, dip, rake = 90., 90., 0.
+    latitude, longitude, depth_in_m = 89.9999, 0.0, 10000.0
+    strike, dip, rake = 90.0, 90.0, 0.0
     M0 = 1e20  # NOQA
-    fault_length, fault_width = 1000e3, 200.
-    rupture_velocity = 1000.
+    fault_length, fault_width = 1000e3, 200.0
+    rupture_velocity = 1000.0
     nl, nw = 3, 3
     finitesource = FiniteSource.from_Haskell(
-        latitude, longitude, depth_in_m, strike, dip, rake, M0, fault_length,
-        fault_width, rupture_velocity, nl=nl, nw=nw)
-    np.testing.assert_almost_equal(finitesource.moment_magnitude,
-                                   7.26666666666)
+        latitude,
+        longitude,
+        depth_in_m,
+        strike,
+        dip,
+        rake,
+        M0,
+        fault_length,
+        fault_width,
+        rupture_velocity,
+        nl=nl,
+        nw=nw,
+    )
+    np.testing.assert_almost_equal(
+        finitesource.moment_magnitude, 7.26666666666
+    )
 
     # Should raise an error if above ground.
     with pytest.raises(ValueError) as err:
         FiniteSource.from_Haskell(
-            latitude, longitude, -100.0, strike, dip, rake, M0,
+            latitude,
+            longitude,
+            -100.0,
+            strike,
+            dip,
+            rake,
+            M0,
             fault_length,
-            fault_width, rupture_velocity, nl=nl, nw=nw)
+            fault_width,
+            rupture_velocity,
+            nl=nl,
+            nw=nw,
+        )
     assert err.value.args[0].startswith("At least one source point outside")
 
     # Manually settings trise and tfall.
     finitesource = FiniteSource.from_Haskell(
-        latitude, longitude, depth_in_m, strike, dip, rake, M0, fault_length,
-        fault_width, rupture_velocity, nl=nl, nw=nw, trise=1.0, tfall=1.0)
-    np.testing.assert_almost_equal(finitesource.moment_magnitude,
-                                   7.26666666666666666)
+        latitude,
+        longitude,
+        depth_in_m,
+        strike,
+        dip,
+        rake,
+        M0,
+        fault_length,
+        fault_width,
+        rupture_velocity,
+        nl=nl,
+        nw=nw,
+        trise=1.0,
+        tfall=1.0,
+    )
+    np.testing.assert_almost_equal(
+        finitesource.moment_magnitude, 7.26666666666666666
+    )
 
 
 def test_resample_stf():
@@ -228,12 +348,22 @@ def test_resample_stf():
     Tests resampling sliprates
     """
     finitesource = FiniteSource.from_srf_file(SRF_FILE, True)
-    finitesource.resample_sliprate(dt=1., nsamp=10)
+    finitesource.resample_sliprate(dt=1.0, nsamp=10)
 
-    stf_ref = np.array([
-        0.00000000e+00, 1.60000000e-05, 3.20000000e-05, 4.80000000e-05,
-        6.40000000e-05, 8.00000000e-05, 1.84000000e-04, 2.88000000e-04,
-        3.92000000e-04, 4.96000000e-04])
+    stf_ref = np.array(
+        [
+            0.00000000e00,
+            1.60000000e-05,
+            3.20000000e-05,
+            4.80000000e-05,
+            6.40000000e-05,
+            8.00000000e-05,
+            1.84000000e-04,
+            2.88000000e-04,
+            3.92000000e-04,
+            4.96000000e-04,
+        ]
+    )
 
     for isrc, src in enumerate(finitesource):
         np.testing.assert_allclose(stf_ref, src.sliprate)
@@ -276,11 +406,11 @@ def test_m0():
     """
     Tests computation of scalar Moment.
     """
-    strike = 10.
-    dip = 20.
-    rake = 30.
+    strike = 10.0
+    dip = 20.0
+    rake = 30.0
     m0 = 1e16
-    source = Source.from_strike_dip_rake(0., 0., 0., strike, dip, rake, m0)
+    source = Source.from_strike_dip_rake(0.0, 0.0, 0.0, strike, dip, rake, m0)
 
     assert source.M0 == m0
 
@@ -314,45 +444,61 @@ def test_cmt_finite_source():
     finitesource.compute_centroid()
 
     np.testing.assert_allclose(
-        np.array([-3.918870e+04, 3.909051e+04, 9.819052e+01,
-                  1.942254e+04, -5.476000e+03, 3.195987e+20]),
-        finitesource.CMT.tensor_voigt, rtol=1E-5)
+        np.array(
+            [
+                -3.918870e04,
+                3.909051e04,
+                9.819052e01,
+                1.942254e04,
+                -5.476000e03,
+                3.195987e20,
+            ]
+        ),
+        finitesource.CMT.tensor_voigt,
+        rtol=1e-5,
+    )
 
-    np.testing.assert_allclose(np.array([finitesource.CMT.latitude]),
-                               np.array([0.0]))
-    np.testing.assert_allclose(np.array([finitesource.CMT.longitude]),
-                               np.array([4.496608]))
+    np.testing.assert_allclose(
+        np.array([finitesource.CMT.latitude]), np.array([0.0])
+    )
+    np.testing.assert_allclose(
+        np.array([finitesource.CMT.longitude]), np.array([4.496608])
+    )
 
 
 def test_fault_vectors_lmn():
     """
     Tests computation of fault vectors l, m and n
     """
-    strike, dip, rake = 35., 70., 17.
+    strike, dip, rake = 35.0, 70.0, 17.0
     l, m, n = fault_vectors_lmn(strike, dip, rake)
 
     # vectors should be perpendicular
-    np.testing.assert_allclose(np.array([np.dot(l, n)]),
-                               np.array([0.0]), atol=1e-15)
-    np.testing.assert_allclose(np.array([np.dot(l, m)]),
-                               np.array([0.0]), atol=1e-15)
-    np.testing.assert_allclose(np.array([np.dot(m, n)]),
-                               np.array([0.0]), atol=1e-15)
+    np.testing.assert_allclose(
+        np.array([np.dot(l, n)]), np.array([0.0]), atol=1e-15
+    )
+    np.testing.assert_allclose(
+        np.array([np.dot(l, m)]), np.array([0.0]), atol=1e-15
+    )
+    np.testing.assert_allclose(
+        np.array([np.dot(m, n)]), np.array([0.0]), atol=1e-15
+    )
 
     np.testing.assert_allclose(np.cross(n, l), m, atol=1e-15)
 
     # vectors should be normalized
-    np.testing.assert_allclose(np.array([1.0]), (l**2).sum())
-    np.testing.assert_allclose(np.array([1.0]), (m**2).sum())
-    np.testing.assert_allclose(np.array([1.0]), (n**2).sum())
+    np.testing.assert_allclose(np.array([1.0]), (l ** 2).sum())
+    np.testing.assert_allclose(np.array([1.0]), (m ** 2).sum())
+    np.testing.assert_allclose(np.array([1.0]), (n ** 2).sum())
 
 
 def test_strike_dip_rake_from_ln():
     """
     Tests computation of strike dip and rake from fault vectors l and n
     """
-    for strike, dip, rake in zip((42., 180., -140.), (22., 0., 90.),
-                                 (17., 32., 120.)):
+    for strike, dip, rake in zip(
+        (42.0, 180.0, -140.0), (22.0, 0.0, 90.0), (17.0, 32.0, 120.0)
+    ):
         l, m, n = fault_vectors_lmn(strike, dip, rake)
         s, d, r = strike_dip_rake_from_ln(l, n)
 
@@ -461,9 +607,11 @@ def test_sliprate_convenience_methods():
 
     src = Source(latitude=0.0, longitude=90.0)
     src.set_sliprate_lp(2.0, 5, 0.1)
-    np.testing.assert_allclose(np.array(
-        [0.023291, 0.111382, 0.211022, 0.186723, 0.045481]), src.sliprate,
-        rtol=1E-3)
+    np.testing.assert_allclose(
+        np.array([0.023291, 0.111382, 0.211022, 0.186723, 0.045481]),
+        src.sliprate,
+        rtol=1e-3,
+    )
 
     src = Source(latitude=0.0, longitude=90.0)
     src.sliprate = np.ones(5)
@@ -484,9 +632,11 @@ def test_sliprate_convenience_methods_finite_source():
     src = Source(latitude=0.0, longitude=90.0)
     fs = FiniteSource(pointsources=[src])
     fs.set_sliprate_lp(2.0, 5, 0.1)
-    np.testing.assert_allclose(np.array(
-        [0.023291, 0.111382, 0.211022, 0.186723, 0.045481]), src.sliprate,
-        rtol=1E-3)
+    np.testing.assert_allclose(
+        np.array([0.023291, 0.111382, 0.211022, 0.186723, 0.045481]),
+        src.sliprate,
+        rtol=1e-3,
+    )
 
     src = Source(latitude=0.0, longitude=90.0)
     src.sliprate = np.ones(5)
@@ -506,9 +656,11 @@ def test_sliprate_convenience_methods_force_source():
 
     src = ForceSource(latitude=0.0, longitude=90.0)
     src.set_sliprate_lp(2.0, 5, 0.1)
-    np.testing.assert_allclose(np.array(
-        [0.023291, 0.111382, 0.211022, 0.186723, 0.045481]), src.sliprate,
-        rtol=1E-3)
+    np.testing.assert_allclose(
+        np.array([0.023291, 0.111382, 0.211022, 0.186723, 0.045481]),
+        src.sliprate,
+        rtol=1e-3,
+    )
 
     src = ForceSource(latitude=0.0, longitude=90.0)
     src.sliprate = np.ones(5)
@@ -532,7 +684,8 @@ def test_str_method_of_src():
         "\tMpp              :   0.00e+00 Nm\n"
         "\tMrt              :   0.00e+00 Nm\n"
         "\tMrp              :   0.00e+00 Nm\n"
-        "\tMtp              :   0.00e+00 Nm\n")
+        "\tMtp              :   0.00e+00 Nm\n"
+    )
 
 
 def test_str_method_of_force_source():
@@ -544,27 +697,28 @@ def test_str_method_of_force_source():
         "\tLatitude  :    0.0 deg\n"
         "\tFr        :   1.00e+00 N\n"
         "\tFt        :   2.00e+00 N\n"
-        "\tFp        :   3.00e+00 N\n")
+        "\tFp        :   3.00e+00 N\n"
+    )
 
 
 def test_str_method_of_finite_source():
     finitesource = FiniteSource.from_srf_file(SRF_FILE, True)
     assert str(finitesource) == (
-            "Instaseis Finite Source:\n"
-            "\tMoment Magnitude     : 7.60\n"
-            "\tScalar Moment        :   3.20e+20 Nm\n"
-            "\t#Point Sources       : 10\n"
-            "\tRupture Duration     :  222.2 s\n"
-            "\tTime Shift           :    0.0 s\n"
-            "\tMin Depth            : 50000.0 m\n"
-            "\tMax Depth            : 50000.0 m\n"
-            "\tHypocenter Depth     : 50000.0 m\n"
-            "\tMin Latitude         :    0.0 deg\n"
-            "\tMax Latitude         :    0.0 deg\n"
-            "\tHypocenter Latitude  :    0.0 deg\n"
-            "\tMin Longitude        :    0.0 deg\n"
-            "\tMax Longitude        :    9.0 deg\n"
-            "\tHypocenter Longitude :    0.0 deg\n"
+        "Instaseis Finite Source:\n"
+        "\tMoment Magnitude     : 7.60\n"
+        "\tScalar Moment        :   3.20e+20 Nm\n"
+        "\t#Point Sources       : 10\n"
+        "\tRupture Duration     :  222.2 s\n"
+        "\tTime Shift           :    0.0 s\n"
+        "\tMin Depth            : 50000.0 m\n"
+        "\tMax Depth            : 50000.0 m\n"
+        "\tHypocenter Depth     : 50000.0 m\n"
+        "\tMin Latitude         :    0.0 deg\n"
+        "\tMax Latitude         :    0.0 deg\n"
+        "\tHypocenter Latitude  :    0.0 deg\n"
+        "\tMin Longitude        :    0.0 deg\n"
+        "\tMax Longitude        :    9.0 deg\n"
+        "\tHypocenter Longitude :    0.0 deg\n"
     )
 
 
@@ -604,9 +758,15 @@ def test_print_regressions():
     Guard against a regression for printing a source object.
     """
     src = Source.from_strike_dip_rake(
-        latitude=27.77, longitude=85.37, depth_in_m=12000.0,
-        M0=1e+21, strike=32., dip=62., rake=90.)
-    assert(str(src)) == (
+        latitude=27.77,
+        longitude=85.37,
+        depth_in_m=12000.0,
+        M0=1e21,
+        strike=32.0,
+        dip=62.0,
+        rake=90.0,
+    )
+    assert (str(src)) == (
         "Instaseis Source:\n"
         "\tOrigin Time      : 1970-01-01T00:00:00.000000Z\n"
         "\tLongitude        :   85.4 deg\n"
@@ -619,4 +779,5 @@ def test_print_regressions():
         "\tMpp              :  -5.96e+20 Nm\n"
         "\tMrt              :   2.96e+20 Nm\n"
         "\tMrp              :   4.74e+20 Nm\n"
-        "\tMtp              :  -3.73e+20 Nm\n")
+        "\tMtp              :  -3.73e+20 Nm\n"
+    )

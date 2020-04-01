@@ -18,21 +18,30 @@ class TravelTimeHandler(InstaseisRequestHandler):
     def get(self):
         if self.application.travel_time_callback is None:
             msg = "Server does not support travel time calculations."
-            raise tornado.web.HTTPError(
-                404, log_message=msg, reason=msg)
+            raise tornado.web.HTTPError(404, log_message=msg, reason=msg)
 
         required_parameters = (
-            "sourcelatitude", "sourcelongitude", "sourcedepthinmeters",
-            "receiverlatitude", "receiverlongitude", "receiverdepthinmeters",
-            "phases")
+            "sourcelatitude",
+            "sourcelongitude",
+            "sourcedepthinmeters",
+            "receiverlatitude",
+            "receiverlongitude",
+            "receiverdepthinmeters",
+            "phases",
+        )
 
-        missing_parameters = sorted([_i for _i in required_parameters
-                                     if _i not in self.request.arguments])
+        missing_parameters = sorted(
+            [
+                _i
+                for _i in required_parameters
+                if _i not in self.request.arguments
+            ]
+        )
         if missing_parameters:
             msg = "The following required parameters are missing: %s" % (
-                ", ".join("'%s'" % _i for _i in missing_parameters))
-            raise tornado.web.HTTPError(
-                400, log_message=msg, reason=msg)
+                ", ".join("'%s'" % _i for _i in missing_parameters)
+            )
+            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
         # Preserve order.
         all_phases = collections.OrderedDict()
@@ -40,20 +49,25 @@ class TravelTimeHandler(InstaseisRequestHandler):
         for p in self.get_argument("phases").split(","):
             try:
                 tt = self.application.travel_time_callback(
-                    sourcelatitude=float(
-                        self.get_argument("sourcelatitude")),
+                    sourcelatitude=float(self.get_argument("sourcelatitude")),
                     sourcelongitude=float(
-                        self.get_argument("sourcelongitude")),
+                        self.get_argument("sourcelongitude")
+                    ),
                     sourcedepthinmeters=float(
-                        self.get_argument("sourcedepthinmeters")),
+                        self.get_argument("sourcedepthinmeters")
+                    ),
                     receiverlatitude=float(
-                        self.get_argument("receiverlatitude")),
+                        self.get_argument("receiverlatitude")
+                    ),
                     receiverlongitude=float(
-                        self.get_argument("receiverlongitude")),
+                        self.get_argument("receiverlongitude")
+                    ),
                     receiverdepthinmeters=float(
-                        self.get_argument("receiverdepthinmeters")),
+                        self.get_argument("receiverdepthinmeters")
+                    ),
                     phase_name=p,
-                    db_info=self.application.db.info)
+                    db_info=self.application.db.info,
+                )
                 if tt:
                     all_phases[p] = tt
             except ValueError as e:
@@ -65,8 +79,7 @@ class TravelTimeHandler(InstaseisRequestHandler):
                 raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
         if not all_phases:
-            msg = \
-                "No ray for the given geometry and any of the phases found."
+            msg = "No ray for the given geometry and any of the phases found."
             raise tornado.web.HTTPError(404, log_message=msg, reason=msg)
 
         self.write({"travel_times": all_phases})

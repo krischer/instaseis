@@ -13,8 +13,5 @@ from ... import __version__
 
 class IndexHandler(InstaseisRequestHandler):
     def get(self):
-        response = {
-            "type": "Instaseis Remote Server",
-            "version": __version__
-        }
+        response = {"type": "Instaseis Remote Server", "version": __version__}
         self.write(response)

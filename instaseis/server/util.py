@@ -39,6 +39,7 @@ class IOQueue(object):
     loop. This enables the server to send unbounded zipfiles without running
     into memory issues.
     """
+
     def __init__(self):
         self.count = 0
         self.data = []
@@ -80,10 +81,7 @@ def _validtimesetting(value):
     else:
         offset = -float(m.group(3))
 
-    return {
-        "phase": m.group(1),
-        "offset": offset
-    }
+    return {"phase": m.group(1), "offset": offset}
 
 
 def _format_utc_datetime(dt):
@@ -94,8 +92,9 @@ def _format_utc_datetime(dt):
     return dt.datetime.isoformat() + "Z"
 
 
-def _validate_and_write_waveforms(st, starttime, endtime, scale,
-                                  source, receiver, db, label, format):
+def _validate_and_write_waveforms(
+    st, starttime, endtime, scale, source, receiver, db, label, format
+):
     if not label:
         label = ""
     else:
@@ -112,15 +111,21 @@ def _validate_and_write_waveforms(st, starttime, endtime, scale,
     # Sanity checks. Raise internal server errors in case something fails.
     # This should not happen and should have been caught before.
     if endtime > st[0].stats.endtime:
-        msg = ("Endtime larger than the extracted endtime: endtime=%s, "
-               "largest db endtime=%s" % (
+        msg = (
+            "Endtime larger than the extracted endtime: endtime=%s, "
+            "largest db endtime=%s"
+            % (
                 _format_utc_datetime(endtime),
-                _format_utc_datetime(st[0].stats.endtime)))
+                _format_utc_datetime(st[0].stats.endtime),
+            )
+        )
         return tornado.web.HTTPError(500, log_message=msg, reason=msg), None
 
     if starttime < st[0].stats.starttime - 3600.0:
-        msg = ("Starttime more than one hour before the starttime of the "
-               "seismograms.")
+        msg = (
+            "Starttime more than one hour before the starttime of the "
+            "seismograms."
+        )
         return tornado.web.HTTPError(500, log_message=msg, reason=msg), None
 
     if isinstance(source, FiniteSource):
@@ -148,13 +153,15 @@ def _validate_and_write_waveforms(st, starttime, endtime, scale,
             tr.stats.sac = obspy.core.AttribDict()
             # Write WGS84 coordinates to the SAC files.
             tr.stats.sac.stla = geocentric_to_elliptic_latitude(
-                receiver.latitude)
+                receiver.latitude
+            )
             tr.stats.sac.stlo = receiver.longitude
             tr.stats.sac.stdp = receiver.depth_in_m
             tr.stats.sac.stel = 0.0
             if isinstance(source, FiniteSource):
                 tr.stats.sac.evla = geocentric_to_elliptic_latitude(
-                    source.hypocenter_latitude)
+                    source.hypocenter_latitude
+                )
                 tr.stats.sac.evlo = source.hypocenter_longitude
                 tr.stats.sac.evdp = source.hypocenter_depth_in_m
                 # Force source has no magnitude.
@@ -164,7 +171,8 @@ def _validate_and_write_waveforms(st, starttime, endtime, scale,
                 src_lng = source.hypocenter_longitude
             else:
                 tr.stats.sac.evla = geocentric_to_elliptic_latitude(
-                    source.latitude)
+                    source.latitude
+                )
                 tr.stats.sac.evlo = source.longitude
                 tr.stats.sac.evdp = source.depth_in_m
                 # Force source has no magnitude.
@@ -184,7 +192,8 @@ def _validate_and_write_waveforms(st, starttime, endtime, scale,
                 lat1=tr.stats.sac.evla,
                 lon1=tr.stats.sac.evlo,
                 lat2=tr.stats.sac.stla,
-                lon2=tr.stats.sac.stlo)
+                lon2=tr.stats.sac.stlo,
+            )
 
             tr.stats.sac.dist = dist_in_m / 1000.0
             tr.stats.sac.az = az
@@ -196,7 +205,8 @@ def _validate_and_write_waveforms(st, starttime, endtime, scale,
                 lat1=src_lat,
                 long1=src_lng,
                 lat2=receiver.latitude,
-                long2=receiver.longitude)
+                long2=receiver.longitude,
+            )
 
             # Set two more headers. See #45.
             tr.stats.sac.lpspol = 1
@@ -294,7 +304,7 @@ def get_gaussian_source_time_function(source_width, dt):
 
     # Sanity checks and manually set the first and last sample to 0.
     y_m = y.max()
-    assert y[0] <= 1E-5 * y_m and y[-1] <= 1E-5 * y_m
+    assert y[0] <= 1e-5 * y_m and y[-1] <= 1e-5 * y_m
     y[0] = 0
     y[-1] = 0
 

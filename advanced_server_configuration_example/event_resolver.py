@@ -46,21 +46,29 @@ def create_event_json_file(output_filename):
     If the file already exist this function is a no-op.
     """
     if os.path.exists(output_filename):
-        print("File '%s' already exists. It will not be recreated." %
-              output_filename)
+        print(
+            "File '%s' already exists. It will not be recreated."
+            % output_filename
+        )
         return
     print("Downloading GCMT catalog up to 2013...")
-    cat = obspy.readEvents("http://www.ldeo.columbia.edu/~gcmt/projects/CMT/"
-                           "catalog/jan76_dec13.ndk.gz")
+    cat = obspy.readEvents(
+        "http://www.ldeo.columbia.edu/~gcmt/projects/CMT/"
+        "catalog/jan76_dec13.ndk.gz"
+    )
     events = {}
     for event in cat:
         # This only works due to the way ObsPy parses NDK files.
-        gcmt_id = [_i.text for _i in event.event_descriptions
-                   if _i.type == 'earthquake name'][0]
+        gcmt_id = [
+            _i.text
+            for _i in event.event_descriptions
+            if _i.type == "earthquake name"
+        ][0]
 
         # Get the centroid origin.
-        origin = [_i for _i in event.origins
-                  if _i.origin_type == "centroid"][0]
+        origin = [_i for _i in event.origins if _i.origin_type == "centroid"][
+            0
+        ]
         mt = event.focal_mechanisms[0].moment_tensor.tensor
 
         events[gcmt_id] = {
@@ -73,7 +81,8 @@ def create_event_json_file(output_filename):
             "m_pp": mt.m_pp,
             "m_rt": mt.m_rt,
             "m_rp": mt.m_rp,
-            "m_tp": mt.m_tp}
+            "m_tp": mt.m_tp,
+        }
 
     with open(output_filename, "wt") as fh:
         json.dump(events, fh)
@@ -104,5 +113,6 @@ if __name__ == "__main__":
     create_event_json_file(FILENAME)
 
     import pprint
+
     pprint.pprint(get_event_information("C201308081707A", FILENAME))
     pprint.pprint(get_event_information("B071791B", FILENAME))

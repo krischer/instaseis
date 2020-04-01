@@ -63,8 +63,9 @@ def _compare_streams(s_db, l_db, kwargs):
         # Very small values have issues with floating point accuracy. 7
         # orders of magnitude should be more than accurate enough.
 
-        np.testing.assert_allclose(s_tr.data, l_tr.data,
-                                   atol=1E-6 * s_tr.data.ptp())
+        np.testing.assert_allclose(
+            s_tr.data, l_tr.data, atol=1e-6 * s_tr.data.ptp()
+        )
 
 
 def test_seismogram_extraction(syngine_client):
@@ -76,41 +77,72 @@ def test_seismogram_extraction(syngine_client):
     l_db = instaseis.open_db(db_path)
 
     source = instaseis.Source(
-        latitude=4., longitude=3.0, depth_in_m=0, m_rr=4.71e+17, m_tt=3.81e+17,
-        m_pp=-4.74e+17, m_rt=3.99e+17, m_rp=-8.05e+17, m_tp=-1.23e+17)
+        latitude=4.0,
+        longitude=3.0,
+        depth_in_m=0,
+        m_rr=4.71e17,
+        m_tt=3.81e17,
+        m_pp=-4.74e17,
+        m_rt=3.99e17,
+        m_rp=-8.05e17,
+        m_tp=-1.23e17,
+    )
 
-    receiver = instaseis.Receiver(latitude=10., longitude=20., depth_in_m=None)
+    receiver = instaseis.Receiver(
+        latitude=10.0, longitude=20.0, depth_in_m=None
+    )
 
-    kwargs = {"source": source, "receiver": receiver,
-              "components": ["Z", "N", "E", "R", "T"]}
+    kwargs = {
+        "source": source,
+        "receiver": receiver,
+        "components": ["Z", "N", "E", "R", "T"],
+    }
     _compare_streams(s_db, l_db, kwargs)
 
     # Test velocity and acceleration.
-    kwargs = {"source": source, "receiver": receiver,
-              "components": ["Z", "N", "E", "R", "T"], "kind": "velocity"}
+    kwargs = {
+        "source": source,
+        "receiver": receiver,
+        "components": ["Z", "N", "E", "R", "T"],
+        "kind": "velocity",
+    }
     _compare_streams(s_db, l_db, kwargs)
-    kwargs = {"source": source, "receiver": receiver,
-              "components": ["Z", "N", "E", "R", "T"], "kind": "acceleration"}
+    kwargs = {
+        "source": source,
+        "receiver": receiver,
+        "components": ["Z", "N", "E", "R", "T"],
+        "kind": "acceleration",
+    }
     _compare_streams(s_db, l_db, kwargs)
 
     # Test remove source shift.
-    kwargs = {"source": source, "receiver": receiver,
-              "components": ["Z", "N", "E", "R", "T"],
-              "remove_source_shift": False}
+    kwargs = {
+        "source": source,
+        "receiver": receiver,
+        "components": ["Z", "N", "E", "R", "T"],
+        "remove_source_shift": False,
+    }
     _compare_streams(s_db, l_db, kwargs)
 
     # Test resampling.
-    kwargs = {"source": source, "receiver": receiver,
-              "components": ["Z", "N", "E", "R", "T"],
-              "dt": 1.0, "kernelwidth": 6}
+    kwargs = {
+        "source": source,
+        "receiver": receiver,
+        "components": ["Z", "N", "E", "R", "T"],
+        "dt": 1.0,
+        "kernelwidth": 6,
+    }
     _compare_streams(s_db, l_db, kwargs)
 
     # Force sources currently raise an error.
     source = instaseis.ForceSource(
-        latitude=89.91, longitude=0.0, depth_in_m=12000,
-        f_r=1.23E10,
-        f_t=2.55E10,
-        f_p=1.73E10)
+        latitude=89.91,
+        longitude=0.0,
+        depth_in_m=12000,
+        f_r=1.23e10,
+        f_t=2.55e10,
+        f_p=1.73e10,
+    )
     kwargs = {"source": source, "receiver": receiver}
     with pytest.raises(ValueError) as e:
         _compare_streams(s_db, l_db, kwargs)
@@ -119,19 +151,31 @@ def test_seismogram_extraction(syngine_client):
         "The Syngine Instaseis client does currently not "
         "support force sources. You can still download "
         "data from the Syngine service for force "
-        "sources manually.")
+        "sources manually."
+    )
 
     # Test less components and a latitude of 45 degrees to have the maximal
     # effect of geocentric vs geographic coordinates.
     source = instaseis.Source(
-        latitude=45.0, longitude=3.0, depth_in_m=0, m_rr=4.71e+17,
-        m_tt=3.81e+17, m_pp=-4.74e+17, m_rt=3.99e+17, m_rp=-8.05e+17,
-        m_tp=-1.23e+17)
+        latitude=45.0,
+        longitude=3.0,
+        depth_in_m=0,
+        m_rr=4.71e17,
+        m_tt=3.81e17,
+        m_pp=-4.74e17,
+        m_rt=3.99e17,
+        m_rp=-8.05e17,
+        m_tp=-1.23e17,
+    )
 
-    receiver = instaseis.Receiver(latitude=-45.0, longitude=20.0,
-                                  depth_in_m=None)
-    kwargs = {"source": source, "receiver": receiver,
-              "components": ["Z", "N", "E", "R", "T"]}
+    receiver = instaseis.Receiver(
+        latitude=-45.0, longitude=20.0, depth_in_m=None
+    )
+    kwargs = {
+        "source": source,
+        "receiver": receiver,
+        "components": ["Z", "N", "E", "R", "T"],
+    }
     _compare_streams(s_db, l_db, kwargs)
 
 
@@ -139,8 +183,11 @@ def test_str_method(syngine_client):
     str_repr = str(syngine_client)
 
     # Replace version number string to not be dependent on a certain version.
-    str_repr = re.sub(r"Syngine service version:\s+\d\.\d\.\d",
-                      "Syngine service version:  XXX", str_repr)
+    str_repr = re.sub(
+        r"Syngine service version:\s+\d\.\d\.\d",
+        "Syngine service version:  XXX",
+        str_repr,
+    )
 
     assert str_repr.startswith(
         "SyngineInstaseisDB reciprocal Green's function Database (v7) "
@@ -149,4 +196,5 @@ def test_str_method(syngine_client):
         "Syngine service version:  XXX\n"
         "\tcomponents           : vertical and horizontal\n"
         "\tvelocity model       : prem_iso_light\n"
-        "\tattenuation          : False\n")
+        "\tattenuation          : False\n"
+    )

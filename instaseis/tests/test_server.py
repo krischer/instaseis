@@ -27,6 +27,7 @@ from instaseis.server import util
 
 # Conditionally import mock either from the stdlib or as a separate library.
 import sys
+
 if sys.version_info[0] == 2:  # pragma: no cover
     import mock
 else:  # pragma: no cover
@@ -36,8 +37,8 @@ else:  # pragma: no cover
 def _compare_streams(st1, st2):
     for tr1, tr2 in zip(st1, st2):
         assert tr1.stats.__dict__ == tr2.stats.__dict__
-        rtol = 1E-3
-        atol = 1E-4 * max(np.abs(tr1.data).max(), np.abs(tr2.data).max())
+        rtol = 1e-3
+        atol = 1e-4 * max(np.abs(tr1.data).max(), np.abs(tr2.data).max())
         np.testing.assert_allclose(tr1.data, tr2.data, rtol=rtol, atol=atol)
 
 
@@ -45,9 +46,12 @@ def fetch_sync(client, url, **kwargs):
     """
     Helper function to call an async test client in a sync test case.
     """
+
     async def f():
         try:
-            response = await client.fetch(f"http://localhost:{client.port}{url}", **kwargs)
+            response = await client.fetch(
+                f"http://localhost:{client.port}{url}", **kwargs
+            )
         except Exception as e:
             response = e.response
         return response
@@ -65,7 +69,9 @@ def test_root_route(all_clients):
     assert request.code == 200
     result = json.loads(str(request.body.decode("utf8")))
     assert result == {
-        "type": "Instaseis Remote Server", "version": instaseis.__version__}
+        "type": "Instaseis Remote Server",
+        "version": instaseis.__version__,
+    }
     assert request.headers["Content-Type"] == "application/json; charset=UTF-8"
 
 
@@ -118,21 +124,28 @@ def test_greens_function_error_handling_no_reciprocal_db(all_clients):
     params = {
         "sourcedepthinmeters": 1e3,
         "sourcedistanceindegrees": 20,
-        "format": "saczip"}
-    request = fetch_sync(client, _assemble_url('greens_function', **params))
+        "format": "saczip",
+    }
+    request = fetch_sync(client, _assemble_url("greens_function", **params))
 
-    if client.is_reciprocal and \
-            client.info.components == "vertical and horizontal":
+    if (
+        client.is_reciprocal
+        and client.info.components == "vertical and horizontal"
+    ):
         assert request.code == 200
     elif client.info.components == "4 elemental moment tensors":
         assert request.code == 400
-        assert request.reason == ("The database is not reciprocal, so Green's "
-                                  "functions can't be computed.")
+        assert request.reason == (
+            "The database is not reciprocal, so Green's "
+            "functions can't be computed."
+        )
     else:
         assert request.code == 400
-        assert request.reason == ("Database requires vertical AND horizontal "
-                                  "components to be able to compute Green's "
-                                  "functions.")
+        assert request.reason == (
+            "Database requires vertical AND horizontal "
+            "components to be able to compute Green's "
+            "functions."
+        )
 
 
 def test_greens_function_error_handling(all_greens_clients):
@@ -143,49 +156,73 @@ def test_greens_function_error_handling(all_greens_clients):
 
     basic_parameters = {
         "sourcedepthinmeters": client.source_depth,
-        "sourcedistanceindegrees": 20}
+        "sourcedistanceindegrees": 20,
+    }
 
     # Remove the sourcedistanceindegrees, required parameter.
     params = copy.deepcopy(basic_parameters)
     del params["sourcedistanceindegrees"]
-    request = fetch_sync(client, _assemble_url('greens_function', **params))
+    request = fetch_sync(client, _assemble_url("greens_function", **params))
     assert request.code == 400
-    assert request.reason == \
-        "Required parameter 'sourcedistanceindegrees' not given."
+    assert (
+        request.reason
+        == "Required parameter 'sourcedistanceindegrees' not given."
+    )
 
     # Remove the sourcedepthinmeters, required parameter.
     params = copy.deepcopy(basic_parameters)
     del params["sourcedepthinmeters"]
-    request = fetch_sync(client, _assemble_url('greens_function', **params))
+    request = fetch_sync(client, _assemble_url("greens_function", **params))
     assert request.code == 400
-    assert request.reason == \
-        "Required parameter 'sourcedepthinmeters' not given."
+    assert (
+        request.reason == "Required parameter 'sourcedepthinmeters' not given."
+    )
 
     # Negative source distance
-    request = fetch_sync(client, _assemble_url(
-        "greens_function",
-        sourcedepthinmeters=20, sourcedistanceindegrees=-30))
+    request = fetch_sync(
+        client,
+        _assemble_url(
+            "greens_function",
+            sourcedepthinmeters=20,
+            sourcedistanceindegrees=-30,
+        ),
+    )
     assert request.code == 400
     assert request.reason == "Epicentral distance should be in [0, 180]."
 
     # Too far source distances.
-    request = fetch_sync(client, _assemble_url(
-        "greens_function",
-        sourcedepthinmeters=20, sourcedistanceindegrees=200))
+    request = fetch_sync(
+        client,
+        _assemble_url(
+            "greens_function",
+            sourcedepthinmeters=20,
+            sourcedistanceindegrees=200,
+        ),
+    )
     assert request.code == 400
     assert request.reason == "Epicentral distance should be in [0, 180]."
 
     # Negative source depth.
-    request = fetch_sync(client, _assemble_url(
-        "greens_function",
-        sourcedepthinmeters=-20, sourcedistanceindegrees=20))
+    request = fetch_sync(
+        client,
+        _assemble_url(
+            "greens_function",
+            sourcedepthinmeters=-20,
+            sourcedistanceindegrees=20,
+        ),
+    )
     assert request.code == 400
     assert request.reason == "Source depth should be in [0.0, 371000.0]."
 
     # Too large source depth.
-    request = fetch_sync(client, _assemble_url(
-        "greens_function",
-        sourcedepthinmeters=2E6, sourcedistanceindegrees=20))
+    request = fetch_sync(
+        client,
+        _assemble_url(
+            "greens_function",
+            sourcedepthinmeters=2e6,
+            sourcedistanceindegrees=20,
+        ),
+    )
     assert request.code == 400
     assert request.reason == "Source depth should be in [0.0, 371000.0]."
 
@@ -202,14 +239,15 @@ def test_greens_function_retrieval(all_greens_clients):
     basic_parameters = {
         "sourcedepthinmeters": 1e3,
         "sourcedistanceindegrees": 20,
-        "format": "saczip"}
+        "format": "saczip",
+    }
 
     time = obspy.UTCDateTime(2010, 1, 2, 3, 4, 5)
 
     # default parameters
     params = copy.deepcopy(basic_parameters)
     params["origintime"] = str(time)
-    request = fetch_sync(client, _assemble_url('greens_function', **params))
+    request = fetch_sync(client, _assemble_url("greens_function", **params))
     assert request.code == 200
     # ObsPy needs the filename to be able to directly unpack zip files. We
     # don't have a filename here so we unpack manually.
@@ -221,9 +259,11 @@ def test_greens_function_retrieval(all_greens_clients):
         assert tr.stats._format == "SAC"
 
     st_db = db.get_greens_function(
-        epicentral_distance_in_degree=params['sourcedistanceindegrees'],
-        source_depth_in_m=params['sourcedepthinmeters'], origin_time=time,
-        definition="seiscomp")
+        epicentral_distance_in_degree=params["sourcedistanceindegrees"],
+        source_depth_in_m=params["sourcedepthinmeters"],
+        origin_time=time,
+        definition="seiscomp",
+    )
     for tr in st_db:
         tr.stats.network = "XX"
         tr.stats.station = "GF001"
@@ -240,14 +280,15 @@ def test_greens_function_retrieval(all_greens_clients):
         assert tr_server.stats == tr_db.stats
         # Relative tolerance not particularly useful when testing super
         # small values.
-        np.testing.assert_allclose(tr_server.data, tr_db.data,
-                                   atol=1E-10 * tr_server.data.ptp())
+        np.testing.assert_allclose(
+            tr_server.data, tr_db.data, atol=1e-10 * tr_server.data.ptp()
+        )
 
     # miniseed
     params = copy.deepcopy(basic_parameters)
     params["format"] = "miniseed"
     params["origintime"] = str(time)
-    request = fetch_sync(client, _assemble_url('greens_function', **params))
+    request = fetch_sync(client, _assemble_url("greens_function", **params))
     assert request.code == 200
     st_server = obspy.read(request.buffer)
 
@@ -255,9 +296,11 @@ def test_greens_function_retrieval(all_greens_clients):
         assert tr.stats._format == "MSEED"
 
     st_db = db.get_greens_function(
-        epicentral_distance_in_degree=params['sourcedistanceindegrees'],
-        source_depth_in_m=params['sourcedepthinmeters'], origin_time=time,
-        definition="seiscomp")
+        epicentral_distance_in_degree=params["sourcedistanceindegrees"],
+        source_depth_in_m=params["sourcedepthinmeters"],
+        origin_time=time,
+        definition="seiscomp",
+    )
     for tr in st_db:
         tr.stats.network = "XX"
         tr.stats.station = "GF001"
@@ -274,15 +317,16 @@ def test_greens_function_retrieval(all_greens_clients):
         assert tr_server.stats == tr_db.stats
         # Relative tolerance not particularly useful when testing super
         # small values.
-        np.testing.assert_allclose(tr_server.data, tr_db.data,
-                                   atol=1E-10 * tr_server.data.ptp())
+        np.testing.assert_allclose(
+            tr_server.data, tr_db.data, atol=1e-10 * tr_server.data.ptp()
+        )
 
     # One with a label.
     params = copy.deepcopy(basic_parameters)
     params["format"] = "miniseed"
     params["label"] = "random_things"
     params["origintime"] = str(time)
-    request = fetch_sync(client, _assemble_url('greens_function', **params))
+    request = fetch_sync(client, _assemble_url("greens_function", **params))
     assert request.code == 200
 
     cd = request.headers["Content-Disposition"]
@@ -296,14 +340,19 @@ def test_greens_function_retrieval(all_greens_clients):
     params["kernelwidth"] = 2
     params["units"] = "acceleration"
     params["origintime"] = str(time)
-    request = fetch_sync(client, _assemble_url('greens_function', **params))
+    request = fetch_sync(client, _assemble_url("greens_function", **params))
     assert request.code == 200
     st_server = obspy.read(request.buffer)
 
     st_db = db.get_greens_function(
-        epicentral_distance_in_degree=params['sourcedistanceindegrees'],
-        source_depth_in_m=params['sourcedepthinmeters'], origin_time=time,
-        definition="seiscomp", dt=0.1, kernelwidth=2, kind="acceleration")
+        epicentral_distance_in_degree=params["sourcedistanceindegrees"],
+        source_depth_in_m=params["sourcedepthinmeters"],
+        origin_time=time,
+        definition="seiscomp",
+        dt=0.1,
+        kernelwidth=2,
+        kind="acceleration",
+    )
     for tr in st_db:
         tr.stats.network = "XX"
         tr.stats.station = "GF001"
@@ -320,96 +369,120 @@ def test_greens_function_retrieval(all_greens_clients):
         assert tr_server.stats == tr_db.stats
         # Relative tolerance not particularly useful when testing super
         # small values.
-        np.testing.assert_allclose(tr_server.data, tr_db.data,
-                                   atol=1E-10 * tr_server.data.ptp())
+        np.testing.assert_allclose(
+            tr_server.data, tr_db.data, atol=1e-10 * tr_server.data.ptp()
+        )
 
     # One simulating a crash in the underlying function.
     params = copy.deepcopy(basic_parameters)
     params["format"] = "miniseed"
 
-    with mock.patch("instaseis.database_interfaces.base_instaseis_db"
-                    ".BaseInstaseisDB.get_greens_function") as p:
+    with mock.patch(
+        "instaseis.database_interfaces.base_instaseis_db"
+        ".BaseInstaseisDB.get_greens_function"
+    ) as p:
 
         p.side_effect = ValueError("random crash")
-        request = fetch_sync(client, _assemble_url('greens_function', **params))
+        request = fetch_sync(
+            client, _assemble_url("greens_function", **params)
+        )
 
     assert request.code == 400
-    assert request.reason == ("Could not extract Green's function. Make "
-                              "sure, the parameters are valid, and the depth "
-                              "settings are correct.")
+    assert request.reason == (
+        "Could not extract Green's function. Make "
+        "sure, the parameters are valid, and the depth "
+        "settings are correct."
+    )
 
     # Two more simulating logic erros that should not be able to happen.
     params = copy.deepcopy(basic_parameters)
     params["format"] = "miniseed"
 
-    with mock.patch("instaseis.database_interfaces.base_instaseis_db"
-                    ".BaseInstaseisDB.get_greens_function") as p:
+    with mock.patch(
+        "instaseis.database_interfaces.base_instaseis_db"
+        ".BaseInstaseisDB.get_greens_function"
+    ) as p:
         st = obspy.read()
         for tr in st:
-            tr.stats.starttime = obspy.UTCDateTime(1E5)
+            tr.stats.starttime = obspy.UTCDateTime(1e5)
 
         p.return_value = st
-        request = fetch_sync(client, _assemble_url('greens_function', **params))
+        request = fetch_sync(
+            client, _assemble_url("greens_function", **params)
+        )
 
     assert request.code == 500
-    assert request.reason == ("Starttime more than one hour before the "
-                              "starttime of the seismograms.")
+    assert request.reason == (
+        "Starttime more than one hour before the "
+        "starttime of the seismograms."
+    )
 
     params = copy.deepcopy(basic_parameters)
     params["format"] = "miniseed"
 
-    with mock.patch("instaseis.database_interfaces.base_instaseis_db"
-                    ".BaseInstaseisDB.get_greens_function") as p:
+    with mock.patch(
+        "instaseis.database_interfaces.base_instaseis_db"
+        ".BaseInstaseisDB.get_greens_function"
+    ) as p:
         st = obspy.read()
         for tr in st:
             tr.stats.starttime = obspy.UTCDateTime(1900, 1, 1)
             tr.stats.delta = 0.0001
 
         p.return_value = st
-        request = fetch_sync(client, _assemble_url('greens_function', **params))
+        request = fetch_sync(
+            client, _assemble_url("greens_function", **params)
+        )
 
     assert request.code == 500
-    assert request.reason.startswith("Endtime larger than the extracted "
-                                     "endtime")
+    assert request.reason.startswith(
+        "Endtime larger than the extracted " "endtime"
+    )
 
 
 def test_phase_relative_offsets_but_no_ttimes_callback_greens_function(
-        all_greens_clients):
+    all_greens_clients,
+):
     client = all_greens_clients
 
     params = {
         "sourcedepthinmeters": 1e3,
         "sourcedistanceindegrees": 20,
-        "format": "miniseed"}
+        "format": "miniseed",
+    }
 
     # Test for starttime.
     p = copy.deepcopy(params)
     p["starttime"] = "P%2D10"
-    request = fetch_sync(client, _assemble_url('greens_function', **p))
+    request = fetch_sync(client, _assemble_url("greens_function", **p))
     assert request.code == 404
     assert request.reason == (
-        "Server does not support travel time calculations.")
+        "Server does not support travel time calculations."
+    )
 
     # Test for endtime.
     p = copy.deepcopy(params)
     p["endtime"] = "P%2D10"
-    request = fetch_sync(client, _assemble_url('greens_function', **p))
+    request = fetch_sync(client, _assemble_url("greens_function", **p))
     assert request.code == 404
     assert request.reason == (
-        "Server does not support travel time calculations.")
+        "Server does not support travel time calculations."
+    )
 
     # Test for both.
     p = copy.deepcopy(params)
     p["starttime"] = "P%2D10"
     p["endtime"] = "S%2B10"
-    request = fetch_sync(client, _assemble_url('greens_function', **p))
+    request = fetch_sync(client, _assemble_url("greens_function", **p))
     assert request.code == 404
     assert request.reason == (
-        "Server does not support travel time calculations.")
+        "Server does not support travel time calculations."
+    )
 
 
 def test_phase_relative_offset_failures_greens_function(
-        all_greens_clients_ttimes_callback):
+    all_greens_clients_ttimes_callback,
+):
     """
     Tests some common failures for the phase relative offsets with the
     greens function route.
@@ -419,29 +492,32 @@ def test_phase_relative_offset_failures_greens_function(
     params = {
         "sourcedepthinmeters": 1e3,
         "sourcedistanceindegrees": 20,
-        "format": "miniseed"}
+        "format": "miniseed",
+    }
 
     # Illegal phase.
     p = copy.deepcopy(params)
     p["starttime"] = "bogus%2D10"
-    request = fetch_sync(client, _assemble_url('greens_function', **p))
+    request = fetch_sync(client, _assemble_url("greens_function", **p))
     assert request.code == 400
     assert request.reason == "Invalid phase name: bogus"
 
     # Phase not available at that distance.
     p = copy.deepcopy(params)
     p["starttime"] = "Pdiff%2D10"
-    request = fetch_sync(client, _assemble_url('greens_function', **p))
+    request = fetch_sync(client, _assemble_url("greens_function", **p))
     assert request.code == 400
     assert request.reason == (
         "No Green's function extracted for the given phase relative offsets. "
         "This could either be due to the chosen phase not existing for the "
         "specific source-receiver geometry or arriving too late/with too "
-        "large offsets if the database is not long enough.")
+        "large offsets if the database is not long enough."
+    )
 
 
 def test_phase_relative_offsets_greens_function(
-        all_greens_clients_ttimes_callback):
+    all_greens_clients_ttimes_callback,
+):
     """
     Test phase relative offsets with the green's function route.
 
@@ -457,11 +533,13 @@ def test_phase_relative_offsets_greens_function(
     params = {
         "sourcedepthinmeters": 300000,
         "sourcedistanceindegrees": 50,
-        "format": "miniseed", "dt": 0.1}
+        "format": "miniseed",
+        "dt": 0.1,
+    }
 
     # Normal seismogram.
     p = copy.deepcopy(params)
-    request = fetch_sync(client, _assemble_url('greens_function', **p))
+    request = fetch_sync(client, _assemble_url("greens_function", **p))
     assert request.code == 200
     tr = obspy.read(request.buffer)[0]
     starttime, endtime = tr.stats.starttime, tr.stats.endtime
@@ -469,7 +547,7 @@ def test_phase_relative_offsets_greens_function(
     # Start 10 seconds before the P arrival.
     p = copy.deepcopy(params)
     p["starttime"] = "P%2D10"
-    request = fetch_sync(client, _assemble_url('greens_function', **p))
+    request = fetch_sync(client, _assemble_url("greens_function", **p))
     assert request.code == 200
     tr = obspy.read(request.buffer)[0]
 
@@ -479,7 +557,7 @@ def test_phase_relative_offsets_greens_function(
     # Starts 10 seconds after the P arrival
     p = copy.deepcopy(params)
     p["starttime"] = "P%2B10"
-    request = fetch_sync(client, _assemble_url('greens_function', **p))
+    request = fetch_sync(client, _assemble_url("greens_function", **p))
     assert request.code == 200
     tr = obspy.read(request.buffer)[0]
 
@@ -489,7 +567,7 @@ def test_phase_relative_offsets_greens_function(
     # Ends 15 seconds before the PP arrival
     p = copy.deepcopy(params)
     p["endtime"] = "PP%2D15"
-    request = fetch_sync(client, _assemble_url('greens_function', **p))
+    request = fetch_sync(client, _assemble_url("greens_function", **p))
     assert request.code == 200
     tr = obspy.read(request.buffer)[0]
 
@@ -499,7 +577,7 @@ def test_phase_relative_offsets_greens_function(
     # Ends 15 seconds after the PP arrival
     p = copy.deepcopy(params)
     p["endtime"] = "PP%2B15"
-    request = fetch_sync(client, _assemble_url('greens_function', **p))
+    request = fetch_sync(client, _assemble_url("greens_function", **p))
     assert request.code == 200
     tr = obspy.read(request.buffer)[0]
 
@@ -510,7 +588,7 @@ def test_phase_relative_offsets_greens_function(
     p = copy.deepcopy(params)
     p["starttime"] = "PP%2D5"
     p["endtime"] = "sPKiKP%2B2"
-    request = fetch_sync(client, _assemble_url('greens_function', **p))
+    request = fetch_sync(client, _assemble_url("greens_function", **p))
     assert request.code == 200
     tr = obspy.read(request.buffer)[0]
 
@@ -523,7 +601,7 @@ def test_phase_relative_offsets_greens_function(
     p = copy.deepcopy(params)
     p["starttime"] = "PP%2D5"
     p["endtime"] = 10.0
-    request = fetch_sync(client, _assemble_url('greens_function', **p))
+    request = fetch_sync(client, _assemble_url("greens_function", **p))
     assert request.code == 200
     tr = obspy.read(request.buffer)[0]
 
@@ -535,7 +613,7 @@ def test_phase_relative_offsets_greens_function(
     p = copy.deepcopy(params)
     p["starttime"] = "10"
     p["endtime"] = "PP%2B15"
-    request = fetch_sync(client, _assemble_url('greens_function', **p))
+    request = fetch_sync(client, _assemble_url("greens_function", **p))
     assert request.code == 200
     tr = obspy.read(request.buffer)[0]
 
@@ -549,11 +627,12 @@ def test_greens_function_start_and_origintime(all_greens_clients):
     basic_parameters = {
         "sourcedepthinmeters": 1e3,
         "sourcedistanceindegrees": 20,
-        "format": "miniseed"}
+        "format": "miniseed",
+    }
 
     # default parameters
     params = copy.deepcopy(basic_parameters)
-    request = fetch_sync(client, _assemble_url('greens_function', **params))
+    request = fetch_sync(client, _assemble_url("greens_function", **params))
     assert request.code == 200
     st = obspy.read(request.buffer)
     assert st[0].stats.starttime == obspy.UTCDateTime(1900, 1, 1)
@@ -562,7 +641,7 @@ def test_greens_function_start_and_origintime(all_greens_clients):
     time = obspy.UTCDateTime(2016, 1, 1)
     p = copy.deepcopy(basic_parameters)
     p["origintime"] = str(time)
-    request = fetch_sync(client, _assemble_url('greens_function', **p))
+    request = fetch_sync(client, _assemble_url("greens_function", **p))
     assert request.code == 200
     st = obspy.read(request.buffer)
     assert st[0].stats.starttime == time
@@ -571,7 +650,7 @@ def test_greens_function_start_and_origintime(all_greens_clients):
     time = obspy.UTCDateTime(1990, 1, 1)
     p = copy.deepcopy(basic_parameters)
     p["origintime"] = str(time)
-    request = fetch_sync(client, _assemble_url('greens_function', **p))
+    request = fetch_sync(client, _assemble_url("greens_function", **p))
     assert request.code == 200
     st = obspy.read(request.buffer)
     assert st[0].stats.starttime == time
@@ -581,7 +660,7 @@ def test_greens_function_start_and_origintime(all_greens_clients):
     p = copy.deepcopy(basic_parameters)
     p["origintime"] = str(time)
     p["starttime"] = str(time - 60 * 30)
-    request = fetch_sync(client, _assemble_url('greens_function', **p))
+    request = fetch_sync(client, _assemble_url("greens_function", **p))
     assert request.code == 200
     st_new = obspy.read(request.buffer)
     # This should be about 30 mins.
@@ -596,7 +675,7 @@ def test_greens_function_start_and_origintime(all_greens_clients):
     p["origintime"] = str(time)
     p["starttime"] = str(time - 60 * 30)
     p["endtime"] = str(time + 20 * 60)
-    request = fetch_sync(client, _assemble_url('greens_function', **p))
+    request = fetch_sync(client, _assemble_url("greens_function", **p))
     assert request.code == 200
     st_new = obspy.read(request.buffer)
     # This should be about 30 mins.
@@ -616,27 +695,28 @@ def test_raw_seismograms_error_handling(all_clients):
         "sourcelongitude": 10,
         "receiverdepthinmeters": 0,
         "receiverlatitude": -10,
-        "receiverlongitude": -10}
+        "receiverlongitude": -10,
+    }
 
     # Remove the source latitude, a required parameter.
     params = copy.deepcopy(basic_parameters)
     del params["sourcelatitude"]
-    request = fetch_sync(client, _assemble_url('seismograms_raw', **params))
+    request = fetch_sync(client, _assemble_url("seismograms_raw", **params))
     assert request.code == 400
-    assert request.reason == \
-        "Required parameter 'sourcelatitude' not given."
+    assert request.reason == "Required parameter 'sourcelatitude' not given."
 
     # Invalid type.
     params = copy.deepcopy(basic_parameters)
     params["sourcelatitude"] = "A"
-    request = fetch_sync(client, _assemble_url('seismograms_raw', **params))
+    request = fetch_sync(client, _assemble_url("seismograms_raw", **params))
     assert request.code == 400
     assert "could not be converted" in request.reason
     assert "sourcelatitude" in request.reason
 
     # No source.
-    request = fetch_sync(client, _assemble_url('seismograms_raw',
-                           **basic_parameters))
+    request = fetch_sync(
+        client, _assemble_url("seismograms_raw", **basic_parameters)
+    )
     assert request.code == 400
     assert request.reason == "No/insufficient source parameters specified"
 
@@ -649,7 +729,7 @@ def test_raw_seismograms_error_handling(all_clients):
     params["mrt"] = "100000"
     params["mrp"] = "100000"
     params["mtp"] = "100000"
-    request = fetch_sync(client, _assemble_url('seismograms_raw', **params))
+    request = fetch_sync(client, _assemble_url("seismograms_raw", **params))
     assert request.code == 400
     assert "could not construct receiver with " in request.reason.lower()
 
@@ -662,7 +742,7 @@ def test_raw_seismograms_error_handling(all_clients):
     params["mrp"] = "100000"
     params["mtp"] = "100000"
     params["sourcelatitude"] = "100"
-    request = fetch_sync(client, _assemble_url('seismograms_raw', **params))
+    request = fetch_sync(client, _assemble_url("seismograms_raw", **params))
     assert request.code == 400
     assert "could not construct moment tensor source" in request.reason.lower()
 
@@ -673,7 +753,7 @@ def test_raw_seismograms_error_handling(all_clients):
     params["rake"] = "45"
     params["M0"] = "450000"
     params["sourcelatitude"] = "100"
-    request = fetch_sync(client, _assemble_url('seismograms_raw', **params))
+    request = fetch_sync(client, _assemble_url("seismograms_raw", **params))
     assert request.code == 400
     assert "could not construct the source" in request.reason.lower()
     assert "strike/dip/rake" in request.reason.lower()
@@ -685,7 +765,7 @@ def test_raw_seismograms_error_handling(all_clients):
     params["ft"] = "100000"
     params["fp"] = "100000"
     params["sourcelatitude"] = "100"
-    request = fetch_sync(client, _assemble_url('seismograms_raw', **params))
+    request = fetch_sync(client, _assemble_url("seismograms_raw", **params))
     assert request.code == 400
     assert "could not construct force source" in request.reason.lower()
 
@@ -698,13 +778,15 @@ def test_raw_seismograms_error_handling(all_clients):
     params["mrp"] = "100000"
     params["mtp"] = "100000"
     params["components"] = "ABC"
-    request = fetch_sync(client, _assemble_url('seismograms_raw', **params))
+    request = fetch_sync(client, _assemble_url("seismograms_raw", **params))
     assert request.code == 400
     assert "could not extract seismogram" in request.reason.lower()
 
     # Unlikely to be raised for real, but test the resulting error nonetheless.
-    with mock.patch("instaseis.database_interfaces.base_instaseis_db"
-                    ".BaseInstaseisDB._convert_to_stream") as p:
+    with mock.patch(
+        "instaseis.database_interfaces.base_instaseis_db"
+        ".BaseInstaseisDB._convert_to_stream"
+    ) as p:
         p.side_effect = Exception
 
         params = copy.deepcopy(basic_parameters)
@@ -714,7 +796,9 @@ def test_raw_seismograms_error_handling(all_clients):
         params["mrt"] = "100000"
         params["mrp"] = "100000"
         params["mtp"] = "100000"
-        request = fetch_sync(client, _assemble_url('seismograms_raw', **params))
+        request = fetch_sync(
+            client, _assemble_url("seismograms_raw", **params)
+        )
         assert request.code == 500
         assert "could not convert seismogram to a" in request.reason.lower()
 
@@ -727,7 +811,7 @@ def test_raw_seismograms_error_handling(all_clients):
     params["mrp"] = "100000"
     params["mtp"] = "100000"
     params["components"] = "NNEERRTTZZ"
-    request = fetch_sync(client, _assemble_url('seismograms_raw', **params))
+    request = fetch_sync(client, _assemble_url("seismograms_raw", **params))
     assert request.code == 400
     assert "a maximum of 5 components can be request" in request.reason.lower()
 
@@ -740,7 +824,7 @@ def test_raw_seismograms_error_handling(all_clients):
     params["mrp"] = "100000"
     params["mtp"] = "100000"
     params["components"] = ""
-    request = fetch_sync(client, _assemble_url('seismograms_raw', **params))
+    request = fetch_sync(client, _assemble_url("seismograms_raw", **params))
     assert request.code == 400
     assert "a request with no components will not re" in request.reason.lower()
 
@@ -759,18 +843,25 @@ def test_seismograms_raw_route(all_clients):
         "sourcelatitude": 10,
         "sourcelongitude": 10,
         "receiverlatitude": -10,
-        "receiverlongitude": -10}
+        "receiverlongitude": -10,
+    }
 
     # Various sources.
-    mt = {"mtt": "100000", "mpp": "200000", "mrr": "300000",
-          "mrt": "400000", "mrp": "500000", "mtp": "600000"}
+    mt = {
+        "mtt": "100000",
+        "mpp": "200000",
+        "mrr": "300000",
+        "mrt": "400000",
+        "mrp": "500000",
+        "mtp": "600000",
+    }
     sdr = {"strike": "10", "dip": "20", "rake": "30", "M0": "1000000"}
     fs = {"fr": "100000", "ft": "200000", "fp": "300000"}
 
     # Moment tensor source.
     params = copy.deepcopy(basic_parameters)
     params.update(mt)
-    request = fetch_sync(client, _assemble_url('seismograms_raw', **params))
+    request = fetch_sync(client, _assemble_url("seismograms_raw", **params))
     assert request.code == 200
 
     st = obspy.read(request.buffer)
@@ -784,7 +875,7 @@ def test_seismograms_raw_route(all_clients):
     # Strike/dip/rake
     params = copy.deepcopy(basic_parameters)
     params.update(sdr)
-    request = fetch_sync(client, _assemble_url('seismograms_raw', **params))
+    request = fetch_sync(client, _assemble_url("seismograms_raw", **params))
     assert request.code == 200
 
     st = obspy.read(request.buffer)
@@ -801,7 +892,9 @@ def test_seismograms_raw_route(all_clients):
         params.update(fs)
         time = obspy.UTCDateTime(2008, 7, 6, 5, 4, 3)
         params["origintime"] = str(time)
-        request = fetch_sync(client, _assemble_url('seismograms_raw', **params))
+        request = fetch_sync(
+            client, _assemble_url("seismograms_raw", **params)
+        )
         assert request.code == 200
 
         st = obspy.read(request.buffer)
@@ -821,20 +914,23 @@ def test_seismograms_raw_route(all_clients):
         params = copy.deepcopy(basic_parameters)
         params.update(mt)
         params["components"] = comp
-        request = fetch_sync(client, _assemble_url('seismograms_raw', **params))
+        request = fetch_sync(
+            client, _assemble_url("seismograms_raw", **params)
+        )
         assert request.code == 200
 
         st = obspy.read(request.buffer)
         assert len(st) == len(comp)
-        assert "".join(sorted(comp)) == "".join(sorted(
-            [tr.stats.channel[-1] for tr in st]))
+        assert "".join(sorted(comp)) == "".join(
+            sorted([tr.stats.channel[-1] for tr in st])
+        )
 
     # Test passing the origin time.
     params = copy.deepcopy(basic_parameters)
     time = obspy.UTCDateTime(2013, 1, 2, 3, 4, 5)
     params.update(mt)
     params["origintime"] = str(time)
-    request = fetch_sync(client, _assemble_url('seismograms_raw', **params))
+    request = fetch_sync(client, _assemble_url("seismograms_raw", **params))
     assert request.code == 200
 
     st = obspy.read(request.buffer)
@@ -848,7 +944,7 @@ def test_seismograms_raw_route(all_clients):
     params["networkcode"] = "BW"
     params["stationcode"] = "ALTM"
     params["locationcode"] = "XX"
-    request = fetch_sync(client, _assemble_url('seismograms_raw', **params))
+    request = fetch_sync(client, _assemble_url("seismograms_raw", **params))
     assert request.code == 200
 
     st = obspy.read(request.buffer)
@@ -866,13 +962,23 @@ def test_mu_is_passed_as_header_value(all_clients):
     Also tests the other headers.
     """
     client = all_clients
-    parameters = {"sourcelatitude": 10, "sourcelongitude": 10,
-                  "receiverlatitude": -10, "receiverlongitude": -10,
-                  "mtt": "100000", "mpp": "100000", "mrr": "100000",
-                  "mrt": "100000", "mrp": "100000", "mtp": "100000"}
+    parameters = {
+        "sourcelatitude": 10,
+        "sourcelongitude": 10,
+        "receiverlatitude": -10,
+        "receiverlongitude": -10,
+        "mtt": "100000",
+        "mpp": "100000",
+        "mrr": "100000",
+        "mrt": "100000",
+        "mrp": "100000",
+        "mtp": "100000",
+    }
 
     # Moment tensor source.
-    request = fetch_sync(client, _assemble_url('seismograms_raw', **parameters))
+    request = fetch_sync(
+        client, _assemble_url("seismograms_raw", **parameters)
+    )
     assert request.code == 200
     # Make sure the mu header exists and the value can be converted to a float.
     assert "Instaseis-Mu" in request.headers
@@ -895,18 +1001,27 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
         "sourcelatitude": 10,
         "sourcelongitude": 10,
         "receiverlatitude": -10,
-        "receiverlongitude": -10}
+        "receiverlongitude": -10,
+    }
 
     # Various sources.
-    mt = {"mtt": "100000", "mpp": "200000", "mrr": "300000",
-          "mrt": "400000", "mrp": "500000", "mtp": "600000"}
+    mt = {
+        "mtt": "100000",
+        "mpp": "200000",
+        "mrr": "300000",
+        "mrt": "400000",
+        "mrp": "500000",
+        "mtp": "600000",
+    }
     sdr = {"strike": "10", "dip": "20", "rake": "30", "M0": "1000000"}
     fs = {"fr": "100000", "ft": "200000", "fp": "300000"}
 
     time = obspy.UTCDateTime(2010, 1, 2, 3, 4, 5)
 
-    with mock.patch("instaseis.database_interfaces.base_netcdf_instaseis_db"
-                    ".BaseNetCDFInstaseisDB._get_seismograms") as p:
+    with mock.patch(
+        "instaseis.database_interfaces.base_netcdf_instaseis_db"
+        ".BaseNetCDFInstaseisDB._get_seismograms"
+    ) as p:
         _st = obspy.read()
         for tr in _st:
             tr.stats.instaseis = obspy.core.AttribDict()
@@ -921,22 +1036,29 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
         # Moment tensor source.
         params = copy.deepcopy(basic_parameters)
         params.update(mt)
-        request = fetch_sync(client, _assemble_url('seismograms_raw', **params))
+        request = fetch_sync(
+            client, _assemble_url("seismograms_raw", **params)
+        )
         assert request.code == 200
 
         assert p.call_count == 1
         assert sorted(p.call_args[1]["components"]) == sorted(
-            db.default_components)
+            db.default_components
+        )
         assert p.call_args[1]["source"] == instaseis.Source(
             latitude=basic_parameters["sourcelatitude"],
             longitude=basic_parameters["sourcelongitude"],
             depth_in_m=0.0,
-            **dict((key[0] + "_" + key[1:], float(value))
-                   for (key, value) in mt.items()))
+            **dict(
+                (key[0] + "_" + key[1:], float(value))
+                for (key, value) in mt.items()
+            ),
+        )
         assert p.call_args[1]["receiver"] == instaseis.Receiver(
             latitude=basic_parameters["receiverlatitude"],
             longitude=basic_parameters["receiverlongitude"],
-            depth_in_m=0.0)
+            depth_in_m=0.0,
+        )
 
         # Moment tensor source with a couple more parameters.
         p.reset_mock()
@@ -948,44 +1070,61 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
         params["stationcode"] = "ALTM"
         params["locationcode"] = "XX"
 
-        request = fetch_sync(client, _assemble_url('seismograms_raw', **params))
+        request = fetch_sync(
+            client, _assemble_url("seismograms_raw", **params)
+        )
         assert request.code == 200
 
         assert p.call_count == 1
         assert sorted(p.call_args[1]["components"]) == sorted(
-            db.default_components)
+            db.default_components
+        )
         assert p.call_args[1]["source"] == instaseis.Source(
             latitude=basic_parameters["sourcelatitude"],
             longitude=basic_parameters["sourcelongitude"],
-            depth_in_m=5.0, origin_time=time,
-            **dict((key[0] + "_" + key[1:], float(value))
-                   for (key, value) in mt.items()))
+            depth_in_m=5.0,
+            origin_time=time,
+            **dict(
+                (key[0] + "_" + key[1:], float(value))
+                for (key, value) in mt.items()
+            ),
+        )
         assert p.call_args[1]["receiver"] == instaseis.Receiver(
             latitude=basic_parameters["receiverlatitude"],
             longitude=basic_parameters["receiverlongitude"],
-            depth_in_m=55.0, network="BW", station="ALTM", location="XX")
+            depth_in_m=55.0,
+            network="BW",
+            station="ALTM",
+            location="XX",
+        )
 
         # From strike, dip, rake
         p.reset_mock()
 
         params = copy.deepcopy(basic_parameters)
         params.update(sdr)
-        request = fetch_sync(client, _assemble_url('seismograms_raw', **params))
+        request = fetch_sync(
+            client, _assemble_url("seismograms_raw", **params)
+        )
         assert request.code == 200
 
         assert p.call_count == 1
         assert sorted(p.call_args[1]["components"]) == sorted(
-            db.default_components)
-        assert p.call_args[1]["source"] == \
-            instaseis.Source.from_strike_dip_rake(
-                latitude=basic_parameters["sourcelatitude"],
-                longitude=basic_parameters["sourcelongitude"],
-                depth_in_m=0.0,
-                **dict((key, float(value)) for (key, value) in sdr.items()))
+            db.default_components
+        )
+        assert p.call_args[1][
+            "source"
+        ] == instaseis.Source.from_strike_dip_rake(
+            latitude=basic_parameters["sourcelatitude"],
+            longitude=basic_parameters["sourcelongitude"],
+            depth_in_m=0.0,
+            **dict((key, float(value)) for (key, value) in sdr.items()),
+        )
         assert p.call_args[1]["receiver"] == instaseis.Receiver(
             latitude=basic_parameters["receiverlatitude"],
             longitude=basic_parameters["receiverlongitude"],
-            depth_in_m=0.0)
+            depth_in_m=0.0,
+        )
 
         # Moment tensor source with a couple more parameters.
         p.reset_mock()
@@ -997,22 +1136,32 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
         params["stationcode"] = "ALTM"
         params["locationcode"] = "XX"
 
-        request = fetch_sync(client, _assemble_url('seismograms_raw', **params))
+        request = fetch_sync(
+            client, _assemble_url("seismograms_raw", **params)
+        )
         assert request.code == 200
 
         assert p.call_count == 1
         assert sorted(p.call_args[1]["components"]) == sorted(
-            db.default_components)
-        assert p.call_args[1]["source"] == \
-            instaseis.Source.from_strike_dip_rake(
-                latitude=basic_parameters["sourcelatitude"],
-                longitude=basic_parameters["sourcelongitude"],
-                depth_in_m=5.0, origin_time=time,
-                **dict((key, float(value)) for (key, value) in sdr.items()))
+            db.default_components
+        )
+        assert p.call_args[1][
+            "source"
+        ] == instaseis.Source.from_strike_dip_rake(
+            latitude=basic_parameters["sourcelatitude"],
+            longitude=basic_parameters["sourcelongitude"],
+            depth_in_m=5.0,
+            origin_time=time,
+            **dict((key, float(value)) for (key, value) in sdr.items()),
+        )
         assert p.call_args[1]["receiver"] == instaseis.Receiver(
             latitude=basic_parameters["receiverlatitude"],
             longitude=basic_parameters["receiverlongitude"],
-            depth_in_m=55.0, network="BW", station="ALTM", location="XX")
+            depth_in_m=55.0,
+            network="BW",
+            station="ALTM",
+            location="XX",
+        )
 
         # Force source only works for displ_only databases.
         if "displ_only" in client.filepath:
@@ -1020,22 +1169,29 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
 
             params = copy.deepcopy(basic_parameters)
             params.update(fs)
-            request = fetch_sync(client, _assemble_url('seismograms_raw', **params))
+            request = fetch_sync(
+                client, _assemble_url("seismograms_raw", **params)
+            )
             assert request.code == 200
 
             assert p.call_count == 1
             assert sorted(p.call_args[1]["components"]) == sorted(
-                db.default_components)
+                db.default_components
+            )
             assert p.call_args[1]["source"] == instaseis.ForceSource(
                 latitude=basic_parameters["sourcelatitude"],
                 longitude=basic_parameters["sourcelongitude"],
                 depth_in_m=0.0,
-                **dict(("_".join(key), float(value))
-                       for (key, value) in fs.items()))
+                **dict(
+                    ("_".join(key), float(value))
+                    for (key, value) in fs.items()
+                ),
+            )
             assert p.call_args[1]["receiver"] == instaseis.Receiver(
                 latitude=basic_parameters["receiverlatitude"],
                 longitude=basic_parameters["receiverlongitude"],
-                depth_in_m=0.0)
+                depth_in_m=0.0,
+            )
 
             # Moment tensor source with a couple more parameters.
             p.reset_mock()
@@ -1047,22 +1203,33 @@ def test_object_creation_for_raw_seismogram_route(all_clients):
             params["stationcode"] = "ALTM"
             params["locationcode"] = "XX"
 
-            request = fetch_sync(client, _assemble_url('seismograms_raw', **params))
+            request = fetch_sync(
+                client, _assemble_url("seismograms_raw", **params)
+            )
             assert request.code == 200
 
             assert p.call_count == 1
             assert sorted(p.call_args[1]["components"]) == sorted(
-                db.default_components)
+                db.default_components
+            )
             assert p.call_args[1]["source"] == instaseis.ForceSource(
                 latitude=basic_parameters["sourcelatitude"],
                 longitude=basic_parameters["sourcelongitude"],
-                depth_in_m=5.0, origin_time=time,
-                **dict(("_".join(key), float(value))
-                       for (key, value) in fs.items()))
+                depth_in_m=5.0,
+                origin_time=time,
+                **dict(
+                    ("_".join(key), float(value))
+                    for (key, value) in fs.items()
+                ),
+            )
             assert p.call_args[1]["receiver"] == instaseis.Receiver(
                 latitude=basic_parameters["receiverlatitude"],
                 longitude=basic_parameters["receiverlongitude"],
-                depth_in_m=55.0, network="BW", station="ALTM", location="XX")
+                depth_in_m=55.0,
+                network="BW",
+                station="ALTM",
+                location="XX",
+            )
 
 
 def test_seismograms_error_handling(all_clients):
@@ -1077,43 +1244,52 @@ def test_seismograms_error_handling(all_clients):
         "sourcelongitude": 10,
         "sourcedepthinmeters": client.source_depth,
         "receiverlatitude": -10,
-        "receiverlongitude": -10}
+        "receiverlongitude": -10,
+    }
 
     # No source given at all.
-    request = fetch_sync(client, _assemble_url('seismograms',
-                                         receiverlatitude=-10,
-                                         receiverlongitude=10))
+    request = fetch_sync(
+        client,
+        _assemble_url(
+            "seismograms", receiverlatitude=-10, receiverlongitude=10
+        ),
+    )
     assert request.code == 400
     assert request.reason == "No source specified"
 
     # Remove the source latitude, a required parameter.
     params = copy.deepcopy(basic_parameters)
     del params["sourcelatitude"]
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     assert request.code == 400
-    assert request.reason == \
-        "The following required parameters are missing: 'sourcelatitude'"
+    assert (
+        request.reason
+        == "The following required parameters are missing: 'sourcelatitude'"
+    )
 
     # Invalid type.
     params = copy.deepcopy(basic_parameters)
     params["sourcelatitude"] = "A"
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     assert request.code == 400
     assert "could not be converted" in request.reason
     assert "sourcelatitude" in request.reason
 
     # No source.
-    request = fetch_sync(client, _assemble_url('seismograms', **basic_parameters))
+    request = fetch_sync(
+        client, _assemble_url("seismograms", **basic_parameters)
+    )
     assert request.code == 400
     assert request.reason == (
         "One of the following has to be given: 'eventid', "
-        "'sourcedoublecouple', 'sourceforce', 'sourcemomenttensor'")
+        "'sourcedoublecouple', 'sourceforce', 'sourcemomenttensor'"
+    )
 
     # Invalid receiver.
     params = copy.deepcopy(basic_parameters)
     params["receiverlatitude"] = "100"
     params["sourcemomenttensor"] = "100000,100000,100000,100000,100000,100000"
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     assert request.code == 400
     assert "could not construct receiver with " in request.reason.lower()
 
@@ -1121,7 +1297,7 @@ def test_seismograms_error_handling(all_clients):
     params = copy.deepcopy(basic_parameters)
     params["sourcemomenttensor"] = "100000,100000,100000,100000,100000,100000"
     params["sourcelatitude"] = "100"
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     assert request.code == 400
     assert "could not construct moment tensor source" in request.reason.lower()
 
@@ -1129,7 +1305,7 @@ def test_seismograms_error_handling(all_clients):
     params = copy.deepcopy(basic_parameters)
     params["sourcedoublecouple"] = "45,45,45,450000"
     params["sourcelatitude"] = "100"
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     assert request.code == 400
     assert "could not construct the source" in request.reason.lower()
     assert "strike/dip/rake" in request.reason.lower()
@@ -1139,7 +1315,7 @@ def test_seismograms_error_handling(all_clients):
     params = copy.deepcopy(basic_parameters)
     params["sourceforce"] = "100000,100000,100000"
     params["sourcelatitude"] = "100"
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     assert request.code == 400
     assert "could not construct force source" in request.reason.lower()
 
@@ -1147,7 +1323,7 @@ def test_seismograms_error_handling(all_clients):
     params = copy.deepcopy(basic_parameters)
     params["sourcemomenttensor"] = "100000,100000,100000,100000,100000,100000"
     params["components"] = "ABC"
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     assert request.code == 400
     assert "could not extract seismogram" in request.reason.lower()
 
@@ -1155,7 +1331,7 @@ def test_seismograms_error_handling(all_clients):
     params = copy.deepcopy(basic_parameters)
     params["sourcemomenttensor"] = "100000,100000,100000,100000,100000,100000"
     params["units"] = "fun"
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     assert request.code == 400
     assert "unit must be one of" in request.reason.lower()
 
@@ -1164,7 +1340,7 @@ def test_seismograms_error_handling(all_clients):
     params = copy.deepcopy(basic_parameters)
     params["sourcemomenttensor"] = "100000,100000,100000,100000,100000,100000"
     params["dt"] = "0.009"
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     assert request.code == 400
     assert "the smallest possible dt is 0.01" in request.reason.lower()
 
@@ -1172,13 +1348,13 @@ def test_seismograms_error_handling(all_clients):
     params = copy.deepcopy(basic_parameters)
     params["sourcemomenttensor"] = "100000,100000,100000,100000,100000,100000"
     params["kernelwidth"] = "0"
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     assert request.code == 400
     assert "`kernelwidth` must not be smaller" in request.reason.lower()
     params = copy.deepcopy(basic_parameters)
     params["sourcemomenttensor"] = "100000,100000,100000,100000,100000,100000"
     params["kernelwidth"] = "21"
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     assert request.code == 400
     assert "`kernelwidth` must not be smaller" in request.reason.lower()
 
@@ -1186,7 +1362,7 @@ def test_seismograms_error_handling(all_clients):
     params = copy.deepcopy(basic_parameters)
     params["sourcemomenttensor"] = "100000,100000,100000,100000,100000,100000"
     params["components"] = "NNEERRTTZZ"
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     assert request.code == 400
     assert "a maximum of 5 components can be request" in request.reason.lower()
 
@@ -1194,7 +1370,7 @@ def test_seismograms_error_handling(all_clients):
     params = copy.deepcopy(basic_parameters)
     params["sourcemomenttensor"] = "100000,100000,100000,100000,100000,100000"
     params["components"] = ""
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     assert request.code == 400
     assert "a request with no components will not re" in request.reason.lower()
 
@@ -1212,13 +1388,20 @@ def test_object_creation_for_seismogram_route(all_clients):
         "sourcedepthinmeters": client.source_depth,
         "receiverlatitude": -10,
         "receiverlongitude": -10,
-        "receiverdepthinmeters": 0.0}
+        "receiverdepthinmeters": 0.0,
+    }
 
     dt = 24.724845445855724
 
     # Various sources.
-    mt = {"mrr": "100000", "mtt": "200000", "mpp": "300000",
-          "mrt": "400000", "mrp": "500000", "mtp": "600000"}
+    mt = {
+        "mrr": "100000",
+        "mtt": "200000",
+        "mpp": "300000",
+        "mrt": "400000",
+        "mrp": "500000",
+        "mtp": "600000",
+    }
     mt_param = "100000,200000,300000,400000,500000,600000"
     sdr = {"strike": "10", "dip": "20", "rake": "30", "M0": "1000000"}
     sdr_param = "10,20,30,1000000"
@@ -1227,8 +1410,10 @@ def test_object_creation_for_seismogram_route(all_clients):
 
     time = obspy.UTCDateTime(2010, 1, 2, 3, 4, 5)
 
-    with mock.patch("instaseis.database_interfaces.base_netcdf_instaseis_db"
-                    ".BaseNetCDFInstaseisDB.get_seismograms") as p:
+    with mock.patch(
+        "instaseis.database_interfaces.base_netcdf_instaseis_db"
+        ".BaseNetCDFInstaseisDB.get_seismograms"
+    ) as p:
         _st = obspy.read()
         for tr in _st:
             tr.stats.instaseis = obspy.core.AttribDict()
@@ -1240,23 +1425,31 @@ def test_object_creation_for_seismogram_route(all_clients):
         # Moment tensor source.
         params = copy.deepcopy(basic_parameters)
         params["sourcemomenttensor"] = mt_param
-        request = fetch_sync(client, _assemble_url('seismograms', **params))
+        request = fetch_sync(client, _assemble_url("seismograms", **params))
         assert request.code == 200
 
         assert p.call_count == 1
-        assert sorted(p.call_args[1]["components"]) == \
-            sorted(db.default_components)
+        assert sorted(p.call_args[1]["components"]) == sorted(
+            db.default_components
+        )
         assert p.call_args[1]["source"] == instaseis.Source(
             latitude=basic_parameters["sourcelatitude"],
             longitude=basic_parameters["sourcelongitude"],
             depth_in_m=client.source_depth,
             origin_time=obspy.UTCDateTime(1900, 1, 1),
-            **dict((key[0] + "_" + key[1:], float(value))
-                   for (key, value) in mt.items()))
+            **dict(
+                (key[0] + "_" + key[1:], float(value))
+                for (key, value) in mt.items()
+            ),
+        )
         assert p.call_args[1]["receiver"] == instaseis.Receiver(
             latitude=basic_parameters["receiverlatitude"],
             longitude=basic_parameters["receiverlongitude"],
-            depth_in_m=0.0, network="XX", station="SYN", location="SE")
+            depth_in_m=0.0,
+            network="XX",
+            station="SYN",
+            location="SE",
+        )
         assert p.call_args[1]["kind"] == "displacement"
         # Remove source shift is always False.
         assert p.call_args[1]["remove_source_shift"] is False
@@ -1288,24 +1481,31 @@ def test_object_creation_for_seismogram_route(all_clients):
             tr.stats.starttime = time - 1 - 7 * dt
             tr.stats.delta = dt
 
-        request = fetch_sync(client, _assemble_url('seismograms', **params))
+        request = fetch_sync(client, _assemble_url("seismograms", **params))
         assert request.code == 200
 
         assert p.call_count == 1
-        assert sorted(p.call_args[1]["components"]) == \
-            sorted(db.default_components)
+        assert sorted(p.call_args[1]["components"]) == sorted(
+            db.default_components
+        )
         assert p.call_args[1]["source"] == instaseis.Source(
             latitude=basic_parameters["sourcelatitude"],
             longitude=basic_parameters["sourcelongitude"],
             depth_in_m=params["sourcedepthinmeters"],
             origin_time=time,
-            **dict((key[0] + "_" + key[1:], float(value))
-                   for (key, value) in mt.items()))
+            **dict(
+                (key[0] + "_" + key[1:], float(value))
+                for (key, value) in mt.items()
+            ),
+        )
         assert p.call_args[1]["receiver"] == instaseis.Receiver(
             latitude=basic_parameters["receiverlatitude"],
             longitude=basic_parameters["receiverlongitude"],
             depth_in_m=params["receiverdepthinmeters"],
-            network="BW", station="ALTM", location="XX")
+            network="BW",
+            station="ALTM",
+            location="XX",
+        )
         assert p.call_args[1]["kind"] == "displacement"
         # Remove source shift is always False
         assert p.call_args[1]["remove_source_shift"] is False
@@ -1324,23 +1524,30 @@ def test_object_creation_for_seismogram_route(all_clients):
 
         params = copy.deepcopy(basic_parameters)
         params["sourcedoublecouple"] = sdr_param
-        request = fetch_sync(client, _assemble_url('seismograms', **params))
+        request = fetch_sync(client, _assemble_url("seismograms", **params))
         assert request.code == 200
 
         assert p.call_count == 1
-        assert sorted(p.call_args[1]["components"]) == \
-            sorted(db.default_components)
-        assert p.call_args[1]["source"] == \
-            instaseis.Source.from_strike_dip_rake(
-                latitude=basic_parameters["sourcelatitude"],
-                longitude=basic_parameters["sourcelongitude"],
-                depth_in_m=basic_parameters["sourcedepthinmeters"],
-                origin_time=obspy.UTCDateTime(1900, 1, 1),
-                **dict((key, float(value)) for (key, value) in sdr.items()))
+        assert sorted(p.call_args[1]["components"]) == sorted(
+            db.default_components
+        )
+        assert p.call_args[1][
+            "source"
+        ] == instaseis.Source.from_strike_dip_rake(
+            latitude=basic_parameters["sourcelatitude"],
+            longitude=basic_parameters["sourcelongitude"],
+            depth_in_m=basic_parameters["sourcedepthinmeters"],
+            origin_time=obspy.UTCDateTime(1900, 1, 1),
+            **dict((key, float(value)) for (key, value) in sdr.items()),
+        )
         assert p.call_args[1]["receiver"] == instaseis.Receiver(
             latitude=basic_parameters["receiverlatitude"],
             longitude=basic_parameters["receiverlongitude"],
-            depth_in_m=0.0, network="XX", station="SYN", location="SE")
+            depth_in_m=0.0,
+            network="XX",
+            station="SYN",
+            location="SE",
+        )
         assert p.call_args[1]["kind"] == "displacement"
         # Remove source shift is always False
         assert p.call_args[1]["remove_source_shift"] is False
@@ -1369,24 +1576,30 @@ def test_object_creation_for_seismogram_route(all_clients):
         params["stationcode"] = "ALTM"
         params["locationcode"] = "XX"
 
-        request = fetch_sync(client, _assemble_url('seismograms', **params))
+        request = fetch_sync(client, _assemble_url("seismograms", **params))
         assert request.code == 200
 
         assert p.call_count == 1
-        assert sorted(p.call_args[1]["components"]) == \
-            sorted(db.default_components)
-        assert p.call_args[1]["source"] == \
-            instaseis.Source.from_strike_dip_rake(
-                latitude=basic_parameters["sourcelatitude"],
-                longitude=basic_parameters["sourcelongitude"],
-                depth_in_m=params["sourcedepthinmeters"],
-                origin_time=time,
-                **dict((key, float(value)) for (key, value) in sdr.items()))
+        assert sorted(p.call_args[1]["components"]) == sorted(
+            db.default_components
+        )
+        assert p.call_args[1][
+            "source"
+        ] == instaseis.Source.from_strike_dip_rake(
+            latitude=basic_parameters["sourcelatitude"],
+            longitude=basic_parameters["sourcelongitude"],
+            depth_in_m=params["sourcedepthinmeters"],
+            origin_time=time,
+            **dict((key, float(value)) for (key, value) in sdr.items()),
+        )
         assert p.call_args[1]["receiver"] == instaseis.Receiver(
             latitude=basic_parameters["receiverlatitude"],
             longitude=basic_parameters["receiverlongitude"],
             depth_in_m=params["receiverdepthinmeters"],
-            network="BW", station="ALTM", location="XX")
+            network="BW",
+            station="ALTM",
+            location="XX",
+        )
         assert p.call_args[1]["kind"] == "displacement"
         # Remove source shift is always False
         assert p.call_args[1]["remove_source_shift"] is False
@@ -1405,23 +1618,33 @@ def test_object_creation_for_seismogram_route(all_clients):
 
         params = copy.deepcopy(basic_parameters)
         params["sourcedoublecouple"] = "10,10,10"
-        request = fetch_sync(client, _assemble_url('seismograms', **params))
+        request = fetch_sync(client, _assemble_url("seismograms", **params))
         assert request.code == 200
 
         assert p.call_count == 1
-        assert sorted(p.call_args[1]["components"]) == \
-            sorted(db.default_components)
-        assert p.call_args[1]["source"] == \
-            instaseis.Source.from_strike_dip_rake(
-                latitude=basic_parameters["sourcelatitude"],
-                longitude=basic_parameters["sourcelongitude"],
-                depth_in_m=basic_parameters["sourcedepthinmeters"],
-                origin_time=obspy.UTCDateTime(1900, 1, 1),
-                strike=10, dip=10, rake=10, M0=1E19)
+        assert sorted(p.call_args[1]["components"]) == sorted(
+            db.default_components
+        )
+        assert p.call_args[1][
+            "source"
+        ] == instaseis.Source.from_strike_dip_rake(
+            latitude=basic_parameters["sourcelatitude"],
+            longitude=basic_parameters["sourcelongitude"],
+            depth_in_m=basic_parameters["sourcedepthinmeters"],
+            origin_time=obspy.UTCDateTime(1900, 1, 1),
+            strike=10,
+            dip=10,
+            rake=10,
+            M0=1e19,
+        )
         assert p.call_args[1]["receiver"] == instaseis.Receiver(
             latitude=basic_parameters["receiverlatitude"],
             longitude=basic_parameters["receiverlongitude"],
-            depth_in_m=0.0, network="XX", station="SYN", location="SE")
+            depth_in_m=0.0,
+            network="XX",
+            station="SYN",
+            location="SE",
+        )
         assert p.call_args[1]["kind"] == "displacement"
         # Remove source shift is always False
         assert p.call_args[1]["remove_source_shift"] is False
@@ -1441,22 +1664,33 @@ def test_object_creation_for_seismogram_route(all_clients):
 
             params = copy.deepcopy(basic_parameters)
             params["sourceforce"] = fs_param
-            request = fetch_sync(client, _assemble_url('seismograms', **params))
+            request = fetch_sync(
+                client, _assemble_url("seismograms", **params)
+            )
             assert request.code == 200
 
             assert p.call_count == 1
-            assert sorted(p.call_args[1]["components"]) == \
-                sorted(db.default_components)
+            assert sorted(p.call_args[1]["components"]) == sorted(
+                db.default_components
+            )
             assert p.call_args[1]["source"] == instaseis.ForceSource(
                 latitude=basic_parameters["sourcelatitude"],
                 longitude=basic_parameters["sourcelongitude"],
-                depth_in_m=0.0, origin_time=obspy.UTCDateTime(1900, 1, 1),
-                **dict(("_".join(key), float(value))
-                       for (key, value) in fs.items()))
+                depth_in_m=0.0,
+                origin_time=obspy.UTCDateTime(1900, 1, 1),
+                **dict(
+                    ("_".join(key), float(value))
+                    for (key, value) in fs.items()
+                ),
+            )
             assert p.call_args[1]["receiver"] == instaseis.Receiver(
                 latitude=basic_parameters["receiverlatitude"],
                 longitude=basic_parameters["receiverlongitude"],
-                depth_in_m=0.0, network="XX", station="SYN", location="SE")
+                depth_in_m=0.0,
+                network="XX",
+                station="SYN",
+                location="SE",
+            )
             assert p.call_args[1]["kind"] == "displacement"
             # Remove source shift is always False
             assert p.call_args[1]["remove_source_shift"] is False
@@ -1480,23 +1714,33 @@ def test_object_creation_for_seismogram_route(all_clients):
             params["stationcode"] = "ALTM"
             params["locationcode"] = "XX"
 
-            request = fetch_sync(client, _assemble_url('seismograms', **params))
+            request = fetch_sync(
+                client, _assemble_url("seismograms", **params)
+            )
             assert request.code == 200
 
             assert p.call_count == 1
-            assert sorted(p.call_args[1]["components"]) == \
-                sorted(db.default_components)
+            assert sorted(p.call_args[1]["components"]) == sorted(
+                db.default_components
+            )
             assert p.call_args[1]["source"] == instaseis.ForceSource(
                 latitude=basic_parameters["sourcelatitude"],
                 longitude=basic_parameters["sourcelongitude"],
-                depth_in_m=5.0, origin_time=time,
-                **dict(("_".join(key), float(value))
-                       for (key, value) in fs.items()))
+                depth_in_m=5.0,
+                origin_time=time,
+                **dict(
+                    ("_".join(key), float(value))
+                    for (key, value) in fs.items()
+                ),
+            )
             assert p.call_args[1]["receiver"] == instaseis.Receiver(
                 latitude=basic_parameters["receiverlatitude"],
                 longitude=basic_parameters["receiverlongitude"],
-                depth_in_m=0.0, network="BW", station="ALTM",
-                location="XX")
+                depth_in_m=0.0,
+                network="BW",
+                station="ALTM",
+                location="XX",
+            )
             assert p.call_args[1]["kind"] == "displacement"
             # Remove source shift is always False
             assert p.call_args[1]["remove_source_shift"] is False
@@ -1521,7 +1765,7 @@ def test_object_creation_for_seismogram_route(all_clients):
         params = copy.deepcopy(basic_parameters)
         params["sourcemomenttensor"] = mt_param
         params["components"] = "RTE"
-        request = fetch_sync(client, _assemble_url('seismograms', **params))
+        request = fetch_sync(client, _assemble_url("seismograms", **params))
         assert request.code == 200
         assert p.call_count == 1
         assert p.call_args[1]["components"] == ["R", "T", "E"]
@@ -1536,7 +1780,7 @@ def test_object_creation_for_seismogram_route(all_clients):
         params = copy.deepcopy(basic_parameters)
         params["sourcemomenttensor"] = mt_param
         params["units"] = "acceleration"
-        request = fetch_sync(client, _assemble_url('seismograms', **params))
+        request = fetch_sync(client, _assemble_url("seismograms", **params))
         assert request.code == 200
         assert p.call_count == 1
         assert p.call_args[1]["components"] == ["Z", "N", "E"]
@@ -1551,7 +1795,7 @@ def test_object_creation_for_seismogram_route(all_clients):
         params = copy.deepcopy(basic_parameters)
         params["sourcemomenttensor"] = mt_param
         params["units"] = "velocity"
-        request = fetch_sync(client, _assemble_url('seismograms', **params))
+        request = fetch_sync(client, _assemble_url("seismograms", **params))
         assert request.code == 200
         assert p.call_count == 1
         assert p.call_args[1]["components"] == ["Z", "N", "E"]
@@ -1566,7 +1810,7 @@ def test_object_creation_for_seismogram_route(all_clients):
         params = copy.deepcopy(basic_parameters)
         params["sourcemomenttensor"] = mt_param
         params["units"] = "VeLoCity"
-        request = fetch_sync(client, _assemble_url('seismograms', **params))
+        request = fetch_sync(client, _assemble_url("seismograms", **params))
         assert request.code == 200
         assert p.call_count == 1
         assert p.call_args[1]["components"] == ["Z", "N", "E"]
@@ -1582,7 +1826,7 @@ def test_object_creation_for_seismogram_route(all_clients):
         params["sourcemomenttensor"] = mt_param
         params["dt"] = "0.1"
         params["kernelwidth"] = "20"
-        request = fetch_sync(client, _assemble_url('seismograms', **params))
+        request = fetch_sync(client, _assemble_url("seismograms", **params))
         assert request.code == 200
         assert p.call_count == 1
         assert p.call_args[1]["components"] == ["Z", "N", "E"]
@@ -1606,7 +1850,7 @@ def test_object_creation_for_seismogram_route(all_clients):
         params["dt"] = "0.1"
         params["kernelwidth"] = "2"
         params["units"] = "ACCELERATION"
-        request = fetch_sync(client, _assemble_url('seismograms', **params))
+        request = fetch_sync(client, _assemble_url("seismograms", **params))
         assert request.code == 200
         assert p.call_count == 1
         assert p.call_args[1]["components"] == ["Z", "N", "E"]
@@ -1633,11 +1877,18 @@ def test_seismograms_retrieval(all_clients):
         "sourcedepthinmeters": client.source_depth,
         "receiverlatitude": -10,
         "receiverlongitude": -10,
-        "format": "miniseed"}
+        "format": "miniseed",
+    }
 
     # Various sources.
-    mt = {"mrr": "100000", "mtt": "200000", "mpp": "300000",
-          "mrt": "400000", "mrp": "500000", "mtp": "600000"}
+    mt = {
+        "mrr": "100000",
+        "mtt": "200000",
+        "mpp": "300000",
+        "mrt": "400000",
+        "mrp": "500000",
+        "mtp": "600000",
+    }
     mt_param = "100000,200000,300000,400000,500000,600000"
     sdr = {"strike": "10", "dip": "20", "rake": "30", "M0": "1000000"}
     sdr_param = "10,20,30,1000000"
@@ -1649,22 +1900,31 @@ def test_seismograms_retrieval(all_clients):
     # Moment tensor source.
     params = copy.deepcopy(basic_parameters)
     params["sourcemomenttensor"] = mt_param
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     st_server = obspy.read(request.buffer)
 
     components = db.available_components
     source = instaseis.Source(
         latitude=basic_parameters["sourcelatitude"],
         longitude=basic_parameters["sourcelongitude"],
-        depth_in_m=0.0, origin_time=obspy.UTCDateTime(1900, 1, 1),
-        **dict((key[0] + "_" + key[1:], float(value))
-               for (key, value) in mt.items()))
+        depth_in_m=0.0,
+        origin_time=obspy.UTCDateTime(1900, 1, 1),
+        **dict(
+            (key[0] + "_" + key[1:], float(value))
+            for (key, value) in mt.items()
+        ),
+    )
     receiver = instaseis.Receiver(
         latitude=basic_parameters["receiverlatitude"],
         longitude=basic_parameters["receiverlongitude"],
-        depth_in_m=0.0, network="XX", station="SYN", location="SE")
-    st_db = db.get_seismograms(source=source, receiver=receiver,
-                               components=components)
+        depth_in_m=0.0,
+        network="XX",
+        station="SYN",
+        location="SE",
+    )
+    st_db = db.get_seismograms(
+        source=source, receiver=receiver, components=components
+    )
 
     for tr_server, tr_db in zip(st_server, st_db):
         # Remove the additional stats from both.
@@ -1678,8 +1938,9 @@ def test_seismograms_retrieval(all_clients):
         assert tr_server.stats == tr_db.stats
         # Relative tolerance not particularly useful when testing super
         # small values.
-        np.testing.assert_allclose(tr_server.data, tr_db.data,
-                                   atol=1E-10 * tr_server.data.ptp())
+        np.testing.assert_allclose(
+            tr_server.data, tr_db.data, atol=1e-10 * tr_server.data.ptp()
+        )
 
     if client.is_reciprocal:
         params["sourcedepthinmeters"] = "5.0"
@@ -1692,7 +1953,7 @@ def test_seismograms_retrieval(all_clients):
     params["networkcode"] = "BW"
     params["stationcode"] = "ALTM"
     params["locationcode"] = "XX"
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     st_server = obspy.read(request.buffer)
 
     source = instaseis.Source(
@@ -1700,15 +1961,22 @@ def test_seismograms_retrieval(all_clients):
         longitude=basic_parameters["sourcelongitude"],
         depth_in_m=params["sourcedepthinmeters"],
         origin_time=time,
-        **dict((key[0] + "_" + key[1:], float(value))
-               for (key, value) in mt.items()))
+        **dict(
+            (key[0] + "_" + key[1:], float(value))
+            for (key, value) in mt.items()
+        ),
+    )
     receiver = instaseis.Receiver(
         latitude=basic_parameters["receiverlatitude"],
         longitude=basic_parameters["receiverlongitude"],
         depth_in_m=params["receiverdepthinmeters"],
-        network="BW", station="ALTM", location="XX")
-    st_db = db.get_seismograms(source=source, receiver=receiver,
-                               components=components)
+        network="BW",
+        station="ALTM",
+        location="XX",
+    )
+    st_db = db.get_seismograms(
+        source=source, receiver=receiver, components=components
+    )
     for tr_server, tr_db in zip(st_server, st_db):
         # Remove the additional stats from both.
         del tr_server.stats.mseed
@@ -1721,26 +1989,34 @@ def test_seismograms_retrieval(all_clients):
         assert tr_server.stats == tr_db.stats
         # Relative tolerance not particularly useful when testing super
         # small values.
-        np.testing.assert_allclose(tr_server.data, tr_db.data,
-                                   atol=1E-10 * tr_server.data.ptp())
+        np.testing.assert_allclose(
+            tr_server.data, tr_db.data, atol=1e-10 * tr_server.data.ptp()
+        )
 
     # From strike, dip, rake
     params = copy.deepcopy(basic_parameters)
     params["sourcedoublecouple"] = sdr_param
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     st_server = obspy.read(request.buffer)
 
     source = instaseis.Source.from_strike_dip_rake(
         latitude=basic_parameters["sourcelatitude"],
         longitude=basic_parameters["sourcelongitude"],
-        depth_in_m=0.0, origin_time=obspy.UTCDateTime(1900, 1, 1),
-        **dict((key, float(value)) for (key, value) in sdr.items()))
+        depth_in_m=0.0,
+        origin_time=obspy.UTCDateTime(1900, 1, 1),
+        **dict((key, float(value)) for (key, value) in sdr.items()),
+    )
     receiver = instaseis.Receiver(
         latitude=basic_parameters["receiverlatitude"],
-        longitude=basic_parameters["receiverlongitude"], depth_in_m=0.0,
-        network="XX", station="SYN", location="SE")
-    st_db = db.get_seismograms(source=source, receiver=receiver,
-                               components=components)
+        longitude=basic_parameters["receiverlongitude"],
+        depth_in_m=0.0,
+        network="XX",
+        station="SYN",
+        location="SE",
+    )
+    st_db = db.get_seismograms(
+        source=source, receiver=receiver, components=components
+    )
     for tr_server, tr_db in zip(st_server, st_db):
         # Remove the additional stats from both.
         del tr_server.stats.mseed
@@ -1753,8 +2029,9 @@ def test_seismograms_retrieval(all_clients):
         assert tr_server.stats == tr_db.stats
         # Relative tolerance not particularly useful when testing super
         # small values.
-        np.testing.assert_allclose(tr_server.data, tr_db.data,
-                                   atol=1E-10 * tr_server.data.ptp())
+        np.testing.assert_allclose(
+            tr_server.data, tr_db.data, atol=1e-10 * tr_server.data.ptp()
+        )
 
     # Moment tensor source with a couple more parameters.
     if client.is_reciprocal:
@@ -1769,7 +2046,7 @@ def test_seismograms_retrieval(all_clients):
     params["stationcode"] = "ALTM"
     params["locationcode"] = "XX"
 
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     st_server = obspy.read(request.buffer)
 
     source = instaseis.Source.from_strike_dip_rake(
@@ -1777,14 +2054,19 @@ def test_seismograms_retrieval(all_clients):
         longitude=basic_parameters["sourcelongitude"],
         depth_in_m=params["sourcedepthinmeters"],
         origin_time=time,
-        **dict((key, float(value)) for (key, value) in sdr.items()))
+        **dict((key, float(value)) for (key, value) in sdr.items()),
+    )
     receiver = instaseis.Receiver(
         latitude=basic_parameters["receiverlatitude"],
         longitude=basic_parameters["receiverlongitude"],
         depth_in_m=params["receiverdepthinmeters"],
-        network="BW", station="ALTM", location="XX")
-    st_db = db.get_seismograms(source=source, receiver=receiver,
-                               components=components)
+        network="BW",
+        station="ALTM",
+        location="XX",
+    )
+    st_db = db.get_seismograms(
+        source=source, receiver=receiver, components=components
+    )
     for tr_server, tr_db in zip(st_server, st_db):
         # Remove the additional stats from both.
         del tr_server.stats.mseed
@@ -1797,28 +2079,37 @@ def test_seismograms_retrieval(all_clients):
         assert tr_server.stats == tr_db.stats
         # Relative tolerance not particularly useful when testing super
         # small values.
-        np.testing.assert_allclose(tr_server.data, tr_db.data,
-                                   atol=1E-10 * tr_server.data.ptp())
+        np.testing.assert_allclose(
+            tr_server.data, tr_db.data, atol=1e-10 * tr_server.data.ptp()
+        )
 
     # Force source only works for displ_only databases.
     if "displ_only" in client.filepath:
         params = copy.deepcopy(basic_parameters)
         params["sourceforce"] = fs_param
-        request = fetch_sync(client, _assemble_url('seismograms', **params))
+        request = fetch_sync(client, _assemble_url("seismograms", **params))
         st_server = obspy.read(request.buffer)
 
         source = instaseis.ForceSource(
             latitude=basic_parameters["sourcelatitude"],
             longitude=basic_parameters["sourcelongitude"],
-            depth_in_m=0.0, origin_time=obspy.UTCDateTime(1900, 1, 1),
-            **dict(("_".join(key), float(value))
-                   for (key, value) in fs.items()))
+            depth_in_m=0.0,
+            origin_time=obspy.UTCDateTime(1900, 1, 1),
+            **dict(
+                ("_".join(key), float(value)) for (key, value) in fs.items()
+            ),
+        )
         receiver = instaseis.Receiver(
             latitude=basic_parameters["receiverlatitude"],
             longitude=basic_parameters["receiverlongitude"],
-            depth_in_m=0.0, network="XX", station="SYN", location="SE")
-        st_db = db.get_seismograms(source=source, receiver=receiver,
-                                   components=components)
+            depth_in_m=0.0,
+            network="XX",
+            station="SYN",
+            location="SE",
+        )
+        st_db = db.get_seismograms(
+            source=source, receiver=receiver, components=components
+        )
         for tr_server, tr_db in zip(st_server, st_db):
             # Remove the additional stats from both.
             del tr_server.stats.mseed
@@ -1826,14 +2117,16 @@ def test_seismograms_retrieval(all_clients):
             del tr_db.stats.instaseis
             # Sample spacing is very similar but not equal due to floating
             # point accuracy.
-            np.testing.assert_allclose(tr_server.stats.delta,
-                                       tr_db.stats.delta)
+            np.testing.assert_allclose(
+                tr_server.stats.delta, tr_db.stats.delta
+            )
             tr_server.stats.delta = tr_db.stats.delta
             assert tr_server.stats == tr_db.stats
             # Relative tolerance not particularly useful when testing super
             # small values.
-            np.testing.assert_allclose(tr_server.data, tr_db.data,
-                                       atol=1E-10 * tr_server.data.ptp())
+            np.testing.assert_allclose(
+                tr_server.data, tr_db.data, atol=1e-10 * tr_server.data.ptp()
+            )
 
         params["sourcedepthinmeters"] = "5.0"
         params["receiverdepthinmeters"] = "0.0"
@@ -1843,7 +2136,7 @@ def test_seismograms_retrieval(all_clients):
         params["stationcode"] = "ALTM"
         params["locationcode"] = "XX"
 
-        request = fetch_sync(client, _assemble_url('seismograms', **params))
+        request = fetch_sync(client, _assemble_url("seismograms", **params))
         st_server = obspy.read(request.buffer)
 
         source = instaseis.ForceSource(
@@ -1851,15 +2144,21 @@ def test_seismograms_retrieval(all_clients):
             longitude=basic_parameters["sourcelongitude"],
             depth_in_m=params["sourcedepthinmeters"],
             origin_time=time,
-            **dict(("_".join(key), float(value))
-                   for (key, value) in fs.items()))
+            **dict(
+                ("_".join(key), float(value)) for (key, value) in fs.items()
+            ),
+        )
         receiver = instaseis.Receiver(
             latitude=basic_parameters["receiverlatitude"],
             longitude=basic_parameters["receiverlongitude"],
             depth_in_m=params["receiverdepthinmeters"],
-            network="BW", station="ALTM", location="XX")
-        st_db = db.get_seismograms(source=source, receiver=receiver,
-                                   components=components)
+            network="BW",
+            station="ALTM",
+            location="XX",
+        )
+        st_db = db.get_seismograms(
+            source=source, receiver=receiver, components=components
+        )
         for tr_server, tr_db in zip(st_server, st_db):
             # Remove the additional stats from both.
             del tr_server.stats.mseed
@@ -1867,34 +2166,45 @@ def test_seismograms_retrieval(all_clients):
             del tr_db.stats.instaseis
             # Sample spacing is very similar but not equal due to floating
             # point accuracy.
-            np.testing.assert_allclose(tr_server.stats.delta,
-                                       tr_db.stats.delta)
+            np.testing.assert_allclose(
+                tr_server.stats.delta, tr_db.stats.delta
+            )
             tr_server.stats.delta = tr_db.stats.delta
             assert tr_server.stats == tr_db.stats
             # Relative tolerance not particularly useful when testing super
             # small values.
-            np.testing.assert_allclose(tr_server.data, tr_db.data,
-                                       atol=1E-10 * tr_server.data.ptp())
+            np.testing.assert_allclose(
+                tr_server.data, tr_db.data, atol=1e-10 * tr_server.data.ptp()
+            )
 
     source = instaseis.Source(
         latitude=basic_parameters["sourcelatitude"],
         longitude=basic_parameters["sourcelongitude"],
-        depth_in_m=0.0, origin_time=obspy.UTCDateTime(1900, 1, 1),
-        **dict((key[0] + "_" + key[1:], float(value))
-               for (key, value) in mt.items()))
+        depth_in_m=0.0,
+        origin_time=obspy.UTCDateTime(1900, 1, 1),
+        **dict(
+            (key[0] + "_" + key[1:], float(value))
+            for (key, value) in mt.items()
+        ),
+    )
     receiver = instaseis.Receiver(
         latitude=basic_parameters["receiverlatitude"],
         longitude=basic_parameters["receiverlongitude"],
-        depth_in_m=0.0, network="XX", station="SYN", location="SE")
+        depth_in_m=0.0,
+        network="XX",
+        station="SYN",
+        location="SE",
+    )
 
     # Now test other the other parameters.
     params = copy.deepcopy(basic_parameters)
     params["sourcemomenttensor"] = mt_param
     params["components"] = "".join(db.default_components[:1])
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     st_server = obspy.read(request.buffer)
-    st_db = db.get_seismograms(source=source, receiver=receiver,
-                               components=db.default_components[:1])
+    st_db = db.get_seismograms(
+        source=source, receiver=receiver, components=db.default_components[:1]
+    )
     for tr_server, tr_db in zip(st_server, st_db):
         # Remove the additional stats from both.
         del tr_server.stats.mseed
@@ -1902,22 +2212,23 @@ def test_seismograms_retrieval(all_clients):
         del tr_db.stats.instaseis
         # Sample spacing is very similar but not equal due to floating
         # point accuracy.
-        np.testing.assert_allclose(tr_server.stats.delta,
-                                   tr_db.stats.delta)
+        np.testing.assert_allclose(tr_server.stats.delta, tr_db.stats.delta)
         tr_server.stats.delta = tr_db.stats.delta
         assert tr_server.stats == tr_db.stats
         # Relative tolerance not particularly useful when testing super
         # small values.
-        np.testing.assert_allclose(tr_server.data, tr_db.data,
-                                   atol=1E-10 * tr_server.data.ptp())
+        np.testing.assert_allclose(
+            tr_server.data, tr_db.data, atol=1e-10 * tr_server.data.ptp()
+        )
 
     params = copy.deepcopy(basic_parameters)
     params["sourcemomenttensor"] = mt_param
     params["units"] = "acceleration"
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     st_server = obspy.read(request.buffer)
-    st_db = db.get_seismograms(source=source, receiver=receiver,
-                               kind="acceleration")
+    st_db = db.get_seismograms(
+        source=source, receiver=receiver, kind="acceleration"
+    )
     for tr_server, tr_db in zip(st_server, st_db):
         # Remove the additional stats from both.
         del tr_server.stats.mseed
@@ -1925,22 +2236,23 @@ def test_seismograms_retrieval(all_clients):
         del tr_db.stats.instaseis
         # Sample spacing is very similar but not equal due to floating
         # point accuracy.
-        np.testing.assert_allclose(tr_server.stats.delta,
-                                   tr_db.stats.delta)
+        np.testing.assert_allclose(tr_server.stats.delta, tr_db.stats.delta)
         tr_server.stats.delta = tr_db.stats.delta
         assert tr_server.stats == tr_db.stats
         # Relative tolerance not particularly useful when testing super
         # small values.
-        np.testing.assert_allclose(tr_server.data, tr_db.data,
-                                   atol=1E-10 * tr_server.data.ptp())
+        np.testing.assert_allclose(
+            tr_server.data, tr_db.data, atol=1e-10 * tr_server.data.ptp()
+        )
 
     params = copy.deepcopy(basic_parameters)
     params["sourcemomenttensor"] = mt_param
     params["units"] = "velocity"
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     st_server = obspy.read(request.buffer)
-    st_db = db.get_seismograms(source=source, receiver=receiver,
-                               kind="velocity")
+    st_db = db.get_seismograms(
+        source=source, receiver=receiver, kind="velocity"
+    )
     for tr_server, tr_db in zip(st_server, st_db):
         # Remove the additional stats from both.
         del tr_server.stats.mseed
@@ -1948,23 +2260,24 @@ def test_seismograms_retrieval(all_clients):
         del tr_db.stats.instaseis
         # Sample spacing is very similar but not equal due to floating
         # point accuracy.
-        np.testing.assert_allclose(tr_server.stats.delta,
-                                   tr_db.stats.delta)
+        np.testing.assert_allclose(tr_server.stats.delta, tr_db.stats.delta)
         tr_server.stats.delta = tr_db.stats.delta
         assert tr_server.stats == tr_db.stats
         # Relative tolerance not particularly useful when testing super
         # small values.
-        np.testing.assert_allclose(tr_server.data, tr_db.data,
-                                   atol=1E-10 * tr_server.data.ptp())
+        np.testing.assert_allclose(
+            tr_server.data, tr_db.data, atol=1e-10 * tr_server.data.ptp()
+        )
 
     params = copy.deepcopy(basic_parameters)
     params["sourcemomenttensor"] = mt_param
     params["dt"] = "0.1"
     params["kernelwidth"] = "1"
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     st_server = obspy.read(request.buffer)
-    st_db = db.get_seismograms(source=source, receiver=receiver,
-                               dt=0.1, kernelwidth=1)
+    st_db = db.get_seismograms(
+        source=source, receiver=receiver, dt=0.1, kernelwidth=1
+    )
     for tr_server, tr_db in zip(st_server, st_db):
         # Remove the additional stats from both.
         del tr_server.stats.mseed
@@ -1973,25 +2286,30 @@ def test_seismograms_retrieval(all_clients):
 
         # Sample spacing is very similar but not equal due to floating
         # point accuracy.
-        np.testing.assert_allclose(tr_server.stats.delta,
-                                   tr_db.stats.delta)
+        np.testing.assert_allclose(tr_server.stats.delta, tr_db.stats.delta)
         tr_server.stats.delta = tr_db.stats.delta
         assert tr_server.stats == tr_db.stats
         # Relative tolerance not particularly useful when testing super
         # small values.
-        np.testing.assert_allclose(tr_server.data, tr_db.data,
-                                   atol=1E-10 * tr_server.data.ptp())
+        np.testing.assert_allclose(
+            tr_server.data, tr_db.data, atol=1e-10 * tr_server.data.ptp()
+        )
 
     params = copy.deepcopy(basic_parameters)
     params["sourcemomenttensor"] = mt_param
     params["dt"] = "0.1"
     params["kernelwidth"] = "2"
     params["units"] = "ACCELERATION"
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     st_server = obspy.read(request.buffer)
-    st_db = db.get_seismograms(source=source, receiver=receiver,
-                               dt=0.1, kernelwidth=2, kind="acceleration",
-                               remove_source_shift=True)
+    st_db = db.get_seismograms(
+        source=source,
+        receiver=receiver,
+        dt=0.1,
+        kernelwidth=2,
+        kind="acceleration",
+        remove_source_shift=True,
+    )
     for tr_server, tr_db in zip(st_server, st_db):
         # Remove the additional stats from both.
         del tr_server.stats.mseed
@@ -1999,14 +2317,14 @@ def test_seismograms_retrieval(all_clients):
         del tr_db.stats.instaseis
         # Sample spacing is very similar but not equal due to floating
         # point accuracy.
-        np.testing.assert_allclose(tr_server.stats.delta,
-                                   tr_db.stats.delta)
+        np.testing.assert_allclose(tr_server.stats.delta, tr_db.stats.delta)
         tr_server.stats.delta = tr_db.stats.delta
         assert tr_server.stats == tr_db.stats
         # Relative tolerance not particularly useful when testing super
         # small values.
-        np.testing.assert_allclose(tr_server.data, tr_db.data,
-                                   atol=1E-10 * tr_server.data.ptp())
+        np.testing.assert_allclose(
+            tr_server.data, tr_db.data, atol=1e-10 * tr_server.data.ptp()
+        )
 
 
 def test_output_formats(all_clients):
@@ -2023,12 +2341,13 @@ def test_output_formats(all_clients):
         "sourcedepthinmeters": client.source_depth,
         "receiverlatitude": -10,
         "receiverlongitude": -10,
-        "sourcemomenttensor": "100000,100000,100000,100000,100000,100000"}
+        "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
+    }
 
     # First try to get a MiniSEED file.
     params = copy.deepcopy(basic_parameters)
     params["format"] = "miniseed"
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     st = obspy.read(request.buffer)
     for tr in st:
         assert tr.stats._format == "MSEED"
@@ -2036,7 +2355,7 @@ def test_output_formats(all_clients):
     # saczip results in a folder of multiple sac files.
     params = copy.deepcopy(basic_parameters)
     params["format"] = "saczip"
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     # ObsPy needs the filename to be able to directly unpack zip files. We
     # don't have a filename here so we unpack manually.
     sac_st = obspy.Stream()
@@ -2074,7 +2393,7 @@ def test_output_formats(all_clients):
     # Specifying the saczip format also work.
     params = copy.deepcopy(basic_parameters)
     params["format"] = "saczip"
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     sac_st = obspy.Stream()
     zip_obj = zipfile.ZipFile(request.buffer)
     for name in zip_obj.namelist():
@@ -2088,17 +2407,24 @@ def test_output_formats(all_clients):
         "sourcelongitude": 10,
         "sourcedepthinmeters": client.source_depth,
         "receiverlatitude": -10,
-        "receiverlongitude": -10}
-    mt = {"sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
-          "components": "".join(db.default_components[:2]),
-          "units": "velocity", "dt": 2, "kernelwidth": 3,
-          "networkcode": "BW", "stationcode": "FURT", "locationcode": "XX"}
+        "receiverlongitude": -10,
+    }
+    mt = {
+        "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
+        "components": "".join(db.default_components[:2]),
+        "units": "velocity",
+        "dt": 2,
+        "kernelwidth": 3,
+        "networkcode": "BW",
+        "stationcode": "FURT",
+        "locationcode": "XX",
+    }
     basic_parameters.update(mt)
 
     # First get a MiniSEED file.
     params = copy.deepcopy(basic_parameters)
     params["format"] = "miniseed"
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     st = obspy.read(request.buffer)
     for tr in st:
         assert tr.stats._format == "MSEED"
@@ -2106,7 +2432,7 @@ def test_output_formats(all_clients):
     # saczip results in a folder of multiple sac files.
     params = copy.deepcopy(basic_parameters)
     params["format"] = "saczip"
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     # ObsPy needs the filename to be able to directly unpack zip files. We
     # don't have a filename here so we unpack manually.
     sac_st = obspy.Stream()
@@ -2144,7 +2470,7 @@ def test_output_formats(all_clients):
     # Specifying the saczip format also work.
     params = copy.deepcopy(basic_parameters)
     params["format"] = "saczip"
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     sac_st = obspy.Stream()
     zip_obj = zipfile.ZipFile(request.buffer)
     for name in zip_obj.namelist():
@@ -2161,11 +2487,12 @@ def test_coordinates_route_with_no_coordinate_callback(all_clients):
     client = all_clients
     request = fetch_sync(client, "/coordinates?network=BW&station=FURT")
     assert request.code == 404
-    assert request.reason == 'Server does not support station coordinates.'
+    assert request.reason == "Server does not support station coordinates."
 
 
 def test_coordinates_route_with_stations_coordinates_callback(
-        all_clients_station_coordinates_callback):
+    all_clients_station_coordinates_callback,
+):
     """
     Tests the /coordinates route.
     """
@@ -2174,7 +2501,7 @@ def test_coordinates_route_with_stations_coordinates_callback(
     # 404 is returned if no coordinates are found.
     request = fetch_sync(client, "/coordinates?network=BW&station=FURT")
     assert request.code == 404
-    assert request.reason == 'No coordinates found satisfying the query.'
+    assert request.reason == "No coordinates found satisfying the query."
 
     # Single station.
     request = fetch_sync(client, "/coordinates?network=IU&station=ANMO")
@@ -2184,37 +2511,56 @@ def test_coordinates_route_with_stations_coordinates_callback(
     stations = json.loads(str(request.body.decode("utf8")))
 
     assert stations == {
-        'features': [
-            {'geometry': {'coordinates': [-106.4572, 34.94591],
-                          'type': 'Point'},
-             'properties': {'network_code': 'IU', 'station_code': 'ANMO'},
-             'type': 'Feature'}
+        "features": [
+            {
+                "geometry": {
+                    "coordinates": [-106.4572, 34.94591],
+                    "type": "Point",
+                },
+                "properties": {"network_code": "IU", "station_code": "ANMO"},
+                "type": "Feature",
+            }
         ],
-        'type': 'FeatureCollection'}
+        "type": "FeatureCollection",
+    }
 
     # Multiple stations with wildcard searches.
-    request = fetch_sync(client, "/coordinates?network=IU,B*&station=ANT*,ANM?")
+    request = fetch_sync(
+        client, "/coordinates?network=IU,B*&station=ANT*,ANM?"
+    )
     assert request.code == 200
     # Assert the GeoJSON content-type.
     assert request.headers["Content-Type"] == "application/vnd.geo+json"
     stations = json.loads(str(request.body.decode("utf8")))
 
     assert stations == {
-        'features': [
-            {'geometry': {'coordinates': [32.7934, 39.868], 'type': 'Point'},
-             'properties': {'network_code': 'IU', 'station_code': 'ANTO'},
-             'type': 'Feature'},
-            {'geometry': {'coordinates': [-106.4572, 34.94591],
-                          'type': 'Point'},
-             'properties': {'network_code': 'IU', 'station_code': 'ANMO'},
-             'type': 'Feature'}],
-        'type': 'FeatureCollection'}
+        "features": [
+            {
+                "geometry": {
+                    "coordinates": [32.7934, 39.868],
+                    "type": "Point",
+                },
+                "properties": {"network_code": "IU", "station_code": "ANTO"},
+                "type": "Feature",
+            },
+            {
+                "geometry": {
+                    "coordinates": [-106.4572, 34.94591],
+                    "type": "Point",
+                },
+                "properties": {"network_code": "IU", "station_code": "ANMO"},
+                "type": "Feature",
+            },
+        ],
+        "type": "FeatureCollection",
+    }
 
     # network and station must be given.
     request = fetch_sync(client, "/coordinates?network=IU")
     assert request.code == 400
-    assert request.reason == ("Parameters 'network' and 'station' must be "
-                              "given.")
+    assert request.reason == (
+        "Parameters 'network' and 'station' must be " "given."
+    )
 
 
 def test_cors_headers(all_clients_all_callbacks):
@@ -2247,7 +2593,8 @@ def test_cors_headers(all_clients_all_callbacks):
         client,
         "/ttimes?sourcelatitude=50&sourcelongitude=10&"
         "sourcedepthinmeters=%i&receiverlatitude=40&receiverlongitude=90&"
-        "receiverdepthinmeters=0&phases=P" % client.source_depth)
+        "receiverdepthinmeters=0&phases=P" % client.source_depth,
+    )
     assert request.code == 200
     assert "Access-Control-Allow-Origin" in request.headers
     assert request.headers["Access-Control-Allow-Origin"] == "*"
@@ -2263,8 +2610,9 @@ def test_cors_headers(all_clients_all_callbacks):
         "mrr": "100000",
         "mrt": "100000",
         "mrp": "100000",
-        "mtp": "100000"}
-    request = fetch_sync(client, _assemble_url('seismograms_raw', **params))
+        "mtp": "100000",
+    }
+    request = fetch_sync(client, _assemble_url("seismograms_raw", **params))
     assert request.code == 200
     assert "Access-Control-Allow-Origin" in request.headers
     assert request.headers["Access-Control-Allow-Origin"] == "*"
@@ -2276,8 +2624,9 @@ def test_cors_headers(all_clients_all_callbacks):
         "sourcedepthinmeters": client.source_depth,
         "receiverlatitude": -10,
         "receiverlongitude": -10,
-        "sourcemomenttensor": "100000,100000,100000,100000,100000,100000"}
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+        "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
+    }
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     assert request.code == 200
     assert "Access-Control-Allow-Origin" in request.headers
     assert request.headers["Access-Control-Allow-Origin"] == "*"
@@ -2306,13 +2655,13 @@ def test_cors_headers_failing_requests(all_clients_all_callbacks):
 
     # raw seismograms route
     params = {}
-    request = fetch_sync(client, _assemble_url('seismograms_raw', **params))
+    request = fetch_sync(client, _assemble_url("seismograms_raw", **params))
     assert request.code == 400
     assert "Access-Control-Allow-Origin" in request.headers
     assert request.headers["Access-Control-Allow-Origin"] == "*"
 
     # standard seismograms route
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     assert request.code == 400
     assert "Access-Control-Allow-Origin" in request.headers
     assert request.headers["Access-Control-Allow-Origin"] == "*"
@@ -2339,7 +2688,8 @@ def test_gzipped_responses(all_clients_all_callbacks):
         client,
         "/ttimes?sourcelatitude=50&sourcelongitude=10&"
         "sourcedepthinmeters=%i&receiverlatitude=40&receiverlongitude=90&"
-        "receiverdepthinmeters=0&phases=P" % client.source_depth)
+        "receiverdepthinmeters=0&phases=P" % client.source_depth,
+    )
     assert request.code == 200
     assert "X-Consumed-Content-Encoding" not in request.headers
 
@@ -2354,13 +2704,15 @@ def test_gzipped_responses(all_clients_all_callbacks):
         "mrr": "100000",
         "mrt": "100000",
         "mrp": "100000",
-        "mtp": "100000"}
-    request = fetch_sync(client, _assemble_url('seismograms_raw', **params))
+        "mtp": "100000",
+    }
+    request = fetch_sync(client, _assemble_url("seismograms_raw", **params))
     assert request.code == 200
     assert "X-Consumed-Content-Encoding" not in request.headers
     # Gzipping should not return gzipped data as its a binary format.
-    request = fetch_sync(client, _assemble_url('seismograms_raw', **params),
-                           use_gzip=True)
+    request = fetch_sync(
+        client, _assemble_url("seismograms_raw", **params), use_gzip=True
+    )
     assert request.code == 200
     assert "X-Consumed-Content-Encoding" not in request.headers
 
@@ -2371,19 +2723,22 @@ def test_gzipped_responses(all_clients_all_callbacks):
         "sourcedepthinmeters": client.source_depth,
         "receiverlatitude": -10,
         "receiverlongitude": -10,
-        "sourcemomenttensor": "100000,100000,100000,100000,100000,100000"}
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+        "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
+    }
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     assert request.code == 200
     assert "X-Consumed-Content-Encoding" not in request.headers
     # Binary format, no gzipping.
-    request = fetch_sync(client, _assemble_url('seismograms', **params),
-                           use_gzip=True)
+    request = fetch_sync(
+        client, _assemble_url("seismograms", **params), use_gzip=True
+    )
     assert request.code == 200
     assert "X-Consumed-Content-Encoding" not in request.headers
 
 
 def test_multiple_seismograms_retrieval_no_format_given(
-        all_clients_station_coordinates_callback):
+    all_clients_station_coordinates_callback,
+):
     """
     Tests  the retrieval of multiple station in one request with no passed
     format parameter. This results in saczip return values.
@@ -2391,12 +2746,21 @@ def test_multiple_seismograms_retrieval_no_format_given(
     client = all_clients_station_coordinates_callback
     db = instaseis.open_db(client.filepath)
 
-    basic_parameters = {"sourcelatitude": 10, "sourcelongitude": 10,
-                        "sourcedepthinmeters": client.source_depth}
+    basic_parameters = {
+        "sourcelatitude": 10,
+        "sourcelongitude": 10,
+        "sourcedepthinmeters": client.source_depth,
+    }
 
     # Various sources.
-    mt = {"mtt": "100000", "mpp": "100000", "mrr": "100000",
-          "mrt": "100000", "mrp": "100000", "mtp": "100000"}
+    mt = {
+        "mtt": "100000",
+        "mpp": "100000",
+        "mrr": "100000",
+        "mrt": "100000",
+        "mrp": "100000",
+        "mtp": "100000",
+    }
     mt_param = "100000,100000,100000,100000,100000,100000"
     sdr = {"strike": "10", "dip": "10", "rake": "10", "M0": "1000000"}
     sdr_param = "10,10,10,1000000"
@@ -2413,7 +2777,7 @@ def test_multiple_seismograms_retrieval_no_format_given(
     params["station"] = "ANT*,ANM?"
 
     # Default format is MiniSEED>
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     assert request.code == 200
     assert request.headers["Content-Type"] == "application/zip"
     st_server = obspy.Stream()
@@ -2427,13 +2791,27 @@ def test_multiple_seismograms_retrieval_no_format_given(
         longitude=basic_parameters["sourcelongitude"],
         depth_in_m=0.0,
         origin_time=obspy.UTCDateTime(1900, 1, 1),
-        **dict((key[0] + "_" + key[1:], float(value))
-               for (key, value) in mt.items()))
+        **dict(
+            (key[0] + "_" + key[1:], float(value))
+            for (key, value) in mt.items()
+        ),
+    )
     receivers = [
-        instaseis.Receiver(latitude=39.868, longitude=32.7934,
-                           depth_in_m=0.0, network="IU", station="ANTO"),
-        instaseis.Receiver(latitude=34.94591, longitude=-106.4572,
-                           depth_in_m=0.0, network="IU", station="ANMO")]
+        instaseis.Receiver(
+            latitude=39.868,
+            longitude=32.7934,
+            depth_in_m=0.0,
+            network="IU",
+            station="ANTO",
+        ),
+        instaseis.Receiver(
+            latitude=34.94591,
+            longitude=-106.4572,
+            depth_in_m=0.0,
+            network="IU",
+            station="ANMO",
+        ),
+    ]
     st_db = obspy.Stream()
     for receiver in receivers:
         st_db += db.get_seismograms(source=source, receiver=receiver)
@@ -2453,8 +2831,9 @@ def test_multiple_seismograms_retrieval_no_format_given(
         assert tr_server.stats == tr_db.stats
         # Relative tolerance not particularly useful when testing super
         # small values.
-        np.testing.assert_allclose(tr_server.data, tr_db.data,
-                                   atol=1E-10 * tr_server.data.ptp())
+        np.testing.assert_allclose(
+            tr_server.data, tr_db.data, atol=1e-10 * tr_server.data.ptp()
+        )
 
     # Strike/dip/rake source
     params = copy.deepcopy(basic_parameters)
@@ -2468,7 +2847,7 @@ def test_multiple_seismograms_retrieval_no_format_given(
     params["origintime"] = str(time)
 
     # Default format is MiniSEED>
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     assert request.code == 200
     assert request.headers["Content-Type"] == "application/zip"
     st_server = obspy.Stream()
@@ -2480,13 +2859,26 @@ def test_multiple_seismograms_retrieval_no_format_given(
     source = instaseis.Source.from_strike_dip_rake(
         latitude=basic_parameters["sourcelatitude"],
         longitude=basic_parameters["sourcelongitude"],
-        depth_in_m=5.0, origin_time=time,
-        **dict((key, float(value)) for (key, value) in sdr.items()))
+        depth_in_m=5.0,
+        origin_time=time,
+        **dict((key, float(value)) for (key, value) in sdr.items()),
+    )
     receivers = [
-        instaseis.Receiver(latitude=39.868, longitude=32.7934,
-                           depth_in_m=0.0, network="IU", station="ANTO"),
-        instaseis.Receiver(latitude=34.94591, longitude=-106.4572,
-                           depth_in_m=0.0, network="IU", station="ANMO")]
+        instaseis.Receiver(
+            latitude=39.868,
+            longitude=32.7934,
+            depth_in_m=0.0,
+            network="IU",
+            station="ANTO",
+        ),
+        instaseis.Receiver(
+            latitude=34.94591,
+            longitude=-106.4572,
+            depth_in_m=0.0,
+            network="IU",
+            station="ANMO",
+        ),
+    ]
     st_db = obspy.Stream()
     for receiver in receivers:
         st_db += db.get_seismograms(source=source, receiver=receiver)
@@ -2508,8 +2900,9 @@ def test_multiple_seismograms_retrieval_no_format_given(
         assert tr_server.stats == tr_db.stats
         # Relative tolerance not particularly useful when testing super
         # small values.
-        np.testing.assert_allclose(tr_server.data, tr_db.data,
-                                   atol=1E-10 * tr_server.data.ptp())
+        np.testing.assert_allclose(
+            tr_server.data, tr_db.data, atol=1e-10 * tr_server.data.ptp()
+        )
 
     # Force source only works for displ_only databases.
     # Force source, all components.
@@ -2522,7 +2915,7 @@ def test_multiple_seismograms_retrieval_no_format_given(
         params["components"] = "".join(db.available_components)
 
         # Default format is MiniSEED>
-        request = fetch_sync(client, _assemble_url('seismograms', **params))
+        request = fetch_sync(client, _assemble_url("seismograms", **params))
         assert request.code == 200
         assert request.headers["Content-Type"] == "application/zip"
         st_server = obspy.Stream()
@@ -2535,18 +2928,33 @@ def test_multiple_seismograms_retrieval_no_format_given(
         source = instaseis.ForceSource(
             latitude=basic_parameters["sourcelatitude"],
             longitude=basic_parameters["sourcelongitude"],
-            depth_in_m=0.0, origin_time=obspy.UTCDateTime(1900, 1, 1),
-            **dict(("_".join(key), float(value))
-                   for (key, value) in fs.items()))
+            depth_in_m=0.0,
+            origin_time=obspy.UTCDateTime(1900, 1, 1),
+            **dict(
+                ("_".join(key), float(value)) for (key, value) in fs.items()
+            ),
+        )
         receivers = [
-            instaseis.Receiver(latitude=39.868, longitude=32.7934,
-                               depth_in_m=0.0, network="IU", station="ANTO"),
-            instaseis.Receiver(latitude=34.94591, longitude=-106.4572,
-                               depth_in_m=0.0, network="IU", station="ANMO")]
+            instaseis.Receiver(
+                latitude=39.868,
+                longitude=32.7934,
+                depth_in_m=0.0,
+                network="IU",
+                station="ANTO",
+            ),
+            instaseis.Receiver(
+                latitude=34.94591,
+                longitude=-106.4572,
+                depth_in_m=0.0,
+                network="IU",
+                station="ANMO",
+            ),
+        ]
         st_db = obspy.Stream()
         for receiver in receivers:
-            st_db += db.get_seismograms(source=source, receiver=receiver,
-                                        components=components)
+            st_db += db.get_seismograms(
+                source=source, receiver=receiver, components=components
+            )
         st_db.sort()
 
         # Should now have 10 Stream objects.
@@ -2559,18 +2967,21 @@ def test_multiple_seismograms_retrieval_no_format_given(
             del tr_db.stats.instaseis
             # Sample spacing is very similar but not equal due to floating
             # point accuracy.
-            np.testing.assert_allclose(tr_server.stats.delta,
-                                       tr_db.stats.delta)
+            np.testing.assert_allclose(
+                tr_server.stats.delta, tr_db.stats.delta
+            )
             tr_server.stats.delta = tr_db.stats.delta
             assert tr_server.stats == tr_db.stats
             # Relative tolerance not particularly useful when testing super
             # small values.
-            np.testing.assert_allclose(tr_server.data, tr_db.data,
-                                       atol=1E-10 * tr_server.data.ptp())
+            np.testing.assert_allclose(
+                tr_server.data, tr_db.data, atol=1e-10 * tr_server.data.ptp()
+            )
 
 
 def test_multiple_seismograms_retrieval_no_format_given_single_station(
-        all_clients_station_coordinates_callback):
+    all_clients_station_coordinates_callback,
+):
     """
     Tests  the retrieval of multiple station in one request with no passed
     format parameter. This results in sac return values.
@@ -2581,12 +2992,21 @@ def test_multiple_seismograms_retrieval_no_format_given_single_station(
     client = all_clients_station_coordinates_callback
     db = instaseis.open_db(client.filepath)
 
-    basic_parameters = {"sourcelatitude": 10, "sourcelongitude": 10,
-                        "sourcedepthinmeters": client.source_depth}
+    basic_parameters = {
+        "sourcelatitude": 10,
+        "sourcelongitude": 10,
+        "sourcedepthinmeters": client.source_depth,
+    }
 
     # Various sources.
-    mt = {"mrr": "100000", "mtt": "200000", "mpp": "300000",
-          "mrt": "400000", "mrp": "500000", "mtp": "600000"}
+    mt = {
+        "mrr": "100000",
+        "mtt": "200000",
+        "mpp": "300000",
+        "mrt": "400000",
+        "mrp": "500000",
+        "mtp": "600000",
+    }
     mt_param = "100000,200000,300000,400000,500000,600000"
     sdr = {"strike": "10", "dip": "20", "rake": "30", "M0": "1000000"}
     sdr_param = "10,20,30,1000000"
@@ -2603,7 +3023,7 @@ def test_multiple_seismograms_retrieval_no_format_given_single_station(
     params["station"] = "ANMO"
 
     # Default format is saczip.
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     assert request.code == 200
     assert request.headers["Content-Type"] == "application/zip"
     st_server = obspy.Stream()
@@ -2617,11 +3037,20 @@ def test_multiple_seismograms_retrieval_no_format_given_single_station(
         longitude=basic_parameters["sourcelongitude"],
         depth_in_m=0.0,
         origin_time=obspy.UTCDateTime(1900, 1, 1),
-        **dict((key[0] + "_" + key[1:], float(value))
-               for (key, value) in mt.items()))
+        **dict(
+            (key[0] + "_" + key[1:], float(value))
+            for (key, value) in mt.items()
+        ),
+    )
     receivers = [
-        instaseis.Receiver(latitude=34.94591, longitude=-106.4572,
-                           depth_in_m=0.0, network="IU", station="ANMO")]
+        instaseis.Receiver(
+            latitude=34.94591,
+            longitude=-106.4572,
+            depth_in_m=0.0,
+            network="IU",
+            station="ANMO",
+        )
+    ]
     st_db = obspy.Stream()
     for receiver in receivers:
         st_db += db.get_seismograms(source=source, receiver=receiver)
@@ -2641,8 +3070,9 @@ def test_multiple_seismograms_retrieval_no_format_given_single_station(
         assert tr_server.stats == tr_db.stats
         # Relative tolerance not particularly useful when testing super
         # small values.
-        np.testing.assert_allclose(tr_server.data, tr_db.data,
-                                   atol=1E-10 * tr_server.data.ptp())
+        np.testing.assert_allclose(
+            tr_server.data, tr_db.data, atol=1e-10 * tr_server.data.ptp()
+        )
 
     # From this point on, only three component databases.
     if "R" not in db.available_components:
@@ -2663,7 +3093,7 @@ def test_multiple_seismograms_retrieval_no_format_given_single_station(
     params["origintime"] = str(time)
 
     # Default format is MiniSEED>
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     assert request.code == 200
     assert request.headers["Content-Type"] == "application/zip"
     st_server = obspy.Stream()
@@ -2678,14 +3108,22 @@ def test_multiple_seismograms_retrieval_no_format_given_single_station(
         longitude=basic_parameters["sourcelongitude"],
         depth_in_m=params["sourcedepthinmeters"],
         origin_time=time,
-        **dict((key, float(value)) for (key, value) in sdr.items()))
+        **dict((key, float(value)) for (key, value) in sdr.items()),
+    )
     receivers = [
-        instaseis.Receiver(latitude=34.94591, longitude=-106.4572,
-                           depth_in_m=0.0, network="IU", station="ANMO")]
+        instaseis.Receiver(
+            latitude=34.94591,
+            longitude=-106.4572,
+            depth_in_m=0.0,
+            network="IU",
+            station="ANMO",
+        )
+    ]
     st_db = obspy.Stream()
     for receiver in receivers:
-        st_db += db.get_seismograms(source=source, receiver=receiver,
-                                    components=components)
+        st_db += db.get_seismograms(
+            source=source, receiver=receiver, components=components
+        )
     st_db.sort()
 
     # Should now have only 2 Stream objects.
@@ -2703,8 +3141,9 @@ def test_multiple_seismograms_retrieval_no_format_given_single_station(
         assert tr_server.stats == tr_db.stats
         # Relative tolerance not particularly useful when testing super
         # small values.
-        np.testing.assert_allclose(tr_server.data, tr_db.data,
-                                   atol=1E-10 * tr_server.data.ptp())
+        np.testing.assert_allclose(
+            tr_server.data, tr_db.data, atol=1e-10 * tr_server.data.ptp()
+        )
 
     # Force source only works for displ_only databases.
     # Force source, all 5 components.
@@ -2717,7 +3156,7 @@ def test_multiple_seismograms_retrieval_no_format_given_single_station(
         params["components"] = "NEZRT"
 
         # Default format is MiniSEED>
-        request = fetch_sync(client, _assemble_url('seismograms', **params))
+        request = fetch_sync(client, _assemble_url("seismograms", **params))
         assert request.code == 200
         assert request.headers["Content-Type"] == "application/zip"
         st_server = obspy.Stream()
@@ -2730,16 +3169,26 @@ def test_multiple_seismograms_retrieval_no_format_given_single_station(
         source = instaseis.ForceSource(
             latitude=basic_parameters["sourcelatitude"],
             longitude=basic_parameters["sourcelongitude"],
-            depth_in_m=0.0, origin_time=obspy.UTCDateTime(1900, 1, 1),
-            **dict(("_".join(key), float(value))
-                   for (key, value) in fs.items()))
+            depth_in_m=0.0,
+            origin_time=obspy.UTCDateTime(1900, 1, 1),
+            **dict(
+                ("_".join(key), float(value)) for (key, value) in fs.items()
+            ),
+        )
         receivers = [
-            instaseis.Receiver(latitude=34.94591, longitude=-106.4572,
-                               depth_in_m=0.0, network="IU", station="ANMO")]
+            instaseis.Receiver(
+                latitude=34.94591,
+                longitude=-106.4572,
+                depth_in_m=0.0,
+                network="IU",
+                station="ANMO",
+            )
+        ]
         st_db = obspy.Stream()
         for receiver in receivers:
-            st_db += db.get_seismograms(source=source, receiver=receiver,
-                                        components=components)
+            st_db += db.get_seismograms(
+                source=source, receiver=receiver, components=components
+            )
         st_db.sort()
 
         # Should now have 5 Stream objects.
@@ -2752,18 +3201,21 @@ def test_multiple_seismograms_retrieval_no_format_given_single_station(
             del tr_db.stats.instaseis
             # Sample spacing is very similar but not equal due to floating
             # point accuracy.
-            np.testing.assert_allclose(tr_server.stats.delta,
-                                       tr_db.stats.delta)
+            np.testing.assert_allclose(
+                tr_server.stats.delta, tr_db.stats.delta
+            )
             tr_server.stats.delta = tr_db.stats.delta
             assert tr_server.stats == tr_db.stats
             # Relative tolerance not particularly useful when testing super
             # small values.
-            np.testing.assert_allclose(tr_server.data, tr_db.data,
-                                       atol=1E-10 * tr_server.data.ptp())
+            np.testing.assert_allclose(
+                tr_server.data, tr_db.data, atol=1e-10 * tr_server.data.ptp()
+            )
 
 
 def test_multiple_seismograms_retrieval_mseed_format(
-        all_clients_station_coordinates_callback):
+    all_clients_station_coordinates_callback,
+):
     """
     Tests  the retrieval of multiple station in one request with the mseed
     format parameter.
@@ -2771,13 +3223,22 @@ def test_multiple_seismograms_retrieval_mseed_format(
     client = all_clients_station_coordinates_callback
     db = instaseis.open_db(client.filepath)
 
-    basic_parameters = {"sourcelatitude": 10, "sourcelongitude": 10,
-                        "format": "miniseed",
-                        "sourcedepthinmeters": client.source_depth}
+    basic_parameters = {
+        "sourcelatitude": 10,
+        "sourcelongitude": 10,
+        "format": "miniseed",
+        "sourcedepthinmeters": client.source_depth,
+    }
 
     # Various sources.
-    mt = {"mtt": "100000", "mpp": "100000", "mrr": "100000",
-          "mrt": "100000", "mrp": "100000", "mtp": "100000"}
+    mt = {
+        "mtt": "100000",
+        "mpp": "100000",
+        "mrr": "100000",
+        "mrt": "100000",
+        "mrp": "100000",
+        "mtp": "100000",
+    }
     mt_param = "100000,100000,100000,100000,100000,100000"
     sdr = {"strike": "10", "dip": "10", "rake": "10", "M0": "1000000"}
     sdr_param = "10,10,10,1000000"
@@ -2794,7 +3255,7 @@ def test_multiple_seismograms_retrieval_mseed_format(
     params["station"] = "ANT*,ANM?"
 
     # Default format is MiniSEED.
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     assert request.code == 200
     assert request.headers["Content-Type"] == "application/vnd.fdsn.mseed"
     st_server = obspy.read(request.buffer)
@@ -2804,18 +3265,34 @@ def test_multiple_seismograms_retrieval_mseed_format(
     source = instaseis.Source(
         latitude=basic_parameters["sourcelatitude"],
         longitude=basic_parameters["sourcelongitude"],
-        depth_in_m=0.0, origin_time=obspy.UTCDateTime(1900, 1, 1),
-        **dict((key[0] + "_" + key[1:], float(value))
-               for (key, value) in mt.items()))
+        depth_in_m=0.0,
+        origin_time=obspy.UTCDateTime(1900, 1, 1),
+        **dict(
+            (key[0] + "_" + key[1:], float(value))
+            for (key, value) in mt.items()
+        ),
+    )
     receivers = [
-        instaseis.Receiver(latitude=39.868, longitude=32.7934,
-                           depth_in_m=0.0, network="IU", station="ANTO"),
-        instaseis.Receiver(latitude=34.94591, longitude=-106.4572,
-                           depth_in_m=0.0, network="IU", station="ANMO")]
+        instaseis.Receiver(
+            latitude=39.868,
+            longitude=32.7934,
+            depth_in_m=0.0,
+            network="IU",
+            station="ANTO",
+        ),
+        instaseis.Receiver(
+            latitude=34.94591,
+            longitude=-106.4572,
+            depth_in_m=0.0,
+            network="IU",
+            station="ANMO",
+        ),
+    ]
     st_db = obspy.Stream()
     for receiver in receivers:
-        st_db += db.get_seismograms(source=source, receiver=receiver,
-                                    components=components)
+        st_db += db.get_seismograms(
+            source=source, receiver=receiver, components=components
+        )
     st_db.sort()
 
     # Should now have a number of streams.
@@ -2836,8 +3313,9 @@ def test_multiple_seismograms_retrieval_mseed_format(
         assert tr_server.stats == tr_db.stats
         # Relative tolerance not particularly useful when testing super
         # small values.
-        np.testing.assert_allclose(tr_server.data, tr_db.data,
-                                   atol=1E-10 * tr_server.data.ptp())
+        np.testing.assert_allclose(
+            tr_server.data, tr_db.data, atol=1e-10 * tr_server.data.ptp()
+        )
 
     # Execute the rest only for databases that have vertical and horizontal
     # components.
@@ -2859,7 +3337,7 @@ def test_multiple_seismograms_retrieval_mseed_format(
         params["sourcedepthinmeters"] = str(client.source_depth)
 
     # Default format is MiniSEED>
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     assert request.code == 200
     assert request.headers["Content-Type"] == "application/vnd.fdsn.mseed"
     st_server = obspy.read(request.buffer)
@@ -2871,16 +3349,29 @@ def test_multiple_seismograms_retrieval_mseed_format(
         longitude=basic_parameters["sourcelongitude"],
         depth_in_m=params["sourcedepthinmeters"],
         origin_time=time,
-        **dict((key, float(value)) for (key, value) in sdr.items()))
+        **dict((key, float(value)) for (key, value) in sdr.items()),
+    )
     receivers = [
-        instaseis.Receiver(latitude=39.868, longitude=32.7934,
-                           depth_in_m=0.0, network="IU", station="ANTO"),
-        instaseis.Receiver(latitude=34.94591, longitude=-106.4572,
-                           depth_in_m=0.0, network="IU", station="ANMO")]
+        instaseis.Receiver(
+            latitude=39.868,
+            longitude=32.7934,
+            depth_in_m=0.0,
+            network="IU",
+            station="ANTO",
+        ),
+        instaseis.Receiver(
+            latitude=34.94591,
+            longitude=-106.4572,
+            depth_in_m=0.0,
+            network="IU",
+            station="ANMO",
+        ),
+    ]
     st_db = obspy.Stream()
     for receiver in receivers:
-        st_db += db.get_seismograms(source=source, receiver=receiver,
-                                    components=components)
+        st_db += db.get_seismograms(
+            source=source, receiver=receiver, components=components
+        )
     st_db.sort()
 
     # Should now have only 4 Stream objects.
@@ -2899,8 +3390,9 @@ def test_multiple_seismograms_retrieval_mseed_format(
         assert tr_server.stats == tr_db.stats
         # Relative tolerance not particularly useful when testing super
         # small values.
-        np.testing.assert_allclose(tr_server.data, tr_db.data,
-                                   atol=1E-10 * tr_server.data.ptp())
+        np.testing.assert_allclose(
+            tr_server.data, tr_db.data, atol=1e-10 * tr_server.data.ptp()
+        )
 
     # Force source only works for displ_only databases.
     # Force source, all 5 components.
@@ -2913,7 +3405,7 @@ def test_multiple_seismograms_retrieval_mseed_format(
         params["components"] = "NEZRT"
 
         # Default format is MiniSEED>
-        request = fetch_sync(client, _assemble_url('seismograms', **params))
+        request = fetch_sync(client, _assemble_url("seismograms", **params))
         assert request.code == 200
         assert request.headers["Content-Type"] == "application/vnd.fdsn.mseed"
         st_server = obspy.read(request.buffer)
@@ -2923,18 +3415,33 @@ def test_multiple_seismograms_retrieval_mseed_format(
         source = instaseis.ForceSource(
             latitude=basic_parameters["sourcelatitude"],
             longitude=basic_parameters["sourcelongitude"],
-            depth_in_m=0.0, origin_time=obspy.UTCDateTime(1900, 1, 1),
-            **dict(("_".join(key), float(value))
-                   for (key, value) in fs.items()))
+            depth_in_m=0.0,
+            origin_time=obspy.UTCDateTime(1900, 1, 1),
+            **dict(
+                ("_".join(key), float(value)) for (key, value) in fs.items()
+            ),
+        )
         receivers = [
-            instaseis.Receiver(latitude=39.868, longitude=32.7934,
-                               depth_in_m=0.0, network="IU", station="ANTO"),
-            instaseis.Receiver(latitude=34.94591, longitude=-106.4572,
-                               depth_in_m=0.0, network="IU", station="ANMO")]
+            instaseis.Receiver(
+                latitude=39.868,
+                longitude=32.7934,
+                depth_in_m=0.0,
+                network="IU",
+                station="ANTO",
+            ),
+            instaseis.Receiver(
+                latitude=34.94591,
+                longitude=-106.4572,
+                depth_in_m=0.0,
+                network="IU",
+                station="ANMO",
+            ),
+        ]
         st_db = obspy.Stream()
         for receiver in receivers:
-            st_db += db.get_seismograms(source=source, receiver=receiver,
-                                        components=components)
+            st_db += db.get_seismograms(
+                source=source, receiver=receiver, components=components
+            )
         st_db.sort()
 
         # Should now have 10 Stream objects.
@@ -2949,18 +3456,21 @@ def test_multiple_seismograms_retrieval_mseed_format(
             del tr_db.stats.instaseis
             # Sample spacing is very similar but not equal due to floating
             # point accuracy.
-            np.testing.assert_allclose(tr_server.stats.delta,
-                                       tr_db.stats.delta)
+            np.testing.assert_allclose(
+                tr_server.stats.delta, tr_db.stats.delta
+            )
             tr_server.stats.delta = tr_db.stats.delta
             assert tr_server.stats == tr_db.stats
             # Relative tolerance not particularly useful when testing super
             # small values.
-            np.testing.assert_allclose(tr_server.data, tr_db.data,
-                                       atol=1E-10 * tr_server.data.ptp())
+            np.testing.assert_allclose(
+                tr_server.data, tr_db.data, atol=1e-10 * tr_server.data.ptp()
+            )
 
 
 def test_multiple_seismograms_retrieval_saczip_format(
-        all_clients_station_coordinates_callback):
+    all_clients_station_coordinates_callback,
+):
     """
     Tests  the retrieval of multiple station in one request with the saczip
     format parameter.
@@ -2968,13 +3478,22 @@ def test_multiple_seismograms_retrieval_saczip_format(
     client = all_clients_station_coordinates_callback
     db = instaseis.open_db(client.filepath)
 
-    basic_parameters = {"sourcelatitude": 10, "sourcelongitude": 10,
-                        "sourcedepthinmeters": client.source_depth,
-                        "format": "saczip"}
+    basic_parameters = {
+        "sourcelatitude": 10,
+        "sourcelongitude": 10,
+        "sourcedepthinmeters": client.source_depth,
+        "format": "saczip",
+    }
 
     # Various sources.
-    mt = {"mtt": "100000", "mpp": "100000", "mrr": "100000",
-          "mrt": "100000", "mrp": "100000", "mtp": "100000"}
+    mt = {
+        "mtt": "100000",
+        "mpp": "100000",
+        "mrr": "100000",
+        "mrt": "100000",
+        "mrp": "100000",
+        "mtp": "100000",
+    }
     mt_param = "100000,100000,100000,100000,100000,100000"
     sdr = {"strike": "10", "dip": "10", "rake": "10", "M0": "1000000"}
     sdr_param = "10,10,10,1000000"
@@ -2991,7 +3510,7 @@ def test_multiple_seismograms_retrieval_saczip_format(
     params["station"] = "ANT*,ANM?"
 
     # Default format is MiniSEED>
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     assert request.code == 200
     assert request.headers["Content-Type"] == "application/zip"
 
@@ -3008,14 +3527,29 @@ def test_multiple_seismograms_retrieval_saczip_format(
     source = instaseis.Source(
         latitude=basic_parameters["sourcelatitude"],
         longitude=basic_parameters["sourcelongitude"],
-        depth_in_m=0.0, origin_time=obspy.UTCDateTime(1900, 1, 1),
-        **dict((key[0] + "_" + key[1:], float(value))
-               for (key, value) in mt.items()))
+        depth_in_m=0.0,
+        origin_time=obspy.UTCDateTime(1900, 1, 1),
+        **dict(
+            (key[0] + "_" + key[1:], float(value))
+            for (key, value) in mt.items()
+        ),
+    )
     receivers = [
-        instaseis.Receiver(latitude=39.868, longitude=32.7934,
-                           depth_in_m=0.0, network="IU", station="ANTO"),
-        instaseis.Receiver(latitude=34.94591, longitude=-106.4572,
-                           depth_in_m=0.0, network="IU", station="ANMO")]
+        instaseis.Receiver(
+            latitude=39.868,
+            longitude=32.7934,
+            depth_in_m=0.0,
+            network="IU",
+            station="ANTO",
+        ),
+        instaseis.Receiver(
+            latitude=34.94591,
+            longitude=-106.4572,
+            depth_in_m=0.0,
+            network="IU",
+            station="ANMO",
+        ),
+    ]
     st_db = obspy.Stream()
     for receiver in receivers:
         st_db += db.get_seismograms(source=source, receiver=receiver)
@@ -3037,8 +3571,9 @@ def test_multiple_seismograms_retrieval_saczip_format(
         assert tr_server.stats == tr_db.stats
         # Relative tolerance not particularly useful when testing super
         # small values.
-        np.testing.assert_allclose(tr_server.data, tr_db.data,
-                                   atol=1E-10 * tr_server.data.ptp())
+        np.testing.assert_allclose(
+            tr_server.data, tr_db.data, atol=1e-10 * tr_server.data.ptp()
+        )
 
     # From here on only 3C databases
     if "R" not in db.available_components:
@@ -3059,7 +3594,7 @@ def test_multiple_seismograms_retrieval_saczip_format(
         params["sourcedepthinmeters"] = str(client.source_depth)
 
     # Default format is saczip.
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     assert request.code == 200
     assert request.headers["Content-Type"] == "application/zip"
 
@@ -3077,17 +3612,31 @@ def test_multiple_seismograms_retrieval_saczip_format(
     source = instaseis.Source.from_strike_dip_rake(
         latitude=basic_parameters["sourcelatitude"],
         longitude=basic_parameters["sourcelongitude"],
-        depth_in_m=5.0, origin_time=time,
-        **dict((key, float(value)) for (key, value) in sdr.items()))
+        depth_in_m=5.0,
+        origin_time=time,
+        **dict((key, float(value)) for (key, value) in sdr.items()),
+    )
     receivers = [
-        instaseis.Receiver(latitude=39.868, longitude=32.7934,
-                           depth_in_m=0.0, network="IU", station="ANTO"),
-        instaseis.Receiver(latitude=34.94591, longitude=-106.4572,
-                           depth_in_m=0.0, network="IU", station="ANMO")]
+        instaseis.Receiver(
+            latitude=39.868,
+            longitude=32.7934,
+            depth_in_m=0.0,
+            network="IU",
+            station="ANTO",
+        ),
+        instaseis.Receiver(
+            latitude=34.94591,
+            longitude=-106.4572,
+            depth_in_m=0.0,
+            network="IU",
+            station="ANMO",
+        ),
+    ]
     st_db = obspy.Stream()
     for receiver in receivers:
-        st_db += db.get_seismograms(source=source, receiver=receiver,
-                                    components=components)
+        st_db += db.get_seismograms(
+            source=source, receiver=receiver, components=components
+        )
     st_db.sort()
 
     # Should now have only 4 Stream objects.
@@ -3105,8 +3654,9 @@ def test_multiple_seismograms_retrieval_saczip_format(
         assert tr_server.stats == tr_db.stats
         # Relative tolerance not particularly useful when testing super
         # small values.
-        np.testing.assert_allclose(tr_server.data, tr_db.data,
-                                   atol=1E-10 * tr_server.data.ptp())
+        np.testing.assert_allclose(
+            tr_server.data, tr_db.data, atol=1e-10 * tr_server.data.ptp()
+        )
 
     # Force source only works for displ_only databases.
     # Force source, all 5 components.
@@ -3119,7 +3669,7 @@ def test_multiple_seismograms_retrieval_saczip_format(
         params["components"] = "NEZRT"
 
         # Default format is MiniSEED>
-        request = fetch_sync(client, _assemble_url('seismograms', **params))
+        request = fetch_sync(client, _assemble_url("seismograms", **params))
         assert request.code == 200
         assert request.headers["Content-Type"] == "application/zip"
 
@@ -3137,18 +3687,33 @@ def test_multiple_seismograms_retrieval_saczip_format(
         source = instaseis.ForceSource(
             latitude=basic_parameters["sourcelatitude"],
             longitude=basic_parameters["sourcelongitude"],
-            depth_in_m=0.0, origin_time=obspy.UTCDateTime(1900, 1, 1),
-            **dict(("_".join(key), float(value))
-                   for (key, value) in fs.items()))
+            depth_in_m=0.0,
+            origin_time=obspy.UTCDateTime(1900, 1, 1),
+            **dict(
+                ("_".join(key), float(value)) for (key, value) in fs.items()
+            ),
+        )
         receivers = [
-            instaseis.Receiver(latitude=39.868, longitude=32.7934,
-                               depth_in_m=0.0, network="IU", station="ANTO"),
-            instaseis.Receiver(latitude=34.94591, longitude=-106.4572,
-                               depth_in_m=0.0, network="IU", station="ANMO")]
+            instaseis.Receiver(
+                latitude=39.868,
+                longitude=32.7934,
+                depth_in_m=0.0,
+                network="IU",
+                station="ANTO",
+            ),
+            instaseis.Receiver(
+                latitude=34.94591,
+                longitude=-106.4572,
+                depth_in_m=0.0,
+                network="IU",
+                station="ANMO",
+            ),
+        ]
         st_db = obspy.Stream()
         for receiver in receivers:
-            st_db += db.get_seismograms(source=source, receiver=receiver,
-                                        components=components)
+            st_db += db.get_seismograms(
+                source=source, receiver=receiver, components=components
+            )
         st_db.sort()
 
         # Should now have 10 Stream objects.
@@ -3161,38 +3726,45 @@ def test_multiple_seismograms_retrieval_saczip_format(
             del tr_db.stats.instaseis
             # Sample spacing is very similar but not equal due to floating
             # point accuracy.
-            np.testing.assert_allclose(tr_server.stats.delta,
-                                       tr_db.stats.delta)
+            np.testing.assert_allclose(
+                tr_server.stats.delta, tr_db.stats.delta
+            )
             tr_server.stats.delta = tr_db.stats.delta
             assert tr_server.stats == tr_db.stats
             # Relative tolerance not particularly useful when testing super
             # small values.
-            np.testing.assert_allclose(tr_server.data, tr_db.data,
-                                       atol=1E-10 * tr_server.data.ptp())
+            np.testing.assert_allclose(
+                tr_server.data, tr_db.data, atol=1e-10 * tr_server.data.ptp()
+            )
 
 
 def test_multiple_seismograms_retrieval_invalid_format(
-        all_clients_station_coordinates_callback):
+    all_clients_station_coordinates_callback,
+):
     """
     Tests  the retrieval of multiple station with an invalid format.
     """
     client = all_clients_station_coordinates_callback
 
     params = {
-        "sourcelatitude": 10, "sourcelongitude": 10, "sourcedepthinmeters": 0,
+        "sourcelatitude": 10,
+        "sourcelongitude": 10,
+        "sourcedepthinmeters": 0,
         "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
-        "format": "bogus"}
+        "format": "bogus",
+    }
     # This will return two stations.
     params["network"] = "IU,B*"
     params["station"] = "ANT*,ANM?"
 
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     assert request.code == 400
     assert request.reason == "Format must either be 'miniseed' or 'saczip'."
 
 
 def test_multiple_seismograms_retrieval_no_stations(
-        all_clients_station_coordinates_callback):
+    all_clients_station_coordinates_callback,
+):
     """
     Tests  the retrieval of multiple station where the request ends up in no
     found stations.
@@ -3200,13 +3772,16 @@ def test_multiple_seismograms_retrieval_no_stations(
     client = all_clients_station_coordinates_callback
 
     params = {
-        "sourcelatitude": 10, "sourcelongitude": 10, "sourcedepthinmeters": 0,
-        "sourcemomenttensor": "100000,100000,100000,100000,100000,100000"}
+        "sourcelatitude": 10,
+        "sourcelongitude": 10,
+        "sourcedepthinmeters": 0,
+        "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
+    }
     # This will return two stations.
     params["network"] = "HE"
     params["station"] = "LLO"
 
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     assert request.code == 404
     assert request.reason == "No coordinates found satisfying the query."
 
@@ -3219,35 +3794,51 @@ def test_unknown_parameter_raises(all_clients):
 
     # Normal request works fine.
     params = {
-        "sourcelatitude": 10, "sourcelongitude": 10, "receiverlatitude": -10,
-        "receiverlongitude": -10, "mtt": "100000", "mpp": "100000",
-        "mrr": "100000", "mrt": "100000", "mrp": "100000", "mtp": "100000"}
-    request = fetch_sync(client, _assemble_url('seismograms_raw', **params))
+        "sourcelatitude": 10,
+        "sourcelongitude": 10,
+        "receiverlatitude": -10,
+        "receiverlongitude": -10,
+        "mtt": "100000",
+        "mpp": "100000",
+        "mrr": "100000",
+        "mrt": "100000",
+        "mrp": "100000",
+        "mtp": "100000",
+    }
+    request = fetch_sync(client, _assemble_url("seismograms_raw", **params))
     assert request.code == 200
 
     # Adding a random other parameter raises
     params["bogus"] = "bogus"
     params["random"] = "stuff"
-    request = fetch_sync(client, _assemble_url('seismograms_raw', **params))
+    request = fetch_sync(client, _assemble_url("seismograms_raw", **params))
     assert request.code == 400
-    assert request.reason == ("The following unknown parameters have been "
-                              "passed: 'bogus', 'random'")
+    assert request.reason == (
+        "The following unknown parameters have been "
+        "passed: 'bogus', 'random'"
+    )
 
     # Same with /seismograms route.
     params = {
-        "sourcelatitude": 10, "sourcelongitude": 10, "receiverlatitude": -10,
-        "receiverlongitude": -10, "sourcedepthinmeters": client.source_depth,
-        "sourcemomenttensor": "100000,100000,100000,100000,100000,100000"}
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+        "sourcelatitude": 10,
+        "sourcelongitude": 10,
+        "receiverlatitude": -10,
+        "receiverlongitude": -10,
+        "sourcedepthinmeters": client.source_depth,
+        "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
+    }
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     assert request.code == 200
 
     # Adding a random other parameter raises
     params["random"] = "stuff"
     params["bogus"] = "bogus"
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     assert request.code == 400
-    assert request.reason == ("The following unknown parameters have been "
-                              "passed: 'bogus', 'random'")
+    assert request.reason == (
+        "The following unknown parameters have been "
+        "passed: 'bogus', 'random'"
+    )
 
 
 def test_passing_duplicate_parameter_raises(all_clients):
@@ -3259,10 +3850,18 @@ def test_passing_duplicate_parameter_raises(all_clients):
 
     # Normal request works fine.
     params = {
-        "sourcelatitude": 10, "sourcelongitude": 10, "receiverlatitude": -10,
-        "receiverlongitude": -10, "mtt": "100000", "mpp": "100000",
-        "mrr": "100000", "mrt": "100000", "mrp": "100000", "mtp": "100000"}
-    url = _assemble_url('seismograms_raw', **params)
+        "sourcelatitude": 10,
+        "sourcelongitude": 10,
+        "receiverlatitude": -10,
+        "receiverlongitude": -10,
+        "mtt": "100000",
+        "mpp": "100000",
+        "mrr": "100000",
+        "mrt": "100000",
+        "mrp": "100000",
+        "mtp": "100000",
+    }
+    url = _assemble_url("seismograms_raw", **params)
     request = fetch_sync(client, url)
     assert request.code == 200
 
@@ -3270,15 +3869,20 @@ def test_passing_duplicate_parameter_raises(all_clients):
     url += "&receiverlatitude=10&mrt=10"
     request = fetch_sync(client, url)
     assert request.code == 400
-    assert request.reason == ("Duplicate parameters: 'mrt', "
-                              "'receiverlatitude'")
+    assert request.reason == (
+        "Duplicate parameters: 'mrt', " "'receiverlatitude'"
+    )
 
     # Same with /seismograms route.
     params = {
-        "sourcelatitude": 10, "sourcelongitude": 10, "receiverlatitude": -10,
-        "receiverlongitude": -10, "sourcedepthinmeters": client.source_depth,
-        "sourcemomenttensor": "100000,100000,100000,100000,100000,100000"}
-    url = _assemble_url('seismograms', **params)
+        "sourcelatitude": 10,
+        "sourcelongitude": 10,
+        "receiverlatitude": -10,
+        "receiverlongitude": -10,
+        "sourcedepthinmeters": client.source_depth,
+        "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
+    }
+    url = _assemble_url("seismograms", **params)
     request = fetch_sync(client, url)
     assert request.code == 200
 
@@ -3287,7 +3891,8 @@ def test_passing_duplicate_parameter_raises(all_clients):
     request = fetch_sync(client, url)
     assert request.code == 400
     assert request.reason == (
-        "Duplicate parameters: 'receiverlatitude', 'sourcemomenttensor'")
+        "Duplicate parameters: 'receiverlatitude', 'sourcemomenttensor'"
+    )
 
 
 def test_passing_invalid_time_settings_raises(all_clients):
@@ -3297,40 +3902,48 @@ def test_passing_invalid_time_settings_raises(all_clients):
     origin_time = obspy.UTCDateTime(2015, 1, 1)
     client = all_clients
     params = {
-        "sourcelatitude": 10, "sourcelongitude": 10, "receiverlatitude": -10,
-        "receiverlongitude": -10, "sourcedepthinmeters": client.source_depth,
+        "sourcelatitude": 10,
+        "sourcelongitude": 10,
+        "receiverlatitude": -10,
+        "receiverlongitude": -10,
+        "sourcedepthinmeters": client.source_depth,
         "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
-        "origintime": str(origin_time)}
+        "origintime": str(origin_time),
+    }
 
     # This should work fine.
-    url = _assemble_url('seismograms', **params)
+    url = _assemble_url("seismograms", **params)
     request = fetch_sync(client, url)
     assert request.code == 200
 
     # The remainder should not.
     p = copy.deepcopy(params)
-    p["starttime"] = str(origin_time + 1E6)
-    url = _assemble_url('seismograms', **p)
+    p["starttime"] = str(origin_time + 1e6)
+    url = _assemble_url("seismograms", **p)
     request = fetch_sync(client, url)
     assert request.code == 400
-    assert request.reason == ("The `starttime` must be before the seismogram "
-                              "ends.")
+    assert request.reason == (
+        "The `starttime` must be before the seismogram " "ends."
+    )
 
     p = copy.deepcopy(params)
-    p["endtime"] = str(origin_time - 1E6)
-    url = _assemble_url('seismograms', **p)
+    p["endtime"] = str(origin_time - 1e6)
+    url = _assemble_url("seismograms", **p)
     request = fetch_sync(client, url)
     assert request.code == 400
-    assert request.reason == ("The end time of the seismograms lies outside "
-                              "the allowed range.")
+    assert request.reason == (
+        "The end time of the seismograms lies outside " "the allowed range."
+    )
 
     p = copy.deepcopy(params)
     p["starttime"] = str(origin_time - 3800)
-    url = _assemble_url('seismograms', **p)
+    url = _assemble_url("seismograms", **p)
     request = fetch_sync(client, url)
     assert request.code == 400
-    assert request.reason == ("The seismogram can start at the maximum one "
-                              "hour before the origin time.")
+    assert request.reason == (
+        "The seismogram can start at the maximum one "
+        "hour before the origin time."
+    )
 
 
 def test_time_settings_for_seismograms_route(all_clients):
@@ -3344,14 +3957,20 @@ def test_time_settings_for_seismograms_route(all_clients):
     client = all_clients
     # Resample to 1Hz to simplify the logic.
     params = {
-        "sourcelatitude": 10, "sourcelongitude": 10, "receiverlatitude": -10,
-        "receiverlongitude": -10, "sourcedepthinmeters": client.source_depth,
+        "sourcelatitude": 10,
+        "sourcelongitude": 10,
+        "receiverlatitude": -10,
+        "receiverlongitude": -10,
+        "sourcedepthinmeters": client.source_depth,
         "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
-        "dt": 1.0, "kernelwidth": 1, "origintime": str(origin_time),
-        "format": "miniseed"}
+        "dt": 1.0,
+        "kernelwidth": 1,
+        "origintime": str(origin_time),
+        "format": "miniseed",
+    }
 
     p = copy.deepcopy(params)
-    url = _assemble_url('seismograms', **p)
+    url = _assemble_url("seismograms", **p)
     request = fetch_sync(client, url)
     st = obspy.read(request.buffer)
 
@@ -3362,7 +3981,7 @@ def test_time_settings_for_seismograms_route(all_clients):
     # Different starttime.
     p = copy.deepcopy(params)
     p["starttime"] = origin_time - 10
-    url = _assemble_url('seismograms', **p)
+    url = _assemble_url("seismograms", **p)
     request = fetch_sync(client, url)
     st_2 = obspy.read(request.buffer)
 
@@ -3373,7 +3992,7 @@ def test_time_settings_for_seismograms_route(all_clients):
     # an offset to the origin time.
     p = copy.deepcopy(params)
     p["starttime"] = -10
-    url = _assemble_url('seismograms', **p)
+    url = _assemble_url("seismograms", **p)
     request = fetch_sync(client, url)
     st_2 = obspy.read(request.buffer)
 
@@ -3393,7 +4012,7 @@ def test_time_settings_for_seismograms_route(all_clients):
     # Test endtime settings.
     p = copy.deepcopy(params)
     p["endtime"] = origin_time + 10
-    url = _assemble_url('seismograms', **p)
+    url = _assemble_url("seismograms", **p)
     request = fetch_sync(client, url)
     st_2 = obspy.read(request.buffer)
 
@@ -3405,7 +4024,7 @@ def test_time_settings_for_seismograms_route(all_clients):
     # offset in respect to the starttime.
     p = copy.deepcopy(params)
     p["endtime"] = 13.0
-    url = _assemble_url('seismograms', **p)
+    url = _assemble_url("seismograms", **p)
     request = fetch_sync(client, url)
     st_2 = obspy.read(request.buffer)
 
@@ -3417,7 +4036,7 @@ def test_time_settings_for_seismograms_route(all_clients):
     p = copy.deepcopy(params)
     p["endtime"] = 10
     p["starttime"] = origin_time - 5
-    url = _assemble_url('seismograms', **p)
+    url = _assemble_url("seismograms", **p)
     request = fetch_sync(client, url)
     st_2 = obspy.read(request.buffer)
 
@@ -3429,7 +4048,7 @@ def test_time_settings_for_seismograms_route(all_clients):
     # in the back will raise an error but that is tested elsewhere.
     p = copy.deepcopy(params)
     p["starttime"] = origin_time - 1800
-    url = _assemble_url('seismograms', **p)
+    url = _assemble_url("seismograms", **p)
     request = fetch_sync(client, url)
     st_2 = obspy.read(request.buffer)
 
@@ -3447,11 +4066,12 @@ def test_event_route_with_no_event_callback(all_clients):
     client = all_clients
     request = fetch_sync(client, "/event?id=B071791B")
     assert request.code == 404
-    assert request.reason == 'Server does not support event information.'
+    assert request.reason == "Server does not support event information."
 
 
 def test_event_route_with_event_coordinates_callback(
-        all_clients_event_callback):
+    all_clients_event_callback,
+):
     """
     Tests the /event route.
     """
@@ -3482,19 +4102,24 @@ def test_event_route_with_event_coordinates_callback(
         "latitude": -3.8,
         "longitude": -104.21,
         "depth_in_m": 0,
-        "origin_time": "1991-07-17T16:41:33.100000Z"}
+        "origin_time": "1991-07-17T16:41:33.100000Z",
+    }
 
 
 def test_station_query_various_failures(
-        all_clients_station_coordinates_callback):
+    all_clients_station_coordinates_callback,
+):
     """
     The station query can fail for various reasons.
     """
     client = all_clients_station_coordinates_callback
 
     params = {
-        "sourcelatitude": 10, "sourcelongitude": 10, "sourcedepthinmeters": 0,
-        "sourcemomenttensor": "100000,100000,100000,100000,100000,100000"}
+        "sourcelatitude": 10,
+        "sourcelongitude": 10,
+        "sourcedepthinmeters": 0,
+        "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
+    }
 
     # It fails if receiver coordinates and query params are passed.
     p = copy.deepcopy(params)
@@ -3502,29 +4127,31 @@ def test_station_query_various_failures(
     p["station"] = "ANT*,ANM?"
     p["receiverlatitude"] = 1.0
 
-    request = fetch_sync(client, _assemble_url('seismograms', **p))
+    request = fetch_sync(client, _assemble_url("seismograms", **p))
     assert request.code == 400
     assert request.reason == (
         "Receiver coordinates can either be specified by passing "
         "the coordinates, or by specifying query parameters, "
-        "but not both.")
+        "but not both."
+    )
 
     # It also fails if only one part is given.
     p = copy.deepcopy(params)
     p["network"] = "IU,B*"
 
-    request = fetch_sync(client, _assemble_url('seismograms', **p))
+    request = fetch_sync(client, _assemble_url("seismograms", **p))
     assert request.code == 400
     assert request.reason == (
         "Must specify a full set of coordinates or a full set of receiver "
-        "parameters.")
+        "parameters."
+    )
 
     # It also fails if it does not find any networks and stations.
     p = copy.deepcopy(params)
     p["network"] = "X*"
     p["station"] = "Y*"
 
-    request = fetch_sync(client, _assemble_url('seismograms', **p))
+    request = fetch_sync(client, _assemble_url("seismograms", **p))
     assert request.code == 404
     assert request.reason == ("No coordinates found satisfying the query.")
 
@@ -3534,10 +4161,12 @@ def test_station_query_various_failures(
     p["network"] = "XX"
     p["station"] = "DUMMY"
 
-    request = fetch_sync(client, _assemble_url('seismograms', **p))
+    request = fetch_sync(client, _assemble_url("seismograms", **p))
     assert request.code == 400
-    assert request.reason == ("Could not construct receiver with passed "
-                              "parameters. Check parameters for sanity.")
+    assert request.reason == (
+        "Could not construct receiver with passed "
+        "parameters. Check parameters for sanity."
+    )
 
 
 def test_station_query_no_callback(all_clients):
@@ -3547,18 +4176,22 @@ def test_station_query_no_callback(all_clients):
     client = all_clients
 
     params = {
-        "sourcelatitude": 10, "sourcelongitude": 10, "sourcedepthinmeters": 0,
-        "sourcemomenttensor": "100000,100000,100000,100000,100000,100000"}
+        "sourcelatitude": 10,
+        "sourcelongitude": 10,
+        "sourcedepthinmeters": 0,
+        "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
+    }
 
     p = copy.deepcopy(params)
     p["network"] = "IU,B*"
     p["station"] = "ANT*,ANM?"
 
-    request = fetch_sync(client, _assemble_url('seismograms', **p))
+    request = fetch_sync(client, _assemble_url("seismograms", **p))
     assert request.code == 404
     assert request.reason == (
         "Server does not support station coordinates and thus no station "
-        "queries.")
+        "queries."
+    )
 
 
 def test_event_query_no_callbacks(all_clients):
@@ -3572,10 +4205,11 @@ def test_event_query_no_callbacks(all_clients):
     p = copy.deepcopy(params)
     p["eventid"] = "B071791B"
 
-    request = fetch_sync(client, _assemble_url('seismograms', **p))
+    request = fetch_sync(client, _assemble_url("seismograms", **p))
     assert request.code == 404
     assert request.reason == (
-        "Server does not support event information and thus no event queries.")
+        "Server does not support event information and thus no event queries."
+    )
 
 
 def test_event_query_various_failures(all_clients_event_callback):
@@ -3594,12 +4228,13 @@ def test_event_query_various_failures(all_clients_event_callback):
     p["sourcedepthinmeters"] = -20
 
     # Cannot not pass other source parameters along.
-    request = fetch_sync(client, _assemble_url('seismograms', **p))
+    request = fetch_sync(client, _assemble_url("seismograms", **p))
     assert request.code == 400
     assert request.reason == (
         "The following parameters cannot be used if 'eventid' is a "
         "parameter: 'sourcedepthinmeters', 'sourcelatitude', "
-        "'sourcelongitude', 'sourcemomenttensor'")
+        "'sourcelongitude', 'sourcemomenttensor'"
+    )
 
     # Neither can the origin time be specified.
     p = copy.deepcopy(params)
@@ -3607,16 +4242,17 @@ def test_event_query_various_failures(all_clients_event_callback):
     p["origintime"] = obspy.UTCDateTime(2014, 1, 1)
 
     # Cannot not pass other source parameters along.
-    request = fetch_sync(client, _assemble_url('seismograms', **p))
+    request = fetch_sync(client, _assemble_url("seismograms", **p))
     assert request.code == 400
     assert request.reason == (
         "'eventid' and 'origintime' parameters cannot both be passed at the "
-        "same time.")
+        "same time."
+    )
 
     # Callback returns an invalid event.
     p = copy.deepcopy(params)
     p["eventid"] = "invalid_event"
-    request = fetch_sync(client, _assemble_url('seismograms', **p))
+    request = fetch_sync(client, _assemble_url("seismograms", **p))
     assert request.code == 400
     assert request.reason == ("Event callback returned an invalid result.")
 
@@ -3633,13 +4269,16 @@ def test_event_parameters_by_querying(all_clients_event_callback):
 
     db = instaseis.open_db(client.filepath)
 
-    params = {"receiverlatitude": 10, "receiverlongitude": 10,
-              "format": "miniseed"}
+    params = {
+        "receiverlatitude": 10,
+        "receiverlongitude": 10,
+        "format": "miniseed",
+    }
 
     p = copy.deepcopy(params)
     p["eventid"] = "B071791B"
 
-    request = fetch_sync(client, _assemble_url('seismograms', **p))
+    request = fetch_sync(client, _assemble_url("seismograms", **p))
     assert request.code == 200
     st = obspy.read(request.buffer)
 
@@ -3654,9 +4293,16 @@ def test_event_parameters_by_querying(all_clients_event_callback):
         m_rr=-58000000000000000,
         m_tp=315300000000000000,
         m_tt=78100000000000000,
-        origin_time=obspy.UTCDateTime("1991-07-17T16:41:33.100000Z"))
-    receiver = instaseis.Receiver(latitude=10, longitude=10, depth_in_m=0.0,
-                                  network="XX", station="SYN", location="SE")
+        origin_time=obspy.UTCDateTime("1991-07-17T16:41:33.100000Z"),
+    )
+    receiver = instaseis.Receiver(
+        latitude=10,
+        longitude=10,
+        depth_in_m=0.0,
+        network="XX",
+        station="SYN",
+        location="SE",
+    )
 
     st_db = db.get_seismograms(source=source, receiver=receiver)
 
@@ -3668,12 +4314,15 @@ def test_event_parameters_by_querying(all_clients_event_callback):
         np.testing.assert_allclose([tr.stats.delta], [tr_db.stats.delta])
         tr.stats.delta = tr_db.stats.delta
         assert tr.stats == tr_db.stats
-        np.testing.assert_allclose(tr.data, tr_db.data,
-                                   atol=tr.data.ptp() / 1E9)
+        np.testing.assert_allclose(
+            tr.data, tr_db.data, atol=tr.data.ptp() / 1e9
+        )
 
     # Also perform a mock comparison to test the actually created object.
-    with mock.patch("instaseis.database_interfaces.base_netcdf_instaseis_db"
-                    ".BaseNetCDFInstaseisDB.get_seismograms") as patch:
+    with mock.patch(
+        "instaseis.database_interfaces.base_netcdf_instaseis_db"
+        ".BaseNetCDFInstaseisDB.get_seismograms"
+    ) as patch:
         _st = obspy.read()
         for tr in _st:
             tr.stats.instaseis = obspy.core.AttribDict()
@@ -3681,7 +4330,7 @@ def test_event_parameters_by_querying(all_clients_event_callback):
             tr.stats.starttime = source.origin_time - 0.01
             tr.stats.delta = 10.0
         patch.return_value = _st
-        result = fetch_sync(client, _assemble_url('seismograms', **p))
+        result = fetch_sync(client, _assemble_url("seismograms", **p))
         assert result.code == 200
 
     assert patch.call_args[1]["source"] == source
@@ -3693,15 +4342,19 @@ def test_event_query_seismogram_non_existent_event(all_clients_event_callback):
     """
     client = all_clients_event_callback
 
-    params = {"receiverlatitude": 10, "receiverlongitude": 10,
-              "eventid": "bogus"}
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+    params = {
+        "receiverlatitude": 10,
+        "receiverlongitude": 10,
+        "eventid": "bogus",
+    }
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     assert request.code == 404
     assert request.reason == "Event not found."
 
 
 def test_mu_parameter_for_seismograms_and_greens_function_route(
-        all_clients_station_coordinates_callback):
+    all_clients_station_coordinates_callback,
+):
     """
     Test that the mu parameter is passed on for seismograms anf the greens
     function route.
@@ -3709,13 +4362,17 @@ def test_mu_parameter_for_seismograms_and_greens_function_route(
     client = all_clients_station_coordinates_callback
 
     params = {
-        "sourcelatitude": 10, "sourcelongitude": 10,
+        "sourcelatitude": 10,
+        "sourcelongitude": 10,
         "sourcedepthinmeters": client.source_depth,
         "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
-        "receiverlatitude": 20, "receiverlongitude": 20, "format": "miniseed"}
+        "receiverlatitude": 20,
+        "receiverlongitude": 20,
+        "format": "miniseed",
+    }
 
     p = copy.deepcopy(params)
-    request = fetch_sync(client, _assemble_url('seismograms', **p))
+    request = fetch_sync(client, _assemble_url("seismograms", **p))
     assert request.code == 200
 
     # Make sure the mu header exists and the value can be converted to a float.
@@ -3730,7 +4387,7 @@ def test_mu_parameter_for_seismograms_and_greens_function_route(
     p["network"] = "IU,B*"
     p["station"] = "ANT*,ANM?"
 
-    request = fetch_sync(client, _assemble_url('seismograms', **p))
+    request = fetch_sync(client, _assemble_url("seismograms", **p))
     assert request.code == 200
 
     # Make sure the mu header exists and the value can be converted to a float.
@@ -3739,17 +4396,22 @@ def test_mu_parameter_for_seismograms_and_greens_function_route(
 
     # get_greens_function() only works with reciprocal DBs that also must
     # have all three components.
-    if not client.is_reciprocal or \
-            client.info.components != "vertical and horizontal":
+    if (
+        not client.is_reciprocal
+        or client.info.components != "vertical and horizontal"
+    ):
         return
 
     parameters = {
         "sourcedepthinmeters": 1e3,
         "sourcedistanceindegrees": 20,
-        "format": "saczip"}
+        "format": "saczip",
+    }
 
     # default parameters
-    request = fetch_sync(client, _assemble_url('greens_function', **parameters))
+    request = fetch_sync(
+        client, _assemble_url("greens_function", **parameters)
+    )
     assert request.code == 200
 
     # Make sure the mu header exists and the value can be converted to a float.
@@ -3765,21 +4427,25 @@ def test_label_parameter(all_greens_clients):
     client = all_greens_clients
 
     params = {
-        "sourcelatitude": 10, "sourcelongitude": 10,
+        "sourcelatitude": 10,
+        "sourcelongitude": 10,
         "sourcedepthinmeters": client.source_depth,
         "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
-        "receiverlatitude": 20, "receiverlongitude": 20, "format": "miniseed"}
+        "receiverlatitude": 20,
+        "receiverlongitude": 20,
+        "format": "miniseed",
+    }
 
     # No specified label will result in it having a generic label.
     p = copy.deepcopy(params)
 
-    request = fetch_sync(client, _assemble_url('seismograms', **p))
+    request = fetch_sync(client, _assemble_url("seismograms", **p))
     assert request.code == 200
 
     filename = request.headers["Content-Disposition"]
     assert filename.startswith(prefix)
 
-    filename = filename[len(prefix):]
+    filename = filename[len(prefix) :]
     assert filename.startswith("instaseis_seismogram_")
     assert filename.endswith(".mseed")
 
@@ -3788,13 +4454,13 @@ def test_label_parameter(all_greens_clients):
     p = copy.deepcopy(params)
     p["format"] = "saczip"
 
-    request = fetch_sync(client, _assemble_url('seismograms', **p))
+    request = fetch_sync(client, _assemble_url("seismograms", **p))
     assert request.code == 200
 
     filename = request.headers["Content-Disposition"]
     assert filename.startswith(prefix)
 
-    filename = filename[len(prefix):]
+    filename = filename[len(prefix) :]
     assert filename.startswith("instaseis_seismogram_")
     assert filename.endswith(".zip")
 
@@ -3803,19 +4469,20 @@ def test_label_parameter(all_greens_clients):
     zip_obj.close()
 
     assert sorted(names) == sorted(
-        ["XX.SYN.SE.LXZ.sac", "XX.SYN.SE.LXN.sac", "XX.SYN.SE.LXE.sac"])
+        ["XX.SYN.SE.LXZ.sac", "XX.SYN.SE.LXN.sac", "XX.SYN.SE.LXE.sac"]
+    )
 
     # Now pass one. It will replace the filename prefix.
     p = copy.deepcopy(params)
     p["label"] = "Tohoku"
 
-    request = fetch_sync(client, _assemble_url('seismograms', **p))
+    request = fetch_sync(client, _assemble_url("seismograms", **p))
     assert request.code == 200
 
     filename = request.headers["Content-Disposition"]
     assert filename.startswith(prefix)
 
-    filename = filename[len(prefix):]
+    filename = filename[len(prefix) :]
     assert filename.startswith("Tohoku_")
     assert filename.endswith(".mseed")
 
@@ -3824,13 +4491,13 @@ def test_label_parameter(all_greens_clients):
     p["format"] = "saczip"
     p["label"] = "Tohoku"
 
-    request = fetch_sync(client, _assemble_url('seismograms', **p))
+    request = fetch_sync(client, _assemble_url("seismograms", **p))
     assert request.code == 200
 
     filename = request.headers["Content-Disposition"]
     assert filename.startswith(prefix)
 
-    filename = filename[len(prefix):]
+    filename = filename[len(prefix) :]
     assert filename.startswith("Tohoku_")
     assert filename.endswith(".zip")
 
@@ -3838,10 +4505,13 @@ def test_label_parameter(all_greens_clients):
     names = zip_obj.namelist()
     zip_obj.close()
 
-    assert sorted(names) == sorted([
-        "Tohoku_XX.SYN.SE.LXZ.sac",
-        "Tohoku_XX.SYN.SE.LXN.sac",
-        "Tohoku_XX.SYN.SE.LXE.sac"])
+    assert sorted(names) == sorted(
+        [
+            "Tohoku_XX.SYN.SE.LXZ.sac",
+            "Tohoku_XX.SYN.SE.LXN.sac",
+            "Tohoku_XX.SYN.SE.LXE.sac",
+        ]
+    )
 
 
 def test_ttimes_route_no_callback(all_clients):
@@ -3854,10 +4524,12 @@ def test_ttimes_route_no_callback(all_clients):
         client,
         "/ttimes?sourcelatitude=50&sourcelongitude=10&"
         "sourcedepthinmeters=0&receiverlatitude=40&receiverlongitude=90&"
-        "receiverdepthinmeters=0&phase=P")
+        "receiverdepthinmeters=0&phase=P",
+    )
     assert request.code == 404
     assert request.reason == (
-        "Server does not support travel time calculations.")
+        "Server does not support travel time calculations."
+    )
 
 
 def test_ttimes_route(all_clients_ttimes_callback):
@@ -3870,18 +4542,21 @@ def test_ttimes_route(all_clients_ttimes_callback):
     request = fetch_sync(
         client,
         "/ttimes?sourcelatitude=50&sourcelongitude=10&"
-        "sourcedepthinmeters=0&receiverlatitude=40&receiverlongitude=90")
+        "sourcedepthinmeters=0&receiverlatitude=40&receiverlongitude=90",
+    )
     assert request.code == 400
     assert request.reason == (
         "The following required parameters are missing: "
-        "'phases', 'receiverdepthinmeters'")
+        "'phases', 'receiverdepthinmeters'"
+    )
 
     # Invalid phase name
     request = fetch_sync(
         client,
         "/ttimes?sourcelatitude=50&sourcelongitude=10&"
         "sourcedepthinmeters=0&receiverlatitude=40&receiverlongitude=90&"
-        "receiverdepthinmeters=0&phases=bogs")
+        "receiverdepthinmeters=0&phases=bogs",
+    )
     assert request.code == 400
     assert request.reason == "Invalid phase name 'bogs'."
 
@@ -3890,77 +4565,89 @@ def test_ttimes_route(all_clients_ttimes_callback):
         client,
         "/ttimes?sourcelatitude=50&sourcelongitude=10&"
         "sourcedepthinmeters=-200&receiverlatitude=40&receiverlongitude=90&"
-        "receiverdepthinmeters=0&phases=P")
+        "receiverdepthinmeters=0&phases=P",
+    )
     assert request.code == 400
-    assert request.reason == ("Failed to calculate travel time due to: No "
-                              "layer contains this depth")
+    assert request.reason == (
+        "Failed to calculate travel time due to: No "
+        "layer contains this depth"
+    )
 
     # No such phase at that distance.
     request = fetch_sync(
         client,
         "/ttimes?sourcelatitude=50&sourcelongitude=10&"
         "sourcedepthinmeters=0&receiverlatitude=40&receiverlongitude=90&"
-        "receiverdepthinmeters=0&phases=Pdiff")
+        "receiverdepthinmeters=0&phases=Pdiff",
+    )
     assert request.code == 404
-    assert request.reason == \
-        "No ray for the given geometry and any of the phases found."
+    assert (
+        request.reason
+        == "No ray for the given geometry and any of the phases found."
+    )
 
     # Many implementations will not have a receiverdepth. This one does not.
     request = fetch_sync(
         client,
         "/ttimes?sourcelatitude=50&sourcelongitude=10&"
         "sourcedepthinmeters=0&receiverlatitude=40&receiverlongitude=90&"
-        "receiverdepthinmeters=20&phases=Pdiff")
+        "receiverdepthinmeters=20&phases=Pdiff",
+    )
     assert request.code == 400
-    assert request.reason == ("Failed to calculate travel time due to: This "
-                              "travel time implementation cannot calculate "
-                              "buried receivers.")
+    assert request.reason == (
+        "Failed to calculate travel time due to: This "
+        "travel time implementation cannot calculate "
+        "buried receivers."
+    )
 
     # Last but not least test some actual travel times.
     request = fetch_sync(
         client,
         "/ttimes?sourcelatitude=0&sourcelongitude=0&"
         "sourcedepthinmeters=300000&receiverlatitude=0&receiverlongitude=50&"
-        "receiverdepthinmeters=0&phases=P")
+        "receiverdepthinmeters=0&phases=P",
+    )
     assert request.code == 200
     result = json.loads(str(request.body.decode("utf8")))
     assert list(result.keys()) == ["travel_times"]
-    assert abs(result["travel_times"]["P"] - 504.357 < 1E-2)
+    assert abs(result["travel_times"]["P"] - 504.357 < 1e-2)
 
     request = fetch_sync(
         client,
         "/ttimes?sourcelatitude=0&sourcelongitude=0&"
         "sourcedepthinmeters=300000&receiverlatitude=0&receiverlongitude=50&"
-        "receiverdepthinmeters=0&phases=PP")
+        "receiverdepthinmeters=0&phases=PP",
+    )
     assert request.code == 200
     result = json.loads(str(request.body.decode("utf8")))
     assert list(result.keys()) == ["travel_times"]
-    assert abs(result["travel_times"]["PP"] - 622.559 < 1E-2)
+    assert abs(result["travel_times"]["PP"] - 622.559 < 1e-2)
 
     request = fetch_sync(
         client,
         "/ttimes?sourcelatitude=0&sourcelongitude=0&"
         "sourcedepthinmeters=300000&receiverlatitude=0&receiverlongitude=50&"
-        "receiverdepthinmeters=0&phases=sPKiKP")
+        "receiverdepthinmeters=0&phases=sPKiKP",
+    )
     assert request.code == 200
     result = json.loads(str(request.body.decode("utf8")))
     assert list(result.keys()) == ["travel_times"]
-    assert abs(result["travel_times"]["sPKiKP"] - 1090.081 < 1E-2)
+    assert abs(result["travel_times"]["sPKiKP"] - 1090.081 < 1e-2)
 
     # Multiple phases at once with one phase not existing at hte distance.
     request = fetch_sync(
         client,
         "/ttimes?sourcelatitude=0&sourcelongitude=0&"
         "sourcedepthinmeters=300000&receiverlatitude=0&receiverlongitude=50&"
-        "receiverdepthinmeters=0&phases=sPKiKP,P,PP,Sdiff")
+        "receiverdepthinmeters=0&phases=sPKiKP,P,PP,Sdiff",
+    )
     assert request.code == 200
     result = json.loads(str(request.body.decode("utf8")))
     assert list(result.keys()) == ["travel_times"]
-    assert sorted(list(result["travel_times"].keys())) == [
-        "P", "PP", "sPKiKP"]
-    assert abs(result["travel_times"]["P"] - 504.357 < 1E-2)
-    assert abs(result["travel_times"]["PP"] - 622.559 < 1E-2)
-    assert abs(result["travel_times"]["sPKiKP"] - 1090.081 < 1E-2)
+    assert sorted(list(result["travel_times"].keys())) == ["P", "PP", "sPKiKP"]
+    assert abs(result["travel_times"]["P"] - 504.357 < 1e-2)
+    assert abs(result["travel_times"]["PP"] - 622.559 < 1e-2)
+    assert abs(result["travel_times"]["sPKiKP"] - 1090.081 < 1e-2)
 
 
 def test_network_and_station_code_settings(all_clients):
@@ -3970,14 +4657,18 @@ def test_network_and_station_code_settings(all_clients):
     client = all_clients
 
     params = {
-        "sourcelatitude": 10, "sourcelongitude": 10,
+        "sourcelatitude": 10,
+        "sourcelongitude": 10,
         "sourcedepthinmeters": client.source_depth,
         "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
-        "receiverlatitude": 20, "receiverlongitude": 20, "format": "miniseed"}
+        "receiverlatitude": 20,
+        "receiverlongitude": 20,
+        "format": "miniseed",
+    }
 
     # Default network and station codes.
     p = copy.deepcopy(params)
-    request = fetch_sync(client, _assemble_url('seismograms', **p))
+    request = fetch_sync(client, _assemble_url("seismograms", **p))
     assert request.code == 200
     for tr in obspy.read(request.buffer):
         assert tr.stats.network == "XX"
@@ -3986,7 +4677,7 @@ def test_network_and_station_code_settings(all_clients):
     # Set only the network code.
     p = copy.deepcopy(params)
     p["networkcode"] = "BW"
-    request = fetch_sync(client, _assemble_url('seismograms', **p))
+    request = fetch_sync(client, _assemble_url("seismograms", **p))
     assert request.code == 200
     for tr in obspy.read(request.buffer):
         assert tr.stats.network == "BW"
@@ -3996,7 +4687,7 @@ def test_network_and_station_code_settings(all_clients):
     # Set only the station code.
     p = copy.deepcopy(params)
     p["stationcode"] = "INS"
-    request = fetch_sync(client, _assemble_url('seismograms', **p))
+    request = fetch_sync(client, _assemble_url("seismograms", **p))
     assert request.code == 200
     for tr in obspy.read(request.buffer):
         assert tr.stats.network == "XX"
@@ -4007,7 +4698,7 @@ def test_network_and_station_code_settings(all_clients):
     p = copy.deepcopy(params)
     p["networkcode"] = "BW"
     p["stationcode"] = "INS"
-    request = fetch_sync(client, _assemble_url('seismograms', **p))
+    request = fetch_sync(client, _assemble_url("seismograms", **p))
     assert request.code == 200
     for tr in obspy.read(request.buffer):
         assert tr.stats.network == "BW"
@@ -4017,7 +4708,7 @@ def test_network_and_station_code_settings(all_clients):
     # Set only the location code.
     p = copy.deepcopy(params)
     p["locationcode"] = "AA"
-    request = fetch_sync(client, _assemble_url('seismograms', **p))
+    request = fetch_sync(client, _assemble_url("seismograms", **p))
     assert request.code == 200
     for tr in obspy.read(request.buffer):
         assert tr.stats.network == "XX"
@@ -4027,21 +4718,21 @@ def test_network_and_station_code_settings(all_clients):
     # Station code is limited to five letters.
     p = copy.deepcopy(params)
     p["stationcode"] = "123456"
-    request = fetch_sync(client, _assemble_url('seismograms', **p))
+    request = fetch_sync(client, _assemble_url("seismograms", **p))
     assert request.code == 400
     assert request.reason == "'stationcode' must have 5 or fewer letters."
 
     # Network code is limited to two letters.
     p = copy.deepcopy(params)
     p["networkcode"] = "123"
-    request = fetch_sync(client, _assemble_url('seismograms', **p))
+    request = fetch_sync(client, _assemble_url("seismograms", **p))
     assert request.code == 400
     assert request.reason == "'networkcode' must have 2 or fewer letters."
 
     # Location code is limited to two letters.
     p = copy.deepcopy(params)
     p["locationcode"] = "123"
-    request = fetch_sync(client, _assemble_url('seismograms', **p))
+    request = fetch_sync(client, _assemble_url("seismograms", **p))
     assert request.code == 400
     assert request.reason == "'locationcode' must have 2 or fewer letters."
 
@@ -4065,15 +4756,19 @@ def test_phase_relative_offsets(all_clients_ttimes_callback):
     # sPKiKP: 1090.081 seconds
 
     params = {
-        "sourcelatitude": 0, "sourcelongitude": 0,
+        "sourcelatitude": 0,
+        "sourcelongitude": 0,
         "sourcedepthinmeters": 300000,
-        "receiverlatitude": 0, "receiverlongitude": 50,
+        "receiverlatitude": 0,
+        "receiverlongitude": 50,
         "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
-        "dt": 0.1, "format": "miniseed"}
+        "dt": 0.1,
+        "format": "miniseed",
+    }
 
     # Normal seismogram.
     p = copy.deepcopy(params)
-    request = fetch_sync(client, _assemble_url('seismograms', **p))
+    request = fetch_sync(client, _assemble_url("seismograms", **p))
     assert request.code == 200
     tr = obspy.read(request.buffer)[0]
     starttime, endtime = tr.stats.starttime, tr.stats.endtime
@@ -4081,7 +4776,7 @@ def test_phase_relative_offsets(all_clients_ttimes_callback):
     # Start 10 seconds before the P arrival.
     p = copy.deepcopy(params)
     p["starttime"] = "P%2D10"
-    request = fetch_sync(client, _assemble_url('seismograms', **p))
+    request = fetch_sync(client, _assemble_url("seismograms", **p))
     assert request.code == 200
     tr = obspy.read(request.buffer)[0]
 
@@ -4091,7 +4786,7 @@ def test_phase_relative_offsets(all_clients_ttimes_callback):
     # Starts 10 seconds after the P arrival
     p = copy.deepcopy(params)
     p["starttime"] = "P%2B10"
-    request = fetch_sync(client, _assemble_url('seismograms', **p))
+    request = fetch_sync(client, _assemble_url("seismograms", **p))
     assert request.code == 200
     tr = obspy.read(request.buffer)[0]
 
@@ -4101,7 +4796,7 @@ def test_phase_relative_offsets(all_clients_ttimes_callback):
     # Ends 15 seconds before the PP arrival
     p = copy.deepcopy(params)
     p["endtime"] = "PP%2D15"
-    request = fetch_sync(client, _assemble_url('seismograms', **p))
+    request = fetch_sync(client, _assemble_url("seismograms", **p))
     assert request.code == 200
     tr = obspy.read(request.buffer)[0]
 
@@ -4111,7 +4806,7 @@ def test_phase_relative_offsets(all_clients_ttimes_callback):
     # Ends 15 seconds after the PP arrival
     p = copy.deepcopy(params)
     p["endtime"] = "PP%2B15"
-    request = fetch_sync(client, _assemble_url('seismograms', **p))
+    request = fetch_sync(client, _assemble_url("seismograms", **p))
     assert request.code == 200
     tr = obspy.read(request.buffer)[0]
 
@@ -4122,7 +4817,7 @@ def test_phase_relative_offsets(all_clients_ttimes_callback):
     p = copy.deepcopy(params)
     p["starttime"] = "PP%2D5"
     p["endtime"] = "sPKiKP%2B2"
-    request = fetch_sync(client, _assemble_url('seismograms', **p))
+    request = fetch_sync(client, _assemble_url("seismograms", **p))
     assert request.code == 200
     tr = obspy.read(request.buffer)[0]
 
@@ -4135,7 +4830,7 @@ def test_phase_relative_offsets(all_clients_ttimes_callback):
     p = copy.deepcopy(params)
     p["starttime"] = "PP%2D5"
     p["endtime"] = 10.0
-    request = fetch_sync(client, _assemble_url('seismograms', **p))
+    request = fetch_sync(client, _assemble_url("seismograms", **p))
     assert request.code == 200
     tr = obspy.read(request.buffer)[0]
 
@@ -4147,7 +4842,7 @@ def test_phase_relative_offsets(all_clients_ttimes_callback):
     p = copy.deepcopy(params)
     p["starttime"] = "10"
     p["endtime"] = "PP%2B15"
-    request = fetch_sync(client, _assemble_url('seismograms', **p))
+    request = fetch_sync(client, _assemble_url("seismograms", **p))
     assert request.code == 200
     tr = obspy.read(request.buffer)[0]
 
@@ -4159,41 +4854,49 @@ def test_phase_relative_offsets_but_no_ttimes_callback(all_clients):
     client = all_clients
 
     params = {
-        "sourcelatitude": 0, "sourcelongitude": 0,
+        "sourcelatitude": 0,
+        "sourcelongitude": 0,
         "sourcedepthinmeters": 300000,
-        "receiverlatitude": 0, "receiverlongitude": 50,
+        "receiverlatitude": 0,
+        "receiverlongitude": 50,
         "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
-        "components": "Z", "dt": 0.1,
-        "format": "miniseed"}
+        "components": "Z",
+        "dt": 0.1,
+        "format": "miniseed",
+    }
 
     # Test for starttime.
     p = copy.deepcopy(params)
     p["starttime"] = "P%2D10"
-    request = fetch_sync(client, _assemble_url('seismograms', **p))
+    request = fetch_sync(client, _assemble_url("seismograms", **p))
     assert request.code == 404
     assert request.reason == (
-        "Server does not support travel time calculations.")
+        "Server does not support travel time calculations."
+    )
 
     # Test for endtime.
     p = copy.deepcopy(params)
     p["endtime"] = "P%2D10"
-    request = fetch_sync(client, _assemble_url('seismograms', **p))
+    request = fetch_sync(client, _assemble_url("seismograms", **p))
     assert request.code == 404
     assert request.reason == (
-        "Server does not support travel time calculations.")
+        "Server does not support travel time calculations."
+    )
 
     # Test for both.
     p = copy.deepcopy(params)
     p["starttime"] = "P%2D10"
     p["endtime"] = "S%2B10"
-    request = fetch_sync(client, _assemble_url('seismograms', **p))
+    request = fetch_sync(client, _assemble_url("seismograms", **p))
     assert request.code == 404
     assert request.reason == (
-        "Server does not support travel time calculations.")
+        "Server does not support travel time calculations."
+    )
 
 
 def test_phase_relative_offset_different_time_representations(
-        all_clients_ttimes_callback):
+    all_clients_ttimes_callback,
+):
     client = all_clients_ttimes_callback
 
     # Different source depth for non-reciprocal client...
@@ -4201,15 +4904,19 @@ def test_phase_relative_offset_different_time_representations(
         return
 
     params = {
-        "sourcelatitude": 0, "sourcelongitude": 0,
+        "sourcelatitude": 0,
+        "sourcelongitude": 0,
         "sourcedepthinmeters": 300000,
-        "receiverlatitude": 0, "receiverlongitude": 50,
+        "receiverlatitude": 0,
+        "receiverlongitude": 50,
         "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
-        "dt": 0.1, "format": "miniseed"}
+        "dt": 0.1,
+        "format": "miniseed",
+    }
 
     # Normal seismogram.
     p = copy.deepcopy(params)
-    request = fetch_sync(client, _assemble_url('seismograms', **p))
+    request = fetch_sync(client, _assemble_url("seismograms", **p))
     assert request.code == 200
     tr = obspy.read(request.buffer)[0]
     starttime, endtime = tr.stats.starttime, tr.stats.endtime
@@ -4217,7 +4924,7 @@ def test_phase_relative_offset_different_time_representations(
     # P+10
     p = copy.deepcopy(params)
     p["starttime"] = "P%2D10"
-    request = fetch_sync(client, _assemble_url('seismograms', **p))
+    request = fetch_sync(client, _assemble_url("seismograms", **p))
     assert request.code == 200
     tr = obspy.read(request.buffer)[0]
     assert abs((tr.stats.starttime) - (starttime + 504.357 - 10)) < 0.1
@@ -4226,7 +4933,7 @@ def test_phase_relative_offset_different_time_representations(
     # P-10
     p = copy.deepcopy(params)
     p["starttime"] = "P%2B10"
-    request = fetch_sync(client, _assemble_url('seismograms', **p))
+    request = fetch_sync(client, _assemble_url("seismograms", **p))
     assert request.code == 200
     tr = obspy.read(request.buffer)[0]
     assert abs((tr.stats.starttime) - (starttime + 504.357 + 10)) < 0.1
@@ -4235,7 +4942,7 @@ def test_phase_relative_offset_different_time_representations(
     # P+10.0
     p = copy.deepcopy(params)
     p["starttime"] = "P%2D10.0"
-    request = fetch_sync(client, _assemble_url('seismograms', **p))
+    request = fetch_sync(client, _assemble_url("seismograms", **p))
     assert request.code == 200
     tr = obspy.read(request.buffer)[0]
     assert abs((tr.stats.starttime) - (starttime + 504.357 - 10)) < 0.1
@@ -4244,7 +4951,7 @@ def test_phase_relative_offset_different_time_representations(
     # P-10.0
     p = copy.deepcopy(params)
     p["starttime"] = "P%2B10.0"
-    request = fetch_sync(client, _assemble_url('seismograms', **p))
+    request = fetch_sync(client, _assemble_url("seismograms", **p))
     assert request.code == 200
     tr = obspy.read(request.buffer)[0]
     assert abs((tr.stats.starttime) - (starttime + 504.357 + 10)) < 0.1
@@ -4253,7 +4960,7 @@ def test_phase_relative_offset_different_time_representations(
     # P+10.000
     p = copy.deepcopy(params)
     p["starttime"] = "P%2D10.000"
-    request = fetch_sync(client, _assemble_url('seismograms', **p))
+    request = fetch_sync(client, _assemble_url("seismograms", **p))
     assert request.code == 200
     tr = obspy.read(request.buffer)[0]
     assert abs((tr.stats.starttime) - (starttime + 504.357 - 10)) < 0.1
@@ -4262,7 +4969,7 @@ def test_phase_relative_offset_different_time_representations(
     # P-10.000
     p = copy.deepcopy(params)
     p["starttime"] = "P%2B10.000"
-    request = fetch_sync(client, _assemble_url('seismograms', **p))
+    request = fetch_sync(client, _assemble_url("seismograms", **p))
     assert request.code == 200
     tr = obspy.read(request.buffer)[0]
     assert abs((tr.stats.starttime) - (starttime + 504.357 + 10)) < 0.1
@@ -4271,7 +4978,7 @@ def test_phase_relative_offset_different_time_representations(
     # P+1E1
     p = copy.deepcopy(params)
     p["starttime"] = "P%2D1E1"
-    request = fetch_sync(client, _assemble_url('seismograms', **p))
+    request = fetch_sync(client, _assemble_url("seismograms", **p))
     assert request.code == 200
     tr = obspy.read(request.buffer)[0]
     assert abs((tr.stats.starttime) - (starttime + 504.357 - 10)) < 0.1
@@ -4280,7 +4987,7 @@ def test_phase_relative_offset_different_time_representations(
     # P-1E1
     p = copy.deepcopy(params)
     p["starttime"] = "P%2B1E1"
-    request = fetch_sync(client, _assemble_url('seismograms', **p))
+    request = fetch_sync(client, _assemble_url("seismograms", **p))
     assert request.code == 200
     tr = obspy.read(request.buffer)[0]
     assert abs((tr.stats.starttime) - (starttime + 504.357 + 10)) < 0.1
@@ -4289,7 +4996,7 @@ def test_phase_relative_offset_different_time_representations(
     # P+1.0E1
     p = copy.deepcopy(params)
     p["starttime"] = "P%2D1.0E1"
-    request = fetch_sync(client, _assemble_url('seismograms', **p))
+    request = fetch_sync(client, _assemble_url("seismograms", **p))
     assert request.code == 200
     tr = obspy.read(request.buffer)[0]
     assert abs((tr.stats.starttime) - (starttime + 504.357 - 10)) < 0.1
@@ -4298,7 +5005,7 @@ def test_phase_relative_offset_different_time_representations(
     # P-1.0E1
     p = copy.deepcopy(params)
     p["starttime"] = "P%2B1.0E1"
-    request = fetch_sync(client, _assemble_url('seismograms', **p))
+    request = fetch_sync(client, _assemble_url("seismograms", **p))
     assert request.code == 200
     tr = obspy.read(request.buffer)[0]
     assert abs((tr.stats.starttime) - (starttime + 504.357 + 10)) < 0.1
@@ -4307,7 +5014,7 @@ def test_phase_relative_offset_different_time_representations(
     # P+1e1
     p = copy.deepcopy(params)
     p["starttime"] = "P%2D1e1"
-    request = fetch_sync(client, _assemble_url('seismograms', **p))
+    request = fetch_sync(client, _assemble_url("seismograms", **p))
     assert request.code == 200
     tr = obspy.read(request.buffer)[0]
     assert abs((tr.stats.starttime) - (starttime + 504.357 - 10)) < 0.1
@@ -4316,7 +5023,7 @@ def test_phase_relative_offset_different_time_representations(
     # P-1e1
     p = copy.deepcopy(params)
     p["starttime"] = "P%2B1e1"
-    request = fetch_sync(client, _assemble_url('seismograms', **p))
+    request = fetch_sync(client, _assemble_url("seismograms", **p))
     assert request.code == 200
     tr = obspy.read(request.buffer)[0]
     assert abs((tr.stats.starttime) - (starttime + 504.357 + 10)) < 0.1
@@ -4330,31 +5037,36 @@ def test_phase_relative_offset_failures(all_clients_ttimes_callback):
     client = all_clients_ttimes_callback
 
     params = {
-        "sourcelatitude": 0, "sourcelongitude": 0,
+        "sourcelatitude": 0,
+        "sourcelongitude": 0,
         "sourcedepthinmeters": 300000,
-        "receiverlatitude": 0, "receiverlongitude": 50,
+        "receiverlatitude": 0,
+        "receiverlongitude": 50,
         "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
-        "components": "Z", "dt": 0.1,
-        "format": "miniseed"}
+        "components": "Z",
+        "dt": 0.1,
+        "format": "miniseed",
+    }
 
     # Illegal phase.
     p = copy.deepcopy(params)
     p["starttime"] = "bogus%2D10"
-    request = fetch_sync(client, _assemble_url('seismograms', **p))
+    request = fetch_sync(client, _assemble_url("seismograms", **p))
     assert request.code == 400
     assert request.reason == "Invalid phase name: bogus"
 
     # Phase not available at that distance.
     p = copy.deepcopy(params)
     p["starttime"] = "Pdiff%2D10"
-    request = fetch_sync(client, _assemble_url('seismograms', **p))
+    request = fetch_sync(client, _assemble_url("seismograms", **p))
     assert request.code == 400
     assert request.reason == (
         "No seismograms found for the given phase relative "
         "offsets. This could either be due to the chosen phase "
         "not existing for the specific source-receiver geometry "
         "or arriving too late/with too large offsets if the "
-        "database is not long enough.")
+        "database is not long enough."
+    )
 
 
 def test_phase_relative_offsets_multiple_stations(all_clients_all_callbacks):
@@ -4370,12 +5082,17 @@ def test_phase_relative_offsets_multiple_stations(all_clients_all_callbacks):
     # This is constructed in such a way that only one station will have a P
     # phase (due to the distance). So this is tested here.
     params = {
-        "sourcelatitude": -39, "sourcelongitude": 20,
+        "sourcelatitude": -39,
+        "sourcelongitude": 20,
         "sourcedepthinmeters": 300000,
         "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
-        "dt": 0.1, "format": "miniseed", "network": "IU,B*",
-        "station": "ANT*,ANM?", "starttime": "P%2D10"}
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+        "dt": 0.1,
+        "format": "miniseed",
+        "network": "IU,B*",
+        "station": "ANT*,ANM?",
+        "starttime": "P%2D10",
+    }
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     assert request.code == 200
     st = obspy.read(request.buffer)
     assert len(st) == len(db.default_components)
@@ -4383,24 +5100,34 @@ def test_phase_relative_offsets_multiple_stations(all_clients_all_callbacks):
     # This is constructed in such a way that only one station will have a P
     # phase (due to the distance). So this is tested here.
     params = {
-        "sourcelatitude": -39, "sourcelongitude": 20,
+        "sourcelatitude": -39,
+        "sourcelongitude": 20,
         "sourcedepthinmeters": 300000,
         "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
-        "dt": 0.1, "format": "miniseed", "network": "IU,B*",
-        "station": "ANT*,ANM?", "endtime": "P%2D10"}
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+        "dt": 0.1,
+        "format": "miniseed",
+        "network": "IU,B*",
+        "station": "ANT*,ANM?",
+        "endtime": "P%2D10",
+    }
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     assert request.code == 200
     st = obspy.read(request.buffer)
     assert len(st) == len(db.default_components)
 
     # Now get both.
     params = {
-        "sourcelatitude": 39, "sourcelongitude": 20,
+        "sourcelatitude": 39,
+        "sourcelongitude": 20,
         "sourcedepthinmeters": 300000,
         "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
-        "dt": 0.1, "format": "miniseed", "network": "IU,B*",
-        "station": "ANT*,ANM?", "starttime": "P%2D10"}
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+        "dt": 0.1,
+        "format": "miniseed",
+        "network": "IU,B*",
+        "station": "ANT*,ANM?",
+        "starttime": "P%2D10",
+    }
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     assert request.code == 200
     st = obspy.read(request.buffer)
     # Two stations!
@@ -4408,35 +5135,47 @@ def test_phase_relative_offsets_multiple_stations(all_clients_all_callbacks):
 
     # Or one also does not get any. In that case an error is raised.
     params = {
-        "sourcelatitude": 39, "sourcelongitude": 20,
+        "sourcelatitude": 39,
+        "sourcelongitude": 20,
         "sourcedepthinmeters": 300000,
         "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
-        "dt": 0.1, "format": "miniseed", "network": "IU,B*",
-        "station": "ANT*,ANM?", "starttime": "P%2D10000"}
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+        "dt": 0.1,
+        "format": "miniseed",
+        "network": "IU,B*",
+        "station": "ANT*,ANM?",
+        "starttime": "P%2D10000",
+    }
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     assert request.code == 400
     assert request.reason == (
         "No seismograms found for the given phase relative "
         "offsets. This could either be due to the chosen phase "
         "not existing for the specific source-receiver geometry "
         "or arriving too late/with too large offsets if the "
-        "database is not long enough.")
+        "database is not long enough."
+    )
 
     # Or one also does not get any. In that case an error is raised.
     params = {
-        "sourcelatitude": 39, "sourcelongitude": 20,
+        "sourcelatitude": 39,
+        "sourcelongitude": 20,
         "sourcedepthinmeters": 300000,
         "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
-        "dt": 0.1, "format": "miniseed", "network": "IU,B*",
-        "station": "ANT*,ANM?", "endtime": "P%2B10000"}
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+        "dt": 0.1,
+        "format": "miniseed",
+        "network": "IU,B*",
+        "station": "ANT*,ANM?",
+        "endtime": "P%2B10000",
+    }
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     assert request.code == 400
     assert request.reason == (
         "No seismograms found for the given phase relative "
         "offsets. This could either be due to the chosen phase "
         "not existing for the specific source-receiver geometry "
         "or arriving too late/with too large offsets if the "
-        "database is not long enough.")
+        "database is not long enough."
+    )
 
 
 def test_various_failure_conditions(all_clients_all_callbacks):
@@ -4445,185 +5184,256 @@ def test_various_failure_conditions(all_clients_all_callbacks):
 
     # no source mechanism given.
     params = {
-        "sourcelatitude": -39, "sourcelongitude": 20,
+        "sourcelatitude": -39,
+        "sourcelongitude": 20,
         "sourcedepthinmeters": 300000,
-        "dt": 0.1, "format": "miniseed", "network": "IU,B*",
-        "station": "ANT*,ANM?"}
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+        "dt": 0.1,
+        "format": "miniseed",
+        "network": "IU,B*",
+        "station": "ANT*,ANM?",
+    }
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     assert request.code == 400
     assert request.reason == (
         "One of the following has to be given: 'eventid', "
-        "'sourcedoublecouple', 'sourceforce', 'sourcemomenttensor'")
+        "'sourcedoublecouple', 'sourceforce', 'sourcemomenttensor'"
+    )
 
     # moment tensor is missing a component.
     params = {
-        "sourcelatitude": -39, "sourcelongitude": 20,
+        "sourcelatitude": -39,
+        "sourcelongitude": 20,
         "sourcedepthinmeters": 300000,
         "sourcemomenttensor": "100000,100000,100000,100000,100000",
-        "components": "Z", "dt": 0.1,
-        "format": "miniseed", "network": "IU,B*", "station": "ANT*,ANM?"}
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+        "components": "Z",
+        "dt": 0.1,
+        "format": "miniseed",
+        "network": "IU,B*",
+        "station": "ANT*,ANM?",
+    }
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     assert request.code == 400
     assert request.reason == (
         "Parameter 'sourcemomenttensor' must be formatted as: "
-        "'Mrr,Mtt,Mpp,Mrt,Mrp,Mtp'")
+        "'Mrr,Mtt,Mpp,Mrt,Mrp,Mtp'"
+    )
 
     # moment tensor has an invalid component.
     params = {
-        "sourcelatitude": -39, "sourcelongitude": 20,
+        "sourcelatitude": -39,
+        "sourcelongitude": 20,
         "sourcedepthinmeters": 300000,
         "sourcemomenttensor": "100000,100000,100000,100000,100000,bogus",
-        "dt": 0.1, "format": "miniseed", "network": "IU,B*",
-        "station": "ANT*,ANM?"}
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+        "dt": 0.1,
+        "format": "miniseed",
+        "network": "IU,B*",
+        "station": "ANT*,ANM?",
+    }
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     assert request.code == 400
     assert request.reason == (
         "Parameter 'sourcemomenttensor' must be formatted as: "
-        "'Mrr,Mtt,Mpp,Mrt,Mrp,Mtp'")
+        "'Mrr,Mtt,Mpp,Mrt,Mrp,Mtp'"
+    )
 
     # sourcedoublecouple is missing a component.
     params = {
-        "sourcelatitude": -39, "sourcelongitude": 20,
+        "sourcelatitude": -39,
+        "sourcelongitude": 20,
         "sourcedepthinmeters": 300000,
         "sourcedoublecouple": "100000,100000",
-        "dt": 0.1, "format": "miniseed", "network": "IU,B*",
-        "station": "ANT*,ANM?"}
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+        "dt": 0.1,
+        "format": "miniseed",
+        "network": "IU,B*",
+        "station": "ANT*,ANM?",
+    }
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     assert request.code == 400
     assert request.reason == (
         "Parameter 'sourcedoublecouple' must be formatted as: "
-        "'strike,dip,rake[,M0]'")
+        "'strike,dip,rake[,M0]'"
+    )
 
     # sourcedoublecouple has an extra component.
     params = {
-        "sourcelatitude": -39, "sourcelongitude": 20,
+        "sourcelatitude": -39,
+        "sourcelongitude": 20,
         "sourcedepthinmeters": 300000,
         "sourcedoublecouple": "100000,100000,10,11,12",
-        "dt": 0.1, "format": "miniseed", "network": "IU,B*",
-        "station": "ANT*,ANM?"}
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+        "dt": 0.1,
+        "format": "miniseed",
+        "network": "IU,B*",
+        "station": "ANT*,ANM?",
+    }
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     assert request.code == 400
     assert request.reason == (
         "Parameter 'sourcedoublecouple' must be formatted as: "
-        "'strike,dip,rake[,M0]'")
+        "'strike,dip,rake[,M0]'"
+    )
 
     # sourcedoublecouple has an invalid component.
     params = {
-        "sourcelatitude": -39, "sourcelongitude": 20,
+        "sourcelatitude": -39,
+        "sourcelongitude": 20,
         "sourcedepthinmeters": 300000,
         "sourcedoublecouple": "100000,100000,10,bogus",
-        "dt": 0.1, "format": "miniseed", "network": "IU,B*",
-        "station": "ANT*,ANM?"}
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+        "dt": 0.1,
+        "format": "miniseed",
+        "network": "IU,B*",
+        "station": "ANT*,ANM?",
+    }
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     assert request.code == 400
     assert request.reason == (
         "Parameter 'sourcedoublecouple' must be formatted as: "
-        "'strike,dip,rake[,M0]'")
+        "'strike,dip,rake[,M0]'"
+    )
 
     # sourceforce is missing a component.
     params = {
-        "sourcelatitude": -39, "sourcelongitude": 20,
+        "sourcelatitude": -39,
+        "sourcelongitude": 20,
         "sourcedepthinmeters": 300000,
         "sourceforce": "100000,100000",
-        "dt": 0.1, "format": "miniseed", "network": "IU,B*",
-        "station": "ANT*,ANM?"}
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+        "dt": 0.1,
+        "format": "miniseed",
+        "network": "IU,B*",
+        "station": "ANT*,ANM?",
+    }
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     assert request.code == 400
     assert request.reason == (
-        "Parameter 'sourceforce' must be formatted as: "
-        "'Fr,Ft,Fp'")
+        "Parameter 'sourceforce' must be formatted as: " "'Fr,Ft,Fp'"
+    )
 
     # sourceforce has an invalid component.
     params = {
-        "sourcelatitude": -39, "sourcelongitude": 20,
+        "sourcelatitude": -39,
+        "sourcelongitude": 20,
         "sourcedepthinmeters": 300000,
         "sourceforce": "100000,100000,bogus",
-        "dt": 0.1, "format": "miniseed", "network": "IU,B*",
-        "station": "ANT*,ANM?"}
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+        "dt": 0.1,
+        "format": "miniseed",
+        "network": "IU,B*",
+        "station": "ANT*,ANM?",
+    }
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     assert request.code == 400
     assert request.reason == (
-        "Parameter 'sourceforce' must be formatted as: "
-        "'Fr,Ft,Fp'")
+        "Parameter 'sourceforce' must be formatted as: " "'Fr,Ft,Fp'"
+    )
 
     # Seismic moment cannot be negative.
     params = {
-        "sourcelatitude": -39, "sourcelongitude": 20,
+        "sourcelatitude": -39,
+        "sourcelongitude": 20,
         "sourcedepthinmeters": 300000,
         "sourcedoublecouple": "100000,100000,10,-10",
-        "dt": 0.1, "format": "miniseed", "network": "IU,B*",
-        "station": "ANT*,ANM?"}
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+        "dt": 0.1,
+        "format": "miniseed",
+        "network": "IU,B*",
+        "station": "ANT*,ANM?",
+    }
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     assert request.code == 400
     assert request.reason == "Seismic moment must not be negative."
 
     # Funky phase offset setting.
     params = {
-        "sourcelatitude": -39, "sourcelongitude": 20,
+        "sourcelatitude": -39,
+        "sourcelongitude": 20,
         "sourcedepthinmeters": 300000,
         "sourcedoublecouple": "100000,100000,10,10",
-        "dt": 0.1, "starttime": "P+!A",
-        "format": "miniseed", "network": "IU,B*", "station": "ANT*,ANM?"}
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+        "dt": 0.1,
+        "starttime": "P+!A",
+        "format": "miniseed",
+        "network": "IU,B*",
+        "station": "ANT*,ANM?",
+    }
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     assert request.code == 400
     assert request.reason == (
         "Parameter 'starttime' must be formatted as: 'Datetime "
-        "String/Float/Phase+-Offset'")
+        "String/Float/Phase+-Offset'"
+    )
 
     # Mixing different source settings.
     params = {
-        "sourcelatitude": -39, "sourcelongitude": 20,
+        "sourcelatitude": -39,
+        "sourcelongitude": 20,
         "sourcedepthinmeters": 300000,
         "sourcedoublecouple": "100000,100000,10,10",
         "sourceforce": "10,10,10",
-        "dt": 0.1, "format": "miniseed", "network": "IU,B*",
-        "station": "ANT*,ANM?"}
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+        "dt": 0.1,
+        "format": "miniseed",
+        "network": "IU,B*",
+        "station": "ANT*,ANM?",
+    }
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     assert request.code == 400
-    assert request.reason == ("Only one of these parameters can be given "
-                              "simultaneously: 'sourcedoublecouple', "
-                              "'sourceforce'")
+    assert request.reason == (
+        "Only one of these parameters can be given "
+        "simultaneously: 'sourcedoublecouple', "
+        "'sourceforce'"
+    )
 
     if db.info.is_reciprocal:
         # Receiver depth must be at the surface for a reciprocal database.
         params = {
-            "sourcelatitude": -39, "sourcelongitude": 20,
+            "sourcelatitude": -39,
+            "sourcelongitude": 20,
             "sourcedepthinmeters": 0,
             "sourcedoublecouple": "10,10,10,10",
-            "receiverlatitude": 10, "receiverlongitude": 10,
+            "receiverlatitude": 10,
+            "receiverlongitude": 10,
             "receiverdepthinmeters": 10,
-            "dt": 0.1, "format": "miniseed"}
-        request = fetch_sync(client, _assemble_url('seismograms', **params))
+            "dt": 0.1,
+            "format": "miniseed",
+        }
+        request = fetch_sync(client, _assemble_url("seismograms", **params))
         assert request.code == 400
-        assert request.reason == ("Receiver must be at the surface for "
-                                  "reciprocal databases.")
+        assert request.reason == (
+            "Receiver must be at the surface for " "reciprocal databases."
+        )
 
         # A too deep source depth raises.
         params = {
-            "sourcelatitude": -39, "sourcelongitude": 20,
-            "sourcedepthinmeters": 3E9,
+            "sourcelatitude": -39,
+            "sourcelongitude": 20,
+            "sourcedepthinmeters": 3e9,
             "sourcedoublecouple": "10,10,10,10",
-            "receiverlatitude": 10, "receiverlongitude": 10,
-            "dt": 0.1, "format": "miniseed"}
-        request = fetch_sync(client, _assemble_url('seismograms', **params))
+            "receiverlatitude": 10,
+            "receiverlongitude": 10,
+            "dt": 0.1,
+            "format": "miniseed",
+        }
+        request = fetch_sync(client, _assemble_url("seismograms", **params))
         assert request.code == 400
-        assert request.reason == ("Source depth must be within the database "
-                                  "range: 0.0 - 371000.0 meters.")
+        assert request.reason == (
+            "Source depth must be within the database "
+            "range: 0.0 - 371000.0 meters."
+        )
 
     # For a forward database the source depth must be equal to the database
     # depth!
     if db.info.is_reciprocal is False:
         params = {
-            "sourcelatitude": -39, "sourcelongitude": 20,
+            "sourcelatitude": -39,
+            "sourcelongitude": 20,
             "sourcedepthinmeters": 14,
             "sourcedoublecouple": "10,10,10,10",
-            "receiverlatitude": 10, "receiverlongitude": 10,
+            "receiverlatitude": 10,
+            "receiverlongitude": 10,
             "receiverdepthinmeters": 10,
-            "dt": 0.1, "format": "miniseed"}
-        request = fetch_sync(client, _assemble_url('seismograms', **params))
+            "dt": 0.1,
+            "format": "miniseed",
+        }
+        request = fetch_sync(client, _assemble_url("seismograms", **params))
         assert request.code == 400
         assert request.reason == (
-            "Source depth must be: %.1f km" % db.info.source_depth)
+            "Source depth must be: %.1f km" % db.info.source_depth
+        )
 
 
 def test_sac_dist_header_edge_case(all_clients):
@@ -4633,12 +5443,15 @@ def test_sac_dist_header_edge_case(all_clients):
     client = all_clients
 
     params = {
-        "sourcelatitude": 0.0, "sourcelongitude": 0.0,
+        "sourcelatitude": 0.0,
+        "sourcelongitude": 0.0,
         "sourcedepthinmeters": client.source_depth,
         "sourcemomenttensor": "1E15,1E15,1E15,1E15,1E15,1E15",
-        "receiverlatitude": 0.0, "receiverlongitude": 10.0,
-        "format": "saczip"}
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+        "receiverlatitude": 0.0,
+        "receiverlongitude": 10.0,
+        "format": "saczip",
+    }
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     assert request.code == 200
     st = obspy.Stream()
     zip_obj = zipfile.ZipFile(request.buffer)
@@ -4647,15 +5460,18 @@ def test_sac_dist_header_edge_case(all_clients):
     for tr in st:
         assert tr.stats._format == "SAC"
         # Checked with http://www.fai.org/distance_calculation
-        assert abs(tr.stats.sac.dist - 1113.194907792064) < 1E-4
+        assert abs(tr.stats.sac.dist - 1113.194907792064) < 1e-4
 
     params = {
-        "sourcelatitude": 0.0, "sourcelongitude": 100.0,
+        "sourcelatitude": 0.0,
+        "sourcelongitude": 100.0,
         "sourcedepthinmeters": client.source_depth,
         "sourcemomenttensor": "1E15,1E15,1E15,1E15,1E15,1E15",
-        "receiverlatitude": 0.0, "receiverlongitude": 105.0,
-        "format": "saczip"}
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+        "receiverlatitude": 0.0,
+        "receiverlongitude": 105.0,
+        "format": "saczip",
+    }
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     assert request.code == 200
     st = obspy.Stream()
     zip_obj = zipfile.ZipFile(request.buffer)
@@ -4664,7 +5480,7 @@ def test_sac_dist_header_edge_case(all_clients):
     for tr in st:
         assert tr.stats._format == "SAC"
         # Checked with http://www.fai.org/distance_calculation
-        assert abs(tr.stats.sac.dist - 556.5974538960322) < 1E-4
+        assert abs(tr.stats.sac.dist - 556.5974538960322) < 1e-4
 
 
 def test_sac_headers(all_clients):
@@ -4674,13 +5490,19 @@ def test_sac_headers(all_clients):
     client = all_clients
 
     params = {
-        "sourcelatitude": 1, "sourcelongitude": 12,
+        "sourcelatitude": 1,
+        "sourcelongitude": 12,
         "sourcedepthinmeters": client.source_depth,
         "sourcemomenttensor": "1E15,1E15,1E15,1E15,1E15,1E15",
-        "origintime": obspy.UTCDateTime(0), "scale": 0.5,
-        "dt": 0.1, "starttime": "-1.5", "receiverlatitude": 22,
-        "receiverlongitude": 44, "format": "saczip"}
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+        "origintime": obspy.UTCDateTime(0),
+        "scale": 0.5,
+        "dt": 0.1,
+        "starttime": "-1.5",
+        "receiverlatitude": 22,
+        "receiverlongitude": 44,
+        "format": "saczip",
+    }
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     assert request.code == 200
     st = obspy.Stream()
     zip_obj = zipfile.ZipFile(request.buffer)
@@ -4690,27 +5512,29 @@ def test_sac_headers(all_clients):
         assert tr.stats._format == "SAC"
         # Instaseis will write SAC coordinates in WGS84!
         # Assert the station headers.
-        assert abs(tr.stats.sac.stla -
-                   geocentric_to_elliptic_latitude(22)) < 1E-6
-        assert abs(tr.stats.sac.stlo - 44) < 1E-6
-        assert abs(tr.stats.sac.stdp - 0.0) < 1E-6
-        assert abs(tr.stats.sac.stel - 0.0) < 1E-6
+        assert (
+            abs(tr.stats.sac.stla - geocentric_to_elliptic_latitude(22)) < 1e-6
+        )
+        assert abs(tr.stats.sac.stlo - 44) < 1e-6
+        assert abs(tr.stats.sac.stdp - 0.0) < 1e-6
+        assert abs(tr.stats.sac.stel - 0.0) < 1e-6
         # Assert the event parameters.
-        assert abs(tr.stats.sac.evla -
-                   geocentric_to_elliptic_latitude(1)) < 1E-6
-        assert abs(tr.stats.sac.evlo - 12) < 1E-6
-        assert abs(tr.stats.sac.evdp - client.source_depth) < 1E-6
-        assert abs(tr.stats.sac.mag - 4.151) < 1E-2
+        assert (
+            abs(tr.stats.sac.evla - geocentric_to_elliptic_latitude(1)) < 1e-6
+        )
+        assert abs(tr.stats.sac.evlo - 12) < 1e-6
+        assert abs(tr.stats.sac.evdp - client.source_depth) < 1e-6
+        assert abs(tr.stats.sac.mag - 4.151) < 1e-2
         # Thats what SPECFEM uses for a moment magnitude....
         assert tr.stats.sac.imagtyp == 55
         # Assume the reference time is the starttime.
-        assert abs(tr.stats.sac.o - 1.5) < 1E-6
+        assert abs(tr.stats.sac.o - 1.5) < 1e-6
 
         # Distances, az and baz
-        assert abs(tr.stats.sac.dist - 4180.436) < 1E-4
-        assert abs(tr.stats.sac.az - 53.691647) < 1E-4
-        assert abs(tr.stats.sac.baz - 240.38969) < 1E-4
-        assert abs(tr.stats.sac.gcarc - 37.560081) < 1E-4
+        assert abs(tr.stats.sac.dist - 4180.436) < 1e-4
+        assert abs(tr.stats.sac.az - 53.691647) < 1e-4
+        assert abs(tr.stats.sac.baz - 240.38969) < 1e-4
+        assert abs(tr.stats.sac.gcarc - 37.560081) < 1e-4
 
         # Test the "provenance".
         assert tr.stats.sac.kuser0 == "InstSeis"
@@ -4737,14 +5561,20 @@ def test_sac_headers_azimuth_and_incidence(all_clients):
 
     def _run_test(rec_latitude, rec_longitude, az_inc_map):
         params = {
-            "sourcelatitude": 0, "sourcelongitude": 0,
+            "sourcelatitude": 0,
+            "sourcelongitude": 0,
             "sourcedepthinmeters": client.source_depth,
             "sourcemomenttensor": "1E15,1E15,1E15,1E15,1E15,1E15",
-            "origintime": obspy.UTCDateTime(0), "scale": 0.5,
-            "dt": 0.1, "starttime": "-1.5", "receiverlatitude": rec_latitude,
-            "receiverlongitude": rec_longitude, "format": "saczip",
-            "components": "ZNERT"}
-        request = fetch_sync(client, _assemble_url('seismograms', **params))
+            "origintime": obspy.UTCDateTime(0),
+            "scale": 0.5,
+            "dt": 0.1,
+            "starttime": "-1.5",
+            "receiverlatitude": rec_latitude,
+            "receiverlongitude": rec_longitude,
+            "format": "saczip",
+            "components": "ZNERT",
+        }
+        request = fetch_sync(client, _assemble_url("seismograms", **params))
         assert request.code == 200
         st = obspy.Stream()
         zip_obj = zipfile.ZipFile(request.buffer)
@@ -4759,33 +5589,53 @@ def test_sac_headers_azimuth_and_incidence(all_clients):
 
     # The source is always at 0/0.
     # First value is azimuth, second incidence angle.
-    _run_test(rec_latitude=0.0, rec_longitude=90.0, az_inc_map={
-        "Z": (0.0, 0.0),
-        "N": (0.0, 90.0),
-        "E": (90.0, 90.0),
-        "R": (90.0, 90.0),
-        "T": (180.0, 90.0)})
+    _run_test(
+        rec_latitude=0.0,
+        rec_longitude=90.0,
+        az_inc_map={
+            "Z": (0.0, 0.0),
+            "N": (0.0, 90.0),
+            "E": (90.0, 90.0),
+            "R": (90.0, 90.0),
+            "T": (180.0, 90.0),
+        },
+    )
 
-    _run_test(rec_latitude=0.0, rec_longitude=-90.0, az_inc_map={
-        "Z": (0.0, 0.0),
-        "N": (0.0, 90.0),
-        "E": (90.0, 90.0),
-        "R": (270.0, 90.0),
-        "T": (0.0, 90.0)})
+    _run_test(
+        rec_latitude=0.0,
+        rec_longitude=-90.0,
+        az_inc_map={
+            "Z": (0.0, 0.0),
+            "N": (0.0, 90.0),
+            "E": (90.0, 90.0),
+            "R": (270.0, 90.0),
+            "T": (0.0, 90.0),
+        },
+    )
 
-    _run_test(rec_latitude=45.0, rec_longitude=0.0, az_inc_map={
-        "Z": (0.0, 0.0),
-        "N": (0.0, 90.0),
-        "E": (90.0, 90.0),
-        "R": (0.0, 90.0),
-        "T": (90.0, 90.0)})
+    _run_test(
+        rec_latitude=45.0,
+        rec_longitude=0.0,
+        az_inc_map={
+            "Z": (0.0, 0.0),
+            "N": (0.0, 90.0),
+            "E": (90.0, 90.0),
+            "R": (0.0, 90.0),
+            "T": (90.0, 90.0),
+        },
+    )
 
-    _run_test(rec_latitude=-45.0, rec_longitude=0.0, az_inc_map={
-        "Z": (0.0, 0.0),
-        "N": (0.0, 90.0),
-        "E": (90.0, 90.0),
-        "R": (180.0, 90.0),
-        "T": (270.0, 90.0)})
+    _run_test(
+        rec_latitude=-45.0,
+        rec_longitude=0.0,
+        az_inc_map={
+            "Z": (0.0, 0.0),
+            "N": (0.0, 90.0),
+            "E": (90.0, 90.0),
+            "R": (180.0, 90.0),
+            "T": (270.0, 90.0),
+        },
+    )
 
 
 def test_sac_headers_azimuth_and_incidence_greens_route(all_greens_clients):
@@ -4798,9 +5648,10 @@ def test_sac_headers_azimuth_and_incidence_greens_route(all_greens_clients):
     params = {
         "sourcedepthinmeters": client.source_depth,
         "sourcedistanceindegrees": 20,
-        "format": "saczip"}
+        "format": "saczip",
+    }
 
-    request = fetch_sync(client, _assemble_url('greens_function', **params))
+    request = fetch_sync(client, _assemble_url("greens_function", **params))
     assert request.code == 200
     st = obspy.Stream()
     zip_obj = zipfile.ZipFile(request.buffer)
@@ -4821,59 +5672,76 @@ def test_dt_settings(all_clients):
 
     # Requesting exactly at the initial sampling rate works.
     params = {
-        "sourcelatitude": 1, "sourcelongitude": 12,
+        "sourcelatitude": 1,
+        "sourcelongitude": 12,
         "sourcedepthinmeters": client.source_depth,
         "sourcemomenttensor": "1E15,1E15,1E15,1E15,1E15,1E15",
         "dt": client.info.dt,
-        "receiverlatitude": 22, "receiverlongitude": 44}
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+        "receiverlatitude": 22,
+        "receiverlongitude": 44,
+    }
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     assert request.code == 200
 
     # Request exactly at 100 Hz works.
     params = {
-        "sourcelatitude": 1, "sourcelongitude": 12,
+        "sourcelatitude": 1,
+        "sourcelongitude": 12,
         "sourcedepthinmeters": client.source_depth,
         "sourcemomenttensor": "1E15,1E15,1E15,1E15,1E15,1E15",
         "dt": 0.01,
-        "receiverlatitude": 22, "receiverlongitude": 44}
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+        "receiverlatitude": 22,
+        "receiverlongitude": 44,
+    }
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     assert request.code == 200
 
     # Requesting at something in between works.
     params = {
-        "sourcelatitude": 1, "sourcelongitude": 12,
+        "sourcelatitude": 1,
+        "sourcelongitude": 12,
         "sourcedepthinmeters": client.source_depth,
         "sourcemomenttensor": "1E15,1E15,1E15,1E15,1E15,1E15",
         "dt": 0.123,
-        "receiverlatitude": 22, "receiverlongitude": 44}
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+        "receiverlatitude": 22,
+        "receiverlongitude": 44,
+    }
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     assert request.code == 200
 
     # Requesting a tiny bit above does not work.
     params = {
-        "sourcelatitude": 1, "sourcelongitude": 12,
+        "sourcelatitude": 1,
+        "sourcelongitude": 12,
         "sourcedepthinmeters": client.source_depth,
         "sourcemomenttensor": "1E15,1E15,1E15,1E15,1E15,1E15",
         "dt": 0.009,
-        "receiverlatitude": 22, "receiverlongitude": 44}
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+        "receiverlatitude": 22,
+        "receiverlongitude": 44,
+    }
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     assert request.code == 400
     assert request.reason == (
         "The smallest possible dt is 0.01. Please choose a smaller value and "
-        "resample locally if needed.")
+        "resample locally if needed."
+    )
 
     # Requesting a tiny bit below also does not work.
     params = {
-        "sourcelatitude": 1, "sourcelongitude": 12,
+        "sourcelatitude": 1,
+        "sourcelongitude": 12,
         "sourcedepthinmeters": client.source_depth,
         "sourcemomenttensor": "1E15,1E15,1E15,1E15,1E15,1E15",
         "dt": client.info.dt + 0.001,
-        "receiverlatitude": 22, "receiverlongitude": 44}
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+        "receiverlatitude": 22,
+        "receiverlongitude": 44,
+    }
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     assert request.code == 400
     assert request.reason == (
         "Cannot downsample. The sampling interval of the database is "
-        "24.72485 seconds. Make sure to choose a smaller or equal one.")
+        "24.72485 seconds. Make sure to choose a smaller or equal one."
+    )
 
 
 def test_scale_parameter(all_clients):
@@ -4889,30 +5757,45 @@ def test_scale_parameter(all_clients):
         "sourcedepthinmeters": client.source_depth,
         "receiverlatitude": -10,
         "receiverlongitude": -10,
-        "format": "miniseed"}
+        "format": "miniseed",
+    }
 
     # Various sources.
-    mt = {"mrr": "100000", "mtt": "200000", "mpp": "300000",
-          "mrt": "400000", "mrp": "500000", "mtp": "600000"}
+    mt = {
+        "mrr": "100000",
+        "mtt": "200000",
+        "mpp": "300000",
+        "mrt": "400000",
+        "mrp": "500000",
+        "mtp": "600000",
+    }
     mt_param = "100000,200000,300000,400000,500000,600000"
 
     # Retrieve reference.
     source = instaseis.Source(
         latitude=basic_parameters["sourcelatitude"],
         longitude=basic_parameters["sourcelongitude"],
-        depth_in_m=0.0, origin_time=obspy.UTCDateTime(1900, 1, 1),
-        **dict((key[0] + "_" + key[1:], float(value))
-               for (key, value) in mt.items()))
+        depth_in_m=0.0,
+        origin_time=obspy.UTCDateTime(1900, 1, 1),
+        **dict(
+            (key[0] + "_" + key[1:], float(value))
+            for (key, value) in mt.items()
+        ),
+    )
     receiver = instaseis.Receiver(
         latitude=basic_parameters["receiverlatitude"],
         longitude=basic_parameters["receiverlongitude"],
-        depth_in_m=0.0, network="XX", station="SYN", location="SE")
+        depth_in_m=0.0,
+        network="XX",
+        station="SYN",
+        location="SE",
+    )
     st_db = db.get_seismograms(source=source, receiver=receiver)
 
     # Moment tensor source.
     params = copy.deepcopy(basic_parameters)
     params["sourcemomenttensor"] = mt_param
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     st_server = obspy.read(request.buffer)
 
     for tr_server, tr_db in zip(st_server, st_db):
@@ -4927,14 +5810,15 @@ def test_scale_parameter(all_clients):
         assert tr_server.stats == tr_db.stats
         # Relative tolerance not particularly useful when testing super
         # small values.
-        np.testing.assert_allclose(tr_server.data, tr_db.data,
-                                   atol=1E-10 * tr_server.data.ptp())
+        np.testing.assert_allclose(
+            tr_server.data, tr_db.data, atol=1e-10 * tr_server.data.ptp()
+        )
 
     # No change if a scale of 1 is set.
     params = copy.deepcopy(basic_parameters)
     params["sourcemomenttensor"] = mt_param
     params["scale"] = 1.0
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     st_server = obspy.read(request.buffer)
 
     for tr_server, tr_db in zip(st_server, st_db):
@@ -4948,14 +5832,15 @@ def test_scale_parameter(all_clients):
         assert tr_server.stats == tr_db.stats
         # Relative tolerance not particularly useful when testing super
         # small values.
-        np.testing.assert_allclose(tr_server.data, tr_db.data,
-                                   atol=1E-10 * tr_server.data.ptp())
+        np.testing.assert_allclose(
+            tr_server.data, tr_db.data, atol=1e-10 * tr_server.data.ptp()
+        )
 
     # No change if a scale of 3.5 is set.
     params = copy.deepcopy(basic_parameters)
     params["sourcemomenttensor"] = mt_param
     params["scale"] = 3.5
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     st_server = obspy.read(request.buffer)
 
     for tr_server, tr_database in zip(st_server, st_db):
@@ -4971,14 +5856,15 @@ def test_scale_parameter(all_clients):
         assert tr_server.stats == tr_db.stats
         # Relative tolerance not particularly useful when testing super
         # small values.
-        np.testing.assert_allclose(tr_server.data, tr_db.data,
-                                   atol=1E-10 * tr_server.data.ptp())
+        np.testing.assert_allclose(
+            tr_server.data, tr_db.data, atol=1e-10 * tr_server.data.ptp()
+        )
 
     # Negative scale of -2.5.
     params = copy.deepcopy(basic_parameters)
     params["sourcemomenttensor"] = mt_param
     params["scale"] = -2.5
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     st_server = obspy.read(request.buffer)
 
     for tr_server, tr_database in zip(st_server, st_db):
@@ -4994,18 +5880,20 @@ def test_scale_parameter(all_clients):
         assert tr_server.stats == tr_db.stats
         # Relative tolerance not particularly useful when testing super
         # small values.
-        np.testing.assert_allclose(tr_server.data, tr_db.data,
-                                   atol=1E-10 * tr_server.data.ptp())
+        np.testing.assert_allclose(
+            tr_server.data, tr_db.data, atol=1e-10 * tr_server.data.ptp()
+        )
 
     # Scale of 0 should raise.
     params = copy.deepcopy(basic_parameters)
     params["sourcemomenttensor"] = mt_param
     params["scale"] = 0.0
-    request = fetch_sync(client, _assemble_url('seismograms', **params))
+    request = fetch_sync(client, _assemble_url("seismograms", **params))
     assert request.code == 400
     assert request.reason == (
         "A scale of zero means all seismograms have an amplitude "
-        "of zero. No need to get it in the first place.")
+        "of zero. No need to get it in the first place."
+    )
 
 
 def test_error_handling_custom_stf(all_clients):
@@ -5019,23 +5907,32 @@ def test_error_handling_custom_stf(all_clients):
     # to worry about the other parameters for now.
 
     # Empty request.
-    request = fetch_sync(client, _assemble_url('seismograms'),
-                         method="POST", body=b'')
+    request = fetch_sync(
+        client, _assemble_url("seismograms"), method="POST", body=b""
+    )
     assert request.code == 400
-    assert request.reason == ("The source time function must be given in the "
-                              "body of the POST request.")
+    assert request.reason == (
+        "The source time function must be given in the "
+        "body of the POST request."
+    )
 
     # Not a valid json file.
-    request = fetch_sync(client, _assemble_url('seismograms'),
-                           method="POST", body=b'abcdefg')
+    request = fetch_sync(
+        client, _assemble_url("seismograms"), method="POST", body=b"abcdefg"
+    )
     assert request.code == 400
-    assert request.reason == ("The body of the POST request is not a valid "
-                              "JSON file.")
+    assert request.reason == (
+        "The body of the POST request is not a valid " "JSON file."
+    )
 
     # Not a json file that's valid according to the schema.
     body = {"random": "things"}
-    request = fetch_sync(client, _assemble_url('seismograms'),
-                           method="POST", body=json.dumps(body))
+    request = fetch_sync(
+        client,
+        _assemble_url("seismograms"),
+        method="POST",
+        body=json.dumps(body),
+    )
     assert request.code == 400
     # This file has many problems thus the error might vary.
     assert request.reason.startswith("Validation Error in JSON file: ")
@@ -5044,63 +5941,94 @@ def test_error_handling_custom_stf(all_clients):
         "units": "moment_rate",
         "relative_origin_time_in_sec": 15.23,
         "sample_spacing_in_sec": 50.0,
-        "data": [0.0, 4, 25, 5.6, 2.4, 0.0]
+        "data": [0.0, 4, 25, 5.6, 2.4, 0.0],
     }
 
     # Couple more wrong ones.
     body = copy.deepcopy(valid_json)
     body["units"] = "random"
-    request = fetch_sync(client, _assemble_url('seismograms'),
-                           method="POST", body=json.dumps(body))
+    request = fetch_sync(
+        client,
+        _assemble_url("seismograms"),
+        method="POST",
+        body=json.dumps(body),
+    )
     assert request.code == 400
     assert request.reason == (
         "Validation Error in JSON file: 'random' is not one of "
-        "['moment_rate']")
+        "['moment_rate']"
+    )
 
     body = copy.deepcopy(valid_json)
     body["sample_spacing_in_sec"] = -0.1
-    request = fetch_sync(client, _assemble_url('seismograms'),
-                           method="POST", body=json.dumps(body))
+    request = fetch_sync(
+        client,
+        _assemble_url("seismograms"),
+        method="POST",
+        body=json.dumps(body),
+    )
     assert request.code == 400
     assert request.reason == (
         "Validation Error in JSON file: -0.1 is less than the minimum of "
-        "1e-05")
+        "1e-05"
+    )
 
     body = copy.deepcopy(valid_json)
     body["data"].append("hello")
-    request = fetch_sync(client, _assemble_url('seismograms'),
-                           method="POST", body=json.dumps(body))
+    request = fetch_sync(
+        client,
+        _assemble_url("seismograms"),
+        method="POST",
+        body=json.dumps(body),
+    )
     assert request.code == 400
     assert request.reason == (
-        "Validation Error in JSON file: 'hello' is not of type 'number'")
+        "Validation Error in JSON file: 'hello' is not of type 'number'"
+    )
 
     # Does not start and end with zero.
     body = copy.deepcopy(valid_json)
     body["data"][0] = 0.3
-    request = fetch_sync(client, _assemble_url('seismograms'),
-                           method="POST", body=json.dumps(body))
+    request = fetch_sync(
+        client,
+        _assemble_url("seismograms"),
+        method="POST",
+        body=json.dumps(body),
+    )
     assert request.code == 400
     assert request.reason == (
-        "STF data did not validate: Must begin and end with zero.")
+        "STF data did not validate: Must begin and end with zero."
+    )
 
     # The sample spacing must not be smaller than the database sampling.
     body = copy.deepcopy(valid_json)
     body["sample_spacing_in_sec"] = 10.0
-    request = fetch_sync(client, _assemble_url('seismograms'),
-                           method="POST", body=json.dumps(body))
+    request = fetch_sync(
+        client,
+        _assemble_url("seismograms"),
+        method="POST",
+        body=json.dumps(body),
+    )
     assert request.code == 400
     assert request.reason == (
         "'sample_spacing_in_sec' in the JSON file must not be smaller than "
-        "the database dt [24.725 seconds].")
+        "the database dt [24.725 seconds]."
+    )
 
     # Should raise for an all zeros array.
     body = copy.deepcopy(valid_json)
     body["data"] = [0, 0, 0, 0, 0, 0]
-    request = fetch_sync(client, _assemble_url('seismograms'),
-                           method="POST", body=json.dumps(body))
+    request = fetch_sync(
+        client,
+        _assemble_url("seismograms"),
+        method="POST",
+        body=json.dumps(body),
+    )
     assert request.code == 400
-    assert ("All zero (or nearly all zero) source time functions don't "
-            "make any sense.") in request.reason
+    assert (
+        "All zero (or nearly all zero) source time functions don't "
+        "make any sense."
+    ) in request.reason
 
 
 def test_custom_stf(all_clients):
@@ -5117,7 +6045,8 @@ def test_custom_stf(all_clients):
         "receiverlatitude": -10,
         "receiverlongitude": -10,
         "format": "miniseed",
-        "sourcemomenttensor": "100000,200000,300000,400000,500000,600000"}
+        "sourcemomenttensor": "100000,200000,300000,400000,500000,600000",
+    }
 
     # First test: Just reconvolve with the sliprate of the database...that
     # should not change it at all!
@@ -5125,16 +6054,20 @@ def test_custom_stf(all_clients):
         "units": "moment_rate",
         "relative_origin_time_in_sec": db.info.src_shift,
         "sample_spacing_in_sec": db.info.dt,
-        "data": [float(_i) for _i in db.info.sliprate]
+        "data": [float(_i) for _i in db.info.sliprate],
     }
 
     body = copy.deepcopy(valid_json)
-    r = fetch_sync(client, _assemble_url('seismograms', **basic_parameters),
-                     method="POST", body=json.dumps(body))
+    r = fetch_sync(
+        client,
+        _assemble_url("seismograms", **basic_parameters),
+        method="POST",
+        body=json.dumps(body),
+    )
     assert r.code == 200
     st_custom_stf = obspy.read(r.buffer)
 
-    r = fetch_sync(client, _assemble_url('seismograms', **basic_parameters))
+    r = fetch_sync(client, _assemble_url("seismograms", **basic_parameters))
     assert r.code == 200
     st_default = obspy.read(r.buffer)
 
@@ -5148,12 +6081,16 @@ def test_custom_stf(all_clients):
     # Now we try the same thing, but shift it one sample.
     body = copy.deepcopy(valid_json)
     body["relative_origin_time_in_sec"] = db.info.src_shift + db.info.dt
-    r = fetch_sync(client, _assemble_url('seismograms', **basic_parameters),
-                     method="POST", body=json.dumps(body))
+    r = fetch_sync(
+        client,
+        _assemble_url("seismograms", **basic_parameters),
+        method="POST",
+        body=json.dumps(body),
+    )
     assert r.code == 200
     st_custom_stf = obspy.read(r.buffer)
 
-    r = fetch_sync(client, _assemble_url('seismograms', **basic_parameters))
+    r = fetch_sync(client, _assemble_url("seismograms", **basic_parameters))
     assert r.code == 200
     st_default = obspy.read(r.buffer)
 
@@ -5174,12 +6111,16 @@ def test_custom_stf(all_clients):
     # Parameter "sourcewidth" not compatible with POST requests.
     body = copy.deepcopy(valid_json)
     body["relative_origin_time_in_sec"] = db.info.src_shift + db.info.dt
-    r = fetch_sync(client, _assemble_url('seismograms', sourcewidth=1.0,
-                                   **basic_parameters),
-                     method="POST", body=json.dumps(body))
+    r = fetch_sync(
+        client,
+        _assemble_url("seismograms", sourcewidth=1.0, **basic_parameters),
+        method="POST",
+        body=json.dumps(body),
+    )
     assert r.code == 400
-    assert r.reason == ("Parameter 'sourcewidth' is not allowed for POST "
-                        "requests.")
+    assert r.reason == (
+        "Parameter 'sourcewidth' is not allowed for POST " "requests."
+    )
 
 
 def test_gaussian_source_time_function_calculation():
@@ -5188,13 +6129,13 @@ def test_gaussian_source_time_function_calculation():
     """
     # Test the integral. More accurate for smaller deltas.
     _, y = util.get_gaussian_source_time_function(4, 1.2)
-    assert np.isclose(simps(y, dx=1.2), 1.0, rtol=1E-2)
+    assert np.isclose(simps(y, dx=1.2), 1.0, rtol=1e-2)
     _, y = util.get_gaussian_source_time_function(4, 1.0)
-    assert np.isclose(simps(y, dx=1.0), 1.0, rtol=1E-3)
+    assert np.isclose(simps(y, dx=1.0), 1.0, rtol=1e-3)
     _, y = util.get_gaussian_source_time_function(4, 0.1)
-    assert np.isclose(simps(y, dx=0.1), 1.0, rtol=1E-6)
+    assert np.isclose(simps(y, dx=0.1), 1.0, rtol=1e-6)
     _, y = util.get_gaussian_source_time_function(4, 0.01)
-    assert np.isclose(simps(y, dx=0.01), 1.0, rtol=1E-7)
+    assert np.isclose(simps(y, dx=0.01), 1.0, rtol=1e-7)
 
     # Test the offset. Always has to be larger then the chosen source width
     # and at a sample.
@@ -5206,8 +6147,9 @@ def test_gaussian_source_time_function_calculation():
     # Test a known good solution.
     np.testing.assert_allclose(
         util.get_gaussian_source_time_function(4, 2.5)[1],
-        [0.0, 1.089142E-3, 5.641895E-1, 1.089142E-3, 7.835433E-12, 0],
-        rtol=1E-5)
+        [0.0, 1.089142e-3, 5.641895e-1, 1.089142e-3, 7.835433e-12, 0],
+        rtol=1e-5,
+    )
 
 
 def test_sourcewidth_parameter(all_clients):
@@ -5225,29 +6167,38 @@ def test_sourcewidth_parameter(all_clients):
         "receiverlongitude": -10,
         "components": "".join(db.available_components),
         "format": "miniseed",
-        "sourcemomenttensor": "100000,200000,300000,400000,500000,600000"}
+        "sourcemomenttensor": "100000,200000,300000,400000,500000,600000",
+    }
 
-    r = fetch_sync(client, _assemble_url('seismograms', sourcewidth=1.0,
-                                   **basic_parameters))
+    r = fetch_sync(
+        client,
+        _assemble_url("seismograms", sourcewidth=1.0, **basic_parameters),
+    )
     assert r.code == 400
-    assert r.reason == ("The sourcewidth must not be smaller than the mesh "
-                        "period of the database (100.000 seconds).")
+    assert r.reason == (
+        "The sourcewidth must not be smaller than the mesh "
+        "period of the database (100.000 seconds)."
+    )
 
-    r = fetch_sync(client, _assemble_url('seismograms', sourcewidth=601.0,
-                                   **basic_parameters))
+    r = fetch_sync(
+        client,
+        _assemble_url("seismograms", sourcewidth=601.0, **basic_parameters),
+    )
     assert r.code == 400
     assert r.reason == "The sourcewidth must not be larger than 600 seconds."
 
     # This is unfortunately really hard to test - so we'll just take the FFT
     # of a normal and a reconvolved one and make sure the reconvolved one
     # has less energy.
-    r = fetch_sync(client, _assemble_url('seismograms', **basic_parameters))
+    r = fetch_sync(client, _assemble_url("seismograms", **basic_parameters))
     assert r.code == 200
     st = obspy.read(r.buffer)
     assert len(st) >= 1
 
-    r = fetch_sync(client, _assemble_url('seismograms', sourcewidth=200.0,
-                                   **basic_parameters))
+    r = fetch_sync(
+        client,
+        _assemble_url("seismograms", sourcewidth=200.0, **basic_parameters),
+    )
     st_re = obspy.read(r.buffer)
     assert len(st_re) >= 1
 

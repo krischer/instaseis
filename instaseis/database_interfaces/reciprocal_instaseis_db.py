@@ -24,8 +24,16 @@ class ReciprocalInstaseisDB(BaseNetCDFInstaseisDB):
     """
     Reciprocal Instaseis database.
     """
-    def __init__(self, db_path, netcdf_files, buffer_size_in_mb=100,
-                 read_on_demand=False, *args, **kwargs):
+
+    def __init__(
+        self,
+        db_path,
+        netcdf_files,
+        buffer_size_in_mb=100,
+        read_on_demand=False,
+        *args,
+        **kwargs,
+    ):
         """
         :param db_path: Path to the Instaseis Database containing
             subdirectories PZ and/or PX each containing a
@@ -44,8 +52,13 @@ class ReciprocalInstaseisDB(BaseNetCDFInstaseisDB):
         :type read_on_demand: bool, optional
         """
         BaseNetCDFInstaseisDB.__init__(
-            self, db_path=db_path, buffer_size_in_mb=buffer_size_in_mb,
-            read_on_demand=read_on_demand, *args, **kwargs)
+            self,
+            db_path=db_path,
+            buffer_size_in_mb=buffer_size_in_mb,
+            read_on_demand=read_on_demand,
+            *args,
+            **kwargs,
+        )
         self._parse_meshes(netcdf_files)
 
     def _parse_meshes(self, files):
@@ -63,44 +76,54 @@ class ReciprocalInstaseisDB(BaseNetCDFInstaseisDB):
         # full_parse will force the kd-tree to be built
         if x_exists and z_exists:
             px_m = mesh.Mesh(
-                px_file, full_parse=True,
+                px_file,
+                full_parse=True,
                 strain_buffer_size_in_mb=self.buffer_size_in_mb,
                 displ_buffer_size_in_mb=self.buffer_size_in_mb,
-                read_on_demand=self.read_on_demand)
+                read_on_demand=self.read_on_demand,
+            )
             pz_m = mesh.Mesh(
-                pz_file, full_parse=False,
+                pz_file,
+                full_parse=False,
                 strain_buffer_size_in_mb=self.buffer_size_in_mb,
                 displ_buffer_size_in_mb=self.buffer_size_in_mb,
-                read_on_demand=self.read_on_demand)
+                read_on_demand=self.read_on_demand,
+            )
             self.parsed_mesh = px_m
         elif x_exists:
             px_m = mesh.Mesh(
-                px_file, full_parse=True,
+                px_file,
+                full_parse=True,
                 strain_buffer_size_in_mb=self.buffer_size_in_mb,
                 displ_buffer_size_in_mb=self.buffer_size_in_mb,
-                read_on_demand=self.read_on_demand)
+                read_on_demand=self.read_on_demand,
+            )
             pz_m = None
             self.parsed_mesh = px_m
         elif z_exists:
             px_m = None
             pz_m = mesh.Mesh(
-                pz_file, full_parse=True,
+                pz_file,
+                full_parse=True,
                 strain_buffer_size_in_mb=self.buffer_size_in_mb,
                 displ_buffer_size_in_mb=self.buffer_size_in_mb,
-                read_on_demand=self.read_on_demand)
+                read_on_demand=self.read_on_demand,
+            )
             self.parsed_mesh = pz_m
         else:
             # Should not happen.
             raise NotImplementedError
 
         MeshCollection_bwd = collections.namedtuple(
-            "MeshCollection_bwd", ["px", "pz"])
+            "MeshCollection_bwd", ["px", "pz"]
+        )
         self.meshes = MeshCollection_bwd(px=px_m, pz=pz_m)
 
         self._is_reciprocal = True
 
-    def _get_data(self, source, receiver, components, coordinates,
-                  element_info):
+    def _get_data(
+        self, source, receiver, components, coordinates, element_info
+    ):
         ei = element_info
         # Collect data arrays and mu in a dictionary.
         data = {}
@@ -120,13 +143,11 @@ class ReciprocalInstaseisDB(BaseNetCDFInstaseisDB):
             mu = mesh_mu[ei.id_elem]
         data["mu"] = mu
 
-        fac_1_map = {"N": np.cos,
-                     "E": np.sin}
-        fac_2_map = {"N": lambda x: - np.sin(x),
-                     "E": np.cos}
+        fac_1_map = {"N": np.cos, "E": np.sin}
+        fac_2_map = {"N": lambda x: -np.sin(x), "E": np.cos}
 
         if isinstance(source, Source):
-            if self.info.dump_type == 'displ_only':
+            if self.info.dump_type == "displ_only":
                 if ei.axis:
                     G = self.parsed_mesh.G2  # NOQA
                     GT = self.parsed_mesh.G1T  # NOQA
@@ -139,35 +160,62 @@ class ReciprocalInstaseisDB(BaseNetCDFInstaseisDB):
 
             # Minor optimization: Only read if actually requested.
             if "Z" in components:
-                if self.info.dump_type == 'displ_only':
+                if self.info.dump_type == "displ_only":
                     strain_z = self._get_strain_interp(
-                        self.meshes.pz, ei.id_elem, ei.gll_point_ids, G, GT,
-                        ei.col_points_xi, ei.col_points_eta, ei.corner_points,
-                        ei.eltype, ei.axis, ei.xi, ei.eta)
-                elif (self.info.dump_type == 'fullfields' or
-                      self.info.dump_type == 'strain_only'):
+                        self.meshes.pz,
+                        ei.id_elem,
+                        ei.gll_point_ids,
+                        G,
+                        GT,
+                        ei.col_points_xi,
+                        ei.col_points_eta,
+                        ei.corner_points,
+                        ei.eltype,
+                        ei.axis,
+                        ei.xi,
+                        ei.eta,
+                    )
+                elif (
+                    self.info.dump_type == "fullfields"
+                    or self.info.dump_type == "strain_only"
+                ):
                     strain_z = self._get_strain(self.meshes.pz, ei.id_elem)
 
-            if any(comp in components for comp in ['N', 'E', 'R', 'T']):
-                if self.info.dump_type == 'displ_only':
+            if any(comp in components for comp in ["N", "E", "R", "T"]):
+                if self.info.dump_type == "displ_only":
                     strain_x = self._get_strain_interp(
-                        self.meshes.px, ei.id_elem, ei.gll_point_ids, G, GT,
-                        ei.col_points_xi, ei.col_points_eta, ei.corner_points,
-                        ei.eltype, ei.axis, ei.xi, ei.eta)
-                elif (self.info.dump_type == 'fullfields' or
-                      self.info.dump_type == 'strain_only'):
+                        self.meshes.px,
+                        ei.id_elem,
+                        ei.gll_point_ids,
+                        G,
+                        GT,
+                        ei.col_points_xi,
+                        ei.col_points_eta,
+                        ei.corner_points,
+                        ei.eltype,
+                        ei.axis,
+                        ei.xi,
+                        ei.eta,
+                    )
+                elif (
+                    self.info.dump_type == "fullfields"
+                    or self.info.dump_type == "strain_only"
+                ):
                     strain_x = self._get_strain(self.meshes.px, ei.id_elem)
 
-            mij = rotations \
-                .rotate_symm_tensor_voigt_xyz_src_to_xyz_earth(
-                    source.tensor_voigt, np.deg2rad(source.longitude),
-                    np.deg2rad(source.colatitude))
-            mij = rotations \
-                .rotate_symm_tensor_voigt_xyz_earth_to_xyz_src(
-                    mij, np.deg2rad(receiver.longitude),
-                    np.deg2rad(receiver.colatitude))
+            mij = rotations.rotate_symm_tensor_voigt_xyz_src_to_xyz_earth(
+                source.tensor_voigt,
+                np.deg2rad(source.longitude),
+                np.deg2rad(source.colatitude),
+            )
+            mij = rotations.rotate_symm_tensor_voigt_xyz_earth_to_xyz_src(
+                mij,
+                np.deg2rad(receiver.longitude),
+                np.deg2rad(receiver.colatitude),
+            )
             mij = rotations.rotate_symm_tensor_voigt_xyz_to_src(
-                mij, coordinates.phi)
+                mij, coordinates.phi
+            )
             mij /= self.parsed_mesh.amplitude
 
             if "Z" in components:
@@ -210,31 +258,42 @@ class ReciprocalInstaseisDB(BaseNetCDFInstaseisDB):
                 data[comp] = final
 
         elif isinstance(source, ForceSource):
-            if self.info.dump_type != 'displ_only':
+            if self.info.dump_type != "displ_only":
                 raise ValueError("Force sources only in displ_only mode")
 
             if "Z" in components:
-                displ_z = self._get_displacement(self.meshes.pz, ei.id_elem,
-                                                 ei.gll_point_ids,
-                                                 ei.col_points_xi,
-                                                 ei.col_points_eta, ei.xi,
-                                                 ei.eta)
+                displ_z = self._get_displacement(
+                    self.meshes.pz,
+                    ei.id_elem,
+                    ei.gll_point_ids,
+                    ei.col_points_xi,
+                    ei.col_points_eta,
+                    ei.xi,
+                    ei.eta,
+                )
 
-            if any(comp in components for comp in ['N', 'E', 'R', 'T']):
-                displ_x = self._get_displacement(self.meshes.px, ei.id_elem,
-                                                 ei.gll_point_ids,
-                                                 ei.col_points_xi,
-                                                 ei.col_points_eta, ei.xi,
-                                                 ei.eta)
+            if any(comp in components for comp in ["N", "E", "R", "T"]):
+                displ_x = self._get_displacement(
+                    self.meshes.px,
+                    ei.id_elem,
+                    ei.gll_point_ids,
+                    ei.col_points_xi,
+                    ei.col_points_eta,
+                    ei.xi,
+                    ei.eta,
+                )
 
             force = rotations.rotate_vector_xyz_src_to_xyz_earth(
-                source.force_tpr, np.deg2rad(source.longitude),
-                np.deg2rad(source.colatitude))
+                source.force_tpr,
+                np.deg2rad(source.longitude),
+                np.deg2rad(source.colatitude),
+            )
             force = rotations.rotate_vector_xyz_earth_to_xyz_src(
-                force, np.deg2rad(receiver.longitude),
-                np.deg2rad(receiver.colatitude))
-            force = rotations.rotate_vector_xyz_to_src(
-                force, coordinates.phi)
+                force,
+                np.deg2rad(receiver.longitude),
+                np.deg2rad(receiver.colatitude),
+            )
+            force = rotations.rotate_vector_xyz_to_src(force, coordinates.phi)
             force /= self.parsed_mesh.amplitude
 
             if "Z" in components:

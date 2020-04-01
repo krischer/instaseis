@@ -50,18 +50,22 @@ def rotate_symm_tensor_voigt_xyz_earth_to_xyz_src(mt, phi, theta):
     compute and ouput in voigt notation:
     Rt.A.R
     """
-    A = np.array([[mt[0], mt[5], mt[4]],  # NOQA
-                  [mt[5], mt[1], mt[3]],
-                  [mt[4], mt[3], mt[2]]])
+    A = np.array(
+        [
+            [mt[0], mt[5], mt[4]],  # NOQA
+            [mt[5], mt[1], mt[3]],
+            [mt[4], mt[3], mt[2]],
+        ]
+    )
 
     ct = np.cos(theta)
     cp = np.cos(phi)
     st = np.sin(theta)
     sp = np.sin(phi)
 
-    R = np.array([[ct * cp, -sp, st * cp],  # NOQA
-                  [ct * sp, cp, st * sp],
-                  [-st, 0, ct]])
+    R = np.array(
+        [[ct * cp, -sp, st * cp], [ct * sp, cp, st * sp], [-st, 0, ct]]  # NOQA
+    )
 
     # This double matrix product involves number that might differ by 20
     # orders of magnitudes which makes it numerically tricky. Thus we employ
@@ -74,7 +78,8 @@ def rotate_symm_tensor_voigt_xyz_earth_to_xyz_src(mt, phi, theta):
     # Convert back to single precision.
     return np.require(
         np.array([B[0, 0], B[1, 1], B[2, 2], B[1, 2], B[0, 2], B[0, 1]]),
-        dtype=np.float64)
+        dtype=np.float64,
+    )
 
 
 def rotate_symm_tensor_voigt_xyz_src_to_xyz_earth(mt, phi, theta):
@@ -91,18 +96,22 @@ def rotate_symm_tensor_voigt_xyz_src_to_xyz_earth(mt, phi, theta):
     compute and ouput in voigt notation:
     R.A.Rt
     """
-    A = np.array([[mt[0], mt[5], mt[4]],  # NOQA
-                  [mt[5], mt[1], mt[3]],
-                  [mt[4], mt[3], mt[2]]])
+    A = np.array(
+        [
+            [mt[0], mt[5], mt[4]],  # NOQA
+            [mt[5], mt[1], mt[3]],
+            [mt[4], mt[3], mt[2]],
+        ]
+    )
 
     ct = np.cos(theta)
     cp = np.cos(phi)
     st = np.sin(theta)
     sp = np.sin(phi)
 
-    R = np.array([[ct * cp, -sp, st * cp],  # NOQA
-                  [ct * sp, cp, st * sp],
-                  [-st, 0, ct]])
+    R = np.array(
+        [[ct * cp, -sp, st * cp], [ct * sp, cp, st * sp], [-st, 0, ct]]  # NOQA
+    )
 
     B = np.dot(np.dot(R, A), R.T)  # NOQA
     return np.array([B[0, 0], B[1, 1], B[2, 2], B[1, 2], B[0, 2], B[0, 1]])
@@ -122,14 +131,18 @@ def rotate_symm_tensor_voigt_xyz_to_src(mt, phi):
     compute and ouput in voigt notation:
     R.A.Rt
     """
-    A = np.array([[mt[0], mt[5], mt[4]],  # NOQA
-                  [mt[5], mt[1], mt[3]],
-                  [mt[4], mt[3], mt[2]]])
+    A = np.array(
+        [
+            [mt[0], mt[5], mt[4]],  # NOQA
+            [mt[5], mt[1], mt[3]],
+            [mt[4], mt[3], mt[2]],
+        ]
+    )
 
     cp = np.cos(phi)
     sp = np.sin(phi)
 
-    R = np.array([[cp, sp, 0.], [-sp, cp, 0], [0, 0, 1.]])  # NOQA
+    R = np.array([[cp, sp, 0.0], [-sp, cp, 0], [0, 0, 1.0]])  # NOQA
 
     B = np.dot(np.dot(R, A), R.T)  # NOQA
     return np.array([B[0, 0], B[1, 1], B[2, 2], B[1, 2], B[0, 2], B[0, 1]])
@@ -142,9 +155,13 @@ def rotate_vector_xyz_earth_to_xyz_src(vec, phi, theta):
     st = np.sin(theta)
     ct = np.cos(theta)
 
-    return np.array([cp * ct * vec[0] + ct * sp * vec[1] - st * vec[2],
-                     -(sp * vec[0]) + cp * vec[1],
-                     cp * st * vec[0] + sp * st * vec[1] + ct * vec[2]])
+    return np.array(
+        [
+            cp * ct * vec[0] + ct * sp * vec[1] - st * vec[2],
+            -(sp * vec[0]) + cp * vec[1],
+            cp * st * vec[0] + sp * st * vec[1] + ct * vec[2],
+        ]
+    )
 
 
 def rotate_vector_xyz_src_to_xyz_earth(vec, phi, theta):
@@ -154,31 +171,36 @@ def rotate_vector_xyz_src_to_xyz_earth(vec, phi, theta):
     st = np.sin(theta)
     ct = np.cos(theta)
 
-    return np.array([cp * ct * vec[0] - sp * vec[1] + cp * st * vec[2],
-                     ct * sp * vec[0] + cp * vec[1] + sp * st * vec[2],
-                     -(st * vec[0]) + ct * vec[2]])
+    return np.array(
+        [
+            cp * ct * vec[0] - sp * vec[1] + cp * st * vec[2],
+            ct * sp * vec[0] + cp * vec[1] + sp * st * vec[2],
+            -(st * vec[0]) + ct * vec[2],
+        ]
+    )
 
 
 def rotate_vector_xyz_to_src(vec, phi):
     sp = np.sin(phi)
     cp = np.cos(phi)
 
-    return np.array([cp * vec[0] + sp * vec[1],
-                     - sp * vec[0] + cp * vec[1],
-                     vec[2]])
+    return np.array(
+        [cp * vec[0] + sp * vec[1], -sp * vec[0] + cp * vec[1], vec[2]]
+    )
 
 
 def rotate_vector_src_to_xyz(vec, phi):
     sp = np.sin(phi)
     cp = np.cos(phi)
 
-    return np.array([cp * vec[0] - sp * vec[1],
-                     sp * vec[0] + cp * vec[1],
-                     vec[2]])
+    return np.array(
+        [cp * vec[0] - sp * vec[1], sp * vec[0] + cp * vec[1], vec[2]]
+    )
 
 
 def rotate_vector_src_to_NEZ(  # NOQA
-        vec, phi, srclon, srccolat, reclon, reccolat):
+    vec, phi, srclon, srccolat, reclon, reccolat
+):
     rotmat = np.eye(3)
     rotmat = rotate_vector_src_to_xyz(rotmat, phi)
     rotmat = rotate_vector_xyz_src_to_xyz_earth(rotmat, srclon, srccolat)
@@ -196,8 +218,9 @@ def rotate_vector_xyz_src_to_xyz_rec(vec, srclon, srccolat, reclon, reccolat):
     return np.dot(rotmat, vec)
 
 
-def coord_transform_lat_lon_depth_to_xyz(latitude, longitude, depth_in_m,
-                                         planet_radius=6371e3):
+def coord_transform_lat_lon_depth_to_xyz(
+    latitude, longitude, depth_in_m, planet_radius=6371e3
+):
     """
     Tansform coordinates from latitude, longitude, depth to global cartesian
     coordinates with z aligned with northpole
@@ -206,10 +229,16 @@ def coord_transform_lat_lon_depth_to_xyz(latitude, longitude, depth_in_m,
     latitude_rad = np.radians(latitude)
 
     xyz = np.empty(3)
-    xyz[0] = (planet_radius - depth_in_m) \
-        * np.cos(latitude_rad) * np.cos(longitude_rad)
-    xyz[1] = (planet_radius - depth_in_m) \
-        * np.cos(latitude_rad) * np.sin(longitude_rad)
+    xyz[0] = (
+        (planet_radius - depth_in_m)
+        * np.cos(latitude_rad)
+        * np.cos(longitude_rad)
+    )
+    xyz[1] = (
+        (planet_radius - depth_in_m)
+        * np.cos(latitude_rad)
+        * np.sin(longitude_rad)
+    )
     xyz[2] = (planet_radius - depth_in_m) * np.sin(latitude_rad)
 
     return xyz
@@ -226,7 +255,7 @@ def coord_transform_xyz_to_lat_lon_depth(x, y, z, planet_radius=6371e3):
     phi = np.arctan2(y, x)
 
     longitude = np.rad2deg(phi)
-    latitude = 90. - np.rad2deg(theta)
+    latitude = 90.0 - np.rad2deg(theta)
     depth_in_m = planet_radius - r
 
     return latitude, longitude, depth_in_m

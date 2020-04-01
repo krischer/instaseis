@@ -21,12 +21,15 @@ lib = load_lib()
 
 
 def lagrange_interpol_2D_td(points1, points2, coefficients, x1, x2):  # NOQA
-    points1 = np.require(points1, dtype=np.float64,
-                         requirements=["F_CONTIGUOUS"])
-    points2 = np.require(points2, dtype=np.float64,
-                         requirements=["F_CONTIGUOUS"])
-    coefficients = np.require(coefficients, dtype=np.float64,
-                              requirements=["F_CONTIGUOUS"])
+    points1 = np.require(
+        points1, dtype=np.float64, requirements=["F_CONTIGUOUS"]
+    )
+    points2 = np.require(
+        points2, dtype=np.float64, requirements=["F_CONTIGUOUS"]
+    )
+    coefficients = np.require(
+        coefficients, dtype=np.float64, requirements=["F_CONTIGUOUS"]
+    )
 
     # Should be safe enough. This was never raised while extracting a lot of
     # seismograms.
@@ -45,5 +48,6 @@ def lagrange_interpol_2D_td(points1, points2, coefficients, x1, x2):  # NOQA
         coefficients.ctypes.data_as(C.POINTER(C.c_double)),
         C.c_double(x1),
         C.c_double(x2),
-        interpolant.ctypes.data_as(C.POINTER(C.c_double)))
+        interpolant.ctypes.data_as(C.POINTER(C.c_double)),
+    )
     return interpolant

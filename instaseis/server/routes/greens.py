@@ -24,8 +24,19 @@ from ..instaseis_request import InstaseisTimeSeriesHandler
 executor = concurrent.futures.ThreadPoolExecutor(12)
 
 
-def _get_greens(db, epicentral_distance_degree, source_depth_in_m, units, dt,
-                kernelwidth, origintime, starttime, endtime, format, label):
+def _get_greens(
+    db,
+    epicentral_distance_degree,
+    source_depth_in_m,
+    units,
+    dt,
+    kernelwidth,
+    origintime,
+    starttime,
+    endtime,
+    format,
+    label,
+):
     """
     Extract a Green's function from the passed db and write it either to a
     MiniSEED or a SACZIP file.
@@ -45,29 +56,50 @@ def _get_greens(db, epicentral_distance_degree, source_depth_in_m, units, dt,
     try:
         st = db.get_greens_function(
             epicentral_distance_in_degree=epicentral_distance_degree,
-            source_depth_in_m=source_depth_in_m, origin_time=origintime,
-            kind=units, return_obspy_stream=True, dt=dt,
-            kernelwidth=kernelwidth, definition="seiscomp")
+            source_depth_in_m=source_depth_in_m,
+            origin_time=origintime,
+            kind=units,
+            return_obspy_stream=True,
+            dt=dt,
+            kernelwidth=kernelwidth,
+            definition="seiscomp",
+        )
     except Exception:
-        msg = ("Could not extract Green's function. Make sure, the parameters "
-               "are valid, and the depth settings are correct.")
+        msg = (
+            "Could not extract Green's function. Make sure, the parameters "
+            "are valid, and the depth settings are correct."
+        )
         return tornado.web.HTTPError(400, log_message=msg, reason=msg), None
 
     # Fake source and receiver to be able to reuse the generic waveform
     # serializer.
-    source = ForceSource(latitude=90.0, longitude=90.0,
-                         depth_in_m=source_depth_in_m,
-                         origin_time=origintime)
-    receiver = Receiver(latitude=90.0 - epicentral_distance_degree,
-                        longitude=0.0, depth_in_m=0.0)
+    source = ForceSource(
+        latitude=90.0,
+        longitude=90.0,
+        depth_in_m=source_depth_in_m,
+        origin_time=origintime,
+    )
+    receiver = Receiver(
+        latitude=90.0 - epicentral_distance_degree,
+        longitude=0.0,
+        depth_in_m=0.0,
+    )
 
     for tr in st:
         tr.stats.network = "XX"
         tr.stats.station = "GF001"
 
     return _validate_and_write_waveforms(
-        st=st, starttime=starttime, endtime=endtime, scale=1.0,
-        source=source, receiver=receiver, db=db, label=label, format=format)
+        st=st,
+        starttime=starttime,
+        endtime=endtime,
+        scale=1.0,
+        source=source,
+        receiver=receiver,
+        db=db,
+        label=label,
+        format=format,
+    )
 
 
 class GreensFunctionHandler(InstaseisTimeSeriesHandler):
@@ -77,19 +109,20 @@ class GreensFunctionHandler(InstaseisTimeSeriesHandler):
         "dt": {"type": float},
         "kernelwidth": {"type": int, "default": 12},
         "label": {"type": str, "default": "greensfunction"},
-
         # Source parameters.
         "sourcedistanceindegrees": {"type": float, "required": True},
         "sourcedepthinmeters": {"type": float, "required": True},
-
         # Time parameters.
         "origintime": {"type": obspy.UTCDateTime},
-        "starttime": {"type": _validtimesetting,
-                      "format": "Datetime String/Float/Phase+-Offset"},
-        "endtime": {"type": _validtimesetting,
-                    "format": "Datetime String/Float/Phase+-Offset"},
-
-        "format": {"type": str, "default": "saczip"}
+        "starttime": {
+            "type": _validtimesetting,
+            "format": "Datetime String/Float/Phase+-Offset",
+        },
+        "endtime": {
+            "type": _validtimesetting,
+            "format": "Datetime String/Float/Phase+-Offset",
+        },
+        "format": {"type": str, "default": "saczip"},
     }
 
     default_label = "instaseis_greens_function"
@@ -109,28 +142,38 @@ class GreensFunctionHandler(InstaseisTimeSeriesHandler):
 
         # greens functions only work with reciprocal databases
         if not info.is_reciprocal:
-            msg = ("The database is not reciprocal, "
-                   "so Green's functions can't be computed.")
+            msg = (
+                "The database is not reciprocal, "
+                "so Green's functions can't be computed."
+            )
             raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
         if info.components != "vertical and horizontal":
-            msg = ("Database requires vertical AND horizontal components to "
-                   "be able to compute Green's functions.")
+            msg = (
+                "Database requires vertical AND horizontal components to "
+                "be able to compute Green's functions."
+            )
             raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
         # Make sure that epicentral disance and source depth are in reasonable
         # ranges
-        if args.sourcedistanceindegrees is not None and \
-                not 0.0 <= args.sourcedistanceindegrees <= 180.0:
-            msg = ("Epicentral distance should be in [0, 180].")
+        if (
+            args.sourcedistanceindegrees is not None
+            and not 0.0 <= args.sourcedistanceindegrees <= 180.0
+        ):
+            msg = "Epicentral distance should be in [0, 180]."
             raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
         min_depth = info.planet_radius - info.max_radius
         max_depth = info.planet_radius - info.min_radius
-        if args.sourcedepthinmeters is not None and \
-                not min_depth <= args.sourcedepthinmeters <= max_depth:
-            msg = ("Source depth should be in [%.1f, %.1f]." % (
-                   min_depth, max_depth))
+        if (
+            args.sourcedepthinmeters is not None
+            and not min_depth <= args.sourcedepthinmeters <= max_depth
+        ):
+            msg = "Source depth should be in [%.1f, %.1f]." % (
+                min_depth,
+                max_depth,
+            )
             raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
     @tornado.gen.coroutine
@@ -145,8 +188,8 @@ class GreensFunctionHandler(InstaseisTimeSeriesHandler):
 
         # generating source and receiver as in the get_greens routine of the
         # base_instaseis class
-        src_latitude, src_longitude = 90., 0.
-        rec_latitude, rec_longitude = 90. - args.sourcedistanceindegrees, 0.
+        src_latitude, src_longitude = 90.0, 0.0
+        rec_latitude, rec_longitude = 90.0 - args.sourcedistanceindegrees, 0.0
         source = Source(src_latitude, src_longitude, args.sourcedepthinmeters)
         receiver = Receiver(rec_latitude, rec_longitude)
 
@@ -155,15 +198,21 @@ class GreensFunctionHandler(InstaseisTimeSeriesHandler):
 
         # Get phase-relative times.
         time_values = self.get_phase_relative_times(
-            args=args, source=source, receiver=receiver,
-            min_starttime=min_starttime, max_endtime=max_endtime)
+            args=args,
+            source=source,
+            receiver=receiver,
+            min_starttime=min_starttime,
+            max_endtime=max_endtime,
+        )
 
         if time_values is None:
-            msg = ("No Green's function extracted for the given phase "
-                   "relative offsets. This could either be due to the "
-                   "chosen phase not existing for the specific "
-                   "source-receiver geometry or arriving too late/with "
-                   "too large offsets if the database is not long enough.")
+            msg = (
+                "No Green's function extracted for the given phase "
+                "relative offsets. This could either be due to the "
+                "chosen phase not existing for the specific "
+                "source-receiver geometry or arriving too late/with "
+                "too large offsets if the database is not long enough."
+            )
             raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
         starttime, endtime = time_values
@@ -174,10 +223,16 @@ class GreensFunctionHandler(InstaseisTimeSeriesHandler):
             _get_greens,
             db=self.application.db,
             epicentral_distance_degree=args.sourcedistanceindegrees,
-            source_depth_in_m=args.sourcedepthinmeters, units=args.units,
-            dt=args.dt, kernelwidth=args.kernelwidth,
-            origintime=args.origintime, starttime=starttime,
-            endtime=endtime, format=args.format, label=args.label)
+            source_depth_in_m=args.sourcedepthinmeters,
+            units=args.units,
+            dt=args.dt,
+            kernelwidth=args.kernelwidth,
+            origintime=args.origintime,
+            starttime=starttime,
+            endtime=endtime,
+            format=args.format,
+            label=args.label,
+        )
 
         # If an exception is returned from the task, re-raise it here.
         if isinstance(response, Exception):

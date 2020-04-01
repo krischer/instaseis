@@ -30,12 +30,13 @@ WRITE_INTERVAL = 0.05
 
 def plot_gnuplot(times):
     try:
-        gnuplot = subprocess.Popen(["gnuplot"],
-                                   stdin=subprocess.PIPE)
+        gnuplot = subprocess.Popen(["gnuplot"], stdin=subprocess.PIPE)
         gnuplot.stdin.write("set term dumb 79 15\n".encode())
         gnuplot.stdin.write("set xlabel 'Seismogram Number'\n".encode())
-        gnuplot.stdin.write("plot '-' using 1:2 title 'time per sm' with "
-                            "linespoints \n".encode())
+        gnuplot.stdin.write(
+            "plot '-' using 1:2 title 'time per sm' with "
+            "linespoints \n".encode()
+        )
         for i, j in zip(np.arange(len(times)), times):
             gnuplot.stdin.write(("%f %f\n" % (i, j)).encode())
         gnuplot.stdin.write("e\n".encode())
@@ -46,9 +47,14 @@ def plot_gnuplot(times):
 
 
 class InstaseisBenchmark(metaclass=ABCMeta):
-
-    def __init__(self, path, time_per_benchmark, save_output=False,
-                 seed=None, count=None):
+    def __init__(
+        self,
+        path,
+        time_per_benchmark,
+        save_output=False,
+        seed=None,
+        count=None,
+    ):
         self.path = path
         self.time_per_benchmark = time_per_benchmark
         self.save_output = save_output
@@ -88,8 +94,9 @@ class InstaseisBenchmark(metaclass=ABCMeta):
 
         print("\tStarting...", end="\r")
         t = starttime
-        while ((self.count is not None and count < self.count) or
-                (self.count is None and t < endtime)):
+        while (self.count is not None and count < self.count) or (
+            self.count is None and t < endtime
+        ):
             count += 1
             s = timeit.default_timer()
             self.iterate()
@@ -103,13 +110,17 @@ class InstaseisBenchmark(metaclass=ABCMeta):
                 cumtime = sum(latest_times)
                 speed = len(latest_times) / cumtime
                 if self.count is None:
-                    print("\tseismograms/sec: {0:>8.2f}, remaining time: "
-                          "{1:>2.1f} sec".format(speed, endtime - t),
-                          end="\r")
+                    print(
+                        "\tseismograms/sec: {0:>8.2f}, remaining time: "
+                        "{1:>2.1f} sec".format(speed, endtime - t),
+                        end="\r",
+                    )
                 else:
-                    print("\tseismograms/sec: {0:>8.2f}, remaining runs: "
-                          "{1:>6d}".format(speed, self.count - count),
-                          end="\r")
+                    print(
+                        "\tseismograms/sec: {0:>8.2f}, remaining runs: "
+                        "{1:>6d}".format(speed, self.count - count),
+                        end="\r",
+                    )
                 sys.stdout.flush()
                 latest_times = []
                 last_write_time = t
@@ -122,8 +133,11 @@ class InstaseisBenchmark(metaclass=ABCMeta):
         print("\t%g sec/seismogram" % all_times.mean())
         print("\t%g seismograms/sec" % (count / cumtime))
         for p in [0, 10, 25, 50, 75, 90, 100]:
-            print("\t {0:>3}th percentile: {1} sec".format(
-                p, np.percentile(all_times, p)))
+            print(
+                "\t {0:>3}th percentile: {1} sec".format(
+                    p, np.percentile(all_times, p)
+                )
+            )
         sys.stdout.flush()
         plot_gnuplot(all_times)
         time.sleep(0.1)
@@ -134,19 +148,24 @@ class InstaseisBenchmark(metaclass=ABCMeta):
             _i = 0
             while True:
                 _i += 1
-                filename = os.path.join(folder, "%s_%04i.txt" % (
-                    self.__class__.__name__, _i))
+                filename = os.path.join(
+                    folder, "%s_%04i.txt" % (self.__class__.__name__, _i)
+                )
                 if not os.path.exists(filename):
                     break
-            np.savetxt(filename, all_times,
-                       header="time per seismogram [run at %s]" % (
-                           obspy.UTCDateTime()))
+            np.savetxt(
+                filename,
+                all_times,
+                header="time per seismogram [run at %s]"
+                % (obspy.UTCDateTime()),
+            )
 
 
 class BufferedFixedSrcRecRoDOffSeismogramGeneration(InstaseisBenchmark):
     def setup(self):
-        self.db = open_db(self.path, read_on_demand=False,
-                          buffer_size_in_mb=250)
+        self.db = open_db(
+            self.path, read_on_demand=False, buffer_size_in_mb=250
+        )
 
     def iterate(self):
         src = Source(latitude=10, longitude=10)
@@ -155,32 +174,35 @@ class BufferedFixedSrcRecRoDOffSeismogramGeneration(InstaseisBenchmark):
 
     @property
     def description(self):
-        return "Buffered, fixed source and receiver, " \
-               "read_on_demand=False"
+        return "Buffered, fixed source and receiver, " "read_on_demand=False"
 
 
 class BufferedFixedSrcRecRoDOffSeismogramGenerationNoObsPy(InstaseisBenchmark):
     def setup(self):
-        self.db = open_db(self.path, read_on_demand=False,
-                          buffer_size_in_mb=250)
+        self.db = open_db(
+            self.path, read_on_demand=False, buffer_size_in_mb=250
+        )
 
     def iterate(self):
         src = Source(latitude=10, longitude=10)
         rec = Receiver(latitude=20, longitude=20)
-        self.db.get_seismograms(source=src, receiver=rec,
-                                return_obspy_stream=False)
+        self.db.get_seismograms(
+            source=src, receiver=rec, return_obspy_stream=False
+        )
 
     @property
     def description(self):
-        return "Buffered, fixed source and receiver, " \
-               "read_on_demand=False, no ObsPy output, best case!"
+        return (
+            "Buffered, fixed source and receiver, "
+            "read_on_demand=False, no ObsPy output, best case!"
+        )
 
 
 class UnbufferedFixedSrcRecRoDOffSeismogramGenerationNoObsPy(
-        InstaseisBenchmark):
+    InstaseisBenchmark
+):
     def setup(self):
-        self.db = open_db(self.path, read_on_demand=False,
-                          buffer_size_in_mb=0)
+        self.db = open_db(self.path, read_on_demand=False, buffer_size_in_mb=0)
 
     def iterate(self):
         src = Source(latitude=10, longitude=10)
@@ -189,14 +211,14 @@ class UnbufferedFixedSrcRecRoDOffSeismogramGenerationNoObsPy(
 
     @property
     def description(self):
-        return "Unbuffered, fixed source and receiver, " \
-               "read_on_demand=False"
+        return "Unbuffered, fixed source and receiver, " "read_on_demand=False"
 
 
 class BufferedFixedSrcRecRoDOnSeismogramGeneration(InstaseisBenchmark):
     def setup(self):
-        self.db = open_db(self.path, read_on_demand=True,
-                          buffer_size_in_mb=250)
+        self.db = open_db(
+            self.path, read_on_demand=True, buffer_size_in_mb=250
+        )
 
     def iterate(self):
         src = Source(latitude=10, longitude=10)
@@ -205,14 +227,14 @@ class BufferedFixedSrcRecRoDOnSeismogramGeneration(InstaseisBenchmark):
 
     @property
     def description(self):
-        return "Buffered, fixed source and receiver, " \
-               "read_on_demand=True"
+        return "Buffered, fixed source and receiver, " "read_on_demand=True"
 
 
 class Buffered2DegreeLatLngDepthScatter(InstaseisBenchmark):
     def setup(self):
-        self.db = open_db(self.path, read_on_demand=False,
-                          buffer_size_in_mb=250)
+        self.db = open_db(
+            self.path, read_on_demand=False, buffer_size_in_mb=250
+        )
         self.max_depth = self.db.info.max_radius - self.db.info.min_radius
 
     def iterate(self):
@@ -232,8 +254,9 @@ class Buffered2DegreeLatLngDepthScatter(InstaseisBenchmark):
 
 class BufferedHalfDegreeLatLngDepthScatter(InstaseisBenchmark):
     def setup(self):
-        self.db = open_db(self.path, read_on_demand=False,
-                          buffer_size_in_mb=250)
+        self.db = open_db(
+            self.path, read_on_demand=False, buffer_size_in_mb=250
+        )
 
     def iterate(self):
         rec = Receiver(latitude=20, longitude=20)
@@ -252,8 +275,9 @@ class BufferedHalfDegreeLatLngDepthScatter(InstaseisBenchmark):
 
 class BufferedFullyRandom(InstaseisBenchmark):
     def setup(self):
-        self.db = open_db(self.path, read_on_demand=False,
-                          buffer_size_in_mb=250)
+        self.db = open_db(
+            self.path, read_on_demand=False, buffer_size_in_mb=250
+        )
         self.max_depth = self.db.info.max_radius - self.db.info.min_radius
 
     def iterate(self):
@@ -276,8 +300,7 @@ class BufferedFullyRandom(InstaseisBenchmark):
 
 class UnbufferedFullyRandom(InstaseisBenchmark):
     def setup(self):
-        self.db = open_db(self.path, read_on_demand=False,
-                          buffer_size_in_mb=0)
+        self.db = open_db(self.path, read_on_demand=False, buffer_size_in_mb=0)
         self.max_depth = self.db.info.max_radius - self.db.info.min_radius
 
     def iterate(self):
@@ -300,8 +323,7 @@ class UnbufferedFullyRandom(InstaseisBenchmark):
 
 class UnbufferedAndRandomReadOnDemandTrue(InstaseisBenchmark):
     def setup(self):
-        self.db = open_db(self.path, read_on_demand=True,
-                          buffer_size_in_mb=0)
+        self.db = open_db(self.path, read_on_demand=True, buffer_size_in_mb=0)
         self.max_depth = self.db.info.max_radius - self.db.info.min_radius
 
     def iterate(self):
@@ -319,14 +341,17 @@ class UnbufferedAndRandomReadOnDemandTrue(InstaseisBenchmark):
 
     @property
     def description(self):
-        return "Unbuffered, random src and receiver, read_on_demand=True, " \
-               "worst case!"
+        return (
+            "Unbuffered, random src and receiver, read_on_demand=True, "
+            "worst case!"
+        )
 
 
 class FiniteSourceEmulation(InstaseisBenchmark):
     def setup(self):
-        self.db = open_db(self.path, read_on_demand=False,
-                          buffer_size_in_mb=250)
+        self.db = open_db(
+            self.path, read_on_demand=False, buffer_size_in_mb=250
+        )
         self.counter = 0
         self.current_depth_counter = 0
         # Depth increases in 1 km steps up to a depth of 25 km.
@@ -345,8 +370,11 @@ class FiniteSourceEmulation(InstaseisBenchmark):
         lat = 0.0
         # Longitude values increase in 1 km steps.
         lng = self.counter * 0.01
-        src = Source(latitude=lat, longitude=lng,
-                     depth_in_m=self.depths[self.current_depth_counter])
+        src = Source(
+            latitude=lat,
+            longitude=lng,
+            depth_in_m=self.depths[self.current_depth_counter],
+        )
 
         self.db.get_seismograms(source=src, receiver=self.rec)
         self.current_depth_counter += 1
@@ -357,31 +385,47 @@ class FiniteSourceEmulation(InstaseisBenchmark):
 
 
 parser = argparse.ArgumentParser(
-    prog="python -m instaseis.benchmark",
-    description='Benchmark Instaseis.')
-parser.add_argument('folder', type=str,
-                    help="path to AxiSEM Green's function database")
-parser.add_argument('--time', type=float, default=10.0,
-                    help='time spent per benchmark in seconds')
-parser.add_argument('--pattern', type=str,
-                    help='UNIX style patterns to only run certain benchmarks')
-parser.add_argument('--seed', type=int,
-                    help='Seed used for the random number generation')
-parser.add_argument('--count', type=int,
-                    help='Number of seismograms to be calculated for each '
-                         'benchmark. Overwrites any time limitations if '
-                         'given.')
-parser.add_argument('--save', action="store_true",
-                    help='save output to txt file')
+    prog="python -m instaseis.benchmark", description="Benchmark Instaseis."
+)
+parser.add_argument(
+    "folder", type=str, help="path to AxiSEM Green's function database"
+)
+parser.add_argument(
+    "--time",
+    type=float,
+    default=10.0,
+    help="time spent per benchmark in seconds",
+)
+parser.add_argument(
+    "--pattern",
+    type=str,
+    help="UNIX style patterns to only run certain benchmarks",
+)
+parser.add_argument(
+    "--seed", type=int, help="Seed used for the random number generation"
+)
+parser.add_argument(
+    "--count",
+    type=int,
+    help="Number of seismograms to be calculated for each "
+    "benchmark. Overwrites any time limitations if "
+    "given.",
+)
+parser.add_argument(
+    "--save", action="store_true", help="save output to txt file"
+)
 args = parser.parse_args()
-path = os.path.abspath(args.folder) if "://" not in args.folder \
-    else args.folder
+path = (
+    os.path.abspath(args.folder) if "://" not in args.folder else args.folder
+)
 
 print(colorama.Fore.GREEN + 79 * "=" + "\nInstaseis Benchmark Suite\n")
 print("It enables to gauge the speed of Instaseis for a certain DB.")
 print(79 * "=" + colorama.Fore.RESET)
-print(colorama.Fore.RED + "\nIt does not deal with OS level caches! So "
-      "interpret the results accordingly!\n" + colorama.Fore.RESET)
+print(
+    colorama.Fore.RED + "\nIt does not deal with OS level caches! So "
+    "interpret the results accordingly!\n" + colorama.Fore.RESET
+)
 
 db = open_db(path, read_on_demand=True, buffer_size_in_mb=0)
 if not db.info.is_reciprocal:
@@ -403,8 +447,10 @@ def get_subclasses(cls):
     return subclasses
 
 
-benchmarks = [i(path, args.time, args.save, args.seed, args.count) for i in
-              get_subclasses(InstaseisBenchmark)]
+benchmarks = [
+    i(path, args.time, args.save, args.seed, args.count)
+    for i in get_subclasses(InstaseisBenchmark)
+]
 benchmarks.sort(key=lambda x: x.description)
 
 print(79 * "=")
@@ -412,8 +458,11 @@ print("Discovered %i benchmark(s)" % len(benchmarks))
 
 if args.pattern is not None:
     pattern = "*%s*" % args.pattern.lower()
-    benchmarks = [_i for _i in benchmarks if
-                  fnmatch.fnmatch(_i.__class__.__name__.lower(), pattern)]
+    benchmarks = [
+        _i
+        for _i in benchmarks
+        if fnmatch.fnmatch(_i.__class__.__name__.lower(), pattern)
+    ]
     print("Pattern matching retained %i benchmark(s)" % len(benchmarks))
 
 print(79 * "=")
@@ -423,7 +472,12 @@ for benchmark in benchmarks:
     print(colorama.Fore.YELLOW + 79 * "=")
     print(79 * "=" + colorama.Fore.RESET)
     print("\n")
-    print(colorama.Fore.BLUE +
-          benchmark.__class__.__name__ + ": " + benchmark.description +
-          colorama.Fore.RESET, end="\n\n")
+    print(
+        colorama.Fore.BLUE
+        + benchmark.__class__.__name__
+        + ": "
+        + benchmark.description
+        + colorama.Fore.RESET,
+        end="\n\n",
+    )
     benchmark.run()

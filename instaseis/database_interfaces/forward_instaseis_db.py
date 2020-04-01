@@ -24,8 +24,16 @@ class ForwardInstaseisDB(BaseNetCDFInstaseisDB):
     """
     Forward Instaseis database.
     """
-    def __init__(self, db_path, netcdf_files, buffer_size_in_mb=100,
-                 read_on_demand=False, *args, **kwargs):
+
+    def __init__(
+        self,
+        db_path,
+        netcdf_files,
+        buffer_size_in_mb=100,
+        read_on_demand=False,
+        *args,
+        **kwargs,
+    ):
         """
         :param db_path: Path to the Instaseis Database containing
             subdirectories PZ and/or PX each containing a
@@ -44,38 +52,56 @@ class ForwardInstaseisDB(BaseNetCDFInstaseisDB):
         :type read_on_demand: bool, optional
         """
         BaseNetCDFInstaseisDB.__init__(
-            self, db_path=db_path, buffer_size_in_mb=buffer_size_in_mb,
-            read_on_demand=read_on_demand, *args, **kwargs)
+            self,
+            db_path=db_path,
+            buffer_size_in_mb=buffer_size_in_mb,
+            read_on_demand=read_on_demand,
+            *args,
+            **kwargs,
+        )
         self._parse_meshes(netcdf_files)
 
     def _parse_meshes(self, files):
         m1_m = mesh.Mesh(
-            files["MZZ"], full_parse=True, strain_buffer_size_in_mb=0,
-            displ_buffer_size_in_mb=self.buffer_size_in_mb,
-            read_on_demand=self.read_on_demand)
-        m2_m = mesh.Mesh(
-            files["MXX_P_MYY"], full_parse=False, strain_buffer_size_in_mb=0,
-            displ_buffer_size_in_mb=self.buffer_size_in_mb,
-            read_on_demand=self.read_on_demand)
-        m3_m = mesh.Mesh(
-            files["MXZ_MYZ"], full_parse=False, strain_buffer_size_in_mb=0,
-            displ_buffer_size_in_mb=self.buffer_size_in_mb,
-            read_on_demand=self.read_on_demand)
-        m4_m = mesh.Mesh(
-            files["MXY_MXX_M_MYY"], full_parse=False,
+            files["MZZ"],
+            full_parse=True,
             strain_buffer_size_in_mb=0,
             displ_buffer_size_in_mb=self.buffer_size_in_mb,
-            read_on_demand=self.read_on_demand)
+            read_on_demand=self.read_on_demand,
+        )
+        m2_m = mesh.Mesh(
+            files["MXX_P_MYY"],
+            full_parse=False,
+            strain_buffer_size_in_mb=0,
+            displ_buffer_size_in_mb=self.buffer_size_in_mb,
+            read_on_demand=self.read_on_demand,
+        )
+        m3_m = mesh.Mesh(
+            files["MXZ_MYZ"],
+            full_parse=False,
+            strain_buffer_size_in_mb=0,
+            displ_buffer_size_in_mb=self.buffer_size_in_mb,
+            read_on_demand=self.read_on_demand,
+        )
+        m4_m = mesh.Mesh(
+            files["MXY_MXX_M_MYY"],
+            full_parse=False,
+            strain_buffer_size_in_mb=0,
+            displ_buffer_size_in_mb=self.buffer_size_in_mb,
+            read_on_demand=self.read_on_demand,
+        )
         self.parsed_mesh = m1_m
 
         MeshCollection_fwd = collections.namedtuple(
-            "MeshCollection_fwd", ["m1", "m2", "m3", "m4"])
+            "MeshCollection_fwd", ["m1", "m2", "m3", "m4"]
+        )
         self.meshes = MeshCollection_fwd(m1_m, m2_m, m3_m, m4_m)
 
         self._is_reciprocal = False
 
-    def _get_data(self, source, receiver, components, coordinates,
-                  element_info):
+    def _get_data(
+        self, source, receiver, components, coordinates, element_info
+    ):
         ei = element_info
         # Collect data arrays and mu in a dictionary.
         data = {}
@@ -93,21 +119,45 @@ class ForwardInstaseisDB(BaseNetCDFInstaseisDB):
 
         if not isinstance(source, Source):
             raise NotImplementedError
-        if self.info.dump_type != 'displ_only':
+        if self.info.dump_type != "displ_only":
             raise NotImplementedError
 
-        displ_1 = self._get_displacement(self.meshes.m1, ei.id_elem,
-                                         ei.gll_point_ids, ei.col_points_xi,
-                                         ei.col_points_eta, ei.xi, ei.eta)
-        displ_2 = self._get_displacement(self.meshes.m2, ei.id_elem,
-                                         ei.gll_point_ids, ei.col_points_xi,
-                                         ei.col_points_eta, ei.xi, ei.eta)
-        displ_3 = self._get_displacement(self.meshes.m3, ei.id_elem,
-                                         ei.gll_point_ids, ei.col_points_xi,
-                                         ei.col_points_eta, ei.xi, ei.eta)
-        displ_4 = self._get_displacement(self.meshes.m4, ei.id_elem,
-                                         ei.gll_point_ids, ei.col_points_xi,
-                                         ei.col_points_eta, ei.xi, ei.eta)
+        displ_1 = self._get_displacement(
+            self.meshes.m1,
+            ei.id_elem,
+            ei.gll_point_ids,
+            ei.col_points_xi,
+            ei.col_points_eta,
+            ei.xi,
+            ei.eta,
+        )
+        displ_2 = self._get_displacement(
+            self.meshes.m2,
+            ei.id_elem,
+            ei.gll_point_ids,
+            ei.col_points_xi,
+            ei.col_points_eta,
+            ei.xi,
+            ei.eta,
+        )
+        displ_3 = self._get_displacement(
+            self.meshes.m3,
+            ei.id_elem,
+            ei.gll_point_ids,
+            ei.col_points_xi,
+            ei.col_points_eta,
+            ei.xi,
+            ei.eta,
+        )
+        displ_4 = self._get_displacement(
+            self.meshes.m4,
+            ei.id_elem,
+            ei.gll_point_ids,
+            ei.col_points_xi,
+            ei.col_points_eta,
+            ei.xi,
+            ei.eta,
+        )
 
         mij = source.tensor / self.parsed_mesh.amplitude
         # mij is [m_rr, m_tt, m_pp, m_rt, m_rp, m_tp]
@@ -120,19 +170,23 @@ class ForwardInstaseisDB(BaseNetCDFInstaseisDB):
         final[:, 0] += displ_2[:, 0] * (mij[1] + mij[2])
         final[:, 2] += displ_2[:, 2] * (mij[1] + mij[2])
 
-        fac_1 = mij[3] * np.cos(coordinates.phi) + \
-            mij[4] * np.sin(coordinates.phi)
-        fac_2 = -mij[3] * np.sin(coordinates.phi) + \
-            mij[4] * np.cos(coordinates.phi)
+        fac_1 = mij[3] * np.cos(coordinates.phi) + mij[4] * np.sin(
+            coordinates.phi
+        )
+        fac_2 = -mij[3] * np.sin(coordinates.phi) + mij[4] * np.cos(
+            coordinates.phi
+        )
 
         final[:, 0] += displ_3[:, 0] * fac_1
         final[:, 1] += displ_3[:, 1] * fac_2
         final[:, 2] += displ_3[:, 2] * fac_1
 
-        fac_1 = (mij[1] - mij[2]) * np.cos(2 * coordinates.phi) \
-            + 2 * mij[5] * np.sin(2 * coordinates.phi)
-        fac_2 = -(mij[1] - mij[2]) * np.sin(2 * coordinates.phi) \
-            + 2 * mij[5] * np.cos(2 * coordinates.phi)
+        fac_1 = (mij[1] - mij[2]) * np.cos(2 * coordinates.phi) + 2 * mij[
+            5
+        ] * np.sin(2 * coordinates.phi)
+        fac_2 = -(mij[1] - mij[2]) * np.sin(2 * coordinates.phi) + 2 * mij[
+            5
+        ] * np.cos(2 * coordinates.phi)
 
         final[:, 0] += displ_4[:, 0] * fac_1
         final[:, 1] += displ_4[:, 1] * fac_2
@@ -146,16 +200,21 @@ class ForwardInstaseisDB(BaseNetCDFInstaseisDB):
             data["T"] = -final[:, 1]
 
         if "R" in components:
-            data["R"] = final[:, 0] * np.cos(rotmesh_colat) \
-                        - final[:, 2] * np.sin(rotmesh_colat)
+            data["R"] = final[:, 0] * np.cos(rotmesh_colat) - final[
+                :, 2
+            ] * np.sin(rotmesh_colat)
 
         if "N" in components or "E" in components or "Z" in components:
             # transpose needed because rotations assume different slicing
             # (ugly)
             final = rotations.rotate_vector_src_to_NEZ(
-                final.T, coordinates.phi,
-                source.longitude_rad, source.colatitude_rad,
-                receiver.longitude_rad, receiver.colatitude_rad).T
+                final.T,
+                coordinates.phi,
+                source.longitude_rad,
+                source.colatitude_rad,
+                receiver.longitude_rad,
+                receiver.colatitude_rad,
+            ).T
 
             if "N" in components:
                 data["N"] = final[:, 0]

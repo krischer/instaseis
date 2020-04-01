@@ -29,22 +29,20 @@ from ..helpers import get_band_code, sizeof_fmt, rfftfreq
 DEFAULT_MU = 32e9
 
 
-KIND_MAP = {
-    'displacement': 0,
-    'velocity': 1,
-    'acceleration': 2}
+KIND_MAP = {"displacement": 0, "velocity": 1, "acceleration": 2}
 
 
 INV_KIND_MAP = dict((j, i) for i, j in KIND_MAP.items())
 
 
 STF_MAP = {
-    'errorf': 0,
-    'quheavi': 0,
-    'dirac_0': 1,
-    'gauss_0': 1,
-    'gauss_1': 2,
-    'gauss_2': 3}
+    "errorf": 0,
+    "quheavi": 0,
+    "dirac_0": 1,
+    "gauss_0": 1,
+    "gauss_1": 2,
+    "gauss_2": 3,
+}
 
 
 def _diff_and_integrate(n_derivative, data, comp, dt_out):
@@ -66,10 +64,18 @@ class BaseInstaseisDB(metaclass=ABCMeta):
     """
     Base class for all Instaseis database classes defining the user interface.
     """
-    def get_greens_function(self, epicentral_distance_in_degree,
-                            source_depth_in_m, origin_time=UTCDateTime(0),
-                            kind='displacement', return_obspy_stream=True,
-                            dt=None, kernelwidth=12, definition='seiscomp'):
+
+    def get_greens_function(
+        self,
+        epicentral_distance_in_degree,
+        source_depth_in_m,
+        origin_time=UTCDateTime(0),
+        kind="displacement",
+        return_obspy_stream=True,
+        dt=None,
+        kernelwidth=12,
+        definition="seiscomp",
+    ):
         """
         Extract Green's function from the Green's function database.
 
@@ -113,11 +119,12 @@ class BaseInstaseisDB(metaclass=ABCMeta):
         if definition.lower() != "seiscomp":
             raise NotImplementedError
 
-        self._get_greens_seiscomp_sanity_checks(epicentral_distance_in_degree,
-                                                source_depth_in_m, kind, dt=dt)
+        self._get_greens_seiscomp_sanity_checks(
+            epicentral_distance_in_degree, source_depth_in_m, kind, dt=dt
+        )
 
-        src_latitude, src_longitude = 90., 0.
-        rec_latitude, rec_longitude = 90. - epicentral_distance_in_degree, 0.
+        src_latitude, src_longitude = 90.0, 0.0
+        rec_latitude, rec_longitude = 90.0 - epicentral_distance_in_degree, 0.0
 
         # sources according to https://github.com/krischer/instaseis/issues/8
         # transformed to r, theta, phi
@@ -133,28 +140,65 @@ class BaseInstaseisDB(metaclass=ABCMeta):
         #  1.0   1.0   1.0    0      0      0      m6
         #  2.0  -1.0  -1.0    0      0      0      cl
 
-        m1 = Source(src_latitude, src_longitude, source_depth_in_m,
-                    m_tp=-1.0, origin_time=origin_time)
-        m2 = Source(src_latitude, src_longitude, source_depth_in_m,
-                    m_tt=1.0, m_pp=-1.0, origin_time=origin_time)
-        m3 = Source(src_latitude, src_longitude, source_depth_in_m,
-                    m_rp=-1.0, origin_time=origin_time)
-        m4 = Source(src_latitude, src_longitude, source_depth_in_m,
-                    m_rt=1.0, origin_time=origin_time)
-        m6 = Source(src_latitude, src_longitude, source_depth_in_m,
-                    m_rr=1.0, m_tt=1.0, m_pp=1.0, origin_time=origin_time)
-        cl = Source(src_latitude, src_longitude, source_depth_in_m,
-                    m_rr=2.0, m_tt=-1.0, m_pp=-1.0, origin_time=origin_time)
+        m1 = Source(
+            src_latitude,
+            src_longitude,
+            source_depth_in_m,
+            m_tp=-1.0,
+            origin_time=origin_time,
+        )
+        m2 = Source(
+            src_latitude,
+            src_longitude,
+            source_depth_in_m,
+            m_tt=1.0,
+            m_pp=-1.0,
+            origin_time=origin_time,
+        )
+        m3 = Source(
+            src_latitude,
+            src_longitude,
+            source_depth_in_m,
+            m_rp=-1.0,
+            origin_time=origin_time,
+        )
+        m4 = Source(
+            src_latitude,
+            src_longitude,
+            source_depth_in_m,
+            m_rt=1.0,
+            origin_time=origin_time,
+        )
+        m6 = Source(
+            src_latitude,
+            src_longitude,
+            source_depth_in_m,
+            m_rr=1.0,
+            m_tt=1.0,
+            m_pp=1.0,
+            origin_time=origin_time,
+        )
+        cl = Source(
+            src_latitude,
+            src_longitude,
+            source_depth_in_m,
+            m_rr=2.0,
+            m_tt=-1.0,
+            m_pp=-1.0,
+            origin_time=origin_time,
+        )
 
         receiver = Receiver(rec_latitude, rec_longitude)
 
         # Extract all seismograms - leverage the logic of the
         # get_seismograms() method as much as possible.
-        args = {'receiver': receiver,
-                'dt': dt,
-                'kind': kind,
-                'kernelwidth': kernelwidth,
-                'return_obspy_stream': return_obspy_stream}
+        args = {
+            "receiver": receiver,
+            "dt": dt,
+            "kind": kind,
+            "kernelwidth": kernelwidth,
+            "return_obspy_stream": return_obspy_stream,
+        }
 
         items = [
             ("TSS", m1, "T"),
@@ -166,7 +210,8 @@ class BaseInstaseisDB(metaclass=ABCMeta):
             ("ZDD", cl, "Z"),
             ("RDD", cl, "R"),
             ("ZEP", m6, "Z"),
-            ("REP", m6, "R")]
+            ("REP", m6, "R"),
+        ]
 
         if return_obspy_stream:
             st = Stream()
@@ -174,8 +219,7 @@ class BaseInstaseisDB(metaclass=ABCMeta):
             st = {}
 
         for name, src, comp in items:
-            tr = self.get_seismograms(
-                source=src, components=comp, **args)
+            tr = self.get_seismograms(source=src, components=comp, **args)
             if return_obspy_stream:
                 tr = tr[0]
                 tr.stats.channel = name
@@ -186,10 +230,18 @@ class BaseInstaseisDB(metaclass=ABCMeta):
 
         return st
 
-    def get_seismograms(self, source, receiver, components=None,
-                        kind='displacement', remove_source_shift=True,
-                        reconvolve_stf=False, return_obspy_stream=True,
-                        dt=None, kernelwidth=12):
+    def get_seismograms(
+        self,
+        source,
+        receiver,
+        components=None,
+        kind="displacement",
+        remove_source_shift=True,
+        reconvolve_stf=False,
+        return_obspy_stream=True,
+        dt=None,
+        kernelwidth=12,
+    ):
         """
         Extract seismograms from the Green's function database.
 
@@ -235,21 +287,24 @@ class BaseInstaseisDB(metaclass=ABCMeta):
             components = self.default_components
 
         source, receiver = self._get_seismograms_sanity_checks(
-            source=source, receiver=receiver, components=components,
-            kind=kind, dt=dt)
+            source=source,
+            receiver=receiver,
+            components=components,
+            kind=kind,
+            dt=dt,
+        )
 
         # Call the _get_seismograms() method of the respective implementation.
-        data = self._get_seismograms(source=source, receiver=receiver,
-                                     components=components)
+        data = self._get_seismograms(
+            source=source, receiver=receiver, components=components
+        )
 
         if dt is None:
             dt_out = self.info.dt
         else:
             dt_out = dt
 
-        stf_deconv_map = {
-            0: self.info.sliprate,
-            1: self.info.slip}
+        stf_deconv_map = {0: self.info.sliprate, 1: self.info.slip}
 
         # Can never be negative with the current logic.
         n_derivative = KIND_MAP[kind] - STF_MAP[self.info.stf]
@@ -258,14 +313,20 @@ class BaseInstaseisDB(metaclass=ABCMeta):
             n_derivative += 1
 
         if reconvolve_stf and remove_source_shift:
-            raise ValueError("'remove_source_shift' argument not "
-                             "compatible with 'reconvolve_stf'.")
+            raise ValueError(
+                "'remove_source_shift' argument not "
+                "compatible with 'reconvolve_stf'."
+            )
 
         # Calculate the final time information about the seismograms.
         time_information = _get_seismogram_times(
-            info=self.info, origin_time=source.origin_time, dt=dt,
-            kernelwidth=kernelwidth, remove_source_shift=remove_source_shift,
-            reconvolve_stf=reconvolve_stf)
+            info=self.info,
+            origin_time=source.origin_time,
+            dt=dt,
+            kernelwidth=kernelwidth,
+            remove_source_shift=remove_source_shift,
+            reconvolve_stf=reconvolve_stf,
+        )
 
         for comp in components:
             if reconvolve_stf:
@@ -277,23 +338,28 @@ class BaseInstaseisDB(metaclass=ABCMeta):
 
                 if STF_MAP[self.info.stf] not in [0, 1]:
                     raise NotImplementedError(
-                        'deconvolution not implemented for stf %s'
-                        % (self.info.stf))
+                        "deconvolution not implemented for stf %s"
+                        % (self.info.stf)
+                    )
 
                 stf_deconv_f = np.fft.rfft(
-                    stf_deconv_map[STF_MAP[self.info.stf]],
-                    n=self.info.nfft)
+                    stf_deconv_map[STF_MAP[self.info.stf]], n=self.info.nfft
+                )
 
                 if abs((source.dt - self.info.dt) / self.info.dt) > 1e-7:
                     raise ValueError("dt of the source not compatible")
 
-                stf_conv_f = np.fft.rfft(source.sliprate,
-                                         n=self.info.nfft)
+                stf_conv_f = np.fft.rfft(source.sliprate, n=self.info.nfft)
 
                 if source.time_shift is not None:
-                    stf_conv_f *= \
-                        np.exp(- 1j * rfftfreq(self.info.nfft) *
-                               2. * np.pi * source.time_shift / self.info.dt)
+                    stf_conv_f *= np.exp(
+                        -1j
+                        * rfftfreq(self.info.nfft)
+                        * 2.0
+                        * np.pi
+                        * source.time_shift
+                        / self.info.dt
+                    )
 
                 # Apply a 5 percent, at least 5 samples taper at the end.
                 # The first sample is guaranteed to be zero in any case.
@@ -309,41 +375,52 @@ class BaseInstaseisDB(metaclass=ABCMeta):
                 f[_idx] /= stf_deconv_f[_idx]
                 f[_l == 0] = 0 + 0j
 
-                data[comp] = np.fft.irfft(dataf * f)[:self.info.npts]
+                data[comp] = np.fft.irfft(dataf * f)[: self.info.npts]
 
             if dt is not None:
                 data[comp] = lanczos_interpolation(
                     data=np.require(data[comp], requirements=["C"]),
-                    old_start=0, old_dt=self.info.dt,
+                    old_start=0,
+                    old_dt=self.info.dt,
                     new_start=time_information["time_shift_at_beginning"],
                     new_dt=dt,
                     new_npts=time_information["npts_before_shift_removal"],
                     a=kernelwidth,
-                    window="blackman")
+                    window="blackman",
+                )
 
             # Integrate/differentiate before removing the source shift in
             # order to reduce boundary effects at the start of the signal.
             #
             # NEVER to this before the resampling! The error can be really big.
             if n_derivative:
-                _diff_and_integrate(n_derivative=n_derivative, data=data,
-                                    comp=comp, dt_out=dt_out)
+                _diff_and_integrate(
+                    n_derivative=n_derivative,
+                    data=data,
+                    comp=comp,
+                    dt_out=dt_out,
+                )
 
             # If desired, remove the samples before the peak of the source
             # time function.
             if remove_source_shift:
-                data[comp] = data[comp][time_information["ref_sample"]:]
+                data[comp] = data[comp][time_information["ref_sample"] :]
 
         if return_obspy_stream:
             return self._convert_to_stream(
-                receiver=receiver, components=components, data=data,
-                dt_out=dt_out, starttime=time_information["starttime"])
+                receiver=receiver,
+                components=components,
+                data=data,
+                dt_out=dt_out,
+                starttime=time_information["starttime"],
+            )
         else:
             return data
 
     @staticmethod
-    def _convert_to_stream(receiver, components, data, dt_out, starttime,
-                           add_band_code=True):
+    def _convert_to_stream(
+        receiver, components, data, dt_out, starttime, add_band_code=True
+    ):
         # Convert to an ObsPy Stream object.
         st = Stream()
         band_code = get_band_code(dt_out)
@@ -352,13 +429,16 @@ class BaseInstaseisDB(metaclass=ABCMeta):
         for comp in components:
             tr = Trace(
                 data=data[comp],
-                header={"delta": dt_out,
-                        "starttime": starttime,
-                        "station": receiver.station,
-                        "network": receiver.network,
-                        "location": receiver.location,
-                        "channel": add_band_code * (band_code + 'X') + comp,
-                        "instaseis": instaseis_header})
+                header={
+                    "delta": dt_out,
+                    "starttime": starttime,
+                    "station": receiver.station,
+                    "network": receiver.network,
+                    "location": receiver.location,
+                    "channel": add_band_code * (band_code + "X") + comp,
+                    "instaseis": instaseis_header,
+                },
+            )
             st += tr
         return st
 
@@ -383,11 +463,17 @@ class BaseInstaseisDB(metaclass=ABCMeta):
         """
         raise NotImplementedError
 
-    def get_seismograms_finite_source(self, sources, receiver,
-                                      components=None,
-                                      kind='displacement', dt=None,
-                                      kernelwidth=12, correct_mu=False,
-                                      progress_callback=None):
+    def get_seismograms_finite_source(
+        self,
+        sources,
+        receiver,
+        components=None,
+        kind="displacement",
+        dt=None,
+        kernelwidth=12,
+        correct_mu=False,
+        progress_callback=None,
+    ):
         """
         Extract seismograms for a finite source from an Instaseis database.
 
@@ -437,13 +523,18 @@ class BaseInstaseisDB(metaclass=ABCMeta):
             # Don't perform the diff/integration here, but after the
             # resampling later on.
             data = self.get_seismograms(
-                source, receiver, components, reconvolve_stf=True,
+                source,
+                receiver,
+                components,
+                reconvolve_stf=True,
                 # Effectively results in nothing happening.
                 kind=INV_KIND_MAP[STF_MAP[self.info.stf]],
-                return_obspy_stream=False, remove_source_shift=False)
+                return_obspy_stream=False,
+                remove_source_shift=False,
+            )
 
             if correct_mu:
-                corr_fac = data["mu"] / DEFAULT_MU,
+                corr_fac = (data["mu"] / DEFAULT_MU,)
             else:
                 corr_fac = 1
 
@@ -462,12 +553,19 @@ class BaseInstaseisDB(metaclass=ABCMeta):
             for comp in components:
                 # We don't need to align a sample to the peak of the source
                 # time function here.
-                new_npts = int(round(
-                    (len(data[comp]) - 1) * self.info.dt / dt, 6) + 1)
+                new_npts = int(
+                    round((len(data[comp]) - 1) * self.info.dt / dt, 6) + 1
+                )
                 data_summed[comp] = lanczos_interpolation(
                     data=np.require(data_summed[comp], requirements=["C"]),
-                    old_start=0, old_dt=self.info.dt, new_start=0, new_dt=dt,
-                    new_npts=new_npts, a=kernelwidth, window="blackman")
+                    old_start=0,
+                    old_dt=self.info.dt,
+                    new_start=0,
+                    new_dt=dt,
+                    new_npts=new_npts,
+                    a=kernelwidth,
+                    window="blackman",
+                )
 
                 # The resampling assumes zeros outside the data range. This
                 # does not introduce any errors at the beginning as the data is
@@ -479,8 +577,9 @@ class BaseInstaseisDB(metaclass=ABCMeta):
                 # important for testing.
                 if round(dt / self.info.dt, 6) != 1.0:
                     affected_area = kernelwidth * self.info.dt
-                    data_summed[comp] = \
-                        data_summed[comp][:-int(np.ceil(affected_area / dt))]
+                    data_summed[comp] = data_summed[comp][
+                        : -int(np.ceil(affected_area / dt))
+                    ]
 
         if dt is None:
             dt_out = self.info.dt
@@ -492,24 +591,33 @@ class BaseInstaseisDB(metaclass=ABCMeta):
         n_derivative = KIND_MAP[kind] - STF_MAP[self.info.stf]
         if n_derivative:
             for comp in data_summed.keys():
-                _diff_and_integrate(n_derivative=n_derivative,
-                                    data=data_summed, comp=comp, dt_out=dt_out)
+                _diff_and_integrate(
+                    n_derivative=n_derivative,
+                    data=data_summed,
+                    comp=comp,
+                    dt_out=dt_out,
+                )
 
         # Convert to an ObsPy Stream object.
         st = Stream()
         band_code = get_band_code(dt_out)
         for comp in components:
-            tr = Trace(data=data_summed[comp],
-                       header={"delta": dt_out,
-                               "station": receiver.station,
-                               "network": receiver.network,
-                               "location": receiver.location,
-                               "channel": "%sX%s" % (band_code, comp)})
+            tr = Trace(
+                data=data_summed[comp],
+                header={
+                    "delta": dt_out,
+                    "station": receiver.station,
+                    "network": receiver.network,
+                    "location": receiver.location,
+                    "channel": "%sX%s" % (band_code, comp),
+                },
+            )
             st += tr
         return st
 
-    def _get_greens_seiscomp_sanity_checks(self, epicentral_distance_degree,
-                                           source_depth_in_m, kind, dt):
+    def _get_greens_seiscomp_sanity_checks(
+        self, epicentral_distance_degree, source_depth_in_m, kind, dt
+    ):
         """
         Common sanity checks for the get_greens_seiscomp method.
 
@@ -529,24 +637,29 @@ class BaseInstaseisDB(metaclass=ABCMeta):
                     "The database is sampled with a sample spacing of %.3f "
                     "seconds. You must not pass a 'dt' larger than that as "
                     "that would be a downsampling operation which Instaseis "
-                    "does not do." % self.info.dt)
+                    "does not do." % self.info.dt
+                )
 
-        if kind not in ['displacement', 'velocity', 'acceleration']:
+        if kind not in ["displacement", "velocity", "acceleration"]:
             raise ValueError("unknown kind '%s'." % (kind,))
 
         if not self.info.is_reciprocal:
-            raise ValueError('forward DB cannot be used with '
-                             'get_greens_function()')
+            raise ValueError(
+                "forward DB cannot be used with " "get_greens_function()"
+            )
 
-        if not self.info.components == 'vertical and horizontal':
-            raise ValueError('get_greens_function() needs a DB with both '
-                             'vertical and horizontal components')
+        if not self.info.components == "vertical and horizontal":
+            raise ValueError(
+                "get_greens_function() needs a DB with both "
+                "vertical and horizontal components"
+            )
 
         d = epicentral_distance_degree
         if not self.info.min_d <= d <= self.info.max_d:
             raise ValueError(
-                'epicentral_distance_degree should be in [%.1f, %.1f]' % (
-                    self.info.min_d, self.info.max_d))
+                "epicentral_distance_degree should be in [%.1f, %.1f]"
+                % (self.info.min_d, self.info.max_d)
+            )
 
         # Check source depth.
         src_radius = self.info.planet_radius - source_depth_in_m
@@ -554,20 +667,22 @@ class BaseInstaseisDB(metaclass=ABCMeta):
             msg = (
                 "Source too deep. Source would be located at a radius of "
                 "%.1f meters. The database supports source radii from "
-                "%.1f to %.1f meters." % (src_radius, self.info.min_radius,
-                                          self.info.max_radius))
+                "%.1f to %.1f meters."
+                % (src_radius, self.info.min_radius, self.info.max_radius)
+            )
             raise ValueError(msg)
         elif src_radius > self.info.max_radius:
             msg = (
                 "Source is too shallow. Source would be located at a "
                 "radius of %.1f meters. The database supports source "
-                "radii from %.1f to %.1f meters." % (
-                    src_radius, self.info.min_radius,
-                    self.info.max_radius))
+                "radii from %.1f to %.1f meters."
+                % (src_radius, self.info.min_radius, self.info.max_radius)
+            )
             raise ValueError(msg)
 
-    def _get_seismograms_sanity_checks(self, source, receiver, components,
-                                       kind, dt):
+    def _get_seismograms_sanity_checks(
+        self, source, receiver, components, kind, dt
+    ):
         """
         Common sanity checks for the get_seismograms method. Also parses
         source and receiver objects if necessary.
@@ -589,29 +704,34 @@ class BaseInstaseisDB(metaclass=ABCMeta):
                     "The database is sampled with a sample spacing of %.3f "
                     "seconds. You must not pass a 'dt' larger than that as "
                     "that would be a downsampling operation which Instaseis "
-                    "does not do." % self.info.dt)
+                    "does not do." % self.info.dt
+                )
 
         if isinstance(source, FiniteSource):
             raise TypeError(
                 "Please use the `get_seismograms_finite_source()` method to "
-                "compute seisomgrams with finite sources.")
+                "compute seisomgrams with finite sources."
+            )
 
         # Attempt to parse them if the types are not correct.
-        if not isinstance(source, Source) and \
-                not isinstance(source, ForceSource):
+        if not isinstance(source, Source) and not isinstance(
+            source, ForceSource
+        ):
             source = Source.parse(source)
         if not isinstance(receiver, Receiver):
             # This only works in the special case of one station, otherwise
             # it has to be called more then once.
             rec = Receiver.parse(receiver)
             if len(rec) != 1:
-                raise ValueError("Receiver object/file contains multiple "
-                                 "stations. Please parse outside the "
-                                 "get_seismograms() function and call in a "
-                                 "loop.")
+                raise ValueError(
+                    "Receiver object/file contains multiple "
+                    "stations. Please parse outside the "
+                    "get_seismograms() function and call in a "
+                    "loop."
+                )
             receiver = rec[0]
 
-        if kind not in ['displacement', 'velocity', 'acceleration']:
+        if kind not in ["displacement", "velocity", "acceleration"]:
             raise ValueError("unknown kind '%s'" % (kind,))
 
         for comp in components:
@@ -620,20 +740,26 @@ class BaseInstaseisDB(metaclass=ABCMeta):
 
         if self.info.is_reciprocal:
             if receiver.depth_in_m is not None:
-                warnings.warn('Receiver depth cannot be changed when reading '
-                              'from reciprocal DB. Using depth from the DB.')
+                warnings.warn(
+                    "Receiver depth cannot be changed when reading "
+                    "from reciprocal DB. Using depth from the DB."
+                )
 
-            if any(comp in components for comp in ['N', 'E', 'R', 'T']) and \
-                    "horizontal" not in self.info.components:
+            if (
+                any(comp in components for comp in ["N", "E", "R", "T"])
+                and "horizontal" not in self.info.components
+            ):
                 raise ValueError("vertical component only DB")
 
-            if 'Z' in components and "vertical" not in self.info.components:
+            if "Z" in components and "vertical" not in self.info.components:
                 raise ValueError("horizontal component only DB")
 
         else:
             if source.depth_in_m is not None:
-                warnings.warn('Source depth cannot be changed when reading '
-                              'from forward DB. Using depth from the DB.')
+                warnings.warn(
+                    "Source depth cannot be changed when reading "
+                    "from forward DB. Using depth from the DB."
+                )
 
         # Make sure that the source is within the domain.
         if self.info.is_reciprocal and source.depth_in_m is not None:
@@ -642,16 +768,17 @@ class BaseInstaseisDB(metaclass=ABCMeta):
                 msg = (
                     "Source too deep. Source would be located at a radius of "
                     "%.1f meters. The database supports source radii from "
-                    "%.1f to %.1f meters." % (src_radius, self.info.min_radius,
-                                              self.info.max_radius))
+                    "%.1f to %.1f meters."
+                    % (src_radius, self.info.min_radius, self.info.max_radius)
+                )
                 raise ValueError(msg)
             elif src_radius > self.info.max_radius:
                 msg = (
                     "Source is too shallow. Source would be located at a "
                     "radius of %.1f meters. The database supports source "
-                    "radii from %.1f to %.1f meters." % (
-                        src_radius, self.info.min_radius,
-                        self.info.max_radius))
+                    "radii from %.1f to %.1f meters."
+                    % (src_radius, self.info.min_radius, self.info.max_radius)
+                )
                 raise ValueError(msg)
         elif not self.info.is_reciprocal and receiver.depth_in_m is not None:
             rec_radius = self.info.planet_radius - receiver.depth_in_m
@@ -659,25 +786,30 @@ class BaseInstaseisDB(metaclass=ABCMeta):
                 msg = (
                     "Receiver too deep. Receiver would be located at a radius "
                     "of %.1f meters. The database supports receiver radii "
-                    "from %.1f to %.1f meters." % (
-                        rec_radius, self.info.min_radius,
-                        self.info.max_radius))
+                    "from %.1f to %.1f meters."
+                    % (rec_radius, self.info.min_radius, self.info.max_radius)
+                )
                 raise ValueError(msg)
             elif rec_radius > self.info.max_radius:
                 msg = (
                     "Receiver is too shallow. Receiver would be located at a "
                     "radius of %.1f meters. The database supports receiver "
-                    "radii from %.1f to %.1f meters." % (
-                        rec_radius, self.info.min_radius,
-                        self.info.max_radius))
+                    "radii from %.1f to %.1f meters."
+                    % (rec_radius, self.info.min_radius, self.info.max_radius)
+                )
                 raise ValueError(msg)
 
-        d = locations2degrees(source.latitude, source.longitude,
-                              receiver.latitude, receiver.longitude)
+        d = locations2degrees(
+            source.latitude,
+            source.longitude,
+            receiver.latitude,
+            receiver.longitude,
+        )
         if not self.info.min_d <= d <= self.info.max_d:
             raise ValueError(
-                'Epicentral distance is %.1f but should be in [%.1f, '
-                '%.1f].' % (d, self.info.min_d, self.info.max_d))
+                "Epicentral distance is %.1f but should be in [%.1f, "
+                "%.1f]." % (d, self.info.min_d, self.info.max_d)
+            )
 
         return source, receiver
 
@@ -727,8 +859,10 @@ class BaseInstaseisDB(metaclass=ABCMeta):
             reciprocal="reciprocal" if info.is_reciprocal else "forward",
             components=info.components,
             source_depth=(
-                "\tsource depth         : %.2f km\n" %
-                info.source_depth) if info.source_depth is not None else "",
+                "\tsource depth         : %.2f km\n" % info.source_depth
+            )
+            if info.source_depth is not None
+            else "",
             velocity_model=info.velocity_model,
             attenuation=info.attenuation,
             period=info.period,
@@ -741,9 +875,9 @@ class BaseInstaseisDB(metaclass=ABCMeta):
             stf=info.stf,
             src_shift=info.src_shift,
             spatial_order=info.spatial_order,
-            min_radius=info.min_radius / 1.0E3,
-            max_radius=info.max_radius / 1.0E3,
-            planet_radius=info.planet_radius / 1.0E3,
+            min_radius=info.min_radius / 1.0e3,
+            max_radius=info.max_radius / 1.0e3,
+            planet_radius=info.planet_radius / 1.0e3,
             min_d=info.min_d,
             max_d=info.max_d,
             time_scheme=info.time_scheme,
@@ -753,7 +887,7 @@ class BaseInstaseisDB(metaclass=ABCMeta):
             user=info.user,
             format_version=info.format_version,
             axisem_version=info.axisem_version,
-            datetime=info.datetime
+            datetime=info.datetime,
         )
         return return_str
 
@@ -789,8 +923,14 @@ class BaseInstaseisDB(metaclass=ABCMeta):
         return components
 
 
-def _get_seismogram_times(info, origin_time, dt, kernelwidth,
-                          remove_source_shift, reconvolve_stf=False):
+def _get_seismogram_times(
+    info,
+    origin_time,
+    dt,
+    kernelwidth,
+    remove_source_shift,
+    reconvolve_stf=False,
+):
     """
     Helper function to calculate the final times of seismograms.
 
@@ -822,8 +962,10 @@ def _get_seismogram_times(info, origin_time, dt, kernelwidth,
         source time shift has been removed.
     """
     if reconvolve_stf and remove_source_shift:
-        raise ValueError("'remove_source_shift' argument not "
-                         "compatible with 'reconvolve_stf'.")
+        raise ValueError(
+            "'remove_source_shift' argument not "
+            "compatible with 'reconvolve_stf'."
+        )
 
     dt_out = dt or info.dt
 
@@ -840,8 +982,7 @@ def _get_seismogram_times(info, origin_time, dt, kernelwidth,
             # make integer based calculations.
             if round(info.src_shift / dt, 5) % 1.0 == 0:
                 ref_sample = int(round(info.src_shift / dt, 5))
-                shift = (info.src_shift_samples * info.dt) - \
-                        (ref_sample * dt)
+                shift = (info.src_shift_samples * info.dt) - (ref_sample * dt)
                 shift = round(shift, 6)
                 duration = (info.npts - 1) * info.dt - shift
                 new_npts = int(round(duration / dt, 6)) + 1
@@ -849,15 +990,15 @@ def _get_seismogram_times(info, origin_time, dt, kernelwidth,
                 shift = round(info.src_shift % dt, 8)
                 duration = (info.npts - 1) * info.dt - shift
                 new_npts = int(round(duration / dt, 6)) + 1
-                ref_sample = \
-                    int(round((info.src_shift - shift) / dt, 6))
+                ref_sample = int(round((info.src_shift - shift) / dt, 6))
 
             ti["time_shift_at_beginning"] = shift
             ti["npts_before_shift_removal"] = new_npts
         else:
             ti["time_shift_at_beginning"] = 0
-            ti["npts_before_shift_removal"] = \
+            ti["npts_before_shift_removal"] = (
                 int(round((info.npts - 1) * info.dt / dt, 6)) + 1
+            )
             ref_sample = 0
 
         # The resampling assumes zeros outside the data range. This
@@ -870,8 +1011,7 @@ def _get_seismogram_times(info, origin_time, dt, kernelwidth,
         # important for testing.
         if round(dt / info.dt, 6) != 1.0:
             affected_area = kernelwidth * info.dt
-            ti["samples_cut_at_end"] = \
-                int(np.ceil(affected_area / dt))
+            ti["samples_cut_at_end"] = int(np.ceil(affected_area / dt))
             ti["npts_before_shift_removal"] -= ti["samples_cut_at_end"]
     else:
         if not reconvolve_stf:

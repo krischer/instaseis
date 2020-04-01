@@ -41,19 +41,24 @@ import os
 import inspect
 from subprocess import Popen, PIPE
 
-__all__ = ("get_git_version")
+__all__ = "get_git_version"
 
 
-script_dir = os.path.abspath(os.path.dirname(inspect.getfile(
-                                             inspect.currentframe())))
+script_dir = os.path.abspath(
+    os.path.dirname(inspect.getfile(inspect.currentframe()))
+)
 INSTASEIS_ROOT = os.path.abspath(os.path.join(script_dir, os.pardir))
 VERSION_FILE = os.path.join(script_dir, "RELEASE-VERSION")
 
 
 def call_git_describe(abbrev=4):  # pragma: no cover
     try:
-        p = Popen(['git', 'rev-parse', '--show-toplevel'],
-                  cwd=INSTASEIS_ROOT, stdout=PIPE, stderr=PIPE)
+        p = Popen(
+            ["git", "rev-parse", "--show-toplevel"],
+            cwd=INSTASEIS_ROOT,
+            stdout=PIPE,
+            stderr=PIPE,
+        )
         p.stderr.close()
         path = p.stdout.readline().decode().strip()
         p.stdout.close()
@@ -62,9 +67,19 @@ def call_git_describe(abbrev=4):  # pragma: no cover
     if os.path.normpath(path) != INSTASEIS_ROOT:
         return None
     try:
-        p = Popen(['git', 'describe', '--dirty', '--abbrev=%d' % abbrev,
-                   '--always', '--tags'],
-                  cwd=INSTASEIS_ROOT, stdout=PIPE, stderr=PIPE)
+        p = Popen(
+            [
+                "git",
+                "describe",
+                "--dirty",
+                "--abbrev=%d" % abbrev,
+                "--always",
+                "--tags",
+            ],
+            cwd=INSTASEIS_ROOT,
+            stdout=PIPE,
+            stderr=PIPE,
+        )
 
         p.stderr.close()
         line = p.stdout.readline().decode()
@@ -88,7 +103,7 @@ def read_release_version():  # pragma: no cover
 
 def write_release_version(version):  # pragma: no cover
     with io.open(VERSION_FILE, "wb") as fh:
-        fh.write(("%s\n" % version).encode('ascii', 'strict'))
+        fh.write(("%s\n" % version).encode("ascii", "strict"))
 
 
 def get_git_version(abbrev=4):  # pragma: no cover
@@ -105,7 +120,7 @@ def get_git_version(abbrev=4):  # pragma: no cover
 
     # If we still don't have anything, that's an error.
     if version is None:
-        return '0.0.0-tar/zipball'
+        return "0.0.0-tar/zipball"
 
     # If the current version is different from what's in the
     # RELEASE-VERSION file, update the file to be current.

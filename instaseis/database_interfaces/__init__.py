@@ -30,13 +30,15 @@ def find_and_open_files(path, *args, **kwargs):
     found_files = []
     for root, dirs, filenames in os.walk(path, followlinks=True):
         # Limit depth of filetree traversal
-        nested_levels = os.path.relpath(root, path).split(
-            os.path.sep)
+        nested_levels = os.path.relpath(root, path).split(os.path.sep)
         if len(nested_levels) >= 4:
             del dirs[:]
         for filename in sorted(filenames, reverse=True):
-            if filename in ["ordered_output.nc4", "axisem_output.nc4",
-                            "merged_output.nc4"]:
+            if filename in [
+                "ordered_output.nc4",
+                "axisem_output.nc4",
+                "merged_output.nc4",
+            ]:
                 break
         else:
             continue
@@ -44,12 +46,13 @@ def find_and_open_files(path, *args, **kwargs):
 
     if len(found_files) == 0:
         raise InstaseisNotFoundError(
-            "No suitable netCDF files found under '%s'" % path)
+            "No suitable netCDF files found under '%s'" % path
+        )
     elif len(found_files) not in [1, 2, 4]:
         raise InstaseisError(
             "1, 2 or 4 netCDF must be present in the folder structure. "
-            "Found %i: \t%s" % (len(found_files),
-                                "\n\t".join(found_files)))
+            "Found %i: \t%s" % (len(found_files), "\n\t".join(found_files))
+        )
 
     # Catch the merged file first because its easy.
     if len(found_files) == 1 and found_files[0].endswith("merged_output.nc4"):
@@ -69,10 +72,12 @@ def find_and_open_files(path, *args, **kwargs):
 
         if dims in (2, 3, 5):
             return ReciprocalMergedInstaseisDB(
-                db_path=path, netcdf_file=found_files[0], *args, **kwargs)
+                db_path=path, netcdf_file=found_files[0], *args, **kwargs
+            )
         elif dims == 10:
             return ForwardMergedInstaseisDB(
-                db_path=path, netcdf_file=found_files[0], *args, **kwargs)
+                db_path=path, netcdf_file=found_files[0], *args, **kwargs
+            )
         else:  # pragma: no cover
             raise NotImplementedError
 
@@ -89,26 +94,36 @@ def find_and_open_files(path, *args, **kwargs):
     for key, files in netcdf_files.items():
         if len(files) != 1:
             raise InstaseisError(
-                "Found %i files for component %s:\n\t%s" % (
-                    len(files), key, "\n\t".join(files)))
+                "Found %i files for component %s:\n\t%s"
+                % (len(files), key, "\n\t".join(files))
+            )
         netcdf_files[key] = files[0]
 
     # Two valid cases.
     if "PX" in netcdf_files or "PZ" in netcdf_files:
-        return ReciprocalInstaseisDB(db_path=path, netcdf_files=netcdf_files,
-                                     *args, **kwargs)
-    elif "MZZ" in netcdf_files or "MXX_P_MYY" in netcdf_files or \
-            "MXZ_MYZ" in netcdf_files or "MXY_MXX_M_MYY" in netcdf_files:
-        if sorted(netcdf_files.keys()) != sorted([
-                "MZZ", "MXX_P_MYY", "MXZ_MYZ", "MXY_MXX_M_MYY"]):
+        return ReciprocalInstaseisDB(
+            db_path=path, netcdf_files=netcdf_files, *args, **kwargs
+        )
+    elif (
+        "MZZ" in netcdf_files
+        or "MXX_P_MYY" in netcdf_files
+        or "MXZ_MYZ" in netcdf_files
+        or "MXY_MXX_M_MYY" in netcdf_files
+    ):
+        if sorted(netcdf_files.keys()) != sorted(
+            ["MZZ", "MXX_P_MYY", "MXZ_MYZ", "MXY_MXX_M_MYY"]
+        ):
             raise InstaseisError(
                 "Expecting all four elemental moment tensor subfolders "
-                "to be present.")
-        return ForwardInstaseisDB(db_path=path, netcdf_files=netcdf_files,
-                                  *args, **kwargs)
+                "to be present."
+            )
+        return ForwardInstaseisDB(
+            db_path=path, netcdf_files=netcdf_files, *args, **kwargs
+        )
     else:
         raise InstaseisError(
             "Could not find any suitable netCDF files. Did you pass the "
             "correct directory? E.g. if the 'ordered_output.nc4' files "
             "are located in '/path/to/PZ/Data', please pass '/path/to/' "
-            "to Instaseis.")
+            "to Instaseis."
+        )

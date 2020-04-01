@@ -11,7 +11,7 @@ import re
 # Regular expression to find floats. Match groups are the whole string, the
 # whole coefficient, the decimal part of the coefficient, and the exponent
 # part.
-_float_re = re.compile(r'(([+-]?\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?)')
+_float_re = re.compile(r"(([+-]?\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?)")
 
 
 def valid_float_string(string):
@@ -24,7 +24,7 @@ class FloatValidator(QtGui.QValidator):
         string = str(string)
         if valid_float_string(string):
             return (self.Acceptable, string, position)
-        if string == "" or string[position-1] in 'e.-+':
+        if string == "" or string[position - 1] in "e.-+":
             return (self.Intermediate, string, position)
         return (self.Invalid, string, position)
 

@@ -79,13 +79,17 @@ def open_db(path, *args, **kwargs):
     if path.startswith("syngine://"):
         model = re.sub("syngine://", "", path).strip()
         from instaseis.database_interfaces import syngine_instaseis_db
-        return syngine_instaseis_db.SyngineInstaseisDB(model=model, *args,
-                                                       **kwargs)
+
+        return syngine_instaseis_db.SyngineInstaseisDB(
+            model=model, *args, **kwargs
+        )
     elif "://" in path:
         from .database_interfaces import remote_instaseis_db
+
         return remote_instaseis_db.RemoteInstaseisDB(path, *args, **kwargs)
     else:
         from .database_interfaces import find_and_open_files
+
         return find_and_open_files(path=path, *args, **kwargs)
 
 
@@ -93,8 +97,11 @@ __version__ = get_git_version()
 
 
 if __version__.startswith("0.0.0-tar/zipball"):  # pragma: no cover
-    warnings.warn("Please don't install from a tarball. Use the proper pypi "
-                  "release or install from git.", UserWarning)
+    warnings.warn(
+        "Please don't install from a tarball. Use the proper pypi "
+        "release or install from git.",
+        UserWarning,
+    )
 
 
 from .source import Source, Receiver, ForceSource, FiniteSource  # NoQa

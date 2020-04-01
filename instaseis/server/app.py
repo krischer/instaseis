@@ -30,8 +30,7 @@ from .routes.finite_source import FiniteSourceSeismogramsHandler
 
 # Bit of a hack: Add geojson to the content-types supported for gzipping.
 # The tests will catch if this no longer works with newer tornado versions.
-tornado.web.GZipContentEncoding.CONTENT_TYPES.add(
-    "application/vnd.geo+json")
+tornado.web.GZipContentEncoding.CONTENT_TYPES.add("application/vnd.geo+json")
 
 
 def get_application():
@@ -41,24 +40,33 @@ def get_application():
     This is a separate function to be able to get the same application
     objects for the tests.
     """
-    return tornado.web.Application([
-        (r"/seismograms", SeismogramsHandler),
-        (r"/seismograms_raw", RawSeismogramsHandler),
-        (r"/finite_source", FiniteSourceSeismogramsHandler),
-        (r"/greens_function", GreensFunctionHandler),
-        (r"/info", InfoHandler),
-        (r"/", IndexHandler),
-        (r"/coordinates", CoordinatesHandler),
-        (r"/event", EventHandler),
-        (r"/ttimes", TravelTimeHandler)
-    ], compress_response=True)
+    return tornado.web.Application(
+        [
+            (r"/seismograms", SeismogramsHandler),
+            (r"/seismograms_raw", RawSeismogramsHandler),
+            (r"/finite_source", FiniteSourceSeismogramsHandler),
+            (r"/greens_function", GreensFunctionHandler),
+            (r"/info", InfoHandler),
+            (r"/", IndexHandler),
+            (r"/coordinates", CoordinatesHandler),
+            (r"/event", EventHandler),
+            (r"/ttimes", TravelTimeHandler),
+        ],
+        compress_response=True,
+    )
 
 
-def launch_io_loop(db_path, port, buffer_size_in_mb, quiet, log_level,
-                   max_size_of_finite_sources=1000,
-                   station_coordinates_callback=None,
-                   event_info_callback=None,
-                   travel_time_callback=None):  # pragma: no cover
+def launch_io_loop(
+    db_path,
+    port,
+    buffer_size_in_mb,
+    quiet,
+    log_level,
+    max_size_of_finite_sources=1000,
+    station_coordinates_callback=None,
+    event_info_callback=None,
+    travel_time_callback=None,
+):  # pragma: no cover
     """
     Launch the instaseis server.
 
@@ -82,7 +90,8 @@ def launch_io_loop(db_path, port, buffer_size_in_mb, quiet, log_level,
     """
     application = get_application()
     application.db = find_and_open_files(
-        path=db_path, buffer_size_in_mb=buffer_size_in_mb)
+        path=db_path, buffer_size_in_mb=buffer_size_in_mb
+    )
     application.station_coordinates_callback = station_coordinates_callback
     application.event_info_callback = event_info_callback
 

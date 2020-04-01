@@ -26,9 +26,20 @@ from .. import sem_derivatives
 from .. import spectral_basis
 
 
-ElementInfo = collections.namedtuple("ElementInfo", [
-    "id_elem", "gll_point_ids", "xi", "eta", "corner_points", "col_points_xi",
-    "col_points_eta", "axis", "eltype"])
+ElementInfo = collections.namedtuple(
+    "ElementInfo",
+    [
+        "id_elem",
+        "gll_point_ids",
+        "xi",
+        "eta",
+        "corner_points",
+        "col_points_xi",
+        "col_points_eta",
+        "axis",
+        "eltype",
+    ],
+)
 
 Coordinates = collections.namedtuple("Coordinates", ["s", "phi", "z"])
 
@@ -38,8 +49,15 @@ class BaseNetCDFInstaseisDB(BaseInstaseisDB, metaclass=ABCMeta):
     Base class for extracting seismograms from a local Instaseis netCDF
     database.
     """
-    def __init__(self, db_path, buffer_size_in_mb=100,
-                 read_on_demand=False, *args, **kwargs):
+
+    def __init__(
+        self,
+        db_path,
+        buffer_size_in_mb=100,
+        read_on_demand=False,
+        *args,
+        **kwargs,
+    ):
         """
         :param db_path: Path to the Instaseis Database containing
             subdirectories PZ and/or PX each containing a
@@ -66,16 +84,15 @@ class BaseNetCDFInstaseisDB(BaseInstaseisDB, metaclass=ABCMeta):
         Find and collect/calculate information about the element containing
         the given coordinates.
         """
-        k_map = {"displ_only": 10,
-                 "strain_only": 1,
-                 "fullfields": 1}
+        k_map = {"displ_only": 10, "strain_only": 1, "fullfields": 1}
 
         nextpoints = self.parsed_mesh.kdtree.query(
-            [coordinates.s, coordinates.z], k=k_map[self.info.dump_type])
+            [coordinates.s, coordinates.z], k=k_map[self.info.dump_type]
+        )
 
         # Find the element containing the point of interest.
         mesh = self.parsed_mesh.f["Mesh"]
-        if self.info.dump_type == 'displ_only':
+        if self.info.dump_type == "displ_only":
             # Loop over multiple tolerances - this is mainly needed for
             # legacy regional databases that have small elements far from the
             # core.
@@ -91,10 +108,12 @@ class BaseNetCDFInstaseisDB(BaseInstaseisDB, metaclass=ABCMeta):
                     if not self.read_on_demand:
                         corner_point_ids = self.parsed_mesh.fem_mesh[idx][:4]
                         eltype = self.parsed_mesh.eltypes[idx]
-                        corner_points[:, 0] = \
-                            self.parsed_mesh.mesh_S[corner_point_ids]
-                        corner_points[:, 1] = \
-                            self.parsed_mesh.mesh_Z[corner_point_ids]
+                        corner_points[:, 0] = self.parsed_mesh.mesh_S[
+                            corner_point_ids
+                        ]
+                        corner_points[:, 1] = self.parsed_mesh.mesh_Z[
+                            corner_point_ids
+                        ]
                     else:
                         corner_point_ids = mesh["fem_mesh"][idx][:4]
 
@@ -106,14 +125,20 @@ class BaseNetCDFInstaseisDB(BaseInstaseisDB, metaclass=ABCMeta):
 
                         m_s = mesh["mesh_S"]
                         m_z = mesh["mesh_Z"]
-                        corner_points[:, 0] = \
-                            [m_s[_i] for _i in corner_point_ids]
-                        corner_points[:, 1] = \
-                            [m_z[_i] for _i in corner_point_ids]
+                        corner_points[:, 0] = [
+                            m_s[_i] for _i in corner_point_ids
+                        ]
+                        corner_points[:, 1] = [
+                            m_z[_i] for _i in corner_point_ids
+                        ]
 
                     isin, xi, eta = finite_elem_mapping.inside_element(
-                        coordinates.s, coordinates.z, corner_points, eltype,
-                        tolerance=tolerance)
+                        coordinates.s,
+                        coordinates.z,
+                        corner_points,
+                        eltype,
+                        tolerance=tolerance,
+                    )
                     if isin:
                         id_elem = idx
                         break
@@ -147,13 +172,21 @@ class BaseNetCDFInstaseisDB(BaseInstaseisDB, metaclass=ABCMeta):
             eta = None
 
         return ElementInfo(
-            id_elem=id_elem, gll_point_ids=gll_point_ids, xi=xi, eta=eta,
-            corner_points=corner_points, col_points_xi=col_points_xi,
-            col_points_eta=col_points_eta, axis=axis, eltype=eltype)
+            id_elem=id_elem,
+            gll_point_ids=gll_point_ids,
+            xi=xi,
+            eta=eta,
+            corner_points=corner_points,
+            col_points_xi=col_points_xi,
+            col_points_eta=col_points_eta,
+            axis=axis,
+            eltype=eltype,
+        )
 
     @abstractmethod
-    def _get_data(self, source, receiver, components, coordinates,
-                  element_info):
+    def _get_data(
+        self, source, receiver, components, coordinates, element_info
+    ):
         """
         Has to be implemented by each implementation.
 
@@ -191,25 +224,46 @@ class BaseNetCDFInstaseisDB(BaseInstaseisDB, metaclass=ABCMeta):
             a.x(planet_radius=self.info.planet_radius),
             a.y(planet_radius=self.info.planet_radius),
             a.z(planet_radius=self.info.planet_radius),
-            b.longitude, b.colatitude)
+            b.longitude,
+            b.colatitude,
+        )
 
         coordinates = Coordinates(s=rotmesh_s, phi=rotmesh_phi, z=rotmesh_z)
 
         element_info = self._get_element_info(coordinates=coordinates)
 
         return self._get_data(
-            source=source, receiver=receiver, components=components,
-            coordinates=coordinates, element_info=element_info)
+            source=source,
+            receiver=receiver,
+            components=components,
+            coordinates=coordinates,
+            element_info=element_info,
+        )
 
     def _get_strain_interp(  # NOQA
-            self, mesh, id_elem, gll_point_ids, G, GT, col_points_xi,
-            col_points_eta, corner_points, eltype, axis, xi, eta):
+        self,
+        mesh,
+        id_elem,
+        gll_point_ids,
+        G,
+        GT,
+        col_points_xi,
+        col_points_eta,
+        corner_points,
+        eltype,
+        axis,
+        xi,
+        eta,
+    ):
         if id_elem not in mesh.strain_buffer:
             # Single precision in the NetCDF files but the later interpolation
             # routines require double precision. Assignment to this array will
             # force a cast.
-            utemp = np.zeros((mesh.ndumps, mesh.npol + 1, mesh.npol + 1, 3),
-                             dtype=np.float64, order="F")
+            utemp = np.zeros(
+                (mesh.ndumps, mesh.npol + 1, mesh.npol + 1, 3),
+                dtype=np.float64,
+                order="F",
+            )
 
             # The list of ids we have is unique but not sorted.
             ids = gll_point_ids.flatten()
@@ -234,18 +288,17 @@ class BaseNetCDFInstaseisDB(BaseInstaseisDB, metaclass=ABCMeta):
                 if time_axis == 0:
                     for _c in chunks:
                         if isinstance(_c, list):
-                            _temp.append(m[:, _c[0]:_c[1]])
+                            _temp.append(m[:, _c[0] : _c[1]])
                         else:
                             _temp.append(m[:, _c])
                 else:
                     for _c in chunks:
                         if isinstance(_c, list):
-                            _temp.append(m[_c[0]:_c[1], :].T)
+                            _temp.append(m[_c[0] : _c[1], :].T)
                         else:
                             _temp.append(m[_c, :].T)
 
-                _t = np.empty((_temp[0].shape[0], 25),
-                              dtype=_temp[0].dtype)
+                _t = np.empty((_temp[0].shape[0], 25), dtype=_temp[0].dtype)
 
                 k = 0
                 for _i in _temp:
@@ -263,18 +316,28 @@ class BaseNetCDFInstaseisDB(BaseInstaseisDB, metaclass=ABCMeta):
                 for ipol in range(mesh.npol + 1):
                     for jpol in range(mesh.npol + 1):
                         idx = ipol * 5 + jpol
-                        utemp[:, jpol, ipol, i] = \
-                            _temp[:, np.argwhere(
-                                s_ids == ids[idx])[0][0]]
+                        utemp[:, jpol, ipol, i] = _temp[
+                            :, np.argwhere(s_ids == ids[idx])[0][0]
+                        ]
 
             strain_fct_map = {
                 "monopole": sem_derivatives.strain_monopole_td,
                 "dipole": sem_derivatives.strain_dipole_td,
-                "quadpole": sem_derivatives.strain_quadpole_td}
+                "quadpole": sem_derivatives.strain_quadpole_td,
+            }
 
             strain = strain_fct_map[mesh.excitation_type](
-                utemp, G, GT, col_points_xi, col_points_eta, mesh.npol,
-                mesh.ndumps, corner_points, eltype, axis)
+                utemp,
+                G,
+                GT,
+                col_points_xi,
+                col_points_eta,
+                mesh.npol,
+                mesh.ndumps,
+                corner_points,
+                eltype,
+                axis,
+            )
 
             mesh.strain_buffer.add(id_elem, strain)
         else:
@@ -284,7 +347,8 @@ class BaseNetCDFInstaseisDB(BaseInstaseisDB, metaclass=ABCMeta):
 
         for i in range(6):
             final_strain[:, i] = spectral_basis.lagrange_interpol_2D_td(
-                col_points_xi, col_points_eta, strain[:, :, :, i], xi, eta)
+                col_points_xi, col_points_eta, strain[:, :, :, i], xi, eta
+            )
 
         if not mesh.excitation_type == "monopole":
             final_strain[:, 3] *= -1.0
@@ -298,9 +362,16 @@ class BaseNetCDFInstaseisDB(BaseInstaseisDB, metaclass=ABCMeta):
 
             mesh_dict = mesh.f["Snapshots"]
 
-            for i, var in enumerate([
-                    'strain_dsus', 'strain_dsuz', 'strain_dpup',
-                    'strain_dsup', 'strain_dzup', 'straintrace']):
+            for i, var in enumerate(
+                [
+                    "strain_dsus",
+                    "strain_dsuz",
+                    "strain_dpup",
+                    "strain_dsup",
+                    "strain_dzup",
+                    "straintrace",
+                ]
+            ):
                 if var not in mesh_dict:
                     continue
 
@@ -323,8 +394,9 @@ class BaseNetCDFInstaseisDB(BaseInstaseisDB, metaclass=ABCMeta):
             final_strain = np.empty((self.info.npts, 6), order="F")
             final_strain[:, 0] = strain_temp[:, 0]
             final_strain[:, 1] = strain_temp[:, 2]
-            final_strain[:, 2] = (strain_temp[:, 5] - strain_temp[:, 0] -
-                                  strain_temp[:, 2])
+            final_strain[:, 2] = (
+                strain_temp[:, 5] - strain_temp[:, 0] - strain_temp[:, 2]
+            )
             final_strain[:, 3] = -strain_temp[:, 4]
             final_strain[:, 4] = strain_temp[:, 1]
             final_strain[:, 5] = -strain_temp[:, 3]
@@ -334,11 +406,22 @@ class BaseNetCDFInstaseisDB(BaseInstaseisDB, metaclass=ABCMeta):
 
         return final_strain
 
-    def _get_displacement(self, mesh, id_elem, gll_point_ids, col_points_xi,
-                          col_points_eta, xi, eta):
+    def _get_displacement(
+        self,
+        mesh,
+        id_elem,
+        gll_point_ids,
+        col_points_xi,
+        col_points_eta,
+        xi,
+        eta,
+    ):
         if id_elem not in mesh.displ_buffer:
-            utemp = np.zeros((mesh.ndumps, mesh.npol + 1, mesh.npol + 1, 3),
-                             dtype=np.float64, order="F")
+            utemp = np.zeros(
+                (mesh.ndumps, mesh.npol + 1, mesh.npol + 1, 3),
+                dtype=np.float64,
+                order="F",
+            )
 
             mesh_dict = mesh.f["Snapshots"]
 
@@ -363,15 +446,17 @@ class BaseNetCDFInstaseisDB(BaseInstaseisDB, metaclass=ABCMeta):
                     for ipol in range(mesh.npol + 1):
                         for jpol in range(mesh.npol + 1):
                             idx = ipol * 5 + jpol
-                            utemp[:, jpol, ipol, i] = \
-                                temp[:, np.argwhere(s_ids == ids[idx])[0][0]]
+                            utemp[:, jpol, ipol, i] = temp[
+                                :, np.argwhere(s_ids == ids[idx])[0][0]
+                            ]
                 else:
                     temp = mesh_dict[var][s_ids, :]
                     for ipol in range(mesh.npol + 1):
                         for jpol in range(mesh.npol + 1):
                             idx = ipol * 5 + jpol
-                            utemp[:, jpol, ipol, i] = \
-                                temp[np.argwhere(s_ids == ids[idx])[0][0], :]
+                            utemp[:, jpol, ipol, i] = temp[
+                                np.argwhere(s_ids == ids[idx])[0][0], :
+                            ]
 
             mesh.displ_buffer.add(id_elem, utemp)
         else:
@@ -381,7 +466,8 @@ class BaseNetCDFInstaseisDB(BaseInstaseisDB, metaclass=ABCMeta):
 
         for i in range(3):
             final_displacement[:, i] = spectral_basis.lagrange_interpol_2D_td(
-                col_points_xi, col_points_eta, utemp[:, :, :, i], xi, eta)
+                col_points_xi, col_points_eta, utemp[:, :, :, i], xi, eta
+            )
 
         return final_displacement
 
@@ -401,27 +487,28 @@ class BaseNetCDFInstaseisDB(BaseInstaseisDB, metaclass=ABCMeta):
                 # The number of dimensions determines the available components.
                 dims = self.meshes.merged.f["MergedSnapshots"].shape[1]
                 if dims == 5:
-                    components = 'vertical and horizontal'
+                    components = "vertical and horizontal"
                 elif dims == 3:
-                    components = 'horizontal only'
+                    components = "horizontal only"
                 elif dims == 2:
-                    components = 'vertical only'
+                    components = "vertical only"
                 else:  # pragma: no cover
                     raise NotImplementedError
             elif self.meshes.pz is not None and self.meshes.px is not None:
-                components = 'vertical and horizontal'
+                components = "vertical and horizontal"
             elif self.meshes.pz is None and self.meshes.px is not None:
-                components = 'horizontal only'
+                components = "horizontal only"
             elif self.meshes.pz is not None and self.meshes.px is None:
-                components = 'vertical only'
+                components = "vertical only"
         else:
-            components = '4 elemental moment tensors'
+            components = "4 elemental moment tensors"
 
         return dict(
             is_reciprocal=self._is_reciprocal,
             components=components,
             source_depth=float(self.parsed_mesh.source_depth)
-            if self._is_reciprocal is False else None,
+            if self._is_reciprocal is False
+            else None,
             velocity_model=self.parsed_mesh.background_model,
             external_model_name=self.parsed_mesh.external_model_name,
             attenuation=self.parsed_mesh.attenuation,
@@ -451,5 +538,5 @@ class BaseNetCDFInstaseisDB(BaseInstaseisDB, metaclass=ABCMeta):
             user=self.parsed_mesh.axisem_user,
             format_version=int(self.parsed_mesh.file_version),
             axisem_version=self.parsed_mesh.axisem_version,
-            datetime=self.parsed_mesh.creation_time
+            datetime=self.parsed_mesh.creation_time,
         )

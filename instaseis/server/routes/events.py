@@ -16,13 +16,11 @@ class EventHandler(InstaseisRequestHandler):
     def get(self):
         if self.application.event_info_callback is None:
             msg = "Server does not support event information."
-            raise tornado.web.HTTPError(
-                404, log_message=msg, reason=msg)
+            raise tornado.web.HTTPError(404, log_message=msg, reason=msg)
 
         if "id" not in self.request.arguments:
             msg = "'id' parameter is required."
-            raise tornado.web.HTTPError(
-                400, log_message=msg, reason=msg)
+            raise tornado.web.HTTPError(400, log_message=msg, reason=msg)
 
         event_id = self.get_argument("id")
 

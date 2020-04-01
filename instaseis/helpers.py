@@ -18,8 +18,10 @@ import os
 import numpy as np
 
 
-LIB_DIR = os.path.join(os.path.dirname(os.path.abspath(
-    inspect.getfile(inspect.currentframe()))), "lib")
+LIB_DIR = os.path.join(
+    os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))),
+    "lib",
+)
 
 cache = []
 
@@ -31,8 +33,9 @@ def load_lib():
         # Enable a couple of different library naming schemes.
         possible_files = glob.glob(os.path.join(LIB_DIR, "instaseis*.so"))
         if not possible_files:  # pragma: no cover
-            raise ValueError("Could not find suitable instaseis shared "
-                             "library.")
+            raise ValueError(
+                "Could not find suitable instaseis shared " "library."
+            )
         filename = possible_files[0]
         lib = C.CDLL(filename)
         cache.append(lib)
@@ -58,8 +61,9 @@ def get_band_code(dt):
     return band_code
 
 
-def elliptic_to_geocentric_latitude(lat, axis_a=6378137.0,
-                                    axis_b=6356752.314245):
+def elliptic_to_geocentric_latitude(
+    lat, axis_a=6378137.0, axis_b=6356752.314245
+):
     """
     Convert a latitude defined on an ellipsoid to a geocentric one.
 
@@ -85,15 +89,15 @@ def elliptic_to_geocentric_latitude(lat, axis_a=6378137.0,
 
     # Singularities close to the pole and the equator. Just return the value
     # in that case.
-    if abs(lat) < 1E-6 or abs(lat - 90) < 1E-6 or \
-            abs(lat + 90.0) < 1E-6:
+    if abs(lat) < 1e-6 or abs(lat - 90) < 1e-6 or abs(lat + 90.0) < 1e-6:
         return lat
 
     return math.degrees(math.atan((1 - e_2) * math.tan(math.radians(lat))))
 
 
-def geocentric_to_elliptic_latitude(lat, axis_a=6378137.0,
-                                    axis_b=6356752.314245):
+def geocentric_to_elliptic_latitude(
+    lat, axis_a=6378137.0, axis_b=6356752.314245
+):
     """
     Convert a geocentric latitude to one defined on an ellipsoid.
 
@@ -119,8 +123,7 @@ def geocentric_to_elliptic_latitude(lat, axis_a=6378137.0,
 
     # Singularities close to the pole and the equator. Just return the value
     # in that case.
-    if abs(lat) < 1E-6 or abs(lat - 90) < 1E-6 or \
-            abs(lat + 90.0) < 1E-6:
+    if abs(lat) < 1e-6 or abs(lat - 90) < 1e-6 or abs(lat + 90.0) < 1e-6:
         return lat
 
     return math.degrees(math.atan(math.tan(math.radians(lat)) / (1 - e_2)))

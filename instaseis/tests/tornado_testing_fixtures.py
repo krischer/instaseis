@@ -31,8 +31,10 @@ from instaseis.database_interfaces import find_and_open_files
 
 
 # Most generic way to get the data folder path.
-DATA = os.path.join(os.path.dirname(os.path.abspath(
-    inspect.getfile(inspect.currentframe()))), "data")
+DATA = os.path.join(
+    os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))),
+    "data",
+)
 
 MODEL = TauPyModel("ak135")
 
@@ -44,7 +46,6 @@ def _assemble_url(route, **kwargs):
     url = "/%s?" % route
     url += "&".join("%s=%s" % (key, value) for key, value in kwargs.items())
     return url
-
 
 
 # All test databases. Fix order so tests can be executed in parallel.
@@ -76,7 +77,8 @@ def event_info_mock_callback(event_id):
             "latitude": -3.8,
             "longitude": -104.21,
             "depth_in_m": 0,
-            "origin_time": "1991-07-17T16:41:33.100000Z"}
+            "origin_time": "1991-07-17T16:41:33.100000Z",
+        }
     # Half the information is missing.
     elif event_id == "invalid_event":
         return {
@@ -84,7 +86,8 @@ def event_info_mock_callback(event_id):
             "m_pp": -20100000000000000,
             "m_rp": 108100000000000000,
             "latitude": -3.8,
-            "origin_time": "1991-07-17T16:41:33.100000Z"}
+            "origin_time": "1991-07-17T16:41:33.100000Z",
+        }
     else:
         raise ValueError
 
@@ -98,51 +101,72 @@ def station_coordinates_mock_callback(networks, stations):
     stations for all other combinations.
     """
     if networks == ["IU"] and stations == ["ANMO"]:
-        return [{
-            "latitude": 34.94591,
-            "longitude": -106.4572,
-            "network": "IU",
-            "station": "ANMO"}]
+        return [
+            {
+                "latitude": 34.94591,
+                "longitude": -106.4572,
+                "network": "IU",
+                "station": "ANMO",
+            }
+        ]
     elif networks == ["IU", "B*"] and stations == ["ANT*", "ANM?"]:
-        return [{
-            "latitude": 39.868,
-            "longitude": 32.7934,
-            "network": "IU",
-            "station": "ANTO"
-         }, {
-            "latitude": 34.94591,
-            "longitude": -106.4572,
-            "network": "IU",
-            "station": "ANMO"}]
+        return [
+            {
+                "latitude": 39.868,
+                "longitude": 32.7934,
+                "network": "IU",
+                "station": "ANTO",
+            },
+            {
+                "latitude": 34.94591,
+                "longitude": -106.4572,
+                "network": "IU",
+                "station": "ANMO",
+            },
+        ]
     # Invalid coordinates!
     elif networks == ["XX"] and stations == ["DUMMY"]:
-        return [{
-            "latitude": 3E9,
-            "longitude": -106.4572,
-            "network": "XX",
-            "station": "DUMMY"}]
+        return [
+            {
+                "latitude": 3e9,
+                "longitude": -106.4572,
+                "network": "XX",
+                "station": "DUMMY",
+            }
+        ]
     else:
         return []
 
 
-def get_travel_time(sourcelatitude, sourcelongitude, sourcedepthinmeters,
-                    receiverlatitude, receiverlongitude,
-                    receiverdepthinmeters, phase_name, db_info):
+def get_travel_time(
+    sourcelatitude,
+    sourcelongitude,
+    sourcedepthinmeters,
+    receiverlatitude,
+    receiverlongitude,
+    receiverdepthinmeters,
+    phase_name,
+    db_info,
+):
     """
     Fully working travel time callback implementation.
     """
     if receiverdepthinmeters:
-        raise ValueError("This travel time implementation cannot calculate "
-                         "buried receivers.")
+        raise ValueError(
+            "This travel time implementation cannot calculate "
+            "buried receivers."
+        )
 
     great_circle_distance = geodetics.locations2degrees(
-        sourcelatitude, sourcelongitude, receiverlatitude, receiverlongitude)
+        sourcelatitude, sourcelongitude, receiverlatitude, receiverlongitude
+    )
 
     try:
         tts = MODEL.get_travel_times(
             source_depth_in_km=sourcedepthinmeters / 1000.0,
             distance_in_degree=great_circle_distance,
-            phase_list=[phase_name])
+            phase_list=[phase_name],
+        )
     except Exception as e:
         raise ValueError(str(e))
 
@@ -168,10 +192,14 @@ def io_loop(request):
     return io_loop
 
 
-def create_async_client(io_loop, request, path,
-                        station_coordinates_callback=None,
-                        event_info_callback=None,
-                        travel_time_callback=None):
+def create_async_client(
+    io_loop,
+    request,
+    path,
+    station_coordinates_callback=None,
+    event_info_callback=None,
+    travel_time_callback=None,
+):
     application = get_application()
     application.db = find_and_open_files(path=path)
     application.station_coordinates_callback = station_coordinates_callback
@@ -187,9 +215,9 @@ def create_async_client(io_loop, request, path,
     def _stop():
         server.stop()
 
-        if hasattr(server, 'close_all_connections'):
-            io_loop.run_sync(server.close_all_connections,
-                             timeout=30)
+        if hasattr(server, "close_all_connections"):
+            io_loop.run_sync(server.close_all_connections, timeout=30)
+
     request.addfinalizer(_stop)
 
     # Build client.
@@ -198,6 +226,7 @@ def create_async_client(io_loop, request, path,
 
     def _close():
         client.close()
+
     request.addfinalizer(_close)
 
     client.application = application
@@ -221,20 +250,29 @@ def all_clients(io_loop, request):
     """
     Fixture returning all clients!
     """
-    return create_async_client(io_loop, request, request.param,
-                               station_coordinates_callback=None)
+    return create_async_client(
+        io_loop, request, request.param, station_coordinates_callback=None
+    )
 
 
-@pytest.fixture(params=[_i for _i in list(DBS.values()) if (
-        "db_bwd" in _i and
-        "horizontal_only" not in _i and
-        "vertical_only" not in _i)])
+@pytest.fixture(
+    params=[
+        _i
+        for _i in list(DBS.values())
+        if (
+            "db_bwd" in _i
+            and "horizontal_only" not in _i
+            and "vertical_only" not in _i
+        )
+    ]
+)
 def all_greens_clients(io_loop, request):
     """
     Fixture returning all clients compatible with Green's functions!
     """
-    return create_async_client(io_loop, request, request.param,
-                               station_coordinates_callback=None)
+    return create_async_client(
+        io_loop, request, request.param, station_coordinates_callback=None
+    )
 
 
 @pytest.fixture(params=[_i for _i in list(DBS.values()) if "db_bwd" in _i])
@@ -242,8 +280,9 @@ def reciprocal_clients(io_loop, request):
     """
     Fixture returning all reciprocal clients!
     """
-    return create_async_client(io_loop, request, request.param,
-                               station_coordinates_callback=None)
+    return create_async_client(
+        io_loop, request, request.param, station_coordinates_callback=None
+    )
 
 
 @pytest.fixture(params=list(DBS.values()))
@@ -255,7 +294,8 @@ def all_clients_station_coordinates_callback(io_loop, request):
         io_loop,
         request,
         request.param,
-        station_coordinates_callback=station_coordinates_mock_callback)
+        station_coordinates_callback=station_coordinates_mock_callback,
+    )
 
 
 @pytest.fixture(params=list(DBS.values()))
@@ -267,7 +307,8 @@ def all_clients_event_callback(io_loop, request):
         io_loop,
         request,
         request.param,
-        event_info_callback=event_info_mock_callback)
+        event_info_callback=event_info_mock_callback,
+    )
 
 
 @pytest.fixture(params=list(DBS.values()))
@@ -276,29 +317,35 @@ def all_clients_ttimes_callback(io_loop, request):
     Fixture returning all clients with a travel time callback.
     """
     return create_async_client(
-        io_loop,
-        request,
-        request.param,
-        travel_time_callback=get_travel_time)
+        io_loop, request, request.param, travel_time_callback=get_travel_time
+    )
 
 
-@pytest.fixture(params=[_i for _i in list(DBS.values()) if (
-        "db_bwd" in _i and
-        "horizontal_only" not in _i and
-        "vertical_only" not in _i)])
-def all_greens_clients_ttimes_callback(io_loop,request):
+@pytest.fixture(
+    params=[
+        _i
+        for _i in list(DBS.values())
+        if (
+            "db_bwd" in _i
+            and "horizontal_only" not in _i
+            and "vertical_only" not in _i
+        )
+    ]
+)
+def all_greens_clients_ttimes_callback(io_loop, request):
     """
     Fixture returning all clients compatible with Green's functions!
     """
     return create_async_client(
-        io_loop,
-        request,
-        request.param,
-        travel_time_callback=get_travel_time)
+        io_loop, request, request.param, travel_time_callback=get_travel_time
+    )
 
 
-@pytest.fixture(params=[_i for _i in list(DBS.values()) if
-                        ("db_bwd" in _i or "_only_" in _i)])
+@pytest.fixture(
+    params=[
+        _i for _i in list(DBS.values()) if ("db_bwd" in _i or "_only_" in _i)
+    ]
+)
 def reciprocal_clients_all_callbacks(io_loop, request):
     """
     Fixture returning reciprocal clients with all callbacks.
@@ -309,7 +356,8 @@ def reciprocal_clients_all_callbacks(io_loop, request):
         request.param,
         station_coordinates_callback=station_coordinates_mock_callback,
         event_info_callback=event_info_mock_callback,
-        travel_time_callback=get_travel_time)
+        travel_time_callback=get_travel_time,
+    )
 
 
 @pytest.fixture(params=list(DBS.values()))
@@ -323,7 +371,8 @@ def all_clients_all_callbacks(io_loop, request):
         request.param,
         station_coordinates_callback=station_coordinates_mock_callback,
         event_info_callback=event_info_mock_callback,
-        travel_time_callback=get_travel_time)
+        travel_time_callback=get_travel_time,
+    )
 
 
 def _add_callback(client):
@@ -340,9 +389,10 @@ def _add_callback(client):
 
     pattern = re.compile(r"http://localhost.*")
     responses.add_callback(
-        responses.GET, pattern,
+        responses.GET,
+        pattern,
         callback=request_callback,
-        content_type="application/octet_stream"
+        content_type="application/octet_stream",
     )
 
 

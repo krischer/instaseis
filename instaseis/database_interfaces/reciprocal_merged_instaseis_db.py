@@ -24,8 +24,16 @@ class ReciprocalMergedInstaseisDB(BaseNetCDFInstaseisDB):
     """
     Reciprocal Merged Instaseis Database.
     """
-    def __init__(self, db_path, netcdf_file, buffer_size_in_mb=100,
-                 read_on_demand=False, *args, **kwargs):
+
+    def __init__(
+        self,
+        db_path,
+        netcdf_file,
+        buffer_size_in_mb=100,
+        read_on_demand=False,
+        *args,
+        **kwargs,
+    ):
         """
         :param db_path: Path to the Instaseis Database.
         :type db_path: str
@@ -44,26 +52,37 @@ class ReciprocalMergedInstaseisDB(BaseNetCDFInstaseisDB):
         :type read_on_demand: bool, optional
         """
         BaseNetCDFInstaseisDB.__init__(
-            self, db_path=db_path, buffer_size_in_mb=buffer_size_in_mb,
-            read_on_demand=read_on_demand, *args, **kwargs)
+            self,
+            db_path=db_path,
+            buffer_size_in_mb=buffer_size_in_mb,
+            read_on_demand=read_on_demand,
+            *args,
+            **kwargs,
+        )
         self._parse_mesh(netcdf_file)
 
     def _parse_mesh(self, filename):
 
         MeshCollection_merged = collections.namedtuple(
-            "MeshCollection_merged", ["merged"])
+            "MeshCollection_merged", ["merged"]
+        )
 
-        self.meshes = MeshCollection_merged(mesh.Mesh(
-            filename, full_parse=True,
-            strain_buffer_size_in_mb=self.buffer_size_in_mb,
-            displ_buffer_size_in_mb=self.buffer_size_in_mb,
-            read_on_demand=self.read_on_demand))
+        self.meshes = MeshCollection_merged(
+            mesh.Mesh(
+                filename,
+                full_parse=True,
+                strain_buffer_size_in_mb=self.buffer_size_in_mb,
+                displ_buffer_size_in_mb=self.buffer_size_in_mb,
+                read_on_demand=self.read_on_demand,
+            )
+        )
         self.parsed_mesh = self.meshes.merged
 
         self._is_reciprocal = True
 
-    def _get_data(self, source, receiver, components, coordinates,
-                  element_info):
+    def _get_data(
+        self, source, receiver, components, coordinates, element_info
+    ):
         ei = element_info
         # Collect data arrays and mu in a dictionary.
         data = {}
@@ -86,13 +105,11 @@ class ReciprocalMergedInstaseisDB(BaseNetCDFInstaseisDB):
             mu = mesh_mu[ei.id_elem]
         data["mu"] = mu
 
-        fac_1_map = {"N": np.cos,
-                     "E": np.sin}
-        fac_2_map = {"N": lambda x: - np.sin(x),
-                     "E": np.cos}
+        fac_1_map = {"N": np.cos, "E": np.sin}
+        fac_2_map = {"N": lambda x: -np.sin(x), "E": np.cos}
 
         if isinstance(source, Source):
-            if self.info.dump_type == 'displ_only':
+            if self.info.dump_type == "displ_only":
                 if ei.axis:
                     G = self.parsed_mesh.G2  # NOQA
                     GT = self.parsed_mesh.G1T  # NOQA
@@ -100,27 +117,41 @@ class ReciprocalMergedInstaseisDB(BaseNetCDFInstaseisDB):
                     G = self.parsed_mesh.G2  # NOQA
                     GT = self.parsed_mesh.G2T  # NOQA
 
-            if self.info.dump_type == 'displ_only':
+            if self.info.dump_type == "displ_only":
                 strain_x, strain_z = self._get_strain_interp(
-                    ei.id_elem, ei.gll_point_ids, G, GT,
-                    ei.col_points_xi, ei.col_points_eta, ei.corner_points,
-                    ei.eltype, ei.axis, ei.xi, ei.eta)
-            elif (self.info.dump_type == 'fullfields' or
-                  self.info.dump_type == 'strain_only'):  # pragma: no cover
+                    ei.id_elem,
+                    ei.gll_point_ids,
+                    G,
+                    GT,
+                    ei.col_points_xi,
+                    ei.col_points_eta,
+                    ei.corner_points,
+                    ei.eltype,
+                    ei.axis,
+                    ei.xi,
+                    ei.eta,
+                )
+            elif (
+                self.info.dump_type == "fullfields"
+                or self.info.dump_type == "strain_only"
+            ):  # pragma: no cover
                 # Merged databases currently not implemented for
                 # non-displacement databases.
                 raise NotImplementedError
 
-            mij = rotations \
-                .rotate_symm_tensor_voigt_xyz_src_to_xyz_earth(
-                    source.tensor_voigt, np.deg2rad(source.longitude),
-                    np.deg2rad(source.colatitude))
-            mij = rotations \
-                .rotate_symm_tensor_voigt_xyz_earth_to_xyz_src(
-                    mij, np.deg2rad(receiver.longitude),
-                    np.deg2rad(receiver.colatitude))
+            mij = rotations.rotate_symm_tensor_voigt_xyz_src_to_xyz_earth(
+                source.tensor_voigt,
+                np.deg2rad(source.longitude),
+                np.deg2rad(source.colatitude),
+            )
+            mij = rotations.rotate_symm_tensor_voigt_xyz_earth_to_xyz_src(
+                mij,
+                np.deg2rad(receiver.longitude),
+                np.deg2rad(receiver.colatitude),
+            )
             mij = rotations.rotate_symm_tensor_voigt_xyz_to_src(
-                mij, coordinates.phi)
+                mij, coordinates.phi
+            )
             mij /= self.parsed_mesh.amplitude
 
             if "Z" in components:
@@ -163,24 +194,32 @@ class ReciprocalMergedInstaseisDB(BaseNetCDFInstaseisDB):
                 data[comp] = final
 
         elif isinstance(source, ForceSource):
-            if self.info.dump_type != 'displ_only':  # pragma: no cover
+            if self.info.dump_type != "displ_only":  # pragma: no cover
                 # Merged databases currently not implemented for
                 # non-displacement databases.
                 raise NotImplementedError
                 raise ValueError("Force sources only in displ_only mode")
 
             displ_x, displ_z = self._get_displacement(
-                ei.id_elem, ei.gll_point_ids, ei.col_points_xi,
-                ei.col_points_eta, ei.xi, ei.eta)
+                ei.id_elem,
+                ei.gll_point_ids,
+                ei.col_points_xi,
+                ei.col_points_eta,
+                ei.xi,
+                ei.eta,
+            )
 
             force = rotations.rotate_vector_xyz_src_to_xyz_earth(
-                source.force_tpr, np.deg2rad(source.longitude),
-                np.deg2rad(source.colatitude))
+                source.force_tpr,
+                np.deg2rad(source.longitude),
+                np.deg2rad(source.colatitude),
+            )
             force = rotations.rotate_vector_xyz_earth_to_xyz_src(
-                force, np.deg2rad(receiver.longitude),
-                np.deg2rad(receiver.colatitude))
-            force = rotations.rotate_vector_xyz_to_src(
-                force, coordinates.phi)
+                force,
+                np.deg2rad(receiver.longitude),
+                np.deg2rad(receiver.colatitude),
+            )
+            force = rotations.rotate_vector_xyz_to_src(force, coordinates.phi)
             force /= self.parsed_mesh.amplitude
 
             if "Z" in components:
@@ -235,8 +274,19 @@ class ReciprocalMergedInstaseisDB(BaseNetCDFInstaseisDB):
         return utemp
 
     def _get_strain_interp(  # NOQA
-            self, id_elem, gll_point_ids, G, GT, col_points_xi, col_points_eta,
-            corner_points, eltype, axis, xi, eta):
+        self,
+        id_elem,
+        gll_point_ids,
+        G,
+        GT,
+        col_points_xi,
+        col_points_eta,
+        corner_points,
+        eltype,
+        axis,
+        xi,
+        eta,
+    ):
         mesh = self.meshes.merged
         if id_elem not in mesh.strain_buffer:
             utemp = self._get_and_reorder_utemp(id_elem)
@@ -244,7 +294,8 @@ class ReciprocalMergedInstaseisDB(BaseNetCDFInstaseisDB):
             strain_fct_map = {
                 "monopole": sem_derivatives.strain_monopole_td,
                 "dipole": sem_derivatives.strain_dipole_td,
-                "quadpole": sem_derivatives.strain_quadpole_td}
+                "quadpole": sem_derivatives.strain_quadpole_td,
+            }
 
             # We want the cache to work - thus we always have to
             # calculate both! Also I/O is the slow part here.
@@ -252,11 +303,21 @@ class ReciprocalMergedInstaseisDB(BaseNetCDFInstaseisDB):
             # Horizontal component is available if we have 3 or 5 components.
             if utemp.shape[-1] >= 3:
                 utemp_x = utemp[:, :, :, :3]
-                utemp_x = np.require(utemp_x, requirements=["F"],
-                                     dtype=np.float64)
+                utemp_x = np.require(
+                    utemp_x, requirements=["F"], dtype=np.float64
+                )
                 strain_x = strain_fct_map["dipole"](
-                    utemp_x, G, GT, col_points_xi, col_points_eta,
-                    mesh.npol, mesh.ndumps, corner_points, eltype, axis)
+                    utemp_x,
+                    G,
+                    GT,
+                    col_points_xi,
+                    col_points_eta,
+                    mesh.npol,
+                    mesh.ndumps,
+                    corner_points,
+                    eltype,
+                    axis,
+                )
             else:
                 strain_x = None
 
@@ -276,12 +337,22 @@ class ReciprocalMergedInstaseisDB(BaseNetCDFInstaseisDB):
                     utemp_z = utemp[:, :, :, -3:]
                     utemp_z[:, :, :, 0] = utemp_z[:, :, :, 1]
                     utemp_z[:, :, :, 1][:] = 0
-                    utemp_z = np.require(utemp_z, requirements=["F"],
-                                         dtype=np.float64)
+                    utemp_z = np.require(
+                        utemp_z, requirements=["F"], dtype=np.float64
+                    )
 
                 strain_z = strain_fct_map["monopole"](
-                    utemp_z, G, GT, col_points_xi, col_points_eta,
-                    mesh.npol, mesh.ndumps, corner_points, eltype, axis)
+                    utemp_z,
+                    G,
+                    GT,
+                    col_points_xi,
+                    col_points_eta,
+                    mesh.npol,
+                    mesh.ndumps,
+                    corner_points,
+                    eltype,
+                    axis,
+                )
             else:
                 strain_z = None
 
@@ -298,7 +369,8 @@ class ReciprocalMergedInstaseisDB(BaseNetCDFInstaseisDB):
 
             for i in range(6):
                 final_strain[:, i] = spectral_basis.lagrange_interpol_2D_td(
-                    col_points_xi, col_points_eta, strain[:, :, :, i], xi, eta)
+                    col_points_xi, col_points_eta, strain[:, :, :, i], xi, eta
+                )
 
             if not name == "strain_z":
                 final_strain[:, 3] *= -1.0
@@ -308,8 +380,9 @@ class ReciprocalMergedInstaseisDB(BaseNetCDFInstaseisDB):
 
         return all_strains["strain_x"], all_strains["strain_z"]
 
-    def _get_displacement(self, id_elem, gll_point_ids,
-                          col_points_xi, col_points_eta, xi, eta):
+    def _get_displacement(
+        self, id_elem, gll_point_ids, col_points_xi, col_points_eta, xi, eta
+    ):
         mesh = self.meshes.merged
         if id_elem not in mesh.displ_buffer:
             utemp = self._get_and_reorder_utemp(id_elem)
@@ -319,13 +392,13 @@ class ReciprocalMergedInstaseisDB(BaseNetCDFInstaseisDB):
 
         final_displacement_x = np.empty((utemp.shape[0], 3), order="F")
         utemp_x = utemp[:, :, :, :3]
-        utemp_x = np.require(utemp_x, requirements=["F"],
-                             dtype=np.float64)
+        utemp_x = np.require(utemp_x, requirements=["F"], dtype=np.float64)
         for i in range(3):
-            final_displacement_x[:, i] = \
-                spectral_basis.lagrange_interpol_2D_td(
-                    col_points_xi, col_points_eta,
-                    utemp_x[:, :, :, i], xi, eta)
+            final_displacement_x[
+                :, i
+            ] = spectral_basis.lagrange_interpol_2D_td(
+                col_points_xi, col_points_eta, utemp_x[:, :, :, i], xi, eta
+            )
 
         utemp_z = utemp[:, :, :, -3:]
         utemp_z[:, :, :, 0] = utemp_z[:, :, :, 1]
@@ -333,9 +406,10 @@ class ReciprocalMergedInstaseisDB(BaseNetCDFInstaseisDB):
         utemp_z = np.require(utemp_z, requirements=["F"], dtype=np.float64)
         final_displacement_z = np.empty((utemp.shape[0], 3), order="F")
         for i in range(3):
-            final_displacement_z[:, i] = \
-                spectral_basis.lagrange_interpol_2D_td(
-                    col_points_xi, col_points_eta,
-                    utemp_z[:, :, :, i], xi, eta)
+            final_displacement_z[
+                :, i
+            ] = spectral_basis.lagrange_interpol_2D_td(
+                col_points_xi, col_points_eta, utemp_z[:, :, :, i], xi, eta
+            )
 
         return final_displacement_x, final_displacement_z
