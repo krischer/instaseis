@@ -9,8 +9,8 @@ Graphical user interface for Instaseis.
     GNU Lesser General Public License, Version 3 [non-commercial/academic use]
     (http://www.gnu.org/copyleft/lgpl.html)
 """
-from PyQt5 import QtGui, QtCore
-from PyQt5.QtWidgets import QApplication
+from PySide2 import QtGui, QtCore
+from PySide2.QtWidgets import QApplication
 import pyqtgraph as pg
 
 from glob import iglob
@@ -54,10 +54,20 @@ def compile_and_import_ui_files():
         py_ui_file = os.path.splitext(ui_file)[0] + os.path.extsep + 'py'
         if not os.path.exists(py_ui_file) or \
                 (os.path.getmtime(ui_file) >= os.path.getmtime(py_ui_file)):
-            from PyQt5 import uic
+
+            # No more function in pyside2 so we'll just call the built in tool
+            # directly.
+            import PySide2 as ref_mod
+            pyside_dir = os.path.dirname(ref_mod.__file__)
+
+            exe = os.path.join(pyside_dir, "uic")
+            cmd = f'{exe} -g python --output="{py_ui_file}" "{ui_file}"'
+
             print("Compiling ui file: %s" % ui_file)
-            with open(py_ui_file, 'w') as open_file:
-                uic.compileUi(ui_file, open_file)
+            print(f"Executing: '{cmd}'")
+            os.system(cmd)
+            print("Done")
+
         # Import the (compiled) file.
         try:
             import_name = os.path.splitext(os.path.basename(py_ui_file))[0]

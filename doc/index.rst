@@ -217,14 +217,14 @@ To run the tests, please also install:
 * ``pytest``
 * ``pytest-xdist``
 * ``responses``
-* ``mock`` *(only for Python 2.x, otherwise part of the standard library)*
 
 The optional graphical user interface furthermore requires
 
-* ``PyQt4``
-* ``pyqtgraph``
+* ``PySide2``
+* ``pyqtgraph`` (Must at least be version 0.11 - at the time of writing this means installing the dev version with ``pip install https://github.com/pyqtgraph/pyqtgraph/archive/develop.zip``)
 * ``matplotlib``
 * ``basemap``
+* ``pillow``
 
 Fortran Compiler
 ~~~~~~~~~~~~~~~~

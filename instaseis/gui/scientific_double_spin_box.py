@@ -3,7 +3,7 @@
 """
 Originally from https://gist.github.com/jdreaver/0be2e44981159d0854f5
 """
-from PyQt5 import QtGui
+from PySide2 import QtGui
 import numpy as np
 import platform
 import re
