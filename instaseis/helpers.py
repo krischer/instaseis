@@ -9,9 +9,6 @@ Library loading helper.
     GNU Lesser General Public License, Version 3 [non-commercial/academic use]
     (http://www.gnu.org/copyleft/lgpl.html)
 """
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
-
 import ctypes as C
 import glob
 import inspect

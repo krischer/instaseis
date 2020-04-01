@@ -9,12 +9,10 @@ Instaseis database class for remote access over HTTP.
     GNU Lesser General Public License, Version 3 [non-commercial/academic use]
     (http://www.gnu.org/copyleft/lgpl.html)
 """
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
-
 import io
 import numpy as np
 import obspy
+from urllib.parse import urlencode, urlparse
 import requests
 import warnings
 
@@ -22,9 +20,6 @@ from .base_instaseis_db import BaseInstaseisDB, DEFAULT_MU
 from .. import InstaseisError, InstaseisWarning, Source, ForceSource, \
     __version__
 
-from future import standard_library
-with standard_library.hooks():
-    from urllib.parse import urlencode, urlparse
 
 
 class RemoteInstaseisDB(BaseInstaseisDB):

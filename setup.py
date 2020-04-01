@@ -141,10 +141,8 @@ lib = MyExtension('instaseis',
 
 INSTALL_REQUIRES = ["h5py",
                     "numpy",
-                    "obspy >= 1.1.0",
-                    "future",
-                    'futures; python_version == "2.7"',
-                    "tornado>=5.0.0",
+                    "obspy >= 1.1.1",
+                    "tornado>=6.0.0",
                     "requests",
                     "geographiclib",
                     "jsonschema >= 2.4.0"]

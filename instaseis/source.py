@@ -10,9 +10,6 @@ Source and Receiver classes of Instaseis.
     GNU Lesser General Public License, Version 3 [non-commercial/academic use]
     (http://www.gnu.org/copyleft/lgpl.html)
 """
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
-
 import collections
 import functools
 import io

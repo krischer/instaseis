@@ -11,11 +11,6 @@ AxiSEM.
     GNU Lesser General Public License, Version 3 [non-commercial/academic use]
     (http://www.gnu.org/copyleft/lgpl.html)
 """
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
-
-from future.utils import with_metaclass
-
 from abc import ABCMeta, abstractmethod
 import collections
 
@@ -38,7 +33,7 @@ ElementInfo = collections.namedtuple("ElementInfo", [
 Coordinates = collections.namedtuple("Coordinates", ["s", "phi", "z"])
 
 
-class BaseNetCDFInstaseisDB(with_metaclass(ABCMeta, BaseInstaseisDB)):
+class BaseNetCDFInstaseisDB(BaseInstaseisDB, metaclass=ABCMeta):
     """
     Base class for extracting seismograms from a local Instaseis netCDF
     database.

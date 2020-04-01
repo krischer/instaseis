@@ -9,8 +9,6 @@ Base Instaseis Request handler currently only settings default headers.
     GNU Lesser General Public License, Version 3 [non-commercial/academic use]
     (http://www.gnu.org/copyleft/lgpl.html)
 """
-from future.utils import with_metaclass
-
 from abc import ABCMeta, abstractmethod
 import obspy
 import tornado
@@ -26,8 +24,7 @@ class InstaseisRequestHandler(tornado.web.RequestHandler):
         self.set_header("Server", "InstaseisServer/%s" % __version__)
 
 
-class InstaseisTimeSeriesHandler(with_metaclass(ABCMeta,
-                                                InstaseisRequestHandler)):
+class InstaseisTimeSeriesHandler(InstaseisRequestHandler, metaclass=ABCMeta):
     arguments = None
     connection_closed = False
     default_label = ""

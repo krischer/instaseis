@@ -10,11 +10,6 @@ Abstract base class for all Instaseis database classes.
     GNU Lesser General Public License, Version 3 [non-commercial/academic use]
     (http://www.gnu.org/copyleft/lgpl.html)
 """
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
-
-from future.utils import with_metaclass
-
 from abc import ABCMeta, abstractmethod
 from distutils.version import LooseVersion
 import math
@@ -67,7 +62,7 @@ def _diff_and_integrate(n_derivative, data, comp, dt_out):
         data[comp] = cumtrapz(data[comp], dx=dt_out, initial=0.0)
 
 
-class BaseInstaseisDB(with_metaclass(ABCMeta)):
+class BaseInstaseisDB(metaclass=ABCMeta):
     """
     Base class for all Instaseis database classes defining the user interface.
     """

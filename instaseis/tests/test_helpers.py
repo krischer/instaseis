@@ -9,8 +9,6 @@ Tests for some helper routines.
     GNU Lesser General Public License, Version 3 [non-commercial/academic use]
     (http://www.gnu.org/copyleft/lgpl.html)
 """
-from __future__ import absolute_import, division
-
 from instaseis.helpers import io_chunker
 
 

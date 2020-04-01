@@ -203,11 +203,9 @@ and Mac OS X. Adding support for Windows is mainly a question of compiling the
 shared Fortran librarys - pull requests are welcome.
 
 * ``gfortran >= 4.7``
-* ``Python 2.7, 3.3, 3.4, or 3.5``
-* ``NumPy >= 1.7``
-* ``ObsPy >= 1.0.2``
+* ``Python >= 3.7``
+* ``ObsPy >= 1.2.1``
 * ``h5py``
-* ``future``
 * ``requests``
 * ``tornado``
 * ``jsonschema >= 2.4``
@@ -258,7 +256,7 @@ Anaconda).
 
 .. code-block:: bash
 
-    $ conda install -c conda-forge obspy h5py future requests tornado flake8 pytest mock basemap pyqt pip jsonschema responses pyqtgraph pytest-xdist
+    $ conda install -c conda-forge obspy h5py requests tornado flake8 pytest mock basemap pyqt pip jsonschema responses pyqtgraph pytest-xdist
 
 A possible complication arises **if you are running on a server without a
 display**. In that case please edit (on Linux)
@@ -387,11 +385,10 @@ following resources are useful if you are starting out with Python and ObsPy:
 Acquiring A Database
 ^^^^^^^^^^^^^^^^^^^^
 
-To use Instaseis, one requires access to a waveform database.
-`AxiSEM <http://axisem.info>`_ has to be used to calculate one from scratch. In
-the near future we plan to offer remote databases that Instaseis can then
-connect to. As these database tend to get very big we so far cannot offer them
-as a download. If you are interested in a big database, please contact us.
+To use Instaseis, one requires access to a waveform database. `AxiSEM
+<http://axisem.info>`_ has to be used to calculate one from scratch. As these
+database tend to get very big we so far cannot offer them as a download. If
+you are interested in a big database, please contact us.
 
 To quickly get started, please download one of these low frequency
 example databases (please note that they may only be available temporarily):

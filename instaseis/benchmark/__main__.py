@@ -9,11 +9,6 @@ Benchmarks for Instaseis.
     GNU Lesser General Public License, Version 3 [non-commercial/academic use]
     (http://www.gnu.org/copyleft/lgpl.html)
 """
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
-
-from future.utils import with_metaclass
-
 from abc import ABCMeta, abstractmethod, abstractproperty
 import argparse
 import colorama
@@ -50,7 +45,7 @@ def plot_gnuplot(times):
         print("Could not plot graph. No gnuplot installed?")
 
 
-class InstaseisBenchmark(with_metaclass(ABCMeta)):
+class InstaseisBenchmark(metaclass=ABCMeta):
 
     def __init__(self, path, time_per_benchmark, save_output=False,
                  seed=None, count=None):
