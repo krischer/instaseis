@@ -288,13 +288,13 @@ class BaseNetCDFInstaseisDB(BaseInstaseisDB, metaclass=ABCMeta):
                 if time_axis == 0:
                     for _c in chunks:
                         if isinstance(_c, list):
-                            _temp.append(m[:, _c[0] : _c[1]])
+                            _temp.append(m[:, _c[0] : _c[1]])  # NOQA
                         else:
                             _temp.append(m[:, _c])
                 else:
                     for _c in chunks:
                         if isinstance(_c, list):
-                            _temp.append(m[_c[0] : _c[1], :].T)
+                            _temp.append(m[_c[0] : _c[1], :].T)  # NOQA
                         else:
                             _temp.append(m[_c, :].T)
 

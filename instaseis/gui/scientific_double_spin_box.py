@@ -5,7 +5,6 @@ Originally from https://gist.github.com/jdreaver/0be2e44981159d0854f5
 """
 from PySide2 import QtGui
 import numpy as np
-import platform
 import re
 
 # Regular expression to find floats. Match groups are the whole string, the
@@ -65,5 +64,5 @@ class ScientificDoubleSpinBox(QtGui.QDoubleSpinBox):
 def format_float(value):
     """Modified form of the 'g' format specifier."""
     string = "{:g}".format(value).replace("e+", "e")
-    string = re.sub("e(-?)0*(\d+)", r"e\1\2", string)
+    string = re.sub(r"e(-?)0*(\d+)", r"e\1\2", string)
     return string

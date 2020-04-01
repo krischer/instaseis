@@ -404,7 +404,9 @@ class BaseInstaseisDB(metaclass=ABCMeta):
             # If desired, remove the samples before the peak of the source
             # time function.
             if remove_source_shift:
-                data[comp] = data[comp][time_information["ref_sample"] :]
+                data[comp] = data[comp][
+                    time_information["ref_sample"] :  # NOQA
+                ]
 
         if return_obspy_stream:
             return self._convert_to_stream(

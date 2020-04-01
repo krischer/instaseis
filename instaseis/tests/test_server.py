@@ -4445,7 +4445,7 @@ def test_label_parameter(all_greens_clients):
     filename = request.headers["Content-Disposition"]
     assert filename.startswith(prefix)
 
-    filename = filename[len(prefix) :]
+    filename = filename[len(prefix) :]  # NOQA
     assert filename.startswith("instaseis_seismogram_")
     assert filename.endswith(".mseed")
 
@@ -4460,7 +4460,7 @@ def test_label_parameter(all_greens_clients):
     filename = request.headers["Content-Disposition"]
     assert filename.startswith(prefix)
 
-    filename = filename[len(prefix) :]
+    filename = filename[len(prefix) :]  # NOQA
     assert filename.startswith("instaseis_seismogram_")
     assert filename.endswith(".zip")
 
@@ -4482,7 +4482,7 @@ def test_label_parameter(all_greens_clients):
     filename = request.headers["Content-Disposition"]
     assert filename.startswith(prefix)
 
-    filename = filename[len(prefix) :]
+    filename = filename[len(prefix) :]  # NOQA
     assert filename.startswith("Tohoku_")
     assert filename.endswith(".mseed")
 
@@ -4497,7 +4497,7 @@ def test_label_parameter(all_greens_clients):
     filename = request.headers["Content-Disposition"]
     assert filename.startswith(prefix)
 
-    filename = filename[len(prefix) :]
+    filename = filename[len(prefix) :]  # NOQA
     assert filename.startswith("Tohoku_")
     assert filename.endswith(".zip")
 

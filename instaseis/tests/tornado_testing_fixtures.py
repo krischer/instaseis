@@ -12,15 +12,11 @@ import os
 import pytest
 import re
 import responses
-import socket
-import sys
 
-from tornado import netutil
 from tornado.httpserver import HTTPServer
-from tornado.httpclient import AsyncHTTPClient, HTTPClient
+from tornado.httpclient import AsyncHTTPClient
 from tornado.ioloop import IOLoop
 from tornado.testing import bind_unused_port
-from tornado.util import raise_exc_info
 
 from obspy.taup import TauPyModel
 from obspy import geodetics
