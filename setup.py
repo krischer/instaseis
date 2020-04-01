@@ -141,7 +141,7 @@ lib = MyExtension('instaseis',
 
 INSTALL_REQUIRES = ["h5py",
                     "numpy",
-                    "obspy >= 1.1.1",
+                    "obspy >= 1.2.1",
                     "tornado>=6.0.0",
                     "requests",
                     "geographiclib",
@@ -149,7 +149,7 @@ INSTALL_REQUIRES = ["h5py",
 
 EXTRAS_REQUIRE = {
     'tests': ['click', 'netCDF4', 'pytest-xdist', 'flake8>=3',
-              'pytest>=3.0', 'responses']
+              'pytest>=5.0', 'responses']
 }
 
 # Add mock for Python 2.x. Starting with Python 3 it is part of the standard
@@ -163,7 +163,7 @@ setup_config = dict(
     description=DOCSTRING[0],
     long_description="\n".join(DOCSTRING[2:]),
     author=u"Lion Krischer, Martin van Driel, and Simon Stähler",
-    author_email="krischer@geophysik.uni-muenchen.de",
+    author_email="lion.krischer@gmail.com",
     url="http://instaseis.net",
     packages=find_packages(),
     package_data={
