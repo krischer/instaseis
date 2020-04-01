@@ -635,48 +635,48 @@ class Window(QtGui.QMainWindow):
         self.ui.depth_slider.setValue(- s.depth_in_m / 1e3)
         self.set_info()
 
-    @QtCore.Slot()
+    @QtCore.Slot("double")
     def on_source_latitude_valueChanged(self, *args):
         self.update()
 
-    @QtCore.Slot()
+    @QtCore.Slot("double")
     def on_source_longitude_valueChanged(self, *args):
         self.update()
 
-    @QtCore.Slot()
+    @QtCore.Slot("double")
     def on_receiver_latitude_valueChanged(self, *args):
         self.update()
 
-    @QtCore.Slot()
+    @QtCore.Slot("double")
     def on_receiver_longitude_valueChanged(self, *args):
         self.update()
 
-    @QtCore.Slot()
+    @QtCore.Slot("double")
     def on_m_rr_valueChanged(self, *args):
         self._draw_mt()
         self.update()
 
-    @QtCore.Slot()
+    @QtCore.Slot("double")
     def on_m_tt_valueChanged(self, *args):
         self._draw_mt()
         self.update()
 
-    @QtCore.Slot()
+    @QtCore.Slot("double")
     def on_m_pp_valueChanged(self, *args):
         self._draw_mt()
         self.update()
 
-    @QtCore.Slot()
+    @QtCore.Slot("double")
     def on_m_rt_valueChanged(self, *args):
         self._draw_mt()
         self.update()
 
-    @QtCore.Slot()
+    @QtCore.Slot("double")
     def on_m_rp_valueChanged(self, *args):
         self._draw_mt()
         self.update()
 
-    @QtCore.Slot()
+    @QtCore.Slot("double")
     def on_m_tp_valueChanged(self, *args):
         self._draw_mt()
         self.update()
@@ -726,7 +726,7 @@ class Window(QtGui.QMainWindow):
         self.ui.sr_ref_label.setEnabled(resample)
         self.update()
 
-    @QtCore.Slot()
+    @QtCore.Slot("double")
     def on_resample_factor_valueChanged(self, *args):
         self.update()
 
@@ -741,7 +741,7 @@ class Window(QtGui.QMainWindow):
         self.ui.lowpass_label.setEnabled(resample)
         self.update()
 
-    @QtCore.Slot()
+    @QtCore.Slot("double")
     def on_lowpass_period_valueChanged(self, *args):
         self.update()
 
@@ -752,7 +752,7 @@ class Window(QtGui.QMainWindow):
         self.ui.highpass_label.setEnabled(resample)
         self.update()
 
-    @QtCore.Slot()
+    @QtCore.Slot("double")
     def on_highpass_period_valueChanged(self, *args):
         self.update()
 
@@ -760,7 +760,7 @@ class Window(QtGui.QMainWindow):
     def on_zero_phase_check_box_stateChanged(self, state):
         self.update()
 
-    @QtCore.Slot()
+    @QtCore.Slot("int")
     def on_components_combo_currentIndexChanged(self):
         self.update()
 
@@ -796,7 +796,7 @@ class Window(QtGui.QMainWindow):
 
         self._plot_bg_receivers()
 
-    @QtCore.Slot()
+    @QtCore.Slot("int")
     def on_stations_combo_currentIndexChanged(self):
         idx = self.ui.stations_combo.currentIndex()
         self.ui.receiver_longitude.setValue(self.receivers[idx].longitude)
