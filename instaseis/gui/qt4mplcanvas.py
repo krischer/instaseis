@@ -1,7 +1,7 @@
 from matplotlib import rc as matplotlibrc
 import matplotlib as mpl
 from matplotlib.figure import Figure
-from matplotlib.backends.backend_qt4agg import \
+from matplotlib.backends.backend_qt5agg import \
     FigureCanvasQTAgg as FigureCanvas
 
 mpl.rcParams['font.size'] = 10
