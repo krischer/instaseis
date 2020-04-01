@@ -42,13 +42,13 @@ def _compare_streams(st1, st2):
         atol = 1E-4 * max(np.abs(tr1.data).max(), np.abs(tr2.data).max())
         np.testing.assert_allclose(tr1.data, tr2.data, rtol=rtol, atol=atol)
 
-def fetch_sync(client, url):
+def fetch_sync(client, url, **kwargs):
     """
     Helper function to call an async test client in a sync test case.
     """
     async def f():
         try:
-            response = await client.fetch(f"http://localhost:{client.port}{url}")
+            response = await client.fetch(f"http://localhost:{client.port}{url}", **kwargs)
         except Exception as e:
             response = e.response
         return response
@@ -2328,7 +2328,8 @@ def test_gzipped_responses(all_clients_all_callbacks):
     """
     client = all_clients_all_callbacks
 
-    request = fetch_sync(client, "/info")
+    # Explicitly turn if off.
+    request = fetch_sync(client, "/info", use_gzip=False)
     assert request.code == 200
     assert "X-Consumed-Content-Encoding" not in request.headers
     request = fetch_sync(client, "/info", use_gzip=True)
@@ -5020,7 +5021,7 @@ def test_error_handling_custom_stf(all_clients):
 
     # Empty request.
     request = fetch_sync(client, _assemble_url('seismograms'),
-                           method="POST", body=b'')
+                         method="POST", body=b'')
     assert request.code == 400
     assert request.reason == ("The source time function must be given in the "
                               "body of the POST request.")
