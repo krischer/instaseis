@@ -509,6 +509,7 @@ class Window(QtGui.QMainWindow):
                 self.tts = tts
         self.set_info()
 
+    @QtCore.Slot()
     def on_select_folder_button_released(self):
         pwd = os.getcwd()
         self.folder = str(QtGui.QFileDialog.getExistingDirectory(
@@ -529,6 +530,7 @@ class Window(QtGui.QMainWindow):
         self.update()
         self.set_info()
 
+    @QtCore.Slot()
     def on_select_remote_connection_button_released(self):
         text, ok = QtGui.QInputDialog.getText(
             self, "Remote Instaseis Connection",
@@ -551,6 +553,7 @@ class Window(QtGui.QMainWindow):
         self.update()
         self.set_info()
 
+    @QtCore.Slot()
     def on_open_srf_file_button_released(self):
         pwd = os.getcwd()
         self.finite_src_file = str(QtGui.QFileDialog.getOpenFileName(
@@ -611,6 +614,7 @@ class Window(QtGui.QMainWindow):
             info_str += str(self.instaseis_db) + '\n'
         self.ui.info_text.setText(info_str)
 
+    @QtCore.Slot()
     def on_load_source_button_released(self):
         pwd = os.getcwd()
         self.source_file = str(QtGui.QFileDialog.getOpenFileName(
@@ -631,38 +635,48 @@ class Window(QtGui.QMainWindow):
         self.ui.depth_slider.setValue(- s.depth_in_m / 1e3)
         self.set_info()
 
+    @QtCore.Slot()
     def on_source_latitude_valueChanged(self, *args):
         self.update()
 
+    @QtCore.Slot()
     def on_source_longitude_valueChanged(self, *args):
         self.update()
 
+    @QtCore.Slot()
     def on_receiver_latitude_valueChanged(self, *args):
         self.update()
 
+    @QtCore.Slot()
     def on_receiver_longitude_valueChanged(self, *args):
         self.update()
 
+    @QtCore.Slot()
     def on_m_rr_valueChanged(self, *args):
         self._draw_mt()
         self.update()
 
+    @QtCore.Slot()
     def on_m_tt_valueChanged(self, *args):
         self._draw_mt()
         self.update()
 
+    @QtCore.Slot()
     def on_m_pp_valueChanged(self, *args):
         self._draw_mt()
         self.update()
 
+    @QtCore.Slot()
     def on_m_rt_valueChanged(self, *args):
         self._draw_mt()
         self.update()
 
+    @QtCore.Slot()
     def on_m_rp_valueChanged(self, *args):
         self._draw_mt()
         self.update()
 
+    @QtCore.Slot()
     def on_m_tp_valueChanged(self, *args):
         self._draw_mt()
         self.update()
@@ -672,20 +686,24 @@ class Window(QtGui.QMainWindow):
         value = int(-1.0 * int(self.ui.depth_slider.value()))
         return value
 
+    @QtCore.Slot()
     def on_depth_slider_valueChanged(self, *args):
         self.ui.depth_label.setText("Depth: %i km" % self.source_depth)
         self.update()
 
+    @QtCore.Slot()
     def on_strike_slider_valueChanged(self, *args):
         self.ui.strike_value.setText("%i" % self.ui.strike_slider.value())
         self._draw_mt()
         self.update()
 
+    @QtCore.Slot()
     def on_dip_slider_valueChanged(self, *args):
         self.ui.dip_value.setText("%i" % self.ui.dip_slider.value())
         self._draw_mt()
         self.update()
 
+    @QtCore.Slot()
     def on_rake_slider_valueChanged(self, *args):
         self.ui.rake_value.setText("%i" % self.ui.rake_slider.value())
         self._draw_mt()
@@ -697,56 +715,70 @@ class Window(QtGui.QMainWindow):
         widgets.sort(key=lambda x: x.ptp)
         widgets[-1].autoRange()
 
+    @QtCore.Slot()
     def on_reset_view_button_released(self, *args):
         self.autoRange()
 
+    @QtCore.Slot()
     def on_resample_check_box_stateChanged(self, state):
         resample = bool(state)
         self.ui.resample_factor.setEnabled(resample)
         self.ui.sr_ref_label.setEnabled(resample)
         self.update()
 
+    @QtCore.Slot()
     def on_resample_factor_valueChanged(self, *args):
         self.update()
 
+    @QtCore.Slot()
     def on_tt_times_stateChanged(self, state):
         self.update()
 
+    @QtCore.Slot()
     def on_lowpass_check_box_stateChanged(self, state):
         resample = bool(state)
         self.ui.lowpass_period.setEnabled(resample)
         self.ui.lowpass_label.setEnabled(resample)
         self.update()
 
+    @QtCore.Slot()
     def on_lowpass_period_valueChanged(self, *args):
         self.update()
 
+    @QtCore.Slot()
     def on_highpass_check_box_stateChanged(self, state):
         resample = bool(state)
         self.ui.highpass_period.setEnabled(resample)
         self.ui.highpass_label.setEnabled(resample)
         self.update()
 
+    @QtCore.Slot()
     def on_highpass_period_valueChanged(self, *args):
         self.update()
 
+    @QtCore.Slot()
     def on_zero_phase_check_box_stateChanged(self, state):
         self.update()
 
+    @QtCore.Slot()
     def on_components_combo_currentIndexChanged(self):
         self.update()
 
+    @QtCore.Slot()
     def on_finsource_tab_currentChanged(self):
         self.update()
 
+    @QtCore.Slot()
     def on_source_tab_currentChanged(self):
         self._draw_mt()
         self.update()
         self.autoRange()
 
+    @QtCore.Slot()
     def on_update_button_released(self):
         self.update(force=True)
 
+    @QtCore.Slot()
     def on_load_stations_button_released(self):
         pwd = os.getcwd()
         self.stations_file = str(QtGui.QFileDialog.getOpenFileName(
@@ -764,6 +796,7 @@ class Window(QtGui.QMainWindow):
 
         self._plot_bg_receivers()
 
+    @QtCore.Slot()
     def on_stations_combo_currentIndexChanged(self):
         idx = self.ui.stations_combo.currentIndex()
         self.ui.receiver_longitude.setValue(self.receivers[idx].longitude)
