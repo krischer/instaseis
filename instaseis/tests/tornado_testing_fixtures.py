@@ -17,8 +17,9 @@ import sys
 
 from tornado import netutil
 from tornado.httpserver import HTTPServer
+from tornado.httpclient import AsyncHTTPClient, HTTPClient
 from tornado.ioloop import IOLoop
-from tornado.testing import AsyncHTTPClient
+from tornado.testing import bind_unused_port
 from tornado.util import raise_exc_info
 
 from obspy.taup import TauPyModel
@@ -44,97 +45,6 @@ def _assemble_url(route, **kwargs):
     url += "&".join("%s=%s" % (key, value) for key, value in kwargs.items())
     return url
 
-
-class AsyncClient(object):
-    """
-    A port of parts of AsyncTestCase. See tornado.testing.py:275
-    """
-    def __init__(self, httpserver, httpclient):
-        self.__stopped = False
-        self.__running = False
-        self.__stop_args = None
-        self.__failure = None
-        self.httpserver = httpserver
-        self.httpclient = httpclient
-
-    def __del__(self):
-        self.httpserver.stop()
-
-    def _get_port(self):
-        # This seems a bit fragile. How else to get the dynamic port number?
-        return list(self.httpserver._sockets.values())[0].getsockname()[1]
-
-    def fetch(self, path, use_gzip=False, **kwargs):
-        port = self._get_port()
-        url = u'%s://localhost:%s%s' % ('http', port, path)
-        self.httpclient.fetch(url, self.stop, decompress_response=use_gzip,
-                              **kwargs)
-        return self.wait()
-
-    @property
-    def io_loop(self):
-        # We're using a singleton ioloop throughout
-        return IOLoop.instance()
-
-    def stop(self, _arg=None, **kwargs):
-        """
-        Stops the `.IOLoop`, causing one pending (or future) call to `wait()`
-        to return.
-        """
-        assert _arg is None or not kwargs
-        self.__stop_args = kwargs or _arg
-        if self.__running:
-            self.io_loop.stop()
-            self.__running = False
-        self.__stopped = True
-
-    def __rethrow(self):  # pragma: no cover
-        if self.__failure is not None:
-            failure = self.__failure
-            self.__failure = None
-            raise_exc_info(failure)
-
-    def wait(self, condition=None, timeout=None):
-        if timeout is None:
-            timeout = 30
-
-        if not self.__stopped:
-            if timeout:  # pragma: no cover
-                def timeout_func():
-                    try:
-                        raise self.failureException(
-                            'Async operation timed out after %s seconds' %
-                            timeout)
-                    except Exception:
-                        self.__failure = sys.exc_info()
-                    self.stop()
-                self.__timeout = self.io_loop.add_timeout(
-                    self.io_loop.time() + timeout, timeout_func)
-            while True:
-                self.__running = True
-                self.io_loop.start()
-                if (self.__failure is not None or
-                        condition is None or condition()):
-                    break
-            if self.__timeout is not None:
-                self.io_loop.remove_timeout(self.__timeout)
-                self.__timeout = None
-        assert self.__stopped
-        self.__stopped = False
-        self.__rethrow()
-        result = self.__stop_args
-        self.__stop_args = None
-        return result
-
-
-def bind_unused_port():
-    """
-    Binds a server socket to an available port on localhost.
-    Returns a tuple (socket, port).
-    """
-    sock = netutil.bind_sockets(None, 'localhost', family=socket.AF_INET)[0]
-    port = sock.getsockname()[1]
-    return sock, port
 
 
 # All test databases. Fix order so tests can be executed in parallel.
@@ -243,7 +153,23 @@ def get_travel_time(sourcelatitude, sourcelongitude, sourcedepthinmeters,
     return tts[0].time
 
 
-def create_async_client(path, station_coordinates_callback=None,
+@pytest.fixture
+def io_loop(request):
+    """Create an instance of the `tornado.ioloop.IOLoop` for each test case.
+    """
+    io_loop = IOLoop()
+    io_loop.make_current()
+
+    def _close():
+        io_loop.clear_current()
+        io_loop.close(all_fds=True)
+
+    request.addfinalizer(_close)
+    return io_loop
+
+
+def create_async_client(io_loop, request, path,
+                        station_coordinates_callback=None,
                         event_info_callback=None,
                         travel_time_callback=None):
     application = get_application()
@@ -252,14 +178,32 @@ def create_async_client(path, station_coordinates_callback=None,
     application.event_info_callback = event_info_callback
     application.travel_time_callback = travel_time_callback
     application.max_size_of_finite_sources = 1000
-    # Build server as in testing:311
+
+    # Build server.
     sock, port = bind_unused_port()
     server = HTTPServer(application)
     server.add_sockets([sock])
-    client = AsyncClient(server, AsyncHTTPClient())
+
+    def _stop():
+        server.stop()
+
+        if hasattr(server, 'close_all_connections'):
+            io_loop.run_sync(server.close_all_connections,
+                             timeout=request.config.option.async_test_timeout)
+    request.addfinalizer(_stop)
+
+    # Build client.
+    client = AsyncHTTPClient()
+    client.loop = io_loop
+
+    def _close():
+        client.close()
+    request.addfinalizer(_close)
+
     client.application = application
     client.filepath = path
     client.port = port
+
     # Flag to help deal with forward/backwards databases.
     b = os.path.basename(path)
     if "bwd" in b or "horizontal_only" in b or "vertical_only" in b:
@@ -273,11 +217,11 @@ def create_async_client(path, station_coordinates_callback=None,
 
 
 @pytest.fixture(params=list(DBS.values()))
-def all_clients(request):
+def all_clients(io_loop, request):
     """
     Fixture returning all clients!
     """
-    return create_async_client(request.param,
+    return create_async_client(io_loop, request, request.param,
                                station_coordinates_callback=None)
 
 
@@ -285,49 +229,55 @@ def all_clients(request):
         "db_bwd" in _i and
         "horizontal_only" not in _i and
         "vertical_only" not in _i)])
-def all_greens_clients(request):
+def all_greens_clients(io_loop, request):
     """
     Fixture returning all clients compatible with Green's functions!
     """
-    return create_async_client(request.param,
+    return create_async_client(io_loop, request, request.param,
                                station_coordinates_callback=None)
 
 
 @pytest.fixture(params=[_i for _i in list(DBS.values()) if "db_bwd" in _i])
-def reciprocal_clients(request):
+def reciprocal_clients(io_loop, request):
     """
     Fixture returning all reciprocal clients!
     """
-    return create_async_client(request.param,
+    return create_async_client(io_loop, request, request.param,
                                station_coordinates_callback=None)
 
 
 @pytest.fixture(params=list(DBS.values()))
-def all_clients_station_coordinates_callback(request):
+def all_clients_station_coordinates_callback(io_loop, request):
     """
     Fixture returning all with a station coordinates callback.
     """
     return create_async_client(
+        io_loop,
+        request,
         request.param,
         station_coordinates_callback=station_coordinates_mock_callback)
 
 
 @pytest.fixture(params=list(DBS.values()))
-def all_clients_event_callback(request):
+def all_clients_event_callback(io_loop, request):
     """
     Fixture returning all with a event info callback.
     """
     return create_async_client(
+        io_loop,
+        request,
         request.param,
         event_info_callback=event_info_mock_callback)
 
 
 @pytest.fixture(params=list(DBS.values()))
-def all_clients_ttimes_callback(request):
+def all_clients_ttimes_callback(io_loop, request):
     """
     Fixture returning all clients with a travel time callback.
     """
     return create_async_client(
+        io_loop,
+        request,
         request.param,
         travel_time_callback=get_travel_time)
 
@@ -336,22 +286,26 @@ def all_clients_ttimes_callback(request):
         "db_bwd" in _i and
         "horizontal_only" not in _i and
         "vertical_only" not in _i)])
-def all_greens_clients_ttimes_callback(request):
+def all_greens_clients_ttimes_callback(io_loop,request):
     """
     Fixture returning all clients compatible with Green's functions!
     """
     return create_async_client(
+        io_loop,
+        request,
         request.param,
         travel_time_callback=get_travel_time)
 
 
 @pytest.fixture(params=[_i for _i in list(DBS.values()) if
                         ("db_bwd" in _i or "_only_" in _i)])
-def reciprocal_clients_all_callbacks(request):
+def reciprocal_clients_all_callbacks(io_loop, request):
     """
     Fixture returning reciprocal clients with all callbacks.
     """
     return create_async_client(
+        io_loop,
+        request,
         request.param,
         station_coordinates_callback=station_coordinates_mock_callback,
         event_info_callback=event_info_mock_callback,
@@ -359,11 +313,13 @@ def reciprocal_clients_all_callbacks(request):
 
 
 @pytest.fixture(params=list(DBS.values()))
-def all_clients_all_callbacks(request):
+def all_clients_all_callbacks(io_loop, request):
     """
     Fixture returning all clients with all callbacks.
     """
     return create_async_client(
+        io_loop,
+        request,
         request.param,
         station_coordinates_callback=station_coordinates_mock_callback,
         event_info_callback=event_info_mock_callback,
@@ -371,9 +327,16 @@ def all_clients_all_callbacks(request):
 
 
 def _add_callback(client):
+    # Convert the async callback to a sync one so the responses library can
+    # work with it.
     def request_callback(request):
-        req = client.fetch(request.path_url)
-        return (req.code, req.headers, req.body)
+        async def f():
+            response = await client.fetch(request.url)
+            return response
+
+        r = client.io_loop.run_sync(f)
+
+        return (r.code, r.headers, r.body)
 
     pattern = re.compile(r"http://localhost.*")
     responses.add_callback(
@@ -385,8 +348,8 @@ def _add_callback(client):
 
 @pytest.fixture(params=list(DBS.values()))
 @responses.activate
-def all_remote_dbs(request):
-    client = create_async_client(request.param, None)
+def all_remote_dbs(io_loop, request):
+    client = create_async_client(io_loop, request, request.param, None)
 
     _add_callback(client)
 

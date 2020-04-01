@@ -38,7 +38,7 @@ def get_application():
     """
     Return the tornado application.
 
-    This is a seperate function to be able to get the same application
+    This is a separate function to be able to get the same application
     objects for the tests.
     """
     return tornado.web.Application([
