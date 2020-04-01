@@ -23,7 +23,7 @@ from obspy.signal.filter import lowpass
 from obspy.signal.util import next_pow_2
 import obspy.io.xseed.parser
 import os
-from scipy import interp
+from numpy import interp
 
 from . import ReceiverParseError, SourceParseError
 from . import rotations
