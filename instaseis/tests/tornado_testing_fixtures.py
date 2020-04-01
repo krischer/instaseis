@@ -189,7 +189,7 @@ def create_async_client(io_loop, request, path,
 
         if hasattr(server, 'close_all_connections'):
             io_loop.run_sync(server.close_all_connections,
-                             timeout=request.config.option.async_test_timeout)
+                             timeout=30)
     request.addfinalizer(_stop)
 
     # Build client.
