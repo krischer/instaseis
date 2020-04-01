@@ -3,19 +3,15 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Sources and Receivers &#8212; instaseis 1.3.0-10-g25d0 documentation</title>
+    <meta charset="utf-8" />
+    <title>Sources and Receivers &#8212; instaseis 1.3.0-24-g7b814 documentation</title>
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
-    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
-    <script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Utility Functions" href="helpers.html" />
@@ -24,6 +20,10 @@
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="_static/bootstrap-sphinx.js "></script>
 
   </head><body>
 
@@ -38,7 +38,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>1.3.0-10-g25d0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>1.3.0-24-g7b814</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -91,7 +91,7 @@
 
 <div class="container">
   <div class="row">
-    <div class="col-md-12 content">
+    <div class="body col-md-12 content" role="main">
       
   <div class="section" id="sources-and-receivers">
 <h1>Sources and Receivers<a class="headerlink" href="#sources-and-receivers" title="Permalink to this headline">¶</a></h1>
@@ -101,7 +101,7 @@ or double couple sources, <a class="reference internal" href="#instaseis.source.
 (as the name implies) force sources, and finite source are represented by the
 <a class="reference internal" href="#instaseis.source.FiniteSource" title="instaseis.source.FiniteSource"><code class="xref py py-class docutils literal notranslate"><span class="pre">FiniteSource</span></code></a> class.</p>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
+<p class="admonition-title">Note</p>
 <p>Instaseis works with geocentric coordinates. Coordinates in for example
 QuakeML files are defined on the WGS84 ellipsoid. Thus they need to be
 converted. Instaseis performs this conversion if it is used to read from
@@ -110,47 +110,43 @@ take care to pass geocentric coordinates. The difference in both can be up
 to 20 kilometers. Depending on the application, <strong>this is not an effect you
 can savely ignore</strong>.</p>
 <p>The ruleset within Instaseis is simple:</p>
-<ol class="last arabic simple">
-<li>Source and receiver objects are always in geocentric coordinates.</li>
-<li>If parsed from any outside file (QuakeML/SEED/SAC/StationXML/…) the
+<ol class="arabic simple">
+<li><p>Source and receiver objects are always in geocentric coordinates.</p></li>
+<li><p>If parsed from any outside file (QuakeML/SEED/SAC/StationXML/…) the
 coordinates are assumed to be WGS84 and will be converted so the
-source/receiver objects are again in geocentric coordinates.</li>
+source/receiver objects are again in geocentric coordinates.</p></li>
 </ol>
 </div>
 <div class="contents local topic" id="contents">
 <ul class="simple">
-<li><a class="reference internal" href="#receiver" id="id1">Receiver</a></li>
-<li><a class="reference internal" href="#source" id="id2">Source</a></li>
-<li><a class="reference internal" href="#forcesource" id="id3">ForceSource</a></li>
-<li><a class="reference internal" href="#finitesource" id="id4">FiniteSource</a></li>
+<li><p><a class="reference internal" href="#receiver" id="id1">Receiver</a></p></li>
+<li><p><a class="reference internal" href="#source" id="id2">Source</a></p></li>
+<li><p><a class="reference internal" href="#forcesource" id="id3">ForceSource</a></p></li>
+<li><p><a class="reference internal" href="#finitesource" id="id4">FiniteSource</a></p></li>
 </ul>
 </div>
 <div class="section" id="receiver">
 <h2><a class="toc-backref" href="#id1">Receiver</a><a class="headerlink" href="#receiver" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="instaseis.source.Receiver">
-<em class="property">class </em><code class="descclassname">instaseis.source.</code><code class="descname">Receiver</code><span class="sig-paren">(</span><em>latitude</em>, <em>longitude</em>, <em>network=None</em>, <em>station=None</em>, <em>location=None</em>, <em>depth_in_m=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/source.html#Receiver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.Receiver" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">instaseis.source.</code><code class="sig-name descname">Receiver</code><span class="sig-paren">(</span><em class="sig-param">latitude</em>, <em class="sig-param">longitude</em>, <em class="sig-param">network=None</em>, <em class="sig-param">station=None</em>, <em class="sig-param">location=None</em>, <em class="sig-param">depth_in_m=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/source.html#Receiver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.Receiver" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class dealing with seismic receivers.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>latitude</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – The geocentric latitude of the receiver in degree.</li>
-<li><strong>longitude</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – The longitude of the receiver in degree.</li>
-<li><strong>depth_in_m</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – The depth of the receiver in meters. Only</li>
-<li><strong>network</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – The network id of the receiver.</li>
-<li><strong>station</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – The station id of the receiver.</li>
-<li><strong>location</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The location code of the receiver.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>latitude</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – The geocentric latitude of the receiver in degree.</p></li>
+<li><p><strong>longitude</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – The longitude of the receiver in degree.</p></li>
+<li><p><strong>depth_in_m</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – The depth of the receiver in meters. Only</p></li>
+<li><p><strong>network</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – The network id of the receiver.</p></li>
+<li><p><strong>station</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – The station id of the receiver.</p></li>
+<li><p><strong>location</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The location code of the receiver.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">instaseis</span> <span class="k">import</span> <span class="n">Receiver</span>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">instaseis</span> <span class="kn">import</span> <span class="n">Receiver</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">rec</span> <span class="o">=</span> <span class="n">Receiver</span><span class="p">(</span><span class="n">latitude</span><span class="o">=</span><span class="mf">12.34</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="mf">56.78</span><span class="p">,</span> <span class="n">network</span><span class="o">=</span><span class="s2">&quot;AB&quot;</span><span class="p">,</span>
 <span class="gp">... </span>               <span class="n">station</span><span class="o">=</span><span class="s2">&quot;CDE&quot;</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="s2">&quot;SY&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">rec</span><span class="p">)</span>  <span class="c1"># doctest: +NORMALIZE_WHITESPACE</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">rec</span><span class="p">)</span>  
 <span class="go">Instaseis Receiver:</span>
 <span class="go">    Longitude :   56.8 deg</span>
 <span class="go">    Latitude  :   12.3 deg</span>
@@ -159,9 +155,9 @@ source/receiver objects are again in geocentric coordinates.</li>
 <span class="go">    Location  : SY</span>
 </pre></div>
 </div>
-<dl class="staticmethod">
+<dl class="method">
 <dt id="instaseis.source.Receiver.parse">
-<em class="property">static </em><code class="descname">parse</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwds</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/source.html#Receiver.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.Receiver.parse" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="sig-name descname">parse</code><span class="sig-paren">(</span><em class="sig-param">filename_or_obj</em>, <em class="sig-param">network_code=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/source.html#Receiver.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.Receiver.parse" title="Permalink to this definition">¶</a></dt>
 <dd><p>Attempts to parse anything to a list of
 <a class="reference internal" href="#instaseis.source.Receiver" title="instaseis.source.Receiver"><code class="xref py py-class docutils literal notranslate"><span class="pre">Receiver</span></code></a> objects. Always
 returns a list, even if it only contains a single element. It is
@@ -172,25 +168,21 @@ furthermore work with anything ObsPy can deal with (filename, URL,
 memory files, …).</p>
 <p>Coordinates are assumed to be defined on the WGS84 ellipsoid and
 will be converted to geocentric coordinates.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>filename_or_obj</strong> – Filename/URL/Python object</li>
-<li><strong>network_code</strong> – Network code needed to parse ObsPy station
-objects. Likely only needed for the recursive part of this method.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename_or_obj</strong> – Filename/URL/Python object</p></li>
+<li><p><strong>network_code</strong> – Network code needed to parse ObsPy station
+objects. Likely only needed for the recursive part of this method.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">List of <a class="reference internal" href="#instaseis.source.Receiver" title="instaseis.source.Receiver"><code class="xref py py-class docutils literal notranslate"><span class="pre">Receiver</span></code></a> objects.</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>List of <a class="reference internal" href="#instaseis.source.Receiver" title="instaseis.source.Receiver"><code class="xref py py-class docutils literal notranslate"><span class="pre">Receiver</span></code></a> objects.</p>
+</dd>
+</dl>
 <p>The following example parses a StationXML file to a list of
 <a class="reference internal" href="#instaseis.source.Receiver" title="instaseis.source.Receiver"><code class="xref py py-class docutils literal notranslate"><span class="pre">Receiver</span></code></a> objects.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">instaseis</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">instaseis</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">instaseis</span><span class="o">.</span><span class="n">Receiver</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">stationxml_file</span><span class="p">))</span>
 <span class="go">[&lt;instaseis.source.Receiver object at 0x...&gt;]</span>
 </pre></div>
@@ -205,44 +197,40 @@ objects. Likely only needed for the recursive part of this method.</li>
 <h2><a class="toc-backref" href="#id2">Source</a><a class="headerlink" href="#source" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="instaseis.source.Source">
-<em class="property">class </em><code class="descclassname">instaseis.source.</code><code class="descname">Source</code><span class="sig-paren">(</span><em>latitude</em>, <em>longitude</em>, <em>depth_in_m=None</em>, <em>m_rr=0.0</em>, <em>m_tt=0.0</em>, <em>m_pp=0.0</em>, <em>m_rt=0.0</em>, <em>m_rp=0.0</em>, <em>m_tp=0.0</em>, <em>time_shift=None</em>, <em>sliprate=None</em>, <em>dt=None</em>, <em>origin_time=UTCDateTime(1970</em>, <em>1</em>, <em>1</em>, <em>0</em>, <em>0)</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/source.html#Source"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.Source" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">instaseis.source.</code><code class="sig-name descname">Source</code><span class="sig-paren">(</span><em class="sig-param">latitude</em>, <em class="sig-param">longitude</em>, <em class="sig-param">depth_in_m=None</em>, <em class="sig-param">m_rr=0.0</em>, <em class="sig-param">m_tt=0.0</em>, <em class="sig-param">m_pp=0.0</em>, <em class="sig-param">m_rt=0.0</em>, <em class="sig-param">m_rp=0.0</em>, <em class="sig-param">m_tp=0.0</em>, <em class="sig-param">time_shift=None</em>, <em class="sig-param">sliprate=None</em>, <em class="sig-param">dt=None</em>, <em class="sig-param">origin_time=UTCDateTime(1970</em>, <em class="sig-param">1</em>, <em class="sig-param">1</em>, <em class="sig-param">0</em>, <em class="sig-param">0)</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/source.html#Source"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.Source" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class to handle a seismic moment tensor source including a source time
 function.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>latitude</strong> – geocentric latitude of the source in degree</li>
-<li><strong>longitude</strong> – longitude of the source in degree</li>
-<li><strong>depth_in_m</strong> – source depth in m</li>
-<li><strong>m_rr</strong> – moment tensor components in r, theta, phi in Nm</li>
-<li><strong>m_tt</strong> – moment tensor components in r, theta, phi in Nm</li>
-<li><strong>m_pp</strong> – moment tensor components in r, theta, phi in Nm</li>
-<li><strong>m_rt</strong> – moment tensor components in r, theta, phi in Nm</li>
-<li><strong>m_rp</strong> – moment tensor components in r, theta, phi in Nm</li>
-<li><strong>m_tp</strong> – moment tensor components in r, theta, phi in Nm</li>
-<li><strong>time_shift</strong> – correction of the origin time in seconds. Useful
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>latitude</strong> – geocentric latitude of the source in degree</p></li>
+<li><p><strong>longitude</strong> – longitude of the source in degree</p></li>
+<li><p><strong>depth_in_m</strong> – source depth in m</p></li>
+<li><p><strong>m_rr</strong> – moment tensor components in r, theta, phi in Nm</p></li>
+<li><p><strong>m_tt</strong> – moment tensor components in r, theta, phi in Nm</p></li>
+<li><p><strong>m_pp</strong> – moment tensor components in r, theta, phi in Nm</p></li>
+<li><p><strong>m_rt</strong> – moment tensor components in r, theta, phi in Nm</p></li>
+<li><p><strong>m_rp</strong> – moment tensor components in r, theta, phi in Nm</p></li>
+<li><p><strong>m_tp</strong> – moment tensor components in r, theta, phi in Nm</p></li>
+<li><p><strong>time_shift</strong> – correction of the origin time in seconds. Useful
 in the context of finite source or user defined source time
-functions.</li>
-<li><strong>sliprate</strong> – normalized source time function (sliprate)</li>
-<li><strong>dt</strong> – sampling of the source time function</li>
-<li><strong>origin_time</strong> – The origin time of the source. If you don’t
+functions.</p></li>
+<li><p><strong>sliprate</strong> – normalized source time function (sliprate)</p></li>
+<li><p><strong>dt</strong> – sampling of the source time function</p></li>
+<li><p><strong>origin_time</strong> – The origin time of the source. If you don’t
 reconvolve with another source time function this time is the
 peak of the source time function used to generate the database.
 If you reconvolve with another source time function this time is
-the time of the first sample of the final seismogram.</li>
+the time of the first sample of the final seismogram.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">instaseis</span>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">instaseis</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">source</span> <span class="o">=</span> <span class="n">instaseis</span><span class="o">.</span><span class="n">Source</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="n">latitude</span><span class="o">=</span><span class="mf">89.91</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">depth_in_m</span><span class="o">=</span><span class="mi">12000</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">m_rr</span> <span class="o">=</span> <span class="mf">4.71e+17</span><span class="p">,</span> <span class="n">m_tt</span> <span class="o">=</span> <span class="mf">3.81e+15</span><span class="p">,</span> <span class="n">m_pp</span> <span class="o">=-</span><span class="mf">4.74e+17</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">m_rt</span> <span class="o">=</span> <span class="mf">3.99e+16</span><span class="p">,</span> <span class="n">m_rp</span> <span class="o">=-</span><span class="mf">8.05e+16</span><span class="p">,</span> <span class="n">m_tp</span> <span class="o">=-</span><span class="mf">1.23e+17</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>  <span class="c1"># doctest: +NORMALIZE_WHITESPACE</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>  
 <span class="go">Instaseis Source:</span>
 <span class="go">    Origin Time      : 1970-01-01T00:00:00.000000Z</span>
 <span class="go">    Longitude        :    0.0 deg</span>
@@ -258,48 +246,44 @@ the time of the first sample of the final seismogram.</li>
 <span class="go">    Mtp              :  -1.23e+17 Nm</span>
 </pre></div>
 </div>
-<dl class="attribute">
+<dl class="method">
 <dt id="instaseis.source.Source.M0">
-<code class="descname">M0</code><a class="headerlink" href="#instaseis.source.Source.M0" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">M0</code><a class="headerlink" href="#instaseis.source.Source.M0" title="Permalink to this definition">¶</a></dt>
 <dd><p>Scalar Moment M0 in Nm</p>
 </dd></dl>
 
-<dl class="classmethod">
+<dl class="method">
 <dt id="instaseis.source.Source.from_strike_dip_rake">
-<em class="property">classmethod </em><code class="descname">from_strike_dip_rake</code><span class="sig-paren">(</span><em>latitude</em>, <em>longitude</em>, <em>depth_in_m</em>, <em>strike</em>, <em>dip</em>, <em>rake</em>, <em>M0</em>, <em>time_shift=None</em>, <em>sliprate=None</em>, <em>dt=None</em>, <em>origin_time=UTCDateTime(1970</em>, <em>1</em>, <em>1</em>, <em>0</em>, <em>0)</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/source.html#Source.from_strike_dip_rake"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.Source.from_strike_dip_rake" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">from_strike_dip_rake</code><span class="sig-paren">(</span><em class="sig-param">latitude</em>, <em class="sig-param">longitude</em>, <em class="sig-param">depth_in_m</em>, <em class="sig-param">strike</em>, <em class="sig-param">dip</em>, <em class="sig-param">rake</em>, <em class="sig-param">M0</em>, <em class="sig-param">time_shift=None</em>, <em class="sig-param">sliprate=None</em>, <em class="sig-param">dt=None</em>, <em class="sig-param">origin_time=UTCDateTime(1970</em>, <em class="sig-param">1</em>, <em class="sig-param">1</em>, <em class="sig-param">0</em>, <em class="sig-param">0)</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/source.html#Source.from_strike_dip_rake"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.Source.from_strike_dip_rake" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize a source object from a shear source parameterized by strike,
 dip and rake.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>latitude</strong> – geocentric latitude of the source in degree</li>
-<li><strong>longitude</strong> – longitude of the source in degree</li>
-<li><strong>depth_in_m</strong> – source depth in m</li>
-<li><strong>strike</strong> – strike of the fault in degree</li>
-<li><strong>dip</strong> – dip of the fault in degree</li>
-<li><strong>rake</strong> – rake of the fault in degree</li>
-<li><strong>M0</strong> – scalar moment</li>
-<li><strong>time_shift</strong> – correction of the origin time in seconds. only
-useful in the context of finite sources</li>
-<li><strong>sliprate</strong> – normalized source time function (sliprate)</li>
-<li><strong>dt</strong> – sampling of the source time function</li>
-<li><strong>origin_time</strong> – The origin time of the source. If you don’t
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>latitude</strong> – geocentric latitude of the source in degree</p></li>
+<li><p><strong>longitude</strong> – longitude of the source in degree</p></li>
+<li><p><strong>depth_in_m</strong> – source depth in m</p></li>
+<li><p><strong>strike</strong> – strike of the fault in degree</p></li>
+<li><p><strong>dip</strong> – dip of the fault in degree</p></li>
+<li><p><strong>rake</strong> – rake of the fault in degree</p></li>
+<li><p><strong>M0</strong> – scalar moment</p></li>
+<li><p><strong>time_shift</strong> – correction of the origin time in seconds. only
+useful in the context of finite sources</p></li>
+<li><p><strong>sliprate</strong> – normalized source time function (sliprate)</p></li>
+<li><p><strong>dt</strong> – sampling of the source time function</p></li>
+<li><p><strong>origin_time</strong> – The origin time of the source. If you don’t
 reconvolve with another source time function this time is the
 peak of the source time function used to generate the database.
 If you reconvolve with another source time function this time is
-the time of the first sample of the final seismogram.</li>
+the time of the first sample of the final seismogram.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">instaseis</span>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">instaseis</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">source</span> <span class="o">=</span> <span class="n">instaseis</span><span class="o">.</span><span class="n">Source</span><span class="o">.</span><span class="n">from_strike_dip_rake</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="n">latitude</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="mf">12.0</span><span class="p">,</span> <span class="n">depth_in_m</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">strike</span><span class="o">=</span><span class="mi">79</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">dip</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">rake</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">M0</span><span class="o">=</span><span class="mf">1E17</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>  <span class="c1"># doctest: +NORMALIZE_WHITESPACE</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>  
 <span class="go">Instaseis Source:</span>
 <span class="go">    Origin Time      : 1970-01-01T00:00:00.000000Z</span>
 <span class="go">    Longitude        :   12.0 deg</span>
@@ -317,34 +301,31 @@ the time of the first sample of the final seismogram.</li>
 </div>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="instaseis.source.Source.moment_magnitude">
-<code class="descname">moment_magnitude</code><a class="headerlink" href="#instaseis.source.Source.moment_magnitude" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">moment_magnitude</code><a class="headerlink" href="#instaseis.source.Source.moment_magnitude" title="Permalink to this definition">¶</a></dt>
 <dd><p>Moment magnitude M_w</p>
 </dd></dl>
 
-<dl class="staticmethod">
+<dl class="method">
 <dt id="instaseis.source.Source.parse">
-<em class="property">static </em><code class="descname">parse</code><span class="sig-paren">(</span><em>filename_or_obj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/source.html#Source.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.Source.parse" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="sig-name descname">parse</code><span class="sig-paren">(</span><em class="sig-param">filename_or_obj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/source.html#Source.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.Source.parse" title="Permalink to this definition">¶</a></dt>
 <dd><p>Attempts to parse anything to a Source object. Can currently read
 anything ObsPy can read, ObsPy event related objects.</p>
 <p>For anything ObsPy related, it must contain a full moment tensor,
 otherwise it will raise an error.</p>
 <p>Coordinates are assumed to be defined on the WGS84 ellipsoid and
 will be converted to geocentric coordinates.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filename_or_obj</strong> – The object or filename to parse.</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>filename_or_obj</strong> – The object or filename to parse.</p>
+</dd>
+</dl>
 <p>The following example will read a local QuakeML file and return a
 <a class="reference internal" href="#instaseis.source.Source" title="instaseis.source.Source"><code class="xref py py-class docutils literal notranslate"><span class="pre">Source</span></code></a> object.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">instaseis</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">instaseis</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">source</span> <span class="o">=</span> <span class="n">instaseis</span><span class="o">.</span><span class="n">Source</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">quakeml_file</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>  <span class="c1"># doctest: +NORMALIZE_WHITESPACE</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>  
 <span class="go">Instaseis Source:</span>
 <span class="go">    Origin Time      : 2010-03-24T14:11:31.000000Z</span>
 <span class="go">    Longitude        :   40.1 deg</span>
@@ -362,16 +343,16 @@ will be converted to geocentric coordinates.</p>
 </div>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="instaseis.source.Source.tensor">
-<code class="descname">tensor</code><a class="headerlink" href="#instaseis.source.Source.tensor" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">tensor</code><a class="headerlink" href="#instaseis.source.Source.tensor" title="Permalink to this definition">¶</a></dt>
 <dd><p>List of moment tensor components in r, theta, phi coordinates:
 [m_rr, m_tt, m_pp, m_rt, m_rp, m_tp]</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="instaseis.source.Source.tensor_voigt">
-<code class="descname">tensor_voigt</code><a class="headerlink" href="#instaseis.source.Source.tensor_voigt" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">tensor_voigt</code><a class="headerlink" href="#instaseis.source.Source.tensor_voigt" title="Permalink to this definition">¶</a></dt>
 <dd><p>List of moment tensor components in theta, phi, r coordinates in Voigt
 notation:
 [m_tt, m_pp, m_rr, m_rp, m_rt, m_tp]</p>
@@ -385,34 +366,30 @@ notation:
 <h2><a class="toc-backref" href="#id3">ForceSource</a><a class="headerlink" href="#forcesource" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="instaseis.source.ForceSource">
-<em class="property">class </em><code class="descclassname">instaseis.source.</code><code class="descname">ForceSource</code><span class="sig-paren">(</span><em>latitude</em>, <em>longitude</em>, <em>depth_in_m=None</em>, <em>f_r=0.0</em>, <em>f_t=0.0</em>, <em>f_p=0.0</em>, <em>origin_time=UTCDateTime(1970</em>, <em>1</em>, <em>1</em>, <em>0</em>, <em>0)</em>, <em>sliprate=None</em>, <em>time_shift=None</em>, <em>dt=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/source.html#ForceSource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.ForceSource" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">instaseis.source.</code><code class="sig-name descname">ForceSource</code><span class="sig-paren">(</span><em class="sig-param">latitude</em>, <em class="sig-param">longitude</em>, <em class="sig-param">depth_in_m=None</em>, <em class="sig-param">f_r=0.0</em>, <em class="sig-param">f_t=0.0</em>, <em class="sig-param">f_p=0.0</em>, <em class="sig-param">origin_time=UTCDateTime(1970</em>, <em class="sig-param">1</em>, <em class="sig-param">1</em>, <em class="sig-param">0</em>, <em class="sig-param">0)</em>, <em class="sig-param">sliprate=None</em>, <em class="sig-param">time_shift=None</em>, <em class="sig-param">dt=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/source.html#ForceSource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.ForceSource" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class to handle a seismic force source.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>latitude</strong> – geocentric latitude of the source in degree</li>
-<li><strong>longitude</strong> – longitude of the source in degree</li>
-<li><strong>depth_in_m</strong> – source depth in m</li>
-<li><strong>f_r</strong> – force components in r, theta, phi in N</li>
-<li><strong>f_t</strong> – force components in r, theta, phi in N</li>
-<li><strong>f_p</strong> – force components in r, theta, phi in N</li>
-<li><strong>origin_time</strong> – The origin time of the source. If you don’t
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>latitude</strong> – geocentric latitude of the source in degree</p></li>
+<li><p><strong>longitude</strong> – longitude of the source in degree</p></li>
+<li><p><strong>depth_in_m</strong> – source depth in m</p></li>
+<li><p><strong>f_r</strong> – force components in r, theta, phi in N</p></li>
+<li><p><strong>f_t</strong> – force components in r, theta, phi in N</p></li>
+<li><p><strong>f_p</strong> – force components in r, theta, phi in N</p></li>
+<li><p><strong>origin_time</strong> – The origin time of the source. If you don’t
 reconvolve with another source time function this time is the
 peak of the source time function used to generate the database.
 If you reconvolve with another source time function this time is
-the time of the first sample of the final seismogram.</li>
-<li><strong>sliprate</strong> – normalized source time function (sliprate)</li>
+the time of the first sample of the final seismogram.</p></li>
+<li><p><strong>sliprate</strong> – normalized source time function (sliprate)</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">instaseis</span>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">instaseis</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">source</span> <span class="o">=</span> <span class="n">instaseis</span><span class="o">.</span><span class="n">ForceSource</span><span class="p">(</span><span class="n">latitude</span><span class="o">=</span><span class="mf">12.34</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="mf">12.34</span><span class="p">,</span>
 <span class="gp">... </span>                               <span class="n">f_r</span><span class="o">=</span><span class="mf">1E10</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>  <span class="c1"># doctest: +NORMALIZE_WHITESPACE</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>  
 <span class="go">Instaseis Force Source:</span>
 <span class="go">    Origin Time      : 1970-01-01T00:00:00.000000Z</span>
 <span class="go">    Longitude :   12.3 deg</span>
@@ -422,42 +399,38 @@ the time of the first sample of the final seismogram.</li>
 <span class="go">    Fp        :   0.00e+00 N</span>
 </pre></div>
 </div>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>latitude</strong> – geocentric latitude of the source in degree</li>
-<li><strong>longitude</strong> – longitude of the source in degree</li>
-<li><strong>depth_in_m</strong> – source depth in m</li>
-<li><strong>f_r</strong> – force components in r, theta, phi in N</li>
-<li><strong>f_t</strong> – force components in r, theta, phi in N</li>
-<li><strong>f_p</strong> – force components in r, theta, phi in N</li>
-<li><strong>origin_time</strong> – The origin time of the source. If you don’t
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>latitude</strong> – geocentric latitude of the source in degree</p></li>
+<li><p><strong>longitude</strong> – longitude of the source in degree</p></li>
+<li><p><strong>depth_in_m</strong> – source depth in m</p></li>
+<li><p><strong>f_r</strong> – force components in r, theta, phi in N</p></li>
+<li><p><strong>f_t</strong> – force components in r, theta, phi in N</p></li>
+<li><p><strong>f_p</strong> – force components in r, theta, phi in N</p></li>
+<li><p><strong>origin_time</strong> – The origin time of the source. If you don’t
 reconvolve with another source time function this time is the
 peak of the source time function used to generate the database.
 If you reconvolve with another source time function this time is
-the time of the first sample of the final seismogram.</li>
-<li><strong>sliprate</strong> – normalized source time function (sliprate)</li>
-<li><strong>time_shift</strong> – correction of the origin time in seconds. Useful
+the time of the first sample of the final seismogram.</p></li>
+<li><p><strong>sliprate</strong> – normalized source time function (sliprate)</p></li>
+<li><p><strong>time_shift</strong> – correction of the origin time in seconds. Useful
 in the context of finite source or user defined source time
-functions.</li>
-<li><strong>dt</strong> – sampling of the source time function</li>
+functions.</p></li>
+<li><p><strong>dt</strong> – sampling of the source time function</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
-<dl class="attribute">
+</dd>
+</dl>
+<dl class="method">
 <dt id="instaseis.source.ForceSource.force_rtp">
-<code class="descname">force_rtp</code><a class="headerlink" href="#instaseis.source.ForceSource.force_rtp" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">force_rtp</code><a class="headerlink" href="#instaseis.source.ForceSource.force_rtp" title="Permalink to this definition">¶</a></dt>
 <dd><p>List of force components in r, theta, phi, coordinates:
 [f_r, f_t, f_p]</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="instaseis.source.ForceSource.force_tpr">
-<code class="descname">force_tpr</code><a class="headerlink" href="#instaseis.source.ForceSource.force_tpr" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">force_tpr</code><a class="headerlink" href="#instaseis.source.ForceSource.force_tpr" title="Permalink to this definition">¶</a></dt>
 <dd><p>List of force components in theta, phi, r coordinates:
 [f_t, f_p, f_r]</p>
 </dd></dl>
@@ -470,102 +443,90 @@ functions.</li>
 <h2><a class="toc-backref" href="#id4">FiniteSource</a><a class="headerlink" href="#finitesource" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="instaseis.source.FiniteSource">
-<em class="property">class </em><code class="descclassname">instaseis.source.</code><code class="descname">FiniteSource</code><span class="sig-paren">(</span><em>pointsources=None</em>, <em>CMT=None</em>, <em>magnitude=None</em>, <em>event_duration=None</em>, <em>hypocenter_longitude=None</em>, <em>hypocenter_latitude=None</em>, <em>hypocenter_depth_in_m=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/source.html#FiniteSource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.FiniteSource" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">instaseis.source.</code><code class="sig-name descname">FiniteSource</code><span class="sig-paren">(</span><em class="sig-param">pointsources=None</em>, <em class="sig-param">CMT=None</em>, <em class="sig-param">magnitude=None</em>, <em class="sig-param">event_duration=None</em>, <em class="sig-param">hypocenter_longitude=None</em>, <em class="sig-param">hypocenter_latitude=None</em>, <em class="sig-param">hypocenter_depth_in_m=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/source.html#FiniteSource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.FiniteSource" title="Permalink to this definition">¶</a></dt>
 <dd><p>A class to handle finite sources represented by a number of point sources.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>pointsources</strong> (list of <a class="reference internal" href="#instaseis.source.Source" title="instaseis.source.Source"><code class="xref py py-class docutils literal notranslate"><span class="pre">Source</span></code></a> objects) – The points sources making up the finite source.</li>
-<li><strong>CMT</strong> (<a class="reference internal" href="#instaseis.source.Source" title="instaseis.source.Source"><code class="xref py py-class docutils literal notranslate"><span class="pre">Source</span></code></a>, optional) – The centroid of the finite source.</li>
-<li><strong>magnitude</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – The total moment magnitude of the source.</li>
-<li><strong>event_duration</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – The event duration in seconds.</li>
-<li><strong>hypocenter_longitude</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – The hypocentral longitude.</li>
-<li><strong>hypocenter_latitude</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – The hypocentral latitude.</li>
-<li><strong>hypocenter_depth_in_m</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – The hypocentral depth in m.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pointsources</strong> (list of <a class="reference internal" href="#instaseis.source.Source" title="instaseis.source.Source"><code class="xref py py-class docutils literal notranslate"><span class="pre">Source</span></code></a> objects) – The points sources making up the finite source.</p></li>
+<li><p><strong>CMT</strong> (<a class="reference internal" href="#instaseis.source.Source" title="instaseis.source.Source"><code class="xref py py-class docutils literal notranslate"><span class="pre">Source</span></code></a>, optional) – The centroid of the finite source.</p></li>
+<li><p><strong>magnitude</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em>) – The total moment magnitude of the source.</p></li>
+<li><p><strong>event_duration</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em>) – The event duration in seconds.</p></li>
+<li><p><strong>hypocenter_longitude</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em>) – The hypocentral longitude.</p></li>
+<li><p><strong>hypocenter_latitude</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em>) – The hypocentral latitude.</p></li>
+<li><p><strong>hypocenter_depth_in_m</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em>) – The hypocentral depth in m.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
-<dl class="attribute">
+</dd>
+</dl>
+<dl class="method">
 <dt id="instaseis.source.FiniteSource.M0">
-<code class="descname">M0</code><a class="headerlink" href="#instaseis.source.FiniteSource.M0" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">M0</code><a class="headerlink" href="#instaseis.source.FiniteSource.M0" title="Permalink to this definition">¶</a></dt>
 <dd><p>Scalar Moment M0 in Nm</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="instaseis.source.FiniteSource.compute_centroid">
-<code class="descname">compute_centroid</code><span class="sig-paren">(</span><em>planet_radius=6371000.0</em>, <em>dt=None</em>, <em>nsamp=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/source.html#FiniteSource.compute_centroid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.FiniteSource.compute_centroid" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">compute_centroid</code><span class="sig-paren">(</span><em class="sig-param">planet_radius=6371000.0</em>, <em class="sig-param">dt=None</em>, <em class="sig-param">nsamp=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/source.html#FiniteSource.compute_centroid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.FiniteSource.compute_centroid" title="Permalink to this definition">¶</a></dt>
 <dd><p>computes the centroid moment tensor by summing over all pointsource
 weihted by their scalar moment</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="instaseis.source.FiniteSource.find_hypocenter">
-<code class="descname">find_hypocenter</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/source.html#FiniteSource.find_hypocenter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.FiniteSource.find_hypocenter" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">find_hypocenter</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/source.html#FiniteSource.find_hypocenter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.FiniteSource.find_hypocenter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Finds the hypo- and epicenter based on the point source that has the
 smallest timeshift</p>
 </dd></dl>
 
-<dl class="classmethod">
+<dl class="method">
 <dt id="instaseis.source.FiniteSource.from_Haskell">
-<em class="property">classmethod </em><code class="descname">from_Haskell</code><span class="sig-paren">(</span><em>latitude</em>, <em>longitude</em>, <em>depth_in_m</em>, <em>strike</em>, <em>dip</em>, <em>rake</em>, <em>M0</em>, <em>fault_length</em>, <em>fault_width</em>, <em>rupture_velocity</em>, <em>nl=100</em>, <em>nw=1</em>, <em>trise=1.0</em>, <em>tfall=None</em>, <em>dt=0.1</em>, <em>planet_radius=6371000.0</em>, <em>origin_time=UTCDateTime(1970</em>, <em>1</em>, <em>1</em>, <em>0</em>, <em>0)</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/source.html#FiniteSource.from_Haskell"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.FiniteSource.from_Haskell" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">from_Haskell</code><span class="sig-paren">(</span><em class="sig-param">latitude</em>, <em class="sig-param">longitude</em>, <em class="sig-param">depth_in_m</em>, <em class="sig-param">strike</em>, <em class="sig-param">dip</em>, <em class="sig-param">rake</em>, <em class="sig-param">M0</em>, <em class="sig-param">fault_length</em>, <em class="sig-param">fault_width</em>, <em class="sig-param">rupture_velocity</em>, <em class="sig-param">nl=100</em>, <em class="sig-param">nw=1</em>, <em class="sig-param">trise=1.0</em>, <em class="sig-param">tfall=None</em>, <em class="sig-param">dt=0.1</em>, <em class="sig-param">planet_radius=6371000.0</em>, <em class="sig-param">origin_time=UTCDateTime(1970</em>, <em class="sig-param">1</em>, <em class="sig-param">1</em>, <em class="sig-param">0</em>, <em class="sig-param">0)</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/source.html#FiniteSource.from_Haskell"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.FiniteSource.from_Haskell" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize a source object from a shear source parameterized by strike,
 dip and rake.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>latitude</strong> – geocentric latitude of the source centroid in degree</li>
-<li><strong>longitude</strong> – longitude of the source centroid in degree</li>
-<li><strong>depth_in_m</strong> – source centroid depth in m</li>
-<li><strong>strike</strong> – strike of the fault in degree</li>
-<li><strong>dip</strong> – dip of the fault in degree</li>
-<li><strong>rake</strong> – rake of the fault in degree</li>
-<li><strong>M0</strong> – scalar moment</li>
-<li><strong>fault_length</strong> – fault length in m</li>
-<li><strong>fault_width</strong> – fault width in m</li>
-<li><strong>rupture_velocity</strong> – rupture velocity in m / s. Use negative value
-to propagate the rupture in negative rake direction.</li>
-<li><strong>nl</strong> – number of point sources along strike direction</li>
-<li><strong>nw</strong> – number of point sources perpendicular strike direction</li>
-<li><strong>trise</strong> – rise time</li>
-<li><strong>tfall</strong> – fall time</li>
-<li><strong>dt</strong> – sampling of the source time function</li>
-<li><strong>planet_radius</strong> – radius of the planet, default to Earth.</li>
-<li><strong>origin_time</strong> – The origin time of the first patch breaking.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>latitude</strong> – geocentric latitude of the source centroid in degree</p></li>
+<li><p><strong>longitude</strong> – longitude of the source centroid in degree</p></li>
+<li><p><strong>depth_in_m</strong> – source centroid depth in m</p></li>
+<li><p><strong>strike</strong> – strike of the fault in degree</p></li>
+<li><p><strong>dip</strong> – dip of the fault in degree</p></li>
+<li><p><strong>rake</strong> – rake of the fault in degree</p></li>
+<li><p><strong>M0</strong> – scalar moment</p></li>
+<li><p><strong>fault_length</strong> – fault length in m</p></li>
+<li><p><strong>fault_width</strong> – fault width in m</p></li>
+<li><p><strong>rupture_velocity</strong> – rupture velocity in m / s. Use negative value
+to propagate the rupture in negative rake direction.</p></li>
+<li><p><strong>nl</strong> – number of point sources along strike direction</p></li>
+<li><p><strong>nw</strong> – number of point sources perpendicular strike direction</p></li>
+<li><p><strong>trise</strong> – rise time</p></li>
+<li><p><strong>tfall</strong> – fall time</p></li>
+<li><p><strong>dt</strong> – sampling of the source time function</p></li>
+<li><p><strong>planet_radius</strong> – radius of the planet, default to Earth.</p></li>
+<li><p><strong>origin_time</strong> – The origin time of the first patch breaking.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="classmethod">
+<dl class="method">
 <dt id="instaseis.source.FiniteSource.from_srf_file">
-<em class="property">classmethod </em><code class="descname">from_srf_file</code><span class="sig-paren">(</span><em>filename</em>, <em>normalize=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/source.html#FiniteSource.from_srf_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.FiniteSource.from_srf_file" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">from_srf_file</code><span class="sig-paren">(</span><em class="sig-param">filename</em>, <em class="sig-param">normalize=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/source.html#FiniteSource.from_srf_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.FiniteSource.from_srf_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize a finite source object from a ‘standard rupture format’
 (.srf) file</p>
 <p>Coordinates are assumed to be defined on the WGS84 ellipsoid and
 will be converted to geocentric coordinates.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – path to the .srf file</li>
-<li><strong>normalize</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – normalize the sliprate to 1</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – path to the .srf file</p></li>
+<li><p><strong>normalize</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – normalize the sliprate to 1</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">instaseis</span>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">instaseis</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">source</span> <span class="o">=</span> <span class="n">instaseis</span><span class="o">.</span><span class="n">FiniteSource</span><span class="o">.</span><span class="n">from_srf_file</span><span class="p">(</span><span class="n">srf_file</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>  <span class="c1"># doctest: +NORMALIZE_WHITESPACE</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>  
 <span class="go">Instaseis Finite Source:</span>
 <span class="go">    Moment Magnitude     : 7.60</span>
 <span class="go">    Scalar Moment        :   3.20e+20 Nm</span>
@@ -585,36 +546,32 @@ will be converted to geocentric coordinates.</p>
 </div>
 </dd></dl>
 
-<dl class="classmethod">
+<dl class="method">
 <dt id="instaseis.source.FiniteSource.from_usgs_param_file">
-<em class="property">classmethod </em><code class="descname">from_usgs_param_file</code><span class="sig-paren">(</span><em>filename_or_obj</em>, <em>npts=10000</em>, <em>dt=0.1</em>, <em>trise_min=1.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/source.html#FiniteSource.from_usgs_param_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.FiniteSource.from_usgs_param_file" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">from_usgs_param_file</code><span class="sig-paren">(</span><em class="sig-param">filename_or_obj</em>, <em class="sig-param">npts=10000</em>, <em class="sig-param">dt=0.1</em>, <em class="sig-param">trise_min=1.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/source.html#FiniteSource.from_usgs_param_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.FiniteSource.from_usgs_param_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize a finite source object from a (.param) file available from
 the USGS website</p>
 <p>Coordinates are assumed to be defined on the WGS84 ellipsoid and
 will be converted to geocentric coordinates.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>filename_or_obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – path to the .param file</li>
-<li><strong>npts</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – number of samples for the source time functions. Should be
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename_or_obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – path to the .param file</p></li>
+<li><p><strong>npts</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – number of samples for the source time functions. Should be
 enough to accommodate long rise times plus optional filter
-responses.</li>
-<li><strong>dt</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – sample interval for the source time functions. Needs to be
+responses.</p></li>
+<li><p><strong>dt</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – sample interval for the source time functions. Needs to be
 small enough to sample short rise times and can then be low pass
-filtered and downsampled before extracting seismograms.</li>
-<li><strong>trise_min</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – minimum rise time. If rise time or fall time is
+filtered and downsampled before extracting seismograms.</p></li>
+<li><p><strong>trise_min</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – minimum rise time. If rise time or fall time is
 smaller than this value, it is replaced by the minimum value.
-Mostly meant to handle zero rise times in some USGS files.</li>
+Mostly meant to handle zero rise times in some USGS files.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">instaseis</span>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">instaseis</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">source</span> <span class="o">=</span> <span class="n">instaseis</span><span class="o">.</span><span class="n">FiniteSource</span><span class="o">.</span><span class="n">from_usgs_param_file</span><span class="p">(</span><span class="n">param_file</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>  <span class="c1"># doctest: +NORMALIZE_WHITESPACE</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>  
 <span class="go">Instaseis Finite Source:</span>
 <span class="go">    Moment Magnitude     : 7.87</span>
 <span class="go">    Scalar Moment        :   8.06e+20 Nm</span>
@@ -634,76 +591,64 @@ Mostly meant to handle zero rise times in some USGS files.</li>
 </div>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="instaseis.source.FiniteSource.moment_magnitude">
-<code class="descname">moment_magnitude</code><a class="headerlink" href="#instaseis.source.FiniteSource.moment_magnitude" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">moment_magnitude</code><a class="headerlink" href="#instaseis.source.FiniteSource.moment_magnitude" title="Permalink to this definition">¶</a></dt>
 <dd><p>Moment magnitude M_w</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="instaseis.source.FiniteSource.next">
-<code class="descname">next</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/source.html#FiniteSource.next"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.FiniteSource.next" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">next</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/source.html#FiniteSource.next"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.FiniteSource.next" title="Permalink to this definition">¶</a></dt>
 <dd><p>For Py2K compat.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="instaseis.source.FiniteSource.normalize_sliprate">
-<code class="descname">normalize_sliprate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/source.html#FiniteSource.normalize_sliprate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.FiniteSource.normalize_sliprate" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">normalize_sliprate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/source.html#FiniteSource.normalize_sliprate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.FiniteSource.normalize_sliprate" title="Permalink to this definition">¶</a></dt>
 <dd><p>normalize the sliprate using trapezoidal rule</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="instaseis.source.FiniteSource.resample_sliprate">
-<code class="descname">resample_sliprate</code><span class="sig-paren">(</span><em>dt</em>, <em>nsamp</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/source.html#FiniteSource.resample_sliprate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.FiniteSource.resample_sliprate" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">resample_sliprate</code><span class="sig-paren">(</span><em class="sig-param">dt</em>, <em class="sig-param">nsamp</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/source.html#FiniteSource.resample_sliprate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.FiniteSource.resample_sliprate" title="Permalink to this definition">¶</a></dt>
 <dd><p>For convolution, the sliprate is needed at the sampling of the fields
 in the database. This function resamples the sliprate using linear
 interpolation for all pointsources in the finite source.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>dt</strong> – desired sampling</li>
-<li><strong>nsamp</strong> – desired number of samples</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dt</strong> – desired sampling</p></li>
+<li><p><strong>nsamp</strong> – desired number of samples</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="instaseis.source.FiniteSource.set_sliprate_dirac">
-<code class="descname">set_sliprate_dirac</code><span class="sig-paren">(</span><em>dt</em>, <em>nsamp</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/source.html#FiniteSource.set_sliprate_dirac"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.FiniteSource.set_sliprate_dirac" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>dt</strong> – desired sampling</li>
-<li><strong>nsamp</strong> – desired number of samples</li>
+<code class="sig-name descname">set_sliprate_dirac</code><span class="sig-paren">(</span><em class="sig-param">dt</em>, <em class="sig-param">nsamp</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/source.html#FiniteSource.set_sliprate_dirac"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.FiniteSource.set_sliprate_dirac" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dt</strong> – desired sampling</p></li>
+<li><p><strong>nsamp</strong> – desired number of samples</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="instaseis.source.FiniteSource.set_sliprate_lp">
-<code class="descname">set_sliprate_lp</code><span class="sig-paren">(</span><em>dt</em>, <em>nsamp</em>, <em>freq</em>, <em>corners=4</em>, <em>zerophase=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/source.html#FiniteSource.set_sliprate_lp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.FiniteSource.set_sliprate_lp" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>dt</strong> – desired sampling</li>
-<li><strong>nsamp</strong> – desired number of samples</li>
+<code class="sig-name descname">set_sliprate_lp</code><span class="sig-paren">(</span><em class="sig-param">dt</em>, <em class="sig-param">nsamp</em>, <em class="sig-param">freq</em>, <em class="sig-param">corners=4</em>, <em class="sig-param">zerophase=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/source.html#FiniteSource.set_sliprate_lp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.source.FiniteSource.set_sliprate_lp" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dt</strong> – desired sampling</p></li>
+<li><p><strong>nsamp</strong> – desired number of samples</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -725,7 +670,7 @@ interpolation for all pointsources in the finite source.</p>
     </p>
     <p>
         &copy; Copyright 2014-2015, Lion Krischer and Martin van Driel.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.<br/>
     </p>
   </div>
 </footer>

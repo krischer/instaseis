@@ -3,19 +3,15 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Advanced Server Configuration &#8212; instaseis 1.3.0-10-g25d0 documentation</title>
+    <meta charset="utf-8" />
+    <title>Advanced Server Configuration &#8212; instaseis 1.3.0-24-g7b814 documentation</title>
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
-    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
-    <script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Database Layout and Repacking" href="database_repacking.html" />
@@ -24,6 +20,10 @@
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="_static/bootstrap-sphinx.js "></script>
 
   </head><body>
 
@@ -38,7 +38,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>1.3.0-10-g25d0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>1.3.0-24-g7b814</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -91,7 +91,7 @@
 
 <div class="container">
   <div class="row">
-    <div class="col-md-12 content">
+    <div class="body col-md-12 content" role="main">
       
   <div class="section" id="advanced-server-configuration">
 <h1>Advanced Server Configuration<a class="headerlink" href="#advanced-server-configuration" title="Permalink to this headline">¶</a></h1>
@@ -101,27 +101,27 @@ own needs.</p>
 <p>You can find a complete example implementation <a class="reference external" href="https://github.com/krischer/instaseis/tree/master/advanced_server_configuration_example">here</a>.</p>
 <p>It works by implementing up to three callback functions to:</p>
 <ul class="simple">
-<li>resolve station coordinates from network and station codes</li>
-<li>resolve event parameters from event ids</li>
-<li>calculate theoretical travel times</li>
+<li><p>resolve station coordinates from network and station codes</p></li>
+<li><p>resolve event parameters from event ids</p></li>
+<li><p>calculate theoretical travel times</p></li>
 </ul>
 <p>You can choose to implement any number of these - appropriate error messages
 will be raised if the server requires a callback function this is not
 available. The rest will keep on working just fine.</p>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">Please raise a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> within in the callback functions if something
+<p class="admonition-title">Note</p>
+<p>Please raise a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> within in the callback functions if something
 does not go as expected. That will be caught by Instaseis; other exceptions
 will result in a return code 500 (internal server error).</p>
 </div>
 <div class="contents local topic" id="contents-of-this-page">
-<p class="topic-title first">Contents of this Page</p>
+<p class="topic-title">Contents of this Page</p>
 <ul class="simple">
-<li><a class="reference internal" href="#finite-source-size-setting" id="id2">Finite Source Size Setting</a></li>
-<li><a class="reference internal" href="#station-coordinates-callback" id="id3">Station Coordinates Callback</a></li>
-<li><a class="reference internal" href="#event-parameters-callback" id="id4">Event Parameters Callback</a></li>
-<li><a class="reference internal" href="#travel-time-callback" id="id5">Travel Time Callback</a></li>
-<li><a class="reference internal" href="#hooking-it-up-to-the-instaseis-server" id="id6">Hooking it up to the Instaseis Server</a></li>
+<li><p><a class="reference internal" href="#finite-source-size-setting" id="id2">Finite Source Size Setting</a></p></li>
+<li><p><a class="reference internal" href="#station-coordinates-callback" id="id3">Station Coordinates Callback</a></p></li>
+<li><p><a class="reference internal" href="#event-parameters-callback" id="id4">Event Parameters Callback</a></p></li>
+<li><p><a class="reference internal" href="#travel-time-callback" id="id5">Travel Time Callback</a></p></li>
+<li><p><a class="reference internal" href="#hooking-it-up-to-the-instaseis-server" id="id6">Hooking it up to the Instaseis Server</a></p></li>
 </ul>
 </div>
 <div class="section" id="finite-source-size-setting">
@@ -141,8 +141,8 @@ sure the coordinates are geocentric. Instaseis has a helper function to aid
 with that: <a class="reference internal" href="helpers.html#instaseis.helpers.elliptic_to_geocentric_latitude" title="instaseis.helpers.elliptic_to_geocentric_latitude"><code class="xref py py-func docutils literal notranslate"><span class="pre">instaseis.helpers.elliptic_to_geocentric_latitude()</span></code></a></p>
 <p><strong>Affected routes:</strong></p>
 <ul class="simple">
-<li><a class="reference internal" href="routes/coordinates.html"><span class="doc">GET /coordinates</span></a></li>
-<li><a class="reference internal" href="routes/seismograms.html"><span class="doc">GET/POST /seismograms</span></a></li>
+<li><p><a class="reference internal" href="routes/coordinates.html"><span class="doc">GET /coordinates</span></a></p></li>
+<li><p><a class="reference internal" href="routes/seismograms.html"><span class="doc">GET/POST /seismograms</span></a></p></li>
 </ul>
 <p><strong>Function Signature:</strong></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_station_coordinates</span><span class="p">(</span><span class="n">networks</span><span class="p">,</span> <span class="n">stations</span><span class="p">):</span>
@@ -152,16 +152,16 @@ with that: <a class="reference internal" href="helpers.html#instaseis.helpers.el
 </div>
 <p><strong>Parameters:</strong></p>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">networks</span></code>: [<em>list of strings</em>], list of case-insensitive network ids. Wildcards <code class="docutils literal notranslate"><span class="pre">*</span></code> and <code class="docutils literal notranslate"><span class="pre">?</span></code> are allowed.</li>
-<li><code class="docutils literal notranslate"><span class="pre">stations</span></code>: [<em>list of strings</em>], list of case-insensitive station ids. Wildcards <code class="docutils literal notranslate"><span class="pre">*</span></code> and <code class="docutils literal notranslate"><span class="pre">?</span></code> are allowed.</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">networks</span></code>: [<em>list of strings</em>], list of case-insensitive network ids. Wildcards <code class="docutils literal notranslate"><span class="pre">*</span></code> and <code class="docutils literal notranslate"><span class="pre">?</span></code> are allowed.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">stations</span></code>: [<em>list of strings</em>], list of case-insensitive station ids. Wildcards <code class="docutils literal notranslate"><span class="pre">*</span></code> and <code class="docutils literal notranslate"><span class="pre">?</span></code> are allowed.</p></li>
 </ul>
 <p><strong>Return Values:</strong></p>
 <ul class="simple">
-<li>A list with one dictionary per found station if successful. Each dictionary
+<li><p>A list with one dictionary per found station if successful. Each dictionary
 has the following keys: <code class="docutils literal notranslate"><span class="pre">&quot;network&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;station&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;latitude&quot;</span></code>,
-<code class="docutils literal notranslate"><span class="pre">&quot;longitude&quot;</span></code>.</li>
-<li>An empty list if no station matching the query has been found.</li>
-<li>Raise a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> for other cases.</li>
+<code class="docutils literal notranslate"><span class="pre">&quot;longitude&quot;</span></code>.</p></li>
+<li><p>An empty list if no station matching the query has been found.</p></li>
+<li><p>Raise a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> for other cases.</p></li>
 </ul>
 <p><strong>Examples:</strong></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_station_coordinates</span><span class="p">(</span><span class="n">networks</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;IU&quot;</span><span class="p">],</span> <span class="n">stations</span><span class="p">[</span><span class="s2">&quot;ANMO&quot;</span><span class="p">])</span>
@@ -196,8 +196,8 @@ the coordinates are geocentric. Instaseis has a helper function to aid with
 that: <a class="reference internal" href="helpers.html#instaseis.helpers.elliptic_to_geocentric_latitude" title="instaseis.helpers.elliptic_to_geocentric_latitude"><code class="xref py py-func docutils literal notranslate"><span class="pre">instaseis.helpers.elliptic_to_geocentric_latitude()</span></code></a></p>
 <p><strong>Affected routes:</strong></p>
 <ul class="simple">
-<li><a class="reference internal" href="routes/event.html"><span class="doc">GET /event</span></a></li>
-<li><a class="reference internal" href="routes/seismograms.html"><span class="doc">GET/POST /seismograms</span></a></li>
+<li><p><a class="reference internal" href="routes/event.html"><span class="doc">GET /event</span></a></p></li>
+<li><p><a class="reference internal" href="routes/seismograms.html"><span class="doc">GET/POST /seismograms</span></a></p></li>
 </ul>
 <p><strong>Function Signature:</strong></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_event</span><span class="p">(</span><span class="n">event_id</span><span class="p">):</span>
@@ -207,15 +207,15 @@ that: <a class="reference internal" href="helpers.html#instaseis.helpers.ellipti
 </div>
 <p><strong>Parameters:</strong></p>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">event_id</span></code>: [<em>str</em>], event identifier</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">event_id</span></code>: [<em>str</em>], event identifier</p></li>
 </ul>
 <p><strong>Return Values:</strong></p>
 <ul class="simple">
-<li>A dictionary with the event parameters and the following keys: <code class="docutils literal notranslate"><span class="pre">&quot;m_rr&quot;</span></code>,
+<li><p>A dictionary with the event parameters and the following keys: <code class="docutils literal notranslate"><span class="pre">&quot;m_rr&quot;</span></code>,
 <code class="docutils literal notranslate"><span class="pre">&quot;m_tt&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;m_pp&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;m_rt&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;m_rp&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;m_tp&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;latitude&quot;</span></code>,
 <code class="docutils literal notranslate"><span class="pre">&quot;longitude&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;depth_in_m&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;origin_time&quot;</span></code>. The tensor components
-have to be in <em>Nm</em>.</li>
-<li>A <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> will be always be interpreted as a not found event.</li>
+have to be in <em>Nm</em>.</p></li>
+<li><p>A <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> will be always be interpreted as a not found event.</p></li>
 </ul>
 <p><strong>Examples:</strong></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_event</span><span class="p">(</span><span class="s2">&quot;B071791B&quot;</span><span class="p">)</span>
@@ -247,8 +247,8 @@ that has been used to calculate the databases. Please note that this callback
 function also receives the <code class="docutils literal notranslate"><span class="pre">info</span></code> attribute dictionary of the database.</p>
 <p><strong>Affected routes:</strong></p>
 <ul class="simple">
-<li><a class="reference internal" href="routes/ttimes.html"><span class="doc">GET /ttimes</span></a></li>
-<li><a class="reference internal" href="routes/seismograms.html"><span class="doc">GET/POST /seismograms</span></a></li>
+<li><p><a class="reference internal" href="routes/ttimes.html"><span class="doc">GET /ttimes</span></a></p></li>
+<li><p><a class="reference internal" href="routes/seismograms.html"><span class="doc">GET/POST /seismograms</span></a></p></li>
 </ul>
 <p><strong>Function Signature:</strong></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_travel_time</span><span class="p">(</span><span class="n">sourcelatitude</span><span class="p">,</span> <span class="n">sourcelongitude</span><span class="p">,</span> <span class="n">sourcedepthinmeters</span><span class="p">,</span>
@@ -260,21 +260,21 @@ function also receives the <code class="docutils literal notranslate"><span clas
 </div>
 <p><strong>Parameters:</strong></p>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">sourcelatitude</span></code>: [<em>float</em>], geocentric source latitude</li>
-<li><code class="docutils literal notranslate"><span class="pre">sourcelongitude</span></code>: [<em>float</em>], source longitude</li>
-<li><code class="docutils literal notranslate"><span class="pre">sourcedepthinmeters</span></code>: [<em>float</em>], source depth in meters</li>
-<li><code class="docutils literal notranslate"><span class="pre">receiverlatitude</span></code>: [<em>float</em>], geocentric receiver latitude</li>
-<li><code class="docutils literal notranslate"><span class="pre">receiverlongitude</span></code>: [<em>float</em>], receiver longitude</li>
-<li><code class="docutils literal notranslate"><span class="pre">receiverdepthinmeters</span></code>: [<em>float</em>], receiver depth in meters</li>
-<li><code class="docutils literal notranslate"><span class="pre">phase_name</span></code>: [<em>str</em>], case-sensitive phase name</li>
-<li><code class="docutils literal notranslate"><span class="pre">db_info</span></code>: The <code class="docutils literal notranslate"><span class="pre">info</span></code> attribute dictionary of the used database. Useful
-to calculate travel times for different models depending on the database.</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sourcelatitude</span></code>: [<em>float</em>], geocentric source latitude</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sourcelongitude</span></code>: [<em>float</em>], source longitude</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sourcedepthinmeters</span></code>: [<em>float</em>], source depth in meters</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">receiverlatitude</span></code>: [<em>float</em>], geocentric receiver latitude</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">receiverlongitude</span></code>: [<em>float</em>], receiver longitude</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">receiverdepthinmeters</span></code>: [<em>float</em>], receiver depth in meters</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">phase_name</span></code>: [<em>str</em>], case-sensitive phase name</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">db_info</span></code>: The <code class="docutils literal notranslate"><span class="pre">info</span></code> attribute dictionary of the used database. Useful
+to calculate travel times for different models depending on the database.</p></li>
 </ul>
 <p><strong>Return Values:</strong></p>
 <ul class="simple">
-<li>Travel time in seconds if successful.</li>
-<li><code class="docutils literal notranslate"><span class="pre">None</span></code> if phase has no arrival for the given source-receiver geometry.</li>
-<li>Raise a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> for other cases, e.g. unknown phase name, invalid source-receiver geometry, …</li>
+<li><p>Travel time in seconds if successful.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">None</span></code> if phase has no arrival for the given source-receiver geometry.</p></li>
+<li><p>Raise a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> for other cases, e.g. unknown phase name, invalid source-receiver geometry, …</p></li>
 </ul>
 <p><strong>Examples:</strong></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_travel_time</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">50.0</span><span class="p">,</span> <span class="mi">300000</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s2">&quot;P&quot;</span><span class="p">,</span> <span class="p">{})</span>
@@ -294,9 +294,7 @@ to calculate travel times for different models depending on the database.</li>
 <p>You will have to create a new file and pass the three callback functions to the
 <code class="docutils literal notranslate"><span class="pre">launch_io_loop()</span></code> function. The following code snippet will give you a
 similar command line interface to the default Instaseis server:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="p">(</span><span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span>
-                        <span class="n">unicode_literals</span><span class="p">)</span>
-<span class="kn">import</span> <span class="nn">argparse</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">argparse</span>
 <span class="kn">import</span> <span class="nn">os</span>
 
 <span class="kn">from</span> <span class="nn">instaseis.server.app</span> <span class="kn">import</span> <span class="n">launch_io_loop</span>
@@ -306,7 +304,7 @@ similar command line interface to the default Instaseis server:</p>
         <span class="n">prog</span><span class="o">=</span><span class="s2">&quot;python -m instaseis.server&quot;</span><span class="p">,</span>
         <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Launch an Instaseis server offering seismograms with a &#39;</span>
                     <span class="s1">&#39;REST API.&#39;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--port&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--port&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                         <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Server port.&#39;</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--buffer_size_in_mb&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
                         <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Size of the buffer in MB&#39;</span><span class="p">)</span>
@@ -355,7 +353,7 @@ similar command line interface to the default Instaseis server:</p>
     </p>
     <p>
         &copy; Copyright 2014-2015, Lion Krischer and Martin van Driel.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.<br/>
     </p>
   </div>
 </footer>

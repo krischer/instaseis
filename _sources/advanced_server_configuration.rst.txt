@@ -241,8 +241,6 @@ similar command line interface to the default Instaseis server:
 
 .. code-block:: python
 
-    from __future__ import (absolute_import, division, print_function,
-                            unicode_literals)
     import argparse
     import os
 
