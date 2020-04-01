@@ -1,9 +1,8 @@
 language: python
 
 python:
-  - "2.7"
-  - "3.5"
-  - "3.6"
+  - "3.7"
+  - "3.8"
 
 env:
   global:
@@ -26,12 +25,10 @@ before_install:
   - sudo rm -rf /dev/shm
   - sudo ln -s /run/shm /dev/shm
   - conda install --yes -c conda-forge nomkl obspy nose pytest sphinx h5py tornado click python=$TRAVIS_PYTHON_VERSION jsonschema netcdf4 geographiclib
-  # concurrent.futures backport for Python 2.7
-  - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then pip install futures ; fi
   # Always install latest flake8.
   - pip install flake8
-  # Only install the theme for Python 2.7 as it builds the docs.
-  - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then pip install sphinx-bootstrap-theme ; fi
+  # Only install the theme for Python 3.8 as it builds the docs.
+  - if [[ $TRAVIS_PYTHON_VERSION == '3.8' ]]; then pip install sphinx-bootstrap-theme ; fi
   - pip install coveralls
   - pip install requests responses pytest-xdist
 
@@ -47,8 +44,8 @@ install:
 script:
   - export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libgfortran.so.3 && coverage run --source=instaseis -m instaseis.tests
   # Docs only need to be built once.
-  - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then cd $TRAVIS_BUILD_DIR/doc; make html ; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == '3.8' ]]; then cd $TRAVIS_BUILD_DIR/doc; make html ; fi
 
 after_success:
   - cd $TRAVIS_BUILD_DIR; coveralls
-  - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then bash $TRAVIS_BUILD_DIR/.travis-update-gh-pages.sh ; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == '3.8' ]]; then bash $TRAVIS_BUILD_DIR/.travis-update-gh-pages.sh ; fi
