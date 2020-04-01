@@ -720,8 +720,8 @@ class Window(QtGui.QMainWindow):
         self.autoRange()
 
     @QtCore.Slot()
-    def on_resample_check_box_stateChanged(self, state):
-        resample = bool(state)
+    def on_resample_check_box_stateChanged(self):
+        resample = bool(self.ui.resample_check_box.checkState())
         self.ui.resample_factor.setEnabled(resample)
         self.ui.sr_ref_label.setEnabled(resample)
         self.update()
@@ -731,12 +731,12 @@ class Window(QtGui.QMainWindow):
         self.update()
 
     @QtCore.Slot()
-    def on_tt_times_stateChanged(self, state):
+    def on_tt_times_stateChanged(self):
         self.update()
 
     @QtCore.Slot()
-    def on_lowpass_check_box_stateChanged(self, state):
-        resample = bool(state)
+    def on_lowpass_check_box_stateChanged(self):
+        resample = bool(self.ui.lowpass_check_box.checkState())
         self.ui.lowpass_period.setEnabled(resample)
         self.ui.lowpass_label.setEnabled(resample)
         self.update()
@@ -746,8 +746,8 @@ class Window(QtGui.QMainWindow):
         self.update()
 
     @QtCore.Slot()
-    def on_highpass_check_box_stateChanged(self, state):
-        resample = bool(state)
+    def on_highpass_check_box_stateChanged(self):
+        resample = bool(self.ui.highpass_check_box.checkState())
         self.ui.highpass_period.setEnabled(resample)
         self.ui.highpass_label.setEnabled(resample)
         self.update()
@@ -757,7 +757,7 @@ class Window(QtGui.QMainWindow):
         self.update()
 
     @QtCore.Slot()
-    def on_zero_phase_check_box_stateChanged(self, state):
+    def on_zero_phase_check_box_stateChanged(self):
         self.update()
 
     @QtCore.Slot("int")
