@@ -414,8 +414,8 @@ Connecting to either a local or a remote Instaseis database happens with the
 arguments and keyword arguments are passed to the the initialization
 function of these objects. Once the database objects are created, usage of
 both is identical. Be aware that the initialization of the database objects
-is potentially a fairly expensive operation so make sure to do it more often
-than necessary (usually once per database).
+is potentially a fairly expensive operation so make sure to do it only when
+necessary (usually once per database).
 
 
 .. note::
