@@ -698,18 +698,6 @@ class ForceSource(SourceOrReceiver, SourceTimeFunction):
         the time of the first sample of the final seismogram.
     :param sliprate: normalized source time function (sliprate)
 
-    .. note::
-    
-    The directions for r, theta, and phi are as given in Figure 1 of
-    Nissen-Meyer *et al.* (2008).
-    
-    .. list-table::
-
-    * - | Nissen-Meyer, Tarje, Alexandre Fournier, and F. A. Dahlen (2008)
-        | **A 2-D spectral-element method for computing spherical-earth
-        | seismograms—II. Waves in solid–fluid media.**
-        | *Geophysical Journal International* 174 (3): 873–888.
-        | https://doi.org/10.1111/j.1365-246X.2008.03813.x
 
     >>> import instaseis
     >>> source = instaseis.ForceSource(latitude=12.34, longitude=12.34,
