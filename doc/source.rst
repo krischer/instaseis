@@ -25,6 +25,10 @@ or double couple sources, :class:`~instaseis.source.ForceSource` object are
        coordinates are assumed to be WGS84 and will be converted so the
        source/receiver objects are again in geocentric coordinates.
 
+    The directions of r, theta, and phi are defined according to the standard
+    `spherical coordinate system definition <https://en.wikipedia.org/wiki/Spherical_coordinate_system>`_
+    used in physics, which is: r positive outward, theta positive downward, and
+    phi positive counter-clockwise.
 
 .. contents::
     :local:
