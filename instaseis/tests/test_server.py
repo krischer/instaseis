@@ -6206,3 +6206,113 @@ def test_sourcewidth_parameter(all_clients):
         d = st.select(component=comp)[0].data
         d_re = st_re.select(component=comp)[0].data
         assert np.abs(np.fft.rfft(d)).sum() > np.abs(np.fft.rfft(d_re)).sum()
+
+
+def test_cache_is_not_modified(all_clients):
+    """
+    Test for https://github.com/krischer/instaseis/issues/76.
+
+    Make sure the cached values are not internally modified by requesting
+    things multiple times multiple times and asserting they are identical
+    every time.
+    """
+    client = all_clients
+    db = instaseis.open_db(client.filepath)
+
+    # Helper function to request something from the server multiple times and
+    # making sure it stays the same.
+    def request_multiple_times(url, params):
+        request = fetch_sync(client, _assemble_url(url, **params))
+        st_ref = obspy.read(request.buffer)
+
+        for _i in range(3):
+            request = fetch_sync(client, _assemble_url(url, **params))
+            st_new = obspy.read(request.buffer)
+            assert st_new == st_ref
+
+    basic_parameters = {
+        "sourcelatitude": 10,
+        "sourcelongitude": 10,
+        "sourcedepthinmeters": client.source_depth,
+        "receiverlatitude": -10,
+        "receiverlongitude": -10,
+        "format": "miniseed",
+    }
+
+    # Various sources.
+    mt_param = "100000,200000,300000,400000,500000,600000"
+    sdr_param = "10,20,30,1000000"
+    fs_param = "100000,200000,300000"
+
+    time = obspy.UTCDateTime(2010, 1, 2, 3, 4, 5)
+
+    # Moment tensor source.
+    params = copy.deepcopy(basic_parameters)
+    params["sourcemomenttensor"] = mt_param
+    if client.is_reciprocal:
+        params["sourcedepthinmeters"] = "5.0"
+        params["receiverdepthinmeters"] = "0.0"
+    else:
+        params["sourcedepthinmeters"] = str(client.source_depth)
+        params["receiverdepthinmeters"] = "55.0"
+    params["origintime"] = str(time)
+    params["networkcode"] = "BW"
+    params["stationcode"] = "ALTM"
+    params["locationcode"] = "XX"
+    request_multiple_times("seismograms", params)
+
+    # Moment tensor source from strike, dip, and rake.
+    params = copy.deepcopy(basic_parameters)
+    params["sourcedoublecouple"] = sdr_param
+    if client.is_reciprocal:
+        params["sourcedepthinmeters"] = "5.0"
+        params["receiverdepthinmeters"] = "0.0"
+    else:
+        params["sourcedepthinmeters"] = str(client.source_depth)
+        params["receiverdepthinmeters"] = "55.0"
+    params["origintime"] = str(time)
+    params["networkcode"] = "BW"
+    params["stationcode"] = "ALTM"
+    params["locationcode"] = "XX"
+    request_multiple_times("seismograms", params)
+
+    # Force source only works for displ_only databases.
+    if "displ_only" in client.filepath:
+        params = copy.deepcopy(basic_parameters)
+        params["sourceforce"] = fs_param
+        params["sourcedepthinmeters"] = "5.0"
+        params["receiverdepthinmeters"] = "0.0"
+        params["origintime"] = str(time)
+        params["networkcode"] = "BW"
+        params["stationcode"] = "ALTM"
+        params["locationcode"] = "XX"
+        request_multiple_times("seismograms", params)
+
+    # Now test other the other parameters.
+    params = copy.deepcopy(basic_parameters)
+    params["sourcemomenttensor"] = mt_param
+    params["components"] = "".join(db.default_components[:1])
+    request_multiple_times("seismograms", params)
+
+    params = copy.deepcopy(basic_parameters)
+    params["sourcemomenttensor"] = mt_param
+    params["units"] = "acceleration"
+    request_multiple_times("seismograms", params)
+
+    params = copy.deepcopy(basic_parameters)
+    params["sourcemomenttensor"] = mt_param
+    params["units"] = "velocity"
+    request_multiple_times("seismograms", params)
+
+    params = copy.deepcopy(basic_parameters)
+    params["sourcemomenttensor"] = mt_param
+    params["dt"] = "0.1"
+    params["kernelwidth"] = "1"
+    request_multiple_times("seismograms", params)
+
+    params = copy.deepcopy(basic_parameters)
+    params["sourcemomenttensor"] = mt_param
+    params["dt"] = "0.1"
+    params["kernelwidth"] = "2"
+    params["units"] = "ACCELERATION"
+    request_multiple_times("seismograms", params)

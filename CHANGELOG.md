@@ -1,5 +1,9 @@
 # Changelog
 
+## [dev]
+
+- Fixed problem which modified caches values in certain circumstances (see #76)
+
 ## [1.4.1] - 2020-04-01
 
 - Updating all copyright notices.

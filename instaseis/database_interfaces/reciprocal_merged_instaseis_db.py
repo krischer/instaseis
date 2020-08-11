@@ -400,7 +400,9 @@ class ReciprocalMergedInstaseisDB(BaseNetCDFInstaseisDB):
                 col_points_xi, col_points_eta, utemp_x[:, :, :, i], xi, eta
             )
 
-        utemp_z = utemp[:, :, :, -3:]
+        # Requires a copy to not modify the cached values in place because this
+        # array is later modified.
+        utemp_z = utemp[:, :, :, -3:].copy()
         utemp_z[:, :, :, 0] = utemp_z[:, :, :, 1]
         utemp_z[:, :, :, 1][:] = 0
         utemp_z = np.require(utemp_z, requirements=["F"], dtype=np.float64)
