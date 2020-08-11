@@ -1,10 +1,11 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
-    <title>instaseis.database_interfaces.reciprocal_merged_instaseis_db &#8212; instaseis 1.4.1 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>instaseis.database_interfaces.reciprocal_merged_instaseis_db &#8212; instaseis 1.4.1-4-g13a4 documentation</title>
     <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
@@ -36,7 +37,7 @@
         </button>
         <a class="navbar-brand" href="../../../index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>1.4.1</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>1.4.1-4-g13a4</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -494,7 +495,9 @@
                 <span class="n">col_points_xi</span><span class="p">,</span> <span class="n">col_points_eta</span><span class="p">,</span> <span class="n">utemp_x</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="n">i</span><span class="p">],</span> <span class="n">xi</span><span class="p">,</span> <span class="n">eta</span>
             <span class="p">)</span>
 
-        <span class="n">utemp_z</span> <span class="o">=</span> <span class="n">utemp</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="o">-</span><span class="mi">3</span><span class="p">:]</span>
+        <span class="c1"># Requires a copy to not modify the cached values in place because this</span>
+        <span class="c1"># array is later modified.</span>
+        <span class="n">utemp_z</span> <span class="o">=</span> <span class="n">utemp</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="o">-</span><span class="mi">3</span><span class="p">:]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">utemp_z</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">utemp_z</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">]</span>
         <span class="n">utemp_z</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">][:]</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">utemp_z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">require</span><span class="p">(</span><span class="n">utemp_z</span><span class="p">,</span> <span class="n">requirements</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;F&quot;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
@@ -522,7 +525,7 @@
     </p>
     <p>
         &copy; Copyright 2014-2020, Lion Krischer and Martin van Driel.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.2.0.<br/>
     </p>
   </div>
 </footer>
