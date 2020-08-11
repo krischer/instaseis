@@ -2,7 +2,7 @@
 
 ## [1.4.2] - 2020-08-11
 
-- Fixed problem which modified caches values in certain circumstances (see #76).
+- Fixed problem which modified cached values in certain circumstances (see #76).
 
 ## [1.4.1] - 2020-04-01
 
