@@ -117,6 +117,7 @@ class RawSeismogramsHandler(InstaseisTimeSeriesHandler):
         "locationcode": {"type": str},
     }
     default_label = "instaseis_seismogram"
+    default_sacheader = "geodetic"
 
     def validate_parameters(self, args):
         pass

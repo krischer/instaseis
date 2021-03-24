@@ -36,6 +36,7 @@ def _get_greens(
     endtime,
     format,
     label,
+    sacheader,
 ):
     """
     Extract a Green's function from the passed db and write it either to a
@@ -52,6 +53,7 @@ def _get_greens(
     :param endtime: The desired end time of the seismogram.
     :param format: The output format. Either "miniseed" or "saczip".
     :param label: Prefix for the filename within the SAC zip file.
+    ;param sacheader: Indicates if the SAC header should be populated with geodetic or geocentric latitudes.
     """
     try:
         st = db.get_greens_function(
@@ -99,6 +101,7 @@ def _get_greens(
         db=db,
         label=label,
         format=format,
+        sacheader=sacheader,
     )
 
 
@@ -123,6 +126,7 @@ class GreensFunctionHandler(InstaseisTimeSeriesHandler):
             "format": "Datetime String/Float/Phase+-Offset",
         },
         "format": {"type": str, "default": "saczip"},
+        "sacheader": {"type": str, "default": "geodetic"},
     }
 
     default_label = "instaseis_greens_function"
@@ -232,6 +236,7 @@ class GreensFunctionHandler(InstaseisTimeSeriesHandler):
             endtime=endtime,
             format=args.format,
             label=args.label,
+            sacheader=args.sacheader,
         )
 
         # If an exception is returned from the task, re-raise it here.
