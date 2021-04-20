@@ -2569,10 +2569,7 @@ def test_output_sacheader(all_clients):
 
     # Other than the sac header, they should be identical!
     for tr in sac_st.traces + sac_st_geodetic.traces + sac_st_geocentric.traces:
-        try:
-            del tr.stats.sac
-        except KeyError:
-            pass
+        del tr.stats.sac
 
     # Now make sure the result is the same independent of the output format.
     assert sac_st == sac_st_geodetic == sac_st_geocentric
