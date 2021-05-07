@@ -53,7 +53,8 @@ def _get_greens(
     :param endtime: The desired end time of the seismogram.
     :param format: The output format. Either "miniseed" or "saczip".
     :param label: Prefix for the filename within the SAC zip file.
-    ;param sacheader: Indicates if the SAC header should be populated with geodetic or geocentric latitudes.
+    :param sacheader: Indicates if the SAC header should be populated with
+        geodetic or geocentric latitudes.
     """
     try:
         st = db.get_greens_function(

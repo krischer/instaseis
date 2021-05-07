@@ -66,7 +66,8 @@ def _get_finite_source(
     :param time_of_first_sample: The time of the first sample.
     :param format: The output format. Either "miniseed" or "saczip".
     :param label: Prefix for the filename within the SAC zip file.
-    ;param sacheader: Indicates if the SAC header should be populated with geodetic or geocentric latitudes.
+    :param sacheader: Indicates if the SAC header should be populated with
+        geodetic or geocentric latitudes.
     """
     try:
         st = db.get_seismograms_finite_source(

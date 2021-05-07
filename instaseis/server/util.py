@@ -93,7 +93,16 @@ def _format_utc_datetime(dt):
 
 
 def _validate_and_write_waveforms(
-    st, starttime, endtime, scale, source, receiver, db, label, format, sacheader='geodetic'
+    st,
+    starttime,
+    endtime,
+    scale,
+    source,
+    receiver,
+    db,
+    label,
+    format,
+    sacheader="geodetic",
 ):
     if not label:
         label = ""
@@ -152,9 +161,10 @@ def _validate_and_write_waveforms(
         for tr in st:
             # Write SAC headers.
             tr.stats.sac = obspy.core.AttribDict()
-            # Write WGS84 coordinates to the SAC files (for the Earth models only).
+            # Write WGS84 coordinates to the SAC files (for the Earth models
+            # only).
             tr.stats.sac.stla = receiver.latitude
-            if sacheader == 'geodetic':
+            if sacheader == "geodetic":
                 tr.stats.sac.stla = geocentric_to_elliptic_latitude(
                     receiver.latitude
                 )
@@ -163,7 +173,7 @@ def _validate_and_write_waveforms(
             tr.stats.sac.stel = 0.0
             if isinstance(source, FiniteSource):
                 tr.stats.sac.evla = source.hypocenter_latitude
-                if sacheader == 'geodetic':
+                if sacheader == "geodetic":
                     tr.stats.sac.evla = geocentric_to_elliptic_latitude(
                         source.hypocenter_latitude
                     )
@@ -176,7 +186,7 @@ def _validate_and_write_waveforms(
                 src_lng = source.hypocenter_longitude
             else:
                 tr.stats.sac.evla = source.latitude
-                if sacheader == 'geodetic':
+                if sacheader == "geodetic":
                     tr.stats.sac.evla = geocentric_to_elliptic_latitude(
                         source.latitude
                     )
@@ -195,7 +205,7 @@ def _validate_and_write_waveforms(
 
             # For the Earth models, Sac coordinates are elliptical thus it
             # only makes sense to have elliptical distances.
-            if sacheader != 'geocentric':
+            if sacheader != "geocentric":
                 dist_in_m, az, baz = gps2dist_azimuth(
                     lat1=tr.stats.sac.evla,
                     lon1=tr.stats.sac.evlo,

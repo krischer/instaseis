@@ -2481,10 +2481,11 @@ def test_output_formats(all_clients):
 
 def test_output_sacheader(all_clients):
     """
-    The /seismograms route can return data as zip archive containing multiple SAC files. For sacheader=geocentric,
-    the SAC headers are populated using geocentric latitudes (input latitudes). For sacheader not defined or
-    sacheader=geodetic, the SAC header is populated using geodetic latitudes. Make sure the choice of sacheader
-    does not affect data.
+    The /seismograms route can return data as zip archive containing multiple
+    SAC files. For sacheader=geocentric, the SAC headers are populated using
+    geocentric latitudes (input latitudes). For sacheader not defined or
+    sacheader=geodetic, the SAC header is populated using geodetic latitudes.
+    Make sure the choice of sacheader does not affect data.
     """
     client = all_clients
 
@@ -2498,7 +2499,8 @@ def test_output_sacheader(all_clients):
         "sourcemomenttensor": "100000,100000,100000,100000,100000,100000",
     }
 
-    # First, no sacheader provided, saczip results in a folder of multiple sac files.
+    # First, no sacheader provided, saczip results in a folder of multiple sac
+    # files.
     params = copy.deepcopy(basic_parameters)
     request = fetch_sync(client, _assemble_url("seismograms", **params))
     # ObsPy needs the filename to be able to directly unpack zip files. We
@@ -2510,7 +2512,8 @@ def test_output_sacheader(all_clients):
     for tr in sac_st:
         assert tr.stats._format == "SAC"
 
-    # Second,  sacheader set to geodetic, saczip results in a folder of multiple sac files.
+    # Second,  sacheader set to geodetic, saczip results in a folder of
+    # multiple sac files.
     params = copy.deepcopy(basic_parameters)
     params["sacheader"] = "geodetic"
     request = fetch_sync(client, _assemble_url("seismograms", **params))
@@ -2523,7 +2526,8 @@ def test_output_sacheader(all_clients):
     for tr in sac_st_geodetic:
         assert tr.stats._format == "SAC"
 
-    # Third,  sacheader set to geocentric, saczip results in a folder of multiple sac files.
+    # Third,  sacheader set to geocentric, saczip results in a folder of
+    # multiple sac files.
     params = copy.deepcopy(basic_parameters)
     params["sacheader"] = "geocentric"
     request = fetch_sync(client, _assemble_url("seismograms", **params))
@@ -2551,24 +2555,38 @@ def test_output_sacheader(all_clients):
     assert sac_tr.stats.sac.stla == sac_tr_geodetic.stats.sac.stla
     assert sac_tr.stats.sac.evla == sac_tr_geodetic.stats.sac.evla
 
-    # The sacheader='geocentric' should be the same as the input parameter since not converted.
-    assert sac_tr_geocentric.stats.sac.stla == basic_parameters["receiverlatitude"]
-    assert sac_tr_geocentric.stats.sac.evla == basic_parameters["sourcelatitude"]
+    # The sacheader='geocentric' should be the same as the input parameter
+    # since not converted.
+    assert (
+        sac_tr_geocentric.stats.sac.stla
+        == basic_parameters["receiverlatitude"]
+    )
+    assert (
+        sac_tr_geocentric.stats.sac.evla == basic_parameters["sourcelatitude"]
+    )
 
     # Converting the geocentric latitude should result in ~geodetic latitude.
-    np.testing.assert_allclose(sac_tr_geodetic.stats.sac.stla, geocentric_to_elliptic_latitude(
-        sac_tr_geocentric.stats.sac.stla
-    ))
-    np.testing.assert_allclose(sac_tr_geodetic.stats.sac.evla, geocentric_to_elliptic_latitude(
-        sac_tr_geocentric.stats.sac.evla
-    ))
+    np.testing.assert_allclose(
+        sac_tr_geodetic.stats.sac.stla,
+        geocentric_to_elliptic_latitude(sac_tr_geocentric.stats.sac.stla),
+    )
+    np.testing.assert_allclose(
+        sac_tr_geodetic.stats.sac.evla,
+        geocentric_to_elliptic_latitude(sac_tr_geocentric.stats.sac.evla),
+    )
 
     # GCD should be the same.
-    np.testing.assert_allclose(sac_tr.stats.sac.gcarc, sac_tr_geodetic.stats.sac.gcarc)
-    np.testing.assert_allclose(sac_tr.stats.sac.gcarc, sac_tr_geocentric.stats.sac.gcarc)
+    np.testing.assert_allclose(
+        sac_tr.stats.sac.gcarc, sac_tr_geodetic.stats.sac.gcarc
+    )
+    np.testing.assert_allclose(
+        sac_tr.stats.sac.gcarc, sac_tr_geocentric.stats.sac.gcarc
+    )
 
     # Other than the sac header, they should be identical!
-    for tr in sac_st.traces + sac_st_geodetic.traces + sac_st_geocentric.traces:
+    for tr in (
+        sac_st.traces + sac_st_geodetic.traces + sac_st_geocentric.traces
+    ):
         del tr.stats.sac
 
     # Now make sure the result is the same independent of the output format.

@@ -175,8 +175,7 @@ def get_travel_time(
 
 @pytest.fixture
 def io_loop(request):
-    """Create an instance of the `tornado.ioloop.IOLoop` for each test case.
-    """
+    """Create an instance of the `tornado.ioloop.IOLoop` for each test case."""
     io_loop = IOLoop()
     io_loop.make_current()
 
