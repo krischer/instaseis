@@ -5,14 +5,13 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Main Instaseis Classes &#8212; instaseis 1.4.2-1-ga2b8 documentation</title>
-    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <title>Main Instaseis Classes &#8212; instaseis 1.4.2-5-gdc9d4 documentation</title>
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
-    <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Sources and Receivers" href="source.html" />
@@ -39,7 +38,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           Instaseis</a>
-        <span class="navbar-text navbar-version pull-left"><b>1.4.2-1-ga2b8</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>1.4.2-5-gdc9d4</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -116,14 +115,14 @@ function to open a connection to an Instaseis database.</p>
 <h2><a class="toc-backref" href="#id1">open_db() Function</a><a class="headerlink" href="#open-db-function" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt id="instaseis.open_db">
-<code class="sig-prename descclassname">instaseis.</code><code class="sig-name descname">open_db</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis.html#open_db"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.open_db" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">instaseis.</span></code><code class="sig-name descname"><span class="pre">open_db</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis.html#open_db"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#instaseis.open_db" title="Permalink to this definition">¶</a></dt>
 <dd><p>Central function to open a local or remote Instaseis database. Any
 keyword arguments are passed to the underlying
 <code class="xref py py-class docutils literal notranslate"><span class="pre">InstaseisDB</span></code> or
 <code class="xref py py-class docutils literal notranslate"><span class="pre">RemoteInstaseisDB</span></code> classes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Filepath or URL. Instaseis will determine if it is a local
+<dd class="field-odd"><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Filepath or URL. Instaseis will determine if it is a local
 file path or a HTTP URL and delegate to the corresponding class.</p>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -179,24 +178,24 @@ search the child directories for the  necessary files and open them.</p>
 <h2><a class="toc-backref" href="#id2">BaseInstaseisDB</a><a class="headerlink" href="#baseinstaseisdb" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="instaseis.database_interfaces.base_instaseis_db.BaseInstaseisDB">
-<em class="property">class </em><code class="sig-prename descclassname">instaseis.database_interfaces.base_instaseis_db.</code><code class="sig-name descname">BaseInstaseisDB</code><a class="reference internal" href="_modules/instaseis/database_interfaces/base_instaseis_db.html#BaseInstaseisDB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.database_interfaces.base_instaseis_db.BaseInstaseisDB" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">instaseis.database_interfaces.base_instaseis_db.</span></code><code class="sig-name descname"><span class="pre">BaseInstaseisDB</span></code><a class="reference internal" href="_modules/instaseis/database_interfaces/base_instaseis_db.html#BaseInstaseisDB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#instaseis.database_interfaces.base_instaseis_db.BaseInstaseisDB" title="Permalink to this definition">¶</a></dt>
 <dd><p>Base class for all Instaseis database classes defining the user interface.</p>
 <dl class="py method">
 <dt id="instaseis.database_interfaces.base_instaseis_db.BaseInstaseisDB.available_components">
-<em class="property">property </em><code class="sig-name descname">available_components</code><a class="headerlink" href="#instaseis.database_interfaces.base_instaseis_db.BaseInstaseisDB.available_components" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">available_components</span></code><a class="headerlink" href="#instaseis.database_interfaces.base_instaseis_db.BaseInstaseisDB.available_components" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a list with all available components.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="instaseis.database_interfaces.base_instaseis_db.BaseInstaseisDB.default_components">
-<em class="property">property </em><code class="sig-name descname">default_components</code><a class="headerlink" href="#instaseis.database_interfaces.base_instaseis_db.BaseInstaseisDB.default_components" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">default_components</span></code><a class="headerlink" href="#instaseis.database_interfaces.base_instaseis_db.BaseInstaseisDB.default_components" title="Permalink to this definition">¶</a></dt>
 <dd><p>The components returned by default by most of the higher level
 routines.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="instaseis.database_interfaces.base_instaseis_db.BaseInstaseisDB.get_greens_function">
-<code class="sig-name descname">get_greens_function</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">epicentral_distance_in_degree</span></em>, <em class="sig-param"><span class="n">source_depth_in_m</span></em>, <em class="sig-param"><span class="n">origin_time</span><span class="o">=</span><span class="default_value">UTCDateTime(1970, 1, 1, 0, 0)</span></em>, <em class="sig-param"><span class="n">kind</span><span class="o">=</span><span class="default_value">'displacement'</span></em>, <em class="sig-param"><span class="n">return_obspy_stream</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">dt</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">kernelwidth</span><span class="o">=</span><span class="default_value">12</span></em>, <em class="sig-param"><span class="n">definition</span><span class="o">=</span><span class="default_value">'seiscomp'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/database_interfaces/base_instaseis_db.html#BaseInstaseisDB.get_greens_function"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.database_interfaces.base_instaseis_db.BaseInstaseisDB.get_greens_function" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_greens_function</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">epicentral_distance_in_degree</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_depth_in_m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">UTCDateTime(1970,</span> <span class="pre">1,</span> <span class="pre">1,</span> <span class="pre">0,</span> <span class="pre">0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kind</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'displacement'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_obspy_stream</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernelwidth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">definition</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'seiscomp'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/database_interfaces/base_instaseis_db.html#BaseInstaseisDB.get_greens_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#instaseis.database_interfaces.base_instaseis_db.BaseInstaseisDB.get_greens_function" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extract Green’s function from the Green’s function database.</p>
 <p>Currently only one definition is implemented: the one assumed by
 Seiscomp, i.e. the components <code class="docutils literal notranslate"><span class="pre">TSS</span></code>, <code class="docutils literal notranslate"><span class="pre">ZSS</span></code>, <code class="docutils literal notranslate"><span class="pre">RSS</span></code>, <code class="docutils literal notranslate"><span class="pre">TDS</span></code>,
@@ -219,18 +218,18 @@ Seiscomp, i.e. the components <code class="docutils literal notranslate"><span c
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>epicentral_distance_in_degree</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – The epicentral distance in
+<li><p><strong>epicentral_distance_in_degree</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – The epicentral distance in
 degree.</p></li>
-<li><p><strong>source_depth_in_m</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – The source depth in m below the surface.</p></li>
+<li><p><strong>source_depth_in_m</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – The source depth in m below the surface.</p></li>
 <li><p><strong>origin_time</strong> (<a class="reference external" href="https://docs.obspy.org/packages/autogen/obspy.core.utcdatetime.UTCDateTime.html#obspy.core.utcdatetime.UTCDateTime" title="(in ObsPy Documentation (1.2.0) v1.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">obspy.core.utcdatetime.UTCDateTime</span></code></a>) – Origin time of the source.</p></li>
-<li><p><strong>kind</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The desired units of the seismogram:
+<li><p><strong>kind</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – The desired units of the seismogram:
 <code class="docutils literal notranslate"><span class="pre">&quot;displacement&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;velocity&quot;</span></code>, or <code class="docutils literal notranslate"><span class="pre">&quot;acceleration&quot;</span></code>.</p></li>
-<li><p><strong>dt</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Desired sampling rate of the Green’s functions. Resampling
+<li><p><strong>dt</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Desired sampling rate of the Green’s functions. Resampling
 is done using a Lanczos kernel.</p></li>
-<li><p><strong>kernelwidth</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The width of the sinc kernel used for resampling in
+<li><p><strong>kernelwidth</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The width of the sinc kernel used for resampling in
 terms of the original sampling interval. Best choose something
 between 10 and 20.</p></li>
-<li><p><strong>definition</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The desired Green’s function definition.</p></li>
+<li><p><strong>definition</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – The desired Green’s function definition.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -245,7 +244,7 @@ with NumPy arrays as values.</p>
 
 <dl class="py method">
 <dt id="instaseis.database_interfaces.base_instaseis_db.BaseInstaseisDB.get_seismograms">
-<code class="sig-name descname">get_seismograms</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">source</span></em>, <em class="sig-param"><span class="n">receiver</span></em>, <em class="sig-param"><span class="n">components</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">kind</span><span class="o">=</span><span class="default_value">'displacement'</span></em>, <em class="sig-param"><span class="n">remove_source_shift</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">reconvolve_stf</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">return_obspy_stream</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">dt</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">kernelwidth</span><span class="o">=</span><span class="default_value">12</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/database_interfaces/base_instaseis_db.html#BaseInstaseisDB.get_seismograms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.database_interfaces.base_instaseis_db.BaseInstaseisDB.get_seismograms" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_seismograms</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">receiver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">components</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kind</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'displacement'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_source_shift</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reconvolve_stf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_obspy_stream</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernelwidth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">12</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/database_interfaces/base_instaseis_db.html#BaseInstaseisDB.get_seismograms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#instaseis.database_interfaces.base_instaseis_db.BaseInstaseisDB.get_seismograms" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extract seismograms from the Green’s function database.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -258,20 +257,20 @@ containing any combination of <code class="docutils literal notranslate"><span c
 <code class="docutils literal notranslate"><span class="pre">&quot;R&quot;</span></code>, and <code class="docutils literal notranslate"><span class="pre">&quot;T&quot;</span></code>. Defaults to <code class="docutils literal notranslate"><span class="pre">[&quot;Z&quot;,</span> <span class="pre">&quot;N&quot;,</span> <span class="pre">&quot;E&quot;]</span></code> for two
 component databases, to <code class="docutils literal notranslate"><span class="pre">[&quot;N&quot;,</span> <span class="pre">&quot;E&quot;]</span></code> for horizontal only
 databases, and to <code class="docutils literal notranslate"><span class="pre">[&quot;Z&quot;]</span></code> for vertical only databases.</p></li>
-<li><p><strong>kind</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – The desired units of the seismogram:
+<li><p><strong>kind</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – The desired units of the seismogram:
 <code class="docutils literal notranslate"><span class="pre">&quot;displacement&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;velocity&quot;</span></code>, or <code class="docutils literal notranslate"><span class="pre">&quot;acceleration&quot;</span></code>.</p></li>
-<li><p><strong>remove_source_shift</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – Cut all samples before the peak of the
+<li><p><strong>remove_source_shift</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Cut all samples before the peak of the
 source time function. This has the effect that the first sample
 is the origin time of the source.</p></li>
-<li><p><strong>reconvolve_stf</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – Deconvolve the source time function used in
+<li><p><strong>reconvolve_stf</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Deconvolve the source time function used in
 the AxiSEM run and convolve with the STF attached to the source.
 For this to be stable, the new STF needs to bandlimited.</p></li>
-<li><p><strong>return_obspy_stream</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – Return format is either an
+<li><p><strong>return_obspy_stream</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Return format is either an
 <a class="reference external" href="https://docs.obspy.org/packages/autogen/obspy.core.stream.Stream.html#obspy.core.stream.Stream" title="(in ObsPy Documentation (1.2.0) v1.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">obspy.core.stream.Stream</span></code></a> object or a dictionary
 containing the raw NumPy arrays.</p></li>
-<li><p><strong>dt</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em>) – Desired sampling rate of the seismograms. Resampling is done
+<li><p><strong>dt</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – Desired sampling rate of the seismograms. Resampling is done
 using a Lanczos kernel.</p></li>
-<li><p><strong>kernelwidth</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>optional</em>) – The width of the sinc kernel used for resampling in
+<li><p><strong>kernelwidth</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – The width of the sinc kernel used for resampling in
 terms of the original sampling interval. Best choose something
 between 10 and 20.</p></li>
 </ul>
@@ -288,7 +287,7 @@ with NumPy arrays as values.</p>
 
 <dl class="py method">
 <dt id="instaseis.database_interfaces.base_instaseis_db.BaseInstaseisDB.get_seismograms_finite_source">
-<code class="sig-name descname">get_seismograms_finite_source</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sources</span></em>, <em class="sig-param"><span class="n">receiver</span></em>, <em class="sig-param"><span class="n">components</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">kind</span><span class="o">=</span><span class="default_value">'displacement'</span></em>, <em class="sig-param"><span class="n">dt</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">kernelwidth</span><span class="o">=</span><span class="default_value">12</span></em>, <em class="sig-param"><span class="n">correct_mu</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">progress_callback</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/database_interfaces/base_instaseis_db.html#BaseInstaseisDB.get_seismograms_finite_source"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.database_interfaces.base_instaseis_db.BaseInstaseisDB.get_seismograms_finite_source" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_seismograms_finite_source</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sources</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">receiver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">components</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kind</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'displacement'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernelwidth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">correct_mu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_callback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/database_interfaces/base_instaseis_db.html#BaseInstaseisDB.get_seismograms_finite_source"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#instaseis.database_interfaces.base_instaseis_db.BaseInstaseisDB.get_seismograms_finite_source" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extract seismograms for a finite source from an Instaseis database.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -301,14 +300,14 @@ containing any combination of <code class="docutils literal notranslate"><span c
 <code class="docutils literal notranslate"><span class="pre">&quot;R&quot;</span></code>, and <code class="docutils literal notranslate"><span class="pre">&quot;T&quot;</span></code>. Defaults to <code class="docutils literal notranslate"><span class="pre">[&quot;Z&quot;,</span> <span class="pre">&quot;N&quot;,</span> <span class="pre">&quot;E&quot;]</span></code> for two
 component databases, to <code class="docutils literal notranslate"><span class="pre">[&quot;N&quot;,</span> <span class="pre">&quot;E&quot;]</span></code> for horizontal only
 databases, and to <code class="docutils literal notranslate"><span class="pre">[&quot;Z&quot;]</span></code> for vertical only databases.</p></li>
-<li><p><strong>kind</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – The desired units of the seismogram:
+<li><p><strong>kind</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – The desired units of the seismogram:
 <code class="docutils literal notranslate"><span class="pre">&quot;displacement&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;velocity&quot;</span></code>, or <code class="docutils literal notranslate"><span class="pre">&quot;acceleration&quot;</span></code>.</p></li>
-<li><p><strong>dt</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em>) – Desired sampling rate of the seismograms. Resampling is done
+<li><p><strong>dt</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – Desired sampling rate of the seismograms. Resampling is done
 using a Lanczos kernel.</p></li>
-<li><p><strong>kernelwidth</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>optional</em>) – The width of the sinc kernel used for resampling in
+<li><p><strong>kernelwidth</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – The width of the sinc kernel used for resampling in
 terms of the original sampling interval. Best choose something
 between 10 and 20.</p></li>
-<li><p><strong>correct_mu</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – Correct the source magnitude for the actual shear
+<li><p><strong>correct_mu</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Correct the source magnitude for the actual shear
 modulus from the model.</p></li>
 <li><p><strong>progress_callback</strong> (<em>function</em><em>, </em><em>optional</em>) – Optional callback function that will be
 called with current source number and the number of total
@@ -334,21 +333,21 @@ the callback returns <code class="docutils literal notranslate"><span class="pre
 <h2><a class="toc-backref" href="#id3">BaseNetCDFInstaseisDB</a><a class="headerlink" href="#basenetcdfinstaseisdb" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="instaseis.database_interfaces.base_netcdf_instaseis_db.BaseNetCDFInstaseisDB">
-<em class="property">class </em><code class="sig-prename descclassname">instaseis.database_interfaces.base_netcdf_instaseis_db.</code><code class="sig-name descname">BaseNetCDFInstaseisDB</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">db_path</span></em>, <em class="sig-param"><span class="n">buffer_size_in_mb</span><span class="o">=</span><span class="default_value">100</span></em>, <em class="sig-param"><span class="n">read_on_demand</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/database_interfaces/base_netcdf_instaseis_db.html#BaseNetCDFInstaseisDB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.database_interfaces.base_netcdf_instaseis_db.BaseNetCDFInstaseisDB" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">instaseis.database_interfaces.base_netcdf_instaseis_db.</span></code><code class="sig-name descname"><span class="pre">BaseNetCDFInstaseisDB</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer_size_in_mb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">read_on_demand</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/database_interfaces/base_netcdf_instaseis_db.html#BaseNetCDFInstaseisDB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#instaseis.database_interfaces.base_netcdf_instaseis_db.BaseNetCDFInstaseisDB" title="Permalink to this definition">¶</a></dt>
 <dd><p>Base class for extracting seismograms from a local Instaseis netCDF
 database.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>db_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Path to the Instaseis Database containing
+<li><p><strong>db_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Path to the Instaseis Database containing
 subdirectories PZ and/or PX each containing a
 <code class="docutils literal notranslate"><span class="pre">order_output.nc4</span></code> file.</p></li>
-<li><p><strong>buffer_size_in_mb</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>optional</em>) – Strain and displacement are buffered to
+<li><p><strong>buffer_size_in_mb</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Strain and displacement are buffered to
 avoid repeated disc access. Depending on the type of database
 and the number of components of the database, the total buffer
 memory can be up to four times this number. The optimal value is
 highly application and system dependent.</p></li>
-<li><p><strong>read_on_demand</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – Read several global fields on demand (faster
+<li><p><strong>read_on_demand</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Read several global fields on demand (faster
 initialization) or on initialization (slower
 initialization, faster in individual seismogram extraction,
 useful e.g. for finite sources, default).</p></li>
@@ -363,20 +362,20 @@ useful e.g. for finite sources, default).</p></li>
 <h2><a class="toc-backref" href="#id4">ReciprocalInstaseisDB</a><a class="headerlink" href="#reciprocalinstaseisdb" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="instaseis.database_interfaces.reciprocal_instaseis_db.ReciprocalInstaseisDB">
-<em class="property">class </em><code class="sig-prename descclassname">instaseis.database_interfaces.reciprocal_instaseis_db.</code><code class="sig-name descname">ReciprocalInstaseisDB</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">db_path</span></em>, <em class="sig-param"><span class="n">netcdf_files</span></em>, <em class="sig-param"><span class="n">buffer_size_in_mb</span><span class="o">=</span><span class="default_value">100</span></em>, <em class="sig-param"><span class="n">read_on_demand</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/database_interfaces/reciprocal_instaseis_db.html#ReciprocalInstaseisDB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.database_interfaces.reciprocal_instaseis_db.ReciprocalInstaseisDB" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">instaseis.database_interfaces.reciprocal_instaseis_db.</span></code><code class="sig-name descname"><span class="pre">ReciprocalInstaseisDB</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">netcdf_files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer_size_in_mb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">read_on_demand</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/database_interfaces/reciprocal_instaseis_db.html#ReciprocalInstaseisDB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#instaseis.database_interfaces.reciprocal_instaseis_db.ReciprocalInstaseisDB" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reciprocal Instaseis database.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>db_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Path to the Instaseis Database containing
+<li><p><strong>db_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Path to the Instaseis Database containing
 subdirectories PZ and/or PX each containing a
 <code class="docutils literal notranslate"><span class="pre">order_output.nc4</span></code> file.</p></li>
-<li><p><strong>buffer_size_in_mb</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>optional</em>) – Strain and displacement are buffered to
+<li><p><strong>buffer_size_in_mb</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Strain and displacement are buffered to
 avoid repeated disc access. Depending on the type of database
 and the number of components of the database, the total buffer
 memory can be up to four times this number. The optimal value is
 highly application and system dependent.</p></li>
-<li><p><strong>read_on_demand</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – Read several global fields on demand (faster
+<li><p><strong>read_on_demand</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Read several global fields on demand (faster
 initialization) or on initialization (slower
 initialization, faster in individual seismogram extraction,
 useful e.g. for finite sources, default).</p></li>
@@ -391,19 +390,19 @@ useful e.g. for finite sources, default).</p></li>
 <h2><a class="toc-backref" href="#id5">ReciprocalMergedInstaseisDB</a><a class="headerlink" href="#reciprocalmergedinstaseisdb" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="instaseis.database_interfaces.reciprocal_merged_instaseis_db.ReciprocalMergedInstaseisDB">
-<em class="property">class </em><code class="sig-prename descclassname">instaseis.database_interfaces.reciprocal_merged_instaseis_db.</code><code class="sig-name descname">ReciprocalMergedInstaseisDB</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">db_path</span></em>, <em class="sig-param"><span class="n">netcdf_file</span></em>, <em class="sig-param"><span class="n">buffer_size_in_mb</span><span class="o">=</span><span class="default_value">100</span></em>, <em class="sig-param"><span class="n">read_on_demand</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/database_interfaces/reciprocal_merged_instaseis_db.html#ReciprocalMergedInstaseisDB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.database_interfaces.reciprocal_merged_instaseis_db.ReciprocalMergedInstaseisDB" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">instaseis.database_interfaces.reciprocal_merged_instaseis_db.</span></code><code class="sig-name descname"><span class="pre">ReciprocalMergedInstaseisDB</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">netcdf_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer_size_in_mb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">read_on_demand</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/database_interfaces/reciprocal_merged_instaseis_db.html#ReciprocalMergedInstaseisDB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#instaseis.database_interfaces.reciprocal_merged_instaseis_db.ReciprocalMergedInstaseisDB" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reciprocal Merged Instaseis Database.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>db_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Path to the Instaseis Database.</p></li>
-<li><p><strong>netcdf_file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The path to the actual netcdf4 file.</p></li>
-<li><p><strong>buffer_size_in_mb</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>optional</em>) – Strain and displacement are buffered to
+<li><p><strong>db_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Path to the Instaseis Database.</p></li>
+<li><p><strong>netcdf_file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – The path to the actual netcdf4 file.</p></li>
+<li><p><strong>buffer_size_in_mb</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Strain and displacement are buffered to
 avoid repeated disc access. Depending on the type of database
 and the number of components of the database, the total buffer
 memory can be up to four times this number. The optimal value is
 highly application and system dependent.</p></li>
-<li><p><strong>read_on_demand</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – Read several global fields on demand (faster
+<li><p><strong>read_on_demand</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Read several global fields on demand (faster
 initialization) or on initialization (slower
 initialization, faster in individual seismogram extraction,
 useful e.g. for finite sources, default).</p></li>
@@ -418,20 +417,20 @@ useful e.g. for finite sources, default).</p></li>
 <h2><a class="toc-backref" href="#id6">ForwardInstaseisDB</a><a class="headerlink" href="#forwardinstaseisdb" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="instaseis.database_interfaces.forward_instaseis_db.ForwardInstaseisDB">
-<em class="property">class </em><code class="sig-prename descclassname">instaseis.database_interfaces.forward_instaseis_db.</code><code class="sig-name descname">ForwardInstaseisDB</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">db_path</span></em>, <em class="sig-param"><span class="n">netcdf_files</span></em>, <em class="sig-param"><span class="n">buffer_size_in_mb</span><span class="o">=</span><span class="default_value">100</span></em>, <em class="sig-param"><span class="n">read_on_demand</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/database_interfaces/forward_instaseis_db.html#ForwardInstaseisDB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.database_interfaces.forward_instaseis_db.ForwardInstaseisDB" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">instaseis.database_interfaces.forward_instaseis_db.</span></code><code class="sig-name descname"><span class="pre">ForwardInstaseisDB</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">netcdf_files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer_size_in_mb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">read_on_demand</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/database_interfaces/forward_instaseis_db.html#ForwardInstaseisDB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#instaseis.database_interfaces.forward_instaseis_db.ForwardInstaseisDB" title="Permalink to this definition">¶</a></dt>
 <dd><p>Forward Instaseis database.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>db_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Path to the Instaseis Database containing
+<li><p><strong>db_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Path to the Instaseis Database containing
 subdirectories PZ and/or PX each containing a
 <code class="docutils literal notranslate"><span class="pre">order_output.nc4</span></code> file.</p></li>
-<li><p><strong>buffer_size_in_mb</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>optional</em>) – Strain and displacement are buffered to
+<li><p><strong>buffer_size_in_mb</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Strain and displacement are buffered to
 avoid repeated disc access. Depending on the type of database
 and the number of components of the database, the total buffer
 memory can be up to four times this number. The optimal value is
 highly application and system dependent.</p></li>
-<li><p><strong>read_on_demand</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – Read several global fields on demand (faster
+<li><p><strong>read_on_demand</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Read several global fields on demand (faster
 initialization) or on initialization (slower
 initialization, faster in individual seismogram extraction,
 useful e.g. for finite sources, default).</p></li>
@@ -446,19 +445,19 @@ useful e.g. for finite sources, default).</p></li>
 <h2><a class="toc-backref" href="#id7">ForwardMergedInstaseisDB</a><a class="headerlink" href="#forwardmergedinstaseisdb" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="instaseis.database_interfaces.forward_merged_instaseis_db.ForwardMergedInstaseisDB">
-<em class="property">class </em><code class="sig-prename descclassname">instaseis.database_interfaces.forward_merged_instaseis_db.</code><code class="sig-name descname">ForwardMergedInstaseisDB</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">db_path</span></em>, <em class="sig-param"><span class="n">netcdf_file</span></em>, <em class="sig-param"><span class="n">buffer_size_in_mb</span><span class="o">=</span><span class="default_value">100</span></em>, <em class="sig-param"><span class="n">read_on_demand</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/database_interfaces/forward_merged_instaseis_db.html#ForwardMergedInstaseisDB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.database_interfaces.forward_merged_instaseis_db.ForwardMergedInstaseisDB" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">instaseis.database_interfaces.forward_merged_instaseis_db.</span></code><code class="sig-name descname"><span class="pre">ForwardMergedInstaseisDB</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">netcdf_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer_size_in_mb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">read_on_demand</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/database_interfaces/forward_merged_instaseis_db.html#ForwardMergedInstaseisDB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#instaseis.database_interfaces.forward_merged_instaseis_db.ForwardMergedInstaseisDB" title="Permalink to this definition">¶</a></dt>
 <dd><p>Merged forward Instaseis database.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>db_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Path to the Instaseis Database.</p></li>
-<li><p><strong>netcdf_file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The path to the actual netcdf4 file.</p></li>
-<li><p><strong>buffer_size_in_mb</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>optional</em>) – Strain and displacement are buffered to
+<li><p><strong>db_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Path to the Instaseis Database.</p></li>
+<li><p><strong>netcdf_file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – The path to the actual netcdf4 file.</p></li>
+<li><p><strong>buffer_size_in_mb</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Strain and displacement are buffered to
 avoid repeated disc access. Depending on the type of database
 and the number of components of the database, the total buffer
 memory can be up to four times this number. The optimal value is
 highly application and system dependent.</p></li>
-<li><p><strong>read_on_demand</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – Read several global fields on demand (faster
+<li><p><strong>read_on_demand</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Read several global fields on demand (faster
 initialization) or on initialization (slower
 initialization, faster in individual seismogram extraction,
 useful e.g. for finite sources, default).</p></li>
@@ -473,7 +472,7 @@ useful e.g. for finite sources, default).</p></li>
 <h2><a class="toc-backref" href="#id8">RemoteInstaseisDB</a><a class="headerlink" href="#remoteinstaseisdb" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="instaseis.database_interfaces.remote_instaseis_db.RemoteInstaseisDB">
-<em class="property">class </em><code class="sig-prename descclassname">instaseis.database_interfaces.remote_instaseis_db.</code><code class="sig-name descname">RemoteInstaseisDB</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">url</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/database_interfaces/remote_instaseis_db.html#RemoteInstaseisDB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.database_interfaces.remote_instaseis_db.RemoteInstaseisDB" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">instaseis.database_interfaces.remote_instaseis_db.</span></code><code class="sig-name descname"><span class="pre">RemoteInstaseisDB</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/database_interfaces/remote_instaseis_db.html#RemoteInstaseisDB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#instaseis.database_interfaces.remote_instaseis_db.RemoteInstaseisDB" title="Permalink to this definition">¶</a></dt>
 <dd><p>Remote Instaseis database interface.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -488,14 +487,14 @@ useful e.g. for finite sources, default).</p></li>
 <h2><a class="toc-backref" href="#id9">SyngineInstaseisDB</a><a class="headerlink" href="#syngineinstaseisdb" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="instaseis.database_interfaces.syngine_instaseis_db.SyngineInstaseisDB">
-<em class="property">class </em><code class="sig-prename descclassname">instaseis.database_interfaces.syngine_instaseis_db.</code><code class="sig-name descname">SyngineInstaseisDB</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">base_url</span><span class="o">=</span><span class="default_value">'http://service.iris.edu/irisws/syngine/1'</span></em>, <em class="sig-param"><span class="n">debug</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/database_interfaces/syngine_instaseis_db.html#SyngineInstaseisDB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instaseis.database_interfaces.syngine_instaseis_db.SyngineInstaseisDB" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">instaseis.database_interfaces.syngine_instaseis_db.</span></code><code class="sig-name descname"><span class="pre">SyngineInstaseisDB</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'http://service.iris.edu/irisws/syngine/1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instaseis/database_interfaces/syngine_instaseis_db.html#SyngineInstaseisDB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#instaseis.database_interfaces.syngine_instaseis_db.SyngineInstaseisDB" title="Permalink to this definition">¶</a></dt>
 <dd><p>Remote Instaseis interface connecting with IRIS’ syngine service.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>model</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The model to use.</p></li>
-<li><p><strong>base_url</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – URL to the root of the syngine service.</p></li>
-<li><p><strong>debug</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Debug messages on/off.</p></li>
+<li><p><strong>model</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – The model to use.</p></li>
+<li><p><strong>base_url</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – URL to the root of the syngine service.</p></li>
+<li><p><strong>debug</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – Debug messages on/off.</p></li>
 </ul>
 </dd>
 </dl>
@@ -518,7 +517,7 @@ useful e.g. for finite sources, default).</p></li>
     </p>
     <p>
         &copy; Copyright 2014-2020, Lion Krischer and Martin van Driel.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.2.0.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
     </p>
   </div>
 </footer>
