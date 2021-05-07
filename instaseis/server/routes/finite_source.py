@@ -47,6 +47,7 @@ def _get_finite_source(
     time_of_first_sample,
     format,
     label,
+    sacheader,
 ):
     """
     Extract a seismogram from the passed db and write it either to a MiniSEED
@@ -65,6 +66,8 @@ def _get_finite_source(
     :param time_of_first_sample: The time of the first sample.
     :param format: The output format. Either "miniseed" or "saczip".
     :param label: Prefix for the filename within the SAC zip file.
+    :param sacheader: Indicates if the SAC header should be populated with
+        geodetic or geocentric latitudes.
     """
     try:
         st = db.get_seismograms_finite_source(
@@ -125,6 +128,7 @@ def _get_finite_source(
         db=db,
         label=label,
         format=format,
+        sacheader=sacheader,
     )
 
 
@@ -272,6 +276,7 @@ class FiniteSourceSeismogramsHandler(InstaseisTimeSeriesHandler):
         "network": {"type": str},
         "station": {"type": str},
         "format": {"type": str, "default": "saczip"},
+        "sacheader": {"type": str, "default": "geodetic"},
     }
 
     default_label = "instaseis_finite_source_seismogram"
@@ -467,6 +472,7 @@ class FiniteSourceSeismogramsHandler(InstaseisTimeSeriesHandler):
                 time_of_first_sample=time_of_first_sample,
                 format=args.format,
                 label=args.label,
+                sacheader=args.sacheader,
             )
 
             # Check connection once again.

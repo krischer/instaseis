@@ -135,7 +135,7 @@ def fault_vectors_lmn(strike, dip, rake):
     return l, m, n
 
 
-def strike_dip_rake_from_ln(l, n):
+def strike_dip_rake_from_ln(l, n):  # NOQA
     """
     compute strike, dip and rake from the fault vectors l and n
     describing the fault according to Udias Fig. 16.19

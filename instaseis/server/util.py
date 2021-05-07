@@ -93,7 +93,16 @@ def _format_utc_datetime(dt):
 
 
 def _validate_and_write_waveforms(
-    st, starttime, endtime, scale, source, receiver, db, label, format
+    st,
+    starttime,
+    endtime,
+    scale,
+    source,
+    receiver,
+    db,
+    label,
+    format,
+    sacheader="geodetic",
 ):
     if not label:
         label = ""
@@ -147,21 +156,27 @@ def _validate_and_write_waveforms(
         return binary_data, mu
     # Write a number of SAC files into an archive.
     elif format == "saczip":
+        assert sacheader in ("geodetic", "geocentric")
         byte_strings = []
         for tr in st:
             # Write SAC headers.
             tr.stats.sac = obspy.core.AttribDict()
-            # Write WGS84 coordinates to the SAC files.
-            tr.stats.sac.stla = geocentric_to_elliptic_latitude(
-                receiver.latitude
-            )
+            # Write WGS84 coordinates to the SAC files (for the Earth models
+            # only).
+            tr.stats.sac.stla = receiver.latitude
+            if sacheader == "geodetic":
+                tr.stats.sac.stla = geocentric_to_elliptic_latitude(
+                    receiver.latitude
+                )
             tr.stats.sac.stlo = receiver.longitude
             tr.stats.sac.stdp = receiver.depth_in_m
             tr.stats.sac.stel = 0.0
             if isinstance(source, FiniteSource):
-                tr.stats.sac.evla = geocentric_to_elliptic_latitude(
-                    source.hypocenter_latitude
-                )
+                tr.stats.sac.evla = source.hypocenter_latitude
+                if sacheader == "geodetic":
+                    tr.stats.sac.evla = geocentric_to_elliptic_latitude(
+                        source.hypocenter_latitude
+                    )
                 tr.stats.sac.evlo = source.hypocenter_longitude
                 tr.stats.sac.evdp = source.hypocenter_depth_in_m
                 # Force source has no magnitude.
@@ -170,9 +185,11 @@ def _validate_and_write_waveforms(
                 src_lat = source.hypocenter_latitude
                 src_lng = source.hypocenter_longitude
             else:
-                tr.stats.sac.evla = geocentric_to_elliptic_latitude(
-                    source.latitude
-                )
+                tr.stats.sac.evla = source.latitude
+                if sacheader == "geodetic":
+                    tr.stats.sac.evla = geocentric_to_elliptic_latitude(
+                        source.latitude
+                    )
                 tr.stats.sac.evlo = source.longitude
                 tr.stats.sac.evdp = source.depth_in_m
                 # Force source has no magnitude.
@@ -186,15 +203,24 @@ def _validate_and_write_waveforms(
             # just assume to be the starttime here?
             tr.stats.sac.o = source.origin_time - starttime
 
-            # Sac coordinates are elliptical thus it only makes sense to
-            # have elliptical distances.
-            dist_in_m, az, baz = gps2dist_azimuth(
-                lat1=tr.stats.sac.evla,
-                lon1=tr.stats.sac.evlo,
-                lat2=tr.stats.sac.stla,
-                lon2=tr.stats.sac.stlo,
-            )
-
+            # For the Earth models, Sac coordinates are elliptical thus it
+            # only makes sense to have elliptical distances.
+            if sacheader != "geocentric":
+                dist_in_m, az, baz = gps2dist_azimuth(
+                    lat1=tr.stats.sac.evla,
+                    lon1=tr.stats.sac.evlo,
+                    lat2=tr.stats.sac.stla,
+                    lon2=tr.stats.sac.stlo,
+                )
+            else:
+                dist_in_m, az, baz = gps2dist_azimuth(
+                    lat1=tr.stats.sac.evla,
+                    lon1=tr.stats.sac.evlo,
+                    lat2=tr.stats.sac.stla,
+                    lon2=tr.stats.sac.stlo,
+                    a=float(db.info.planet_radius),
+                    f=0.0,
+                )
             tr.stats.sac.dist = dist_in_m / 1000.0
             tr.stats.sac.az = az
             tr.stats.sac.baz = baz

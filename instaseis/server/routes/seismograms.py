@@ -60,8 +60,9 @@ def _get_seismogram(
     starttime,
     endtime,
     scale,
-    format,
+    sacheader,
     label,
+    format,
 ):
     """
     Extract a seismogram from the passed db and write it either to a MiniSEED
@@ -116,6 +117,7 @@ def _get_seismogram(
         db=db,
         label=label,
         format=format,
+        sacheader=sacheader,
     )
 
 
@@ -292,6 +294,7 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
         "network": {"type": str},
         "station": {"type": str},
         "format": {"type": str, "default": "saczip"},
+        "sacheader": {"type": str, "default": "geodetic"},
     }
 
     default_label = "instaseis_seismogram"
@@ -728,6 +731,7 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
                     scale=args.scale,
                     format=args.format,
                     label=args.label,
+                    sacheader=args.sacheader,
                 )
             else:
                 response, mu = _get_seismogram(
@@ -743,6 +747,7 @@ class SeismogramsHandler(InstaseisTimeSeriesHandler):
                     scale=args.scale,
                     format=args.format,
                     label=args.label,
+                    sacheader=args.sacheader,
                 )
 
             # Check connection once again.
