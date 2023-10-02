@@ -146,7 +146,7 @@ lib = MyExtension(
     library_dirs=get_libgfortran_dir(),
     # Be careful with the order.
     sources=[
-        os.path.join(src, "global_parameters.f90"),
+        os.path.join(src, "all_global_parameters.f90"),
         os.path.join(src, "finite_elem_mapping.f90"),
         os.path.join(src, "spectral_basis.f90"),
         os.path.join(src, "sem_derivatives.f90"),
