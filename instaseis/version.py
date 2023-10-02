@@ -111,15 +111,15 @@ def call_git_describe(abbrev=10, dirty=True,
     else:
         parts = line.split('-', 1)
         version = parts[0]
-        try:
-            modifier = '+' if '.post' in version else '.post+'
-            version += modifier + parts[1]
-            if remote_tracking_branch is not None:
-                version += '.' + remote_tracking_branch
-        # IndexError means we are at a release version tag cleanly,
-        # add nothing additional
-        except IndexError:
-            pass
+        # try:
+        #     modifier = '+' if '.post' in version else '.post+'
+        #     version += modifier + parts[1]
+        #     if remote_tracking_branch is not None:
+        #         version += '.' + remote_tracking_branch
+        # # IndexError means we are at a release version tag cleanly,
+        # # add nothing additional
+        # except IndexError:
+        #     pass
     return version
 
 
@@ -145,9 +145,8 @@ def get_git_version(abbrev=10, dirty=True, append_remote_tracking_branch=True):
     release_version = read_release_version()
 
     # First try to get the current version using “git describe”.
-    version = call_git_describe(
-        abbrev, dirty=dirty,
-        append_remote_tracking_branch=append_remote_tracking_branch)
+    version = call_git_describe(abbrev)
+
     # If that doesn't work, fall back on the value that's in
     # RELEASE-VERSION.
     if version is None:
@@ -155,12 +154,7 @@ def get_git_version(abbrev=10, dirty=True, append_remote_tracking_branch=True):
 
     # If we still don't have anything, that's an error.
     if version is None:
-        warnings.warn("ObsPy could not determine its version number. Make "
-                      "sure it is properly installed. This for example "
-                      "happens when installing from a zip archive "
-                      "of the ObsPy repository which is not a supported way "
-                      "of installing ObsPy.")
-        return '0.0.0+archive'
+        return "0.0.0-tar/zipball"
 
     # pip uses its normalized version number (strict PEP440) instead of our
     # original version number, so we bow to pip and use the normalized version
