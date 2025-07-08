@@ -1,0 +1,446 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Database Layout and Repacking &#8212; instaseis 1.4.3.dev32+g2b8208d documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/bootstrap-sphinx.css?v=49fa7461" />
+    <script src="_static/documentation_options.js?v=16027ae4"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Advanced Server Configuration" href="advanced_server_configuration.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">
+          Instaseis</a>
+        <span class="navbar-text navbar-version pull-left"><b>1.4.3.dev32+g2b8208d</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="http://axisem.info">AxiSEM</a></li>
+                <li><a href="http://obspy.org">ObsPy</a></li>
+                <li><a href="http://github.com/krischer/instaseis">GitHub</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="instaseis.html">Main Instaseis Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gui.html">Instaseis GUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="source.html">Sources and Receivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="helpers.html">Utility Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="server.html">Instaseis Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced_server_configuration.html">Advanced Server Configuration</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Database Layout and Repacking</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-3">
+        <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
+<li><a class="reference internal" href="#">Database Layout and Repacking</a><ul>
+<li><a class="reference internal" href="#available-layouts">Available Layouts</a><ul>
+<li><a class="reference internal" href="#multi-file-layout">Multi File Layout</a></li>
+<li><a class="reference internal" href="#merged-file-layout">Merged File Layout</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#repacking-script">Repacking Script</a><ul>
+<li><a class="reference internal" href="#where-to-execute-this">Where to execute this?</a></li>
+<li><a class="reference internal" href="#usage">Usage</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#comparing-databases">Comparing Databases</a></li>
+</ul>
+</li>
+</ul>
+
+  <li>
+    <a href="advanced_server_configuration.html" title="Previous Chapter: Advanced Server Configuration"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; Advanced Serv...</span>
+    </a>
+  </li>
+<div id="sourcelink">
+  <a href="_sources/database_repacking.rst.txt"
+     rel="nofollow">Source</a>
+</div>
+<form action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+        </div>
+      </div>
+    <div class="body col-md-9 content" role="main">
+      
+  <section id="database-layout-and-repacking">
+<h1>Database Layout and Repacking<a class="headerlink" href="#database-layout-and-repacking" title="Link to this heading">¶</a></h1>
+<p>Instaseis supports a number of different database layouts, each with its own
+advantages and disadvantages as well as repacking functionality to convert
+from some layouts to others.</p>
+<nav class="contents local" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#available-layouts" id="id1">Available Layouts</a></p>
+<ul>
+<li><p><a class="reference internal" href="#multi-file-layout" id="id2">Multi File Layout</a></p></li>
+<li><p><a class="reference internal" href="#merged-file-layout" id="id3">Merged File Layout</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#repacking-script" id="id4">Repacking Script</a></p>
+<ul>
+<li><p><a class="reference internal" href="#where-to-execute-this" id="id5">Where to execute this?</a></p></li>
+<li><p><a class="reference internal" href="#usage" id="id6">Usage</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#comparing-databases" id="id7">Comparing Databases</a></p></li>
+</ul>
+</nav>
+<section id="available-layouts">
+<h2><a class="toc-backref" href="#id1" role="doc-backlink">Available Layouts</a><a class="headerlink" href="#available-layouts" title="Link to this heading">¶</a></h2>
+<p>From a high-level view Instaseis supports two database layouts which we will
+call the <em>multi file layout</em> and the <em>merged layout</em> in the following. Both
+support two components (horizontal + vertical) as well as single component
+databases. Forward database are also supported by both layouts.</p>
+<section id="multi-file-layout">
+<h3><a class="toc-backref" href="#id2" role="doc-backlink">Multi File Layout</a><a class="headerlink" href="#multi-file-layout" title="Link to this heading">¶</a></h3>
+<p>This consists of two NetCDF files - one can optionally be neglected -
+Instaseis will then only be able to extract horizontal or vertical seismograms.
+Its stores the snapshots in time for two (vertical) or three (horizontal)
+components per GLL point. GLL points shared between two elements are only
+stored once which quite significantly reduces the total files size (only
+about 16 GLL points needs to be stored per element instead of 25).</p>
+<p>The big downside is that, to extract three components seismograms, it needs to
+read all 25 GLL points for a single element from all 3 + 2 displacement
+snapshots. Instaseis is being smart about it and batches adjacent reads but
+worst case this means that 125 single read accesses across two different files
+have to be performed to get data from a single element. For forward databases
+up to 250 read operations across four files are reduced to a single read
+operation.</p>
+<p><strong>Expected NetCDF file locations:</strong></p>
+<ul class="simple">
+<li><p>For the horizontal data file: <code class="docutils literal notranslate"><span class="pre">ROOT/.../PX/../ordered_output.nc4</span></code> or
+<code class="docutils literal notranslate"><span class="pre">ROOT/../PX/.../axisem_output.nc4</span></code></p></li>
+<li><p>For the vertical data file: <code class="docutils literal notranslate"><span class="pre">ROOT/.../PZ/../ordered_output.nc4</span></code> or
+<code class="docutils literal notranslate"><span class="pre">ROOT/.../PZ/.../axisem_output.nc4</span></code></p></li>
+<li><p>For the forward databases file:
+<code class="docutils literal notranslate"><span class="pre">ROOT/.../[MZZ,MXX_P_MYY,MXZ_MYZ,MXY_MXX_M_MZZ]/../ordered_output.nc4</span></code> or
+<code class="docutils literal notranslate"><span class="pre">ROOT/.../[MZZ,MXX_P_MYY,MXZ_MYZ,MXY_MXX_M_MZZ]/../axisem_output.nc4</span></code></p></li>
+</ul>
+<p><strong>File layout</strong> (in a commented representation based on the output from
+<code class="docutils literal notranslate"><span class="pre">ncdump</span></code>):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dimensions</span><span class="p">:</span>
+    <span class="n">gllpoints_all</span> <span class="o">=</span> <span class="mi">160692</span> <span class="p">;</span>
+    <span class="n">snapshots</span> <span class="o">=</span> <span class="mi">370</span> <span class="p">;</span>
+
+<span class="o">//</span> <span class="n">required</span> <span class="k">global</span> <span class="n">attributes</span> <span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">g</span><span class="o">.</span> <span class="n">these</span> <span class="n">are</span> <span class="n">used</span> <span class="n">by</span> <span class="n">Instaseis</span><span class="p">):</span>
+<span class="o">*</span> <span class="s2">&quot;dump type (displ_only, displ_velo, fullfields)&quot;</span> <span class="p">(</span><span class="n">string</span><span class="p">)</span>
+<span class="o">*</span> <span class="s2">&quot;excitation_type&quot;</span> <span class="p">(</span><span class="n">string</span><span class="p">)</span>
+<span class="o">*</span> <span class="s2">&quot;source type&quot;</span> <span class="p">(</span><span class="n">string</span><span class="p">)</span>
+<span class="o">*</span> <span class="s2">&quot;background model&quot;</span> <span class="p">(</span><span class="n">string</span><span class="p">)</span>
+<span class="o">*</span> <span class="s2">&quot;external model name&quot;</span> <span class="p">(</span><span class="n">string</span><span class="p">)</span>
+<span class="o">*</span> <span class="s2">&quot;git commit hash&quot;</span> <span class="p">(</span><span class="n">string</span><span class="p">)</span>
+<span class="o">*</span> <span class="s2">&quot;datetime&quot;</span> <span class="p">(</span><span class="n">string</span><span class="p">)</span>
+<span class="o">*</span> <span class="s2">&quot;compiler brand&quot;</span> <span class="p">(</span><span class="n">string</span><span class="p">)</span>
+<span class="o">*</span> <span class="s2">&quot;compiler version&quot;</span> <span class="p">(</span><span class="n">string</span><span class="p">)</span>
+<span class="o">*</span> <span class="s2">&quot;user name&quot;</span> <span class="p">(</span><span class="n">string</span><span class="p">)</span>
+<span class="o">*</span> <span class="s2">&quot;host name&quot;</span> <span class="p">(</span><span class="n">string</span><span class="p">)</span>
+<span class="o">*</span> <span class="s2">&quot;time scheme&quot;</span> <span class="p">(</span><span class="n">string</span><span class="p">)</span>
+<span class="o">*</span> <span class="s2">&quot;source time function&quot;</span> <span class="p">(</span><span class="n">string</span><span class="p">)</span>
+<span class="o">*</span> <span class="s2">&quot;npol&quot;</span> <span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+<span class="o">*</span> <span class="s2">&quot;file version&quot;</span> <span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+<span class="o">*</span> <span class="s2">&quot;number of strain dumps&quot;</span> <span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+<span class="o">*</span> <span class="s2">&quot;scalar source magnitude&quot;</span> <span class="p">(</span><span class="nb">float</span><span class="o">/</span><span class="n">double</span><span class="o">/</span><span class="n">real</span><span class="p">)</span>
+<span class="o">*</span> <span class="s2">&quot;strain dump sampling rate in sec&quot;</span> <span class="p">(</span><span class="nb">float</span><span class="o">/</span><span class="n">double</span><span class="o">/</span><span class="n">real</span><span class="p">)</span>
+<span class="o">*</span> <span class="s2">&quot;source shift factor in sec&quot;</span> <span class="p">(</span><span class="nb">float</span><span class="o">/</span><span class="n">double</span><span class="o">/</span><span class="n">real</span><span class="p">)</span>
+<span class="o">*</span> <span class="s2">&quot;source shift factor for deltat_coarse&quot;</span> <span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+<span class="o">*</span> <span class="s2">&quot;npoints&quot;</span> <span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+<span class="o">*</span> <span class="s2">&quot;attenuation&quot;</span> <span class="p">(</span><span class="nb">int</span> <span class="o">-</span> <span class="mi">1</span> <span class="ow">is</span> <span class="n">true</span><span class="o">/</span><span class="mi">0</span> <span class="ow">is</span> <span class="n">false</span><span class="p">)</span>
+<span class="o">*</span> <span class="s2">&quot;planet radius&quot;</span> <span class="p">(</span><span class="nb">float</span><span class="o">/</span><span class="n">souble</span><span class="o">/</span><span class="n">real</span><span class="p">)</span>
+<span class="o">*</span> <span class="s2">&quot;dominant source period&quot;</span> <span class="p">(</span><span class="nb">float</span><span class="o">/</span><span class="n">souble</span><span class="o">/</span><span class="n">real</span><span class="p">)</span>
+<span class="o">*</span> <span class="s2">&quot;kernel wavefield rmin&quot;</span> <span class="p">(</span><span class="nb">float</span><span class="o">/</span><span class="n">souble</span><span class="o">/</span><span class="n">real</span><span class="p">)</span>
+<span class="o">*</span> <span class="s2">&quot;kernel wavefield rmax&quot;</span> <span class="p">(</span><span class="nb">float</span><span class="o">/</span><span class="n">souble</span><span class="o">/</span><span class="n">real</span><span class="p">)</span>
+<span class="o">*</span> <span class="s2">&quot;kernel wavefield colatmin&quot;</span> <span class="p">(</span><span class="nb">float</span><span class="o">/</span><span class="n">souble</span><span class="o">/</span><span class="n">real</span><span class="p">)</span>
+<span class="o">*</span> <span class="s2">&quot;kernel wavefield colatmax&quot;</span> <span class="p">(</span><span class="nb">float</span><span class="o">/</span><span class="n">souble</span><span class="o">/</span><span class="n">real</span><span class="p">)</span>
+<span class="o">*</span> <span class="s2">&quot;source depth in km&quot;</span> <span class="p">(</span><span class="nb">float</span><span class="o">/</span><span class="n">souble</span><span class="o">/</span><span class="n">real</span><span class="p">)</span>
+<span class="o">*</span> <span class="s2">&quot;nelem_kwf_global&quot;</span> <span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+<span class="n">group</span><span class="p">:</span> <span class="n">Snapshots</span> <span class="p">{</span>
+  <span class="n">variables</span><span class="p">:</span>
+
+    <span class="c1"># Note that these can exist in both version - this one and the</span>
+    <span class="c1"># transposed one. If you use this one, make sure the chunking is set</span>
+    <span class="c1"># up in a way that the snapshots for a single GLL point can be read</span>
+    <span class="c1"># at once - otherwise performance will be abysmal. The transposed</span>
+    <span class="c1"># version does not have this problem.</span>
+    <span class="nb">float</span> <span class="n">disp_s</span><span class="p">(</span><span class="n">snapshots</span><span class="p">,</span> <span class="n">gllpoints_all</span><span class="p">)</span> <span class="p">;</span>
+    <span class="c1"># Not needed for for vertical databases.</span>
+    <span class="nb">float</span> <span class="n">disp_p</span><span class="p">(</span><span class="n">snapshots</span><span class="p">,</span> <span class="n">gllpoints_all</span><span class="p">)</span> <span class="p">;</span>
+    <span class="nb">float</span> <span class="n">disp_z</span><span class="p">(</span><span class="n">snapshots</span><span class="p">,</span> <span class="n">gllpoints_all</span><span class="p">)</span> <span class="p">;</span>
+
+    <span class="c1"># These two can (for legacy reasons) also be part of a top level</span>
+    <span class="c1"># &quot;Surface&quot; group.</span>
+    <span class="nb">float</span> <span class="n">stf_dump</span><span class="p">(</span><span class="n">snapshots</span><span class="p">)</span> <span class="p">;</span>
+    <span class="nb">float</span> <span class="n">stf_d_dump</span><span class="p">(</span><span class="n">snapshots</span><span class="p">)</span> <span class="p">;</span>
+  <span class="p">}</span>
+
+<span class="n">group</span><span class="p">:</span> <span class="n">Mesh</span> <span class="p">{</span>
+  <span class="n">dimensions</span><span class="p">:</span>
+    <span class="n">elements</span> <span class="o">=</span> <span class="mi">9856</span> <span class="p">;</span>
+    <span class="n">control_points</span> <span class="o">=</span> <span class="mi">4</span> <span class="p">;</span>
+    <span class="n">npol</span> <span class="o">=</span> <span class="mi">5</span> <span class="p">;</span>
+  <span class="n">variables</span><span class="p">:</span>
+    <span class="nb">int</span> <span class="n">midpoint_mesh</span><span class="p">(</span><span class="n">elements</span><span class="p">)</span> <span class="p">;</span>
+    <span class="nb">int</span> <span class="n">eltype</span><span class="p">(</span><span class="n">elements</span><span class="p">)</span> <span class="p">;</span>
+    <span class="nb">int</span> <span class="n">axis</span><span class="p">(</span><span class="n">elements</span><span class="p">)</span> <span class="p">;</span>
+    <span class="nb">int</span> <span class="n">fem_mesh</span><span class="p">(</span><span class="n">elements</span><span class="p">,</span> <span class="n">control_points</span><span class="p">)</span> <span class="p">;</span>
+    <span class="nb">int</span> <span class="n">sem_mesh</span><span class="p">(</span><span class="n">elements</span><span class="p">,</span> <span class="n">npol</span><span class="p">,</span> <span class="n">npol</span><span class="p">)</span> <span class="p">;</span>
+    <span class="nb">float</span> <span class="n">mp_mesh_S</span><span class="p">(</span><span class="n">elements</span><span class="p">)</span> <span class="p">;</span>
+    <span class="nb">float</span> <span class="n">mp_mesh_Z</span><span class="p">(</span><span class="n">elements</span><span class="p">)</span> <span class="p">;</span>
+    <span class="n">double</span> <span class="n">G0</span><span class="p">(</span><span class="n">npol</span><span class="p">)</span> <span class="p">;</span>
+    <span class="n">double</span> <span class="n">G1</span><span class="p">(</span><span class="n">npol</span><span class="p">,</span> <span class="n">npol</span><span class="p">)</span> <span class="p">;</span>
+    <span class="n">double</span> <span class="n">G2</span><span class="p">(</span><span class="n">npol</span><span class="p">,</span> <span class="n">npol</span><span class="p">)</span> <span class="p">;</span>
+    <span class="n">double</span> <span class="n">gll</span><span class="p">(</span><span class="n">npol</span><span class="p">)</span> <span class="p">;</span>
+    <span class="n">double</span> <span class="n">glj</span><span class="p">(</span><span class="n">npol</span><span class="p">)</span> <span class="p">;</span>
+    <span class="nb">float</span> <span class="n">mesh_S</span><span class="p">(</span><span class="n">gllpoints_all</span><span class="p">)</span> <span class="p">;</span>
+    <span class="nb">float</span> <span class="n">mesh_Z</span><span class="p">(</span><span class="n">gllpoints_all</span><span class="p">)</span> <span class="p">;</span>
+    <span class="nb">float</span> <span class="n">mesh_vp</span><span class="p">(</span><span class="n">gllpoints_all</span><span class="p">)</span> <span class="p">;</span>
+    <span class="nb">float</span> <span class="n">mesh_vs</span><span class="p">(</span><span class="n">gllpoints_all</span><span class="p">)</span> <span class="p">;</span>
+    <span class="nb">float</span> <span class="n">mesh_rho</span><span class="p">(</span><span class="n">gllpoints_all</span><span class="p">)</span> <span class="p">;</span>
+    <span class="nb">float</span> <span class="n">mesh_lambda</span><span class="p">(</span><span class="n">gllpoints_all</span><span class="p">)</span> <span class="p">;</span>
+    <span class="nb">float</span> <span class="n">mesh_mu</span><span class="p">(</span><span class="n">gllpoints_all</span><span class="p">)</span> <span class="p">;</span>
+    <span class="nb">float</span> <span class="n">mesh_xi</span><span class="p">(</span><span class="n">gllpoints_all</span><span class="p">)</span> <span class="p">;</span>
+    <span class="nb">float</span> <span class="n">mesh_phi</span><span class="p">(</span><span class="n">gllpoints_all</span><span class="p">)</span> <span class="p">;</span>
+    <span class="nb">float</span> <span class="n">mesh_eta</span><span class="p">(</span><span class="n">gllpoints_all</span><span class="p">)</span> <span class="p">;</span>
+    <span class="nb">float</span> <span class="n">mesh_Qmu</span><span class="p">(</span><span class="n">gllpoints_all</span><span class="p">)</span> <span class="p">;</span>
+    <span class="nb">float</span> <span class="n">mesh_Qka</span><span class="p">(</span><span class="n">gllpoints_all</span><span class="p">)</span> <span class="p">;</span>
+  <span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="merged-file-layout">
+<h3><a class="toc-backref" href="#id3" role="doc-backlink">Merged File Layout</a><a class="headerlink" href="#merged-file-layout" title="Link to this heading">¶</a></h3>
+<p>This, in contrast to the <em>multi file layout</em> stores everything in a single
+2D to 10D array, meaning data from one element can be accessed with a single
+read command. The downside is that many GLL points are duplicated which thus
+increases the file size. On the other hand this layout can easily increase
+the performance by more than an order of magnitude so depending on the use
+case this is the way to go. Turning on compression can save quite a lot of
+space here but comes at the expense of some speed. Make sure to set the
+chunking in a way that each chunk corresponds to all the data from a single
+element.</p>
+<p><strong>Expected NetCDF file locations:</strong> <code class="docutils literal notranslate"><span class="pre">ROOT/.../merged_output.nc4</span></code></p>
+<p><strong>File layout</strong> (in a commented representation based on the output from
+<code class="docutils literal notranslate"><span class="pre">ncdump</span></code>):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Global attributes and mesh the same as above!</span>
+
+<span class="n">dimensions</span><span class="p">:</span>
+        <span class="n">gllpoints_all</span> <span class="o">=</span> <span class="mi">160692</span> <span class="p">;</span>
+        <span class="n">snapshots</span> <span class="o">=</span> <span class="mi">370</span> <span class="p">;</span>
+        <span class="n">ipol</span> <span class="o">=</span> <span class="mi">5</span> <span class="p">;</span>
+        <span class="n">jpol</span> <span class="o">=</span> <span class="mi">5</span> <span class="p">;</span>
+        <span class="n">nvars</span> <span class="o">=</span> <span class="mi">5</span> <span class="p">;</span>
+        <span class="n">elements</span> <span class="o">=</span> <span class="mi">9856</span> <span class="p">;</span>
+<span class="n">variables</span><span class="p">:</span>
+        <span class="nb">float</span> <span class="n">stf_dump</span><span class="p">(</span><span class="n">snapshots</span><span class="p">)</span> <span class="p">;</span>
+        <span class="nb">float</span> <span class="n">stf_d_dump</span><span class="p">(</span><span class="n">snapshots</span><span class="p">)</span> <span class="p">;</span>
+        <span class="nb">float</span> <span class="n">MergedSnapshots</span><span class="p">(</span><span class="n">elements</span><span class="p">,</span> <span class="n">nvars</span><span class="p">,</span> <span class="n">jpol</span><span class="p">,</span> <span class="n">ipol</span><span class="p">,</span> <span class="n">snapshots</span><span class="p">)</span> <span class="p">;</span>
+</pre></div>
+</div>
+<p>The second dimension in the <code class="docutils literal notranslate"><span class="pre">MergedSnapshots</span></code> variable corresponds to the
+displacement in the various directions. In terms of the <em>multi file layout</em>,
+Instaseis assumes the following order:</p>
+<p><strong>5D =&gt; horizontal and vertical database:</strong></p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">disp_s</span> <span class="pre">horizontal</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">disp_p</span> <span class="pre">horizontal</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">disp_z</span> <span class="pre">horizontal</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">disp_s</span> <span class="pre">vertical</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">disp_z</span> <span class="pre">vertical</span></code></p></li>
+</ol>
+<p><strong>3D =&gt; horizontal only database:</strong></p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">disp_s</span> <span class="pre">horizontal</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">disp_p</span> <span class="pre">horizontal</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">disp_z</span> <span class="pre">horizontal</span></code></p></li>
+</ol>
+<p><strong>2D =&gt; vertical only database:</strong></p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">disp_s</span> <span class="pre">vertical</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">disp_z</span> <span class="pre">vertical</span></code></p></li>
+</ol>
+<p><strong>10D =&gt; forward database:</strong></p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">disp_s</span> <span class="pre">MZZ</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">disp_z</span> <span class="pre">MZZ</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">disp_s</span> <span class="pre">MXX+MYY</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">disp_z</span> <span class="pre">MXX+MYY</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">disp_s</span> <span class="pre">MXZ/MYZ</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">disp_p</span> <span class="pre">MXZ/MYZ</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">disp_z</span> <span class="pre">MXZ/MYZ</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">disp_s</span> <span class="pre">MXY/MXX-MYY</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">disp_p</span> <span class="pre">MXY/MXX-MYY</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">disp_z</span> <span class="pre">MXY/MXX-MYY</span></code></p></li>
+</ol>
+</section>
+</section>
+<section id="repacking-script">
+<h2><a class="toc-backref" href="#id4" role="doc-backlink">Repacking Script</a><a class="headerlink" href="#repacking-script" title="Link to this heading">¶</a></h2>
+<p>Instaseis can convert databases from the <em>multi file layout</em> (also in the
+form that AxiSEM produces directly) to:</p>
+<ul class="simple">
+<li><p>The same layout - (the <cite>repack</cite> method) - this sometimes improves
+compatibility. Additionally compression settings can be changed.</p></li>
+<li><p>A transposed version of the same layout - this might improve the
+performance. Running this more than one time will keep transposing the data
+arrays.</p></li>
+<li><p>The merged layout. Conversion can take a very long time. Compression is
+also able to save quite a bit of space.</p></li>
+</ul>
+<section id="where-to-execute-this">
+<h3><a class="toc-backref" href="#id5" role="doc-backlink">Where to execute this?</a><a class="headerlink" href="#where-to-execute-this" title="Link to this heading">¶</a></h3>
+<p>Make sure to execute this <strong>at the top-level of all the NetCDF files</strong>. E.g.
+the script (assuming the merge method is chosen), will transform this</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>input_database
+├──<span class="w"> </span>PX
+│<span class="w">   </span>└──<span class="w"> </span>Data
+│<span class="w">       </span>└──<span class="w"> </span>ordered_output.nc4
+└──<span class="w"> </span>PZ
+<span class="w">    </span>└──<span class="w"> </span>Data
+<span class="w">        </span>└──<span class="w"> </span>ordered_output.nc4
+</pre></div>
+</div>
+<p>into this</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>merged_database
+└──<span class="w"> </span>merged_output.nc4
+</pre></div>
+</div>
+</section>
+<section id="usage">
+<h3><a class="toc-backref" href="#id6" role="doc-backlink">Usage</a><a class="headerlink" href="#usage" title="Link to this heading">¶</a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>instaseis.scripts.repack_db<span class="w"> </span>--help
+
+Usage:<span class="w"> </span>repack_db.py<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>INPUT_FOLDER<span class="w"> </span>OUTPUT_FOLDER
+Options:
+<span class="w">  </span>--contiguous<span class="w">                    </span>Write<span class="w"> </span>a<span class="w"> </span>contiguous<span class="w"> </span>array<span class="w"> </span>-<span class="w"> </span>will<span class="w"> </span>turn<span class="w"> </span>off
+<span class="w">                                  </span>chunking<span class="w"> </span>and<span class="w"> </span>compression
+<span class="w">  </span>--compression_level<span class="w"> </span>INTEGER<span class="w"> </span>RANGE
+<span class="w">                                  </span>Compression<span class="w"> </span>level<span class="w"> </span>from<span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="o">(</span>fast<span class="o">)</span><span class="w"> </span>to<span class="w"> </span><span class="m">9</span><span class="w"> </span><span class="o">(</span>slow<span class="o">)</span>.
+<span class="w">  </span>--method<span class="w"> </span><span class="o">[</span>transpose<span class="p">|</span>repack<span class="p">|</span>merge<span class="o">]</span>
+<span class="w">                                  </span><span class="sb">`</span>transpose<span class="sb">`</span><span class="w"> </span>will<span class="w"> </span>transpose<span class="w"> </span>the<span class="w"> </span>data<span class="w"> </span>arrays
+<span class="w">                                  </span>which<span class="w"> </span>oftentimes<span class="w"> </span>results<span class="w"> </span><span class="k">in</span><span class="w"> </span>faster
+<span class="w">                                  </span>extraction<span class="w"> </span>times.<span class="w"> </span><span class="sb">`</span>repack<span class="sb">`</span><span class="w"> </span>will<span class="w"> </span>just<span class="w"> </span>repack
+<span class="w">                                  </span>the<span class="w"> </span>data<span class="w"> </span>and<span class="w"> </span>solve<span class="w"> </span>some<span class="w"> </span>compatibility
+<span class="w">                                  </span>issues.<span class="w"> </span><span class="sb">`</span>merge<span class="sb">`</span><span class="w"> </span>will<span class="w"> </span>create<span class="w"> </span>a<span class="w"> </span>single<span class="w"> </span>much
+<span class="w">                                  </span>larger<span class="w"> </span>file<span class="w"> </span>which<span class="w"> </span>is<span class="w"> </span>much<span class="w"> </span>quicker<span class="w"> </span>to<span class="w"> </span><span class="nb">read</span>
+<span class="w">                                  </span>but<span class="w"> </span>will<span class="w"> </span>take<span class="w"> </span>more<span class="w"> </span>space.<span class="w">  </span><span class="o">[</span>required<span class="o">]</span>
+<span class="w">  </span>--help<span class="w">                          </span>Show<span class="w"> </span>this<span class="w"> </span>message<span class="w"> </span>and<span class="w"> </span>exit.
+</pre></div>
+</div>
+</section>
+</section>
+<section id="comparing-databases">
+<h2><a class="toc-backref" href="#id7" role="doc-backlink">Comparing Databases</a><a class="headerlink" href="#comparing-databases" title="Link to this heading">¶</a></h2>
+<p>If you don’t trust the repacking script, don’t fret - there is another
+script that compares two or more databases to make sure they produce the same
+waveforms:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>instaseis.scripts.compare_dbs<span class="w"> </span>--help
+
+Usage:<span class="w"> </span>compare_dbs.py<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span><span class="o">[</span>DATABASES<span class="o">]</span>...
+
+<span class="w">  </span>Pass<span class="w"> </span>a<span class="w"> </span>list<span class="w"> </span>of<span class="w"> </span>databases<span class="w"> </span>to<span class="w"> </span>assert<span class="w"> </span>that<span class="w"> </span>they<span class="w"> </span>produce<span class="w"> </span>the<span class="w"> </span>same<span class="w"> </span>seismograms.
+<span class="w">  </span>The<span class="w"> </span>first<span class="w"> </span>one<span class="w"> </span>will<span class="w"> </span>be<span class="w"> </span>treated<span class="w"> </span>as<span class="w"> </span>the<span class="w"> </span>reference.
+
+Options:
+<span class="w">  </span>--seed<span class="w"> </span>INTEGER<span class="w">  </span>Optionally<span class="w"> </span>pass<span class="w"> </span>a<span class="w"> </span>seed<span class="w"> </span>number<span class="w"> </span>to<span class="w"> </span>make<span class="w"> </span>it<span class="w"> </span>reproducible.
+<span class="w">  </span>--help<span class="w">          </span>Show<span class="w"> </span>this<span class="w"> </span>message<span class="w"> </span>and<span class="w"> </span>exit.
+</pre></div>
+</div>
+</section>
+</section>
+
+
+    </div>
+      
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2014-2020, Lion Krischer and Martin van Driel.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.2.3.<br/>
+    </p>
+  </div>
+</footer>
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-44800463-2', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+  </body>
+</html>

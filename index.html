@@ -1,0 +1,629 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Instaseis: Instant Global Seismograms Based on a Broadband Waveform Database &#8212; instaseis 1.4.3.dev32+g2b8208d documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/bootstrap-sphinx.css?v=49fa7461" />
+    <script src="_static/documentation_options.js?v=16027ae4"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Main Instaseis Classes" href="instaseis.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#">
+          Instaseis</a>
+        <span class="navbar-text navbar-version pull-left"><b>1.4.3.dev32+g2b8208d</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="http://axisem.info">AxiSEM</a></li>
+                <li><a href="http://obspy.org">ObsPy</a></li>
+                <li><a href="http://github.com/krischer/instaseis">GitHub</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="instaseis.html">Main Instaseis Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gui.html">Instaseis GUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="source.html">Sources and Receivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="helpers.html">Utility Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="server.html">Instaseis Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced_server_configuration.html">Advanced Server Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="database_repacking.html">Database Layout and Repacking</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-3">
+        <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
+<li><a class="reference internal" href="#">Instaseis: Instant Global Seismograms Based on a Broadband Waveform Database</a><ul>
+<li><a class="reference internal" href="#syngine-instaseis-databases-hosted-by-the-iris-dmc">Syngine - Instaseis databases hosted by the IRIS DMC</a></li>
+<li><a class="reference internal" href="#videos">Videos</a></li>
+<li><a class="reference internal" href="#contact-us">Contact Us</a></li>
+<li><a class="reference internal" href="#changelog">Changelog</a></li>
+<li><a class="reference internal" href="#installation">Installation</a><ul>
+<li><a class="reference internal" href="#requirements">Requirements</a><ul>
+<li><a class="reference internal" href="#developer-installation">Developer Installation</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#testing">Testing</a></li>
+<li><a class="reference internal" href="#build-the-documentation">Build the Documentation</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#tutorial">Tutorial</a><ul>
+<li><a class="reference internal" href="#learning-python-and-obspy">Learning Python and ObsPy</a></li>
+<li><a class="reference internal" href="#acquiring-a-database">Acquiring A Database</a></li>
+<li><a class="reference internal" href="#using-instaseis">Using Instaseis</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#gui">GUI</a></li>
+<li><a class="reference internal" href="#acknowledgements">Acknowledgements</a></li>
+<li><a class="reference internal" href="#detailed-documentation">Detailed Documentation</a></li>
+</ul>
+</li>
+</ul>
+
+  <li>
+    <a href="instaseis.html" title="Next Chapter: Main Instaseis Classes"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">Main Instasei... &raquo;</span>
+    </a>
+  </li>
+<div id="sourcelink">
+  <a href="_sources/index.rst.txt"
+     rel="nofollow">Source</a>
+</div>
+<form action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+        </div>
+      </div>
+    <div class="body col-md-9 content" role="main">
+      
+  <div class="col-lg-4 col-md-5 col-sm-12">
+<img src="http://i.imgur.com/6LNoJD6.png">
+</div><section id="instaseis-instant-global-seismograms-based-on-a-broadband-waveform-database">
+<h1>Instaseis: Instant Global Seismograms Based on a Broadband Waveform Database<a class="headerlink" href="#instaseis-instant-global-seismograms-based-on-a-broadband-waveform-database" title="Link to this heading">¶</a></h1>
+<div class="clearfix"></div>
+<div style="float: none; padding-top: 20px" class="col-md-12"><p>Instaseis calculates broadband seismograms from Green’s function databases
+generated with <a class="reference external" href="http://axisem.info">AxiSEM</a>  and allows for near
+instantaneous (on the order of milliseconds) extraction of seismograms. Using
+the 2.5D axisymmetric spectral element method, the generation of these
+databases, based on reciprocity of the Green’s functions, is very efficient and
+is approximately half as expensive as a single AxiSEM forward run. Thus this
+enables the computation of full databases at half the cost of the computation of
+seismograms for a single source in the previous scheme and hence allows to
+compute databases at the highest frequencies globally observed. By storing the
+basis coefficients of the numerical scheme (Lagrange polynomials), the Green’s
+functions are 4th order accurate in space and the spatial discretization
+respects discontinuities in the velocity model exactly. On top, AxiSEM allows to
+include 2D structure in the source receiver plane and readily includes other
+planets such as Mars.</p>
+</div><div class="admonition-for-more-information-please-read-our-paper admonition">
+<p class="admonition-title">For more information, please read our paper:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 100.0%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><div class="line-block">
+<div class="line">van Driel, M., Krischer, L., Stähler, S. C., Hosseini, K., and Nissen-Meyer, T. (2015).</div>
+<div class="line"><strong>Instaseis: instant global seismograms based on a broadband waveform database</strong></div>
+<div class="line"><em>Solid Earth</em>, 6, 701-717</div>
+<div class="line"><a class="reference external" href="http://dx.doi.org/10.5194/se-6-701-2015">http://dx.doi.org/10.5194/se-6-701-2015</a></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<section id="syngine-instaseis-databases-hosted-by-the-iris-dmc">
+<h2>Syngine - Instaseis databases hosted by the IRIS DMC<a class="headerlink" href="#syngine-instaseis-databases-hosted-by-the-iris-dmc" title="Link to this heading">¶</a></h2>
+<p>Please note that the IRIS DMC hosts a large collection of Instaseis databases
+that also supports the dynamic extraction of seismograms. Thus no database must
+actually reside on your PC - Syngine will extract them for you and send the
+resulting seismograms over HTTP. Additionally Syngine can be used as a database
+backend from within Instaseis.</p>
+<ul class="simple">
+<li><p>Syngine Product Page: <a class="reference external" href="http://ds.iris.edu/ds/products/syngine/">http://ds.iris.edu/ds/products/syngine/</a></p></li>
+<li><p>Syngine Documentation: <a class="reference external" href="http://service.iris.edu/irisws/syngine/1">http://service.iris.edu/irisws/syngine/1</a></p></li>
+</ul>
+<div class="admonition-there-is-also-a-paper-for-this admonition">
+<p class="admonition-title">There is also a paper for this:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 100.0%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><div class="line-block">
+<div class="line">Krischer, L., Hutko, A. R., Driel, M. van, Stähler, S., Trabant, C., and Nissen-Meyer, T. (2017).</div>
+<div class="line"><strong>On-demand custom broadband synthetic seismograms.</strong></div>
+<div class="line"><em>Seismological Research Letters</em>, 88(4)</div>
+<div class="line"><a class="reference external" href="https://doi.org/10.1785/0220160210">https://doi.org/10.1785/0220160210</a></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="videos">
+<h2>Videos<a class="headerlink" href="#videos" title="Link to this heading">¶</a></h2>
+<div>
+
+    <div style="padding:10px">
+    This section shows two videos about Instaseis. One is a webinar
+    hosted by CIG giving an introduction to AxiSEM and Instaseis. The
+    second one is a quick demo of Instaseis' GUI.
+    </div>
+
+    <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="active"><a href="#webinar" aria-controls="webinar" role="tab" data-toggle="tab">Webinar</a></li>
+        <li role="presentation"><a href="#gui_teaser" aria-controls="gui_teaser" role="tab" data-toggle="tab">GUI Teaser</a></li>
+    </ul>
+
+    <!-- Tab panes -->
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane active" id="webinar">
+            <div style="padding:10px">
+                This video is a one hour long webinar hosted by CIG
+                containing an introduction to AxiSEM and Instaseis.
+                It explains the basic concepts behind both and
+                additional demonstrates how to calculate databases
+                with AxiSEM and how to use Instaseis at a basic level.
+            </div>
+
+            <div class="row" style="margin-left:25px; margin-right:25px">
+                <div class="embed-responsive embed-responsive-16by9
+                            center-block div_style">
+                    <iframe
+                        class="embed-response-item"
+                        src="https://www.youtube.com/embed/ZaZx7bwL3RI"
+                        frameborder="0" allow="autoplay; encrypted-media" allowfullscreen>
+                    </iframe>
+                </div>
+            </div>
+        </div>
+        <div role="tabpanel" class="tab-pane" id="gui_teaser">
+
+            <div style="padding:10px">
+                Get a first impression of the things Instaseis can do by taking a short
+                video tour of our graphical user interface (:ref:`gui-label`). Make sure
+                to watch it in HD!
+            </div>
+
+            <div class="row" style="margin-left:25px; margin-right:25px">
+                <div class="embed-responsive embed-responsive-16by9
+                            center-block div_style">
+                    <iframe
+                        class="embed-responsive-item"
+                        src="https://www.youtube.com/embed/539R2_ArzLE?hd=1&vq=hd720"
+                        frameborder="0" allowfullscreen>
+                    </iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div></section>
+<section id="contact-us">
+<h2>Contact Us<a class="headerlink" href="#contact-us" title="Link to this heading">¶</a></h2>
+<div class="admonition-contact-us admonition">
+<p class="admonition-title">Contact Us</p>
+<p>If you encounter a bug or another error, please open a new
+<a class="reference external" href="https://github.com/krischer/instaseis/issues">issue</a> on Github. For
+generic questions and to stay up to date with Instaseis, please use our
+<a class="reference external" href="https://groups.google.com/forum/#!forum/instaseis">mailing list</a>.
+Send an email to it via
+<a class="reference external" href="mailto:instaseis&#37;&#52;&#48;googlegroups&#46;com">instaseis<span>&#64;</span>googlegroups<span>&#46;</span>com</a>
+and subscribe by sending an email to
+<a class="reference external" href="mailto:instaseis+subscribe&#37;&#52;&#48;googlegroups&#46;com">instaseis+subscribe<span>&#64;</span>googlegroups<span>&#46;</span>com</a>.</p>
+</div>
+</section>
+<section id="changelog">
+<h2>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">¶</a></h2>
+<p>The most recent changelog can always be found
+<a class="reference external" href="https://github.com/krischer/instaseis/blob/master/CHANGELOG.md">here</a>.</p>
+</section>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading">¶</a></h2>
+<div class="admonition-installation-using-conda-forge admonition">
+<p class="admonition-title">Installation using conda-forge</p>
+<p>By far the easiest way to install Instaseis is to <a class="reference external" href="github.com/conda-forge/miniforge">download
+miniforge</a>, install it and
+then run</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mamba<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>conda-forge<span class="w"> </span>instaseis
+</pre></div>
+</div>
+<p>This will download and install Instaseis including all its dependencies.
+For other options, please keep on reading.</p>
+<p>Alternatively, a simple</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>instaseis
+</pre></div>
+</div>
+<p>should also work on many platforms.</p>
+</div>
+<section id="requirements">
+<h3>Requirements<a class="headerlink" href="#requirements" title="Link to this heading">¶</a></h3>
+<p>Instaseis is implemented as a Python library and has a number of dependencies
+listed here. It might well work with other versions but only the versions listed
+here are continuously tested and supported. It should run on all platforms
+supported by its dependencies.</p>
+<p>To run the tests, please install with</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>instaseis<span class="o">[</span>tests<span class="o">]</span>
+</pre></div>
+</div>
+<p>The optional dependencies of the graphical user interface (GUI) can be
+installed with</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>instaseis<span class="o">[</span>gui<span class="o">]</span>
+</pre></div>
+</div>
+<section id="developer-installation">
+<h4>Developer Installation<a class="headerlink" href="#developer-installation" title="Link to this heading">¶</a></h4>
+<p>Clone the git repository and install in an editable fashion.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/krischer/instaseis.git
+$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>instaseis
+$<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-v<span class="w"> </span>-e<span class="w"> </span>.
+</pre></div>
+</div>
+</section>
+</section>
+<section id="testing">
+<h3>Testing<a class="headerlink" href="#testing" title="Link to this heading">¶</a></h3>
+<p>Many test run without these two packages, but executing the full test suite
+requires two additional packages: <code class="docutils literal notranslate"><span class="pre">click</span></code> and <code class="docutils literal notranslate"><span class="pre">netcdf4</span></code>. If you don’t
+already have them, install with</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mamba<span class="w"> </span>install<span class="w"> </span>click<span class="w"> </span>netcdf4
+</pre></div>
+</div>
+<p>To assert that your installation is working properly, execute (in the instaseis
+directory):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>py.test<span class="w"> </span>tests
+</pre></div>
+</div>
+<p>and make sure all tests pass. Otherwise please contact the developers. To
+speed up the tests they can also be run in parallel with (<code class="docutils literal notranslate"><span class="pre">n</span></code> is the
+number of cores):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>/path/to/instaseis
+$<span class="w"> </span>py.test<span class="w"> </span>-n<span class="w"> </span><span class="m">4</span><span class="w"> </span>tests
+</pre></div>
+</div>
+</section>
+<section id="build-the-documentation">
+<h3>Build the Documentation<a class="headerlink" href="#build-the-documentation" title="Link to this heading">¶</a></h3>
+<p>The documentation requires <code class="docutils literal notranslate"><span class="pre">sphinx</span></code> and the Bootstrap theme. Install both
+with</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>sphinx<span class="w"> </span>sphinx-bootstrap-theme
+</pre></div>
+</div>
+<p>Build the doc with</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>doc
+$<span class="w"> </span>make<span class="w"> </span>html
+</pre></div>
+</div>
+<p>Finally open the <code class="docutils literal notranslate"><span class="pre">doc/_build/html/index.html</span></code> file with the browser of your
+choice.</p>
+</section>
+</section>
+<section id="tutorial">
+<h2>Tutorial<a class="headerlink" href="#tutorial" title="Link to this heading">¶</a></h2>
+<section id="learning-python-and-obspy">
+<h3>Learning Python and ObsPy<a class="headerlink" href="#learning-python-and-obspy" title="Link to this heading">¶</a></h3>
+<p>Instaseis is written in <a class="reference external" href="http://www.python.org">Python</a> and utilizes the
+data structures of <a class="reference external" href="http://obspy.org">ObsPy</a> to allow the construction of
+modern and efficient workflows. Python is an easy to learn and powerful
+interactive programming language with an exhaustive scientific ecosystem. The
+following resources are useful if you are starting out with Python and ObsPy:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="http://learnpythonthehardway.org/book/">Good, general Python tutorial</a></p></li>
+<li><p><a class="reference external" href="http://www.nature.com/news/interactive-notebooks-sharing-the-code-1.16261">IPython Notebook in Nature</a></p></li>
+<li><p><a class="reference external" href="https://scipy-lectures.github.io/">Introduction to the scientific Python ecosystem</a></p></li>
+<li><p><a class="reference external" href="http://docs.obspy.org/master">The ObsPy Documentation</a></p></li>
+<li><p><a class="reference external" href="http://docs.obspy.org/master/tutorial/index.html">The ObsPy Tutorial</a></p></li>
+</ul>
+</section>
+<section id="acquiring-a-database">
+<h3>Acquiring A Database<a class="headerlink" href="#acquiring-a-database" title="Link to this heading">¶</a></h3>
+<p>To use Instaseis, one requires access to a waveform database. <a class="reference external" href="http://axisem.info">AxiSEM</a> has to be used to calculate one from scratch. As these
+database tend to get very big we so far cannot offer them as a download. If
+you are interested in a big database, please contact us.</p>
+<p>To quickly get started, please download one of these low frequency
+example databases (please note that they may only be available temporarily):</p>
+<ul class="simple">
+<li><p><a class="reference external" href="http://www.geophysik.uni-muenchen.de/~krischer/instaseis/20s_PREM_ANI_FORCES.tar.gz">PREM 20 seconds dominant period</a> (581 MB)</p></li>
+<li><p><a class="reference external" href="http://www.geophysik.uni-muenchen.de/~krischer/instaseis/10s_PREM_ANI_FORCES.tar">PREM 10 seconds dominant period</a> (3.4 GB)</p></li>
+</ul>
+</section>
+<section id="using-instaseis">
+<h3>Using Instaseis<a class="headerlink" href="#using-instaseis" title="Link to this heading">¶</a></h3>
+<p>To use Instaseis you first have to open a connection to an Instaseis database.
+Instaseis supports connections to local and remote Green’s function databases; a
+local database consists of up to four NetCDF files on the filesystem whereas a
+remote database requires an Instaseis server answering queries. The usage and
+capabilities of both are completely equivalent. This section deals with using
+Instaseis to generate seismograms; if you wish to run an Instaseis server,
+please see the documentation of the <a class="reference internal" href="server.html"><span class="doc">Instaseis Server</span></a>.</p>
+<p>Connecting to either a local or a remote Instaseis database happens with the
+<a class="reference internal" href="instaseis.html#instaseis.open_db" title="instaseis.open_db"><code class="xref py py-func docutils literal notranslate"><span class="pre">open_db()</span></code></a> function. It will return either an
+<code class="xref py py-class docutils literal notranslate"><span class="pre">InstaseisDB</span></code> or a
+<code class="xref py py-class docutils literal notranslate"><span class="pre">RemoteInstaseisDB</span></code> object. Additional
+arguments and keyword arguments are passed to the the initialization
+function of these objects. Once the database objects are created, usage of
+both is identical. Be aware that the initialization of the database objects
+is potentially a fairly expensive operation so make sure to do it only when
+necessary (usually once per database).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If opening a local database and the <code class="docutils literal notranslate"><span class="pre">ordered_output.nc4</span></code> files are
+located for example in <code class="docutils literal notranslate"><span class="pre">/path/to/DB/PZ/Data</span></code> and <code class="docutils literal notranslate"><span class="pre">/path/to/DB/PX/Data</span></code>,
+please pass <code class="docutils literal notranslate"><span class="pre">/path/to/DB</span></code> to the <a class="reference internal" href="instaseis.html#instaseis.open_db" title="instaseis.open_db"><code class="xref py py-func docutils literal notranslate"><span class="pre">open_db()</span></code></a> function.
+Instaseis will recursively search the child directories for the necessary
+files and open them.</p>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">instaseis</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Open connection to a local database by giving the path on disc where</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># the `ordered_output.nc4` files of AxiSEM are stored.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">instaseis</span><span class="o">.</span><span class="n">open_db</span><span class="p">(</span><span class="s2">&quot;/path/to/10s_PREM&quot;</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Or open connection to a remote database by giving an HTTP URL.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">instaseis</span><span class="o">.</span><span class="n">open_db</span><span class="p">(</span><span class="s2">&quot;http://123.456.789.123:1234&quot;</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Get some basic information by printing the database object.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
+<span class="go">RemoteInstaseisDB reciprocal Green&#39;s function Database (v7) generated with these parameters:</span>
+<span class="go">components           : vertical and horizontal</span>
+<span class="go">velocity model       : prem_ani</span>
+<span class="go">attenuation          : True</span>
+<span class="go">dominant period      : 10.000 s</span>
+<span class="go">dump type            : displ_only</span>
+<span class="go">excitation type      : dipole</span>
+<span class="go">time step            : 2.436 s</span>
+<span class="go">sampling rate        : 0.411 Hz</span>
+<span class="go">number of samples    : 739</span>
+<span class="go">seismogram length    : 1797.7 s</span>
+<span class="go">source time function : errorf</span>
+<span class="go">source shift         : 17.051 s</span>
+<span class="go">spatial order        : 4</span>
+<span class="go">min/max radius       : 5700.0 - 6371.0 km</span>
+<span class="go">Planet radius        : 6371.0 km</span>
+<span class="go">min/max distance     : 0.0 - 180.0 deg</span>
+<span class="go">time stepping scheme : newmark2</span>
+<span class="go">compiler/user        : gfortran 4.9.1 by lion on Laptop</span>
+<span class="go">directory/url        : http://123.456.789.123:1234</span>
+<span class="go">size of netCDF files : 3.4 GB</span>
+<span class="go">generated by AxiSEM version 60945ec at 2014-10-23T21:32:58.000000Z</span>
+</pre></div>
+</div>
+<p>The <code class="xref py py-meth docutils literal notranslate"><span class="pre">get_seismograms()</span></code>
+method is called to generate seismograms as <a class="reference external" href="https://docs.obspy.org/packages/autogen/obspy.core.stream.Stream.html#obspy.core.stream.Stream" title="(in ObsPy v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Stream</span></code></a>
+objects with the waveform data. This enables easy serialization in a large
+selection of formats and facilitates post processing by utilizing ObsPy.</p>
+<p>To generate seismograms source information must be given either as a
+<a class="reference internal" href="source.html#instaseis.source.Source" title="instaseis.source.Source"><code class="xref py py-class docutils literal notranslate"><span class="pre">Source</span></code></a> object, a
+<a class="reference internal" href="source.html#instaseis.source.ForceSource" title="instaseis.source.ForceSource"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForceSource</span></code></a> object, or as a
+<a class="reference internal" href="source.html#instaseis.source.FiniteSource" title="instaseis.source.FiniteSource"><code class="xref py py-class docutils literal notranslate"><span class="pre">FiniteSource</span></code></a> object. Receiver information must be
+passed in form of a <a class="reference internal" href="source.html#instaseis.source.Receiver" title="instaseis.source.Receiver"><code class="xref py py-class docutils literal notranslate"><span class="pre">Receiver</span></code></a> object. Please refer
+to the documentation of these classes for more details.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">obspy</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">receiver</span> <span class="o">=</span> <span class="n">instaseis</span><span class="o">.</span><span class="n">Receiver</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">latitude</span><span class="o">=</span><span class="mf">42.6390</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="mf">74.4940</span><span class="p">,</span> <span class="n">network</span><span class="o">=</span><span class="s2">&quot;AB&quot;</span><span class="p">,</span> <span class="n">station</span><span class="o">=</span><span class="s2">&quot;CED&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span> <span class="o">=</span> <span class="n">instaseis</span><span class="o">.</span><span class="n">Source</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">latitude</span><span class="o">=</span><span class="mf">89.91</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">depth_in_m</span><span class="o">=</span><span class="mi">12000</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">m_rr</span> <span class="o">=</span> <span class="mf">4.710000e+24</span> <span class="o">/</span> <span class="mf">1E7</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">m_tt</span> <span class="o">=</span> <span class="mf">3.810000e+22</span> <span class="o">/</span> <span class="mf">1E7</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">m_pp</span> <span class="o">=-</span><span class="mf">4.740000e+24</span> <span class="o">/</span> <span class="mf">1E7</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">m_rt</span> <span class="o">=</span> <span class="mf">3.990000e+23</span> <span class="o">/</span> <span class="mf">1E7</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">m_rp</span> <span class="o">=-</span><span class="mf">8.050000e+23</span> <span class="o">/</span> <span class="mf">1E7</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">m_tp</span> <span class="o">=-</span><span class="mf">1.230000e+24</span> <span class="o">/</span> <span class="mf">1E7</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">origin_time</span><span class="o">=</span><span class="n">obspy</span><span class="o">.</span><span class="n">UTCDateTime</span><span class="p">(</span><span class="mi">2011</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">st</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_seismograms</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">receiver</span><span class="o">=</span><span class="n">receiver</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">st</span><span class="p">)</span>
+<span class="go">3 Trace(s) in Stream:</span>
+<span class="go">AB.CED..MXZ | 2011-01-02T03:04:05Z - ... | 0.4 Hz, 732 samples</span>
+<span class="go">AB.CED..MXN | 2011-01-02T03:04:05Z - ... | 0.4 Hz, 732 samples</span>
+<span class="go">AB.CED..MXE | 2011-01-02T03:04:05Z - ... | 0.4 Hz, 732 samples</span>
+</pre></div>
+</div>
+<p>Source and receiver can also be replaced by ObsPy objects. This can be used
+to calculate synthetics based on standard file formats and web services.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Read event information from a local QuakeML file.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cat</span> <span class="o">=</span> <span class="n">obspy</span><span class="o">.</span><span class="n">readEvents</span><span class="p">(</span><span class="s2">&quot;quake.xml&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">cat</span><span class="p">)</span>
+<span class="go">1 Event(s) in Catalog:</span>
+<span class="go">2010-03-11T06:22:20.100000Z | -57.460,  -27.580 | 5.6 Mwc</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Query a web service for station information.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">obspy.fdsn</span><span class="w"> </span><span class="kn">import</span> <span class="n">Client</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">Client</span><span class="p">(</span><span class="s2">&quot;IRIS&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">inv</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">get_stations</span><span class="p">(</span><span class="n">network</span><span class="o">=</span><span class="s2">&quot;IU&quot;</span><span class="p">,</span> <span class="n">station</span><span class="o">=</span><span class="s2">&quot;ANMO&quot;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="s2">&quot;station&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                     <span class="n">starttime</span><span class="o">=</span><span class="n">cat</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">origins</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">time</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">inv</span><span class="p">)</span>
+<span class="go">Created by: IRIS WEB SERVICE: fdsnws-station | ...</span>
+<span class="go">Contains:</span>
+<span class="go">    Networks (1): IU</span>
+<span class="go">    Stations (1): IU.ANMO (Albuquerque, New Mexico, USA)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">st</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_seismograms</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">cat</span><span class="p">,</span> <span class="n">receiver</span><span class="o">=</span><span class="n">inv</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">st</span><span class="p">)</span>
+<span class="go">3 Trace(s) in Stream:</span>
+<span class="go">IU.ANMO..MXZ | 2010-03-11T06:22:20Z - ... | 0.4 Hz, 732 samples</span>
+<span class="go">IU.ANMO..MXN | 2010-03-11T06:22:20Z - ... | 0.4 Hz, 732 samples</span>
+<span class="go">IU.ANMO..MXE | 2010-03-11T06:22:20Z - ... | 0.4 Hz, 732 samples</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="gui">
+<span id="gui-label"></span><h2>GUI<a class="headerlink" href="#gui" title="Link to this heading">¶</a></h2>
+<p>Instaseis contains an optional graphical user interface which is useful to
+explore a database and for educational purposes. To launch it just type</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>instaseis.gui
+</pre></div>
+</div>
+<img alt="http://i.imgur.com/FfEtlCU.png" src="http://i.imgur.com/FfEtlCU.png" />
+<p>Screenshot of the Instaseis graphical user interface (GUI). Aside from quickly
+exploring the characteristics of a given Green’s function database it is a
+great tool for understanding and teaching many aspect of seismograms. The speed
+of Instaseis enables an immediate visual response to changing source and
+receiver parameters. The left hand side shows three component seismograms where
+theoretical arrival times of various seismic phases are overlaid as vertical
+lines. The bar at the top is used to change filter and resampling settings and
+the section on the right side is used to modify source and receiver parameters.</p>
+</section>
+<section id="acknowledgements">
+<h2>Acknowledgements<a class="headerlink" href="#acknowledgements" title="Link to this heading">¶</a></h2>
+<p>We gratefully acknowledge support from the European Commission (Marie Curie
+Actions, <strong>ITN QUEST</strong>, <a class="reference external" href="http://www.quest-itn.org">www.quest-itn.org</a>)
+and the EU-FP7 725 690 <strong>VERCE</strong> project
+(number 283543, <a class="reference external" href="http://www.verce.eu">www.verce.eu</a>).</p>
+</section>
+<section id="detailed-documentation">
+<h2>Detailed Documentation<a class="headerlink" href="#detailed-documentation" title="Link to this heading">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="instaseis.html">Main Instaseis Classes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="instaseis.html#open-db-function">open_db() Function</a></li>
+<li class="toctree-l2"><a class="reference internal" href="instaseis.html#baseinstaseisdb">BaseInstaseisDB</a></li>
+<li class="toctree-l2"><a class="reference internal" href="instaseis.html#basenetcdfinstaseisdb">BaseNetCDFInstaseisDB</a></li>
+<li class="toctree-l2"><a class="reference internal" href="instaseis.html#reciprocalinstaseisdb">ReciprocalInstaseisDB</a></li>
+<li class="toctree-l2"><a class="reference internal" href="instaseis.html#reciprocalmergedinstaseisdb">ReciprocalMergedInstaseisDB</a></li>
+<li class="toctree-l2"><a class="reference internal" href="instaseis.html#forwardinstaseisdb">ForwardInstaseisDB</a></li>
+<li class="toctree-l2"><a class="reference internal" href="instaseis.html#forwardmergedinstaseisdb">ForwardMergedInstaseisDB</a></li>
+<li class="toctree-l2"><a class="reference internal" href="instaseis.html#remoteinstaseisdb">RemoteInstaseisDB</a></li>
+<li class="toctree-l2"><a class="reference internal" href="instaseis.html#syngineinstaseisdb">SyngineInstaseisDB</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="gui.html">Instaseis GUI</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="gui.html#recompile-ui-file">Recompile UI file</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="source.html">Sources and Receivers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="source.html#receiver">Receiver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source.html#source">Source</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source.html#forcesource">ForceSource</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source.html#finitesource">FiniteSource</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="helpers.html">Utility Functions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="helpers.html#instaseis.helpers.elliptic_to_geocentric_latitude"><code class="docutils literal notranslate"><span class="pre">elliptic_to_geocentric_latitude()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="helpers.html#instaseis.helpers.geocentric_to_elliptic_latitude"><code class="docutils literal notranslate"><span class="pre">geocentric_to_elliptic_latitude()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="server.html">Instaseis Server</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="server.html#starting-a-server">Starting a Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server.html#connecting-to-a-server">Connecting to a Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server.html#deployment-and-performance-considerations">Deployment and Performance Considerations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server.html#logging">Logging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server.html#rest-like-api-documentation">REST-like API Documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="advanced_server_configuration.html">Advanced Server Configuration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="advanced_server_configuration.html#finite-source-size-setting">Finite Source Size Setting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced_server_configuration.html#station-coordinates-callback">Station Coordinates Callback</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced_server_configuration.html#event-parameters-callback">Event Parameters Callback</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced_server_configuration.html#travel-time-callback">Travel Time Callback</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced_server_configuration.html#hooking-it-up-to-the-instaseis-server">Hooking it up to the Instaseis Server</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="database_repacking.html">Database Layout and Repacking</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="database_repacking.html#available-layouts">Available Layouts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="database_repacking.html#repacking-script">Repacking Script</a></li>
+<li class="toctree-l2"><a class="reference internal" href="database_repacking.html#comparing-databases">Comparing Databases</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+
+
+    </div>
+      
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2014-2020, Lion Krischer and Martin van Driel.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.2.3.<br/>
+    </p>
+  </div>
+</footer>
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-44800463-2', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+  </body>
+</html>

@@ -1,0 +1,325 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Instaseis Server &#8212; instaseis 1.4.3.dev32+g2b8208d documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/bootstrap-sphinx.css?v=49fa7461" />
+    <script src="_static/documentation_options.js?v=16027ae4"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="GET /" href="routes/root.html" />
+    <link rel="prev" title="Utility Functions" href="helpers.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">
+          Instaseis</a>
+        <span class="navbar-text navbar-version pull-left"><b>1.4.3.dev32+g2b8208d</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="http://axisem.info">AxiSEM</a></li>
+                <li><a href="http://obspy.org">ObsPy</a></li>
+                <li><a href="http://github.com/krischer/instaseis">GitHub</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="instaseis.html">Main Instaseis Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gui.html">Instaseis GUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="source.html">Sources and Receivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="helpers.html">Utility Functions</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Instaseis Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced_server_configuration.html">Advanced Server Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="database_repacking.html">Database Layout and Repacking</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-3">
+        <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
+<li><a class="reference internal" href="#">Instaseis Server</a><ul>
+<li><a class="reference internal" href="#starting-a-server">Starting a Server</a></li>
+<li><a class="reference internal" href="#connecting-to-a-server">Connecting to a Server</a></li>
+<li><a class="reference internal" href="#deployment-and-performance-considerations">Deployment and Performance Considerations</a></li>
+<li><a class="reference internal" href="#logging">Logging</a></li>
+<li><a class="reference internal" href="#rest-like-api-documentation">REST-like API Documentation</a></li>
+</ul>
+</li>
+</ul>
+
+  <li>
+    <a href="helpers.html" title="Previous Chapter: Utility Functions"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; Utility Functions</span>
+    </a>
+  </li>
+  <li>
+    <a href="routes/root.html" title="Next Chapter: GET /"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">GET / &raquo;</span>
+    </a>
+  </li>
+<div id="sourcelink">
+  <a href="_sources/server.rst.txt"
+     rel="nofollow">Source</a>
+</div>
+<form action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+        </div>
+      </div>
+    <div class="body col-md-9 content" role="main">
+      
+  <section id="instaseis-server">
+<h1>Instaseis Server<a class="headerlink" href="#instaseis-server" title="Link to this heading">¶</a></h1>
+<p>The biggest hurdle to using Instaseis are the generation and storage of the
+potentially huge databases. Even if that is possible, concurrent access to a
+database on a network storage by multiple users might thrash that storage
+system and result in abysmal performance and other problems.</p>
+<p>Both issues are potentially resolvable by the Instaseis server. Someone (be
+it locally at the institutes network or globally over the internet) opens a
+local connection to an Instaseis database and shares data over HTTP.
+Instaseis clients can connect to that server with the same interface as to a
+local database.</p>
+<section id="starting-a-server">
+<h2>Starting a Server<a class="headerlink" href="#starting-a-server" title="Link to this heading">¶</a></h2>
+<p>To launch a server, just execute</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>instaseis.server<span class="w"> </span>--port<span class="w"> </span><span class="m">8765</span><span class="w"> </span>--buffer_size_in_mb<span class="w"> </span><span class="m">100</span><span class="w"> </span>/path/to/db
+</pre></div>
+</div>
+<p>which will launch a webserver and start serving at the specified port. The
+<code class="docutils literal notranslate"><span class="pre">buffer_size_in_mb</span></code> argument is passed to the
+<code class="xref py py-class docutils literal notranslate"><span class="pre">InstaseisDB</span></code> initialization routine. It is
+probably a good idea to choose it as big as your machine allows.
+For a reciprocal database with horizontal and vertical components Instaseis
+will create 4 buffers, each <code class="docutils literal notranslate"><span class="pre">buffer_size_in_mb</span></code> in size.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Some functionality requires an advanced server setup. Please view the
+<a class="reference internal" href="advanced_server_configuration.html"><span class="doc">Advanced Server Configuration</span></a> for details.</p>
+</div>
+</section>
+<section id="connecting-to-a-server">
+<h2>Connecting to a Server<a class="headerlink" href="#connecting-to-a-server" title="Link to this heading">¶</a></h2>
+<p>Connecting works by simply opening a connection to said machine, e.g. if
+the server is running on the same machine:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">instaseis</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">instaseis</span><span class="o">.</span><span class="n">open_db</span><span class="p">(</span><span class="s2">&quot;http://127.0.0.1:8765&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
+<span class="go">RemoteInstaseisDB reciprocal Green&#39;s function Database (v7) generated with these parameters:</span>
+<span class="go">components           : vertical and horizontal</span>
+<span class="go">velocity model       : ak135f</span>
+<span class="go">attenuation          : True</span>
+<span class="go">dominant period      : 2.000 s</span>
+<span class="go">dump type            : displ_only</span>
+<span class="go">excitation type      : dipole</span>
+<span class="go">time step            : 0.487 s</span>
+<span class="go">sampling rate        : 2.052 Hz</span>
+<span class="go">number of samples    : 7591</span>
+<span class="go">seismogram length    : 3699.7 s</span>
+<span class="go">source time function : errorf</span>
+<span class="go">source shift         : 3.412 s</span>
+<span class="go">spatial order        : 4</span>
+<span class="go">min/max radius       : 5671.0 - 6371.0 km</span>
+<span class="go">Planet radius        : 6371.0 km</span>
+<span class="go">min/max distance     : 0.0 - 180.0 deg</span>
+<span class="go">time stepping scheme : symplec4</span>
+<span class="go">compiler/user        : ifort         1400 by di29kub on login05</span>
+<span class="go">directory/url        : http://127.0.0.1:8765</span>
+<span class="go">size of netCDF files : 883.0 GB</span>
+<span class="go">generated by AxiSEM version 615a180 at 2014-11-07T18:48:29.000000Z</span>
+</pre></div>
+</div>
+<p>Usage is then the same as with a local Instaseis database.</p>
+</section>
+<section id="deployment-and-performance-considerations">
+<h2>Deployment and Performance Considerations<a class="headerlink" href="#deployment-and-performance-considerations" title="Link to this heading">¶</a></h2>
+<p>Network latency and throughput are the limiting factors of the achievable speed
+when using the Instaseis server. The server is based on
+<a class="reference external" href="http://www.tornadoweb.org/">Tornado</a> resulting in asynchronous
+network I/O. The database access and file I/O on the other hand is, by design,
+synchronous. Thus each Instaseis server should easily be able to serve
+dozens or more concurrent users with acceptable speed.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you plan to run this on a machine with outwards facing ports please
+either know what are you doing or ask your network admin to have a look
+to not compromise security of the whole network. Running this on an
+institute’s network or some managed server on the other hand should be a
+less of a security issue.</p>
+</div>
+<p>To get a stable server you will have to properly deploy it. A common option
+to deploy Tornado apps is to use <a class="reference external" href="http://supervisord.org/">supervisor</a> for
+process management and <a class="reference external" href="http://nginx.org/">ngnix</a> as a server and reverse
+proxy. There are a ton of tutorials online as the configuration differs from
+system to system but it should not be hard to find.</p>
+<p>Supervisor takes care to start, monitor, and restart the Instaseis server
+making sure it runs all the time. A very minimal supervisor configuration
+that launches two Instaseis server instances serving two different databases:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[program:instaseis_20s]</span>
+<span class="na">command</span><span class="o">=</span><span class="s">/path/to/python -m instaseis.server --port=8765 --buffer_size_in_mb=50 /path/to/20s_PREM_ANI_FORCES</span>
+<span class="na">autostart</span><span class="o">=</span><span class="s">true</span>
+<span class="na">autorestart</span><span class="o">=</span><span class="s">true</span>
+<span class="na">redirect_stderr</span><span class="o">=</span><span class="s">true</span>
+<span class="na">stdout_logfile</span><span class="o">=</span><span class="s">/tmp/instaseis_20s.log</span>
+
+<span class="k">[program:instaseis_10s]</span>
+<span class="na">command</span><span class="o">=</span><span class="s">/path/to/python -m instaseis.server --port=8766 --buffer_size_in_mb=100 /path/to/10s_PREM_ANI_FORCES</span>
+<span class="na">autostart</span><span class="o">=</span><span class="s">true</span>
+<span class="na">autorestart</span><span class="o">=</span><span class="s">true</span>
+<span class="na">redirect_stderr</span><span class="o">=</span><span class="s">true</span>
+<span class="na">stdout_logfile</span><span class="o">=</span><span class="s">/tmp/instaseis_10s.log</span>
+</pre></div>
+</div>
+<p>Now nginx can be used as a reverse proxy to map the internal routes to nice
+URLs. Also make sure to block all ports that you don’t need with your
+system’s firewall. The following example configuration will map both
+Instaseis server instances started with supervisor to
+<code class="docutils literal notranslate"><span class="pre">http://site-name.org:8080/20s_PREM_ANI_FORCES</span></code> and
+<code class="docutils literal notranslate"><span class="pre">http://site-name.org:8080/10s_PREM_ANI_FORCES</span></code>. One can easily imaging
+this being done for a number of models at various frequencies.</p>
+<div class="highlight-nginx notranslate"><div class="highlight"><pre><span></span><span class="k">server</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kn">listen</span><span class="w"> </span><span class="mi">8080</span><span class="p">;</span>
+<span class="w">    </span><span class="kn">server_name</span><span class="w"> </span><span class="s">localhost</span><span class="p">;</span>
+<span class="w">    </span><span class="kn">location</span><span class="w"> </span><span class="s">/20s_PREM_ANI_FORCES/</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kn">rewrite</span><span class="w"> </span><span class="s">^/20s_PREM_ANI_FORCES/?(.*)</span>$<span class="w"> </span><span class="s">/</span><span class="nv">$1</span><span class="w"> </span><span class="s">break</span><span class="p">;</span>
+<span class="w">        </span><span class="kn">proxy_pass</span><span class="w">  </span><span class="s">http://127.0.0.1:8765</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="kn">location</span><span class="w"> </span><span class="s">/10s_PREM_ANI_FORCES/</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kn">rewrite</span><span class="w"> </span><span class="s">^/10s_PREM_ANI_FORCES/?(.*)</span>$<span class="w"> </span><span class="s">/</span><span class="nv">$1</span><span class="w"> </span><span class="s">break</span><span class="p">;</span>
+<span class="w">        </span><span class="kn">proxy_pass</span><span class="w">  </span><span class="s">http://127.0.0.1:8766</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Load balancing can also be achieved by a combination of supervisor and nginx.
+It might not be worth it as Instaseis itself is oftentimes I/O bound
+but it will depend on your specific system and if you face performance
+issues it is a potential solution.</p>
+</section>
+<section id="logging">
+<h2>Logging<a class="headerlink" href="#logging" title="Link to this heading">¶</a></h2>
+<p>The Instaseis server starting script</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>instaseis.server
+</pre></div>
+</div>
+<p>offers basic functionality to log to standard out. By default it logs at the
+<code class="docutils literal notranslate"><span class="pre">INFO</span></code> level. The <code class="docutils literal notranslate"><span class="pre">--quiet</span></code> flag can be given to deactivate all logging
+output and the <code class="docutils literal notranslate"><span class="pre">--log-level</span></code> argument modifies said level. Please read up on
+<a class="reference external" href="https://docs.python.org/3.4/library/logging.html">Python logging</a> for more
+details.</p>
+<p>The Instaseis server is based on the <a class="reference external" href="http://www.tornadoweb.org/">Tornado</a>
+framework, an asynchronous Python web server. To customize logging, read <a class="reference external" href="http://tornado.readthedocs.org/en/latest/log.html">this</a> document, use
+<a class="reference external" href="https://github.com/krischer/instaseis/tree/master/instaseis/server/__main__.py">this source code file</a>
+as a template for your custom server starting script, and modify however you
+see fit.</p>
+</section>
+<section id="rest-like-api-documentation">
+<h2>REST-like API Documentation<a class="headerlink" href="#rest-like-api-documentation" title="Link to this heading">¶</a></h2>
+<p>If you wish to use the Instaseis Server without the Python client this
+documentation might be helpful. The Instaseis server offers a REST-like API
+with currently nine endpoints.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="routes/root.html">GET /</a></li>
+<li class="toctree-l1"><a class="reference internal" href="routes/info.html">GET /info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="routes/coordinates.html">GET /coordinates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="routes/event.html">GET /event</a></li>
+<li class="toctree-l1"><a class="reference internal" href="routes/ttimes.html">GET /ttimes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="routes/seismograms_raw.html">GET /seismograms_raw</a></li>
+<li class="toctree-l1"><a class="reference internal" href="routes/seismograms.html">GET/POST /seismograms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="routes/greens_function.html">GET /greens_function</a></li>
+<li class="toctree-l1"><a class="reference internal" href="routes/finite_source.html">POST /finite_source</a></li>
+</ul>
+</div>
+</section>
+</section>
+
+
+    </div>
+      
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2014-2020, Lion Krischer and Martin van Driel.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.2.3.<br/>
+    </p>
+  </div>
+</footer>
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-44800463-2', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+  </body>
+</html>

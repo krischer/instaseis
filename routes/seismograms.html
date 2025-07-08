@@ -1,0 +1,446 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>GET/POST /seismograms &#8212; instaseis 1.4.3.dev32+g2b8208d documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/bootstrap-sphinx.css?v=49fa7461" />
+    <script src="../_static/documentation_options.js?v=16027ae4"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="GET /greens_function" href="greens_function.html" />
+    <link rel="prev" title="GET /seismograms_raw" href="seismograms_raw.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="../_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html">
+          Instaseis</a>
+        <span class="navbar-text navbar-version pull-left"><b>1.4.3.dev32+g2b8208d</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="http://axisem.info">AxiSEM</a></li>
+                <li><a href="http://obspy.org">ObsPy</a></li>
+                <li><a href="http://github.com/krischer/instaseis">GitHub</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../instaseis.html">Main Instaseis Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gui.html">Instaseis GUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source.html">Sources and Receivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../helpers.html">Utility Functions</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../server.html">Instaseis Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_server_configuration.html">Advanced Server Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../database_repacking.html">Database Layout and Repacking</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-3">
+        <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
+<li><a class="reference internal" href="#">GET/POST /seismograms</a></li>
+</ul>
+
+  <li>
+    <a href="seismograms_raw.html" title="Previous Chapter: GET /seismograms_raw"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; GET /seismograms_raw</span>
+    </a>
+  </li>
+  <li>
+    <a href="greens_function.html" title="Next Chapter: GET /greens_function"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">GET /greens_function &raquo;</span>
+    </a>
+  </li>
+<div id="sourcelink">
+  <a href="../_sources/routes/seismograms.rst.txt"
+     rel="nofollow">Source</a>
+</div>
+<form action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+        </div>
+      </div>
+    <div class="body col-md-9 content" role="main">
+      
+  <section id="get-post-seismograms">
+<h1>GET/POST /seismograms<a class="headerlink" href="#get-post-seismograms" title="Link to this heading">¶</a></h1>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Some parts of this route require an advanced server setup. Please view the
+<a class="reference internal" href="../advanced_server_configuration.html"><span class="doc">Advanced Server Configuration</span></a> for details. The parts that don’t
+will keep working even with a normal configuration.</p>
+</div>
+<dl>
+<dt>Description</dt><dd><p>Returns Instaseis seismograms. In addition to the functionality of the
+<code class="docutils literal notranslate"><span class="pre">/seismograms_raw</span></code> route this one has quite a couple of convenience
+function and is suitable to be queried by any program able to use HTTP.
+It is possible to <code class="docutils literal notranslate"><span class="pre">GET</span></code> and <code class="docutils literal notranslate"><span class="pre">POST</span></code> to this route: <code class="docutils literal notranslate"><span class="pre">GET</span></code> will just
+retrieve seismograms, <code class="docutils literal notranslate"><span class="pre">POST</span></code> allows one to upload a custom source time
+function, see below for details.</p>
+</dd>
+<dt>Content-Type</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">application/zip</span></code> (if zipped SAC data is requested)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">application/vnd.fdsn.mseed</span></code> (if MiniSEED data is requested)</p></li>
+</ul>
+</dd>
+<dt>Special Response Headers</dt><dd><p><code class="docutils literal notranslate"><span class="pre">Instaseis-Mu</span></code>: This transports the mu of the model for the given
+seismogram which is needed for some finite source calculations. Please make
+sure your proxy, if any, does not filter it.</p>
+</dd>
+<dt>Filetype</dt><dd><p>Returns a ZIP archive with SAC files or MiniSEED files encoded with
+encoding format 4 (IEEE floating point).</p>
+<p>SAC files will have the following user defined variables set:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">KUSER0</span></code>: “InstSeis”</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">KUSER1</span></code>: The first eight letters of the used velocity model.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">KT7</span></code>: The first seven letters of the AxiSEM version number used to generate the model. Prefixed with <code class="docutils literal notranslate"><span class="pre">A</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">KT8</span></code>: The first seven letters of the Instaseis version number used to generate the seismogram. Prefixed with <code class="docutils literal notranslate"><span class="pre">I</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">USER0</span></code>: The scale factor used to generate the waveforms.</p></li>
+</ul>
+</dd>
+<dt>Custom STF</dt><dd><p>A custom source time function can be uploaded with <code class="docutils literal notranslate"><span class="pre">POST</span></code>. The request
+body in this case has to be a JSON file, the other parameters work as for
+the <code class="docutils literal notranslate"><span class="pre">GET</span></code> case, except otherwise noted. The JSON file must be akin to the
+following:</p>
+<div class="highlight-JSON notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;units&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;moment_rate&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;relative_origin_time_in_sec&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">5.0</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;sample_spacing_in_sec&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">10.0</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.2</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="mf">0.2</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Keep in mind that what you are specifying is the moment rate, in seismology
+oftentimes called the source time function, which is the only currently
+supported <code class="docutils literal notranslate"><span class="pre">unit</span></code>.  <code class="docutils literal notranslate"><span class="pre">relative_origin_time_in_sec</span></code> is the offset in
+seconds from the first sample which should be considered the origin time of
+the resulting seismogram (must be between 0 and 600 seconds).
+<code class="docutils literal notranslate"><span class="pre">sample_spacing_in_sec</span></code> is the sample interval in seconds and <code class="docutils literal notranslate"><span class="pre">data</span></code>
+the actual data array. The exact units do not matter as it will be
+normalized in any case.</p>
+</dd>
+</dl>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default Value</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td colspan="5"><p><strong>Output parameters</strong></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">format</span></code></p></td>
+<td><p>String</p></td>
+<td><p>False</p></td>
+<td><p>saczip</p></td>
+<td><p>Specify output file to be either MiniSEED or a ZIP archive of SAC files, either
+<code class="docutils literal notranslate"><span class="pre">miniseed</span></code> or <code class="docutils literal notranslate"><span class="pre">saczip</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">label</span></code></p></td>
+<td><p>String</p></td>
+<td><p>False</p></td>
+<td></td>
+<td><p>Specify a label to be included in file names and HTTP file name suggestions.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">components</span></code></p></td>
+<td><p>String</p></td>
+<td><p>False</p></td>
+<td><p>ZNE, Z, or NE (depends on
+what the DB supports)</p></td>
+<td><p>Specify the orientation of the synthetic seismograms as a list of any combination of
+<code class="docutils literal notranslate"><span class="pre">Z</span></code> (vertical), <code class="docutils literal notranslate"><span class="pre">N</span></code> (north), <code class="docutils literal notranslate"><span class="pre">E</span></code> (east), <code class="docutils literal notranslate"><span class="pre">R</span></code> (radial), <code class="docutils literal notranslate"><span class="pre">T</span></code> (transverse).</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">units</span></code></p></td>
+<td><p>String</p></td>
+<td><p>False</p></td>
+<td><p>displacement</p></td>
+<td><p>Specify either <code class="docutils literal notranslate"><span class="pre">displacement</span></code>, <code class="docutils literal notranslate"><span class="pre">velocity</span></code> or <code class="docutils literal notranslate"><span class="pre">acceleration</span></code> for the synthetics.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">dt</span></code></p></td>
+<td><p>Float</p></td>
+<td><p>False</p></td>
+<td></td>
+<td><p>If given, seismograms will be resampled to the desired sample spacing.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">scale</span></code></p></td>
+<td><p>Float</p></td>
+<td><p>False</p></td>
+<td><p>1.0</p></td>
+<td><p>Scalar factor to multiply the seismograms with.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">kernelwidth</span></code></p></td>
+<td><p>Integer</p></td>
+<td><p>False</p></td>
+<td><p>12</p></td>
+<td><p>Specify the width of the sinc kernel used for resampling to requested sample
+interval in terms of the original sampling interval.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">sourcewidth</span></code></p></td>
+<td><p>Integer</p></td>
+<td><p>False</p></td>
+<td><p>15.0</p></td>
+<td><p>Optionally convolve the seismograms with a Gaussian source time function (moment
+rate) of approximately the given width in seconds. The origin time is assumed to be
+the peak of the Gaussian. Must be larger than the database period. Must not be used
+for a POST requests with a custom STF.</p></td>
+</tr>
+<tr class="row-odd"><td colspan="5"><p><strong>Time Parameters</strong></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">origintime</span></code></p></td>
+<td><p>Datetime</p></td>
+<td><p>False</p></td>
+<td><p>1900-01-01T00:00:00.000000Z</p></td>
+<td><p>Specify the source origin time. This must be specified as an
+absolute date and time. This time coincides with the peak of the
+source time function.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">starttime</span></code></p></td>
+<td><p>Datetime</p></td>
+<td><p>False</p></td>
+<td></td>
+<td><p>Specifies the desired start time for the synthetic trace(s). This may be specified
+as either:</p>
+<ul class="simple">
+<li><p>an absolute date and time</p></li>
+<li><p>a phase-relative offset</p></li>
+<li><p>an offset from origin time in seconds</p></li>
+</ul>
+<p>If the value is recognized as a date and time, it is interpreted as an absolute time.
+If the value is in the form <code class="docutils literal notranslate"><span class="pre">phase[+-]offset</span></code> it is interpreted as a
+phase-relative time, for example <code class="docutils literal notranslate"><span class="pre">P-10</span></code> (meaning P-wave arrival time minus 10
+seconds). If the value is a numerical value it is interpreted as an offset, in
+seconds, from the origin time.</p>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">endtime</span></code></p></td>
+<td><p>Datetime</p></td>
+<td><p>False</p></td>
+<td></td>
+<td><p>Specifies the desired end time for the synthetic trace(s). This may be specified
+as either:</p>
+<ul class="simple">
+<li><p>an absolute date and time</p></li>
+<li><p>a phase-relative offset</p></li>
+<li><p>an offset (duration) from start time in seconds</p></li>
+</ul>
+<p>If the value is recognized as a date and time, it is interpreted as an absolute time.
+If the value is in the form <code class="docutils literal notranslate"><span class="pre">phase[+-]offset</span></code> it is interpreted as a
+phase-relative time, for example <code class="docutils literal notranslate"><span class="pre">P-10</span></code> (meaning P-wave arrival time minus 10
+seconds). If the value is a numerical value it is interpreted as an offset, in
+seconds, from the start time.</p>
+</td>
+</tr>
+<tr class="row-odd"><td colspan="5"><p><strong>Receiver Parameters</strong></p></td>
+</tr>
+<tr class="row-even"><td colspan="5"><p>Directly specify coordinates and network/station codes …</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">receiverlatitude</span></code></p></td>
+<td><p>Float</p></td>
+<td><p>True</p></td>
+<td></td>
+<td><p>The geocentric latitude of the receiver.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">receiverlongitude</span></code></p></td>
+<td><p>Float</p></td>
+<td><p>True</p></td>
+<td></td>
+<td><p>The longitude of the receiver.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">receiverdepthinmeters</span></code></p></td>
+<td><p>Float</p></td>
+<td><p>False</p></td>
+<td><p>0.0</p></td>
+<td><p>The depth of the receiver in meter.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">networkcode</span></code></p></td>
+<td><p>String</p></td>
+<td><p>False</p></td>
+<td><p>XX</p></td>
+<td><p>Specify the network code of the final seismograms. Maximum of two letters.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">stationcode</span></code></p></td>
+<td><p>String</p></td>
+<td><p>False</p></td>
+<td><p>SYN</p></td>
+<td><p>Specify the station code of the final seismograms. Maximum of five letters.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">locationcode</span></code></p></td>
+<td><p>String</p></td>
+<td><p>False</p></td>
+<td><p>SE</p></td>
+<td><p>Specify the location code of the final seismograms. Maximum of two letters.</p></td>
+</tr>
+<tr class="row-odd"><td colspan="5"><p>… or use wildcard searches over network and station codes. Potentially returns multiple stations.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">network</span></code></p></td>
+<td><p>String</p></td>
+<td><p>False</p></td>
+<td></td>
+<td><p>Wildcarded network codes, e.g. <code class="docutils literal notranslate"><span class="pre">I*,B?,AU</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">station</span></code></p></td>
+<td><p>String</p></td>
+<td><p>False</p></td>
+<td></td>
+<td><p>Wildcarded station codes, e.g. <code class="docutils literal notranslate"><span class="pre">A*,ANMO</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td colspan="5"><p><strong>Source Parameters</strong></p></td>
+</tr>
+<tr class="row-odd"><td colspan="5"><p>The source can by set by specifying an event id if the server has been set-up for this …</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">event_id</span></code></p></td>
+<td><p>String</p></td>
+<td><p>False</p></td>
+<td></td>
+<td><p>The id of the event to use.</p></td>
+</tr>
+<tr class="row-odd"><td colspan="5"><p>… or by specify the source parameters in a variety of ways.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">sourcelatitude</span></code></p></td>
+<td><p>Float</p></td>
+<td><p>True</p></td>
+<td></td>
+<td><p>The geocentric latitude of the source.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">sourcelongitude</span></code></p></td>
+<td><p>Float</p></td>
+<td><p>True</p></td>
+<td></td>
+<td><p>The longitude of the source.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">sourcedepthinmeters</span></code></p></td>
+<td><p>Float</p></td>
+<td><p>False</p></td>
+<td><p>0.0</p></td>
+<td><p>The depth of the source in meter.</p></td>
+</tr>
+<tr class="row-odd"><td colspan="5"><p><strong>Source mechanism as a moment tensor</strong></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">sourcemomenttensor</span></code></p></td>
+<td><p>List</p></td>
+<td><p>False</p></td>
+<td></td>
+<td><p>Specify a source in moment tensor components as a list: <code class="docutils literal notranslate"><span class="pre">Mrr,Mtt,Mpp,Mrt,Mrp,Mtp</span></code>
+with values in Newton meters (Nm).</p>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">1.04e22,-0.039e22,-1e22,0.304e22,-1.52e22,-0.119e22</span></code></p>
+</td>
+</tr>
+<tr class="row-odd"><td colspan="5"><p><strong>Source mechanism as a double couple</strong></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">sourcedoublecouple</span></code></p></td>
+<td><p>List</p></td>
+<td><p>False</p></td>
+<td></td>
+<td><p>Specify a source as a double couple. The list of values are <code class="docutils literal notranslate"><span class="pre">strike,dip,rake[,M0]</span></code>,
+where strike, dip and rake are in degrees and M0 is the scalar seismic moment in
+Newton meters (Nm). If not specified, a value of <em>1e19</em> will be used as the scalar
+moment.</p>
+<p>example: <code class="docutils literal notranslate"><span class="pre">19,18,116,1e19</span></code></p>
+</td>
+</tr>
+<tr class="row-odd"><td colspan="5"><p><strong>Source mechanism as forces</strong></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">sourceforce</span></code></p></td>
+<td><p>List</p></td>
+<td><p>False</p></td>
+<td></td>
+<td><p>Specify a force source as a list of <code class="docutils literal notranslate"><span class="pre">Fr,Ft,Fp</span></code> in units of Newtons (N).</p>
+<p>example: <code class="docutils literal notranslate"><span class="pre">1e22,1e22,1e22</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</section>
+
+
+    </div>
+      
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2014-2020, Lion Krischer and Martin van Driel.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.2.3.<br/>
+    </p>
+  </div>
+</footer>
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-44800463-2', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+  </body>
+</html>

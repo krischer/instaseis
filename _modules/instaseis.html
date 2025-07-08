@@ -1,0 +1,241 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>instaseis &#8212; instaseis 1.4.3.dev32+g2b8208d documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/bootstrap-sphinx.css?v=49fa7461" />
+    <script src="../_static/documentation_options.js?v=16027ae4"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="../_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html">
+          Instaseis</a>
+        <span class="navbar-text navbar-version pull-left"><b>1.4.3.dev32+g2b8208d</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="http://axisem.info">AxiSEM</a></li>
+                <li><a href="http://obspy.org">ObsPy</a></li>
+                <li><a href="http://github.com/krischer/instaseis">GitHub</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../instaseis.html">Main Instaseis Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gui.html">Instaseis GUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source.html">Sources and Receivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../helpers.html">Utility Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../server.html">Instaseis Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_server_configuration.html">Advanced Server Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../database_repacking.html">Database Layout and Repacking</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-3">
+        <div id="sidebar" class="bs-sidenav" role="complementary">
+<form action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+        </div>
+      </div>
+    <div class="body col-md-9 content" role="main">
+      
+  <h1>Source code for instaseis</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">importlib.metadata</span><span class="w"> </span><span class="kn">import</span> <span class="n">version</span> <span class="k">as</span> <span class="n">_get_version</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+
+<span class="n">__version__</span> <span class="o">=</span> <span class="n">_get_version</span><span class="p">(</span><span class="s2">&quot;instaseis&quot;</span><span class="p">)</span>
+
+<span class="c1"># Optionally disable the numba cache for problematic systems.</span>
+<span class="n">_use_numba_cache</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+    <span class="s2">&quot;INSTASEIS_DISABLE_NUMBA_CACHE&quot;</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span>
+<span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span> <span class="s2">&quot;t&quot;</span><span class="p">,</span> <span class="s2">&quot;yes&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">]</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">InstaseisError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">InstaseisWarning</span><span class="p">(</span><span class="ne">UserWarning</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">InstaseisNotFoundError</span><span class="p">(</span><span class="n">InstaseisError</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ReceiverParseError</span><span class="p">(</span><span class="n">InstaseisError</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">SourceParseError</span><span class="p">(</span><span class="n">InstaseisError</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+
+<div class="viewcode-block" id="open_db">
+<a class="viewcode-back" href="../instaseis.html#instaseis.open_db">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">open_db</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Central function to open a local or remote Instaseis database. Any</span>
+<span class="sd">    keyword arguments are passed to the underlying</span>
+<span class="sd">    :class:`~instaseis.instaseis_db.InstaseisDB` or</span>
+<span class="sd">    :class:`~instaseis.remote_instaseis_db.RemoteInstaseisDB` classes.</span>
+
+<span class="sd">    :type path: str</span>
+<span class="sd">    :param path: Filepath or URL. Instaseis will determine if it is a local</span>
+<span class="sd">        file path or a HTTP URL and delegate to the corresponding class.</span>
+<span class="sd">    :returns: An initialized database object.</span>
+<span class="sd">    :rtype: :class:`~instaseis.instaseis_db.InstaseisDB` or</span>
+<span class="sd">        :class:`~instaseis.remote_instaseis_db.RemoteInstaseisDB`</span>
+
+<span class="sd">    If a directory is passed, it will return a local Instaseis database:</span>
+
+<span class="sd">    &gt;&gt;&gt; import instaseis</span>
+<span class="sd">    &gt;&gt;&gt; db = instaseis.open_db(&quot;/path/to/DB&quot;)  # doctest: +SKIP</span>
+<span class="sd">    &gt;&gt;&gt; print(db)  # doctest: +SKIP</span>
+<span class="sd">    InstaseisDB reciprocal Green&#39;s function Database (v7) generated ...</span>
+<span class="sd">        components           : vertical and horizontal</span>
+<span class="sd">        velocity model       : ak135f</span>
+<span class="sd">        ...</span>
+
+<span class="sd">    For an HTTP URL it will return a remote Instaseis database:</span>
+
+<span class="sd">    &gt;&gt;&gt; db = instaseis.open_db(&quot;http://webadress.com:8765&quot;)  # doctest: +SKIP</span>
+<span class="sd">    &gt;&gt;&gt; print(db)  # doctest: +SKIP</span>
+<span class="sd">    RemoteInstaseisDB reciprocal Green&#39;s function Database (v7) generated ...</span>
+<span class="sd">        components           : vertical and horizontal</span>
+<span class="sd">        velocity model       : ak135f</span>
+
+<span class="sd">    The special syntax ``syngine://MODEL_NAME`` will connect to the IRIS</span>
+<span class="sd">    syngine web service for the specified model.</span>
+
+<span class="sd">    &gt;&gt;&gt; db = instaseis.open_db(&quot;syngine://ak135f&quot;)  # doctest: +SKIP</span>
+<span class="sd">    &gt;&gt;&gt; print(db)  # doctest: +SKIP</span>
+<span class="sd">    SyngineInstaseisDB reciprocal Green&#39;s function Database (v7) ...</span>
+<span class="sd">    Syngine model name:      &#39;ak135f&#39;</span>
+<span class="sd">    Syngine service version:  0.0.2</span>
+<span class="sd">        components           : vertical and horizontal</span>
+<span class="sd">        velocity model       : ak135f</span>
+
+<span class="sd">    .. note::</span>
+
+<span class="sd">        If opening a local database and the ``ordered_output.nc4`` files are</span>
+<span class="sd">        located for example in ``/path/to/DB/PZ/Data`` and</span>
+<span class="sd">        ``/path/to/DB/PX/Data``, please pass ``/path/to/DB`` to the</span>
+<span class="sd">        :func:`~instaseis.open_db` function. Instaseis will recursively</span>
+<span class="sd">        search the child directories for the  necessary files and open them.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;syngine://&quot;</span><span class="p">):</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">&quot;syngine://&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">instaseis.database_interfaces</span><span class="w"> </span><span class="kn">import</span> <span class="n">syngine_instaseis_db</span>
+
+        <span class="k">return</span> <span class="n">syngine_instaseis_db</span><span class="o">.</span><span class="n">SyngineInstaseisDB</span><span class="p">(</span>
+            <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="s2">&quot;://&quot;</span> <span class="ow">in</span> <span class="n">path</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">.database_interfaces</span><span class="w"> </span><span class="kn">import</span> <span class="n">remote_instaseis_db</span>
+
+        <span class="k">return</span> <span class="n">remote_instaseis_db</span><span class="o">.</span><span class="n">RemoteInstaseisDB</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">.database_interfaces</span><span class="w"> </span><span class="kn">import</span> <span class="n">find_and_open_files</span>
+
+        <span class="k">return</span> <span class="n">find_and_open_files</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.source</span><span class="w"> </span><span class="kn">import</span> <span class="n">Source</span><span class="p">,</span> <span class="n">Receiver</span><span class="p">,</span> <span class="n">ForceSource</span><span class="p">,</span> <span class="n">FiniteSource</span>  <span class="c1"># NoQa</span>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2014-2020, Lion Krischer and Martin van Driel.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.2.3.<br/>
+    </p>
+  </div>
+</footer>
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-44800463-2', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+  </body>
+</html>
