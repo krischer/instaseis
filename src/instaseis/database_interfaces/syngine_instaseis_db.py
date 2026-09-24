@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Instaseis database class for remote access using the syngine service of IRIS.
+"""Instaseis database class for remote access using the syngine service of EarthScope.
 
 :copyright:
     Lion Krischer (lion.krischer@gmail.com), 2020-2025
@@ -43,12 +43,12 @@ HEADERS = {"User-Agent": USER_AGENT, "Accept-Encoding": "gzip,deflate"}
 
 
 class SyngineInstaseisDB(BaseInstaseisDB):
-    """Remote Instaseis interface connecting with IRIS' syngine service."""
+    """Remote Instaseis interface connecting with EarthScope's syngine service."""
 
     def __init__(
         self,
         model,
-        base_url="http://service.iris.edu/irisws/syngine/1",
+        base_url="https://service.earthscope.org/irisws/syngine/1",
         debug=False,
         *args,
         **kwargs,

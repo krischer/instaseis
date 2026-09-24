@@ -58,17 +58,17 @@ planets such as Mars.
            | http://dx.doi.org/10.5194/se-6-701-2015
 
 
-Syngine - Instaseis databases hosted by the IRIS DMC
+Syngine - Instaseis databases hosted by EarthScope Data Services
 ----------------------------------------------------
 
-Please note that the IRIS DMC hosts a large collection of Instaseis databases
+Please note that EarthScope Data Services hosts a large collection of Instaseis databases
 that also supports the dynamic extraction of seismograms. Thus no database must
 actually reside on your PC - Syngine will extract them for you and send the
 resulting seismograms over HTTP. Additionally Syngine can be used as a database
 backend from within Instaseis.
 
-* Syngine Product Page: http://ds.iris.edu/ds/products/syngine/
-* Syngine Documentation: http://service.iris.edu/irisws/syngine/1
+* Syngine Product Page: https://data.earthscope.org/app/products/portal/viewer.html?key=syngine
+* Syngine Documentation: https://service.earthscope.org/irisws/syngine/1
 
 .. admonition:: There is also a paper for this:
 
